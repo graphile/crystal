@@ -43,10 +43,12 @@ describe('graphql/getColumnType', () => {
 
   it('will correctly detect arrays')
 
-  describe('enum types', () => {
-    const getEnumType = config => getColumnType(
-      new TestColumn({ name: 'test_column', ...config }).setEnum(
-        new TestEnum({
+  describe('enums', () => {
+    const getEnum = config => getColumnType(
+      new TestColumn({
+        name: 'test_column',
+        ...config,
+        enum_: new TestEnum({
           name: 'test_enum',
           variants: [
             'red',
@@ -56,22 +58,22 @@ describe('graphql/getColumnType', () => {
             'tomato',
             'hello_world',
           ],
-        })
-      )
+        }),
+      })
     )
 
     it('will make a custom enum type', () => {
-      const enumType = getEnumType()
+      const enumType = getEnum()
       expect(enumType).toBeA(GraphQLEnumType)
     })
 
     it('will pascal case name', () => {
-      const enumType = getEnumType()
+      const enumType = getEnum()
       expect(enumType.name).toEqual('TestEnum')
     })
 
     it('will correctly format variants', () => {
-      const enumType = getEnumType()
+      const enumType = getEnum()
       expect(enumType.getValues()).toEqual([
         { name: 'RED', value: 'red' },
         { name: 'GREEN', value: 'green' },
@@ -83,7 +85,7 @@ describe('graphql/getColumnType', () => {
     })
 
     it('will detect not null enums', () => {
-      const enumType = getEnumType({ isNullable: false })
+      const enumType = getEnum({ isNullable: false })
       expect(enumType).toBeA(GraphQLNonNull)
       expect(enumType.ofType).toBeA(GraphQLEnumType)
       expect(enumType.ofType.name).toEqual('TestEnum')
