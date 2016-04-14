@@ -23,13 +23,13 @@
   ],
   "main": "index.js",
   "scripts": {
-    "lint": "scripty",
-    "build": "scripty",
-    "test": "scripty",
-    "test-watch": "scripty",
+    "lint": "scripts/lint.sh",
+    "build": "scripts/build.sh",
+    "test": "scripts/test.sh",
+    "test-watch": "scripts/test-watch.sh",
     "schema-up": "npm --prefix examples/forum run schema-up",
     "schema-down": "npm --prefix examples/forum run schema-down",
-    "start": "scripty"
+    "start": "scripts/start.sh"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
@@ -53,7 +53,6 @@
     "eslint": "^2.7.0",
     "eslint-config-calebmer": "^3.0.0",
     "expect": "calebmer/expect",
-    "mocha": "^2.4.5",
-    "scripty": "^1.1.0"
+    "mocha": "^2.4.5"
   }
 }
