@@ -1,6 +1,6 @@
 import './promisify'
 
-import createGraphqlSchemaFromPg from './createGraphqlSchemaFromPg.js'
+import createGraphqlSchema from './createGraphqlSchema.js'
 
-export default createGraphqlSchemaFromPg
-export { createGraphqlSchemaFromPg }
+export default createGraphqlSchema
+export { createGraphqlSchema }
