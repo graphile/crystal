@@ -2,7 +2,7 @@
 
 import { assign } from 'lodash'
 import pg from 'pg'
-import { Catalog, Schema, Table, Column, Enum } from '../src/postgres/getCatalog.js'
+import { Catalog, Schema, Table, Column, Enum } from 'src/postgres/getCatalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 

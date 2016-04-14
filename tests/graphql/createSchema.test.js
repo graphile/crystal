@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { GraphQLSchema, GraphQLObjectType } from 'graphql'
-import { TestSchema, TestTable } from '../helpers.js'
-import createSchema from '../../src/graphql/createSchema.js'
+import { TestSchema, TestTable } from 'tests/helpers.js'
+import createSchema from 'src/graphql/createSchema.js'
 
 describe('graphql/createSchema', () => {
   it('creates a schema', () => {

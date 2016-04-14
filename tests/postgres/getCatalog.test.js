@@ -1,6 +1,6 @@
 import expect from 'expect'
-import { getClient } from '../helpers.js'
-import getCatalog from '../../src/postgres/getCatalog.js'
+import { getClient } from 'tests/helpers.js'
+import getCatalog from 'src/postgres/getCatalog.js'
 
 describe('postgres/getCatalog', () => {
   // Because catalog is not mutated in these tests, we cache it.
