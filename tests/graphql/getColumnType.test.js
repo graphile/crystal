@@ -1,8 +1,7 @@
 import expect from 'expect'
 import { assign, noop } from 'lodash'
 import { GraphQLNonNull, GraphQLEnumType } from 'graphql'
-import { TestColumn } from '../helpers.js'
-import { Enum } from '../../src/postgres/getCatalog.js'
+import { TestColumn, TestEnum } from '../helpers.js'
 import getColumnType from '../../src/graphql/getColumnType.js'
 
 describe('graphql/getColumnType', () => {
@@ -45,23 +44,21 @@ describe('graphql/getColumnType', () => {
   it('will correctly detect arrays')
 
   describe('enum types', () => {
-    const getEnumType = config => {
-      const column = new TestColumn({ name: 'test_column', ...config })
-
-      column.getEnum = () => new Enum({
-        name: 'test_enum',
-        variants: [
-          'red',
-          'green',
-          'blue',
-          'purple',
-          'tomato',
-          'hello_world',
-        ],
-      })
-
-      return getColumnType(column)
-    }
+    const getEnumType = config => getColumnType(
+      new TestColumn({ name: 'test_column', ...config }).setEnum(
+        new TestEnum({
+          name: 'test_enum',
+          variants: [
+            'red',
+            'green',
+            'blue',
+            'purple',
+            'tomato',
+            'hello_world',
+          ],
+        })
+      )
+    )
 
     it('will make a custom enum type', () => {
       const enumType = getEnumType()

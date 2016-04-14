@@ -1,7 +1,7 @@
 import assert from 'assert'
 import expect from 'expect'
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
-import { TestTable, getClient, setupDatabase } from '../helpers.js'
+import { getClient, TestTable } from '../helpers.js'
 import getCatalog from '../../src/postgres/getCatalog.js'
 import createTableType from '../../src/graphql/createTableType.js'
 import createTableListField from '../../src/graphql/createTableListField.js'
@@ -139,23 +139,23 @@ describe('graphql/createTableListField', () => {
   })
 })
 
-before(setupDatabase(`
-drop schema if exists create_table_list_field cascade;
-
-create schema create_table_list_field;
-
-set search_path = 'create_table_list_field';
-
-create table camel_case_me (noop int);
-
-create table person (
-  id serial primary key,
-  name varchar not null
-);
-
-insert into person (id, name) values
-  (1, 'Jane'),
-  (2, 'Jim'),
-  (3, 'Bob'),
-  (4, 'Betsy');
-`))
+// before(setupDatabase(`
+// drop schema if exists create_table_list_field cascade;
+//
+// create schema create_table_list_field;
+//
+// set search_path = 'create_table_list_field';
+//
+// create table camel_case_me (noop int);
+//
+// create table person (
+//   id serial primary key,
+//   name varchar not null
+// );
+//
+// insert into person (id, name) values
+//   (1, 'Jane'),
+//   (2, 'Jim'),
+//   (3, 'Bob'),
+//   (4, 'Betsy');
+// `))

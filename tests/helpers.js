@@ -2,26 +2,19 @@
 
 import { assign } from 'lodash'
 import pg from 'pg'
-import getCatalog, { Catalog, Schema, Table, Column, Enum } from '../src/postgres/getCatalog.js'
+import { Catalog, Schema, Table, Column, Enum } from '../src/postgres/getCatalog.js'
 
-const TEST_DB = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
+export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 
-export const connectClient = () => pg.connectAsync(TEST_DB)
+// We acquire a single client here which we will use for all tests because we
+// don’t care about concurrency. Mocha runs tests sequentially.
+const client = pg.connectAsync(PG_CONFIG)
 
-// We cache the client here because we aren’t going to release our clients
-// back to the pool after every test.
-const _client = connectClient()
-
-export const getClient = () => _client
-export const getClientCatalog = () => getClient().then(getCatalog)
-
+// We release our acquired client here.
 after(() => pg.end())
 
-export const setupDatabase = query => async () => {
-  const client = await pg.connectAsync(TEST_DB)
-  await client.queryAsync(`begin;\n${query}\ncommit;`)
-  client.end()
-}
+// Nice convenience function for getting the client.
+export const getClient = () => client
 
 export class TestCatalog extends Catalog {}
 
@@ -44,8 +37,13 @@ export class TestTable extends Table {
 }
 
 export class TestColumn extends Column {
-  constructor ({ name = 'test', table = new TestTable(), ...config } = {}) {
+  constructor ({ name = 'test', table = new TestTable(), enum_, ...config } = {}) {
     super({ name, table, ...config })
+    this._enum = enum_
+  }
+
+  getEnum () {
+    return this._enum || super.getEnum()
   }
 }
 

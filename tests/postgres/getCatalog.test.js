@@ -1,16 +1,12 @@
 import expect from 'expect'
-import { connectClient, setupDatabase } from '../helpers.js'
+import { getClient } from '../helpers.js'
 import getCatalog from '../../src/postgres/getCatalog.js'
 
 describe('postgres/getCatalog', () => {
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 
-  before(async () => {
-    const client = await connectClient()
-    catalog = await getCatalog(client)
-    client.end()
-  })
+  before(async () => (catalog = await getCatalog(await getClient())))
 
   it('gets schemas', () => {
     expect(catalog.getSchema('a')).toExist()
@@ -111,7 +107,7 @@ describe('postgres/getCatalog', () => {
   })
 })
 
-before(setupDatabase(`
+before(() => getClient().then(client => client.queryAsync(`
 drop schema if exists a cascade;
 drop schema if exists b cascade;
 drop schema if exists c cascade;
@@ -168,4 +164,4 @@ create table a.types (
   "varchar" varchar,
   "enum" b.color
 );
-`))
+`)))

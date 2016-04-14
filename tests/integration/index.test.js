@@ -5,21 +5,17 @@ import { once } from 'lodash'
 import path from 'path'
 import { readFileSync, readdirSync } from 'fs'
 import { graphql } from 'graphql'
-import { connectClient, setupDatabase } from '../helpers.js'
-import getCatalog from '../../src/postgres/getCatalog.js'
-import createSchema from '../../src/graphql/createSchema.js'
+import { PG_CONFIG, getClient } from '../helpers.js'
+import createGraphqlSchema from '../../src/createGraphqlSchema.js'
 
 const TEST_FIXTURES = 'tests/integration/fixtures'
 
-before(setupDatabase(readFileSync('examples/forum/schema.sql', 'utf8')))
+before(() => getClient().then(client =>
+  client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
+))
 
 describe('integration', () => {
-  const getGraphqlSchema = once(async () => {
-    const client = await connectClient()
-    const catalog = await getCatalog(client)
-    const schema = catalog.getSchema('forum_example')
-    return createSchema(schema)
-  })
+  const getGraphqlSchema = once(() => createGraphqlSchema(PG_CONFIG, 'forum_example'))
 
   readdirSync(TEST_FIXTURES).forEach(fileName => {
     if (path.extname(fileName) === '.graphql') {
@@ -30,12 +26,13 @@ describe('integration', () => {
         const graphQLPath = path.resolve(TEST_FIXTURES, fileName)
         const jsonPath = path.resolve(TEST_FIXTURES, `${name}.json`)
         const expectedData = JSON.parse(readFileSync(jsonPath, 'utf8'))
+        const client = await getClient()
 
         const data = await graphql(
           graphqlSchema,
           readFileSync(graphQLPath),
           null,
-          { client: await connectClient() }
+          { client }
         )
 
         /* eslint-disable no-console */
