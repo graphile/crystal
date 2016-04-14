@@ -1,0 +1,13 @@
+{
+  "data": {
+    "person": {
+      "id": 12,
+      "givenName": "Kelly",
+      "familyName": "Reed"
+    },
+    "johnny": {
+      "personId": 2,
+      "givenName": "Johnny"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  person(id: 12) {
+    id
+    givenName
+    familyName
+  }
+  johnny: person(id: 2) {
+    personId: id
+    givenName
+  }
+}

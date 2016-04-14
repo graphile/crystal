@@ -1,0 +1,115 @@
+{
+  "data": {
+    "list1": {
+      "list": [
+        {
+          "givenName": "Kathryn",
+          "familyName": "Ramirez"
+        },
+        {
+          "givenName": "Johnny",
+          "familyName": "Tucker"
+        },
+        {
+          "givenName": "Nancy",
+          "familyName": "Diaz"
+        }
+      ]
+    },
+    "list2": {
+      "totalCount": 14,
+      "list": [
+        {
+          "id": 12
+        },
+        {
+          "id": 3
+        },
+        {
+          "id": 13
+        },
+        {
+          "id": 4
+        },
+        {
+          "id": 7
+        }
+      ]
+    },
+    "list3": {
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
+      "edges": [
+        {
+          "cursor": "V2VzdA==",
+          "node": {
+            "id": 5,
+            "givenName": "Ann",
+            "familyName": "West"
+          }
+        },
+        {
+          "cursor": "V2FyZA==",
+          "node": {
+            "id": 9,
+            "givenName": "Carl",
+            "familyName": "Ward"
+          }
+        },
+        {
+          "cursor": "VHVja2Vy",
+          "node": {
+            "id": 2,
+            "givenName": "Johnny",
+            "familyName": "Tucker"
+          }
+        }
+      ]
+    },
+    "list4": {
+      "pageInfo": {
+        "startCursor": "NQ==",
+        "endCursor": "MTA="
+      },
+      "list": [
+        {
+          "givenName": "Ann"
+        },
+        {
+          "givenName": "Joe"
+        },
+        {
+          "givenName": "Scott"
+        },
+        {
+          "givenName": "David"
+        },
+        {
+          "givenName": "Carl"
+        },
+        {
+          "givenName": "Jonathan"
+        }
+      ]
+    },
+    "list5": {
+      "pageInfo": {
+        "prev": true,
+        "next": false
+      },
+      "list": [
+        {
+          "familyName": "Diaz"
+        },
+        {
+          "familyName": "Tucker"
+        },
+        {
+          "familyName": "Ramirez"
+        }
+      ]
+    }
+  }
+}

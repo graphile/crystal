@@ -1,0 +1,59 @@
+{
+  "name": "postgraphql",
+  "version": "1.0.0",
+  "description": "A GraphQL server created from reflection over a PostgreSQL schema 🐘",
+  "author": "Caleb Meredith <calebmeredith8@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/calebmer/postgraphql#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calebmer/postgraphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/calebmer/postgraphql/issues"
+  },
+  "keywords": [
+    "graphql",
+    "postgres",
+    "schema",
+    "reflection",
+    "server",
+    "relay",
+    "connection"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint **/*.js",
+    "build": "babel src -d dist",
+    "test": "mocha tests/**/*.test.js -r babel-register",
+    "test:watch": "npm run test -- -w",
+    "bin": "babel-node src/main.js",
+    "schema-up": "cd examples/forum && npm run schema-up",
+    "schema-down": "cd examples/forum && npm run schema-down",
+    "start": "npm run schema-up && babel-watch src/main.js -w src -- postgres://localhost:5432 -s forum_example -d"
+  },
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "change-case": "^2.3.1",
+    "commander": "^2.9.0",
+    "debug": "^2.2.0",
+    "express": "^4.13.4",
+    "express-graphql": "^0.5.0",
+    "generic-pool": "^2.4.2",
+    "graphql": "^0.5.0",
+    "lodash": "^4.8.2",
+    "morgan": "^1.7.0",
+    "pg": "^4.5.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.6.5",
+    "babel-core": "^6.7.6",
+    "babel-preset-modern-node": "^1.2.0",
+    "babel-register": "^6.7.2",
+    "babel-watch": "^1.0.2",
+    "eslint": "^2.7.0",
+    "eslint-config-calebmer": "^3.0.0",
+    "expect": "calebmer/expect",
+    "mocha": "^2.4.5"
+  }
+}

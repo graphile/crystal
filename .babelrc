@@ -1,0 +1,9 @@
+{
+  "sourceMaps": "inline",
+  "presets": ["modern-node/4.0"],
+  "env": {
+    "production": {
+      "sourceMaps": false
+    }
+  }
+}
