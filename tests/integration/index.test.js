@@ -9,22 +9,26 @@ import { connectClient, setupDatabase } from '../helpers.js'
 import getCatalog from '../../src/postgres/getCatalog.js'
 import createSchema from '../../src/graphql/createSchema.js'
 
-before(setupDatabase(readFileSync('tests/integration/schema.sql', 'utf8')))
+const TEST_FIXTURES = 'tests/integration/fixtures'
+
+before(setupDatabase(readFileSync('examples/forum/schema.sql', 'utf8')))
 
 describe('integration', () => {
   const getGraphqlSchema = once(async () => {
     const client = await connectClient()
     const catalog = await getCatalog(client)
-    const schema = catalog.getSchema('postgraphql_integration_tests')
+    const schema = catalog.getSchema('forum_example')
     return createSchema(schema)
   })
 
-  readdirSync('tests/integration').forEach(name => {
-    if (path.extname(name) === '.graphql') {
+  readdirSync(TEST_FIXTURES).forEach(fileName => {
+    if (path.extname(fileName) === '.graphql') {
+      const name = path.basename(fileName, '.graphql')
+
       it(name, async () => {
         const graphqlSchema = await getGraphqlSchema()
-        const graphQLPath = path.resolve('tests/integration', name)
-        const jsonPath = path.resolve('tests/integration', `${path.basename(name, '.graphql')}.json`)
+        const graphQLPath = path.resolve(TEST_FIXTURES, fileName)
+        const jsonPath = path.resolve(TEST_FIXTURES, `${name}.json`)
         const expectedData = JSON.parse(readFileSync(jsonPath, 'utf8'))
 
         const data = await graphql(
