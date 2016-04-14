@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
 
+import './promisify'
+
 import path from 'path'
 import { readFileSync } from 'fs'
 import { Command } from 'commander'
 import { parse as parseConnectionString } from 'pg-connection-string'
-import { createGraphqlSchema } from './index'
-import { createServer } from './server'
+import createGraphqlSchemaFromPg from './createGraphqlSchemaFromPg.js'
+import createExpressServer from './createExpressServer.js'
 
 const manifest = readFileSync(path.resolve(__dirname, '../package.json'))
 
@@ -46,10 +48,10 @@ const main = async () => {
   }
 
   // Create the GraphQL schema.
-  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName)
+  const graphqlSchema = await createGraphqlSchemaFromPg(pgConfig, schemaName)
 
   // Create the GraphQL HTTP server.
-  const server = await createServer({
+  const server = await createExpressServer({
     graphqlSchema,
     route,
     development,

@@ -13,18 +13,6 @@ import {
   GraphQLEnumType,
 } from 'graphql'
 
-/**
- * Creates a field to be used with `GraphQLObjectType` from a column.
- *
- * @param {Column} column
- * @returns {GraphQLFieldConfig}
- */
-export const createColumnField = column => ({
-  description: column.description,
-  type: getGraphQLType(column),
-  resolve: source => source[column.name],
-})
-
 const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
@@ -36,7 +24,7 @@ const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new
  */
 export const createRequiredColumnArg = column => ({
   description: column.description,
-  type: coerceToNonNullType(getGraphQLType(column)),
+  type: coerceToNonNullType(getColumnGraphqlType(column)),
 })
 
 const extendScalarType = (parent, { name, description, serialize, parseValue, parseLiteral }) =>
@@ -181,7 +169,7 @@ const postgresToGraphQLTypes = new Map([
  * @param {Column} column
  * @returns {GraphQLType}
  */
-export const getGraphQLType = column => {
+const getColumnGraphqlType = column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
   const internalType = postgresToGraphQLTypes.get(column.type)
 
@@ -189,15 +177,15 @@ export const getGraphQLType = column => {
   if (internalType)
     return wrapType(internalType)
 
-  const enumType = column.getEnumType()
+  const enum_ = column.getEnum()
 
   // If the column has an enum type, we need to create a `GraphQLEnumType`.
-  if (enumType) {
+  if (enum_) {
     return wrapType(new GraphQLEnumType({
-      name: pascalCase(enumType.name),
-      description: enumType.description,
+      name: pascalCase(enum_.name),
+      description: enum_.description,
       values: fromPairs(
-        enumType.variants
+        enum_.variants
         .map(variant => [constantCase(variant), { value: variant }])
       ),
     }))
@@ -206,3 +194,5 @@ export const getGraphQLType = column => {
   // Otherwise, just return `GraphQLString`.
   return wrapType(GraphQLString)
 }
+
+export default getColumnGraphqlType

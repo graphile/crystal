@@ -12,7 +12,7 @@ import { createGraphQLMiddleware } from 'express-graphql'
  * @param {boolean} config.development
  * @returns {Server}
  */
-export const createServer = async ({ graphqlSchema, route, development }) => {
+const createServer = async ({ graphqlSchema, route, development }) => {
   const server = new Express()
 
   server.use(logger(development ? 'dev' : 'common'))
@@ -28,6 +28,8 @@ export const createServer = async ({ graphqlSchema, route, development }) => {
   // future ;)
   return server
 }
+
+export default createServer
 
 const developmentFormatError = error => ({
   message: error.message,

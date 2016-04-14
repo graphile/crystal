@@ -1,10 +1,15 @@
 import { memoize, fromPairs } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import { camelCase, pascalCase } from 'change-case'
-import { createColumnField } from '../column'
+import getColumnType from './getColumnType.js'
 
 /**
  * Creates the `GraphQLObjectType` for a table.
+ *
+ * This function is memoized because it will be called often for the same
+ * table. Think that both the single and list fields need an instance of the
+ * table type. Instead of passing the table type around as a parameter, it is
+ * more functional to just memoize this function.
  *
  * @param {Client} client
  * @param {Table} table
@@ -36,3 +41,15 @@ const createTableType = memoize(table => {
 })
 
 export default createTableType
+
+/**
+ * Creates a field to be used with `GraphQLObjectType` from a column.
+ *
+ * @param {Column} column
+ * @returns {GraphQLFieldConfig}
+ */
+const createColumnField = column => ({
+  description: column.description,
+  type: getColumnType(column),
+  resolve: source => source[column.name],
+})

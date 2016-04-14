@@ -5,18 +5,18 @@ import { once } from 'lodash'
 import path from 'path'
 import { readFileSync, readdirSync } from 'fs'
 import { graphql } from 'graphql'
-import { connectClient, setupDatabase } from './helpers'
-import { getCatalog } from '../src/postgres/catalog'
-import { createGraphqlSchema } from '../src/graphql/index'
+import { connectClient, setupDatabase } from '../helpers.js'
+import getCatalog from '../../src/postgres/getCatalog.js'
+import createSchema from '../../src/graphql/createSchema.js'
 
 before(setupDatabase(readFileSync('tests/integration/schema.sql', 'utf8')))
 
-describe('integration tests', () => {
+describe('integration', () => {
   const getGraphqlSchema = once(async () => {
     const client = await connectClient()
     const catalog = await getCatalog(client)
     const schema = catalog.getSchema('postgraphql_integration_tests')
-    return createGraphqlSchema(schema)
+    return createSchema(schema)
   })
 
   readdirSync('tests/integration').forEach(name => {

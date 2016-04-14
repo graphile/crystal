@@ -25,7 +25,7 @@
   "scripts": {
     "lint": "eslint **/*.js",
     "build": "babel src -d dist",
-    "test": "mocha tests/**/*.test.js -r babel-register",
+    "test": "mocha tests/**/*.test.js -r babel-register -r ./src/promisify.js",
     "test:watch": "npm run test -- -w",
     "bin": "babel-node src/main.js",
     "schema-up": "cd examples/forum && npm run schema-up",

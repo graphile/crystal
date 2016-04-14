@@ -1,21 +1,11 @@
 import expect from 'expect'
 import { assign, noop } from 'lodash'
 import { GraphQLNonNull, GraphQLEnumType } from 'graphql'
-import { Column, Enum } from '../src/postgres/catalog'
-import { getGraphQLType } from '../src/graphql/column'
+import { TestColumn } from '../helpers.js'
+import { Enum } from '../../src/postgres/getCatalog.js'
+import getColumnType from '../../src/graphql/getColumnType.js'
 
-class TestColumn extends Column {
-  constructor ({ _enum, ...config }) {
-    super(config)
-    this._enum = _enum
-  }
-
-  getEnumType () {
-    return this._enum
-  }
-}
-
-describe('getGraphQLType', () => {
+describe('graphql/getColumnType', () => {
   it('will get the correct GraphQL types', () => {
     ([
       [20, 'BigInt'],
@@ -38,15 +28,15 @@ describe('getGraphQLType', () => {
       [2950, 'UUID'],
     ])
     .forEach(([type, name]) => {
-      expect(getGraphQLType(new TestColumn({ type })).name).toEqual(name)
+      expect(getColumnType(new TestColumn({ type })).name).toEqual(name)
     })
   })
 
   it('correctly formats non null types', () => {
     const columnNotNull = new TestColumn({ type: 23, isNullable: false })
     const columnNull = new TestColumn({ type: 23, isNullable: true })
-    const typeNotNull = getGraphQLType(columnNotNull)
-    const typeNull = getGraphQLType(columnNull)
+    const typeNotNull = getColumnType(columnNotNull)
+    const typeNull = getColumnType(columnNull)
     expect(typeNotNull).toBeA(GraphQLNonNull)
     expect(typeNotNull.ofType.name).toEqual('Int')
     expect(typeNull.name).toEqual('Int')
@@ -55,23 +45,23 @@ describe('getGraphQLType', () => {
   it('will correctly detect arrays')
 
   describe('enum types', () => {
-    const getEnumType = config => getGraphQLType(
-      new TestColumn({
-        name: 'test_column',
-        ...config,
-        _enum: new Enum({
-          name: 'test_enum',
-          variants: [
-            'red',
-            'green',
-            'blue',
-            'purple',
-            'tomato',
-            'hello_world',
-          ],
-        }),
+    const getEnumType = config => {
+      const column = new TestColumn({ name: 'test_column', ...config })
+
+      column.getEnum = () => new Enum({
+        name: 'test_enum',
+        variants: [
+          'red',
+          'green',
+          'blue',
+          'purple',
+          'tomato',
+          'hello_world',
+        ],
       })
-    )
+
+      return getColumnType(column)
+    }
 
     it('will make a custom enum type', () => {
       const enumType = getEnumType()

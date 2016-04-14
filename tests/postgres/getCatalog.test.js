@@ -1,8 +1,8 @@
 import expect from 'expect'
-import { connectClient, setupDatabase } from './helpers'
-import { getCatalog } from '../src/postgres/catalog'
+import { connectClient, setupDatabase } from '../helpers.js'
+import getCatalog from '../../src/postgres/getCatalog.js'
 
-describe('getCatalog', () => {
+describe('postgres/getCatalog', () => {
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 
@@ -104,7 +104,7 @@ describe('getCatalog', () => {
   })
 
   it('will let a column get its enum type', () => {
-    expect(catalog.getColumn('a', 'types', 'enum').getEnumType()).toInclude({
+    expect(catalog.getColumn('a', 'types', 'enum').getEnum()).toInclude({
       name: 'color',
       variants: ['red', 'green', 'blue'],
     })

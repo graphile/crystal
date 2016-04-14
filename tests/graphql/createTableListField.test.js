@@ -1,12 +1,12 @@
 import assert from 'assert'
 import expect from 'expect'
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
-import { TestTable, getClient, setupDatabase } from './helpers'
-import { getCatalog } from '../src/postgres/catalog'
-import createTableType from '../src/graphql/table/createTableType'
-import { createTableListField } from '../src/graphql/table/list'
+import { TestTable, getClient, setupDatabase } from '../helpers.js'
+import getCatalog from '../../src/postgres/getCatalog.js'
+import createTableType from '../../src/graphql/createTableType.js'
+import createTableListField from '../../src/graphql/createTableListField.js'
 
-describe('createTableListField', () => {
+describe('graphql/createTableListField', () => {
   const testCreateTableListField = async tableName => {
     const client = await getClient()
     const catalog = await getCatalog(client)

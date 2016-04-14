@@ -51,16 +51,6 @@ export class Catalog {
   }
 
   /**
-   * Gets an enum by its type oid.
-   *
-   * @param {number} enumOid
-   * @returns {?Enum}
-   */
-  getEnumType (enumOid) {
-    return this.getAllEnums().find(({ _oid }) => _oid === enumOid)
-  }
-
-  /**
    * Gets the column of a table in a schema.
    *
    * @param {string} schemaName
@@ -208,8 +198,8 @@ export class Column {
    *
    * @returns {?Enum}
    */
-  getEnumType () {
-    return this.table.schema.catalog.getEnumType(this.type)
+  getEnum () {
+    return this.table.schema.catalog.getAllEnums().find(({ _oid }) => _oid === this.type)
   }
 }
 
@@ -331,13 +321,15 @@ const getRawEnums = memoize(client =>
  * @param {Client} client
  * @returns {Catalog}
  */
-export const getCatalog = async client =>
+const getCatalog = async client =>
   Promise
   .resolve(new Catalog())
   .then(catalog =>
     getSchemas(client, catalog)
     .then(schemas => assign(catalog, { schemas }))
   )
+
+export default getCatalog
 
 const getSchemas = (client, catalog) =>
   // Get the raw schemas.

@@ -1,12 +1,8 @@
 /* eslint-disable no-process-env */
 
-// The `../src/postgres/index.js` promisifies `pg` so we need to import it for
-// the side effect.
-import '../src/postgres'
-
 import { assign } from 'lodash'
 import pg from 'pg'
-import { Catalog, Schema, Table, Column, Enum, getCatalog } from '../src/postgres/catalog.js'
+import getCatalog, { Catalog, Schema, Table, Column, Enum } from '../src/postgres/getCatalog.js'
 
 const TEST_DB = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 

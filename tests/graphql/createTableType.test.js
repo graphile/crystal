@@ -1,9 +1,9 @@
 import expect from 'expect'
 import { GraphQLObjectType } from 'graphql'
-import { TestTable, TestColumn } from './helpers'
-import createTableType from '../src/graphql/table/createTableType'
+import { TestTable, TestColumn } from '../helpers.js'
+import createTableType from '../../src/graphql/createTableType.js'
 
-describe('createTableType', () => {
+describe('graphql/createTableType', () => {
   it('creates a table object type', () => {
     const type = createTableType(new TestTable())
     expect(type).toBeA(GraphQLObjectType)

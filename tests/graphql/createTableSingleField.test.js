@@ -1,10 +1,10 @@
 import expect from 'expect'
 import { keys } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
-import { TestTable, TestColumn } from './helpers'
-import { createTableSingleField } from '../src/graphql/table/single'
+import { TestTable, TestColumn } from '../helpers.js'
+import createTableSingleField from '../../src/graphql/createTableSingleField.js'
 
-describe('createTableSingleField', () => {
+describe('graphql/createTableSingleField', () => {
   it('is an object type', async () => {
     const person = createTableSingleField(new TestTable({ name: 'person' }))
     expect(person.type).toBeA(GraphQLObjectType)

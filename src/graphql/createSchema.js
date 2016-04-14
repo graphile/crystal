@@ -1,6 +1,8 @@
 import { ary, assign } from 'lodash'
+import { camelCase } from 'change-case'
 import { GraphQLSchema, GraphQLObjectType } from 'graphql'
-import { createTableFields } from './table'
+import createTableSingleField from './createTableSingleField.js'
+import createTableListField from './createTableListField.js'
 
 /**
  * Creates a GraphQLSchema from a PostgreSQL schema.
@@ -8,10 +10,12 @@ import { createTableFields } from './table'
  * @param {Schema} schema
  * @returns {GrpahQLSchema}
  */
-export const createGraphqlSchema = schema =>
+const createGraphqlSchema = schema =>
   new GraphQLSchema({
     query: createQuery(schema),
   })
+
+export default createGraphqlSchema
 
 const createQuery = schema =>
   new GraphQLObjectType({
@@ -22,3 +26,8 @@ const createQuery = schema =>
       .map(table => createTableFields(table))
       .reduce(ary(assign, 2), {}),
   })
+
+const createTableFields = table => ({
+  [camelCase(table.name)]: createTableSingleField(table),
+  [camelCase(`${table.name}_list`)]: createTableListField(table),
+})

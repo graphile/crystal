@@ -1,7 +1,8 @@
 import { fromPairs } from 'lodash'
 import { camelCase, pascalCase } from 'change-case'
-import { createRequiredColumnArg } from '../column'
-import createTableType from './createTableType'
+import { GraphQLNonNull } from 'graphql'
+import createTableType from './createTableType.js'
+import getColumnType from './getColumnType.js'
 
 /**
  * Creates an object field for selecting a single row of a table.
@@ -9,7 +10,7 @@ import createTableType from './createTableType'
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-export const createTableSingleField = table => {
+const createTableSingleField = table => {
   // Cache the primary key columns. Order matters so by putting it here we get
   // the bonus that it is the one source of ordering truth.
   const primaryKeyColumns = table.getPrimaryKeyColumns()
@@ -54,3 +55,12 @@ export const createTableSingleField = table => {
       .then(({ rows: [row] }) => row),
   }
 }
+
+export default createTableSingleField
+
+const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
+
+export const createRequiredColumnArg = column => ({
+  description: column.description,
+  type: coerceToNonNullType(getColumnType(column)),
+})
