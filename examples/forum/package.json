@@ -6,7 +6,7 @@
   "scripts": {
     "schema-up": "psql -f schema.sql",
     "schema-down": "psql -c 'drop schema forum_example cascade'",
-    "start": "npm run schema-up && $(npm bin)/postgraphql postgres://localhost:5432 -s forum_example -d"
+    "start": "npm run schema-up && postgraphql postgres://localhost:5432 -s forum_example -d"
   },
   "dependencies": {
     "postgraphql": "../.."
