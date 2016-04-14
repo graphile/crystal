@@ -1,3 +1,3 @@
 #!/bin/bash
 
-eslint **/*.js **/*.test.js
+eslint src tests
