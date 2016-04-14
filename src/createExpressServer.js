@@ -1,5 +1,7 @@
+import path from 'path'
 import Express from 'express'
 import logger from 'morgan'
+import favicon from 'serve-favicon'
 import { formatError } from 'graphql'
 import graphql from 'express-graphql'
 
@@ -16,6 +18,7 @@ const createServer = async ({ graphqlSchema, route, development }) => {
   const server = new Express()
 
   server.use(logger(development ? 'dev' : 'common'))
+  server.use(favicon(path.join(__dirname, '../public/favicon.ico')))
 
   server.use(route || '/', graphql({
     schema: graphqlSchema,

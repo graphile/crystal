@@ -43,7 +43,8 @@
     "graphql": "^0.5.0",
     "lodash": "^4.8.2",
     "morgan": "^1.7.0",
-    "pg": "^4.5.2"
+    "pg": "^4.5.2",
+    "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
