@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "bluebird": "^3.3.4",
-    "change-case": "^2.3.1",
     "commander": "^2.9.0",
     "debug": "^2.2.0",
     "express": "^4.13.4",

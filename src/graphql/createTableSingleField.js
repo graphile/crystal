@@ -1,5 +1,4 @@
-import { fromPairs } from 'lodash'
-import { camelCase, pascalCase } from 'change-case'
+import { fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
 import createTableType from './createTableType.js'
 import getColumnType from './getColumnType.js'
@@ -28,7 +27,7 @@ const createTableSingleField = table => {
   }
 
   return {
-    description: `Queries a single \`${pascalCase(table.name)}\` with all of its primary keys.`,
+    description: `Queries a single \`${upperFirst(camelCase(table.name))}\` with all of its primary keys.`,
 
     // Get arguments for this single row data fetcher. Uses only primary key
     // columns. All arguments are required as we want to be 100% certain we are

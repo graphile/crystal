@@ -1,6 +1,5 @@
-import { memoize, fromPairs } from 'lodash'
+import { memoize, fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
-import { camelCase, pascalCase } from 'change-case'
 import getColumnType from './getColumnType.js'
 
 /**
@@ -29,7 +28,7 @@ const createTableType = memoize(table => {
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
     // name and the description is the associated comment in PostgreSQL.
-    name: pascalCase(table.name),
+    name: upperFirst(camelCase(table.name)),
     description: table.description,
 
     // Make sure all of our columns have a corresponding field.

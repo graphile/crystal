@@ -1,5 +1,4 @@
-import { fromPairs, once } from 'lodash'
-import { pascalCase, constantCase } from 'change-case'
+import { fromPairs, once, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
 import createTableType from './createTableType.js'
 
 import {
@@ -13,6 +12,7 @@ import {
   GraphQLBoolean,
 } from 'graphql'
 
+const pascalCase = string => upperFirst(camelCase(string))
 
 /**
  * Gets the Relay connection specification compliant list field for a `Table`.
@@ -231,7 +231,7 @@ const createTableOrderingEnum = table =>
 
     values: fromPairs(
       table.columns
-      .map(({ name }) => [constantCase(name), { value: name }])
+      .map(({ name }) => [toUpper(snakeCase(name)), { value: name }])
     ),
   })
 

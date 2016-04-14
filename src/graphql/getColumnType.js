@@ -1,5 +1,10 @@
-import { fromPairs } from 'lodash'
-import { pascalCase, constantCase } from 'change-case'
+import {
+  fromPairs,
+  camelCase,
+  snakeCase,
+  upperFirst,
+  toUpper,
+} from 'lodash'
 
 import {
   GraphQLBoolean,
@@ -182,11 +187,11 @@ const getColumnGraphqlType = column => {
   // If the column has an enum type, we need to create a `GraphQLEnumType`.
   if (enum_) {
     return wrapType(new GraphQLEnumType({
-      name: pascalCase(enum_.name),
+      name: upperFirst(camelCase(enum_.name)),
       description: enum_.description,
       values: fromPairs(
         enum_.variants
-        .map(variant => [constantCase(variant), { value: variant }])
+        .map(variant => [toUpper(snakeCase(variant)), { value: variant }])
       ),
     }))
   }
