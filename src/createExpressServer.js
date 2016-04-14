@@ -1,7 +1,7 @@
 import Express from 'express'
 import logger from 'morgan'
 import { formatError } from 'graphql'
-import { createGraphQLMiddleware } from 'express-graphql'
+import graphql from 'express-graphql'
 
 /**
  * Creates an HTTP server with the provided configuration.
@@ -17,7 +17,7 @@ const createServer = async ({ graphqlSchema, route, development }) => {
 
   server.use(logger(development ? 'dev' : 'common'))
 
-  server.use(route || '/', createGraphQLMiddleware({
+  server.use(route || '/', graphql({
     schema: graphqlSchema,
     pretty: development,
     graphiql: development,

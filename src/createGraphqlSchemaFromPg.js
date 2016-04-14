@@ -1,4 +1,4 @@
-import { connectAsync } from 'pg'
+import pg from 'pg'
 import getCatalog from './postgres/getCatalog.js'
 import createSchema from './graphql/createSchema.js'
 
@@ -12,7 +12,7 @@ import createSchema from './graphql/createSchema.js'
  */
 const createGraphqlSchema = async (pgConfig, schemaName) => {
   // Connect a client from the pool…
-  const client = await connectAsync(pgConfig)
+  const client = await pg.connectAsync(pgConfig)
 
   const pgCatalog = await getCatalog(client)
   const pgSchema = pgCatalog.getSchema(schemaName)
