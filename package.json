@@ -23,7 +23,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "lint": "eslint **/*.js",
+    "lint": "eslint **/*.js **/*.test.js",
     "build": "babel src -d dist",
     "test": "mocha tests/**/*.test.js -r babel-register -r ./src/promisify.js",
     "test:watch": "npm run test -- -w",
