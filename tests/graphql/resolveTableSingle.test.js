@@ -3,11 +3,11 @@
 import expect, { createSpy } from 'expect'
 import { noop } from 'lodash'
 import { TestSchema, TestTable, TestColumn } from '../helpers.js'
-import resolveTableSingleField from '#/graphql/resolveTableSingleField.js'
+import resolveTableSingle from '#/graphql/resolveTableSingle.js'
 
-describe('graphql/resolveTableSingleField', () => {
+describe('graphql/resolveTableSingle', () => {
   it('is null when nothing is returned', async () => {
-    const resolve = resolveTableSingleField(new TestTable({ name: 'lol' }))
+    const resolve = resolveTableSingle(new TestTable({ name: 'lol' }))
 
     const client = {
       queryAsync: createSpy().andReturn({
@@ -25,7 +25,7 @@ describe('graphql/resolveTableSingleField', () => {
   })
 
   it('returns the value when one is returned', async () => {
-    const resolve = resolveTableSingleField(new TestTable({
+    const resolve = resolveTableSingle(new TestTable({
       name: 'unicorn',
       schema: new TestSchema({ name: 'pony' }),
     }))
@@ -53,7 +53,7 @@ describe('graphql/resolveTableSingleField', () => {
   })
 
   it('will add a condition for primary key', async () => {
-    const resolve = resolveTableSingleField(
+    const resolve = resolveTableSingle(
       new TestTable({
         name: 'person',
         columns: [
@@ -100,7 +100,7 @@ describe('graphql/resolveTableSingleField', () => {
   })
 
   it('will add multiple conditions for compound primary keys', async () => {
-    const resolve = resolveTableSingleField(
+    const resolve = resolveTableSingle(
       new TestTable({
         name: 'compound_key',
         columns: [

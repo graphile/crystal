@@ -55,17 +55,4 @@ describe('graphql/createTableSingleField', () => {
     )
     expect(person.args.id.description).toEqual('The person’s id')
   })
-
-  it.skip('will resolve to a single row', async () => {
-    /* eslint-disable camelcase */
-    const person = await createTableSingleField('person')
-    const compoundKey = await createTableSingleField('compound_key')
-    expect(await person.resolve({}, { id: 1 })).toInclude({ id: 1, name: 'Jim' })
-    expect(await person.resolve({}, { id: 4 })).toInclude({ id: 4, name: 'Betsy' })
-    expect(await compoundKey.resolve({}, { personId1: 1, personId2: 2, personId3: 3 }))
-    .toInclude({ person_id_1: 1, person_id_2: 2, person_id_3: 3, extra: 'bar' })
-    expect(await compoundKey.resolve({}, { personId1: 2, personId2: 1, personId3: 3 }))
-    .toInclude({ person_id_1: 2, person_id_2: 1, person_id_3: 3, extra: 'foo' })
-    /* eslint-enable camelcase */
-  })
 })

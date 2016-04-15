@@ -2,7 +2,7 @@ import { fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
 import createTableType from './createTableType.js'
 import getColumnType from './getColumnType.js'
-import resolveTableSingleField from './resolveTableSingleField.js'
+import resolveTableSingle from './resolveTableSingle.js'
 
 /**
  * Creates an object field for selecting a single row of a table.
@@ -22,7 +22,7 @@ const createTableSingleField = table => ({
     .map(column => [camelCase(column.name), createRequiredColumnArg(column)])
   ),
 
-  resolve: resolveTableSingleField(table),
+  resolve: resolveTableSingle(table),
 })
 
 export default createTableSingleField

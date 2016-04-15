@@ -1,6 +1,6 @@
 import { fromPairs, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
 import createTableType from './createTableType.js'
-import resolveTableListField from './resolveTableListField.js'
+import resolveTableList from './resolveTableList.js'
 
 import {
   Kind,
@@ -72,7 +72,7 @@ const createTableListField = table => ({
   // expensive queries on fields we don’t actually need.
   type: createTableConnectionType(table),
 
-  resolve: resolveTableListField(table),
+  resolve: resolveTableList(table),
 })
 
 export default createTableListField
