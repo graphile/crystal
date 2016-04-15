@@ -43,4 +43,12 @@
       familyName
     }
   }
+  list6: personList {
+    edges {
+      cursor
+      node {
+        givenName
+      }
+    }
+  }
 }
