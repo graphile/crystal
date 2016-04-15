@@ -1,6 +1,6 @@
 import expect from 'expect'
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
-import { TestTable } from '../helpers.js'
+import { TestTable } from '../../helpers.js'
 import createTableListField from '#/graphql/list/createTableListField.js'
 
 describe('createTableListField', () => {

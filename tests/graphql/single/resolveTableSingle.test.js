@@ -2,7 +2,7 @@
 
 import expect, { createSpy } from 'expect'
 import { noop } from 'lodash'
-import { TestSchema, TestTable, TestColumn } from '../helpers.js'
+import { TestSchema, TestTable, TestColumn } from '../../helpers.js'
 import resolveTableSingle from '#/graphql/single/resolveTableSingle.js'
 
 describe('resolveTableSingle', () => {

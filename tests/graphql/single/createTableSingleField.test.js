@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { keys } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
-import { TestTable, TestColumn } from '../helpers.js'
+import { TestTable, TestColumn } from '../../helpers.js'
 import createTableSingleField from '#/graphql/single/createTableSingleField.js'
 
 describe('createTableSingleField', () => {
