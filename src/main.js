@@ -53,6 +53,7 @@ const main = async () => {
   // Create the GraphQL HTTP server.
   const server = await createExpressServer({
     graphqlSchema,
+    pgConfig,
     route,
     development,
   })
