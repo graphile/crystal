@@ -38,7 +38,7 @@ create table if not exists post (
 comment on table post is 'A forum post written by a user.';
 comment on column post.id is 'The primary key for the post.';
 comment on column post.headline is 'The title written by the user.';
-comment on column post.author_id is 'The idea of the author user.';
+comment on column post.author_id is 'The id of the author user.';
 comment on column post.body is 'The main body text of our post.';
 
 -------------------------------------------------------------------------------
