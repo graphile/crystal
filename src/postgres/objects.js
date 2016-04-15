@@ -184,8 +184,8 @@ export class Table {
  * @member {boolean} isPrimaryKey
  */
 export class Column {
-  constructor ({ _oid, table, name, description, type, isNullable = true, isPrimaryKey }) {
-    this._oid = _oid
+  constructor ({ _num, table, name, description, type, isNullable = true, isPrimaryKey }) {
+    this._num = _num
     this.table = table
     this.name = name
     this.description = description

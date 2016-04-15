@@ -49,7 +49,7 @@ const getRawTables = memoize(client =>
 const getRawColumns = memoize(client =>
   client.queryAsync(`
     select
-      a.oid as "_oid",
+      a.attnum as "_num",
       n.nspname as "schemaName",
       c.relname as "tableName",
       a.attname as "name",
@@ -166,9 +166,9 @@ const getColumns = (client, table) =>
     table.schema.name === schemaName &&
     table.name === tableName
   )
-  .map(({ _oid, name, description, type, isNullable, isPrimaryKey }) =>
+  .map(({ _num, name, description, type, isNullable, isPrimaryKey }) =>
     new Column({
-      _oid,
+      _num,
       table,
       name,
       description,
