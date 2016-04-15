@@ -1,5 +1,5 @@
 import { fromPairs, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
-import createTableType from './createTableType.js'
+import createTableType from '../createTableType.js'
 import resolveTableList from './resolveTableList.js'
 
 import {

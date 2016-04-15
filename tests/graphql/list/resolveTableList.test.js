@@ -1,7 +1,7 @@
 import expect, { createSpy } from 'expect'
 import { noop } from 'lodash'
 import { TestTable } from '../helpers.js'
-import resolveTableList from '#/graphql/resolveTableList.js'
+import resolveTableList from '#/graphql/list/resolveTableList.js'
 
 // More in depth testing is done in integration tests.
 describe('graphql/resolveTableListField', () => {

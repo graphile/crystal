@@ -1,7 +1,7 @@
 import { fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
-import createTableType from './createTableType.js'
-import getColumnType from './getColumnType.js'
+import createTableType from '../createTableType.js'
+import getColumnType from '../getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
 
 /**

@@ -1,0 +1,4 @@
+{
+  "presets": ["modern-node/4.0"],
+  "plugins": [["module-alias", [{ "src": "./src", "expose": "#" }]]]
+}

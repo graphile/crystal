@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql'
 import { TestTable } from '../helpers.js'
-import createTableListField from '#/graphql/createTableListField.js'
+import createTableListField from '#/graphql/list/createTableListField.js'
 
 describe('graphql/createTableListField', () => {
   it('has an object type', async () => {

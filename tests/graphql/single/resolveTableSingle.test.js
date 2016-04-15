@@ -3,7 +3,7 @@
 import expect, { createSpy } from 'expect'
 import { noop } from 'lodash'
 import { TestSchema, TestTable, TestColumn } from '../helpers.js'
-import resolveTableSingle from '#/graphql/resolveTableSingle.js'
+import resolveTableSingle from '#/graphql/single/resolveTableSingle.js'
 
 describe('graphql/resolveTableSingle', () => {
   it('is null when nothing is returned', async () => {

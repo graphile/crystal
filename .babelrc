@@ -1,10 +1,3 @@
 {
-  "sourceMaps": "inline",
-  "presets": ["modern-node/4.0"],
-  "plugins": [["module-alias", [{ "src": "./src", "expose": "#" }]]],
-  "env": {
-    "production": {
-      "sourceMaps": false
-    }
-  }
+  "presets": ["modern-node/4.0"]
 }

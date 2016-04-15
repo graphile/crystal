@@ -1,6 +1,3 @@
 {
-  "extends": "calebmer",
-  "rules": {
-    "import/no-unresolved": 0
-  }
+  "extends": "calebmer"
 }
