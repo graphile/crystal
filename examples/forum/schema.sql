@@ -89,5 +89,6 @@ insert into post (id, author_id, headline, body) values
 
 grant select on person, post to public;
 
--- Commit all the changes from this transaction.
+-- Commit all the changes from this transaction. If any statement failed,
+-- these statements will not have succeeded.
 commit;
