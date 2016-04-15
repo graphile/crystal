@@ -30,8 +30,8 @@ comment on column person.about is 'A short description about the user, written b
 
 create table if not exists post (
   id               serial not null primary key,
-  headline         text not null,
   author_id        int not null references person(id),
+  headline         text not null,
   body             text
 );
 
@@ -64,6 +64,25 @@ insert into person (id, given_name, family_name, about) values
       given_name = excluded.given_name,
       family_name = excluded.family_name,
       about = excluded.about;
+
+insert into post (id, author_id, headline, body) values
+  (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null),
+  (2, 1, 'I hate yogurt. It’s just stuff with bits in.', null),
+  (3, 1, 'Is that a cooking show?', null),
+  (4, 1, 'You hit me with a cricket bat.', null),
+  (5, 5, 'Please, Don-Bot… look into your hard drive, and open your mercy file!', null),
+  (6, 3, 'Stop talking, brain thinking. Hush.', null),
+  (7, 1, 'Large bet on myself in round one.', null),
+  (8, 2, 'It’s a fez. I wear a fez now. Fezes are cool.', null),
+  (9, 3, 'You know how I sometimes have really brilliant ideas?', null),
+  (10, 2, 'What’s with you kids? Every other day it’s food, food, food.', null),
+  (11, 3, 'They’re not aliens, they’re Earth…liens!', null),
+  (12, 5, 'You’ve swallowed a planet!', null)
+  on conflict (id) do
+    update set
+      author_id = excluded.author_id,
+      headline = excluded.headline,
+      body = excluded.body;
 
 -------------------------------------------------------------------------------
 -- Permissions
