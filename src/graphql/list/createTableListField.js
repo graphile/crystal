@@ -24,7 +24,9 @@ const pascalCase = string => upperFirst(camelCase(string))
 const createTableListField = table => ({
   description:
     'Queries and returns a list of items with some metatadata for ' +
-    `\`${pascalCase(table.name)}\`.`,
+    `\`${pascalCase(table.name)}\`. Note that cursors will not work across ` +
+    'different `orderBy` values. If you want to reuse a cursor, make sure ' +
+    'you don’t change `orderBy`.',
 
   args: {
     // The column specified by `orderBy` means more than just the order to
@@ -35,7 +37,9 @@ const createTableListField = table => ({
       type: createTableOrderingEnum(table),
       description:
         'The order the resulting items should be returned in. This argument ' +
-        'is required because it is also used to determine cursors.',
+        'is also very important as it is used to determine which field will be ' +
+        'used as the pagination cursor. This value’s default will be the ' +
+        'primary key for the object.',
       defaultValue: (() => {
         const column = table.getPrimaryKeyColumns()[0]
         if (column) return column.name
@@ -44,19 +48,23 @@ const createTableListField = table => ({
     },
     first: {
       type: GraphQLInt,
-      description: 'The first **n** items to query. Can’t be used with `last`.',
+      description:
+        'The top **n** items in the collection to be returned. Can’t be used ' +
+        'with `last`.',
     },
     last: {
       type: GraphQLInt,
-      description: 'The last **n** items to retrieve from the query. Can’t be used with `first`.',
+      description:
+        'The bottom **n** items in the collection to be returned. Can’t be used' +
+        'with `first`.',
     },
     before: {
       type: CursorType,
-      description: 'A cursor specifying the lower limit of items to query.',
+      description: 'The collection returned will be constrained to all items **before** the provided cursor.',
     },
     after: {
       type: CursorType,
-      description: 'A cursor specifying the upper limit of items to query.',
+      description: 'The collection returned will be constrained to all items **after** the provided cursor.',
     },
     offset: {
       type: GraphQLInt,
@@ -64,10 +72,10 @@ const createTableListField = table => ({
     },
     descending: {
       type: GraphQLBoolean,
-      defaultValue: false,
       description:
         'If `true` the items will be in descending order, if `false` the ' +
         'items will be in ascending order.',
+      defaultValue: false,
     },
   },
 
