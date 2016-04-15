@@ -105,6 +105,43 @@ describe('getCatalog', () => {
       variants: ['red', 'green', 'blue'],
     })
   })
+
+  it('will get foreign keys', () => {
+    expect(catalog.getTable('c', 'compound_key').getForeignKeys()).toEqual([
+      {
+        nativeTable: catalog.getTable('c', 'compound_key'),
+        nativeColumns: [catalog.getColumn('c', 'compound_key', 'person_id_2')],
+        foreignTable: catalog.getTable('c', 'person'),
+        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+      },
+      {
+        nativeTable: catalog.getTable('c', 'compound_key'),
+        nativeColumns: [catalog.getColumn('c', 'compound_key', 'person_id_1')],
+        foreignTable: catalog.getTable('c', 'person'),
+        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+      },
+    ])
+    expect(catalog.getTable('a', 'foreign_key').getForeignKeys()).toEqual([
+      {
+        nativeTable: catalog.getTable('a', 'foreign_key'),
+        nativeColumns: [catalog.getColumn('a', 'foreign_key', 'person_id')],
+        foreignTable: catalog.getTable('c', 'person'),
+        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+      },
+      {
+        nativeTable: catalog.getTable('a', 'foreign_key'),
+        nativeColumns: [
+          catalog.getColumn('a', 'foreign_key', 'compound_key_1'),
+          catalog.getColumn('a', 'foreign_key', 'compound_key_2'),
+        ],
+        foreignTable: catalog.getTable('c', 'compound_key'),
+        foreignColumns: [
+          catalog.getColumn('c', 'compound_key', 'person_id_1'),
+          catalog.getColumn('c', 'compound_key', 'person_id_2'),
+        ],
+      },
+    ])
+  })
 })
 
 before(() => getClient().then(client => client.queryAsync(`
@@ -129,6 +166,13 @@ create table c.compound_key (
   person_id_2 int references c.person(id),
   person_id_1 int references c.person(id),
   primary key (person_id_1, person_id_2)
+);
+
+create table a.foreign_key (
+  person_id int references c.person(id),
+  compound_key_1 int,
+  compound_key_2 int,
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
 );
 
 comment on table c.person is 'Person test comment';

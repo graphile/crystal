@@ -63,9 +63,9 @@ const getRawColumns = memoize(client =>
       left join pg_catalog.pg_namespace as n on n.oid = c.relnamespace
       left join pg_catalog.pg_description as d on d.objoid = c.oid and d.objsubid = a.attnum
       left join pg_catalog.pg_constraint as cp on
+        cp.contype = 'p' and
         cp.conrelid = a.attrelid and
-        cp.conkey @> array[a.attnum] and
-        cp.contype = 'p'
+        cp.conkey @> array[a.attnum]
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
       c.relkind in ('r', 'v', 'm', 'f') and
@@ -100,6 +100,21 @@ const getRawEnums = memoize(client =>
   .then(({ rows }) => rows)
 )
 
+const getRawForeignKeys = memoize(client =>
+  client.queryAsync(`
+    select
+      c.conrelid as "nativeTableOid",
+      c.conkey as "nativeColumnNums",
+      c.confrelid as "foreignTableOid",
+      c.confkey as "foreignColumnNums"
+    from
+      pg_catalog.pg_constraint as c
+    where
+      c.contype = 'f'
+  `)
+  .then(({ rows }) => rows)
+)
+
 /**
  * Gets an instance of `Catalog` for the given PostgreSQL configuration.
  *
@@ -119,12 +134,7 @@ export default getCatalog
 const getSchemas = (client, catalog) =>
   // Get the raw schemas.
   getRawSchemas(client)
-  .map(({ _oid, name, description }) => new Schema({
-    _oid,
-    catalog,
-    name,
-    description,
-  }))
+  .map(row => new Schema({ catalog, ...row }))
   // Get tables, set the tables property, return schema so that it is what
   // actually gets resolved.
   .map(schema =>
@@ -143,18 +153,14 @@ const getTables = (client, schema) =>
   .filter(({ schemaName }) =>
     schema.name === schemaName
   )
-  .map(({ _oid, name, description }) => new Table({
-    _oid,
-    schema,
-    name,
-    description,
-  }))
+  .map(row => new Table({ schema, ...row }))
   // Get columns, set the columns property, return table so that it is what
   // actually gets resolved.
   .map(table =>
     Promise.join(
       getColumns(client, table),
-      columns => assign(table, { columns })
+      getRawForeignKeys(client).filter(({ nativeTableOid }) => nativeTableOid === table._oid),
+      (columns, _foreignKeys) => assign(table, { columns, _foreignKeys })
     )
   )
 
@@ -166,28 +172,11 @@ const getColumns = (client, table) =>
     table.schema.name === schemaName &&
     table.name === tableName
   )
-  .map(({ _num, name, description, type, isNullable, isPrimaryKey }) =>
-    new Column({
-      _num,
-      table,
-      name,
-      description,
-      type,
-      isNullable,
-      isPrimaryKey,
-    })
-  )
+  .map(row => new Column({ table, ...row }))
 
 const getEnums = (client, schema) =>
   getRawEnums(client)
   .filter(({ schemaName }) =>
     schema.name === schemaName
   )
-  .map(({ _oid, name, variants }) =>
-    new Enum({
-      _oid,
-      schema,
-      name,
-      variants,
-    })
-  )
+  .map(row => new Enum({ schema, ...row }))

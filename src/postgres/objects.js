@@ -30,6 +30,15 @@ export class Catalog {
   }
 
   /**
+   * Gets all tables in all of our schemas.
+   *
+   * @returns {Table[]}
+   */
+  getAllTables () {
+    return flatten(this.schemas.map(schema => schema.getAllTables()))
+  }
+
+  /**
    * Gets an enum in a schema.
    *
    * @param {string} schemaName
@@ -59,6 +68,15 @@ export class Catalog {
    */
   getColumn (schemaName, tableName, columnName) {
     return this.getSchema(schemaName).getTable(tableName).getColumn(columnName)
+  }
+
+  /**
+   * Gets all columns in all of our schemas.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return flatten(this.schemas.map(schema => schema.getAllColumns()))
   }
 }
 
@@ -103,6 +121,15 @@ export class Schema {
   }
 
   /**
+   * Return all of our tables.
+   *
+   * @returns {Table[]}
+   */
+  getAllTables () {
+    return this.tables
+  }
+
+  /**
    * Gets an enum in this schema.
    *
    * @param {string} enumName
@@ -121,6 +148,15 @@ export class Schema {
    */
   getColumn (tableName, columnName) {
     return this.getTable(tableName).getColumn(columnName)
+  }
+
+  /**
+   * Gets all columns in all of our tables.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return flatten(this.tables.map(table => table.getAllColumns()))
   }
 }
 
@@ -163,6 +199,15 @@ export class Table {
   }
 
   /**
+   * Return all of our columns.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return this.columns
+  }
+
+  /**
    * Gets the primary key columns for this table. If there is no primary key
    * this will return an array with a length of 0.
    *
@@ -170,6 +215,29 @@ export class Table {
    */
   getPrimaryKeyColumns () {
     return this.columns.filter(({ isPrimaryKey }) => isPrimaryKey)
+  }
+
+  /**
+   * Gets the foreign keys for this table.
+   *
+   * @returns {Object[]}
+   */
+  getForeignKeys () {
+    if (!this._foreignKeys)
+      return []
+
+    return this._foreignKeys.map(({ nativeColumnNums, foreignTableOid, foreignColumnNums }) => ({
+      nativeTable: this,
+      nativeColumns:
+        nativeColumnNums.map(num => this.columns.find(({ _num }) => _num === num)),
+      foreignTable:
+        this.schema.catalog.getAllTables().find(({ _oid }) => _oid === foreignTableOid),
+      foreignColumns:
+        foreignColumnNums.map(num =>
+          this.schema.catalog.getAllColumns()
+          .find(({ table, _num }) => table._oid === foreignTableOid && _num === num)
+        ),
+    }))
   }
 }
 
