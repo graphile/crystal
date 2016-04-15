@@ -20,7 +20,7 @@ const createServer = async ({ graphqlSchema, pgConfig, route, development }) => 
   const server = new Express()
 
   server.use(logger(development ? 'dev' : 'common'))
-  server.use(favicon(path.join(__dirname, '../public/favicon.ico')))
+  server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
   server.use(route || '/', graphql(async () => ({
     schema: graphqlSchema,
