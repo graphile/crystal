@@ -1,3 +1,3 @@
 #!/bin/bash
 
-scripts/test.sh --watch
+scripts/test.sh --watch $@
