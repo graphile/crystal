@@ -32,10 +32,15 @@ const createTableListField = table => ({
     // cursors.
     // TODO: intelligent default.
     orderBy: {
-      type: new GraphQLNonNull(createTableOrderingEnum(table)),
+      type: createTableOrderingEnum(table),
       description:
         'The order the resulting items should be returned in. This argument ' +
         'is required because it is also used to determine cursors.',
+      defaultValue: (() => {
+        const column = table.getPrimaryKeyColumns()[0]
+        if (column) return column.name
+        return null
+      })(),
     },
     first: {
       type: GraphQLInt,
