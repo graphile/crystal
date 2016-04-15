@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { GraphQLObjectType } from 'graphql'
-import { TestTable, TestColumn } from 'tests/helpers.js'
-import createTableType from 'src/graphql/createTableType.js'
+import { TestTable, TestColumn } from '../helpers.js'
+import createTableType from '#/graphql/createTableType.js'
 
 describe('graphql/createTableType', () => {
   it('creates a table object type', () => {

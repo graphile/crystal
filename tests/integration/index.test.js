@@ -5,8 +5,8 @@ import { once } from 'lodash'
 import path from 'path'
 import { readFileSync, readdirSync } from 'fs'
 import { graphql } from 'graphql'
-import { PG_CONFIG, getClient } from 'tests/helpers.js'
-import createGraphqlSchema from 'src/createGraphqlSchema.js'
+import { PG_CONFIG, getClient } from '../helpers.js'
+import createGraphqlSchema from '#/createGraphqlSchema.js'
 
 const TEST_FIXTURES = 'tests/integration/fixtures'
 

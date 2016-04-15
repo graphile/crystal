@@ -1,8 +1,8 @@
 import expect from 'expect'
 import { keys } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
-import { TestTable, TestColumn } from 'tests/helpers.js'
-import createTableSingleField from 'src/graphql/createTableSingleField.js'
+import { TestTable, TestColumn } from '../helpers.js'
+import createTableSingleField from '#/graphql/createTableSingleField.js'
 
 describe('graphql/createTableSingleField', () => {
   it('is an object type', async () => {

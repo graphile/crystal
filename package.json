@@ -46,7 +46,7 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-core": "^6.7.6",
-    "babel-plugin-resolver": "0.0.7",
+    "babel-plugin-module-alias": "^1.2.0",
     "babel-preset-modern-node": "^1.2.0",
     "babel-register": "^6.7.2",
     "babel-watch": "^1.0.2",

@@ -1,8 +1,8 @@
 import expect from 'expect'
 import { assign, noop } from 'lodash'
 import { GraphQLNonNull, GraphQLEnumType } from 'graphql'
-import { TestColumn, TestEnum } from 'tests/helpers.js'
-import getColumnType from 'src/graphql/getColumnType.js'
+import { TestColumn, TestEnum } from '../helpers.js'
+import getColumnType from '#/graphql/getColumnType.js'
 
 describe('graphql/getColumnType', () => {
   it('will get the correct GraphQL types', () => {
