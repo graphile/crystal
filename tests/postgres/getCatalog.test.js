@@ -2,7 +2,7 @@ import expect from 'expect'
 import { getClient } from '../helpers.js'
 import getCatalog from '#/postgres/getCatalog.js'
 
-describe('postgres/getCatalog', () => {
+describe('getCatalog', () => {
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 

@@ -4,7 +4,7 @@ import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
 import { TestTable, TestColumn } from '../helpers.js'
 import createTableSingleField from '#/graphql/single/createTableSingleField.js'
 
-describe('graphql/createTableSingleField', () => {
+describe('createTableSingleField', () => {
   it('is an object type', async () => {
     const person = createTableSingleField(new TestTable({ name: 'person' }))
     expect(person.type).toBeA(GraphQLObjectType)

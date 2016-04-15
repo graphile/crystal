@@ -3,7 +3,7 @@ import { GraphQLObjectType } from 'graphql'
 import { TestTable, TestColumn } from '../helpers.js'
 import createTableType from '#/graphql/createTableType.js'
 
-describe('graphql/createTableType', () => {
+describe('createTableType', () => {
   it('creates a table object type', () => {
     const type = createTableType(new TestTable())
     expect(type).toBeA(GraphQLObjectType)

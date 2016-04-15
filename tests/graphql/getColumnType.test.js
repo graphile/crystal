@@ -4,7 +4,7 @@ import { GraphQLNonNull, GraphQLEnumType } from 'graphql'
 import { TestColumn, TestEnum } from '../helpers.js'
 import getColumnType from '#/graphql/getColumnType.js'
 
-describe('graphql/getColumnType', () => {
+describe('getColumnType', () => {
   it('will get the correct GraphQL types', () => {
     ([
       [20, 'BigInt'],

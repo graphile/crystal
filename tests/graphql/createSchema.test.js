@@ -3,7 +3,7 @@ import { GraphQLSchema, GraphQLObjectType } from 'graphql'
 import { TestSchema, TestTable } from '../helpers.js'
 import createSchema from '#/graphql/createSchema.js'
 
-describe('graphql/createSchema', () => {
+describe('createSchema', () => {
   it('creates a schema', () => {
     const graphqlSchema = createSchema(new TestSchema())
     expect(graphqlSchema).toBeA(GraphQLSchema)

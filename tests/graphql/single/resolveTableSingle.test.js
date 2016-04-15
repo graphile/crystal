@@ -5,7 +5,7 @@ import { noop } from 'lodash'
 import { TestSchema, TestTable, TestColumn } from '../helpers.js'
 import resolveTableSingle from '#/graphql/single/resolveTableSingle.js'
 
-describe('graphql/resolveTableSingle', () => {
+describe('resolveTableSingle', () => {
   it('is null when nothing is returned', async () => {
     const resolve = resolveTableSingle(new TestTable({ name: 'lol' }))
 

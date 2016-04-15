@@ -4,7 +4,7 @@ import { TestTable } from '../helpers.js'
 import resolveTableList from '#/graphql/list/resolveTableList.js'
 
 // More in depth testing is done in integration tests.
-describe('graphql/resolveTableListField', () => {
+describe('resolveTableListField', () => {
   it('does not allow `first` and `last` together', async () => {
     const resolve = resolveTableList(new TestTable())
 
