@@ -76,7 +76,8 @@ export class Schema {
   tables = []
   enums = []
 
-  constructor ({ catalog, name, description }) {
+  constructor ({ _oid, catalog, name, description }) {
+    this._oid = _oid
     this.catalog = catalog
     this.name = name
     this.description = description
@@ -135,7 +136,8 @@ export class Schema {
 export class Table {
   columns = []
 
-  constructor ({ schema, name, description }) {
+  constructor ({ _oid, schema, name, description }) {
+    this._oid = _oid
     this.schema = schema
     this.name = name
     this.description = description
@@ -183,7 +185,8 @@ export class Table {
  * @member {boolean} isPrimaryKey
  */
 export class Column {
-  constructor ({ table, name, description, type, isNullable = true, isPrimaryKey }) {
+  constructor ({ _oid, table, name, description, type, isNullable = true, isPrimaryKey }) {
+    this._oid = _oid
     this.table = table
     this.name = name
     this.description = description
@@ -206,7 +209,6 @@ export class Column {
 /**
  * Represents a user defined enum PostgreSQL column.
  *
- * @member {number} oid
  * @member {Schema} schema
  * @member {string} name
  * @member {string[]} variants
@@ -223,6 +225,7 @@ export class Enum {
 const getRawSchemas = memoize(client =>
   client.queryAsync(`
     select
+      n.oid as "_oid",
       n.nspname as "name",
       d.description as "description"
     from
@@ -248,6 +251,7 @@ const getRawSchemas = memoize(client =>
 const getRawTables = memoize(client =>
   client.queryAsync(`
     select
+      c.oid as "_oid",
       n.nspname as "schemaName",
       c.relname as "name",
       d.description as "description"
@@ -265,6 +269,7 @@ const getRawTables = memoize(client =>
 const getRawColumns = memoize(client =>
   client.queryAsync(`
     select
+      a.oid as "_oid",
       n.nspname as "schemaName",
       c.relname as "tableName",
       a.attname as "name",
@@ -334,7 +339,8 @@ export default getCatalog
 const getSchemas = (client, catalog) =>
   // Get the raw schemas.
   getRawSchemas(client)
-  .map(({ name, description }) => new Schema({
+  .map(({ _oid, name, description }) => new Schema({
+    _oid,
     catalog,
     name,
     description,
@@ -357,7 +363,8 @@ const getTables = (client, schema) =>
   .filter(({ schemaName }) =>
     schema.name === schemaName
   )
-  .map(({ name, description }) => new Table({
+  .map(({ _oid, name, description }) => new Table({
+    _oid,
     schema,
     name,
     description,
@@ -379,8 +386,9 @@ const getColumns = (client, table) =>
     table.schema.name === schemaName &&
     table.name === tableName
   )
-  .map(({ name, description, type, isNullable, isPrimaryKey }) =>
+  .map(({ _oid, name, description, type, isNullable, isPrimaryKey }) =>
     new Column({
+      _oid,
       table,
       name,
       description,
