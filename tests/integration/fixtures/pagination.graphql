@@ -1,0 +1,39 @@
+{
+  aa: personList(orderBy: ID) { ...page }
+  ab: personList(orderBy: ID, first: 2) { ...page }
+  ac: personList(orderBy: ID, first: 3) { ...page }
+  ad: personList(orderBy: ID, first: 5) { ...page }
+  ae: personList(orderBy: ID, first: 14) { ...page }
+  af: personList(orderBy: ID, offset: 1) { ...page }
+  ag: personList(orderBy: ID, offset: 3) { ...page }
+  ah: personList(orderBy: ID, offset: 50) { ...page }
+  ai: personList(orderBy: ID, first: 1, offset: 1) { ...page }
+  aj: personList(orderBy: ID, first: 4, offset: 10) { ...page }
+  ak: personList(orderBy: ID, first: 4, offset: 9) { ...page }
+  al: personList(orderBy: ID, after: "NA==") { ...page }
+  am: personList(orderBy: ID, after: "MTQ=") { ...page }
+  an: personList(orderBy: ID, after: "MTA=") { ...page }
+  ao: personList(orderBy: ID, after: "NTA=") { ...page }
+  ap: personList(orderBy: ID, before: "MQ==") { ...page }
+  aq: personList(orderBy: ID, before: "NA==") { ...page }
+  ar: personList(orderBy: ID, before: "MTQ=") { ...page }
+  as: personList(orderBy: ID, before: "NTA=") { ...page }
+  at: personList(orderBy: ID, after: "NTA=", before: "NTA=") { ...page }
+  au: personList(orderBy: ID, after: "NA==", before: "MTA=") { ...page }
+  av: personList(orderBy: ID, after: "Mw==", first: 4) { ...page }
+  aw: personList(orderBy: ID, after: "Mw==", first: 20) { ...page }
+  ax: personList(orderBy: ID, before: "NTA=", last: 2) { ...page }
+  ay: personList(orderBy: ID, before: "MTQ=", last: 2) { ...page }
+  az: personList(orderBy: ID, before: "MTQ=", first: 2) { ...page }
+}
+
+fragment page on PersonConnection {
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+  }
+  list {
+    id
+    givenName
+  }
+}
