@@ -271,16 +271,16 @@ const getRawColumns = memoize(client =>
       d.description as "description",
       a.atttypid as "type",
       not(a.attnotnull) as "isNullable",
-      t.oid is not null as "isPrimaryKey"
+      cp.oid is not null as "isPrimaryKey"
     from
       pg_catalog.pg_attribute as a
       left join pg_catalog.pg_class as c on c.oid = a.attrelid
       left join pg_catalog.pg_namespace as n on n.oid = c.relnamespace
       left join pg_catalog.pg_description as d on d.objoid = c.oid and d.objsubid = a.attnum
-      left join pg_catalog.pg_constraint as t on
-        t.conrelid = a.attrelid and
-        t.conkey @> array[a.attnum] and
-        t.contype = 'p'
+      left join pg_catalog.pg_constraint as cp on
+        cp.conrelid = a.attrelid and
+        cp.conkey @> array[a.attnum] and
+        cp.contype = 'p'
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
       c.relkind in ('r', 'v', 'm', 'f') and
