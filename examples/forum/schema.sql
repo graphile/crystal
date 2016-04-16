@@ -45,7 +45,7 @@ comment on column post.author_id is 'The id of the author user.';
 comment on column post.body is 'The main body text of our post.';
 
 -------------------------------------------------------------------------------
--- Values
+-- Sample Data
 
 insert into person (id, given_name, family_name, about) values
   (1, 'Kathryn', 'Ramirez', null),
