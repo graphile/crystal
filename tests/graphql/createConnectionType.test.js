@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { GraphQLNonNull, GraphQLList } from 'graphql'
-import { TestTable } from '../../helpers.js'
-import createConnectionType from '#/graphql/connection/createConnectionType.js'
+import { TestTable } from '../helpers.js'
+import createConnectionType from '#/graphql/createConnectionType.js'
 
 describe('createConnectionType', () => {
   it('will append “connection” to type name', () => {
