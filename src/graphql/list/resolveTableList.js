@@ -1,6 +1,11 @@
 import { once } from 'lodash'
 
 const resolveTableListField = table => {
+  // Because we are trying to generate very dynamic queries we use the `sql`
+  // module as it lets us guarantee saftey against SQL injection, and is easier
+  // to modify than a string.
+  const tableSql = table.sql()
+
   return (source, args, { client }) => {
     const { orderBy, first, last, after, before, offset, descending } = args
 
@@ -15,34 +20,27 @@ const resolveTableListField = table => {
     const getRowCursorValue = row => row[orderBy] || ''
 
     const getRows = once(async () => {
-      // This query is too dynamic to be prepared…
-      let query = `select * from ${table.getIdentifier()}`
-      const values = []
-
-      const useValue = value => {
-        values.push(value)
-        return `$${values.length}`
-      }
+      // Start our query.
+      let query = tableSql.select(tableSql.star())
 
       // Add the conditions for `after` and `before` which will narrow our
       // range.
-      const conditionBefore = before ? `"${orderBy}" < ${useValue(before)}` : 'true'
-      const conditionAfter = after ? `"${orderBy}" > ${useValue(after)}` : 'true'
-      query += ` where ${conditionBefore} and ${conditionAfter}`
+      if (before) query = query.and(tableSql[orderBy].lt(before))
+      if (after) query = query.and(tableSql[orderBy].gt(after))
 
       // Create the ordering statement and add it to the query.
       // If a `last` argument was defined we are querying from the bottom so we
       // need to flip our order.
       const queryDescending = last ? !descending : descending
-      query += ` order by "${orderBy}" ${queryDescending ? 'desc' : 'asc'}`
+      query = query.order(tableSql[orderBy][queryDescending ? 'descending' : 'ascending'])
 
       // Set the correct range.
-      if (first) query += ` limit ${useValue(first)}`
-      if (last) query += ` limit ${useValue(last)}`
-      if (offset) query += ` offset ${useValue(offset)}`
+      if (first) query = query.limit(first)
+      if (last) query = query.limit(last)
+      if (offset) query = query.offset(offset)
 
       // Run the query.
-      let { rows } = await client.queryAsync(query, values)
+      let { rows } = await client.queryAsync(query.toQuery())
 
       // If a `last` argument was defined we flipped our query ordering (see
       // the above `ORDER BY` addition), so now we need to flip it back so the
@@ -80,11 +78,11 @@ const resolveTableListField = table => {
               // Try to find one row with a greater cursor. If one exists
               // we know there is a next page.
               client.queryAsync(
-                'select null ' +
-                `from ${table.getIdentifier()} ` +
-                `where "${orderBy}" ${descending ? '<' : '>'} $1 ` +
-                'limit 1',
-                [endCursor]
+                tableSql
+                .select('null')
+                .where(tableSql[orderBy][descending ? 'lt' : 'gt'](endCursor))
+                .limit(1)
+                .toQuery()
               )
               .then(({ rowCount }) => rowCount !== 0)
             )
@@ -102,11 +100,11 @@ const resolveTableListField = table => {
               // Try to find one row with a lesser cursor. If one exists
               // we know there is a previous page.
               client.queryAsync(
-                'select null ' +
-                `from ${table.getIdentifier()} ` +
-                `where "${orderBy}" ${descending ? '>' : '<'} $1 ` +
-                'limit 1',
-                [startCursor]
+                tableSql
+                .select('null')
+                .where(tableSql[orderBy][descending ? 'gt' : 'lt'](startCursor))
+                .limit(1)
+                .toQuery()
               )
               .then(({ rowCount }) => rowCount !== 0)
             )
@@ -129,7 +127,11 @@ const resolveTableListField = table => {
       // a possibility that `count` will be so big JavaScript can’t parse it.
       get totalCount () {
         return (
-          client.queryAsync(`select count(*) as "count" from ${table.getIdentifier()}`)
+          client.queryAsync(
+            tableSql
+            .select(tableSql.count('count'))
+            .toQuery()
+          )
           .then(({ rows: [{ count }] }) => parseInt(count, 10))
         )
       },

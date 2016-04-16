@@ -16,11 +16,17 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
   if (columns.length === 0)
     throw new Error('To resolve a single row, some columns must be used.')
 
-  const queryTuple = `(${columns.map(({ name }) => name).join(', ')})`
+  const queryTuple =
+    `(${columns.map(column =>
+      `"${column.table.schema.name}"."${column.table.name}"."${column.name}"`
+    ).join(', ')})`
 
+  // We aren’t using the `sql` module here because the most efficient way to
+  // run this query is with the `= any (…)` field. This feature is PostgreSQL
+  // specific and can’t be done with `sql`.
   const query = {
     name: `${table.schema.name}_${table.name}_single`,
-    text: `select * from ${table.getIdentifier()} where ${queryTuple} = any ($1)`,
+    text: `select * from "${table.schema.name}"."${table.name}" where ${queryTuple} = any ($1)`,
   }
 
   // Because we don’t want to run 30+ SQL queries to fetch single rows if we

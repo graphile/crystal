@@ -42,7 +42,8 @@
     "lodash": "^4.8.2",
     "morgan": "^1.7.0",
     "pg": "^4.5.2",
-    "serve-favicon": "^2.3.0"
+    "serve-favicon": "^2.3.0",
+    "sql": "^0.67.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

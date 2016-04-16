@@ -1,4 +1,5 @@
 import { flatten } from 'lodash'
+import sql from 'sql'
 
 /**
  * A catalog of all objects relevant in the database to PostGraphQL.
@@ -179,13 +180,18 @@ export class Table {
   }
 
   /**
-   * Gets the escaped, qualified, name of the schema to be used as an
-   * identifier in a SQL query.
+   * Returns a table type from the `sql` module based off of this table. This
+   * is so we can use the superior capabilities of the `sql` module to
+   * construct SQL queries with our table type.
    *
-   * @returns {string}
+   * @returns {SqlTable}
    */
-  getIdentifier () {
-    return `${this.schema.getIdentifier()}."${this.name}"`
+  sql () {
+    return sql.define({
+      schema: this.schema.name,
+      name: this.name,
+      columns: this.columns.map(({ name }) => name),
+    })
   }
 
   /**
