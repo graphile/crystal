@@ -31,7 +31,7 @@ export class TestTable extends Table {
   constructor ({ name = 'test', schema = new TestSchema(), columns, ...config } = {}) {
     super({ name, schema, ...config })
     this.columns =
-      (columns || [new TestColumn({ table: this })])
+      (columns || [new TestColumn({ table: this, isPrimaryKey: true })])
       .map(column => assign(column, { table: this }))
   }
 }

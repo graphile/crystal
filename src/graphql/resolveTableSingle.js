@@ -1,3 +1,6 @@
+import { memoize, every } from 'lodash'
+import DataLoader from 'dataloader'
+
 /**
  * Creates a resolver for querying a single value.
  *
@@ -10,34 +13,57 @@
  * @returns {Function} - A function to be fed into `resolve`.
  */
 const resolveTableSingle = (table, columns, getColumnValues) => {
-  // Create the query condition. If there are no columns, the condition will
-  // just be `true`.
-  const queryCondition =
-    columns
-    .map((column, i) => `"${column.name}" = $${i + 1}`)
-    .join(' and ') || 'true'
+  if (columns.length === 0)
+    throw new Error('To resolve a single row, some columns must be used.')
 
-  // Create our prepared query statement. By creating it here we get a
-  // performance boost on repeat usage.
+  const queryTuple = `(${columns.map(({ name }) => name).join(', ')})`
+
   const query = {
     name: `${table.schema.name}_${table.name}_single`,
-    text: `select * from ${table.getIdentifier()} where ${queryCondition} limit 1`,
+    text: `select * from ${table.getIdentifier()} where ${queryTuple} = any ($1)`,
   }
 
-  return async (source, args, { client }) => {
-    // Send our prepared query to the client with some values.
-    const result = await client.queryAsync({
+  // Because we don’t want to run 30+ SQL queries to fetch single rows if we
+  // are fetching relations for a list, we optimize with a `DataLoader`.
+  //
+  // Note that there is a performance penalty in that if we are selecting 100+
+  // rows we will have to run an aggregate `find` method for each row that was
+  // queried. However, this is still much better than running 100+ SQL queries.
+  // In addition, if we are selecting a lot of repeats, we can memoize this
+  // operation.
+  //
+  // This is a memoized function because we don’t have another way of
+  // accessing `client` which is local to the resolution context.
+  const getDataLoader = memoize(client => new DataLoader(async columnValueses => {
+    // Query the client with our list of column values and prepared query.
+    // Results can be returned in any order.
+    const { rowCount, rows } = await client.queryAsync({
       name: query.name,
       text: query.text,
-      // For all of our primary keys we want to get its corresponding
-      // argument (which was required to be included). Order is very
-      // important.
-      values: getColumnValues(source, args),
+      values: [columnValueses],
     })
 
-    // Make sure we are only returning one row.
-    return result.rows[0]
-  }
+    // Gets the row from the result set given a few column values.
+    let getRow = columnValues => rows.find(row =>
+      every(columns.map(({ name }, i) => row[name] === columnValues[i]))
+    )
+
+    // If there are 25% less values in our result set then this means there are
+    // some duplicates and memoizing `getRow` could cause some performance gains.
+    //
+    // Note that this memoization should be tinkered with in the future to
+    // determine the best memoization tradeoffs.
+    if (columnValueses.length * 0.75 >= rowCount)
+      getRow = memoize(getRow, columnValues => columnValues.join(','))
+
+    return columnValueses.map(getRow)
+  }))
+
+  // Make sure we use a `WeakMap` for the cache so old `Client`s are not held
+  // in memory.
+  getDataLoader.cache = new WeakMap()
+
+  return async (source, args, { client }) => getDataLoader(client).load(getColumnValues(source, args))
 }
 
 export default resolveTableSingle
