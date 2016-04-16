@@ -1,12 +1,12 @@
 import expect, { createSpy } from 'expect'
 import { noop } from 'lodash'
-import { TestTable } from '../../helpers.js'
-import resolveTableList from '#/graphql/list/resolveTableList.js'
+import { TestTable } from '../helpers.js'
+import resolveConnection from '#/graphql/resolveConnection.js'
 
 // More in depth testing is done in integration tests.
 describe('resolveTableListField', () => {
   it('will error without an `orderBy`', async () => {
-    const resolve = resolveTableList(new TestTable())
+    const resolve = resolveConnection(new TestTable())
 
     try {
       await resolve({}, {}, {})
@@ -19,7 +19,7 @@ describe('resolveTableListField', () => {
   })
 
   it('does not allow `first` and `last` together', async () => {
-    const resolve = resolveTableList(new TestTable())
+    const resolve = resolveConnection(new TestTable())
 
     try {
       await resolve({}, { orderBy: 'test', first: 2, last: 5 }, {})
@@ -32,7 +32,7 @@ describe('resolveTableListField', () => {
   })
 
   it('will lazily get properties and memoize common data', async () => {
-    const resolve = resolveTableList(new TestTable())
+    const resolve = resolveConnection(new TestTable())
     const client = { queryAsync: createSpy().andReturn(Promise.resolve({ rows: [] })) }
     const result1 = await resolve({}, { orderBy: 'test' }, { client })
     const result2 = await resolve({}, { orderBy: 'test', descending: true }, { client })

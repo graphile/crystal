@@ -1,6 +1,6 @@
 import { reduce, camelCase, once } from 'lodash'
 
-const resolveTableListField = table => {
+const resolveConnection = table => {
   // Because we are trying to generate very dynamic queries we use the `sql`
   // module as it lets us guarantee saftey against SQL injection, and is easier
   // to modify than a string.
@@ -166,4 +166,4 @@ const resolveTableListField = table => {
   }
 }
 
-export default resolveTableListField
+export default resolveConnection

@@ -1,7 +1,7 @@
 import { ary, assign, camelCase } from 'lodash'
 import { GraphQLSchema, GraphQLObjectType } from 'graphql'
 import createTableSingleField from './createTableSingleField.js'
-import createTableListField from './list/createTableListField.js'
+import createTableListField from './createTableListField.js'
 
 /**
  * Creates a GraphQLSchema from a PostgreSQL schema.

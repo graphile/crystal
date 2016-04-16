@@ -1,8 +1,8 @@
 import { fromPairs, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
-import { CursorType } from '../Types.js'
-import getColumnType from '../getColumnType.js'
-import createConnectionType from '../createConnectionType.js'
-import resolveTableList from './resolveTableList.js'
+import { CursorType } from './Types.js'
+import getColumnType from './getColumnType.js'
+import createConnectionType from './createConnectionType.js'
+import resolveConnection from './resolveConnection.js'
 
 import {
   getNullableType,
@@ -86,7 +86,7 @@ const createTableListField = table => ({
   // expensive queries on fields we don’t actually need.
   type: createConnectionType(table),
 
-  resolve: resolveTableList(table),
+  resolve: resolveConnection(table),
 })
 
 export default createTableListField
