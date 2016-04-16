@@ -1,5 +1,6 @@
 import path from 'path'
 import Express from 'express'
+import onFinished from 'on-finished'
 import logger from 'morgan'
 import favicon from 'serve-favicon'
 import pg from 'pg'
@@ -22,13 +23,20 @@ const createServer = async ({ graphqlSchema, pgConfig, route, development }) => 
   server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
-  server.use(route || '/', graphql(async () => ({
-    schema: graphqlSchema,
-    context: { client: await pg.connectAsync(pgConfig) },
-    pretty: development,
-    graphiql: development,
-    formatError: development ? developmentFormatError : formatError,
-  })))
+  server.use(route || '/', graphql(async req => {
+    // Acquire a new client for every request.
+    const client = await pg.connectAsync(pgConfig)
+    // Make sure we release our client back to the pool once the response has
+    // finished.
+    onFinished(req.res, () => client.end())
+    return {
+      schema: graphqlSchema,
+      context: { client },
+      pretty: development,
+      graphiql: development,
+      formatError: development ? developmentFormatError : formatError,
+    }
+  }))
 
   // Lol, we actually return an express server, but we might not in the
   // future ;)
