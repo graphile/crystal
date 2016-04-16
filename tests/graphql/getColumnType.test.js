@@ -43,6 +43,18 @@ describe('getColumnType', () => {
 
   it('will correctly detect arrays')
 
+  it('memoizes results', () => {
+    const column1 = new TestColumn({ isNullable: false })
+    const column2 = new TestColumn({ isNullable: false })
+    const type1a = getColumnType(column1)
+    const type2a = getColumnType(column2)
+    const type2b = getColumnType(column2)
+    const type1b = getColumnType(column1)
+    expect(type1a).toBe(type1b)
+    expect(type2a).toBe(type2b)
+    expect(type1a).toNotBe(type2a)
+  })
+
   describe('enums', () => {
     const getEnum = config => getColumnType(
       new TestColumn({

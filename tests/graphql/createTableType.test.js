@@ -9,21 +9,33 @@ describe('createTableType', () => {
     expect(type).toBeA(GraphQLObjectType)
   })
 
-  it('pascal cases table names', async () => {
+  it('pascal cases table names', () => {
     const type1 = createTableType(new TestTable({ name: 'camel_case_me' }))
     const type2 = createTableType(new TestTable({ name: 'person' }))
     expect(type1.name).toEqual('CamelCaseMe')
     expect(type2.name).toEqual('Person')
   })
 
-  it('camel cases table columns', async () => {
+  it('camel cases table columns', () => {
     const table = new TestTable({ name: 'test', columns: [new TestColumn({ name: 'camel_case_me' })] })
     const type = createTableType(table)
     expect(type.getFields()).toIncludeKey('camelCaseMe')
   })
 
-  it('attaches comment descriptions', async () => {
-    const type = await createTableType(new TestTable({ name: 'person', description: 'This is a person' }))
+  it('attaches comment descriptions', () => {
+    const type = createTableType(new TestTable({ name: 'person', description: 'This is a person' }))
     expect(type.description).toEqual('This is a person')
+  })
+
+  it('memoizes results', () => {
+    const table1 = new TestTable()
+    const table2 = new TestTable()
+    const type1a = createTableType(table1)
+    const type2a = createTableType(table2)
+    const type2b = createTableType(table2)
+    const type1b = createTableType(table1)
+    expect(type1a).toBe(type1b)
+    expect(type2a).toBe(type2b)
+    expect(type1a).toNotBe(type2a)
   })
 })

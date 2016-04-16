@@ -1,4 +1,5 @@
 import {
+  memoize,
   fromPairs,
   camelCase,
   snakeCase,
@@ -174,7 +175,7 @@ const postgresToGraphQLTypes = new Map([
  * @param {Column} column
  * @returns {GraphQLType}
  */
-const getColumnGraphqlType = column => {
+const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
   const internalType = postgresToGraphQLTypes.get(column.type)
 
@@ -198,6 +199,6 @@ const getColumnGraphqlType = column => {
 
   // Otherwise, just return `GraphQLString`.
   return wrapType(GraphQLString)
-}
+})
 
 export default getColumnGraphqlType
