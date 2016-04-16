@@ -1,4 +1,4 @@
-import { once } from 'lodash'
+import { reduce, camelCase, once } from 'lodash'
 
 const resolveTableListField = table => {
   // Because we are trying to generate very dynamic queries we use the `sql`
@@ -7,7 +7,7 @@ const resolveTableListField = table => {
   const tableSql = table.sql()
 
   return (source, args, { client }) => {
-    const { orderBy, first, last, after, before, offset, descending } = args
+    const { orderBy, first, last, after, before, offset, descending, ...conditions } = args
 
     // Throw an error if `orderBy` is not defined.
     if (!orderBy)
@@ -17,6 +17,14 @@ const resolveTableListField = table => {
     if (first && last)
       throw new Error('Cannot define both a `first` and a `last` argument.')
 
+    // An *actual* function because we want `this`.
+    function addConditionsToQuery () {
+      return reduce(conditions, (query, value, fieldName) => {
+        const column = table.columns.find(({ name }) => camelCase(name) === fieldName)
+        return query.where(tableSql[column.name].equals(value))
+      }, this)
+    }
+
     const getRowCursorValue = row => row[orderBy] || ''
 
     const getRows = once(async () => {
@@ -25,8 +33,11 @@ const resolveTableListField = table => {
 
       // Add the conditions for `after` and `before` which will narrow our
       // range.
-      if (before) query = query.and(tableSql[orderBy].lt(before))
-      if (after) query = query.and(tableSql[orderBy].gt(after))
+      if (before) query = query.where(tableSql[orderBy].lt(before))
+      if (after) query = query.where(tableSql[orderBy].gt(after))
+
+      // Add the conditions…
+      query = query::addConditionsToQuery()
 
       // Create the ordering statement and add it to the query.
       // If a `last` argument was defined we are querying from the bottom so we
@@ -75,12 +86,13 @@ const resolveTableListField = table => {
           .then(endCursor => {
             if (!endCursor) return false
             return (
-              // Try to find one row with a greater cursor. If one exists
-              // we know there is a next page.
               client.queryAsync(
+                // Try to find one row with a greater cursor. If one exists
+                // we know there is a next page.
                 tableSql
                 .select('null')
                 .where(tableSql[orderBy][descending ? 'lt' : 'gt'](endCursor))
+                ::addConditionsToQuery()
                 .limit(1)
                 .toQuery()
               )
@@ -97,12 +109,13 @@ const resolveTableListField = table => {
           .then(startCursor => {
             if (!startCursor) return false
             return (
-              // Try to find one row with a lesser cursor. If one exists
-              // we know there is a previous page.
               client.queryAsync(
+                // Try to find one row with a lesser cursor. If one exists
+                // we know there is a previous page.
                 tableSql
                 .select('null')
                 .where(tableSql[orderBy][descending ? 'gt' : 'lt'](startCursor))
+                ::addConditionsToQuery()
                 .limit(1)
                 .toQuery()
               )
@@ -123,13 +136,15 @@ const resolveTableListField = table => {
       },
 
       // Runs a SQL query to get the count for this query with the provided
-      // condition. Also makes sure only the parsed count is returned. There is
-      // a possibility that `count` will be so big JavaScript can’t parse it.
+      // condition. Also makes sure only the parsed count is returned.
       get totalCount () {
+        // There is a possibility that `count` will be so big JavaScript can’t
+        // parse it :|
         return (
           client.queryAsync(
             tableSql
             .select(tableSql.count('count'))
+            ::addConditionsToQuery()
             .toQuery()
           )
           .then(({ rows: [{ count }] }) => parseInt(count, 10))

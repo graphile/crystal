@@ -1,0 +1,91 @@
+{
+  a: personList(orderBy: ID, first: 3) {
+    list {
+      givenName
+      familyName
+    }
+  }
+  b: personList(orderBy: GIVEN_NAME, last: 5) {
+    totalCount
+    list {
+      id
+    }
+  }
+  c: personList(orderBy: FAMILY_NAME, descending: true, first: 3) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    edges {
+      cursor
+      node {
+        id
+        givenName
+        familyName
+      }
+    }
+  }
+  d: personList(orderBy: ID, after: "NA==", first: 6) {
+    pageInfo {
+      startCursor
+      endCursor
+    }
+    list {
+      givenName
+    }
+  }
+  e: personList(orderBy: ID, descending: true, before: "NA==", last: 3) {
+    pageInfo {
+      prev: hasPreviousPage
+      next: hasNextPage
+    }
+    list {
+      familyName
+    }
+  }
+  f: personList {
+    edges {
+      cursor
+      node {
+        givenName
+      }
+    }
+  }
+  g: postList(authorId: 2) {
+		totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    list {
+      id
+      headline
+      authorId
+    }
+  }
+  h: postList(topic: INSPIRATION) {
+		totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    list {
+      id
+      headline
+      topic
+    }
+  }
+  i: postList(authorId: 1, first: 2, offset: 1) {    
+		totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+    list {
+      id
+      headline
+      topic
+      authorId
+    }
+  }
+}

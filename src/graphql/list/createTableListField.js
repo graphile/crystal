@@ -1,9 +1,11 @@
 import { fromPairs, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
-import createConnectionType from '../createConnectionType.js'
 import { CursorType } from '../Types.js'
+import getColumnType from '../getColumnType.js'
+import createConnectionType from '../createConnectionType.js'
 import resolveTableList from './resolveTableList.js'
 
 import {
+  getNullableType,
   GraphQLEnumType,
   GraphQLInt,
   GraphQLBoolean,
@@ -72,6 +74,10 @@ const createTableListField = table => ({
         'items will be in ascending order.',
       defaultValue: false,
     },
+    ...fromPairs(table.columns.map(column => [camelCase(column.name), {
+      type: getNullableType(getColumnType(column)),
+      description: 'Filter the resulting set with an equality test based on this value.',
+    }])),
   },
 
   // Make sure the type of this field is our connection type. This connection
