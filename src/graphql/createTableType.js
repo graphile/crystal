@@ -1,7 +1,7 @@
 import { memoize, fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import getColumnType from './getColumnType.js'
-import createForeignKeyField from './foreign-key/createForeignKeyField.js'
+import createForeignKeyField from './createForeignKeyField.js'
 
 /**
  * Creates the `GraphQLObjectType` for a table.

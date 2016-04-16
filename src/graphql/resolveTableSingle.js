@@ -1,12 +1,19 @@
-import { camelCase } from 'lodash'
-
-const resolveTableSingleField = table => {
-  // Cache the primary key columns. Order matters so by putting it here we get
-  // the bonus that it is the one source of ordering truth.
-  const primaryKeyColumns = table.getPrimaryKeyColumns()
-
+/**
+ * Creates a resolver for querying a single value.
+ *
+ * The last parameter, `getColumnValues` is a function which gets `source` and
+ * `args` and returns values for each of the second argument’s columns.
+ *
+ * @param {Table} table - The table we will be selecting from.
+ * @param {Column[]} columns - The columns which will be filtered against.
+ * @param {Function} getColumnValues - A function to get values for columns.
+ * @returns {Function} - A function to be fed into `resolve`.
+ */
+const resolveTableSingle = (table, columns, getColumnValues) => {
+  // Create the query condition. If there are no columns, the condition will
+  // just be `true`.
   const queryCondition =
-    primaryKeyColumns
+    columns
     .map((column, i) => `"${column.name}" = $${i + 1}`)
     .join(' and ') || 'true'
 
@@ -25,7 +32,7 @@ const resolveTableSingleField = table => {
       // For all of our primary keys we want to get its corresponding
       // argument (which was required to be included). Order is very
       // important.
-      values: primaryKeyColumns.map(column => args[camelCase(column.name)]),
+      values: getColumnValues(source, args),
     })
 
     // Make sure we are only returning one row.
@@ -33,4 +40,4 @@ const resolveTableSingleField = table => {
   }
 }
 
-export default resolveTableSingleField
+export default resolveTableSingle

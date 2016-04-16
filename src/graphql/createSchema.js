@@ -1,6 +1,6 @@
 import { ary, assign, camelCase } from 'lodash'
 import { GraphQLSchema, GraphQLObjectType } from 'graphql'
-import createTableSingleField from './single/createTableSingleField.js'
+import createTableSingleField from './createTableSingleField.js'
 import createTableListField from './list/createTableListField.js'
 
 /**
