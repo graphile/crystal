@@ -1,0 +1,14 @@
+{
+  postList {
+    list {
+      id
+      authorId
+      headline
+      author: personByAuthorId {
+        id
+        givenName
+        familyName
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { memoize, fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import getColumnType from './getColumnType.js'
+import createForeignKeyField from './foreign-key/createForeignKeyField.js'
 
 /**
  * Creates the `GraphQLObjectType` for a table.
@@ -31,10 +32,19 @@ const createTableType = memoize(table => {
     name: upperFirst(camelCase(table.name)),
     description: table.description,
 
-    // Make sure all of our columns have a corresponding field.
-    fields: fromPairs(
+    // Make sure all of our columns have a corresponding field. This is a thunk
+    // because `createForeignKeyField` may have a circular dependency.
+    fields: () => fromPairs(
       table.columns
       .map(column => [camelCase(column.name), createColumnField(column)])
+      .concat(
+        table.getForeignKeys()
+        .map(foreignKey => {
+          const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
+          const name = `${foreignKey.foreignTable.name}_by_${columnNames.join('_and_')}`
+          return [camelCase(name), createForeignKeyField(foreignKey)]
+        })
+      )
     ),
   })
 })
@@ -48,7 +58,7 @@ export default createTableType
  * @returns {GraphQLFieldConfig}
  */
 const createColumnField = column => ({
-  description: column.description,
   type: getColumnType(column),
+  description: column.description,
   resolve: source => source[column.name],
 })
