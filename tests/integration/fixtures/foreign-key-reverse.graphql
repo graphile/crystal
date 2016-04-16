@@ -1,0 +1,17 @@
+{
+  personList {
+    list {
+      id
+      givenName
+      familyName
+      postListByAuthorId {
+        totalCount
+        list {
+          id
+          headline
+          authorId
+        }
+      }
+    }
+  }
+}

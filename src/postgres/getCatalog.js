@@ -1,6 +1,6 @@
 import { memoize, assign } from 'lodash'
 import Promise from 'bluebird'
-import { Catalog, Schema, Table, Column, Enum } from './objects.js'
+import { Catalog, Schema, Table, Column, Enum, ForeignKey } from './Catalog.js'
 
 const getRawSchemas = memoize(client =>
   client.queryAsync(`
@@ -124,10 +124,13 @@ const getRawForeignKeys = memoize(client =>
 const getCatalog = async client =>
   Promise
   .resolve(new Catalog())
-  .then(catalog =>
-    getSchemas(client, catalog)
-    .then(schemas => assign(catalog, { schemas }))
-  )
+  .then(async catalog => {
+    const schemas = await getSchemas(client, catalog)
+    catalog.schemas = schemas
+    const foreignKeys = await getForeignKeys(client, catalog)
+    catalog.foreignKeys = foreignKeys
+    return catalog
+  })
 
 export default getCatalog
 
@@ -159,8 +162,7 @@ const getTables = (client, schema) =>
   .map(table =>
     Promise.join(
       getColumns(client, table),
-      getRawForeignKeys(client).filter(({ nativeTableOid }) => nativeTableOid === table._oid),
-      (columns, _foreignKeys) => assign(table, { columns, _foreignKeys })
+      columns => assign(table, { columns })
     )
   )
 
@@ -180,3 +182,18 @@ const getEnums = (client, schema) =>
     schema.name === schemaName
   )
   .map(row => new Enum({ schema, ...row }))
+
+const getForeignKeys = (client, catalog) =>
+  getRawForeignKeys(client)
+  .map(({ nativeTableOid, nativeColumnNums, foreignTableOid, foreignColumnNums }) => {
+    const nativeTable = catalog.getAllTables().find(({ _oid }) => _oid === nativeTableOid)
+    const foreignTable = catalog.getAllTables().find(({ _oid }) => _oid === foreignTableOid)
+
+    return new ForeignKey({
+      catalog,
+      nativeTable,
+      foreignTable,
+      nativeColumns: nativeColumnNums.map(num => nativeTable.columns.find(({ _num }) => _num === num)),
+      foreignColumns: foreignColumnNums.map(num => foreignTable.columns.find(({ _num }) => _num === num)),
+    })
+  })

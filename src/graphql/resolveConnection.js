@@ -1,6 +1,6 @@
-import { reduce, camelCase, once } from 'lodash'
+import { constant, assign, reduce, camelCase, once } from 'lodash'
 
-const resolveConnection = table => {
+const resolveConnection = (table, getExtraConditions = constant({})) => {
   // Because we are trying to generate very dynamic queries we use the `sql`
   // module as it lets us guarantee saftey against SQL injection, and is easier
   // to modify than a string.
@@ -8,6 +8,9 @@ const resolveConnection = table => {
 
   return (source, args, { client }) => {
     const { orderBy, first, last, after, before, offset, descending, ...conditions } = args
+
+    // Add extra conditions to the leftover `conditions` argument.
+    assign(conditions, getExtraConditions(source, args))
 
     // Throw an error if `orderBy` is not defined.
     if (!orderBy)
@@ -20,7 +23,8 @@ const resolveConnection = table => {
     // An *actual* function because we want `this`.
     function addConditionsToQuery () {
       return reduce(conditions, (query, value, fieldName) => {
-        const column = table.columns.find(({ name }) => camelCase(name) === fieldName)
+        // Perform a soft match using the `camelCase` function.
+        const column = table.columns.find(({ name }) => camelCase(name) === camelCase(fieldName))
         return query.where(tableSql[column.name].equals(value))
       }, this)
     }

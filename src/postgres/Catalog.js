@@ -5,9 +5,11 @@ import sql from 'sql'
  * A catalog of all objects relevant in the database to PostGraphQL.
  *
  * @member {Schema[]} schemas
+ * @member {ForeignKey[]} foreignKeys
  */
 export class Catalog {
   schemas = []
+  foreignKeys = []
 
   /**
    * Gets the schema of a certain name.
@@ -69,15 +71,6 @@ export class Catalog {
    */
   getColumn (schemaName, tableName, columnName) {
     return this.getSchema(schemaName).getTable(tableName).getColumn(columnName)
-  }
-
-  /**
-   * Gets all columns in all of our schemas.
-   *
-   * @returns {Column[]}
-   */
-  getAllColumns () {
-    return flatten(this.schemas.map(schema => schema.getAllColumns()))
   }
 }
 
@@ -150,15 +143,6 @@ export class Schema {
   getColumn (tableName, columnName) {
     return this.getTable(tableName).getColumn(columnName)
   }
-
-  /**
-   * Gets all columns in all of our tables.
-   *
-   * @returns {Column[]}
-   */
-  getAllColumns () {
-    return flatten(this.tables.map(table => table.getAllColumns()))
-  }
 }
 
 /**
@@ -205,15 +189,6 @@ export class Table {
   }
 
   /**
-   * Return all of our columns.
-   *
-   * @returns {Column[]}
-   */
-  getAllColumns () {
-    return this.columns
-  }
-
-  /**
    * Gets the primary key columns for this table. If there is no primary key
    * this will return an array with a length of 0.
    *
@@ -226,24 +201,19 @@ export class Table {
   /**
    * Gets the foreign keys for this table.
    *
-   * @returns {Object[]}
+   * @returns {ForeignKey[]}
    */
   getForeignKeys () {
-    if (!this._foreignKeys)
-      return []
+    return this.schema.catalog.foreignKeys.filter(({ nativeTable }) => this === nativeTable)
+  }
 
-    return this._foreignKeys.map(({ nativeColumnNums, foreignTableOid, foreignColumnNums }) => ({
-      nativeTable: this,
-      nativeColumns:
-        nativeColumnNums.map(num => this.columns.find(({ _num }) => _num === num)),
-      foreignTable:
-        this.schema.catalog.getAllTables().find(({ _oid }) => _oid === foreignTableOid),
-      foreignColumns:
-        foreignColumnNums.map(num =>
-          this.schema.catalog.getAllColumns()
-          .find(({ table, _num }) => table._oid === foreignTableOid && _num === num)
-        ),
-    }))
+  /**
+   * Gets foreign keys in the opposite direction for this table.
+   *
+   * @returns {ForeignKey[]}
+   */
+  getReverseForeignKeys () {
+    return this.schema.catalog.foreignKeys.filter(({ foreignTable }) => this === foreignTable)
   }
 }
 
@@ -292,5 +262,24 @@ export class Enum {
     this.schema = schema
     this.name = name
     this.variants = variants
+  }
+}
+
+/**
+ * A foreign key describing a reference between one table and another.
+ *
+ * @member {Catalog} catalog
+ * @member {Table} nativeTable
+ * @member {Column[]} nativeColumns
+ * @member {Table} foreignTable
+ * @member {Column[]} foreignColumns
+ */
+export class ForeignKey {
+  constructor ({ catalog, nativeTable, nativeColumns, foreignTable, foreignColumns }) {
+    this.catalog = catalog
+    this.nativeTable = nativeTable
+    this.nativeColumns = nativeColumns
+    this.foreignTable = foreignTable
+    this.foreignColumns = foreignColumns
   }
 }

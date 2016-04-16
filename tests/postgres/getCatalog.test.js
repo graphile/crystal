@@ -107,38 +107,39 @@ describe('getCatalog', () => {
   })
 
   it('will get foreign keys', () => {
-    expect(catalog.getTable('c', 'compound_key').getForeignKeys()).toEqual([
+    const simplifyForeignKey = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
+      nativeTable: nativeTable.name,
+      nativeColumns: nativeColumns.map(({ name }) => name),
+      foreignTable: foreignTable.name,
+      foreignColumns: foreignColumns.map(({ name }) => name),
+    })
+
+    expect(catalog.getTable('c', 'compound_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
       {
-        nativeTable: catalog.getTable('c', 'compound_key'),
-        nativeColumns: [catalog.getColumn('c', 'compound_key', 'person_id_2')],
-        foreignTable: catalog.getTable('c', 'person'),
-        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+        nativeTable: 'compound_key',
+        nativeColumns: ['person_id_2'],
+        foreignTable: 'person',
+        foreignColumns: ['id'],
       },
       {
-        nativeTable: catalog.getTable('c', 'compound_key'),
-        nativeColumns: [catalog.getColumn('c', 'compound_key', 'person_id_1')],
-        foreignTable: catalog.getTable('c', 'person'),
-        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+        nativeTable: 'compound_key',
+        nativeColumns: ['person_id_1'],
+        foreignTable: 'person',
+        foreignColumns: ['id'],
       },
     ])
-    expect(catalog.getTable('a', 'foreign_key').getForeignKeys()).toEqual([
+    expect(catalog.getTable('a', 'foreign_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
       {
-        nativeTable: catalog.getTable('a', 'foreign_key'),
-        nativeColumns: [catalog.getColumn('a', 'foreign_key', 'person_id')],
-        foreignTable: catalog.getTable('c', 'person'),
-        foreignColumns: [catalog.getColumn('c', 'person', 'id')],
+        nativeTable: 'foreign_key',
+        nativeColumns: ['person_id'],
+        foreignTable: 'person',
+        foreignColumns: ['id'],
       },
       {
-        nativeTable: catalog.getTable('a', 'foreign_key'),
-        nativeColumns: [
-          catalog.getColumn('a', 'foreign_key', 'compound_key_1'),
-          catalog.getColumn('a', 'foreign_key', 'compound_key_2'),
-        ],
-        foreignTable: catalog.getTable('c', 'compound_key'),
-        foreignColumns: [
-          catalog.getColumn('c', 'compound_key', 'person_id_1'),
-          catalog.getColumn('c', 'compound_key', 'person_id_2'),
-        ],
+        nativeTable: 'foreign_key',
+        nativeColumns: ['compound_key_1', 'compound_key_2'],
+        foreignTable: 'compound_key',
+        foreignColumns: ['person_id_1', 'person_id_2'],
       },
     ])
   })
