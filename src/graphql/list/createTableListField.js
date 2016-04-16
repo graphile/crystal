@@ -50,7 +50,7 @@ const createTableListField = table => ({
     last: {
       type: GraphQLInt,
       description:
-        'The bottom **n** items in the collection to be returned. Can’t be used' +
+        'The bottom **n** items in the collection to be returned. Can’t be used ' +
         'with `first`.',
     },
     before: {
