@@ -32,7 +32,6 @@ const createTableListField = table => ({
     // The column specified by `orderBy` means more than just the order to
     // return items in. This column is also the column we will use for
     // cursors.
-    // TODO: intelligent default.
     orderBy: {
       type: createTableOrderingEnum(table),
       description:

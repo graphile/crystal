@@ -1,5 +1,3 @@
-// TODO: Use the server for this.
-
 import assert from 'assert'
 import { once } from 'lodash'
 import path from 'path'
