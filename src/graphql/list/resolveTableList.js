@@ -31,8 +31,8 @@ const resolveTableListField = table => {
       // Create the ordering statement and add it to the query.
       // If a `last` argument was defined we are querying from the bottom so we
       // need to flip our order.
-      const queryDescending = last ? !descending : descending
-      query = query.order(tableSql[orderBy][queryDescending ? 'descending' : 'ascending'])
+      const actuallyDescending = last ? !descending : descending
+      query = query.order(tableSql[orderBy][actuallyDescending ? 'descending' : 'ascending'])
 
       // Set the correct range.
       if (first) query = query.limit(first)
