@@ -141,6 +141,7 @@ const resolveTableListField = table => {
       },
 
       get edges () {
+        // Returns the rows with a generated `cursor` field for more details.
         return getRows().then(rows => rows.map(row => ({
           cursor: getRowCursorValue(row),
           node: row,
