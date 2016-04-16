@@ -37,8 +37,13 @@ const createServer = async ({ graphqlSchema, pgConfig, route, development }) => 
 
 export default createServer
 
-const developmentFormatError = error => ({
-  message: error.message,
-  locations: error.locations,
-  stack: error.stack,
-})
+const developmentFormatError = error => {
+  /* eslint-disable no-console */
+  console.error(error.stack)
+  /* eslint-enable no-console */
+  return {
+    message: error.message,
+    locations: error.locations,
+    stack: error.stack,
+  }
+}
