@@ -6,14 +6,17 @@ import { graphql } from 'graphql'
 import { PG_CONFIG, getClient } from '../helpers.js'
 import createGraphqlSchema from '#/createGraphqlSchema.js'
 
+const SCHEMA_NAME = 'forum_example'
 const TEST_FIXTURES = 'tests/integration/fixtures'
 
-before(() => getClient().then(client =>
-  client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
-))
+before(async () => {
+  const client = await getClient()
+  await client.queryAsync(`drop schema ${SCHEMA_NAME} cascade`)
+  await client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
+})
 
 describe('integration', () => {
-  const getGraphqlSchema = once(() => createGraphqlSchema(PG_CONFIG, 'forum_example'))
+  const getGraphqlSchema = once(() => createGraphqlSchema(PG_CONFIG, SCHEMA_NAME))
 
   readdirSync(TEST_FIXTURES).forEach(fileName => {
     if (path.extname(fileName) === '.graphql') {
