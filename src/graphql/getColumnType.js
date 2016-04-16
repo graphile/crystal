@@ -14,10 +14,18 @@ import {
   GraphQLString,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLScalarType,
-  GraphQLObjectType,
   GraphQLEnumType,
 } from 'graphql'
+
+import {
+  DateType,
+  BigIntType,
+  PointType,
+  CircleType,
+  IntervalType,
+  JSONType,
+  UUIDType,
+} from './Types.js'
 
 const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
@@ -31,83 +39,6 @@ const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new
 export const createRequiredColumnArg = column => ({
   description: column.description,
   type: coerceToNonNullType(getColumnGraphqlType(column)),
-})
-
-const extendScalarType = (parent, { name, description, serialize, parseValue, parseLiteral }) =>
-  new GraphQLScalarType({
-    name,
-    description,
-    serialize: serialize || parent.serialize,
-    parseValue: parseValue || parent.parseValue,
-    parseLiteral: parseLiteral || parent.parseLiteral,
-  })
-
-const BigIntType = extendScalarType(GraphQLString, {
-  name: 'BigInt',
-  description: 'A signed eight-byte integer represented as a string',
-})
-
-const DateType = extendScalarType(GraphQLString, {
-  name: 'Date',
-  description: 'Some time value',
-})
-
-const PointType = new GraphQLObjectType({
-  name: 'Point',
-  description: 'A geometric point on a plane',
-  fields: {
-    x: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The x coordinate of the point',
-    },
-    y: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The y coordinate of the point',
-    },
-  },
-})
-
-const CircleType = new GraphQLObjectType({
-  name: 'Circle',
-  description: 'Some circle on a plane made of a point and a radius',
-  fields: {
-    x: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The x coordinate of the circle',
-    },
-    y: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The y coordinate of the circle',
-    },
-    radius: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The radius of the circle',
-    },
-  },
-})
-
-const IntervalType = new GraphQLObjectType({
-  name: 'Interval',
-  description: 'Some time span',
-  fields: {
-    milliseconds: { type: GraphQLInt },
-    seconds: { type: GraphQLInt },
-    minutes: { type: GraphQLInt },
-    hours: { type: GraphQLInt },
-    days: { type: GraphQLInt },
-    months: { type: GraphQLInt },
-    years: { type: GraphQLInt },
-  },
-})
-
-const JSONType = extendScalarType(GraphQLString, {
-  name: 'JSON',
-  description: 'An object not queryable by GraphQL',
-})
-
-const UUIDType = extendScalarType(GraphQLString, {
-  name: 'UUID',
-  description: 'A universally unique identifier',
 })
 
 /**

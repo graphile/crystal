@@ -4,7 +4,11 @@ const resolveTableListField = table => {
   return (source, args, { client }) => {
     const { orderBy, first, last, after, before, offset, descending } = args
 
-    // If both first and last are defined, throw an error.
+    // Throw an error if `orderBy` is not defined.
+    if (!orderBy)
+      throw new Error('`orderBy` not defined in properties. `orderBy` is required for creating cursors.')
+
+    // If both `first` and `last` are defined, throw an error.
     if (first && last)
       throw new Error('Cannot define both a `first` and a `last` argument.')
 

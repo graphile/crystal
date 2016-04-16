@@ -1,5 +1,6 @@
 import { fromPairs, camelCase, snakeCase, upperFirst, toUpper } from 'lodash'
-import createConnectionType, { CursorType } from '../createConnectionType.js'
+import createConnectionType from '../createConnectionType.js'
+import { CursorType } from '../Types.js'
 import resolveTableList from './resolveTableList.js'
 
 import {
