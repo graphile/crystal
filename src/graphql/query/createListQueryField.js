@@ -1,7 +1,7 @@
 import { camelCase, upperFirst } from 'lodash'
-import createConnectionType from './createConnectionType.js'
-import createConnectionArgs from './createConnectionArgs.js'
-import resolveConnection from './resolveConnection.js'
+import createConnectionType from '../createConnectionType.js'
+import createConnectionArgs from '../createConnectionArgs.js'
+import resolveConnection from '../resolveConnection.js'
 
 /**
  * Gets the Relay connection specification compliant list field for a `Table`.
@@ -9,7 +9,7 @@ import resolveConnection from './resolveConnection.js'
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createTableListField = table => ({
+const createListQueryField = table => ({
   // Make sure the type of this field is our connection type. This connection
   // type will expect functions (that cache their values) and not traditional
   // values. This improves performance when we don’t have to do potentially
@@ -27,4 +27,4 @@ const createTableListField = table => ({
   resolve: resolveConnection(table),
 })
 
-export default createTableListField
+export default createListQueryField

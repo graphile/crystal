@@ -1,8 +1,8 @@
 import { fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
-import createTableType from './createTableType.js'
-import getColumnType from './getColumnType.js'
-import resolveTableSingle from './resolveTableSingle.js'
+import createTableType from '../createTableType.js'
+import getColumnType from '../getColumnType.js'
+import resolveTableSingle from '../resolveTableSingle.js'
 
 /**
  * Creates an object field for selecting a single row of a table.
@@ -10,7 +10,7 @@ import resolveTableSingle from './resolveTableSingle.js'
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createTableSingleField = table => {
+const createSingleQueryField = table => {
   const primaryKeyColumns = table.getPrimaryKeyColumns()
 
   if (primaryKeyColumns.length === 0) {
@@ -41,7 +41,7 @@ const createTableSingleField = table => {
   }
 }
 
-export default createTableSingleField
+export default createSingleQueryField
 
 const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 

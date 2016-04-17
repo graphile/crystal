@@ -1,6 +1,6 @@
 import { fromPairs, camelCase, upperFirst, identity } from 'lodash'
-import createTableType from './createTableType.js'
-import getColumnType from './getColumnType.js'
+import createTableType from '../createTableType.js'
+import getColumnType from '../getColumnType.js'
 
 import {
   getNullableType,
@@ -18,7 +18,7 @@ const pascalCase = string => upperFirst(camelCase(string))
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createTableInsertField = table => ({
+const createInsertMutationField = table => ({
   type: createPayloadType(table),
   description: `Creates a new node of type \`${pascalCase(table.name)}\`.`,
 
@@ -32,7 +32,7 @@ const createTableInsertField = table => ({
   resolve: resolveCreate(table),
 })
 
-export default createTableInsertField
+export default createInsertMutationField
 
 const createInputType = table =>
   new GraphQLInputObjectType({

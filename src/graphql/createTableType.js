@@ -1,8 +1,12 @@
 import { memoize, fromPairs, camelCase, upperFirst } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import getColumnType from './getColumnType.js'
-import createForeignKeyField from './createForeignKeyField.js'
-import createForeignKeyReverseField from './createForeignKeyReverseField.js'
+import resolveTableSingle from './resolveTableSingle.js'
+import createConnectionType from './createConnectionType.js'
+import createConnectionArgs from './createConnectionArgs.js'
+import resolveConnection from './resolveConnection.js'
+
+const pascalCase = string => upperFirst(camelCase(string))
 
 /**
  * Creates the `GraphQLObjectType` for a table.
@@ -30,7 +34,7 @@ const createTableType = memoize(table => {
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
     // name and the description is the associated comment in PostgreSQL.
-    name: upperFirst(camelCase(table.name)),
+    name: pascalCase(table.name),
     description: table.description,
 
     // Make sure all of our columns have a corresponding field. This is a thunk
@@ -72,4 +76,46 @@ const createColumnField = column => ({
   type: getColumnType(column),
   description: column.description,
   resolve: source => source[column.name],
+})
+
+/**
+ * Creates a field for use with a table type to select a single object
+ * referenced by a foreign key.
+ *
+ * @param {ForeignKey} foreignKey
+ * @returns {GraphQLFieldConfig}
+ */
+const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
+  type: createTableType(foreignTable),
+  description:
+    `Queries a \`${pascalCase(foreignTable.name)}\` node related to ` +
+    `the \`${pascalCase(nativeTable.name)}\` type.`,
+
+  resolve: resolveTableSingle(
+    foreignTable,
+    foreignColumns,
+    source => nativeColumns.map(({ name }) => source[name])
+  ),
+})
+
+/**
+ * Creates a field to be used for selecting a foreign key in the reverse. This
+ * will return a connection.
+ *
+ * @param {ForeignKey} foreignKey
+ * @returns {GraphQLFieldConfig}
+ */
+const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
+  type: createConnectionType(nativeTable),
+  description:
+    `Queries and returns a connection of \`${pascalCase(nativeTable.name)}\` ` +
+    `items that are related to the \`${pascalCase(foreignTable.name)}\` source ` +
+    'node.',
+
+  args: createConnectionArgs(nativeTable, nativeColumns),
+
+  resolve: resolveConnection(
+    nativeTable,
+    source => fromPairs(foreignColumns.map(({ name }, i) => [nativeColumns[i].name, source[name]]))
+  ),
 })

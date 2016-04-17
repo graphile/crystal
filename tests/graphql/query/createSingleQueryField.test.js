@@ -1,18 +1,18 @@
 import expect from 'expect'
 import { keys } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
-import { TestTable, TestColumn } from '../helpers.js'
-import createTableSingleField from '#/graphql/createTableSingleField.js'
+import { TestTable, TestColumn } from '../../helpers.js'
+import createSingleQueryField from '#/graphql/query/createSingleQueryField.js'
 
-describe('createTableSingleField', () => {
+describe('createSingleQueryField', () => {
   it('is an object type', async () => {
-    const person = createTableSingleField(new TestTable({ name: 'person' }))
+    const person = createSingleQueryField(new TestTable({ name: 'person' }))
     expect(person.type).toBeA(GraphQLObjectType)
     expect(person.type.name).toEqual('Person')
   })
 
   it('has args for every primary key column', () => {
-    const person = createTableSingleField(
+    const person = createSingleQueryField(
       new TestTable({
         name: 'person',
         columns: [
@@ -23,7 +23,7 @@ describe('createTableSingleField', () => {
       })
     )
 
-    const compoundKey = createTableSingleField(
+    const compoundKey = createSingleQueryField(
       new TestTable({
         name: 'compound_key',
         columns: [
@@ -45,7 +45,7 @@ describe('createTableSingleField', () => {
   })
 
   it('will use the column comment for arg description', () => {
-    const person = createTableSingleField(
+    const person = createSingleQueryField(
       new TestTable({
         name: 'person',
         columns: [
