@@ -1,27 +1,41 @@
 mutation InsertTest {
-  a: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
-  b: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
-  c: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
-  d: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
-  e: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
-  f: insertPost(post: {id: 200, headline: "Manually set stuffs.", authorId: 1}) {
-    id
-    headline
-    authorId
+  a: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...post }
+  b: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...post }
+  c: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
+    clientMutationId
+    ...post
+  }
+  d: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "abcde"}) {
+    clientMutationId
+    ...post
+  }
+  e: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "123456"}) {
+    clientMutationId
+    ...post
+  }
+  f: insertPost(input: {id: 200, headline: "Manually set stuffs.", authorId: 1}) {
+    clientMutationId
+    post {
+      id
+      headline
+      authorId
+    }
   }
 }
 
-fragment post on Post {
-  id
-  headline
-  personByAuthorId {
+fragment post on InsertPostPayload {
+  post {
     id
-    givenName
-    familyName
-    postListByAuthorId {
-      list {
-        id
-        headline
+    headline
+    personByAuthorId {
+      id
+      givenName
+      familyName
+      postListByAuthorId {
+        list {
+          id
+          headline
+        }
       }
     }
   }

@@ -1,15 +1,20 @@
 import expect from 'expect'
-import { GraphQLNonNull, GraphQLInputObjectType, GraphQLScalarType } from 'graphql'
+import { GraphQLNonNull, GraphQLInputObjectType, GraphQLScalarType, GraphQLString } from 'graphql'
 import { TestTable, TestColumn } from '../helpers.js'
 import createTableInsertField from '#/graphql/createTableInsertField.js'
 
 describe('createTableInsertField', () => {
   it('returns field with single argument', () => {
     const field = createTableInsertField(new TestTable())
-    expect(field.args.test.type).toBeA(GraphQLNonNull)
-    expect(field.args.test.type.ofType).toBeA(GraphQLInputObjectType)
-    expect(field.args.test.type.ofType.name).toEqual('TestInput')
-    expect(field.args.test.type.ofType.getFields()).toIncludeKeys(['test'])
+    expect(field.args.input.type).toBeA(GraphQLNonNull)
+    expect(field.args.input.type.ofType).toBeA(GraphQLInputObjectType)
+    expect(field.args.input.type.ofType.name).toEqual('InsertTestInput')
+    expect(field.args.input.type.ofType.getFields()).toIncludeKeys(['test'])
+  })
+
+  it('will have a `clientMutationId` field in input', () => {
+    const field = createTableInsertField(new TestTable())
+    expect(field.args.input.type.ofType.getFields().clientMutationId.type).toBe(GraphQLString)
   })
 
   it('will make nullable columns with a default', () => {
@@ -22,7 +27,7 @@ describe('createTableInsertField', () => {
         new TestColumn({ name: 'status', isNullable: false, hasDefault: true }),
       ],
     }))
-    const inputFields = field.args.test.type.ofType.getFields()
+    const inputFields = field.args.input.type.ofType.getFields()
     expect(inputFields.id.type).toBeA(GraphQLScalarType)
     expect(inputFields.givenName.type).toBeA(GraphQLNonNull)
     expect(inputFields.givenName.type.ofType).toBeA(GraphQLScalarType)
