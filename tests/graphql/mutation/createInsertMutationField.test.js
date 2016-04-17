@@ -20,7 +20,7 @@ describe('createInsertMutationField', () => {
   it('will make nullable columns with a default', () => {
     const field = createInsertMutationField(new TestTable({
       columns: [
-        new TestColumn({ name: 'id', primaryKey: true, isNullable: false, hasDefault: true }),
+        new TestColumn({ name: 'id', isPrimaryKey: true, isNullable: false, hasDefault: true }),
         new TestColumn({ name: 'given_name', isNullable: false }),
         new TestColumn({ name: 'family_name' }),
         new TestColumn({ name: 'points', hasDefault: true }),

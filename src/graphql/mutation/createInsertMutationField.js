@@ -1,6 +1,6 @@
-import { fromPairs, camelCase, upperFirst, identity } from 'lodash'
-import createTableType from '../createTableType.js'
+import { chain, fromPairs, camelCase, upperFirst, identity } from 'lodash'
 import getColumnType from '../getColumnType.js'
+import createTableType from '../createTableType.js'
 
 import {
   getNullableType,
@@ -20,16 +20,16 @@ const pascalCase = string => upperFirst(camelCase(string))
  */
 const createInsertMutationField = table => ({
   type: createPayloadType(table),
-  description: `Creates a new node of type \`${pascalCase(table.name)}\`.`,
+  description: 'Inserts a new node.',
 
   args: {
     input: {
       type: new GraphQLNonNull(createInputType(table)),
-      description: 'The new node to be created.',
+      description: 'The input for insering the new node.',
     },
   },
 
-  resolve: resolveCreate(table),
+  resolve: resolveInsert(table),
 })
 
 export default createInsertMutationField
@@ -40,8 +40,7 @@ const createInputType = table =>
     description: `Inserts a \`${pascalCase(table.name)}\` into the backend.`,
     fields: {
       ...fromPairs(
-        table.columns
-        .map(column => [camelCase(column.name), {
+        table.columns.map(column => [camelCase(column.name), {
           type: (column.hasDefault ? getNullableType : identity)(getColumnType(column)),
           description: column.description,
         }]),
@@ -61,7 +60,7 @@ const createPayloadType = table =>
     name: pascalCase(`insert_${table.name}_payload`),
     description:
       `Returns the full newly inserted \`${pascalCase(table.name)}\` after the ` +
-      ' mutation.',
+      'mutation.',
 
     fields: {
       [camelCase(table.name)]: {
@@ -80,7 +79,7 @@ const createPayloadType = table =>
     },
   })
 
-const resolveCreate = table => {
+const resolveInsert = table => {
   // Note that using `DataLoader` here would not make very minor performance
   // improvements because mutations are executed in sequence, not parallel.
   //
@@ -95,20 +94,22 @@ const resolveCreate = table => {
     const result = await client.queryAsync(
       tableSql
       .insert(
-        ...table.columns
-        .map(({ name }) => {
-          // Get the value for this column, if it does not exist, we will not try
-          // inserting it. Rather letting the database choose how to handle the
-          // null/default.
-          const value = input[camelCase(name)]
+        // With this chain our goal is to get an object to be sent to the
+        // database and inserted.
+        chain(table.columns)
+        .map(column => {
+          const value = input[camelCase(column.name)]
           if (!value) return null
-          return tableSql[name].value(value)
+          return [column.name, value]
         })
-        .filter(node => node != null)
+        .filter(pair => pair != null)
+        .fromPairs()
+        .value()
       )
       .returning(tableSql.star())
       .toQuery()
     )
+
     // Return the first (and likely only) row.
     return {
       [table.name]: result.rows[0],

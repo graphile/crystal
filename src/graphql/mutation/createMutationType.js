@@ -1,6 +1,7 @@
 import { ary, assign, camelCase } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import createInsertMutationField from './createInsertMutationField.js'
+import createUpdateMutationField from './createUpdateMutationField.js'
 
 const createMutationType = schema =>
   new GraphQLObjectType({
@@ -16,4 +17,5 @@ export default createMutationType
 
 const createMutationFields = table => ({
   [camelCase(`insert_${table.name}`)]: createInsertMutationField(table),
+  [camelCase(`update_${table.name}`)]: createUpdateMutationField(table),
 })

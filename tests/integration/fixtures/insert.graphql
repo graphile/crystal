@@ -1,6 +1,10 @@
 mutation InsertTest {
-  a: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...post }
-  b: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...post }
+  a: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
+    ...post
+  }
+  b: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
+    ...post
+  }
   c: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
     clientMutationId
     ...post

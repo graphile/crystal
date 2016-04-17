@@ -1,0 +1,83 @@
+{
+  "data": {
+    "a": {
+      "post": {
+        "id": 1,
+        "headline": "Whoah",
+        "authorId": 2,
+        "personByAuthorId": {
+          "id": 2,
+          "givenName": "Johnny",
+          "familyName": "Tucker"
+        }
+      }
+    },
+    "b": {
+      "clientMutationId": null,
+      "post": {
+        "id": 1,
+        "headline": "Whoah",
+        "authorId": 5,
+        "personByAuthorId": {
+          "id": 5,
+          "givenName": "Ann",
+          "familyName": "West"
+        }
+      }
+    },
+    "c": {
+      "clientMutationId": "123456",
+      "post": {
+        "id": 1,
+        "headline": "Hello, world!",
+        "authorId": 11,
+        "personByAuthorId": {
+          "id": 11,
+          "givenName": "Beverly",
+          "familyName": "Kelly"
+        }
+      }
+    },
+    "d": {
+      "person": {
+        "id": 11,
+        "givenName": "Test",
+        "familyName": "User",
+        "postListByAuthorId": {
+          "list": [
+            {
+              "id": 1,
+              "headline": "Hello, world!"
+            }
+          ]
+        }
+      }
+    },
+    "e": {
+      "clientMutationId": null,
+      "post": {
+        "id": 1,
+        "headline": "next",
+        "authorId": 11,
+        "personByAuthorId": {
+          "id": 11,
+          "givenName": "Test",
+          "familyName": "User"
+        }
+      }
+    },
+    "f": {
+      "clientMutationId": "abcdefg",
+      "post": {
+        "id": 42,
+        "headline": "next",
+        "authorId": 11,
+        "personByAuthorId": {
+          "id": 11,
+          "givenName": "Test",
+          "familyName": "User"
+        }
+      }
+    }
+  }
+}
