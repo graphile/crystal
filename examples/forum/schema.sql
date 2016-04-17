@@ -63,6 +63,8 @@ insert into person (id, given_name, family_name, about) values
   (13, 'Nicholas', 'Perry', null),
   (14, 'Carol', 'Taylor', null);
 
+alter sequence person_id_seq restart with 15;
+
 insert into post (id, author_id, headline, topic, body) values
   (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null, null),
   (2, 1, 'I hate yogurt. It’s just stuff with bits in.', 'inspiration', null),
@@ -76,6 +78,8 @@ insert into post (id, author_id, headline, topic, body) values
   (10, 2, 'What’s with you kids? Every other day it’s food, food, food.', 'discussion', null),
   (11, 3, 'They’re not aliens, they’re Earth…liens!', 'help', null),
   (12, 5, 'You’ve swallowed a planet!', null, null);
+
+alter sequence post_id_seq restart with 13;
 
 -------------------------------------------------------------------------------
 -- Permissions
