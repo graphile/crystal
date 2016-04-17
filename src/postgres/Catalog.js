@@ -226,9 +226,19 @@ export class Table {
  * @member {number} type
  * @member {boolean} isNullable
  * @member {boolean} isPrimaryKey
+ * @member {boolean} hasDefault
  */
 export class Column {
-  constructor ({ _num, table, name, description, type, isNullable = true, isPrimaryKey }) {
+  constructor ({
+    _num,
+    table,
+    name,
+    description,
+    type,
+    isNullable = true,
+    isPrimaryKey,
+    hasDefault = false,
+  }) {
     this._num = _num
     this.table = table
     this.name = name
@@ -236,6 +246,7 @@ export class Column {
     this.type = type
     this.isNullable = isNullable
     this.isPrimaryKey = isPrimaryKey
+    this.hasDefault = hasDefault
   }
 
   /**

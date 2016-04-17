@@ -1,0 +1,28 @@
+mutation InsertTest {
+  a: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
+  b: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
+  c: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
+  d: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
+  e: insertPost(post: {headline: "Hello, world!", authorId: 10}) { ...post }
+  f: insertPost(post: {id: 200, headline: "Manually set stuffs.", authorId: 1}) {
+    id
+    headline
+    authorId
+  }
+}
+
+fragment post on Post {
+  id
+  headline
+  personByAuthorId {
+    id
+    givenName
+    familyName
+    postListByAuthorId {
+      list {
+        id
+        headline
+      }
+    }
+  }
+}

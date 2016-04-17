@@ -29,12 +29,18 @@ describe('integration', () => {
         const expectedData = JSON.parse(readFileSync(jsonPath, 'utf8'))
         const client = await getClient()
 
+        // Begin a block.
+        await client.queryAsync('begin')
+
         const data = await graphql(
           graphqlSchema,
           readFileSync(graphQLPath),
           null,
           { client }
         )
+
+        // End the block by rolling it back so mutations are not saved.
+        await client.queryAsync('rollback')
 
         /* eslint-disable no-console */
         if (data.errors)

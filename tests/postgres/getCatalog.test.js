@@ -143,6 +143,16 @@ describe('getCatalog', () => {
       },
     ])
   })
+
+  it('will get if a column has a default', () => {
+    expect(catalog.getColumn('c', 'person', 'id').hasDefault).toBe(true)
+    expect(catalog.getColumn('c', 'person', 'name').hasDefault).toBe(false)
+    expect(catalog.getColumn('c', 'person', 'about').hasDefault).toBe(false)
+    expect(catalog.getColumn('a', 'hello', 'z_some').hasDefault).toBe(true)
+    expect(catalog.getColumn('a', 'hello', 'abc').hasDefault).toBe(true)
+    expect(catalog.getColumn('a', 'hello', 'world').hasDefault).toBe(false)
+    expect(catalog.getColumn('a', 'hello', 'moon').hasDefault).toBe(false)
+  })
 })
 
 before(() => getClient().then(client => client.queryAsync(`
@@ -180,10 +190,10 @@ comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
 
 create table a.hello (
-  z_some int,
+  z_some int default 42,
   world int,
   moon int not null,
-  abc int,
+  abc int default 2,
   yoyo int
 );
 

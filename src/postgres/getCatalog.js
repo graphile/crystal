@@ -56,7 +56,8 @@ const getRawColumns = memoize(client =>
       d.description as "description",
       a.atttypid as "type",
       not(a.attnotnull) as "isNullable",
-      cp.oid is not null as "isPrimaryKey"
+      cp.oid is not null as "isPrimaryKey",
+      a.atthasdef as "hasDefault"
     from
       pg_catalog.pg_attribute as a
       left join pg_catalog.pg_class as c on c.oid = a.attrelid
