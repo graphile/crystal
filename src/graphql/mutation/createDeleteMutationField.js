@@ -1,49 +1,49 @@
-import { fromPairs, camelCase, upperFirst, identity } from 'lodash'
+import { fromPairs, camelCase, upperFirst } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
 
 import {
-  getNullableType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLInputObjectType,
 } from 'graphql'
 
 const pascalCase = string => upperFirst(camelCase(string))
+const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
- * Creates a mutation which will create a new row.
+ * Creates a mutation which will delete a single existing row.
  *
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createInsertMutationField = table => ({
+const createDeleteMutationField = table => ({
   type: createPayloadType(table),
-  description: 'Inserts a new node.',
+  description: 'Deletes a single node',
 
   args: {
     input: {
       type: new GraphQLNonNull(createInputType(table)),
-      description: 'The input for insering the new node.',
+      description: 'The input specifying the node to delete.',
     },
   },
 
-  resolve: resolveInsert(table),
+  resolve: resolveDelete(table),
 })
 
-export default createInsertMutationField
+export default createDeleteMutationField
 
 const createInputType = table =>
   new GraphQLInputObjectType({
-    name: pascalCase(`insert_${table.name}_input`),
-    description: `Inserts a \`${pascalCase(table.name)}\` into the backend.`,
+    name: pascalCase(`delete_${table.name}_input`),
+    description: `Deletes a single \`${pascalCase(table.name)}\` from the backend.`,
     fields: {
       ...fromPairs(
-        table.columns.map(column => [camelCase(column.name), {
-          type: (column.hasDefault ? getNullableType : identity)(getColumnType(column)),
-          description: column.description,
-        }]),
+        table.getPrimaryKeyColumns().map(column => [camelCase(column.name), {
+          type: getNonNullType(getColumnType(column)),
+          description: `Used to designate the single \`${pascalCase(table.name)}\` to update.`,
+        }])
       ),
       clientMutationId: inputClientMutationId,
     },
@@ -51,35 +51,31 @@ const createInputType = table =>
 
 const createPayloadType = table =>
   new GraphQLObjectType({
-    name: pascalCase(`insert_${table.name}_payload`),
-    description: `Returns the inserted \`${pascalCase(table.name)}\`.`,
-
+    name: pascalCase(`delete_${table.name}_payload`),
+    description: `Returns the deleted \`${pascalCase(table.name)}\`.`,
     fields: {
       [camelCase(table.name)]: {
         type: createTableType(table),
-        description: `The inserted \`${pascalCase(table.name)}\`.`,
+        description: `The deleted \`${pascalCase(table.name)}\`.`,
         resolve: source => source[table.name],
       },
       clientMutationId: payloadClientMutationId,
     },
   })
 
-const resolveInsert = table => {
-  // Note that using `DataLoader` here would not make very minor performance
-  // improvements because mutations are executed in sequence, not parallel.
-  //
-  // A better solution for batch inserts is a custom batch insert field.
+const resolveDelete = table => {
   const tableSql = table.sql()
+  const primaryKeyColumns = table.getPrimaryKeyColumns()
 
   return async (source, args, { client }) => {
-    // Get the input object value from the args.
     const { input } = args
     const { clientMutationId } = input
-    // Insert the thing making sure we return the newly inserted row.
+
     const result = await client.queryAsync(
       tableSql
-      .insert(fromPairs(
-        table.columns
+      .delete()
+      .where(fromPairs(
+        primaryKeyColumns
         .map(column => [column.name, input[camelCase(column.name)]])
         .filter(([, value]) => value)
       ))
@@ -87,7 +83,6 @@ const resolveInsert = table => {
       .toQuery()
     )
 
-    // Return the first (and likely only) row.
     return {
       [table.name]: result.rows[0],
       clientMutationId,

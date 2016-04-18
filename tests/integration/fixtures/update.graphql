@@ -1,29 +1,27 @@
 mutation UpdateTest {
-	a: updatePost(input: {id: 1, newHeadline: "Whoah"}) {
-		...post
-	}
-	b: updatePost(input: {id: 1, newAuthorId: 5}) {
-		clientMutationId
-		...post
-	}
-	c: updatePost(input: {id: 1, newHeadline: "Hello, world!", newAuthorId: 11, clientMutationId: "123456"}) {
-		clientMutationId
-		...post
-	}
+	a: updatePost(input: {id: 1, newHeadline: "Whoah"}) { ...payload }
+	b: updatePost(input: {id: 1, newAuthorId: 5}) { ...payload }
+	c: updatePost(input: {id: 1, newHeadline: "Hello, world!", newAuthorId: 11, clientMutationId: "123456"}) { ...payload }
 	d: updatePerson(input: {id: 11, newGivenName: "Test", newFamilyName: "User"}) {
-		...person
-	}
-	e: updatePost(input: {id: 1, newHeadline: "next", newAuthorId: 11}) {
 		clientMutationId
-		...post
+		person {
+	    id
+	    givenName
+	    familyName
+	    postListByAuthorId {
+	      list {
+	        id
+	        headline
+	      }
+	    }
+	  }
 	}
-	f: updatePost(input: {id: 1, newId: 42, clientMutationId: "abcdefg"}) {
-		clientMutationId
-		...post
-	}
+	e: updatePost(input: {id: 1, newHeadline: "next", newAuthorId: 11}) { ...payload }
+	f: updatePost(input: {id: 1, newId: 42, clientMutationId: "abcdefg"}) { ...payload }
 }
 
-fragment post on UpdatePostPayload {
+fragment payload on UpdatePostPayload {
+	clientMutationId
   post {
     id
     headline
@@ -32,20 +30,6 @@ fragment post on UpdatePostPayload {
       id
       givenName
       familyName
-    }
-  }
-}
-
-fragment person on UpdatePersonPayload {
-  person {
-    id
-    givenName
-    familyName
-    postListByAuthorId {
-      list {
-        id
-        headline
-      }
     }
   }
 }

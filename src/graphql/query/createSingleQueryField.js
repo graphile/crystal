@@ -4,6 +4,8 @@ import createTableType from '../createTableType.js'
 import getColumnType from '../getColumnType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
+const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
+
 /**
  * Creates an object field for selecting a single row of a table.
  *
@@ -30,7 +32,10 @@ const createSingleQueryField = table => {
     // selecting one and only one row.
     args: fromPairs(
       table.getPrimaryKeyColumns()
-      .map(column => [camelCase(column.name), createRequiredColumnArg(column)])
+      .map(column => [camelCase(column.name), {
+        description: column.description,
+        type: getNonNullType(getColumnType(column)),
+      }])
     ),
 
     resolve: resolveTableSingle(
@@ -42,10 +47,3 @@ const createSingleQueryField = table => {
 }
 
 export default createSingleQueryField
-
-const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
-
-const createRequiredColumnArg = column => ({
-  description: column.description,
-  type: coerceToNonNullType(getColumnType(column)),
-})

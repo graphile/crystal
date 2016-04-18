@@ -1,0 +1,17 @@
+mutation DeleteTest {
+  a: deletePerson(input: {id: 11}) { ...payload }
+  b: deletePerson(input: {id: 11}) { ...payload }
+  c: deletePerson(input: {id: 8, clientMutationId: "hello"}) { ...payload }
+  d: deletePerson(input: {id: 4, clientMutationId: "yoyo"}) { ...payload }
+  e: deletePerson(input: {id: 11}) { ...payload }
+  f: deletePerson(input: {id: 8, clientMutationId: "xxxx"}) { ...payload }
+}
+
+fragment payload on DeletePersonPayload {
+  clientMutationId
+  person {
+    id
+    givenName
+    familyName
+  }
+}

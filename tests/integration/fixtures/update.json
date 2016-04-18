@@ -1,6 +1,7 @@
 {
   "data": {
     "a": {
+      "clientMutationId": null,
       "post": {
         "id": 1,
         "headline": "Whoah",
@@ -39,6 +40,7 @@
       }
     },
     "d": {
+      "clientMutationId": null,
       "person": {
         "id": 11,
         "givenName": "Test",

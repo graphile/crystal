@@ -1,22 +1,9 @@
 mutation InsertTest {
-  a: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
-    ...post
-  }
-  b: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
-    ...post
-  }
-  c: insertPost(input: {headline: "Hello, world!", authorId: 10}) {
-    clientMutationId
-    ...post
-  }
-  d: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "abcde"}) {
-    clientMutationId
-    ...post
-  }
-  e: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "123456"}) {
-    clientMutationId
-    ...post
-  }
+  a: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...payload }
+  b: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...payload }
+  c: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...payload }
+  d: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "abcde"}) { ...payload }
+  e: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "123456"}) { ...payload }
   f: insertPost(input: {id: 200, headline: "Manually set stuffs.", authorId: 1}) {
     clientMutationId
     post {
@@ -27,7 +14,8 @@ mutation InsertTest {
   }
 }
 
-fragment post on InsertPostPayload {
+fragment payload on InsertPostPayload {
+  clientMutationId
   post {
     id
     headline
