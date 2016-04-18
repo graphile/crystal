@@ -25,7 +25,7 @@ const createSingleQueryField = table => {
 
   return {
     type: createTableType(table),
-    description: `Queries a single \`${upperFirst(camelCase(table.name))}\` with all of its primary keys.`,
+    description: `Queries a single \`${upperFirst(camelCase(table.name))}\` using its primary keys.`,
 
     // Get arguments for this single row data fetcher. Uses only primary key
     // columns. All arguments are required as we want to be 100% certain we are
@@ -33,8 +33,8 @@ const createSingleQueryField = table => {
     args: fromPairs(
       table.getPrimaryKeyColumns()
       .map(column => [camelCase(column.name), {
-        description: column.description,
         type: getNonNullType(getColumnType(column)),
+        description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
       }])
     ),
 

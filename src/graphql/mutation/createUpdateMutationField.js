@@ -21,12 +21,11 @@ const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new Grap
  */
 const createUpdateMutationField = table => ({
   type: createPayloadType(table),
-  description: 'Updates a single node.',
+  description: `Updates a single node of type \`${pascalCase(table.name)}\`.`,
 
   args: {
     input: {
       type: new GraphQLNonNull(createInputType(table)),
-      description: 'The input specifying the node to update and .',
     },
   },
 
@@ -39,21 +38,22 @@ const createInputType = table =>
   new GraphQLInputObjectType({
     name: pascalCase(`update_${table.name}_input`),
     description:
-      `Updates a \`${pascalCase(table.name)}\` in the backend. Use \`new*\` ` +
-      'fields to update the node described by the other properties.',
+      `Locates the \`${pascalCase(table.name)}\` node to update and specifies some ` +
+      'new field values. Primary key fields are required to be able to locate ' +
+      'the node to update.',
     fields: {
       // We include primary key columns to select a single row to update.
       ...fromPairs(
         table.getPrimaryKeyColumns().map(column => [camelCase(column.name), {
           type: getNonNullType(getColumnType(column)),
-          description: `Used to designate the single \`${pascalCase(table.name)}\` to update.`,
+          description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
         }])
       ),
       // We include all the other columns to actually allow users to update a value.
       ...fromPairs(
         table.columns.map(column => [camelCase(`new_${column.name}`), {
           type: getNullableType(getColumnType(column)),
-          description: `Updates the \`${camelCase(column.name)}\` field with the new value.`,
+          description: `Updates the node’s \`${camelCase(column.name)}\` field with this new value.`,
         }]),
       ),
       // And the client mutation id…
@@ -64,7 +64,7 @@ const createInputType = table =>
 const createPayloadType = table =>
   new GraphQLObjectType({
     name: pascalCase(`update_${table.name}_payload`),
-    description: `Returns the updated \`${pascalCase(table.name)}\`.`,
+    description: `Contains the \`${pascalCase(table.name)}\` node updated by the mutation.`,
     fields: {
       [camelCase(table.name)]: {
         type: createTableType(table),

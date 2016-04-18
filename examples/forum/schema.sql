@@ -22,7 +22,7 @@ create table person (
   about            text
 );
 
-comment on table person is 'A human, person, user of the forum.';
+comment on table person is 'A user of the forum.';
 comment on column person.id is 'The primary key for the person.';
 comment on column person.given_name is 'The person’s first name.';
 comment on column person.family_name is 'The person’s last name.';

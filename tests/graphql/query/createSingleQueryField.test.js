@@ -43,16 +43,4 @@ describe('createSingleQueryField', () => {
     expect(compoundKey.args.id1.type).toBeA(GraphQLNonNull)
     expect(compoundKey.args.id3.type).toBeA(GraphQLNonNull)
   })
-
-  it('will use the column comment for arg description', () => {
-    const person = createSingleQueryField(
-      new TestTable({
-        name: 'person',
-        columns: [
-          new TestColumn({ name: 'id', description: 'The person’s id', isPrimaryKey: true }),
-        ],
-      })
-    )
-    expect(person.args.id.description).toEqual('The person’s id')
-  })
 })

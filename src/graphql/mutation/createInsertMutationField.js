@@ -20,12 +20,11 @@ const pascalCase = string => upperFirst(camelCase(string))
  */
 const createInsertMutationField = table => ({
   type: createPayloadType(table),
-  description: 'Inserts a new node.',
+  description: `Creates a new node of the \`${pascalCase(table.name)}\` type.`,
 
   args: {
     input: {
       type: new GraphQLNonNull(createInputType(table)),
-      description: 'The input for insering the new node.',
     },
   },
 
@@ -37,7 +36,7 @@ export default createInsertMutationField
 const createInputType = table =>
   new GraphQLInputObjectType({
     name: pascalCase(`insert_${table.name}_input`),
-    description: `Inserts a \`${pascalCase(table.name)}\` into the backend.`,
+    description: `The \`${pascalCase(table.name)}\` to insert.`,
     fields: {
       ...fromPairs(
         table.columns.map(column => [camelCase(column.name), {
@@ -52,7 +51,7 @@ const createInputType = table =>
 const createPayloadType = table =>
   new GraphQLObjectType({
     name: pascalCase(`insert_${table.name}_payload`),
-    description: `Returns the inserted \`${pascalCase(table.name)}\`.`,
+    description: `Contains the \`${pascalCase(table.name)}\` node inserted by the mutation.`,
 
     fields: {
       [camelCase(table.name)]: {

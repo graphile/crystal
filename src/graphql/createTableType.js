@@ -88,7 +88,7 @@ const createColumnField = column => ({
 const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createTableType(foreignTable),
   description:
-    `Queries a \`${pascalCase(foreignTable.name)}\` node related to ` +
+    `Queries a single \`${pascalCase(foreignTable.name)}\` node related to ` +
     `the \`${pascalCase(nativeTable.name)}\` type.`,
 
   resolve: resolveTableSingle(
@@ -108,8 +108,8 @@ const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, forei
 const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createConnectionType(nativeTable),
   description:
-    `Queries and returns a connection for \`${pascalCase(nativeTable.name)}\` ` +
-    `items that are related to the \`${pascalCase(foreignTable.name)}\` source ` +
+    `Queries and returns a set of \`${pascalCase(nativeTable.name)}\` ` +
+    `nodes that are related to the \`${pascalCase(foreignTable.name)}\` source ` +
     'node.',
 
   args: createConnectionArgs(nativeTable, nativeColumns),

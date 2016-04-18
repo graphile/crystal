@@ -20,12 +20,11 @@ const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new Grap
  */
 const createDeleteMutationField = table => ({
   type: createPayloadType(table),
-  description: 'Deletes a single node',
+  description: `Deletes a single node of type \`${pascalCase(table.name)}\`.`,
 
   args: {
     input: {
       type: new GraphQLNonNull(createInputType(table)),
-      description: 'The input specifying the node to delete.',
     },
   },
 
@@ -37,12 +36,14 @@ export default createDeleteMutationField
 const createInputType = table =>
   new GraphQLInputObjectType({
     name: pascalCase(`delete_${table.name}_input`),
-    description: `Deletes a single \`${pascalCase(table.name)}\` from the backend.`,
+    description:
+      `Locates the single \`${pascalCase(table.name)}\` node to delete using ` +
+      'its required primary key fields.',
     fields: {
       ...fromPairs(
         table.getPrimaryKeyColumns().map(column => [camelCase(column.name), {
           type: getNonNullType(getColumnType(column)),
-          description: `Used to designate the single \`${pascalCase(table.name)}\` to update.`,
+          description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
         }])
       ),
       clientMutationId: inputClientMutationId,
@@ -52,7 +53,7 @@ const createInputType = table =>
 const createPayloadType = table =>
   new GraphQLObjectType({
     name: pascalCase(`delete_${table.name}_payload`),
-    description: `Returns the deleted \`${pascalCase(table.name)}\`.`,
+    description: `Contains the \`${pascalCase(table.name)}\` node deleted by the mutation.`,
     fields: {
       [camelCase(table.name)]: {
         type: createTableType(table),

@@ -17,7 +17,7 @@ const createListQueryField = table => ({
   type: createConnectionType(table),
 
   description:
-    'Queries and returns a list of items with some metatadata for ' +
+    'Queries and returns a set of items with some metatadata for ' +
     `\`${upperFirst(camelCase(table.name))}\`. Note that cursors will not work ` +
     'across different `orderBy` values. If you want to reuse a cursor, make ' +
     'sure you don’t change `orderBy`.',

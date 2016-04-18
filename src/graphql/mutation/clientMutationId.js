@@ -12,6 +12,6 @@ export const payloadClientMutationId = {
   type: GraphQLString,
   description:
     'If the mutation was passed a `clientMutationId` in the input object this ' +
-    'is the exact same value.',
+    'is the exact same value echoed back.',
   resolve: ({ clientMutationId }) => clientMutationId,
 }

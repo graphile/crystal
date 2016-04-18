@@ -13,9 +13,8 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
     type: createTableOrderingEnum(table),
     description:
       'The order the resulting items should be returned in. This argument ' +
-      'is also very important as it is used to determine which field will be ' +
-      'used as the pagination cursor. This value’s default will be the ' +
-      'primary key for the object.',
+      'is also important as it is used in creating pagination cursors. This ' +
+      'value’s default is the primary key for the object.',
     defaultValue: (() => {
       const column = table.getPrimaryKeyColumns()[0]
       if (column) return column.name
@@ -25,32 +24,32 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   first: {
     type: GraphQLInt,
     description:
-      'The top **n** items in the collection to be returned. Can’t be used ' +
+      'The top `n` items in the set to be returned. Can’t be used ' +
       'with `last`.',
   },
   last: {
     type: GraphQLInt,
     description:
-      'The bottom **n** items in the collection to be returned. Can’t be used ' +
+      'The bottom `n` items in the set to be returned. Can’t be used ' +
       'with `first`.',
   },
   before: {
     type: CursorType,
-    description: 'The collection returned will be constrained to all items **before** the provided cursor.',
+    description: 'Constrains the set to nodes *before* this cursor in the specified ordering.',
   },
   after: {
     type: CursorType,
-    description: 'The collection returned will be constrained to all items **after** the provided cursor.',
+    description: 'Constrains the set to nodes *after* this cursor in the specified ordering.',
   },
   offset: {
     type: GraphQLInt,
-    description: 'An integer offset representing how many items to skip before returning the values.',
+    description: 'An integer offset representing how many items to skip in the set.',
   },
   descending: {
     type: GraphQLBoolean,
     description:
-      'If `true` the items will be in descending order, if `false` the ' +
-      'items will be in ascending order.',
+      'If `true` the nodes will be in descending order, if `false` the ' +
+      'items will be in ascending order. `false` by default.',
     defaultValue: false,
   },
   ...fromPairs(
@@ -58,7 +57,9 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
     .filter(column => !includes(ignoreColumnConditions, column))
     .map(column => [camelCase(column.name), {
       type: getNullableType(getColumnType(column)),
-      description: 'Filter the resulting set with an equality test based on this value.',
+      description:
+        'Filters the resulting set with an equality test on the ' +
+        `\`${camelCase(column.name)}\` field.`,
     }])
   ),
 })
