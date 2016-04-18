@@ -1,20 +1,9 @@
 /* eslint-disable no-process-env */
 
 import { assign } from 'lodash'
-import pg from 'pg'
 import { Catalog, Schema, Table, Column, Enum } from '#/postgres/Catalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
-
-// We acquire a single client here which we will use for all tests because we
-// don’t care about concurrency. Mocha runs tests sequentially.
-const client = pg.connectAsync(PG_CONFIG)
-
-// We release our acquired client here.
-after(() => pg.end())
-
-// Nice convenience function for getting the client.
-export const getClient = () => client
 
 export class TestCatalog extends Catalog {}
 

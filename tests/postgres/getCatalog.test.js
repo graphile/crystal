@@ -1,12 +1,84 @@
 import expect from 'expect'
-import { getClient } from '../helpers.js'
+import pg from 'pg'
+import { PG_CONFIG } from '../helpers.js'
 import getCatalog from '#/postgres/getCatalog.js'
+
+const PG_SCHEMA = `
+drop schema if exists a cascade;
+drop schema if exists b cascade;
+drop schema if exists c cascade;
+
+create schema a;
+create schema b;
+create schema c;
+
+comment on schema a is 'The a schema.';
+comment on schema b is 'qwerty';
+
+create table c.person (
+  id serial primary key,
+  name varchar not null,
+  about text
+);
+
+create table c.compound_key (
+  person_id_2 int references c.person(id),
+  person_id_1 int references c.person(id),
+  primary key (person_id_1, person_id_2)
+);
+
+create table a.foreign_key (
+  person_id int references c.person(id),
+  compound_key_1 int,
+  compound_key_2 int,
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
+);
+
+comment on table c.person is 'Person test comment';
+comment on column c.person.name is 'The person’s name';
+
+create table a.hello (
+  z_some int default 42,
+  world int,
+  moon int not null,
+  abc int default 2,
+  yoyo int
+);
+
+comment on column a.hello.world is 'Hello, world!';
+
+create view b.yo as
+  select
+    world,
+    moon,
+    2 as constant
+  from
+    a.hello;
+
+comment on view b.yo is 'YOYOYO!!';
+comment on column b.yo.constant is 'This is constantly 2';
+
+create type a.letter as enum ('a', 'b', 'c', 'd');
+create type b.color as enum ('red', 'green', 'blue');
+
+create table a.types (
+  "bigint" bigint,
+  "boolean" boolean,
+  "varchar" varchar,
+  "enum" b.color
+);
+`
 
 describe('getCatalog', () => {
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 
-  before(async () => (catalog = await getCatalog(await getClient())))
+  before(async () => {
+    const client = await pg.connectAsync(PG_CONFIG)
+    await client.queryAsync(PG_SCHEMA)
+    catalog = await getCatalog(client)
+    client.end()
+  })
 
   it('gets schemas', () => {
     expect(catalog.getSchema('a')).toExist()
@@ -154,69 +226,3 @@ describe('getCatalog', () => {
     expect(catalog.getColumn('a', 'hello', 'moon').hasDefault).toBe(false)
   })
 })
-
-before(() => getClient().then(client => client.queryAsync(`
-drop schema if exists a cascade;
-drop schema if exists b cascade;
-drop schema if exists c cascade;
-
-create schema a;
-create schema b;
-create schema c;
-
-comment on schema a is 'The a schema.';
-comment on schema b is 'qwerty';
-
-create table c.person (
-  id serial primary key,
-  name varchar not null,
-  about text
-);
-
-create table c.compound_key (
-  person_id_2 int references c.person(id),
-  person_id_1 int references c.person(id),
-  primary key (person_id_1, person_id_2)
-);
-
-create table a.foreign_key (
-  person_id int references c.person(id),
-  compound_key_1 int,
-  compound_key_2 int,
-  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
-);
-
-comment on table c.person is 'Person test comment';
-comment on column c.person.name is 'The person’s name';
-
-create table a.hello (
-  z_some int default 42,
-  world int,
-  moon int not null,
-  abc int default 2,
-  yoyo int
-);
-
-comment on column a.hello.world is 'Hello, world!';
-
-create view b.yo as
-  select
-    world,
-    moon,
-    2 as constant
-  from
-    a.hello;
-
-comment on view b.yo is 'YOYOYO!!';
-comment on column b.yo.constant is 'This is constantly 2';
-
-create type a.letter as enum ('a', 'b', 'c', 'd');
-create type b.color as enum ('red', 'green', 'blue');
-
-create table a.types (
-  "bigint" bigint,
-  "boolean" boolean,
-  "varchar" varchar,
-  "enum" b.color
-);
-`)))

@@ -2,17 +2,19 @@ import assert from 'assert'
 import { once } from 'lodash'
 import path from 'path'
 import { readFileSync, readdirSync } from 'fs'
+import pg from 'pg'
 import { graphql } from 'graphql'
-import { PG_CONFIG, getClient } from '../helpers.js'
+import { PG_CONFIG } from '../helpers.js'
 import createGraphqlSchema from '#/createGraphqlSchema.js'
 
 const SCHEMA_NAME = 'forum_example'
 const TEST_FIXTURES = 'tests/integration/fixtures'
 
 before(async () => {
-  const client = await getClient()
+  const client = await pg.connectAsync(PG_CONFIG)
   await client.queryAsync(`drop schema ${SCHEMA_NAME} cascade`)
   await client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
+  client.end()
 })
 
 describe('integration', () => {
@@ -27,7 +29,7 @@ describe('integration', () => {
         const graphQLPath = path.resolve(TEST_FIXTURES, fileName)
         const jsonPath = path.resolve(TEST_FIXTURES, `${name}.json`)
         const expectedData = JSON.parse(readFileSync(jsonPath, 'utf8'))
-        const client = await getClient()
+        const client = await pg.connectAsync(PG_CONFIG)
 
         // Begin a block.
         await client.queryAsync('begin')
@@ -41,6 +43,9 @@ describe('integration', () => {
 
         // End the block by rolling it back so mutations are not saved.
         await client.queryAsync('rollback')
+
+        // Make sure to release our client!
+        client.end()
 
         /* eslint-disable no-console */
         if (data.errors)
