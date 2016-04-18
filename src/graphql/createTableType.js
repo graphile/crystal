@@ -56,7 +56,7 @@ const createTableType = memoize(table => {
         table.getReverseForeignKeys()
         .map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
-          const name = `${foreignKey.nativeTable.name}_list_by_${columnNames.join('_and_')}`
+          const name = `${foreignKey.nativeTable.name}_nodes_by_${columnNames.join('_and_')}`
           return [camelCase(name), createForeignKeyReverseField(foreignKey)]
         })
       ),
@@ -108,7 +108,7 @@ const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, forei
 const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createConnectionType(nativeTable),
   description:
-    `Queries and returns a connection of \`${pascalCase(nativeTable.name)}\` ` +
+    `Queries and returns a connection for \`${pascalCase(nativeTable.name)}\` ` +
     `items that are related to the \`${pascalCase(foreignTable.name)}\` source ` +
     'node.',
 

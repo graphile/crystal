@@ -22,8 +22,8 @@ describe('createConnectionType', () => {
   it('will have a connection type with a plain list field', () => {
     const type = createConnectionType(new TestTable({ name: 'person' }))
     const fields = type.getFields()
-    expect(fields.list.type).toBeA(GraphQLList)
-    expect(fields.list.type.ofType.name).toEqual('Person')
+    expect(fields.nodes.type).toBeA(GraphQLList)
+    expect(fields.nodes.type.ofType.name).toEqual('Person')
   })
 
   it('will have edges with a node and a cursor', () => {

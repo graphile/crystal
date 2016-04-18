@@ -17,5 +17,5 @@ export default createQueryType
 
 const createQueryFields = table => ({
   [camelCase(table.name)]: createSingleQueryField(table),
-  [camelCase(`${table.name}_list`)]: createListQueryField(table),
+  [camelCase(`${table.name}_nodes`)]: createListQueryField(table),
 })

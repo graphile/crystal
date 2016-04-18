@@ -23,8 +23,8 @@ fragment payload on InsertPostPayload {
       id
       givenName
       familyName
-      postListByAuthorId {
-        list {
+      postNodesByAuthorId {
+        nodes {
           id
           headline
         }

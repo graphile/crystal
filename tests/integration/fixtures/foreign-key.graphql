@@ -1,6 +1,6 @@
 {
-  postList {
-    list {
+  postNodes {
+    nodes {
       id
       authorId
       headline

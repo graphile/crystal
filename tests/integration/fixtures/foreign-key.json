@@ -1,7 +1,7 @@
 {
   "data": {
-    "postList": {
-      "list": [
+    "postNodes": {
+      "nodes": [
         {
           "id": 1,
           "authorId": 2,

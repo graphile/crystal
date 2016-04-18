@@ -155,7 +155,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
         )
       },
 
-      get list () {
+      get nodes () {
         return getRows()
       },
 

@@ -14,9 +14,9 @@ describe('createSchema', () => {
     const schema = new TestSchema()
     schema.tables = [new TestTable({ name: 'person' })]
     const fields = createSchema(schema).getQueryType().getFields()
-    expect(fields).toIncludeKeys(['person', 'personList'])
+    expect(fields).toIncludeKeys(['person', 'personNodes'])
     expect(fields.person.type.name).toEqual('Person')
-    expect(fields.personList.type.name).toEqual('PersonConnection')
+    expect(fields.personNodes.type.name).toEqual('PersonConnection')
   })
 
   it('camel cases table names in table fields', async () => {
@@ -24,6 +24,6 @@ describe('createSchema', () => {
     schema.tables = [new TestTable({ name: 'camel_case_me' })]
     const fields = createSchema(schema).getQueryType().getFields()
     expect(fields).toExcludeKey('camel_case_me')
-    expect(fields).toIncludeKeys(['camelCaseMe', 'camelCaseMeList'])
+    expect(fields).toIncludeKeys(['camelCaseMe', 'camelCaseMeNodes'])
   })
 })

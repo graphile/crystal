@@ -45,8 +45,8 @@
         "id": 11,
         "givenName": "Test",
         "familyName": "User",
-        "postListByAuthorId": {
-          "list": [
+        "postNodesByAuthorId": {
+          "nodes": [
             {
               "id": 1,
               "headline": "Hello, world!"

@@ -1,17 +1,17 @@
 {
-  a: personList(orderBy: ID, first: 3) {
-    list {
+  a: personNodes(orderBy: ID, first: 3) {
+    nodes {
       givenName
       familyName
     }
   }
-  b: personList(orderBy: GIVEN_NAME, last: 5) {
+  b: personNodes(orderBy: GIVEN_NAME, last: 5) {
     totalCount
-    list {
+    nodes {
       id
     }
   }
-  c: personList(orderBy: FAMILY_NAME, descending: true, first: 3) {
+  c: personNodes(orderBy: FAMILY_NAME, descending: true, first: 3) {
     pageInfo {
       hasNextPage
       hasPreviousPage
@@ -25,25 +25,25 @@
       }
     }
   }
-  d: personList(orderBy: ID, after: "NA==", first: 6) {
+  d: personNodes(orderBy: ID, after: "NA==", first: 6) {
     pageInfo {
       startCursor
       endCursor
     }
-    list {
+    nodes {
       givenName
     }
   }
-  e: personList(orderBy: ID, descending: true, before: "NA==", last: 3) {
+  e: personNodes(orderBy: ID, descending: true, before: "NA==", last: 3) {
     pageInfo {
       prev: hasPreviousPage
       next: hasNextPage
     }
-    list {
+    nodes {
       familyName
     }
   }
-  f: personList {
+  f: personNodes {
     edges {
       cursor
       node {
@@ -51,37 +51,37 @@
       }
     }
   }
-  g: postList(authorId: 2) {
+  g: postNodes(authorId: 2) {
 		totalCount
     pageInfo {
       hasNextPage
       hasPreviousPage
     }
-    list {
+    nodes {
       id
       headline
       authorId
     }
   }
-  h: postList(topic: INSPIRATION) {
+  h: postNodes(topic: INSPIRATION) {
 		totalCount
     pageInfo {
       hasNextPage
       hasPreviousPage
     }
-    list {
+    nodes {
       id
       headline
       topic
     }
   }
-  i: postList(authorId: 1, first: 2, offset: 1) {    
+  i: postNodes(authorId: 1, first: 2, offset: 1) {
 		totalCount
     pageInfo {
       hasNextPage
       hasPreviousPage
     }
-    list {
+    nodes {
       id
       headline
       topic

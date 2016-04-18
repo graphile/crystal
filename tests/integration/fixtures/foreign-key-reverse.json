@@ -1,14 +1,14 @@
 {
   "data": {
-    "personList": {
-      "list": [
+    "personNodes": {
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn",
           "familyName": "Ramirez",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 4,
-            "list": [
+            "nodes": [
               {
                 "id": 2,
                 "headline": "I hate yogurt. It’s just stuff with bits in.",
@@ -36,9 +36,9 @@
           "id": 2,
           "givenName": "Johnny",
           "familyName": "Tucker",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 3,
-            "list": [
+            "nodes": [
               {
                 "id": 1,
                 "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
@@ -61,9 +61,9 @@
           "id": 3,
           "givenName": "Nancy",
           "familyName": "Diaz",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 3,
-            "list": [
+            "nodes": [
               {
                 "id": 6,
                 "headline": "Stop talking, brain thinking. Hush.",
@@ -86,18 +86,18 @@
           "id": 4,
           "givenName": "Russell",
           "familyName": "Gardner",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 5,
           "givenName": "Ann",
           "familyName": "West",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 2,
-            "list": [
+            "nodes": [
               {
                 "id": 5,
                 "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
@@ -115,81 +115,81 @@
           "id": 6,
           "givenName": "Joe",
           "familyName": "Cruz",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 7,
           "givenName": "Scott",
           "familyName": "Torres",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 8,
           "givenName": "David",
           "familyName": "Bell",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 9,
           "givenName": "Carl",
           "familyName": "Ward",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 11,
           "givenName": "Beverly",
           "familyName": "Kelly",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 12,
           "givenName": "Kelly",
           "familyName": "Reed",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 13,
           "givenName": "Nicholas",
           "familyName": "Perry",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         },
         {
           "id": 14,
           "givenName": "Carol",
           "familyName": "Taylor",
-          "postListByAuthorId": {
+          "postNodesByAuthorId": {
             "totalCount": 0,
-            "list": []
+            "nodes": []
           }
         }
       ]

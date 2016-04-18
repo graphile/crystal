@@ -29,10 +29,10 @@ const createTableConnectionType = memoize(table =>
         description: 'All of the items available to be queried in this connection.',
         resolve: ({ totalCount }) => totalCount,
       },
-      list: {
+      nodes: {
         type: new GraphQLList(createTableType(table)),
         description: `The queried list of \`${pascalCase(table.name)}\`.`,
-        resolve: ({ list }) => list,
+        resolve: ({ nodes }) => nodes,
       },
       edges: {
         type: new GraphQLList(createTableEdgeType(table)),

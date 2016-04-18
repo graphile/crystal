@@ -1,7 +1,7 @@
 {
   "data": {
     "a": {
-      "list": [
+      "nodes": [
         {
           "givenName": "Kathryn",
           "familyName": "Ramirez"
@@ -18,7 +18,7 @@
     },
     "b": {
       "totalCount": 14,
-      "list": [
+      "nodes": [
         {
           "id": 12
         },
@@ -73,7 +73,7 @@
         "startCursor": "NQ==",
         "endCursor": "MTA="
       },
-      "list": [
+      "nodes": [
         {
           "givenName": "Ann"
         },
@@ -99,7 +99,7 @@
         "prev": true,
         "next": false
       },
-      "list": [
+      "nodes": [
         {
           "familyName": "Diaz"
         },
@@ -205,7 +205,7 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
@@ -229,7 +229,7 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 2,
           "headline": "I hate yogurt. It’s just stuff with bits in.",
@@ -253,7 +253,7 @@
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 3,
           "headline": "Is that a cooking show?",

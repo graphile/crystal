@@ -5,7 +5,7 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -69,7 +69,7 @@
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -85,7 +85,7 @@
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -105,7 +105,7 @@
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -133,7 +133,7 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -197,7 +197,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 2,
           "givenName": "Johnny"
@@ -257,7 +257,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 4,
           "givenName": "Russell"
@@ -309,14 +309,14 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": []
+      "nodes": []
     },
     "ai": {
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 2,
           "givenName": "Johnny"
@@ -328,7 +328,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 11,
           "givenName": "Beverly"
@@ -352,7 +352,7 @@
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 10,
           "givenName": "Jonathan"
@@ -376,7 +376,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 5,
           "givenName": "Ann"
@@ -424,14 +424,14 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": []
+      "nodes": []
     },
     "an": {
       "pageInfo": {
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 11,
           "givenName": "Beverly"
@@ -455,21 +455,21 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": []
+      "nodes": []
     },
     "ap": {
       "pageInfo": {
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": []
+      "nodes": []
     },
     "aq": {
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -489,7 +489,7 @@
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -549,7 +549,7 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"
@@ -613,14 +613,14 @@
         "hasNextPage": false,
         "hasPreviousPage": false
       },
-      "list": []
+      "nodes": []
     },
     "au": {
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 5,
           "givenName": "Ann"
@@ -648,7 +648,7 @@
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 4,
           "givenName": "Russell"
@@ -672,7 +672,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 4,
           "givenName": "Russell"
@@ -724,7 +724,7 @@
         "hasNextPage": false,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 13,
           "givenName": "Nicholas"
@@ -740,7 +740,7 @@
         "hasNextPage": true,
         "hasPreviousPage": true
       },
-      "list": [
+      "nodes": [
         {
           "id": 12,
           "givenName": "Kelly"
@@ -756,7 +756,7 @@
         "hasNextPage": true,
         "hasPreviousPage": false
       },
-      "list": [
+      "nodes": [
         {
           "id": 1,
           "givenName": "Kathryn"

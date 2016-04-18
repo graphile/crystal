@@ -1,12 +1,12 @@
 {
-  personList {
-    list {
+  personNodes {
+    nodes {
       id
       givenName
       familyName
-      postListByAuthorId {
+      postNodesByAuthorId {
         totalCount
-        list {
+        nodes {
           id
           headline
           authorId

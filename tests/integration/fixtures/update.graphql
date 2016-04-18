@@ -8,8 +8,8 @@ mutation UpdateTest {
 	    id
 	    givenName
 	    familyName
-	    postListByAuthorId {
-	      list {
+	    postNodesByAuthorId {
+	      nodes {
 	        id
 	        headline
 	      }

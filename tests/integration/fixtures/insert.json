@@ -9,8 +9,8 @@
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
-            "list": [
+          "postNodesByAuthorId": {
+            "nodes": [
               {
                 "id": 13,
                 "headline": "Hello, world!"
@@ -29,8 +29,8 @@
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
-            "list": [
+          "postNodesByAuthorId": {
+            "nodes": [
               {
                 "id": 13,
                 "headline": "Hello, world!"
@@ -53,8 +53,8 @@
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
-            "list": [
+          "postNodesByAuthorId": {
+            "nodes": [
               {
                 "id": 13,
                 "headline": "Hello, world!"
@@ -81,8 +81,8 @@
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
-            "list": [
+          "postNodesByAuthorId": {
+            "nodes": [
               {
                 "id": 13,
                 "headline": "Hello, world!"
@@ -113,8 +113,8 @@
           "id": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "postListByAuthorId": {
-            "list": [
+          "postNodesByAuthorId": {
+            "nodes": [
               {
                 "id": 13,
                 "headline": "Hello, world!"
