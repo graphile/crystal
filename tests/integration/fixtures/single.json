@@ -1,7 +1,7 @@
 {
   "data": {
     "person": {
-      "id": 12,
+      "rowId": 12,
       "givenName": "Kelly",
       "familyName": "Reed"
     },

@@ -1,4 +1,4 @@
-import { constant, assign, reduce, camelCase, once } from 'lodash'
+import { constant, assign, mapKeys, once, isEmpty, camelCase } from 'lodash'
 
 const resolveConnection = (table, getExtraConditions = constant({})) => {
   // Because we are trying to generate very dynamic queries we use the `sql`
@@ -20,14 +20,16 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
     if (first && last)
       throw new Error('Cannot define both a `first` and a `last` argument.')
 
-    // An *actual* function because we want `this`.
-    function addConditionsToQuery () {
-      return reduce(conditions, (query, value, fieldName) => {
-        // Perform a soft match using the `camelCase` function.
-        const column = table.columns.find(({ name }) => camelCase(name) === camelCase(fieldName))
-        return query.where(tableSql[column.name].equals(value))
-      }, this)
-    }
+    // Transforms object keys (which are field names) into column names.
+    const getConditionsObject = once(() => {
+      // If there are no conditions, just return `'true'`.
+      if (isEmpty(conditions))
+        return 'true'
+
+      return mapKeys(conditions, (value, fieldName) =>
+        table.columns.find(({ name }) => camelCase(name) === camelCase(fieldName)).name
+      )
+    })
 
     const getRowCursorValue = row => row[orderBy] || ''
 
@@ -41,7 +43,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
       if (after) query = query.where(tableSql[orderBy].gt(after))
 
       // Add the conditions…
-      query = query::addConditionsToQuery()
+      query = query.where(getConditionsObject())
 
       // Create the ordering statement and add it to the query.
       // If a `last` argument was defined we are querying from the bottom so we
@@ -96,7 +98,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
                 tableSql
                 .select('null')
                 .where(tableSql[orderBy][descending ? 'lt' : 'gt'](endCursor))
-                ::addConditionsToQuery()
+                .where(getConditionsObject())
                 .limit(1)
                 .toQuery()
               )
@@ -119,7 +121,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
                 tableSql
                 .select('null')
                 .where(tableSql[orderBy][descending ? 'gt' : 'lt'](startCursor))
-                ::addConditionsToQuery()
+                .where(getConditionsObject())
                 .limit(1)
                 .toQuery()
               )
@@ -148,7 +150,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
           client.queryAsync(
             tableSql
             .select(tableSql.count('count'))
-            ::addConditionsToQuery()
+            .where(getConditionsObject())
             .toQuery()
           )
           .then(({ rows: [{ count }] }) => parseInt(count, 10))

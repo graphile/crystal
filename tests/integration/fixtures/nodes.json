@@ -20,19 +20,19 @@
       "totalCount": 14,
       "nodes": [
         {
-          "id": 12
+          "rowId": 12
         },
         {
-          "id": 3
+          "rowId": 3
         },
         {
-          "id": 13
+          "rowId": 13
         },
         {
-          "id": 4
+          "rowId": 4
         },
         {
-          "id": 7
+          "rowId": 7
         }
       ]
     },
@@ -45,7 +45,7 @@
         {
           "cursor": "V2VzdA==",
           "node": {
-            "id": 5,
+            "rowId": 5,
             "givenName": "Ann",
             "familyName": "West"
           }
@@ -53,7 +53,7 @@
         {
           "cursor": "V2FyZA==",
           "node": {
-            "id": 9,
+            "rowId": 9,
             "givenName": "Carl",
             "familyName": "Ward"
           }
@@ -61,7 +61,7 @@
         {
           "cursor": "VHVja2Vy",
           "node": {
-            "id": 2,
+            "rowId": 2,
             "givenName": "Johnny",
             "familyName": "Tucker"
           }
@@ -207,17 +207,17 @@
       },
       "nodes": [
         {
-          "id": 1,
+          "rowId": 1,
           "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
           "authorId": 2
         },
         {
-          "id": 8,
+          "rowId": 8,
           "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
           "authorId": 2
         },
         {
-          "id": 10,
+          "rowId": 10,
           "headline": "What’s with you kids? Every other day it’s food, food, food.",
           "authorId": 2
         }
@@ -231,17 +231,17 @@
       },
       "nodes": [
         {
-          "id": 2,
+          "rowId": 2,
           "headline": "I hate yogurt. It’s just stuff with bits in.",
           "topic": "INSPIRATION"
         },
         {
-          "id": 3,
+          "rowId": 3,
           "headline": "Is that a cooking show?",
           "topic": "INSPIRATION"
         },
         {
-          "id": 8,
+          "rowId": 8,
           "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
           "topic": "INSPIRATION"
         }
@@ -255,13 +255,13 @@
       },
       "nodes": [
         {
-          "id": 3,
+          "rowId": 3,
           "headline": "Is that a cooking show?",
           "topic": "INSPIRATION",
           "authorId": 1
         },
         {
-          "id": 4,
+          "rowId": 4,
           "headline": "You hit me with a cricket bat.",
           "topic": null,
           "authorId": 1

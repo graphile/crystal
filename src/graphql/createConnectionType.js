@@ -1,4 +1,4 @@
-import { memoize, camelCase, upperFirst } from 'lodash'
+import { memoize } from 'lodash'
 import createTableType from './createTableType.js'
 import { PageInfoType, CursorType } from './Types.js'
 
@@ -9,19 +9,17 @@ import {
   GraphQLInt,
 } from 'graphql'
 
-const pascalCase = string => upperFirst(camelCase(string))
-
 const createTableConnectionType = memoize(table =>
   new GraphQLObjectType({
-    name: pascalCase(`${table.name}_connection`),
-    description: `A connection to a list of \`${pascalCase(table.name)}\` items`,
+    name: `${table.getTypeName()}Connection`,
+    description: `A connection to a list of ${table.getMarkdownTypeName()} items`,
 
     // TODO: Implement a `ConnectionType` interface
 
     fields: {
       pageInfo: {
         type: new GraphQLNonNull(PageInfoType),
-        description: `Information to aid in pagination of type \`${pascalCase(table.name)}\`.`,
+        description: `Information to aid in pagination of type ${table.getMarkdownTypeName()}.`,
         resolve: pageInfo => pageInfo,
       },
       totalCount: {
@@ -31,7 +29,7 @@ const createTableConnectionType = memoize(table =>
       },
       nodes: {
         type: new GraphQLList(createTableType(table)),
-        description: `The queried list of \`${pascalCase(table.name)}\`.`,
+        description: `The queried list of ${table.getMarkdownTypeName()}.`,
         resolve: ({ nodes }) => nodes,
       },
       edges: {
@@ -47,8 +45,8 @@ export default createTableConnectionType
 
 const createTableEdgeType = table =>
   new GraphQLObjectType({
-    name: pascalCase(`${table.name}_edge`),
-    description: `An edge in the \`${pascalCase(`${table.name}_connection`)}\`.`,
+    name: `${table.getTypeName()}Edge`,
+    description: `An edge in the \`${table.getTypeName()}Connection\`.`,
 
     fields: {
       cursor: {

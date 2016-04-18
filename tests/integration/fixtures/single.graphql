@@ -1,11 +1,11 @@
 {
-  person(id: 12) {
-    id
+  person(rowId: 12) {
+    rowId
     givenName
     familyName
   }
-  johnny: person(id: 2) {
-    personId: id
+  johnny: person(rowId: 2) {
+    personId: rowId
     givenName
   }
 }

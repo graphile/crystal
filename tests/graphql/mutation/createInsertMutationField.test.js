@@ -20,7 +20,7 @@ describe('createInsertMutationField', () => {
   it('will make nullable columns with a default', () => {
     const field = createInsertMutationField(new TestTable({
       columns: [
-        new TestColumn({ name: 'id', isPrimaryKey: true, isNullable: false, hasDefault: true }),
+        new TestColumn({ name: 'id_1', isPrimaryKey: true, isNullable: false, hasDefault: true }),
         new TestColumn({ name: 'given_name', isNullable: false }),
         new TestColumn({ name: 'family_name' }),
         new TestColumn({ name: 'points', hasDefault: true }),
@@ -28,7 +28,7 @@ describe('createInsertMutationField', () => {
       ],
     }))
     const inputFields = field.args.input.type.ofType.getFields()
-    expect(inputFields.id.type).toBeA(GraphQLScalarType)
+    expect(inputFields.id1.type).toBeA(GraphQLScalarType)
     expect(inputFields.givenName.type).toBeA(GraphQLNonNull)
     expect(inputFields.givenName.type.ofType).toBeA(GraphQLScalarType)
     expect(inputFields.familyName.type).toBeA(GraphQLScalarType)

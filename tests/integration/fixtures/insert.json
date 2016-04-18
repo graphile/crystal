@@ -3,16 +3,16 @@
     "a": {
       "clientMutationId": null,
       "post": {
-        "id": 13,
+        "rowId": 13,
         "headline": "Hello, world!",
         "personByAuthorId": {
-          "id": 10,
+          "rowId": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
           "postNodesByAuthorId": {
             "nodes": [
               {
-                "id": 13,
+                "rowId": 13,
                 "headline": "Hello, world!"
               }
             ]
@@ -23,20 +23,20 @@
     "b": {
       "clientMutationId": null,
       "post": {
-        "id": 14,
+        "rowId": 14,
         "headline": "Hello, world!",
         "personByAuthorId": {
-          "id": 10,
+          "rowId": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
           "postNodesByAuthorId": {
             "nodes": [
               {
-                "id": 13,
+                "rowId": 13,
                 "headline": "Hello, world!"
               },
               {
-                "id": 14,
+                "rowId": 14,
                 "headline": "Hello, world!"
               }
             ]
@@ -47,24 +47,24 @@
     "c": {
       "clientMutationId": null,
       "post": {
-        "id": 15,
+        "rowId": 15,
         "headline": "Hello, world!",
         "personByAuthorId": {
-          "id": 10,
+          "rowId": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
           "postNodesByAuthorId": {
             "nodes": [
               {
-                "id": 13,
+                "rowId": 13,
                 "headline": "Hello, world!"
               },
               {
-                "id": 14,
+                "rowId": 14,
                 "headline": "Hello, world!"
               },
               {
-                "id": 15,
+                "rowId": 15,
                 "headline": "Hello, world!"
               }
             ]
@@ -75,28 +75,28 @@
     "d": {
       "clientMutationId": "abcde",
       "post": {
-        "id": 16,
+        "rowId": 16,
         "headline": "Hello, world!",
         "personByAuthorId": {
-          "id": 10,
+          "rowId": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
           "postNodesByAuthorId": {
             "nodes": [
               {
-                "id": 13,
+                "rowId": 13,
                 "headline": "Hello, world!"
               },
               {
-                "id": 14,
+                "rowId": 14,
                 "headline": "Hello, world!"
               },
               {
-                "id": 15,
+                "rowId": 15,
                 "headline": "Hello, world!"
               },
               {
-                "id": 16,
+                "rowId": 16,
                 "headline": "Hello, world!"
               }
             ]
@@ -107,32 +107,32 @@
     "e": {
       "clientMutationId": "123456",
       "post": {
-        "id": 17,
+        "rowId": 17,
         "headline": "Hello, world!",
         "personByAuthorId": {
-          "id": 10,
+          "rowId": 10,
           "givenName": "Jonathan",
           "familyName": "Campbell",
           "postNodesByAuthorId": {
             "nodes": [
               {
-                "id": 13,
+                "rowId": 13,
                 "headline": "Hello, world!"
               },
               {
-                "id": 14,
+                "rowId": 14,
                 "headline": "Hello, world!"
               },
               {
-                "id": 15,
+                "rowId": 15,
                 "headline": "Hello, world!"
               },
               {
-                "id": 16,
+                "rowId": 16,
                 "headline": "Hello, world!"
               },
               {
-                "id": 17,
+                "rowId": 17,
                 "headline": "Hello, world!"
               }
             ]
@@ -143,7 +143,7 @@
     "f": {
       "clientMutationId": null,
       "post": {
-        "id": 200,
+        "rowId": 200,
         "headline": "Manually set stuffs.",
         "authorId": 1
       }

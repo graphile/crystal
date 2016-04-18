@@ -4,10 +4,10 @@ mutation InsertTest {
   c: insertPost(input: {headline: "Hello, world!", authorId: 10}) { ...payload }
   d: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "abcde"}) { ...payload }
   e: insertPost(input: {headline: "Hello, world!", authorId: 10, clientMutationId: "123456"}) { ...payload }
-  f: insertPost(input: {id: 200, headline: "Manually set stuffs.", authorId: 1}) {
+  f: insertPost(input: {rowId: 200, headline: "Manually set stuffs.", authorId: 1}) {
     clientMutationId
     post {
-      id
+      rowId
       headline
       authorId
     }
@@ -17,15 +17,15 @@ mutation InsertTest {
 fragment payload on InsertPostPayload {
   clientMutationId
   post {
-    id
+    rowId
     headline
     personByAuthorId {
-      id
+      rowId
       givenName
       familyName
       postNodesByAuthorId {
         nodes {
-          id
+          rowId
           headline
         }
       }

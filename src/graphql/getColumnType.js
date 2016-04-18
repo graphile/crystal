@@ -1,11 +1,4 @@
-import {
-  memoize,
-  fromPairs,
-  camelCase,
-  snakeCase,
-  upperFirst,
-  toUpper,
-} from 'lodash'
+import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
 
 import {
   GraphQLBoolean,

@@ -1,4 +1,4 @@
-import { ary, assign, camelCase } from 'lodash'
+import { ary, assign } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import createSingleQueryField from './createSingleQueryField.js'
 import createListQueryField from './createListQueryField.js'
@@ -16,6 +16,6 @@ const createQueryType = schema =>
 export default createQueryType
 
 const createQueryFields = table => ({
-  [camelCase(table.name)]: createSingleQueryField(table),
-  [camelCase(`${table.name}_nodes`)]: createListQueryField(table),
+  [table.getFieldName()]: createSingleQueryField(table),
+  [`${table.getFieldName()}Nodes`]: createListQueryField(table),
 })

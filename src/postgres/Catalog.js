@@ -1,4 +1,4 @@
-import { flatten } from 'lodash'
+import { flatten, camelCase, upperFirst } from 'lodash'
 import sql from 'sql'
 
 /**
@@ -163,6 +163,18 @@ export class Table {
     this.description = description
   }
 
+  getFieldName () {
+    return camelCase(this.name)
+  }
+
+  getTypeName () {
+    return upperFirst(this.getFieldName())
+  }
+
+  getMarkdownTypeName () {
+    return `\`${this.getTypeName()}\``
+  }
+
   /**
    * Returns a table type from the `sql` module based off of this table. This
    * is so we can use the superior capabilities of the `sql` module to
@@ -247,6 +259,18 @@ export class Column {
     this.isNullable = isNullable
     this.isPrimaryKey = isPrimaryKey
     this.hasDefault = hasDefault
+  }
+
+  getFieldName () {
+    // There is a conflict with the `Node` interface. Therefore we need to alias `rowId`.
+    if (this.name === 'id')
+      return 'rowId'
+
+    return camelCase(this.name)
+  }
+
+  getMarkdownFieldName () {
+    return `\`${this.getFieldName()}\``
   }
 
   /**

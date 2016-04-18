@@ -1,4 +1,4 @@
-import { fromPairs, camelCase, upperFirst, identity } from 'lodash'
+import { fromPairs, identity } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -10,8 +10,6 @@ import {
   GraphQLInputObjectType,
 } from 'graphql'
 
-const pascalCase = string => upperFirst(camelCase(string))
-
 /**
  * Creates a mutation which will create a new row.
  *
@@ -20,7 +18,7 @@ const pascalCase = string => upperFirst(camelCase(string))
  */
 const createInsertMutationField = table => ({
   type: createPayloadType(table),
-  description: `Creates a new node of the \`${pascalCase(table.name)}\` type.`,
+  description: `Creates a new node of the ${table.getMarkdownTypeName()} type.`,
 
   args: {
     input: {
@@ -35,11 +33,11 @@ export default createInsertMutationField
 
 const createInputType = table =>
   new GraphQLInputObjectType({
-    name: pascalCase(`insert_${table.name}_input`),
-    description: `The \`${pascalCase(table.name)}\` to insert.`,
+    name: `Insert${table.getTypeName()}Input`,
+    description: `The ${table.getMarkdownTypeName()} to insert.`,
     fields: {
       ...fromPairs(
-        table.columns.map(column => [camelCase(column.name), {
+        table.columns.map(column => [column.getFieldName(), {
           type: (column.hasDefault ? getNullableType : identity)(getColumnType(column)),
           description: column.description,
         }]),
@@ -50,13 +48,13 @@ const createInputType = table =>
 
 const createPayloadType = table =>
   new GraphQLObjectType({
-    name: pascalCase(`insert_${table.name}_payload`),
-    description: `Contains the \`${pascalCase(table.name)}\` node inserted by the mutation.`,
+    name: `Insert${table.getTypeName()}Payload`,
+    description: `Contains the ${table.getMarkdownTypeName()} node inserted by the mutation.`,
 
     fields: {
-      [camelCase(table.name)]: {
+      [table.getFieldName()]: {
         type: createTableType(table),
-        description: `The inserted \`${pascalCase(table.name)}\`.`,
+        description: `The inserted ${table.getMarkdownTypeName()}.`,
         resolve: source => source[table.name],
       },
       clientMutationId: payloadClientMutationId,
@@ -79,7 +77,7 @@ const resolveInsert = table => {
       tableSql
       .insert(fromPairs(
         table.columns
-        .map(column => [column.name, input[camelCase(column.name)]])
+        .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))
       .returning(tableSql.star())

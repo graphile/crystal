@@ -1,4 +1,4 @@
-import { fromPairs, camelCase, upperFirst } from 'lodash'
+import { fromPairs } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -9,7 +9,6 @@ import {
   GraphQLInputObjectType,
 } from 'graphql'
 
-const pascalCase = string => upperFirst(camelCase(string))
 const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
@@ -20,7 +19,7 @@ const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new Grap
  */
 const createDeleteMutationField = table => ({
   type: createPayloadType(table),
-  description: `Deletes a single node of type \`${pascalCase(table.name)}\`.`,
+  description: `Deletes a single node of type ${table.getMarkdownTypeName()}.`,
 
   args: {
     input: {
@@ -35,15 +34,15 @@ export default createDeleteMutationField
 
 const createInputType = table =>
   new GraphQLInputObjectType({
-    name: pascalCase(`delete_${table.name}_input`),
+    name: `Delete${table.getTypeName()}Input`,
     description:
-      `Locates the single \`${pascalCase(table.name)}\` node to delete using ` +
+      `Locates the single ${table.getMarkdownTypeName()} node to delete using ` +
       'its required primary key fields.',
     fields: {
       ...fromPairs(
-        table.getPrimaryKeyColumns().map(column => [camelCase(column.name), {
+        table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
           type: getNonNullType(getColumnType(column)),
-          description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
+          description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),
       clientMutationId: inputClientMutationId,
@@ -52,12 +51,12 @@ const createInputType = table =>
 
 const createPayloadType = table =>
   new GraphQLObjectType({
-    name: pascalCase(`delete_${table.name}_payload`),
-    description: `Contains the \`${pascalCase(table.name)}\` node deleted by the mutation.`,
+    name: `Delete${table.getTypeName()}Payload`,
+    description: `Contains the ${table.getMarkdownTypeName()} node deleted by the mutation.`,
     fields: {
-      [camelCase(table.name)]: {
+      [table.getFieldName()]: {
         type: createTableType(table),
-        description: `The deleted \`${pascalCase(table.name)}\`.`,
+        description: `The deleted ${table.getMarkdownTypeName()}.`,
         resolve: source => source[table.name],
       },
       clientMutationId: payloadClientMutationId,
@@ -77,7 +76,7 @@ const resolveDelete = table => {
       .delete()
       .where(fromPairs(
         primaryKeyColumns
-        .map(column => [column.name, input[camelCase(column.name)]])
+        .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))
       .returning(tableSql.star())

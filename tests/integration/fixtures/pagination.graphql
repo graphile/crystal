@@ -1,30 +1,30 @@
 {
-  aa: personNodes(orderBy: ID) { ...page }
-  ab: personNodes(orderBy: ID, first: 2) { ...page }
-  ac: personNodes(orderBy: ID, first: 3) { ...page }
-  ad: personNodes(orderBy: ID, first: 5) { ...page }
-  ae: personNodes(orderBy: ID, first: 14) { ...page }
-  af: personNodes(orderBy: ID, offset: 1) { ...page }
-  ag: personNodes(orderBy: ID, offset: 3) { ...page }
-  ah: personNodes(orderBy: ID, offset: 50) { ...page }
-  ai: personNodes(orderBy: ID, first: 1, offset: 1) { ...page }
-  aj: personNodes(orderBy: ID, first: 4, offset: 10) { ...page }
-  ak: personNodes(orderBy: ID, first: 4, offset: 9) { ...page }
-  al: personNodes(orderBy: ID, after: "NA==") { ...page }
-  am: personNodes(orderBy: ID, after: "MTQ=") { ...page }
-  an: personNodes(orderBy: ID, after: "MTA=") { ...page }
-  ao: personNodes(orderBy: ID, after: "NTA=") { ...page }
-  ap: personNodes(orderBy: ID, before: "MQ==") { ...page }
-  aq: personNodes(orderBy: ID, before: "NA==") { ...page }
-  ar: personNodes(orderBy: ID, before: "MTQ=") { ...page }
-  as: personNodes(orderBy: ID, before: "NTA=") { ...page }
-  at: personNodes(orderBy: ID, after: "NTA=", before: "NTA=") { ...page }
-  au: personNodes(orderBy: ID, after: "NA==", before: "MTA=") { ...page }
-  av: personNodes(orderBy: ID, after: "Mw==", first: 4) { ...page }
-  aw: personNodes(orderBy: ID, after: "Mw==", first: 20) { ...page }
-  ax: personNodes(orderBy: ID, before: "NTA=", last: 2) { ...page }
-  ay: personNodes(orderBy: ID, before: "MTQ=", last: 2) { ...page }
-  az: personNodes(orderBy: ID, before: "MTQ=", first: 2) { ...page }
+  aa: personNodes(orderBy: ROW_ID) { ...page }
+  ab: personNodes(orderBy: ROW_ID, first: 2) { ...page }
+  ac: personNodes(orderBy: ROW_ID, first: 3) { ...page }
+  ad: personNodes(orderBy: ROW_ID, first: 5) { ...page }
+  ae: personNodes(orderBy: ROW_ID, first: 14) { ...page }
+  af: personNodes(orderBy: ROW_ID, offset: 1) { ...page }
+  ag: personNodes(orderBy: ROW_ID, offset: 3) { ...page }
+  ah: personNodes(orderBy: ROW_ID, offset: 50) { ...page }
+  ai: personNodes(orderBy: ROW_ID, first: 1, offset: 1) { ...page }
+  aj: personNodes(orderBy: ROW_ID, first: 4, offset: 10) { ...page }
+  ak: personNodes(orderBy: ROW_ID, first: 4, offset: 9) { ...page }
+  al: personNodes(orderBy: ROW_ID, after: "NA==") { ...page }
+  am: personNodes(orderBy: ROW_ID, after: "MTQ=") { ...page }
+  an: personNodes(orderBy: ROW_ID, after: "MTA=") { ...page }
+  ao: personNodes(orderBy: ROW_ID, after: "NTA=") { ...page }
+  ap: personNodes(orderBy: ROW_ID, before: "MQ==") { ...page }
+  aq: personNodes(orderBy: ROW_ID, before: "NA==") { ...page }
+  ar: personNodes(orderBy: ROW_ID, before: "MTQ=") { ...page }
+  as: personNodes(orderBy: ROW_ID, before: "NTA=") { ...page }
+  at: personNodes(orderBy: ROW_ID, after: "NTA=", before: "NTA=") { ...page }
+  au: personNodes(orderBy: ROW_ID, after: "NA==", before: "MTA=") { ...page }
+  av: personNodes(orderBy: ROW_ID, after: "Mw==", first: 4) { ...page }
+  aw: personNodes(orderBy: ROW_ID, after: "Mw==", first: 20) { ...page }
+  ax: personNodes(orderBy: ROW_ID, before: "NTA=", last: 2) { ...page }
+  ay: personNodes(orderBy: ROW_ID, before: "MTQ=", last: 2) { ...page }
+  az: personNodes(orderBy: ROW_ID, before: "MTQ=", first: 2) { ...page }
 }
 
 fragment page on PersonConnection {
@@ -33,7 +33,7 @@ fragment page on PersonConnection {
     hasPreviousPage
   }
   nodes {
-    id
+    rowId
     givenName
   }
 }

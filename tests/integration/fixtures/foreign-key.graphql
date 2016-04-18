@@ -1,11 +1,11 @@
 {
   postNodes {
     nodes {
-      id
+      rowId
       authorId
       headline
       author: personByAuthorId {
-        id
+        rowId
         givenName
         familyName
       }

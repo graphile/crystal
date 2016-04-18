@@ -1,13 +1,13 @@
 {
   personNodes {
     nodes {
-      id
+      rowId
       givenName
       familyName
       postNodesByAuthorId {
         totalCount
         nodes {
-          id
+          rowId
           headline
           authorId
         }

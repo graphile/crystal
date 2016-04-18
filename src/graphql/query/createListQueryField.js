@@ -1,4 +1,3 @@
-import { camelCase, upperFirst } from 'lodash'
 import createConnectionType from '../createConnectionType.js'
 import createConnectionArgs from '../createConnectionArgs.js'
 import resolveConnection from '../resolveConnection.js'
@@ -18,7 +17,7 @@ const createListQueryField = table => ({
 
   description:
     'Queries and returns a set of items with some metatadata for ' +
-    `\`${upperFirst(camelCase(table.name))}\`. Note that cursors will not work ` +
+    `${table.getMarkdownTypeName()}. Note that cursors will not work ` +
     'across different `orderBy` values. If you want to reuse a cursor, make ' +
     'sure you don’t change `orderBy`.',
 

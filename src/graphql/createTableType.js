@@ -1,12 +1,10 @@
-import { memoize, fromPairs, camelCase, upperFirst } from 'lodash'
+import { memoize, fromPairs, camelCase } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import getColumnType from './getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
 import createConnectionType from './createConnectionType.js'
 import createConnectionArgs from './createConnectionArgs.js'
 import resolveConnection from './resolveConnection.js'
-
-const pascalCase = string => upperFirst(camelCase(string))
 
 /**
  * Creates the `GraphQLObjectType` for a table.
@@ -34,7 +32,7 @@ const createTableType = memoize(table => {
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
     // name and the description is the associated comment in PostgreSQL.
-    name: pascalCase(table.name),
+    name: table.getTypeName(),
     description: table.description,
 
     // Make sure all of our columns have a corresponding field. This is a thunk
@@ -42,7 +40,7 @@ const createTableType = memoize(table => {
     fields: () => ({
       ...fromPairs(
         table.columns
-        .map(column => [camelCase(column.name), createColumnField(column)])
+        .map(column => [column.getFieldName(), createColumnField(column)])
       ),
       ...fromPairs(
         table.getForeignKeys()
@@ -88,8 +86,8 @@ const createColumnField = column => ({
 const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createTableType(foreignTable),
   description:
-    `Queries a single \`${pascalCase(foreignTable.name)}\` node related to ` +
-    `the \`${pascalCase(nativeTable.name)}\` type.`,
+    `Queries a single ${foreignTable.getMarkdownTypeName()} node related to ` +
+    `the ${nativeTable.getMarkdownTypeName()} type.`,
 
   resolve: resolveTableSingle(
     foreignTable,
@@ -108,8 +106,8 @@ const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, forei
 const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createConnectionType(nativeTable),
   description:
-    `Queries and returns a set of \`${pascalCase(nativeTable.name)}\` ` +
-    `nodes that are related to the \`${pascalCase(foreignTable.name)}\` source ` +
+    `Queries and returns a set of ${nativeTable.getMarkdownTypeName()} ` +
+    `nodes that are related to the ${foreignTable.getMarkdownTypeName()} source ` +
     'node.',
 
   args: createConnectionArgs(nativeTable, nativeColumns),

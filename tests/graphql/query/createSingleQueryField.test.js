@@ -16,7 +16,7 @@ describe('createSingleQueryField', () => {
       new TestTable({
         name: 'person',
         columns: [
-          new TestColumn({ name: 'id', isPrimaryKey: true }),
+          new TestColumn({ name: 'id_1', isPrimaryKey: true }),
           new TestColumn({ name: 'given_name' }),
           new TestColumn({ name: 'family_name' }),
         ],
@@ -36,8 +36,8 @@ describe('createSingleQueryField', () => {
       })
     )
 
-    expect(keys(person.args)).toEqual(['id'])
-    expect(person.args.id.type).toBeA(GraphQLNonNull)
+    expect(keys(person.args)).toEqual(['id1'])
+    expect(person.args.id1.type).toBeA(GraphQLNonNull)
     expect(keys(compoundKey.args)).toEqual(['id2', 'id1', 'id3'])
     expect(compoundKey.args.id2.type).toBeA(GraphQLNonNull)
     expect(compoundKey.args.id1.type).toBeA(GraphQLNonNull)

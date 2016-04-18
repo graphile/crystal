@@ -1,9 +1,7 @@
-import { memoize, fromPairs, camelCase, snakeCase, upperFirst, toUpper, includes } from 'lodash'
+import { memoize, fromPairs, includes, snakeCase, toUpper } from 'lodash'
 import { getNullableType, GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
 import { CursorType } from './Types.js'
 import getColumnType from './getColumnType.js'
-
-const pascalCase = string => upperFirst(camelCase(string))
 
 const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   // The column specified by `orderBy` means more than just the order to
@@ -55,11 +53,11 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   ...fromPairs(
     table.columns
     .filter(column => !includes(ignoreColumnConditions, column))
-    .map(column => [camelCase(column.name), {
+    .map(column => [column.getFieldName(), {
       type: getNullableType(getColumnType(column)),
       description:
         'Filters the resulting set with an equality test on the ' +
-        `\`${camelCase(column.name)}\` field.`,
+        `${column.getMarkdownFieldName()} field.`,
     }])
   ),
 })
@@ -75,11 +73,14 @@ export default createConnectionArgs
 // TODO: Some way to eliminate some columns from ordering enum?
 const createTableOrderingEnum = memoize(table =>
   new GraphQLEnumType({
-    name: pascalCase(`${table.name}_ordering`),
-    description: `Properties with which \`${pascalCase(table.name)}\` can be ordered.`,
+    name: `${table.getTypeName()}Ordering`,
+    description: `Properties with which ${table.getMarkdownTypeName()} can be ordered.`,
 
     values: fromPairs(
       table.columns
-      .map(({ name }) => [toUpper(snakeCase(name)), { value: name }])
+      .map(column => [toUpper(snakeCase(column.getFieldName())), {
+        value: column.name,
+        description: column.description,
+      }])
     ),
   }))

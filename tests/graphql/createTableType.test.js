@@ -17,7 +17,7 @@ describe('createTableType', () => {
   })
 
   it('camel cases table columns', () => {
-    const table = new TestTable({ name: 'test', columns: [new TestColumn({ name: 'camel_case_me' })] })
+    const table = new TestTable({ columns: [new TestColumn({ name: 'camel_case_me' })] })
     const type = createTableType(table)
     expect(type.getFields()).toIncludeKey('camelCaseMe')
   })
@@ -37,5 +37,11 @@ describe('createTableType', () => {
     expect(type1a).toBe(type1b)
     expect(type2a).toBe(type2b)
     expect(type1a).toNotBe(type2a)
+  })
+
+  it('will rename `id` columns to `rowId`', () => {
+    const type = createTableType(new TestTable({ columns: [new TestColumn({ name: 'id', isPrimaryKey: true })] }))
+    expect(type.getFields().rowId).toExist()
+    expect(type.getFields().id).toNotExist()
   })
 })

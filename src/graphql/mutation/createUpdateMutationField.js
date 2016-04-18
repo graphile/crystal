@@ -1,4 +1,4 @@
-import { fromPairs, camelCase, upperFirst } from 'lodash'
+import { fromPairs, upperFirst } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -10,7 +10,6 @@ import {
   GraphQLInputObjectType,
 } from 'graphql'
 
-const pascalCase = string => upperFirst(camelCase(string))
 const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
@@ -21,7 +20,7 @@ const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new Grap
  */
 const createUpdateMutationField = table => ({
   type: createPayloadType(table),
-  description: `Updates a single node of type \`${pascalCase(table.name)}\`.`,
+  description: `Updates a single node of type ${table.getMarkdownTypeName()}.`,
 
   args: {
     input: {
@@ -36,24 +35,24 @@ export default createUpdateMutationField
 
 const createInputType = table =>
   new GraphQLInputObjectType({
-    name: pascalCase(`update_${table.name}_input`),
+    name: `Update${table.getTypeName()}Input`,
     description:
-      `Locates the \`${pascalCase(table.name)}\` node to update and specifies some ` +
+      `Locates the ${table.getMarkdownTypeName()} node to update and specifies some ` +
       'new field values. Primary key fields are required to be able to locate ' +
       'the node to update.',
     fields: {
       // We include primary key columns to select a single row to update.
       ...fromPairs(
-        table.getPrimaryKeyColumns().map(column => [camelCase(column.name), {
+        table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
           type: getNonNullType(getColumnType(column)),
-          description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
+          description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),
       // We include all the other columns to actually allow users to update a value.
       ...fromPairs(
-        table.columns.map(column => [camelCase(`new_${column.name}`), {
+        table.columns.map(column => [`new${upperFirst(column.getFieldName())}`, {
           type: getNullableType(getColumnType(column)),
-          description: `Updates the node’s \`${camelCase(column.name)}\` field with this new value.`,
+          description: `Updates the node’s ${column.getMarkdownFieldName()} field with this new value.`,
         }]),
       ),
       // And the client mutation id…
@@ -63,12 +62,12 @@ const createInputType = table =>
 
 const createPayloadType = table =>
   new GraphQLObjectType({
-    name: pascalCase(`update_${table.name}_payload`),
-    description: `Contains the \`${pascalCase(table.name)}\` node updated by the mutation.`,
+    name: `Update${table.getTypeName()}Payload`,
+    description: `Contains the ${table.getMarkdownTypeName()} node updated by the mutation.`,
     fields: {
-      [camelCase(table.name)]: {
+      [table.getFieldName()]: {
         type: createTableType(table),
-        description: `The updated \`${pascalCase(table.name)}\`.`,
+        description: `The updated ${table.getMarkdownTypeName()}.`,
         resolve: source => source[table.name],
       },
       clientMutationId: payloadClientMutationId,
@@ -89,12 +88,12 @@ const resolveUpdate = table => {
       tableSql
       .update(fromPairs(
         table.columns
-        .map(column => [column.name, input[camelCase(`new_${column.name}`)]])
+        .map(column => [column.name, input[`new${upperFirst(column.getFieldName())}`]])
         .filter(([, value]) => value)
       ))
       .where(fromPairs(
         primaryKeyColumns
-        .map(column => [column.name, input[camelCase(column.name)]])
+        .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))
       .returning(tableSql.star())

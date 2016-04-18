@@ -1,5 +1,5 @@
 {
-  a: personNodes(orderBy: ID, first: 3) {
+  a: personNodes(orderBy: ROW_ID, first: 3) {
     nodes {
       givenName
       familyName
@@ -8,7 +8,7 @@
   b: personNodes(orderBy: GIVEN_NAME, last: 5) {
     totalCount
     nodes {
-      id
+      rowId
     }
   }
   c: personNodes(orderBy: FAMILY_NAME, descending: true, first: 3) {
@@ -19,13 +19,13 @@
     edges {
       cursor
       node {
-        id
+        rowId
         givenName
         familyName
       }
     }
   }
-  d: personNodes(orderBy: ID, after: "NA==", first: 6) {
+  d: personNodes(orderBy: ROW_ID, after: "NA==", first: 6) {
     pageInfo {
       startCursor
       endCursor
@@ -34,7 +34,7 @@
       givenName
     }
   }
-  e: personNodes(orderBy: ID, descending: true, before: "NA==", last: 3) {
+  e: personNodes(orderBy: ROW_ID, descending: true, before: "NA==", last: 3) {
     pageInfo {
       prev: hasPreviousPage
       next: hasNextPage
@@ -58,7 +58,7 @@
       hasPreviousPage
     }
     nodes {
-      id
+      rowId
       headline
       authorId
     }
@@ -70,7 +70,7 @@
       hasPreviousPage
     }
     nodes {
-      id
+      rowId
       headline
       topic
     }
@@ -82,7 +82,7 @@
       hasPreviousPage
     }
     nodes {
-      id
+      rowId
       headline
       topic
       authorId

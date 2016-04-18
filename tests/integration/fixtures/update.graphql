@@ -1,33 +1,33 @@
 mutation UpdateTest {
-	a: updatePost(input: {id: 1, newHeadline: "Whoah"}) { ...payload }
-	b: updatePost(input: {id: 1, newAuthorId: 5}) { ...payload }
-	c: updatePost(input: {id: 1, newHeadline: "Hello, world!", newAuthorId: 11, clientMutationId: "123456"}) { ...payload }
-	d: updatePerson(input: {id: 11, newGivenName: "Test", newFamilyName: "User"}) {
+	a: updatePost(input: {rowId: 1, newHeadline: "Whoah"}) { ...payload }
+	b: updatePost(input: {rowId: 1, newAuthorId: 5}) { ...payload }
+	c: updatePost(input: {rowId: 1, newHeadline: "Hello, world!", newAuthorId: 11, clientMutationId: "123456"}) { ...payload }
+	d: updatePerson(input: {rowId: 11, newGivenName: "Test", newFamilyName: "User"}) {
 		clientMutationId
 		person {
-	    id
+	    rowId
 	    givenName
 	    familyName
 	    postNodesByAuthorId {
 	      nodes {
-	        id
+	        rowId
 	        headline
 	      }
 	    }
 	  }
 	}
-	e: updatePost(input: {id: 1, newHeadline: "next", newAuthorId: 11}) { ...payload }
-	f: updatePost(input: {id: 1, newId: 42, clientMutationId: "abcdefg"}) { ...payload }
+	e: updatePost(input: {rowId: 1, newHeadline: "next", newAuthorId: 11}) { ...payload }
+	f: updatePost(input: {rowId: 1, newRowId: 42, clientMutationId: "abcdefg"}) { ...payload }
 }
 
 fragment payload on UpdatePostPayload {
 	clientMutationId
   post {
-    id
+    rowId
     headline
     authorId
     personByAuthorId {
-      id
+      rowId
       givenName
       familyName
     }

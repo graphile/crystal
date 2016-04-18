@@ -1,4 +1,4 @@
-import { fromPairs, camelCase, upperFirst } from 'lodash'
+import { fromPairs } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
 import createTableType from '../createTableType.js'
 import getColumnType from '../getColumnType.js'
@@ -25,23 +25,23 @@ const createSingleQueryField = table => {
 
   return {
     type: createTableType(table),
-    description: `Queries a single \`${upperFirst(camelCase(table.name))}\` using its primary keys.`,
+    description: `Queries a single ${table.getMarkdownTypeName()} using its primary keys.`,
 
     // Get arguments for this single row data fetcher. Uses only primary key
     // columns. All arguments are required as we want to be 100% certain we are
     // selecting one and only one row.
     args: fromPairs(
       table.getPrimaryKeyColumns()
-      .map(column => [camelCase(column.name), {
+      .map(column => [column.getFieldName(), {
         type: getNonNullType(getColumnType(column)),
-        description: `Matches the \`${camelCase(column.name)}\` field of the node.`,
+        description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
       }])
     ),
 
     resolve: resolveTableSingle(
       table,
       primaryKeyColumns,
-      (source, args) => primaryKeyColumns.map(({ name }) => args[camelCase(name)])
+      (source, args) => primaryKeyColumns.map(column => args[column.getFieldName()])
     ),
   }
 }

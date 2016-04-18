@@ -3,7 +3,7 @@
     "a": {
       "clientMutationId": null,
       "person": {
-        "id": 11,
+        "rowId": 11,
         "givenName": "Beverly",
         "familyName": "Kelly"
       }
@@ -15,7 +15,7 @@
     "c": {
       "clientMutationId": "hello",
       "person": {
-        "id": 8,
+        "rowId": 8,
         "givenName": "David",
         "familyName": "Bell"
       }
@@ -23,7 +23,7 @@
     "d": {
       "clientMutationId": "yoyo",
       "person": {
-        "id": 4,
+        "rowId": 4,
         "givenName": "Russell",
         "familyName": "Gardner"
       }
