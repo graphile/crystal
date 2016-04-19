@@ -1,5 +1,5 @@
 # PostGraphQL
-*A GraphQL server created from reflection over a PostgreSQL schema.*
+*A GraphQL schema created by reflection over a PostgreSQL schema.*
 
 The strongly typed GraphQL data querying language is a revolutionary new way to interact with your server. Similar to how JSON very quickly overtook XML, GraphQL will likely take over REST. Why? Because GraphQL allows us to express our data in the exact same way we think about it.
 
