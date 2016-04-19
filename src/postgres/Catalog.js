@@ -4,12 +4,20 @@ import sql from 'sql'
 /**
  * A catalog of all objects relevant in the database to PostGraphQL.
  *
+ * The `Catalog` class also contains a `pgConfig` object which allows it to
+ * acquire clients from the `pg` connection pool at will.
+ *
+ * @member {Object} pgConfig
  * @member {Schema[]} schemas
  * @member {ForeignKey[]} foreignKeys
  */
 export class Catalog {
   schemas = []
   foreignKeys = []
+
+  constructor ({ pgConfig }) {
+    this.pgConfig = pgConfig
+  }
 
   /**
    * Gets the schema of a certain name.

@@ -76,8 +76,8 @@ describe('getCatalog', () => {
   before(async () => {
     const client = await pg.connectAsync(PG_CONFIG)
     await client.queryAsync(PG_SCHEMA)
-    catalog = await getCatalog(client)
     client.end()
+    catalog = await getCatalog(PG_CONFIG)
   })
 
   it('gets schemas', () => {

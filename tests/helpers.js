@@ -5,7 +5,11 @@ import { Catalog, Schema, Table, Column, Enum } from '#/postgres/Catalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 
-export class TestCatalog extends Catalog {}
+export class TestCatalog extends Catalog {
+  constructor ({ ...config } = {}) {
+    super({ ...config })
+  }
+}
 
 export class TestSchema extends Schema {
   constructor ({ name = 'test', catalog = new TestCatalog(), tables, ...config } = {}) {

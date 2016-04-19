@@ -1,4 +1,3 @@
-import pg from 'pg'
 import getCatalog from './postgres/getCatalog.js'
 import createSchema from './graphql/createSchema.js'
 
@@ -11,16 +10,10 @@ import createSchema from './graphql/createSchema.js'
  * @returns {GraphQLSchema}
  */
 const createGraphqlSchema = async (pgConfig, schemaName) => {
-  // Connect a client from the pool…
-  const client = await pg.connectAsync(pgConfig)
-
-  const pgCatalog = await getCatalog(client)
+  const pgCatalog = await getCatalog(pgConfig)
   const pgSchema = pgCatalog.getSchema(schemaName)
+  if (!pgSchema) throw new Error(`No schema named '${schemaName}' found.`)
   const graphqlSchema = createSchema(pgSchema)
-
-  // Make sure to release the client!
-  client.end()
-
   return graphqlSchema
 }
 

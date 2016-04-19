@@ -1,5 +1,6 @@
 import { memoize, assign } from 'lodash'
 import Promise from 'bluebird'
+import pg from 'pg'
 import { Catalog, Schema, Table, Column, Enum, ForeignKey } from './Catalog.js'
 
 const getRawSchemas = memoize(client =>
@@ -119,19 +120,19 @@ const getRawForeignKeys = memoize(client =>
 /**
  * Gets an instance of `Catalog` for the given PostgreSQL configuration.
  *
- * @param {Client} client
+ * @param {Object} pgConfig
  * @returns {Catalog}
  */
-const getCatalog = async client =>
-  Promise
-  .resolve(new Catalog())
-  .then(async catalog => {
-    const schemas = await getSchemas(client, catalog)
-    catalog.schemas = schemas
-    const foreignKeys = await getForeignKeys(client, catalog)
-    catalog.foreignKeys = foreignKeys
-    return catalog
-  })
+const getCatalog = async pgConfig => {
+  const client = await pg.connectAsync(pgConfig)
+  const catalog = new Catalog({ pgConfig })
+  const schemas = await getSchemas(client, catalog)
+  catalog.schemas = schemas
+  const foreignKeys = await getForeignKeys(client, catalog)
+  catalog.foreignKeys = foreignKeys
+  client.end()
+  return catalog
+}
 
 export default getCatalog
 
