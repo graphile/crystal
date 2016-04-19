@@ -51,7 +51,7 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
 
     // Gets the row from the result set given a few column values.
     let getRow = columnValues => rows.find(row =>
-      every(columns.map(({ name }, i) => row[name] === columnValues[i]))
+      every(columns.map(({ name }, i) => String(row[name]) === String(columnValues[i])))
     )
 
     // If there are 25% less values in our result set then this means there are
@@ -69,7 +69,14 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
   // in memory.
   getDataLoader.cache = new WeakMap()
 
-  return async (source, args, { client }) => getDataLoader(client).load(getColumnValues(source, args))
+  return async (source, args, { client }) => {
+    const values = getColumnValues(source, args)
+    if (!values) return null
+    const row = await getDataLoader(client).load(values)
+    if (!row) return row
+    row.table = table
+    return row
+  }
 }
 
 export default resolveTableSingle

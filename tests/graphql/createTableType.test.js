@@ -42,6 +42,10 @@ describe('createTableType', () => {
   it('will rename `id` columns to `rowId`', () => {
     const type = createTableType(new TestTable({ columns: [new TestColumn({ name: 'id', isPrimaryKey: true })] }))
     expect(type.getFields().rowId).toExist()
-    expect(type.getFields().id).toNotExist()
+  })
+
+  it('will implement the `Node` type', () => {
+    const type = createTableType(new TestTable())
+    expect(type.getInterfaces()[0].name).toEqual('Node')
   })
 })

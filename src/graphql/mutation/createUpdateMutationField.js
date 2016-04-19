@@ -1,4 +1,4 @@
-import { fromPairs, upperFirst } from 'lodash'
+import { fromPairs, upperFirst, assign } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -84,7 +84,7 @@ const resolveUpdate = table => {
     const { input } = args
     const { clientMutationId } = input
 
-    const result = await client.queryAsync(
+    const { rows: [row] } = await client.queryAsync(
       tableSql
       .update(fromPairs(
         table.columns
@@ -101,7 +101,7 @@ const resolveUpdate = table => {
     )
 
     return {
-      [table.name]: result.rows[0],
+      [table.name]: row ? assign(row, { table }) : null,
       clientMutationId,
     }
   }

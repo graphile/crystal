@@ -1,4 +1,4 @@
-import { fromPairs, identity } from 'lodash'
+import { fromPairs, identity, assign } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -73,7 +73,7 @@ const resolveInsert = table => {
     const { input } = args
     const { clientMutationId } = input
     // Insert the thing making sure we return the newly inserted row.
-    const result = await client.queryAsync(
+    const { rows: [row] } = await client.queryAsync(
       tableSql
       .insert(fromPairs(
         table.columns
@@ -86,7 +86,7 @@ const resolveInsert = table => {
 
     // Return the first (and likely only) row.
     return {
-      [table.name]: result.rows[0],
+      [table.name]: row ? assign(row, { table }) : null,
       clientMutationId,
     }
   }

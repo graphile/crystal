@@ -1,4 +1,4 @@
-import { fromPairs } from 'lodash'
+import { fromPairs, assign } from 'lodash'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -71,7 +71,7 @@ const resolveDelete = table => {
     const { input } = args
     const { clientMutationId } = input
 
-    const result = await client.queryAsync(
+    const { rows: [row] } = await client.queryAsync(
       tableSql
       .delete()
       .where(fromPairs(
@@ -84,7 +84,7 @@ const resolveDelete = table => {
     )
 
     return {
-      [table.name]: result.rows[0],
+      [table.name]: row ? assign(row, { table }) : null,
       clientMutationId,
     }
   }

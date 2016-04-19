@@ -1,0 +1,24 @@
+{
+	person: node(id: "cGVyc29uOjI=") {
+		__typename
+    id
+    ... on Person {
+      givenName
+      familyName
+    }
+    ... on Post {
+      headline
+    }
+  }
+	post: node(id: "cG9zdDo0") {
+    __typename
+    id
+    ... on Person {
+      givenName
+      familyName
+    }
+    ... on Post {
+      headline
+    }
+  }
+}

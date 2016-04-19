@@ -64,7 +64,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
       // user gets what they expected.
       if (last) rows = rows.reverse()
 
-      return rows
+      return rows.map(row => assign(row, { table }))
     })
 
     const getStartCursor = once(() => getRows().then(rows => {

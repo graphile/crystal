@@ -1,5 +1,6 @@
 import { memoize, fromPairs, camelCase } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
+import { IDType, NodeType } from './Types.js'
 import getColumnType from './getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
 import createConnectionType from './createConnectionType.js'
@@ -29,15 +30,28 @@ const createTableType = memoize(table => {
     )
   }
 
+  const primaryKeyColumns = table.getPrimaryKeyColumns()
+
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
     // name and the description is the associated comment in PostgreSQL.
     name: table.getTypeName(),
     description: table.description,
 
+    interfaces: [NodeType],
+    isTypeOf: value => value.table === table,
+
     // Make sure all of our columns have a corresponding field. This is a thunk
     // because `createForeignKeyField` may have a circular dependency.
     fields: () => ({
+      id: {
+        type: IDType,
+        description: `The globally unique identifier for this ${table.getMarkdownTypeName()}.`,
+        resolve: source => ({
+          tableName: table.name,
+          values: primaryKeyColumns.map(column => source[column.name]),
+        }),
+      },
       ...fromPairs(
         table.columns
         .map(column => [column.getFieldName(), createColumnField(column)])

@@ -7,6 +7,7 @@ import {
   GraphQLNonNull,
   GraphQLScalarType,
   GraphQLObjectType,
+  GraphQLInterfaceType,
 } from 'graphql'
 
 /* ============================================================================
@@ -23,6 +24,44 @@ const extendScalarType = (parent, { name, description, serialize, parseValue, pa
     serialize: serialize || parent.serialize,
     parseValue: parseValue || parent.parseValue,
     parseLiteral: parseLiteral || parent.parseLiteral,
+  })
+
+/* ============================================================================
+ * Node Types
+ * ========================================================================= */
+
+const toID = id => toBase64(`${id.tableName}:${id.values.join(',')}`)
+
+const fromID = encodedString => {
+  const string = fromBase64(encodedString)
+  if (!string) throw new Error(`Invalid ID '${encodedString}'.`)
+  const [tableName, valueString] = string.split(':', 2)
+  if (!valueString) throw new Error(`Invalid ID '${encodedString}'.`)
+  const values = valueString.split(',')
+  return { tableName, values }
+}
+
+export const IDType =
+  new GraphQLScalarType({
+    name: 'ID',
+    description:
+      'A globally unique identifier used to refetch an object or as a key for a ' +
+      'cache. It is not intended to be human readable.',
+    serialize: toID,
+    parseValue: fromID,
+    parseLiteral: ast => (ast.kind === Kind.STRING ? fromID(ast.value) : null),
+  })
+
+export const NodeType =
+  new GraphQLInterfaceType({
+    name: 'Node',
+    description: 'A single node object in the graph with a globally unique identifier.',
+    fields: {
+      id: {
+        type: IDType,
+        description: 'The `Node`’s globally unique identifier used to refetch the node.',
+      },
+    },
   })
 
 /* ============================================================================

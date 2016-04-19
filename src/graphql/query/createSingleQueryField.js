@@ -1,10 +1,7 @@
-import { fromPairs } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
+import { IDType } from '../Types.js'
 import createTableType from '../createTableType.js'
-import getColumnType from '../getColumnType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
-
-const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
  * Creates an object field for selecting a single row of a table.
@@ -27,21 +24,20 @@ const createSingleQueryField = table => {
     type: createTableType(table),
     description: `Queries a single ${table.getMarkdownTypeName()} using its primary keys.`,
 
-    // Get arguments for this single row data fetcher. Uses only primary key
-    // columns. All arguments are required as we want to be 100% certain we are
-    // selecting one and only one row.
-    args: fromPairs(
-      table.getPrimaryKeyColumns()
-      .map(column => [column.getFieldName(), {
-        type: getNonNullType(getColumnType(column)),
-        description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
-      }])
-    ),
+    args: {
+      id: {
+        type: new GraphQLNonNull(IDType),
+        description: `The \`ID\` of the ${table.getMarkdownTypeName()} node.`,
+      },
+    },
 
     resolve: resolveTableSingle(
       table,
       primaryKeyColumns,
-      (source, args) => primaryKeyColumns.map(column => args[column.getFieldName()])
+      (source, { id: { tableName, values } }) => {
+        if (tableName !== table.name) return null
+        return values
+      }
     ),
   }
 }

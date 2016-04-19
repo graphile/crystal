@@ -11,7 +11,7 @@ describe('createSingleQueryField', () => {
     expect(person.type.name).toEqual('Person')
   })
 
-  it('has args for every primary key column', () => {
+  it('has args for only the node `id`', () => {
     const person = createSingleQueryField(
       new TestTable({
         name: 'person',
@@ -36,11 +36,11 @@ describe('createSingleQueryField', () => {
       })
     )
 
-    expect(keys(person.args)).toEqual(['id1'])
-    expect(person.args.id1.type).toBeA(GraphQLNonNull)
-    expect(keys(compoundKey.args)).toEqual(['id2', 'id1', 'id3'])
-    expect(compoundKey.args.id2.type).toBeA(GraphQLNonNull)
-    expect(compoundKey.args.id1.type).toBeA(GraphQLNonNull)
-    expect(compoundKey.args.id3.type).toBeA(GraphQLNonNull)
+    expect(keys(person.args)).toEqual(['id'])
+    expect(person.args.id.type).toBeA(GraphQLNonNull)
+    expect(person.args.id.type.ofType.name).toEqual('ID')
+    expect(keys(compoundKey.args)).toEqual(['id'])
+    expect(compoundKey.args.id.type).toBeA(GraphQLNonNull)
+    expect(compoundKey.args.id.type.ofType.name).toEqual('ID')
   })
 })
