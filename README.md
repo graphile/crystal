@@ -140,7 +140,7 @@ If you fundamentally disagree with a one-to-one mapping of a SQL schema to an AP
 4. For what it’s worth, you can write in your favorite scripting language in PostgreSQL including [JavaScript][js-in-pg] and [Ruby][ruby-in-pg].
 5. And if you don’t want to write your Ruby in PostgreSQL, you could also use PostgreSQL’s [`NOTIFY`][pg-notify] feature to fire events to a listening Ruby or [JavaScript][node-pg-notify] microservice can listen and respond to PostgreSQL events (this could include email transactions and event reporting).
 
-Still worried about a certain aspect of a schema driven API? Open an issue.
+Still worried about a certain aspect of a schema driven API? Open an issue, confident we can convince you otherwise 😉
 
 [user-management]: http://www.postgresql.org/docs/current/static/user-manag.html
 [row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
