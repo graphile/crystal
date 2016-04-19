@@ -55,7 +55,7 @@
     "babel-watch": "^1.0.2",
     "eslint": "^2.7.0",
     "eslint-config-calebmer": "^3.0.0",
-    "expect": "calebmer/expect",
+    "expect": "^1.18.0",
     "mocha": "^2.4.5"
   }
 }
