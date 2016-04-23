@@ -150,3 +150,9 @@ Still worried about a certain aspect of a schema driven API? Open an issue, conf
 [ruby-in-pg]: https://github.com/knu/postgresql-plruby
 [pg-notify]: http://www.postgresql.org/docs/current/static/sql-notify.html
 [node-pg-notify]: https://www.npmjs.com/package/pg-pubsub
+
+* * *
+
+Enjoy this server? Want updates and seeing what I’m up to next? Follow me on Twitter [`@calebmer`](https://twitter.com/calebmer).
+
+Thanks and enjoy 👍
