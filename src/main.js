@@ -25,7 +25,7 @@ const main = async () => {
   .option('-p, --port <integer>', 'a URL port the server will listen to. defaults to 3000', parseInt)
   .option('-r, --route <path>', 'the route to mount the GraphQL server on. defaults to /')
   .option('-d, --development', 'enables a development mode which enables GraphiQL, nicer errors, and JSON pretty printing')
-  .option('-m, --max-pool-size', 'the maximum number of connections to keep in the connection pool. defaults to 10')
+  .option('-m, --max-pool-size <integer>', 'the maximum number of connections to keep in the connection pool. defaults to 10')
   .parse(process.argv)
   /* eslint-enable max-len */
 
