@@ -12,8 +12,22 @@ PostGraphQL holds a fundamental belief that a *well designed database schema sho
 For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read the [evaluating PostGraphQL for your project](#evaluating-postgraphql-for-your-project) section.
 
 ## Usage
+First install using npm:
+
+```bash
+npm install -g postgraphql
 ```
+
+and then just run it!
+
+```bash
 postgraphql postgres://localhost:5432/mydb --schema forum --development
+```
+
+For more information run:
+
+```bash
+postgraphql --help
 ```
 
 ## Benefits
