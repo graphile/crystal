@@ -136,7 +136,7 @@ In the future, things PostGraphQL will be able to do will include:
 
 - Authentication using PostgreSQL roles.
 - Whitelisted queries in production.
-- Subscriptions using the PostgreSQL notify feature.
+- Subscriptions using the PostgreSQL [`NOTIFY`][pg-notify] feature.
 
 ## Evaluating PostGraphQL For Your Project
 Hopefully you’ve been convinced that PostGraphQL serves an awesome GraphQL API, but now let’s take a more critical look at whether or not you should adopt PostGraphQL for your project.
