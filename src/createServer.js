@@ -1,11 +1,12 @@
 import path from 'path'
+import http from 'http'
 import Express from 'express'
 import onFinished from 'on-finished'
 import logger from 'morgan'
 import favicon from 'serve-favicon'
 import pg from 'pg'
 import { formatError } from 'graphql'
-import graphql from 'express-graphql'
+import graphqlHTTP from 'express-graphql'
 
 /**
  * Creates an HTTP server with the provided configuration.
@@ -23,7 +24,7 @@ const createServer = async ({ graphqlSchema, pgConfig, route, development }) => 
   server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
-  server.use(route || '/', graphql(async req => {
+  server.use(route || '/', graphqlHTTP(async req => {
     // Acquire a new client for every request.
     const client = await pg.connectAsync(pgConfig)
     // Make sure we release our client back to the pool once the response has
@@ -38,9 +39,7 @@ const createServer = async ({ graphqlSchema, pgConfig, route, development }) => 
     }
   }))
 
-  // Lol, we actually return an express server, but we might not in the
-  // future ;)
-  return server
+  return http.createServer(server)
 }
 
 export default createServer

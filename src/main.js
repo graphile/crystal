@@ -7,7 +7,7 @@ import { readFileSync } from 'fs'
 import { Command } from 'commander'
 import { parse as parseConnectionString } from 'pg-connection-string'
 import createGraphqlSchema from './createGraphqlSchema.js'
-import createExpressServer from './createExpressServer.js'
+import createServer from './createServer.js'
 
 const manifest = readFileSync(path.resolve(__dirname, '../package.json'))
 
@@ -51,7 +51,7 @@ const main = async () => {
   const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName)
 
   // Create the GraphQL HTTP server.
-  const server = await createExpressServer({
+  const server = await createServer({
     graphqlSchema,
     pgConfig,
     route,
