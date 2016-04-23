@@ -22,6 +22,12 @@
     "connection"
   ],
   "main": "index.js",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist",
+    "index.js"
+  ],
   "scripts": {
     "lint": "scripts/lint.sh",
     "build": "scripts/build.sh",
