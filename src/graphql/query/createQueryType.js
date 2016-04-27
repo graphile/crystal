@@ -1,9 +1,15 @@
 import { ary, assign } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import createNodeQueryField from './createNodeQueryField.js'
-import createSingleQueryField from './createSingleQueryField.js'
-import createListQueryField from './createListQueryField.js'
+import createQueryFields from './createQueryFields.js'
 
+/**
+ * Creates the Query type for the entire schema. To see the fields created for
+ * singular tables refer to `createQueryFields`.
+ *
+ * @param {Schema} schema
+ * @returns {GraphQLObjectType}
+ */
 const createQueryType = schema =>
   new GraphQLObjectType({
     name: 'RootQuery',
@@ -19,8 +25,3 @@ const createQueryType = schema =>
   })
 
 export default createQueryType
-
-const createQueryFields = table => ({
-  [table.getFieldName()]: createSingleQueryField(table),
-  [`${table.getFieldName()}Nodes`]: createListQueryField(table),
-})

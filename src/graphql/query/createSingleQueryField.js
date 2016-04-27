@@ -12,13 +12,9 @@ import resolveTableSingle from '../resolveTableSingle.js'
 const createSingleQueryField = table => {
   const primaryKeyColumns = table.getPrimaryKeyColumns()
 
-  if (primaryKeyColumns.length === 0) {
-    throw new Error(
-      `PostgreSQL schema '${table.schema.name}' contains table '${table.name}' ` +
-      'which does not have any primary key. To generate a GraphQL schema ' +
-      'all tables must have a primary key.'
-    )
-  }
+  // Can’t query a single node of a table if it does not have a primary key.
+  if (primaryKeyColumns.length === 0)
+    return null
 
   return {
     type: createTableType(table),
