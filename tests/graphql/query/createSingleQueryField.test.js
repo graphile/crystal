@@ -43,4 +43,8 @@ describe('createSingleQueryField', () => {
     expect(compoundKey.args.id.type).toBeA(GraphQLNonNull)
     expect(compoundKey.args.id.type.ofType.name).toEqual('ID')
   })
+
+  it('it will return null for tables without primary keys', () => {
+    expect(createSingleQueryField(new TestTable({ columns: [new TestColumn()] }))).toNotExist()
+  })
 })

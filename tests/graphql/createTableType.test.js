@@ -47,5 +47,12 @@ describe('createTableType', () => {
   it('will implement the `Node` type', () => {
     const type = createTableType(new TestTable())
     expect(type.getInterfaces()[0].name).toEqual('Node')
+    expect(type.getFields()).toIncludeKey('id')
+  })
+
+  it('will not implement the `Node` type for tables without primary keys', () => {
+    const type = createTableType(new TestTable({ columns: [new TestColumn()] }))
+    expect(type.getInterfaces()).toEqual([])
+    expect(type.getFields()).toExcludeKey('id')
   })
 })

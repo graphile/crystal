@@ -31,6 +31,7 @@ const createTableType = memoize(table => {
   }
 
   const primaryKeyColumns = table.getPrimaryKeyColumns()
+  const isNode = primaryKeyColumns.length !== 0
 
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
@@ -38,20 +39,26 @@ const createTableType = memoize(table => {
     name: table.getTypeName(),
     description: table.description,
 
-    interfaces: [NodeType],
+    // If the table has no primary keys, it shouldn’t implement `Node`.
+    interfaces: isNode ? [NodeType] : [],
+
     isTypeOf: value => value.table === table,
 
     // Make sure all of our columns have a corresponding field. This is a thunk
     // because `createForeignKeyField` may have a circular dependency.
     fields: () => ({
-      id: {
-        type: IDType,
-        description: `The globally unique identifier for this ${table.getMarkdownTypeName()}.`,
-        resolve: source => ({
-          tableName: table.name,
-          values: primaryKeyColumns.map(column => source[column.name]),
-        }),
-      },
+      // If the table is a node, add the `id` field. Otherwise don’t add
+      // anything.
+      ...(isNode ? {
+        id: {
+          type: IDType,
+          description: `The globally unique identifier for this ${table.getMarkdownTypeName()}.`,
+          resolve: source => ({
+            tableName: table.name,
+            values: primaryKeyColumns.map(column => source[column.name]),
+          }),
+        },
+      } : {}),
       ...fromPairs(
         table.columns
         .map(column => [column.getFieldName(), createColumnField(column)])
