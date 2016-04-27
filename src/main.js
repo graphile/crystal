@@ -11,7 +11,7 @@ import { parse as parseConnectionString } from 'pg-connection-string'
 import createGraphqlSchema from './createGraphqlSchema.js'
 import createServer from './createServer.js'
 
-const manifest = readFileSync(path.resolve(__dirname, '../package.json'))
+const manifest = JSON.parse(readFileSync(path.resolve(__dirname, '../package.json')))
 
 const main = async () => {
   const program = new Command('postgraphql')
