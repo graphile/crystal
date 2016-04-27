@@ -182,6 +182,9 @@ Still worried about a certain aspect of a schema driven API? Open an issue, conf
 
 * * *
 
+## Thanks
+Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definetly a huge inspiration for this project! The core contributors are awesome and taught me so much 😊. Ironically, they also convinced me that GraphQL was superior to REST…
+
 Enjoy this server? Want updates and seeing what I’m up to next? Follow me on Twitter [`@calebmer`](https://twitter.com/calebmer).
 
 Thanks and enjoy 👍
