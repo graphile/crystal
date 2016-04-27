@@ -129,7 +129,7 @@ PostGraphQL not only provides limit/offset pagination, but it also provides curs
 [pagination-for-graphql]: https://medium.com/apollo-stack/understanding-pagination-rest-graphql-and-relay-b10f835549e7#.8ehp4qwsq
 
 ### Relay Specification Compliant
-You don’t have to use GraphQL with React and Relay, but if you are PostGraphQL implements the brilliant Relay specifications for GraphQL. Even if you are not using Relay your project will benefit from having these strong, well thought out specifications implemented by PostGraphQL.
+You don’t have to use GraphQL with React and Relay, but if you are, PostGraphQL implements the brilliant Relay specifications for GraphQL. Even if you are not using Relay your project will benefit from having these strong, well thought out specifications implemented by PostGraphQL.
 
 The specific specs PostGraphQL implements are:
 
