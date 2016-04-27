@@ -33,8 +33,7 @@ For more information run:
 postgraphql --help
 ```
 
-## Example
-Check out the [forum example][] for a demo of PostGraphQL.
+Check out the **[forum example][]** for a demo of PostGraphQL in action.
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 
