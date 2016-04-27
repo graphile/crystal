@@ -30,6 +30,11 @@ For more information run:
 postgraphql --help
 ```
 
+## Example
+Check out the [forum example][] for a demo of PostGraphQL.
+
+[forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
+
 ## Benefits
 PostGraphQL uses the joint benefits of PostgreSQL and GraphQL to provide a number of key benefits.
 
