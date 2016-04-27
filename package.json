@@ -26,7 +26,8 @@
     "README.md",
     "LICENSE",
     "dist",
-    "index.js"
+    "index.js",
+    "assets"
   ],
   "bin": {
     "postgraphql": "dist/main.js"
