@@ -13,7 +13,7 @@ const TEST_FIXTURES = 'tests/integration/fixtures'
 describe('integration', () => {
   before(async () => {
     const client = await pg.connectAsync(PG_CONFIG)
-    await client.queryAsync(`drop schema ${SCHEMA_NAME} cascade`)
+    await client.queryAsync(`drop schema if exists ${SCHEMA_NAME} cascade`)
     await client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
     client.end()
   })
