@@ -67,7 +67,7 @@ const getRawColumns = memoize(client =>
       left join pg_catalog.pg_constraint as cp on
         cp.contype = 'p' and
         cp.conrelid = a.attrelid and
-        cp.conkey @> array[a.attnum]
+        cp.conkey @> array[a.attnum::int]
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
       c.relkind in ('r', 'v', 'm', 'f') and
