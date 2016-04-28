@@ -16,8 +16,10 @@ Once you are in this directory and have checked to make sure PostgreSQL is runni
 
 ```bash
 npm install
-npm run schema-up
+psql -f schema.sql
 postgraphql postgres://localhost:5432 --schema forum_example --development
 ```
 
 This will run the SQL in `schema.sql` on your default database and start PostGraphQL. Navigate to the URL printed in your console and you should see GraphiQL. Use it to navigate the generated documentation for the GraphQL server.
+
+In some situations, you might need to change the `psql` and `postgraphql` commands to better reflect your database environment. For example, you might need to change `postgres://localhost:5432` to `postgres://user:pass@localhost:5432` if your database requires authentication.
