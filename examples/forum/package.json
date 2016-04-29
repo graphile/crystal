@@ -9,6 +9,6 @@
     "start": "npm run schema-up && postgraphql postgres://localhost:5432 -s forum_example -d"
   },
   "dependencies": {
-    "postgraphql": "1.0.3"
+    "postgraphql": "latest"
   }
 }
