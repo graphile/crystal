@@ -16,7 +16,7 @@ describe('catalog', () => {
     })
 
     it('will maintain privacy underscores in field name', () => {
-      expect(new Table({ name: '__hello_world__' }).getFieldName()).toEqual('__HelloWorld__')
+      expect(new Table({ name: '__hello_world__' }).getFieldName()).toEqual('__helloWorld__')
     })
 
     it('will maintain privacy underscores in type name', () => {
