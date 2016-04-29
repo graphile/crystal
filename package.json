@@ -40,7 +40,7 @@
     "schema-up": "npm --prefix examples/forum run schema-up",
     "schema-down": "npm --prefix examples/forum run schema-down",
     "start": "scripts/start.sh",
-    "prepublish": "scripts/build.sh"
+    "prepublish": "npm test && scripts/build.sh"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
