@@ -14,6 +14,14 @@ describe('Catalog', () => {
     it('will get a camel case field name', () => {
       expect(new Table({ name: 'hello_world' }).getFieldName()).toEqual('helloWorld')
     })
+
+    it('will maintain privacy underscores in field name', () => {
+      expect(new Table({ name: '__hello_world__' }).getFieldName()).toEqual('__HelloWorld__')
+    })
+
+    it('will maintain privacy underscores in type name', () => {
+      expect(new Table({ name: '__hello_world__' }).getTypeName()).toEqual('__HelloWorld__')
+    })
   })
 
   describe('Column', () => {
@@ -27,6 +35,10 @@ describe('Catalog', () => {
 
     it('will rename `id` to `rowId` for field names', () => {
       expect(new Column({ name: 'id' }).getFieldName()).toEqual('rowId')
+    })
+
+    it('will maintain privacy underscores in field name', () => {
+      expect(new Column({ name: '__hello_world__' }).getFieldName()).toEqual('__helloWorld__')
     })
   })
 })

@@ -1,6 +1,18 @@
 import { flatten, camelCase, upperFirst } from 'lodash'
 import sql from 'sql'
 
+const replaceInsideUnderscores = (string, replacer) => {
+  const [, start, substring, finish] = /^(_*)(.*?)(_*)$/.exec(string)
+  return `${start}${replacer(substring)}${finish}`
+}
+
+const camelCaseInsideUnderscores = string => replaceInsideUnderscores(string, camelCase)
+
+const pascalCaseInsideUnderscores = string => replaceInsideUnderscores(
+  string,
+  substring => upperFirst(camelCase(substring))
+)
+
 /**
  * A catalog of all objects relevant in the database to PostGraphQL.
  *
@@ -172,11 +184,11 @@ export class Table {
   }
 
   getFieldName () {
-    return camelCase(this.name)
+    return camelCaseInsideUnderscores(this.name)
   }
 
   getTypeName () {
-    return upperFirst(this.getFieldName())
+    return pascalCaseInsideUnderscores(this.name)
   }
 
   getMarkdownTypeName () {
@@ -274,7 +286,7 @@ export class Column {
     if (this.name === 'id')
       return 'rowId'
 
-    return camelCase(this.name)
+    return camelCaseInsideUnderscores(this.name)
   }
 
   getMarkdownFieldName () {
