@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { Table, Column } from '#/postgres/Catalog.js'
 
-describe('Catalog', () => {
+describe('catalog', () => {
   describe('Table', () => {
     it('will get a pascal case type name', () => {
       expect(new Table({ name: 'hello_world' }).getTypeName()).toEqual('HelloWorld')
