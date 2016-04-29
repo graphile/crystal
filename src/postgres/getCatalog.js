@@ -1,7 +1,7 @@
 import { memoize, assign } from 'lodash'
 import Promise from 'bluebird'
 import pg from 'pg'
-import { Catalog, Schema, Table, Column, Enum, ForeignKey } from './Catalog.js'
+import { Catalog, Schema, Table, Column, Enum, ForeignKey } from './catalog.js'
 
 const getRawSchemas = memoize(client =>
   client.queryAsync(`
