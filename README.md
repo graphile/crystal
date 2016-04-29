@@ -1,6 +1,6 @@
 # PostGraphQL
 
-[![Package version on npm](https://badge.fury.io/js/postgraphql.svg)](https://www.npmjs.com/package/postgraphql)
+[![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Gitter chat room](https://badges.gitter.im/calebmer/postgraphql.svg)](https://gitter.im/calebmer/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
