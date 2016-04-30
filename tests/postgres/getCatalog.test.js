@@ -169,9 +169,9 @@ describe('getCatalog', () => {
   })
 
   it('gets column types', () => {
-    expect(catalog.getColumn('a', 'types', 'bigint').type).toEqual(20)
-    expect(catalog.getColumn('a', 'types', 'boolean').type).toEqual(16)
-    expect(catalog.getColumn('a', 'types', 'varchar').type).toEqual(1043)
+    expect(catalog.getColumn('a', 'types', 'bigint').type.oid).toEqual(20)
+    expect(catalog.getColumn('a', 'types', 'boolean').type.oid).toEqual(16)
+    expect(catalog.getColumn('a', 'types', 'varchar').type.oid).toEqual(1043)
   })
 
   it('gets enums', () => {
@@ -185,11 +185,10 @@ describe('getCatalog', () => {
     expect(catalog.getEnum('b', 'color').variants).toEqual(['red', 'green', 'blue'])
   })
 
-  it('will let a column get its enum type', () => {
-    expect(catalog.getColumn('a', 'types', 'enum').getEnum()).toInclude({
-      name: 'color',
-      variants: ['red', 'green', 'blue'],
-    })
+  it('enum columns will have an enum type', () => {
+    expect(catalog.getColumn('a', 'types', 'enum').type.isEnum).toBe(true)
+    expect(catalog.getColumn('a', 'types', 'enum').type.name).toEqual('color')
+    expect(catalog.getColumn('a', 'types', 'enum').type.variants).toEqual(['red', 'green', 'blue'])
   })
 
   it('will get foreign keys', () => {

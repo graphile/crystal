@@ -1,7 +1,7 @@
 import { memoize, fromPairs, includes, snakeCase, toUpper } from 'lodash'
-import { getNullableType, GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
+import { GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
 import { CursorType } from './types.js'
-import getColumnType from './getColumnType.js'
+import getType from './getType.js'
 
 const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   // The column specified by `orderBy` means more than just the order to
@@ -54,7 +54,7 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
     table.columns
     .filter(column => !includes(ignoreColumnConditions, column))
     .map(column => [column.getFieldName(), {
-      type: getNullableType(getColumnType(column)),
+      type: getType(column.type),
       description:
         'Filters the resulting set with an equality test on the ' +
         `${column.getMarkdownFieldName()} field.`,

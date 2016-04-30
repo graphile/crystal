@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 
 import { assign } from 'lodash'
-import { Catalog, Schema, Table, Column, Enum } from '#/postgres/catalog.js'
+import { Catalog, Schema, Table, Column, Type, Enum } from '#/postgres/catalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 
@@ -30,13 +30,19 @@ export class TestTable extends Table {
 }
 
 export class TestColumn extends Column {
-  constructor ({ name = 'test', table = new TestTable(), enum_, ...config } = {}) {
-    super({ name, table, ...config })
+  constructor ({ name = 'test', table = new TestTable(), type = new TestType(), enum_, ...config } = {}) {
+    super({ name, table, type, ...config })
     this._enum = enum_
   }
 
   getEnum () {
     return this._enum || super.getEnum()
+  }
+}
+
+export class TestType extends Type {
+  constructor (oid = 0) {
+    super(oid)
   }
 }
 

@@ -1,3 +1,6 @@
+// TODO: Refactor this and `catalog.js` for performance. Identify important
+// and unimportant methods and clean up the API.
+
 import { memoize, assign, ary } from 'lodash'
 import Promise from 'bluebird'
 import pg from 'pg'
@@ -7,6 +10,7 @@ import {
   Schema,
   Table,
   Column,
+  Type,
   Enum,
   ForeignKey,
   Procedure,
@@ -15,7 +19,7 @@ import {
 const getRawSchemas = memoize(client =>
   client.queryAsync(`
     select
-      n.oid as "_oid",
+      n.oid as "oid",
       n.nspname as "name",
       d.description as "description"
     from
@@ -41,7 +45,7 @@ const getRawSchemas = memoize(client =>
 const getRawTables = memoize(client =>
   client.queryAsync(`
     select
-      c.oid as "_oid",
+      c.oid as "oid",
       n.nspname as "schemaName",
       c.relname as "name",
       d.description as "description"
@@ -59,7 +63,7 @@ const getRawTables = memoize(client =>
 const getRawColumns = memoize(client =>
   client.queryAsync(`
     select
-      a.attnum as "_num",
+      a.attnum as "num",
       n.nspname as "schemaName",
       c.relname as "tableName",
       a.attname as "name",
@@ -91,7 +95,7 @@ const getRawColumns = memoize(client =>
 const getRawEnums = memoize(client =>
   client.queryAsync(`
     select
-      t.oid as "_oid",
+      t.oid as "oid",
       n.nspname as "schemaName",
       t.typname as "name",
       array(
@@ -163,6 +167,16 @@ const getCatalog = async pgConfig => {
   const foreignKeys = await getForeignKeys(client, catalog)
   catalog.foreignKeys = foreignKeys
   client.end()
+
+  const enums = catalog.getAllEnums()
+  const getEnhancedType = memoize(type => enums.find(({ oid }) => oid === type.oid))
+
+  // For all columns, enhance the basic type if we can.
+  catalog.getAllColumns().forEach(column => {
+    const type = getEnhancedType(column.type)
+    if (type) column.type = type
+  })
+
   return catalog
 }
 
@@ -209,7 +223,11 @@ const getColumns = (client, table) =>
     table.schema.name === schemaName &&
     table.name === tableName
   )
-  .map(row => new Column({ table, ...row }))
+  .map(row => new Column({
+    table,
+    ...row,
+    type: new Type(row.type),
+  }))
 
 const getEnums = (client, schema) =>
   getRawEnums(client)
@@ -221,14 +239,14 @@ const getEnums = (client, schema) =>
 const getForeignKeys = (client, catalog) =>
   getRawForeignKeys(client)
   .map(({ nativeTableOid, nativeColumnNums, foreignTableOid, foreignColumnNums }) => {
-    const nativeTable = catalog.getAllTables().find(({ _oid }) => _oid === nativeTableOid)
-    const foreignTable = catalog.getAllTables().find(({ _oid }) => _oid === foreignTableOid)
+    const nativeTable = catalog.getAllTables().find(({ oid }) => oid === nativeTableOid)
+    const foreignTable = catalog.getAllTables().find(({ oid }) => oid === foreignTableOid)
     return new ForeignKey({
       catalog,
       nativeTable,
       foreignTable,
-      nativeColumns: nativeColumnNums.map(num => nativeTable.columns.find(({ _num }) => _num === num)),
-      foreignColumns: foreignColumnNums.map(num => foreignTable.columns.find(({ _num }) => _num === num)),
+      nativeColumns: nativeColumnNums.map(colNum => nativeTable.columns.find(({ num }) => num === colNum)),
+      foreignColumns: foreignColumnNums.map(colNum => foreignTable.columns.find(({ num }) => num === colNum)),
     })
   })
 

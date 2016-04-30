@@ -1,5 +1,5 @@
 import { fromPairs, assign } from 'lodash'
-import getColumnType from '../getColumnType.js'
+import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
 
@@ -8,8 +8,6 @@ import {
   GraphQLObjectType,
   GraphQLInputObjectType,
 } from 'graphql'
-
-const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
  * Creates a mutation which will delete a single existing row.
@@ -41,7 +39,7 @@ const createInputType = table =>
     fields: {
       ...fromPairs(
         table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
-          type: getNonNullType(getColumnType(column)),
+          type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),

@@ -94,6 +94,15 @@ export class Catalog {
   }
 
   /**
+   * Gets all columns in all of our schemas.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return flatten(this.schemas.map(schema => schema.getAllColumns()))
+  }
+
+  /**
    * Gets a procedure in a schema.
    *
    * @param {string} schemaName
@@ -108,6 +117,7 @@ export class Catalog {
 /**
  * Represents a PostgreSQL schema.
  *
+ * @member {number} oid
  * @member {Catalog} catalog
  * @member {string} name
  * @member {string} description
@@ -120,8 +130,8 @@ export class Schema {
   enums = []
   procedures = []
 
-  constructor ({ _oid, catalog, name, description }) {
-    this._oid = _oid
+  constructor ({ oid, catalog, name, description }) {
+    this.oid = oid
     this.catalog = catalog
     this.name = name
     this.description = description
@@ -178,6 +188,15 @@ export class Schema {
   }
 
   /**
+   * Return all of our columns in all of our tables.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return flatten(this.tables.map(table => table.getAllColumns()))
+  }
+
+  /**
    * Gets a procedure in this schema.
    *
    * @param {string} procedureName
@@ -191,6 +210,7 @@ export class Schema {
 /**
  * Represents a PostgreSQL table.
  *
+ * @member {number} oid
  * @member {Schema} schema
  * @member {string} name
  * @member {string} description
@@ -199,8 +219,8 @@ export class Schema {
 export class Table {
   columns = []
 
-  constructor ({ _oid, schema, name, description }) {
-    this._oid = _oid
+  constructor ({ oid, schema, name, description }) {
+    this.oid = oid
     this.schema = schema
     this.name = name
     this.description = description
@@ -244,6 +264,15 @@ export class Table {
   }
 
   /**
+   * Return all of our column.
+   *
+   * @returns {Column[]}
+   */
+  getAllColumns () {
+    return this.columns
+  }
+
+  /**
    * Gets the primary key columns for this table. If there is no primary key
    * this will return an array with a length of 0.
    *
@@ -275,17 +304,18 @@ export class Table {
 /**
  * Represents a PostgreSQL column.
  *
+ * @member {number} num
  * @member {Table} table
  * @member {string} name
  * @member {string} description
- * @member {number} type
+ * @member {Type} type
  * @member {boolean} isNullable
  * @member {boolean} isPrimaryKey
  * @member {boolean} hasDefault
  */
 export class Column {
   constructor ({
-    _num,
+    num,
     table,
     name,
     description,
@@ -294,7 +324,7 @@ export class Column {
     isPrimaryKey,
     hasDefault = false,
   }) {
-    this._num = _num
+    this.num = num
     this.table = table
     this.name = name
     this.description = description
@@ -315,28 +345,32 @@ export class Column {
   getMarkdownFieldName () {
     return `\`${this.getFieldName()}\``
   }
+}
 
-  /**
-   * Gets an enum based on the column’s type. If there is no enum for the
-   * column’s type, null is returned.
-   *
-   * @returns {?Enum}
-   */
-  getEnum () {
-    return this.table.schema.catalog.getAllEnums().find(({ _oid }) => _oid === this.type)
+/**
+ * Represents a type defined in a PostgreSQL database.
+ *
+ * @member {number} oid
+ */
+export class Type {
+  constructor (oid) {
+    this.oid = oid
   }
 }
 
 /**
  * Represents a user defined enum PostgreSQL column.
  *
+ * @member {number} oid
  * @member {Schema} schema
  * @member {string} name
  * @member {string[]} variants
  */
-export class Enum {
-  constructor ({ _oid, schema, name, variants }) {
-    this._oid = _oid
+export class Enum extends Type {
+  isEnum = true
+
+  constructor ({ oid, schema, name, variants }) {
+    super(oid)
     this.schema = schema
     this.name = name
     this.variants = variants
