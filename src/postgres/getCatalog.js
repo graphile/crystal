@@ -1,7 +1,16 @@
-import { memoize, assign } from 'lodash'
+import { memoize, assign, ary } from 'lodash'
 import Promise from 'bluebird'
 import pg from 'pg'
-import { Catalog, Schema, Table, Column, Enum, ForeignKey } from './catalog.js'
+
+import {
+  Catalog,
+  Schema,
+  Table,
+  Column,
+  Enum,
+  ForeignKey,
+  Procedure,
+} from './catalog.js'
 
 const getRawSchemas = memoize(client =>
   client.queryAsync(`
@@ -117,6 +126,29 @@ const getRawForeignKeys = memoize(client =>
   .then(({ rows }) => rows)
 )
 
+const getRawProcedures = memoize(client =>
+  client.queryAsync(`
+    select
+      n.nspname as "schemaName",
+      p.proname as "name",
+      case
+        when p.provolatile = 'i' then false
+        when p.provolatile = 's' then false
+        else true
+      end as "isMutation",
+      p.proisstrict as "isStrict",
+      p.proargtypes as "argTypes",
+      p.proargnames as "argNames",
+      p.prorettype as "returnType",
+      p.proretset as "returnsSet"
+    from
+      pg_catalog.pg_proc as p
+      left join pg_catalog.pg_namespace as n on n.oid = p.pronamespace
+      left join pg_catalog.pg_description as d on d.objoid = n.oid and d.objsubid = 0
+  `)
+  .then(({ rows }) => rows)
+)
+
 /**
  * Gets an instance of `Catalog` for the given PostgreSQL configuration.
  *
@@ -146,7 +178,8 @@ const getSchemas = (client, catalog) =>
     Promise.join(
       getTables(client, schema),
       getEnums(client, schema),
-      (tables, enums) => assign(schema, { tables, enums })
+      getProcedures(client, schema),
+      (tables, enums, procedures) => assign(schema, { tables, enums, procedures })
     )
   )
 
@@ -190,12 +223,27 @@ const getForeignKeys = (client, catalog) =>
   .map(({ nativeTableOid, nativeColumnNums, foreignTableOid, foreignColumnNums }) => {
     const nativeTable = catalog.getAllTables().find(({ _oid }) => _oid === nativeTableOid)
     const foreignTable = catalog.getAllTables().find(({ _oid }) => _oid === foreignTableOid)
-
     return new ForeignKey({
       catalog,
       nativeTable,
       foreignTable,
       nativeColumns: nativeColumnNums.map(num => nativeTable.columns.find(({ _num }) => _num === num)),
       foreignColumns: foreignColumnNums.map(num => foreignTable.columns.find(({ _num }) => _num === num)),
+    })
+  })
+
+const getProcedures = (client, schema) =>
+  getRawProcedures(client)
+  .filter(({ schemaName }) => schema.name === schemaName)
+  .map(row => {
+    // The raw procedures table has some wierd columns that we need to correctly format.
+    const argTypes = row.argTypes === '' ? [] : row.argTypes.split(' ').map(ary(parseInt, 1))
+    const argNames = (row.argNames || Array(argTypes.length).fill(null)).map((n, i) => n || `arg${i + 1}`)
+
+    return new Procedure({
+      schema,
+      ...row,
+      argTypes,
+      argNames,
     })
   })

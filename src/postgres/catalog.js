@@ -92,6 +92,17 @@ export class Catalog {
   getColumn (schemaName, tableName, columnName) {
     return this.getSchema(schemaName).getTable(tableName).getColumn(columnName)
   }
+
+  /**
+   * Gets a procedure in a schema.
+   *
+   * @param {string} schemaName
+   * @param {string} procedureName
+   * @returns {?Procedure}
+   */
+  getProcedure (schemaName, procedureName) {
+    return this.getSchema(schemaName).getProcedure(procedureName)
+  }
 }
 
 /**
@@ -102,10 +113,12 @@ export class Catalog {
  * @member {string} description
  * @member {Table[]} tables
  * @member {Enum[]} enums
+ * @member {Procedure[]} procedures
  */
 export class Schema {
   tables = []
   enums = []
+  procedures = []
 
   constructor ({ _oid, catalog, name, description }) {
     this._oid = _oid
@@ -162,6 +175,16 @@ export class Schema {
    */
   getColumn (tableName, columnName) {
     return this.getTable(tableName).getColumn(columnName)
+  }
+
+  /**
+   * Gets a procedure in this schema.
+   *
+   * @param {string} procedureName
+   * @returns {?Procedure}
+   */
+  getProcedure (procedureName) {
+    return this.procedures.find(({ name }) => name === procedureName)
   }
 }
 
@@ -336,5 +359,40 @@ export class ForeignKey {
     this.nativeColumns = nativeColumns
     this.foreignTable = foreignTable
     this.foreignColumns = foreignColumns
+  }
+}
+
+/**
+ * A user defined remote procedure in PostgreSQL which can be called by
+ * PostGraphQL.
+ *
+ * @member {Schema} schema
+ * @member {string} name
+ * @member {boolean} isMutation
+ * @member {boolean} isStrict
+ * @member {number[]} argTypes
+ * @member {string[]} argNames
+ * @member {number} returnType
+ * @member {boolean} returnsSet
+ */
+export class Procedure {
+  constructor ({
+    schema,
+    name,
+    isMutation,
+    isStrict,
+    argTypes,
+    argNames,
+    returnType,
+    returnsSet,
+  }) {
+    this.schema = schema
+    this.name = name
+    this.isMutation = isMutation
+    this.isStrict = isStrict
+    this.argTypes = argTypes
+    this.argNames = argNames
+    this.returnType = returnType
+    this.returnsSet = returnsSet
   }
 }
