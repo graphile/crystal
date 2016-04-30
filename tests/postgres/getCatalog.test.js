@@ -67,6 +67,20 @@ create table a.types (
   "varchar" varchar,
   "enum" b.color
 );
+
+create function a.add1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function a.add2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
+create function a.add3(c int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function a.add4(int, d int) returns int as $$ select $1 + $2 $$ language sql;
+
+create function b.mult1(int, int) returns int as $$ select $1 * $2 $$ language sql;
+create function b.mult2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
+create function b.mult3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
+create function b.mult4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
+
+create function c.types(bigint, boolean, varchar) returns boolean as $$ select false $$ language sql;
+
+create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
 `
 
 describe('getCatalog', () => {
@@ -224,5 +238,49 @@ describe('getCatalog', () => {
     expect(catalog.getColumn('a', 'hello', 'abc').hasDefault).toBe(true)
     expect(catalog.getColumn('a', 'hello', 'world').hasDefault).toBe(false)
     expect(catalog.getColumn('a', 'hello', 'moon').hasDefault).toBe(false)
+  })
+
+  it('will get procedures', () => {
+    expect(catalog.getProcedure('a', 'add1')).toExist()
+    expect(catalog.getProcedure('b', 'add1')).toNotExist()
+  })
+
+  it('will get a procedure’s mutation status', () => {
+    expect(catalog.getProcedure('a', 'add1').isMutation).toBe(false)
+    expect(catalog.getProcedure('a', 'add2').isMutation).toBe(false)
+    expect(catalog.getProcedure('a', 'add3').isMutation).toBe(true)
+    expect(catalog.getProcedure('a', 'add4').isMutation).toBe(true)
+  })
+
+  it('will get if a procedure is strict', () => {
+    expect(catalog.getProcedure('b', 'mult1').isStrict).toBe(false)
+    expect(catalog.getProcedure('b', 'mult2').isStrict).toBe(false)
+    expect(catalog.getProcedure('b', 'mult3').isStrict).toBe(true)
+    expect(catalog.getProcedure('b', 'mult4').isStrict).toBe(true)
+  })
+
+  it('will correctly get argument names', () => {
+    expect(catalog.getProcedure('a', 'add1').argNames).toEqual(['arg1', 'arg2'])
+    expect(catalog.getProcedure('a', 'add2').argNames).toEqual(['a', 'b'])
+    expect(catalog.getProcedure('a', 'add3').argNames).toEqual(['c', 'arg2'])
+    expect(catalog.getProcedure('a', 'add4').argNames).toEqual(['arg1', 'd'])
+    expect(catalog.getProcedure('a', 'set').argNames).toEqual([])
+  })
+
+  it('will correctly get argument types', () => {
+    expect(catalog.getProcedure('a', 'add1').argTypes).toEqual([23, 23])
+    expect(catalog.getProcedure('b', 'mult1').argTypes).toEqual([23, 23])
+    expect(catalog.getProcedure('c', 'types').argTypes).toEqual([20, 16, 1043])
+    expect(catalog.getProcedure('a', 'set').argTypes).toEqual([])
+  })
+
+  it('will correctly get the return type', () => {
+    expect(catalog.getProcedure('a', 'add1').returnType).toEqual(23)
+    expect(catalog.getProcedure('c', 'types').returnType).toEqual(16)
+  })
+
+  it('will correctly get if a procedure is returning a set', () => {
+    expect(catalog.getProcedure('a', 'add1').returnsSet).toBe(false)
+    expect(catalog.getProcedure('a', 'set').returnsSet).toBe(true)
   })
 })
