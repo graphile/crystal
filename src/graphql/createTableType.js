@@ -1,6 +1,6 @@
 import { memoize, fromPairs, camelCase } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
-import { IDType, NodeType } from './Types.js'
+import { IDType, NodeType } from './types.js'
 import getColumnType from './getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
 import createConnectionType from './createConnectionType.js'

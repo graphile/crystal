@@ -1,6 +1,6 @@
 import { memoize } from 'lodash'
 import { GraphQLNonNull } from 'graphql'
-import { NodeType, IDType } from '../Types.js'
+import { NodeType, IDType } from '../types.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
 const createNodeQueryField = schema => ({

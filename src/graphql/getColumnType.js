@@ -18,7 +18,7 @@ import {
   IntervalType,
   JSONType,
   UUIDType,
-} from './Types.js'
+} from './types.js'
 
 const coerceToNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
