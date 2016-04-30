@@ -18,13 +18,16 @@ import graphqlHTTP from 'express-graphql'
  * @param {boolean} config.development
  * @returns {Server}
  */
-const createServer = async ({ graphqlSchema, pgConfig, route, development }) => {
+const createServer = ({ graphqlSchema, pgConfig, route, development, log }) => {
+  development = development == null ? true : development
+  log = log == null ? true : log
+
   const server = new Express()
 
-  server.use(logger(development ? 'dev' : 'common'))
+  if (log) server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
-  server.use(route || '/', graphqlHTTP(async req => {
+  server.all(route || '/', graphqlHTTP(async req => {
     // Acquire a new client for every request.
     const client = await pg.connectAsync(pgConfig)
 
