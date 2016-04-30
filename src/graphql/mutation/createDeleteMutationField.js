@@ -1,4 +1,5 @@
 import { fromPairs, assign } from 'lodash'
+import { getTableSql } from '../../utils.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -62,7 +63,7 @@ const createPayloadType = table =>
   })
 
 const resolveDelete = table => {
-  const tableSql = table.sql()
+  const tableSql = getTableSql(table)
   const primaryKeyColumns = table.getPrimaryKeyColumns()
 
   return async (source, args, { client }) => {

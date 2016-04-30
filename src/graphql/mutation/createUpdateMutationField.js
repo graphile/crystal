@@ -1,4 +1,5 @@
 import { fromPairs, upperFirst, assign } from 'lodash'
+import { getTableSql } from '../../utils.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -74,7 +75,7 @@ const createPayloadType = table =>
 const resolveUpdate = table => {
   // We use our SQL builder here instead of a prepared statement/data loader
   // solution because this query can get super dynamic.
-  const tableSql = table.sql()
+  const tableSql = getTableSql(table)
   const primaryKeyColumns = table.getPrimaryKeyColumns()
 
   return async (source, args, { client }) => {
