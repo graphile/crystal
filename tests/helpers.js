@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 
 import { assign } from 'lodash'
-import { Catalog, Schema, Table, Column, Enum } from '#/postgres/Catalog.js'
+import { Catalog, Schema, Table, Column, Enum } from '#/postgres/catalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 
