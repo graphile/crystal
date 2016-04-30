@@ -1,16 +1,13 @@
 import { fromPairs, upperFirst, assign } from 'lodash'
-import getColumnType from '../getColumnType.js'
+import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
 
 import {
-  getNullableType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLInputObjectType,
 } from 'graphql'
-
-const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
  * Creates a mutation which will update a single existing row.
@@ -44,14 +41,14 @@ const createInputType = table =>
       // We include primary key columns to select a single row to update.
       ...fromPairs(
         table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
-          type: getNonNullType(getColumnType(column)),
+          type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),
       // We include all the other columns to actually allow users to update a value.
       ...fromPairs(
         table.columns.map(column => [`new${upperFirst(column.getFieldName())}`, {
-          type: getNullableType(getColumnType(column)),
+          type: getType(column.type),
           description: `Updates the node’s ${column.getMarkdownFieldName()} field with this new value.`,
         }]),
       ),
