@@ -3,7 +3,6 @@ import {
   GraphQLBoolean,
   GraphQLInt,
   GraphQLFloat,
-  GraphQLString,
   GraphQLNonNull,
   GraphQLScalarType,
   GraphQLObjectType,
@@ -17,13 +16,13 @@ import {
 const toBase64 = value => new Buffer(value.toString()).toString('base64')
 const fromBase64 = value => new Buffer(value.toString(), 'base64').toString()
 
-const extendScalarType = (parent, { name, description, serialize, parseValue, parseLiteral }) =>
+const createStringScalarType = ({ name, description }) =>
   new GraphQLScalarType({
     name,
     description,
-    serialize: serialize || parent.serialize,
-    parseValue: parseValue || parent.parseValue,
-    parseLiteral: parseLiteral || parent.parseLiteral,
+    serialize: String,
+    parseValue: String,
+    parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
   })
 
 /* ============================================================================
@@ -109,12 +108,12 @@ export const PageInfoType =
  * PostgreSQL Types
  * ========================================================================= */
 
-export const BigIntType = extendScalarType(GraphQLString, {
+export const BigIntType = createStringScalarType({
   name: 'BigInt',
   description: 'A signed eight-byte integer represented as a string',
 })
 
-export const DateType = extendScalarType(GraphQLString, {
+export const DateType = createStringScalarType({
   name: 'Date',
   description: 'Some time value',
 })
@@ -167,12 +166,12 @@ export const IntervalType = new GraphQLObjectType({
   },
 })
 
-export const JSONType = extendScalarType(GraphQLString, {
+export const JSONType = createStringScalarType({
   name: 'JSON',
   description: 'An object not queryable by GraphQL',
 })
 
-export const UUIDType = extendScalarType(GraphQLString, {
+export const UUIDType = createStringScalarType({
   name: 'UUID',
   description: 'A universally unique identifier',
 })
