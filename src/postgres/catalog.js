@@ -1,5 +1,4 @@
 import { flatten, camelCase, upperFirst } from 'lodash'
-import sql from 'sql'
 
 const replaceInsideUnderscores = (string, replacer) => {
   const [, start, substring, finish] = /^(_*)(.*?)(_*)$/.exec(string)
@@ -236,21 +235,6 @@ export class Table {
 
   getMarkdownTypeName () {
     return `\`${this.getTypeName()}\``
-  }
-
-  /**
-   * Returns a table type from the `sql` module based off of this table. This
-   * is so we can use the superior capabilities of the `sql` module to
-   * construct SQL queries with our table type.
-   *
-   * @returns {SqlTable}
-   */
-  sql () {
-    return sql.define({
-      schema: this.schema.name,
-      name: this.name,
-      columns: this.columns.map(({ name }) => name),
-    })
   }
 
   /**

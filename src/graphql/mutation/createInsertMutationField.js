@@ -1,4 +1,5 @@
 import { fromPairs, identity, assign } from 'lodash'
+import { getTableSql } from '../../utils.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -66,7 +67,7 @@ const resolveInsert = table => {
   // improvements because mutations are executed in sequence, not parallel.
   //
   // A better solution for batch inserts is a custom batch insert field.
-  const tableSql = table.sql()
+  const tableSql = getTableSql(table)
 
   return async (source, args, { client }) => {
     // Get the input object value from the args.

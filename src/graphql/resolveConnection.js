@@ -1,10 +1,11 @@
 import { constant, assign, mapKeys, once, isEmpty, camelCase } from 'lodash'
+import { getTableSql } from '../utils.js'
 
 const resolveConnection = (table, getExtraConditions = constant({})) => {
   // Because we are trying to generate very dynamic queries we use the `sql`
   // module as it lets us guarantee saftey against SQL injection, and is easier
   // to modify than a string.
-  const tableSql = table.sql()
+  const tableSql = getTableSql(table)
 
   return (source, args, { client }) => {
     const { orderBy, first, last, after, before, offset, descending, ...conditions } = args
