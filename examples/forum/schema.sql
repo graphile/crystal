@@ -2,6 +2,10 @@
 -- changes will be applied.
 begin;
 
+-- We want to cryptographically hash passwords, therefore create this
+-- extension.
+create extension if not exists pgcrypto;
+
 -- Create the schema we are going to use.
 create schema forum_example;
 
@@ -14,10 +18,10 @@ create schema forum_example_utils;
 --
 -- For example, this lets us write `create table person …` instead of
 -- `create table forum_example.person …`.
-set search_path = forum_example, forum_example_utils;
+set search_path = forum_example, forum_example_utils, public;
 
 -------------------------------------------------------------------------------
--- Basic Tables
+-- Public Tables
 
 create table person (
   id               serial not null primary key,
@@ -58,6 +62,92 @@ comment on column post.created_at is 'The time this post was created.';
 comment on column post.updated_at is 'The latest time this post was updated.';
 
 -------------------------------------------------------------------------------
+-- Private Tables
+
+create table forum_example_utils.person_account (
+  person_id        int not null primary key,
+  email            varchar not null unique check (email ~* '^.+@.+\..+$'),
+  pass_hash        char(60) not null
+);
+
+comment on table person_account is 'Private information about a person’s account.';
+comment on column person_account.person_id is 'The id of the person associated with this account.';
+comment on column person_account.email is 'The email address of the person.';
+comment on column person_account.pass_hash is 'An opaque hash of the person’s password.';
+
+-------------------------------------------------------------------------------
+-- Query Procedures
+
+-- Computes the full name for a person using the person’s `given_name` and a
+-- `family_name`.
+create function full_name(person) returns varchar as $$
+  select $1.given_name || ' ' || $1.family_name
+$$ language sql
+stable;
+
+comment on function full_name(person) is 'A person’s full name including their first and last name.';
+
+-- Truncates the body with a given length and a given omission character.
+create function summary(
+  post,
+  length int default 50,
+  omission varchar default '…'
+) returns text as $$
+  select case
+    when $1.body is null then null
+    else substring($1.body from 0 for $2) || omission
+  end
+$$ language sql
+stable;
+
+comment on function summary(post, int, varchar) is 'A truncated version of the body for summaries.';
+
+-- Helper function for getting some short inspirational posts. Maybe in an
+-- actual forum this could be displayed on the homepage or in an email
+-- newsletter.
+create function short_inspiration_posts() returns setof post as $$
+  select *
+  from post
+  where
+    (body is null or char_length(body) < 500)
+    and topic = 'inspiration'
+$$ language sql
+stable;
+
+comment on function short_inspiration_posts() is 'Fetch all posts which are inspirational in nature and short.';
+
+-------------------------------------------------------------------------------
+-- Mutation Procedures
+
+-- Registers a person in our forum with a few key parameters creating a
+-- `person` row and an associated `person_account` row.
+create function register_person(
+  given_name varchar,
+  family_name varchar,
+  email varchar,
+  password varchar
+) returns person as $$
+declare
+  row person;
+begin
+  -- Insert the person’s public profile data.
+  insert into person (given_name, family_name) values
+    (given_name, family_name)
+    returning * into row;
+
+  -- Insert the person’s private account data.
+  insert into person_account (person_id, email, pass_hash) values
+    (row.id, email, crypt(password, gen_salt('bf')));
+
+  return row;
+end;
+$$ language plpgsql
+strict
+set search_path from current;
+
+comment on function register_person(varchar, varchar, varchar, varchar) is 'Register a person in our forum.';
+
+-------------------------------------------------------------------------------
 -- Triggers
 
 -- First we must define two utility functions, `set_created_at` and
@@ -69,21 +159,25 @@ comment on column post.updated_at is 'The latest time this post was updated.';
 -- Triggers taken initially from the Rust [Diesel][1] library, documentation
 -- for `is distinct from` can be found [here][2].
 --
--- [1]: https://github.com/diesel-rs/diesel/blob/1427b9ff24960483b70b5ed491e7d8ef3ed52ffe/diesel/src/pg/connection/setup/timestamp_helpers.sql
+-- [1]: https://github.com/diesel-rs/diesel/blob/1427b9f/diesel/src/pg/connection/setup/timestamp_helpers.sql
 -- [2]: https://wiki.postgresql.org/wiki/Is_distinct_from
 
-create function forum_example_utils.set_created_at() returns trigger as $$ begin
+create function forum_example_utils.set_created_at() returns trigger as $$
+begin
   -- We will let the inserter manually set a `created_at` time if they desire.
   if (new.created_at is null) then
     new.created_at := current_timestamp;
   end if;
   return new;
-end; $$ language plpgsql;
+end;
+$$ language plpgsql;
 
-create function forum_example_utils.set_updated_at() returns trigger as $$ begin
+create function forum_example_utils.set_updated_at() returns trigger as $$
+begin
   new.updated_at := current_timestamp;
   return new;
-end; $$ language plpgsql;
+end;
+$$ language plpgsql;
 
 -- Next we must actually define our triggers for all tables that need them.
 --
@@ -118,7 +212,7 @@ insert into person (id, given_name, family_name, about) values
 alter sequence person_id_seq restart with 15;
 
 insert into post (id, author_id, headline, topic, body) values
-  (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null, null),
+  (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ullamcorper, sem sed pulvinar rutrum, nisl dui faucibus velit, eget sodales urna mauris nec lorem. Vivamus faucibus augue sit amet semper fringilla. Cras nec vulputate eros. Proin fermentum purus posuere ipsum accumsan interdum. Nunc vitae urna non mauris pellentesque sodales vel nec elit. Suspendisse pulvinar ornare turpis ac vestibulum. Cras eu congue magna. Nulla vel sodales enim, vel semper dolor. Curabitur pellentesque dolor elit. Aenean cursus posuere dui, vitae mollis felis rhoncus ac. In at orci a erat congue consequat ut sed risus. Etiam euismod elit eu lobortis varius. Praesent lacinia lobortis nisi, vel faucibus turpis sodales in. In interdum lectus tellus, facilisis mollis diam feugiat vitae.'),
   (2, 1, 'I hate yogurt. It’s just stuff with bits in.', 'inspiration', null),
   (3, 1, 'Is that a cooking show?', 'inspiration', null),
   (4, 1, 'You hit me with a cricket bat.', null, null),
