@@ -1,6 +1,6 @@
 import { memoize } from 'lodash'
 import createTableType from './createTableType.js'
-import { PageInfoType, CursorType } from './Types.js'
+import { PageInfoType, CursorType } from './types.js'
 
 import {
   GraphQLObjectType,

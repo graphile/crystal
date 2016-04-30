@@ -5,12 +5,16 @@ begin;
 -- Create the schema we are going to use.
 create schema forum_example;
 
+-- Create a schema to host the utilities for our schema. The reason it is in
+-- another schema is so that it can be private.
+create schema forum_example_utils;
+
 -- By setting the `search_path`, whenever we create something in the default
 -- namespace it is actually created in the `blog_example` schema.
 --
 -- For example, this lets us write `create table person …` instead of
 -- `create table forum_example.person …`.
-set search_path = forum_example;
+set search_path = forum_example, forum_example_utils;
 
 -------------------------------------------------------------------------------
 -- Basic Tables
@@ -19,7 +23,9 @@ create table person (
   id               serial not null primary key,
   given_name       varchar(64) not null,
   family_name      varchar(64),
-  about            text
+  about            text,
+  created_at       timestamp,
+  updated_at       timestamp
 );
 
 comment on table person is 'A user of the forum.';
@@ -27,6 +33,8 @@ comment on column person.id is 'The primary key for the person.';
 comment on column person.given_name is 'The person’s first name.';
 comment on column person.family_name is 'The person’s last name.';
 comment on column person.about is 'A short description about the user, written by the user.';
+comment on column person.created_at is 'The time this person was created.';
+comment on column person.updated_at is 'The latest time this person was updated.';
 
 create type post_topic as enum ('discussion', 'inspiration', 'help');
 
@@ -35,7 +43,9 @@ create table post (
   author_id        int not null references person(id),
   headline         text not null,
   topic            post_topic,
-  body             text
+  body             text,
+  created_at       timestamp,
+  updated_at       timestamp
 );
 
 comment on table post is 'A forum post written by a user.';
@@ -44,6 +54,47 @@ comment on column post.headline is 'The title written by the user.';
 comment on column post.author_id is 'The id of the author user.';
 comment on column post.topic is 'The topic this has been posted in.';
 comment on column post.body is 'The main body text of our post.';
+comment on column post.created_at is 'The time this post was created.';
+comment on column post.updated_at is 'The latest time this post was updated.';
+
+-------------------------------------------------------------------------------
+-- Triggers
+
+-- First we must define two utility functions, `set_created_at` and
+-- set_updated_at` which we will use for our triggers.
+--
+-- Note that we also create them in `forum_example_utils` as we want them to be
+-- private and not exposed by PostGraphQL.
+--
+-- Triggers taken initially from the Rust [Diesel][1] library, documentation
+-- for `is distinct from` can be found [here][2].
+--
+-- [1]: https://github.com/diesel-rs/diesel/blob/1427b9ff24960483b70b5ed491e7d8ef3ed52ffe/diesel/src/pg/connection/setup/timestamp_helpers.sql
+-- [2]: https://wiki.postgresql.org/wiki/Is_distinct_from
+
+create function forum_example_utils.set_created_at() returns trigger as $$ begin
+  -- We will let the inserter manually set a `created_at` time if they desire.
+  if (new.created_at is null) then
+    new.created_at := current_timestamp;
+  end if;
+  return new;
+end; $$ language plpgsql;
+
+create function forum_example_utils.set_updated_at() returns trigger as $$ begin
+  new.updated_at := current_timestamp;
+  return new;
+end; $$ language plpgsql;
+
+-- Next we must actually define our triggers for all tables that need them.
+--
+-- This is not a good example to copy if you are looking for a good way to
+-- indent and style your trigger statements. They are all on one line to
+-- conserve space 😊
+
+create trigger created_at before insert on person for each row execute procedure set_created_at();
+create trigger updated_at before update on person for each row execute procedure set_updated_at();
+create trigger created_at before insert on post for each row execute procedure set_created_at();
+create trigger updated_at before update on post for each row execute procedure set_updated_at();
 
 -------------------------------------------------------------------------------
 -- Sample Data

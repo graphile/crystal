@@ -1,6 +1,6 @@
 import { memoize, fromPairs, includes, snakeCase, toUpper } from 'lodash'
 import { getNullableType, GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
-import { CursorType } from './Types.js'
+import { CursorType } from './types.js'
 import getColumnType from './getColumnType.js'
 
 const createConnectionArgs = (table, ignoreColumnConditions = []) => ({

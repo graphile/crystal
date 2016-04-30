@@ -1,5 +1,5 @@
 import expect from 'expect'
-import { Table, Column } from '#/postgres/Catalog.js'
+import { Table, Column } from '#/postgres/catalog.js'
 
 describe('catalog', () => {
   describe('Table', () => {

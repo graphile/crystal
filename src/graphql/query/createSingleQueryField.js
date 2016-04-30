@@ -1,5 +1,5 @@
 import { GraphQLNonNull } from 'graphql'
-import { IDType } from '../Types.js'
+import { IDType } from '../types.js'
 import createTableType from '../createTableType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
