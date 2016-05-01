@@ -12,7 +12,7 @@ import sql from 'sql'
 const getTableSql = memoize(table => sql.define({
   schema: table.schema.name,
   name: table.name,
-  columns: table.columns.map(({ name }) => name),
+  columns: table.getColumns().map(({ name }) => name),
 }))
 
 export default getTableSql

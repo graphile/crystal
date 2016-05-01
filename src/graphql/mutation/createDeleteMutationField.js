@@ -39,7 +39,7 @@ const createInputType = table =>
       'its required primary key fields.',
     fields: {
       ...fromPairs(
-        table.primaryKeys.map(column => [column.getFieldName(), {
+        table.getPrimaryKeys().map(column => [column.getFieldName(), {
           type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
@@ -64,7 +64,7 @@ const createPayloadType = table =>
 
 const resolveDelete = table => {
   const tableSql = getTableSql(table)
-  const primaryKeyColumns = table.primaryKeys
+  const primaryKeys = table.getPrimaryKeys()
 
   return async (source, args, { client }) => {
     const { input } = args
@@ -74,7 +74,7 @@ const resolveDelete = table => {
       tableSql
       .delete()
       .where(fromPairs(
-        primaryKeyColumns
+        primaryKeys
         .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))

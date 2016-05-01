@@ -14,7 +14,7 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
       'is also important as it is used in creating pagination cursors. This ' +
       'value’s default is the primary key for the object.',
     defaultValue: (() => {
-      const column = table.primaryKeys[0]
+      const column = table.getPrimaryKeys()[0]
       if (column) return column.name
       return null
     })(),
@@ -51,7 +51,8 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
     defaultValue: false,
   },
   ...fromPairs(
-    table.columns
+    table
+    .getColumns()
     .filter(column => !includes(ignoreColumnConditions, column))
     .map(column => [column.getFieldName(), {
       type: getType(column.type),
@@ -77,7 +78,8 @@ const createTableOrderingEnum = memoize(table =>
     description: `Properties with which ${table.getMarkdownTypeName()} can be ordered.`,
 
     values: fromPairs(
-      table.columns
+      table
+      .getColumns()
       .map(column => [toUpper(snakeCase(column.getFieldName())), {
         value: column.name,
         description: column.description,

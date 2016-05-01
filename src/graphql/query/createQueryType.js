@@ -1,7 +1,7 @@
 import { ary, assign } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import createNodeQueryField from './createNodeQueryField.js'
-import createQueryFields from './createQueryFields.js'
+import createTableQueryFields from './createTableQueryFields.js'
 
 /**
  * Creates the Query type for the entire schema. To see the fields created for
@@ -17,8 +17,9 @@ const createQueryType = schema =>
     fields: {
       node: createNodeQueryField(schema),
       ...(
-        schema.tables
-        .map(table => createQueryFields(table))
+        schema
+        .getTables()
+        .map(table => createTableQueryFields(table))
         .reduce(ary(assign, 2), {})
       ),
     },

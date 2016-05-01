@@ -9,7 +9,8 @@ const createMutationType = schema =>
     name: 'Mutation',
     description: 'The entry type for GraphQL mutations.',
     fields:
-      schema.tables
+      schema
+      .getTables()
       .map(table => createMutationFields(table))
       .reduce(ary(assign, 2), {}),
   })

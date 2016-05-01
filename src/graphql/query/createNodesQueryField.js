@@ -8,7 +8,7 @@ import resolveConnection from '../resolveConnection.js'
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createListQueryField = table => ({
+const createNodesQueryField = table => ({
   // Make sure the type of this field is our connection type. This connection
   // type will expect functions (that cache their values) and not traditional
   // values. This improves performance when we don’t have to do potentially
@@ -26,4 +26,4 @@ const createListQueryField = table => ({
   resolve: resolveConnection(table),
 })
 
-export default createListQueryField
+export default createNodesQueryField

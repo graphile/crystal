@@ -33,8 +33,10 @@ export default createNodeQueryField
 
 // This function will be called for every resolution, therefore it is (and
 // must be) memoized.
+//
+// Because this is memoized, fetching primary keys is ok here.
 const getResolver = memoize(table => resolveTableSingle(
   table,
-  table.primaryKeys,
+  table.getPrimaryKeys(),
   ({ values }) => values,
 ))

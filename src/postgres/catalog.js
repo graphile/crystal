@@ -94,7 +94,7 @@ export class Schema {
     this.description = description
   }
 
-  get tables () {
+  getTables () {
     const tables = []
     for (const [, table] of this.catalog._tables.entries())
       if (table.schema === this) tables.push(table)
@@ -119,22 +119,22 @@ export class Table {
     this.description = description
   }
 
-  get columns () {
+  getColumns () {
     const columns = []
     for (const [, column] of this.schema.catalog._columns.entries())
       if (column.table === this) columns.push(column)
     return columns
   }
 
-  get primaryKeys () {
-    return this.columns.filter(({ isPrimaryKey }) => isPrimaryKey)
+  getPrimaryKeys () {
+    return this.getColumns().filter(({ isPrimaryKey }) => isPrimaryKey)
   }
 
-  get foreignKeys () {
+  getForeignKeys () {
     return this.schema.catalog._foreignKeys.filter(({ nativeTable }) => nativeTable === this)
   }
 
-  get reverseForeignKeys () {
+  getReverseForeignKeys () {
     return this.schema.catalog._foreignKeys.filter(({ foreignTable }) => foreignTable === this)
   }
 

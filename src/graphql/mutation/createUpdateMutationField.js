@@ -41,14 +41,14 @@ const createInputType = table =>
     fields: {
       // We include primary key columns to select a single row to update.
       ...fromPairs(
-        table.primaryKeys.map(column => [column.getFieldName(), {
+        table.getPrimaryKeys().map(column => [column.getFieldName(), {
           type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),
       // We include all the other columns to actually allow users to update a value.
       ...fromPairs(
-        table.columns.map(column => [`new${upperFirst(column.getFieldName())}`, {
+        table.getColumns().map(column => [`new${upperFirst(column.getFieldName())}`, {
           type: getType(column.type),
           description: `Updates the node’s ${column.getMarkdownFieldName()} field with this new value.`,
         }]),
@@ -76,7 +76,8 @@ const resolveUpdate = table => {
   // We use our SQL builder here instead of a prepared statement/data loader
   // solution because this query can get super dynamic.
   const tableSql = getTableSql(table)
-  const primaryKeyColumns = table.primaryKeys
+  const columns = table.getColumns()
+  const primaryKeys = table.getPrimaryKeys()
 
   return async (source, args, { client }) => {
     const { input } = args
@@ -85,12 +86,12 @@ const resolveUpdate = table => {
     const { rows: [row] } = await client.queryAsync(
       tableSql
       .update(fromPairs(
-        table.columns
+        columns
         .map(column => [column.name, input[`new${upperFirst(column.getFieldName())}`]])
         .filter(([, value]) => value)
       ))
       .where(fromPairs(
-        primaryKeyColumns
+        primaryKeys
         .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))

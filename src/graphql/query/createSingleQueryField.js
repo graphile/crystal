@@ -10,7 +10,7 @@ import resolveTableSingle from '../resolveTableSingle.js'
  * @returns {GraphQLFieldConfig}
  */
 const createSingleQueryField = table => {
-  const { primaryKeys } = table
+  const primaryKeys = table.getPrimaryKeys()
 
   // Can’t query a single node of a table if it does not have a primary key.
   if (primaryKeys.length === 0)

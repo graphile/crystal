@@ -171,8 +171,8 @@ const addForeignKeys = (client, catalog) =>
   }) => {
     const nativeTable = catalog.getTable(nativeSchemaName, nativeTableName)
     const foreignTable = catalog.getTable(foreignSchemaName, foreignTableName)
-    const nativeColumns = nativeTable.columns
-    const foreignColumns = foreignTable.columns
+    const nativeColumns = nativeTable.getColumns()
+    const foreignColumns = foreignTable.getColumns()
     return new ForeignKey({
       nativeTable,
       foreignTable,
