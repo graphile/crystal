@@ -216,7 +216,6 @@ export class Type {
 /**
  * Represents a user defined enum PostgreSQL column.
  *
- * @member {number} oid
  * @member {Schema} schema
  * @member {string} name
  * @member {string[]} variants
@@ -229,6 +228,20 @@ export class Enum extends Type {
     this.schema = schema
     this.name = name
     this.variants = variants
+  }
+}
+
+/**
+ * Represents a composite PostgreSQL table type.
+ *
+ * @member {Table} table
+ */
+export class TableType extends Type {
+  isTableType = true
+
+  constructor ({ id, table }) {
+    super(id)
+    this.table = table
   }
 }
 
@@ -258,30 +271,29 @@ export class ForeignKey {
  * @member {string} name
  * @member {boolean} isMutation
  * @member {boolean} isStrict
- * @member {Type[]} argTypes
- * @member {string[]} argNames
- * @member {Type} returnType
  * @member {boolean} returnsSet
+ * @member {Map.<string, Type>} args
+ * @member {Type} returnType
  */
 export class Procedure {
   constructor ({
     schema,
     name,
-    isMutation,
-    isStrict,
-    argTypes,
-    argNames,
+    description,
+    isMutation = true,
+    isStrict = false,
+    returnsSet = false,
+    args = new Map(),
     returnType,
-    returnsSet,
   }) {
     this.schema = schema
     this.name = name
+    this.description = description
     this.isMutation = isMutation
     this.isStrict = isStrict
-    this.argTypes = argTypes
-    this.argNames = argNames
-    this.returnType = returnType
     this.returnsSet = returnsSet
+    this.args = args
+    this.returnType = returnType
   }
 
   getFieldName () {

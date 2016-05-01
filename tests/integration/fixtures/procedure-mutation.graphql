@@ -1,0 +1,14 @@
+mutation ProcedureTest {
+  a: registerPerson(input: { givenName: "Caleb", familyName: "Meredith", email: "calebmeredith8@gmail.com", password: "qwerty" }) { ...payload }
+  b: registerPerson(input: { givenName: "Caleb", familyName: "Meredith", email: "calebmeredith7@gmail.com", password: "qwerty", clientMutationId: "56" }) { ...payload }
+}
+
+fragment payload on RegisterPersonPayload {
+  clientMutationId
+  person {
+    id
+    rowId
+    givenName
+    familyName
+  }
+}

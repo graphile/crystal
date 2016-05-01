@@ -1,4 +1,5 @@
 import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
+import createTableType from './createTableType.js'
 
 import {
   GraphQLBoolean,
@@ -96,6 +97,10 @@ const getType = memoize(type => {
       ),
     })
   }
+
+  // If this type is a table type, use the PostGraphQL table type.
+  if (type.isTableType)
+    return createTableType(type.table)
 
   // Return internal type or a string.
   return postgresToGraphQLTypes.get(type.id) || GraphQLString
