@@ -88,7 +88,7 @@ const resolveProcedure = procedure => {
 
   return async (source, args, { client }) => {
     const { input } = args
-    const { clientMutationId } = args
+    const { clientMutationId } = input
 
     // Actuall run the procedure using our arguments.
     const result = await client.queryAsync({

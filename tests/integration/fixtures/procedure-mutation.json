@@ -10,7 +10,7 @@
       }
     },
     "b": {
-      "clientMutationId": null,
+      "clientMutationId": "56",
       "person": {
         "id": "cGVyc29uOjE2",
         "rowId": 16,
