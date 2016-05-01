@@ -1,5 +1,5 @@
 import { constant, assign, mapKeys, once, isEmpty, camelCase } from 'lodash'
-import { getTableSql } from '../utils.js'
+import getTableSql from '../getTableSql.js'
 
 const resolveConnection = (table, getExtraConditions = constant({})) => {
   // Because we are trying to generate very dynamic queries we use the `sql`

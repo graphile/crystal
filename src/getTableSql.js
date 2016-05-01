@@ -9,8 +9,10 @@ import sql from 'sql'
  * @param {Table} table
  * @returns {SqlTable}
  */
-export const getTableSql = memoize(table => sql.define({
+const getTableSql = memoize(table => sql.define({
   schema: table.schema.name,
   name: table.name,
   columns: table.columns.map(({ name }) => name),
 }))
+
+export default getTableSql
