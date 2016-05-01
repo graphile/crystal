@@ -1,5 +1,5 @@
 import { fromPairs, identity, assign } from 'lodash'
-import { getTableSql } from '../../utils.js'
+import getTableSql from '../../getTableSql.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
