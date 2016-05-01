@@ -169,9 +169,9 @@ describe('getCatalog', () => {
   })
 
   it('gets column types', () => {
-    expect(catalog.getColumn('a', 'types', 'bigint').type.oid).toEqual(20)
-    expect(catalog.getColumn('a', 'types', 'boolean').type.oid).toEqual(16)
-    expect(catalog.getColumn('a', 'types', 'varchar').type.oid).toEqual(1043)
+    expect(catalog.getColumn('a', 'types', 'bigint').type.id).toEqual(20)
+    expect(catalog.getColumn('a', 'types', 'boolean').type.id).toEqual(16)
+    expect(catalog.getColumn('a', 'types', 'varchar').type.id).toEqual(1043)
   })
 
   it('gets enums', () => {
@@ -199,7 +199,7 @@ describe('getCatalog', () => {
       foreignColumns: foreignColumns.map(({ name }) => name),
     })
 
-    expect(catalog.getTable('c', 'compound_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
+    expect(catalog.getTable('c', 'compound_key').foreignKeys.map(simplifyForeignKey)).toEqual([
       {
         nativeTable: 'compound_key',
         nativeColumns: ['person_id_2'],
@@ -213,18 +213,19 @@ describe('getCatalog', () => {
         foreignColumns: ['id'],
       },
     ])
-    expect(catalog.getTable('a', 'foreign_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
-      {
-        nativeTable: 'foreign_key',
-        nativeColumns: ['person_id'],
-        foreignTable: 'person',
-        foreignColumns: ['id'],
-      },
+
+    expect(catalog.getTable('a', 'foreign_key').foreignKeys.map(simplifyForeignKey)).toEqual([
       {
         nativeTable: 'foreign_key',
         nativeColumns: ['compound_key_1', 'compound_key_2'],
         foreignTable: 'compound_key',
         foreignColumns: ['person_id_1', 'person_id_2'],
+      },
+      {
+        nativeTable: 'foreign_key',
+        nativeColumns: ['person_id'],
+        foreignTable: 'person',
+        foreignColumns: ['id'],
       },
     ])
   })
@@ -267,15 +268,15 @@ describe('getCatalog', () => {
   })
 
   it('will correctly get argument types', () => {
-    expect(catalog.getProcedure('a', 'add1').argTypes).toEqual([23, 23])
-    expect(catalog.getProcedure('b', 'mult1').argTypes).toEqual([23, 23])
-    expect(catalog.getProcedure('c', 'types').argTypes).toEqual([20, 16, 1043])
-    expect(catalog.getProcedure('a', 'set').argTypes).toEqual([])
+    expect(catalog.getProcedure('a', 'add1').argTypes.map(({ id }) => id)).toEqual([23, 23])
+    expect(catalog.getProcedure('b', 'mult1').argTypes.map(({ id }) => id)).toEqual([23, 23])
+    expect(catalog.getProcedure('c', 'types').argTypes.map(({ id }) => id)).toEqual([20, 16, 1043])
+    expect(catalog.getProcedure('a', 'set').argTypes.map(({ id }) => id)).toEqual([])
   })
 
   it('will correctly get the return type', () => {
-    expect(catalog.getProcedure('a', 'add1').returnType).toEqual(23)
-    expect(catalog.getProcedure('c', 'types').returnType).toEqual(16)
+    expect(catalog.getProcedure('a', 'add1').returnType.id).toEqual(23)
+    expect(catalog.getProcedure('c', 'types').returnType.id).toEqual(16)
   })
 
   it('will correctly get if a procedure is returning a set', () => {

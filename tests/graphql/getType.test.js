@@ -26,8 +26,8 @@ describe('getType', () => {
       [1114, 'Date'],
       [2950, 'UUID'],
     ])
-    .forEach(([oid, name]) => {
-      expect(getType(new TestType(oid)).name).toEqual(name)
+    .forEach(([id, name]) => {
+      expect(getType(new TestType(id)).name).toEqual(name)
     })
   })
 
@@ -47,19 +47,19 @@ describe('getType', () => {
 
   // TODO: Move this to a `getType` test file.
   describe('enums', () => {
-    const getEnum = () => getType(
-      new TestEnum({
-        name: 'test_enum',
-        variants: [
-          'red',
-          'green',
-          'blue',
-          'purple',
-          'tomato',
-          'hello_world',
-        ],
-      })
-    )
+    const enum_ = new TestEnum({
+      name: 'test_enum',
+      variants: [
+        'red',
+        'green',
+        'blue',
+        'purple',
+        'tomato',
+        'hello_world',
+      ],
+    })
+
+    const getEnum = () => getType(enum_)
 
     it('will make a custom enum type', () => {
       const enumType = getEnum()

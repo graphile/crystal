@@ -14,7 +14,7 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
       'is also important as it is used in creating pagination cursors. This ' +
       'value’s default is the primary key for the object.',
     defaultValue: (() => {
-      const column = table.getPrimaryKeyColumns()[0]
+      const column = table.primaryKeys[0]
       if (column) return column.name
       return null
     })(),

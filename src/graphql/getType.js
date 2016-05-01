@@ -98,7 +98,7 @@ const getType = memoize(type => {
   }
 
   // Return internal type or a string.
-  return postgresToGraphQLTypes.get(type.oid) || GraphQLString
+  return postgresToGraphQLTypes.get(type.id) || GraphQLString
 })
 
 export default getType

@@ -12,7 +12,7 @@ import createQueryFields from './createQueryFields.js'
  */
 const createQueryType = schema =>
   new GraphQLObjectType({
-    name: 'RootQuery',
+    name: 'Query',
     description: schema.description || 'The entry type for GraphQL queries.',
     fields: {
       node: createNodeQueryField(schema),

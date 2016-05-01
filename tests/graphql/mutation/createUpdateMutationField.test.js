@@ -19,14 +19,19 @@ describe('createUpdateMutationField', () => {
   })
 
   it('will require primary keys and maybe allow the rest', () => {
-    const field = createUpdateMutationField(new TestTable({
-      columns: [
-        new TestColumn({ name: 'id_1', isPrimaryKey: true, isNullable: false }),
-        new TestColumn({ name: 'id_2', isPrimaryKey: true }),
-        new TestColumn({ name: 'given_name', isNullable: false }),
-        new TestColumn({ name: 'family_name' }),
-      ],
-    }))
+    const table = new TestTable();
+
+    ([
+      new TestColumn({ table, name: 'id_1', isPrimaryKey: true, isNullable: false }),
+      new TestColumn({ table, name: 'id_2', isPrimaryKey: true }),
+      new TestColumn({ table, name: 'given_name', isNullable: false }),
+      new TestColumn({ table, name: 'family_name' }),
+    ])
+    .forEach(column => table.schema.catalog.addColumn(column))
+
+    table.schema.catalog._columns.delete('test.test.test')
+
+    const field = createUpdateMutationField(table)
     const inputFields = field.args.input.type.ofType.getFields()
     expect(keys(inputFields))
     .toEqual(['id1', 'id2', 'newId1', 'newId2', 'newGivenName', 'newFamilyName', 'clientMutationId'])

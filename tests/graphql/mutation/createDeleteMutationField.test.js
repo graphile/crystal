@@ -19,14 +19,19 @@ describe('createDeleteMutationField', () => {
   })
 
   it('will require primary keys', () => {
-    const field = createDeleteMutationField(new TestTable({
-      columns: [
-        new TestColumn({ name: 'id_1', isPrimaryKey: true, isNullable: false }),
-        new TestColumn({ name: 'id_2', isPrimaryKey: true }),
-        new TestColumn({ name: 'given_name', isNullable: false }),
-        new TestColumn({ name: 'family_name' }),
-      ],
-    }))
+    const table = new TestTable();
+
+    ([
+      new TestColumn({ table, name: 'id_1', isPrimaryKey: true, isNullable: false }),
+      new TestColumn({ table, name: 'id_2', isPrimaryKey: true }),
+      new TestColumn({ table, name: 'given_name', isNullable: false }),
+      new TestColumn({ table, name: 'family_name' }),
+    ])
+    .forEach(column => table.schema.catalog.addColumn(column))
+
+    table.schema.catalog._columns.delete('test.test.test')
+
+    const field = createDeleteMutationField(table)
     const inputFields = field.args.input.type.ofType.getFields()
     expect(keys(inputFields)).toEqual(['id1', 'id2', 'clientMutationId'])
     expect(inputFields.id1.type).toBeA(GraphQLNonNull)
