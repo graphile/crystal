@@ -1,4 +1,4 @@
-import { fromPairs, camelCase, upperFirst, lowerFirst } from 'lodash'
+import { fromPairs, camelCase, upperFirst, lowerFirst, assign } from 'lodash'
 import { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInputObjectType } from 'graphql'
 import getType from '../getType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -30,10 +30,10 @@ const createInputType = procedure =>
         // name from `argNames` and the type from `argTypes` (we also assume they
         // are arrays of equal lengths). If the procedure is marked as strict, all
         // arguments also must be required.
-        procedure.argTypes.map((argType, i) => [camelCase(procedure.argNames[i]), {
+        Array.from(procedure.args).map(([name, type]) => [camelCase(name), {
           type: procedure.isStrict ?
-            new GraphQLNonNull(getType(argType)) :
-            getType(argType),
+            new GraphQLNonNull(getType(type)) :
+            getType(type),
         }])
       ),
       clientMutationId: inputClientMutationId,
@@ -66,14 +66,24 @@ const createPayloadType = procedure => {
 }
 
 const resolveProcedure = procedure => {
-  // Construct the query. The actual procedure call is pretty long so we split
-  // it into two lines.
+  const returnsTable = procedure.returnType.isTableType
+  const argEntries = Array.from(procedure.args)
+
+  // Construct the procedure call. It is pretty long so having it on multiple
+  // lines is helpful.
+  const procedureName = `"${procedure.schema.name}"."${procedure.name}"`
+  const procedureArgs = argEntries.map((entry, i) => `$${i + 1}`).join(', ')
+  const procedureCall = `${procedureName}(${procedureArgs})`
+
+  // Construct the query.
+  //
+  // If the procedure returns a table type let’s select all of its values
+  // instead of just a tuple.
   const query = {
     name: `procedure_${procedure.name}`,
-    text:
-      `select "${procedure.schema.name}"."${procedure.name}"` +
-      `(${procedure.argTypes.map((type, i) => `$${i + 1}`)}) ` +
-      'as "returnValue"',
+    text: returnsTable ?
+      `select * from ${procedureCall}` :
+      `select ${procedureCall} as "returnValue"`,
   }
 
   return async (source, args, { client }) => {
@@ -84,12 +94,15 @@ const resolveProcedure = procedure => {
     const result = await client.queryAsync({
       name: query.name,
       text: query.text,
-      values: procedure.argNames.map(name => input[camelCase(name)]),
+      values: argEntries.map(([name]) => input[camelCase(name)]),
     })
 
     return {
-      returnValue: result.rows[0].returnValue,
       clientMutationId,
+      // If this is a table type, the return value is the entire object.
+      returnValue: returnsTable ?
+        assign(result.rows[0], { table: procedure.returnType.table }) :
+        result.rows[0].returnValue,
     }
   }
 }

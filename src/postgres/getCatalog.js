@@ -7,6 +7,7 @@ import {
   Table,
   Column,
   Enum,
+  TableType,
   ForeignKey,
   Procedure,
 } from './catalog.js'
@@ -26,12 +27,26 @@ const withClient = fn => async pgConfig => {
  */
 const getCatalog = withClient(async client => {
   const catalog = new Catalog()
+
+  // Not all function calls can be parallelized, because some calls have
+  // dependencies on one another. This should probably be cleaned up at some
+  // point…
+
   await addSchemas(client, catalog)
-  await addEnumTypes(client, catalog)
   await addTables(client, catalog)
+
+  await Promise.all([
+    addEnumTypes(client, catalog),
+    addTableTypes(client, catalog),
+  ])
+
   await addColumns(client, catalog)
-  await addForeignKeys(client, catalog)
-  await addProcedures(client, catalog)
+
+  await Promise.all([
+    addForeignKeys(client, catalog),
+    addProcedures(client, catalog),
+  ])
+
   return catalog
 })
 
@@ -138,6 +153,27 @@ const addEnumTypes = (client, catalog) =>
   }))
   .each(type => catalog.addEnum(type))
 
+const addTableTypes = (client, catalog) =>
+  client.queryAsync(`
+    select
+      t.oid as "id",
+      n.nspname as "schemaName",
+      c.relname as "tableName"
+    from
+      pg_catalog.pg_type as t
+      left join pg_catalog.pg_class as c on c.oid = t.typrelid
+      left join pg_catalog.pg_namespace as n on n.oid = c.relnamespace
+    where
+      n.nspname not in ('pg_catalog', 'information_schema') and
+      c.relkind in ('r', 'v', 'm', 'f');
+  `)
+  .then(({ rows }) => rows)
+  .map(row => new TableType({
+    ...row,
+    table: catalog.getTable(row.schemaName, row.tableName),
+  }))
+  .each(type => catalog.addType(type))
+
 const addForeignKeys = (client, catalog) =>
   client.queryAsync(`
     select
@@ -187,33 +223,47 @@ const addProcedures = (client, catalog) =>
     select
       n.nspname as "schemaName",
       p.proname as "name",
+      d.description as "description",
       case
         when p.provolatile = 'i' then false
         when p.provolatile = 's' then false
         else true
       end as "isMutation",
       p.proisstrict as "isStrict",
+      p.proretset as "returnsSet",
       p.proargtypes as "argTypes",
       p.proargnames as "argNames",
-      p.prorettype as "returnType",
-      p.proretset as "returnsSet"
+      p.prorettype as "returnType"
     from
       pg_catalog.pg_proc as p
       left join pg_catalog.pg_namespace as n on n.oid = p.pronamespace
-      left join pg_catalog.pg_description as d on d.objoid = n.oid and d.objsubid = 0
+      left join pg_catalog.pg_description as d on d.objoid = p.oid and d.objsubid = 0
     where
       n.nspname not in ('pg_catalog', 'information_schema');
   `)
   .then(({ rows }) => rows)
   .map(row => {
-    const argTypes = compact(row.argTypes.split(' ').map(ary(parseInt, 1))).map(t => catalog.getType(t))
-    const argNames = (row.argNames || Array(argTypes.length).fill(null)).map((n, i) => n || `arg${i + 1}`)
+    // `argTypes` is an `oidvector` type? Which is wierd. So we need to hand
+    // parse it.
+    //
+    // Also maps maintain order so we can use argument order to call functions,
+    // yay!
+    const argTypes = compact(row.argTypes.split(' ').map(ary(parseInt, 1)))
+    const argNames = row.argNames || []
+    const args = new Map()
+
+    for (const i in argTypes) {
+      const name = argNames[i]
+      const type = argTypes[i]
+      args.set(name || `arg_${parseInt(i, 10) + 1}`, catalog.getType(type))
+    }
+
     return new Procedure({
       schema: catalog.getSchema(row.schemaName),
       ...row,
-      argTypes,
-      argNames,
+      args,
       returnType: catalog.getType(row.returnType),
     })
   })
+  .filter(procedure => procedure)
   .each(procedure => catalog.addProcedure(procedure))

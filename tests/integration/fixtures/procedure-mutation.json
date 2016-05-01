@@ -1,0 +1,22 @@
+{
+  "data": {
+    "a": {
+      "clientMutationId": null,
+      "person": {
+        "id": "cGVyc29uOjE1",
+        "rowId": 15,
+        "givenName": "Caleb",
+        "familyName": "Meredith"
+      }
+    },
+    "b": {
+      "clientMutationId": null,
+      "person": {
+        "id": "cGVyc29uOjE2",
+        "rowId": 16,
+        "givenName": "Caleb",
+        "familyName": "Meredith"
+      }
+    }
+  }
+}
