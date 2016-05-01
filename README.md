@@ -173,6 +173,11 @@ How is it simple? Well first of all, your PostgreSQL schema is still your Postgr
 
 Ideally PostGraphQL scales with your company and we would appreciate your contributions to help it scale, however there is a simple exit path even years into the business.
 
+### Breaking Changes
+They will happen very rarely and only after lot’s of deprecation warnings. The PostGraphQL team believes in stable software over continual reevaluation. PostGraphQL updates should just bring you features and bug fixes without breaking the schema/server system you already have set up.
+
+Semantic versioning is strictly adhered to and if a breaking change were to be made, the major version number would be incremented accordingly.
+
 ### Schema Driven APIs
 If you fundamentally disagree with a one-to-one mapping of a SQL schema to an API (GraphQL or otherwise) this section is for you. First of all, PostGraphQL is not necessarily meant to be a permanent solution. PostGraphQL was created to allow you to focus on your product and not the API. If you want a custom API there is a simple transition path (read [no lock in](#no-lock-in)). If you still can’t get over the one-to-one nature of PostGraphQL consider the following arguments why putting your business logic in PostgreSQL is a good idea:
 
