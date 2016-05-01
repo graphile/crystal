@@ -88,4 +88,10 @@
       authorId
     }
   }
+  j: personNodes(rowId: 1) {
+    nodes {
+      id
+      familyName
+    }
+  }
 }

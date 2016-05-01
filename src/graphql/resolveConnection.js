@@ -27,7 +27,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
         return 'true'
 
       return mapKeys(conditions, (value, fieldName) =>
-        table.columns.find(({ name }) => camelCase(name) === camelCase(fieldName)).name
+        table.columns.find(column => column.getFieldName() === camelCase(fieldName)).name
       )
     })
 
