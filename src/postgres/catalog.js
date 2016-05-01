@@ -100,6 +100,13 @@ export class Schema {
       if (table.schema === this) tables.push(table)
     return tables
   })
+
+  getProcedures = once(() => {
+    const procedures = []
+    for (const [, procedure] of this.catalog._procedures.entries())
+      if (procedure.schema === this) procedures.push(procedure)
+    return procedures
+  })
 }
 
 /**
@@ -275,5 +282,13 @@ export class Procedure {
     this.argNames = argNames
     this.returnType = returnType
     this.returnsSet = returnsSet
+  }
+
+  getFieldName () {
+    return camelCaseInsideUnderscores(this.name)
+  }
+
+  getMarkdownFieldName () {
+    return `\`${this.getFieldName()}\``
   }
 }

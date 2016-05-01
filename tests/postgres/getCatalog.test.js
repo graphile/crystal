@@ -73,6 +73,8 @@ create function a.add2(a int, b int) returns int as $$ select $1 + $2 $$ languag
 create function a.add3(c int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
 create function a.add4(int, d int) returns int as $$ select $1 + $2 $$ language sql;
 
+comment on function a.add1(int, int) is 'lol, add some stuff';
+
 create function b.mult1(int, int) returns int as $$ select $1 * $2 $$ language sql;
 create function b.mult2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
 create function b.mult3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
@@ -282,5 +284,9 @@ describe('getCatalog', () => {
   it('will correctly get if a procedure is returning a set', () => {
     expect(catalog.getProcedure('a', 'add1').returnsSet).toBe(false)
     expect(catalog.getProcedure('a', 'set').returnsSet).toBe(true)
+  })
+
+  it('will get comments on procedures', () => {
+    expect(catalog.getProcedure('a', 'add1').description).toEqual('lol, add some stuff')
   })
 })
