@@ -1,3 +1,7 @@
 #!/bin/bash
 
-scripts/test.sh --watch --watch-extensions json,graphql $@
+scripts/test.sh \
+  --reporter min \
+  --watch \
+  --watch-extensions json,graphql \
+  $@
