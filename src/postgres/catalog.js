@@ -1,4 +1,4 @@
-import { camelCase, upperFirst } from 'lodash'
+import { once, camelCase, upperFirst } from 'lodash'
 
 const replaceInsideUnderscores = (string, replacer) => {
   const [, start, substring, finish] = /^(_*)(.*?)(_*)$/.exec(string)
@@ -94,12 +94,12 @@ export class Schema {
     this.description = description
   }
 
-  getTables () {
+  getTables = once(() => {
     const tables = []
     for (const [, table] of this.catalog._tables.entries())
       if (table.schema === this) tables.push(table)
     return tables
-  }
+  })
 }
 
 /**
@@ -119,24 +119,24 @@ export class Table {
     this.description = description
   }
 
-  getColumns () {
+  getColumns = once(() => {
     const columns = []
     for (const [, column] of this.schema.catalog._columns.entries())
       if (column.table === this) columns.push(column)
     return columns
-  }
+  })
 
-  getPrimaryKeys () {
+  getPrimaryKeys = once(() => {
     return this.getColumns().filter(({ isPrimaryKey }) => isPrimaryKey)
-  }
+  })
 
-  getForeignKeys () {
+  getForeignKeys = once(() => {
     return this.schema.catalog._foreignKeys.filter(({ nativeTable }) => nativeTable === this)
-  }
+  })
 
-  getReverseForeignKeys () {
+  getReverseForeignKeys = once(() => {
     return this.schema.catalog._foreignKeys.filter(({ foreignTable }) => foreignTable === this)
-  }
+  })
 
   getFieldName () {
     return camelCaseInsideUnderscores(this.name)
