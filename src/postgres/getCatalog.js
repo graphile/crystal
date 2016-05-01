@@ -1,8 +1,4 @@
-// TODO: Refactor this and `catalog.js` for performance. Identify important
-// and unimportant methods and clean up the API.
-
-import { memoize, assign, ary } from 'lodash'
-import Promise from 'bluebird'
+import { compact, ary } from 'lodash'
 import pg from 'pg'
 
 import {
@@ -10,42 +6,55 @@ import {
   Schema,
   Table,
   Column,
-  Type,
   Enum,
   ForeignKey,
   Procedure,
 } from './catalog.js'
 
-const getRawSchemas = memoize(client =>
+const withClient = fn => async pgConfig => {
+  const client = await pg.connectAsync(pgConfig)
+  const result = await fn(client)
+  client.end()
+  return result
+}
+
+/**
+ * Gets an instance of `Catalog` for the given PostgreSQL configuration.
+ *
+ * @param {Object} pgConfig
+ * @returns {Catalog}
+ */
+const getCatalog = withClient(async client => {
+  const catalog = new Catalog()
+  await addSchemas(client, catalog)
+  await addEnumTypes(client, catalog)
+  await addTables(client, catalog)
+  await addColumns(client, catalog)
+  await addForeignKeys(client, catalog)
+  await addProcedures(client, catalog)
+  return catalog
+})
+
+export default getCatalog
+
+const addSchemas = (client, catalog) =>
   client.queryAsync(`
     select
-      n.oid as "oid",
       n.nspname as "name",
       d.description as "description"
     from
       pg_catalog.pg_namespace as n
       left join pg_catalog.pg_description as d on d.objoid = n.oid and d.objsubid = 0
     where
-      n.nspname not in ('pg_catalog', 'information_schema')
+      n.nspname not in ('pg_catalog', 'information_schema');
   `)
   .then(({ rows }) => rows)
-)
+  .map(row => new Schema({ ...row, catalog }))
+  .each(schema => catalog.addSchema(schema))
 
-/*
- * Selects rows for things to be treated as tables by PostGraphQL.
- *
- * Note that the `relkind in (…)` expression in the where clause of the
- * statement filters for the following:
- *
- * - 'r': Tables.
- * - 'v': Views.
- * - 'm': Materialized views.
- * - 'f': Foreign tables.
- */
-const getRawTables = memoize(client =>
+const addTables = (client, catalog) =>
   client.queryAsync(`
     select
-      c.oid as "oid",
       n.nspname as "schemaName",
       c.relname as "name",
       d.description as "description"
@@ -55,20 +64,24 @@ const getRawTables = memoize(client =>
       left join pg_catalog.pg_description as d on d.objoid = c.oid and d.objsubid = 0
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
-      c.relkind in ('r', 'v', 'm', 'f')
+      c.relkind in ('r', 'v', 'm', 'f');
   `)
   .then(({ rows }) => rows)
-)
+  .map(row => new Table({
+    ...row,
+    schema: catalog.getSchema(row.schemaName),
+  }))
+  .each(table => catalog.addTable(table))
 
-const getRawColumns = memoize(client =>
+const addColumns = (client, catalog) =>
   client.queryAsync(`
     select
-      a.attnum as "num",
       n.nspname as "schemaName",
       c.relname as "tableName",
       a.attname as "name",
       d.description as "description",
-      a.atttypid as "type",
+      a.attnum as "num",
+      a.atttypid as "typeId",
       not(a.attnotnull) as "isNullable",
       cp.oid is not null as "isPrimaryKey",
       a.atthasdef as "hasDefault"
@@ -90,12 +103,17 @@ const getRawColumns = memoize(client =>
       n.nspname, c.relname, a.attnum;
   `)
   .then(({ rows }) => rows)
-)
+  .map(row => new Column({
+    ...row,
+    table: catalog.getTable(row.schemaName, row.tableName),
+    type: catalog.getType(row.typeId),
+  }))
+  .each(column => catalog.addColumn(column))
 
-const getRawEnums = memoize(client =>
+const addEnumTypes = (client, catalog) =>
   client.queryAsync(`
     select
-      t.oid as "oid",
+      t.oid as "id",
       n.nspname as "schemaName",
       t.typname as "name",
       array(
@@ -110,27 +128,61 @@ const getRawEnums = memoize(client =>
       pg_catalog.pg_type as t
       left join pg_catalog.pg_namespace as n on n.oid = t.typnamespace
     where
+      n.nspname not in ('pg_catalog', 'information_schema') and
       t.typtype = 'e';
   `)
   .then(({ rows }) => rows)
-)
+  .map(row => new Enum({
+    ...row,
+    schema: catalog.getSchema(row.schemaName),
+  }))
+  .each(type => catalog.addEnum(type))
 
-const getRawForeignKeys = memoize(client =>
+const addForeignKeys = (client, catalog) =>
   client.queryAsync(`
     select
-      c.conrelid as "nativeTableOid",
+      nn.nspname as "nativeSchemaName",
+      cn.relname as "nativeTableName",
       c.conkey as "nativeColumnNums",
-      c.confrelid as "foreignTableOid",
+      nf.nspname as "foreignSchemaName",
+      cf.relname as "foreignTableName",
       c.confkey as "foreignColumnNums"
     from
       pg_catalog.pg_constraint as c
+      left join pg_catalog.pg_class as cn on cn.oid = c.conrelid
+      left join pg_catalog.pg_class as cf on cf.oid = c.confrelid
+      left join pg_catalog.pg_namespace as nn on nn.oid = cn.relnamespace
+      left join pg_catalog.pg_namespace as nf on nf.oid = cf.relnamespace
     where
+      nn.nspname not in ('pg_catalog', 'information_schema') and
+      nf.nspname not in ('pg_catalog', 'information_schema') and
       c.contype = 'f'
+    order by
+      nn.nspname, cn.relname, nf.nspname, cf.relname, c.conkey, c.confkey;
   `)
   .then(({ rows }) => rows)
-)
+  .map(({
+    nativeSchemaName,
+    nativeTableName,
+    nativeColumnNums,
+    foreignSchemaName,
+    foreignTableName,
+    foreignColumnNums,
+  }) => {
+    const nativeTable = catalog.getTable(nativeSchemaName, nativeTableName)
+    const foreignTable = catalog.getTable(foreignSchemaName, foreignTableName)
+    const nativeColumns = nativeTable.columns
+    const foreignColumns = foreignTable.columns
+    return new ForeignKey({
+      nativeTable,
+      foreignTable,
+      nativeColumns: nativeColumnNums.map(colNum => nativeColumns.find(({ num }) => num === colNum)),
+      foreignColumns: foreignColumnNums.map(colNum => foreignColumns.find(({ num }) => num === colNum)),
+    })
+  })
+  .each(foreignKey => catalog.addForeignKey(foreignKey))
 
-const getRawProcedures = memoize(client =>
+const addProcedures = (client, catalog) =>
   client.queryAsync(`
     select
       n.nspname as "schemaName",
@@ -149,119 +201,19 @@ const getRawProcedures = memoize(client =>
       pg_catalog.pg_proc as p
       left join pg_catalog.pg_namespace as n on n.oid = p.pronamespace
       left join pg_catalog.pg_description as d on d.objoid = n.oid and d.objsubid = 0
+    where
+      n.nspname not in ('pg_catalog', 'information_schema');
   `)
   .then(({ rows }) => rows)
-)
-
-/**
- * Gets an instance of `Catalog` for the given PostgreSQL configuration.
- *
- * @param {Object} pgConfig
- * @returns {Catalog}
- */
-const getCatalog = async pgConfig => {
-  const client = await pg.connectAsync(pgConfig)
-  const catalog = new Catalog({ pgConfig })
-  const schemas = await getSchemas(client, catalog)
-  catalog.schemas = schemas
-  const foreignKeys = await getForeignKeys(client, catalog)
-  catalog.foreignKeys = foreignKeys
-  client.end()
-
-  const enums = catalog.getAllEnums()
-  const getEnhancedType = memoize(type => enums.find(({ oid }) => oid === type.oid))
-
-  // For all columns, enhance the basic type if we can.
-  catalog.getAllColumns().forEach(column => {
-    const type = getEnhancedType(column.type)
-    if (type) column.type = type
-  })
-
-  return catalog
-}
-
-export default getCatalog
-
-const getSchemas = (client, catalog) =>
-  // Get the raw schemas.
-  getRawSchemas(client)
-  .map(row => new Schema({ catalog, ...row }))
-  // Get tables, set the tables property, return schema so that it is what
-  // actually gets resolved.
-  .map(schema =>
-    Promise.join(
-      getTables(client, schema),
-      getEnums(client, schema),
-      getProcedures(client, schema),
-      (tables, enums, procedures) => assign(schema, { tables, enums, procedures })
-    )
-  )
-
-const getTables = (client, schema) =>
-  // Get the raw tables. This function is cached because `getTables` will be
-  // called once for every `schema`.
-  getRawTables(client)
-  // Only get tables for the passed `schema`.
-  .filter(({ schemaName }) =>
-    schema.name === schemaName
-  )
-  .map(row => new Table({ schema, ...row }))
-  // Get columns, set the columns property, return table so that it is what
-  // actually gets resolved.
-  .map(table =>
-    Promise.join(
-      getColumns(client, table),
-      columns => assign(table, { columns })
-    )
-  )
-
-const getColumns = (client, table) =>
-  // Get the raw columns. This function is cached because `getColumns` will be
-  // called once for every `table`.
-  getRawColumns(client)
-  .filter(({ schemaName, tableName }) =>
-    table.schema.name === schemaName &&
-    table.name === tableName
-  )
-  .map(row => new Column({
-    table,
-    ...row,
-    type: new Type(row.type),
-  }))
-
-const getEnums = (client, schema) =>
-  getRawEnums(client)
-  .filter(({ schemaName }) =>
-    schema.name === schemaName
-  )
-  .map(row => new Enum({ schema, ...row }))
-
-const getForeignKeys = (client, catalog) =>
-  getRawForeignKeys(client)
-  .map(({ nativeTableOid, nativeColumnNums, foreignTableOid, foreignColumnNums }) => {
-    const nativeTable = catalog.getAllTables().find(({ oid }) => oid === nativeTableOid)
-    const foreignTable = catalog.getAllTables().find(({ oid }) => oid === foreignTableOid)
-    return new ForeignKey({
-      catalog,
-      nativeTable,
-      foreignTable,
-      nativeColumns: nativeColumnNums.map(colNum => nativeTable.columns.find(({ num }) => num === colNum)),
-      foreignColumns: foreignColumnNums.map(colNum => foreignTable.columns.find(({ num }) => num === colNum)),
-    })
-  })
-
-const getProcedures = (client, schema) =>
-  getRawProcedures(client)
-  .filter(({ schemaName }) => schema.name === schemaName)
   .map(row => {
-    // The raw procedures table has some wierd columns that we need to correctly format.
-    const argTypes = row.argTypes === '' ? [] : row.argTypes.split(' ').map(ary(parseInt, 1))
+    const argTypes = compact(row.argTypes.split(' ').map(ary(parseInt, 1))).map(t => catalog.getType(t))
     const argNames = (row.argNames || Array(argTypes.length).fill(null)).map((n, i) => n || `arg${i + 1}`)
-
     return new Procedure({
-      schema,
+      schema: catalog.getSchema(row.schemaName),
       ...row,
       argTypes,
       argNames,
+      returnType: catalog.getType(row.returnType),
     })
   })
+  .each(procedure => catalog.addProcedure(procedure))

@@ -41,7 +41,7 @@ const createInputType = table =>
     fields: {
       // We include primary key columns to select a single row to update.
       ...fromPairs(
-        table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
+        table.primaryKeys.map(column => [column.getFieldName(), {
           type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
@@ -76,7 +76,7 @@ const resolveUpdate = table => {
   // We use our SQL builder here instead of a prepared statement/data loader
   // solution because this query can get super dynamic.
   const tableSql = getTableSql(table)
-  const primaryKeyColumns = table.getPrimaryKeyColumns()
+  const primaryKeyColumns = table.primaryKeys
 
   return async (source, args, { client }) => {
     const { input } = args

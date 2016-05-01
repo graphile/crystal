@@ -30,8 +30,8 @@ const createTableType = memoize(table => {
     )
   }
 
-  const primaryKeyColumns = table.getPrimaryKeyColumns()
-  const isNode = primaryKeyColumns.length !== 0
+  const { primaryKeys } = table
+  const isNode = primaryKeys.length !== 0
 
   return new GraphQLObjectType({
     // Creates a new type where the name is a PascalCase version of the table
@@ -55,7 +55,7 @@ const createTableType = memoize(table => {
           description: `The globally unique identifier for this ${table.getMarkdownTypeName()}.`,
           resolve: source => ({
             tableName: table.name,
-            values: primaryKeyColumns.map(column => source[column.name]),
+            values: primaryKeys.map(column => source[column.name]),
           }),
         },
       } : {}),
@@ -64,7 +64,7 @@ const createTableType = memoize(table => {
         .map(column => [column.getFieldName(), createColumnField(column)])
       ),
       ...fromPairs(
-        table.getForeignKeys()
+        table.foreignKeys
         .map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
           const name = `${foreignKey.foreignTable.name}_by_${columnNames.join('_and_')}`
@@ -72,7 +72,7 @@ const createTableType = memoize(table => {
         })
       ),
       ...fromPairs(
-        table.getReverseForeignKeys()
+        table.reverseForeignKeys
         .map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
           const name = `${foreignKey.nativeTable.name}_nodes_by_${columnNames.join('_and_')}`

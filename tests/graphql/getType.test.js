@@ -26,8 +26,8 @@ describe('getType', () => {
       [1114, 'Date'],
       [2950, 'UUID'],
     ])
-    .forEach(([oid, name]) => {
-      expect(getType(new TestType(oid)).name).toEqual(name)
+    .forEach(([id, name]) => {
+      expect(getType(new TestType(id)).name).toEqual(name)
     })
   })
 

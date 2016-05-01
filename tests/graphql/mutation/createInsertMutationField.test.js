@@ -18,16 +18,22 @@ describe('createInsertMutationField', () => {
   })
 
   it('will make nullable columns with a default', () => {
-    const field = createInsertMutationField(new TestTable({
-      columns: [
-        new TestColumn({ name: 'id_1', isPrimaryKey: true, isNullable: false, hasDefault: true }),
-        new TestColumn({ name: 'given_name', isNullable: false }),
-        new TestColumn({ name: 'family_name' }),
-        new TestColumn({ name: 'points', hasDefault: true }),
-        new TestColumn({ name: 'status', isNullable: false, hasDefault: true }),
-      ],
-    }))
+    const table = new TestTable();
+
+    ([
+      new TestColumn({ table, name: 'id_1', isPrimaryKey: true, isNullable: false, hasDefault: true }),
+      new TestColumn({ table, name: 'given_name', isNullable: false }),
+      new TestColumn({ table, name: 'family_name' }),
+      new TestColumn({ table, name: 'points', hasDefault: true }),
+      new TestColumn({ table, name: 'status', isNullable: false, hasDefault: true }),
+    ])
+    .forEach(column => table.schema.catalog.addColumn(column))
+
+    table.schema.catalog._columns.delete('test.test.test')
+
+    const field = createInsertMutationField(table)
     const inputFields = field.args.input.type.ofType.getFields()
+    expect(inputFields).toIncludeKeys(['id1', 'givenName', 'familyName', 'points', 'status'])
     expect(inputFields.id1.type).toBeA(GraphQLScalarType)
     expect(inputFields.givenName.type).toBeA(GraphQLNonNull)
     expect(inputFields.givenName.type.ofType).toBeA(GraphQLScalarType)

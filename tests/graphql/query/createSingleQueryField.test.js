@@ -45,6 +45,8 @@ describe('createSingleQueryField', () => {
   })
 
   it('it will return null for tables without primary keys', () => {
-    expect(createSingleQueryField(new TestTable({ columns: [new TestColumn()] }))).toNotExist()
+    const table = new TestTable()
+    table.schema.catalog.addColumn(new TestColumn({ table }))
+    expect(createSingleQueryField(table)).toNotExist()
   })
 })
