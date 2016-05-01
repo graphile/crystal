@@ -52,6 +52,7 @@
     "express": "^4.13.4",
     "express-graphql": "^0.5.0",
     "graphql": "^0.5.0",
+    "jsonwebtoken": "^6.2.0",
     "lodash": "^4.8.2",
     "morgan": "^1.7.0",
     "on-finished": "^2.3.0",
@@ -70,6 +71,8 @@
     "eslint": "^2.7.0",
     "eslint-config-calebmer": "^3.0.0",
     "expect": "^1.18.0",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "supertest": "^1.2.0",
+    "supertest-as-promised": "^3.1.0"
   }
 }

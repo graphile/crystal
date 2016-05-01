@@ -117,9 +117,22 @@ Will let you reflect on the schema and get the JSON below:
 
 Just navigate with your browser to the URL printed to your console after starting PostGraphQL and use GraphiQL with your data! Even if you don’t want to use GraphQL in your app, this is a great interface for working with any PostgreSQL database.
 
-Just remember to use the `--development` when starting PostGraphQL!
+Just remember to use the `--development` flag when starting PostGraphQL!
 
 [graphiql]: https://github.com/graphql/graphiql
+
+### Token Based Authorization
+PostGraphQL let’s you use token based authentication with [JSON Web Tokens][jwt] (JWT) to secure your API. It doesn’t make sense to redefine your authentication in the API layer, instead just put your authorization logic in the database schema! With an advanced [grants][grants] system and [row level security][row-level-security], authorization in PostgreSQL is more than enough for your needs.
+
+PostGraphQL follows the [PostgreSQL JSON Web Token Serialization Specification][pg-jwt-spec] for serializing JWTs to the database for your use in authorization. The `role` claim of your JWT will become your PostgreSQL role and all other claims can be found under the `jwt.claims` namespace (see [retrieving claims in PostgreSQL][retrieving-claims]).
+
+To enable token based authorization use the `--secret <string>` command line argument with a secure string PostGraphQL will use to sign and verify tokens. And if you don’t want authorization, just don’t set the `--secret` argument and PostGraphQL will ignore all authorization information!
+
+[jwt]: https://jwt.io
+[grants]: http://www.postgresql.org/docs/current/static/sql-grant.html
+[row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
+[pg-jwt-spec]: https://github.com/calebmer/postgraphql/blob/master/docs/pg-jwt-spec.md
+[retrieving-claims]: https://github.com/calebmer/postgraphql/blob/master/docs/pg-jwt-spec.md#retrieving-claims-in-postgresql
 
 ### Cursor Based Pagination For Free
 There are some problems with traditional limit/offset pagination and realtime data. For more information on such problems, read [this article][pagination-for-graphql].
