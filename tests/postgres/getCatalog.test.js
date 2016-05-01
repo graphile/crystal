@@ -130,7 +130,7 @@ describe('getCatalog', () => {
   })
 
   it('gets columns in definition order', () => {
-    expect(catalog.getTable('a', 'hello').columns.map(({ name }) => name))
+    expect(catalog.getTable('a', 'hello').getColumns().map(({ name }) => name))
     .toEqual(['z_some', 'world', 'moon', 'abc', 'yoyo'])
   })
 
@@ -199,7 +199,7 @@ describe('getCatalog', () => {
       foreignColumns: foreignColumns.map(({ name }) => name),
     })
 
-    expect(catalog.getTable('c', 'compound_key').foreignKeys.map(simplifyForeignKey)).toEqual([
+    expect(catalog.getTable('c', 'compound_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
       {
         nativeTable: 'compound_key',
         nativeColumns: ['person_id_2'],
@@ -214,7 +214,7 @@ describe('getCatalog', () => {
       },
     ])
 
-    expect(catalog.getTable('a', 'foreign_key').foreignKeys.map(simplifyForeignKey)).toEqual([
+    expect(catalog.getTable('a', 'foreign_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
       {
         nativeTable: 'foreign_key',
         nativeColumns: ['compound_key_1', 'compound_key_2'],

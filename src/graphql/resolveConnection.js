@@ -6,6 +6,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
   // module as it lets us guarantee saftey against SQL injection, and is easier
   // to modify than a string.
   const tableSql = getTableSql(table)
+  const columns = table.getColumns()
 
   return (source, args, { client }) => {
     const { orderBy, first, last, after, before, offset, descending, ...conditions } = args
@@ -28,7 +29,7 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
         return 'true'
 
       return mapKeys(conditions, (value, fieldName) =>
-        table.columns.find(({ name }) => camelCase(name) === camelCase(fieldName)).name
+        columns.find(({ name }) => camelCase(name) === camelCase(fieldName)).name
       )
     })
 

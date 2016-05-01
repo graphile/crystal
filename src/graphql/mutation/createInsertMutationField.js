@@ -38,7 +38,7 @@ const createInputType = table =>
     description: `The ${table.getMarkdownTypeName()} to insert.`,
     fields: {
       ...fromPairs(
-        table.columns.map(column => [column.getFieldName(), {
+        table.getColumns().map(column => [column.getFieldName(), {
           type: (column.hasDefault ? getNullableType : identity)(getColumnType(column)),
           description: column.description,
         }]),
@@ -67,6 +67,7 @@ const resolveInsert = table => {
   // improvements because mutations are executed in sequence, not parallel.
   //
   // A better solution for batch inserts is a custom batch insert field.
+  const columns = table.getColumns()
   const tableSql = getTableSql(table)
 
   return async (source, args, { client }) => {
@@ -77,7 +78,7 @@ const resolveInsert = table => {
     const { rows: [row] } = await client.queryAsync(
       tableSql
       .insert(fromPairs(
-        table.columns
+        columns
         .map(column => [column.name, input[column.getFieldName()]])
         .filter(([, value]) => value)
       ))

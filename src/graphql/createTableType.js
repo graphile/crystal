@@ -20,9 +20,11 @@ import resolveConnection from './resolveConnection.js'
  * @returns {GraphQLObjectType}
  */
 const createTableType = memoize(table => {
+  const columns = table.getColumns()
+
   // If we have no fields, GraphQL will be sad. Make sure we have meaningful
   // fields by erroring if there are no columns.
-  if (table.columns.length === 0) {
+  if (columns.length === 0) {
     throw new Error(
       `PostgreSQL schema '${table.schema.name}' contains table '${table.name}' ` +
       'which does not have any columns. To generate a GraphQL schema all ' +
@@ -30,7 +32,7 @@ const createTableType = memoize(table => {
     )
   }
 
-  const { primaryKeys } = table
+  const primaryKeys = table.getPrimaryKeys()
   const isNode = primaryKeys.length !== 0
 
   return new GraphQLObjectType({
@@ -60,20 +62,17 @@ const createTableType = memoize(table => {
         },
       } : {}),
       ...fromPairs(
-        table.columns
-        .map(column => [column.getFieldName(), createColumnField(column)])
+        columns.map(column => [column.getFieldName(), createColumnField(column)])
       ),
       ...fromPairs(
-        table.foreignKeys
-        .map(foreignKey => {
+        table.getForeignKeys().map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
           const name = `${foreignKey.foreignTable.name}_by_${columnNames.join('_and_')}`
           return [camelCase(name), createForeignKeyField(foreignKey)]
         })
       ),
       ...fromPairs(
-        table.reverseForeignKeys
-        .map(foreignKey => {
+        table.getReverseForeignKeys().map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
           const name = `${foreignKey.nativeTable.name}_nodes_by_${columnNames.join('_and_')}`
           return [camelCase(name), createForeignKeyReverseField(foreignKey)]
