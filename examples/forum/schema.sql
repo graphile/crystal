@@ -114,19 +114,13 @@ stable;
 
 comment on function summary(post, int, varchar) is 'A truncated version of the body for summaries.';
 
--- Helper function for getting some short inspirational posts. Maybe in an
--- actual forum this could be displayed on the homepage or in an email
--- newsletter.
-create function short_inspiration_posts() returns setof post as $$
-  select *
-  from post
-  where
-    (body is null or char_length(body) < 500)
-    and topic = 'inspiration'
+-- A procedure to search all posts using a given search term.
+create function search_posts(search varchar) returns setof post as $$
+  select * from post where body ilike ('%' || search || '%')
 $$ language sql
 stable;
 
-comment on function short_inspiration_posts() is 'Fetch all posts which are inspirational in nature and short.';
+comment on function search_posts(varchar) is 'Returns posts containing a given search term.';
 
 -------------------------------------------------------------------------------
 -- Mutation Procedures
