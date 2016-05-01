@@ -87,6 +87,18 @@ stable;
 
 comment on function full_name(person) is 'A person’s full name including their first and last name.';
 
+-- Fetches and returns the latest post authored by our person.
+create function latest_post(person) returns post as $$
+  select *
+  from post
+  where author_id = $1.id
+  order by created_at desc
+  limit 1
+$$ language sql
+stable;
+
+comment on function latest_post(person) is 'Get’s the latest post written by the person.';
+
 -- Truncates the body with a given length and a given omission character.
 create function summary(
   post,
