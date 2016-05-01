@@ -23,6 +23,7 @@ describe('createServer', () => {
     pgConfig: PG_CONFIG,
     log: false,
     development: false,
+    secret: 'secret',
     ...config,
   })
 
@@ -281,6 +282,20 @@ describe('createServer', () => {
       .expect(200)
       .expect(req => (req.body = req.body.data))
       .expect({ role: 'none', claim: null })
+    )
+  })
+
+  it('ignores authorization if a secret is not set', async () => {
+    const token = await jwt.signAsync({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
+    const server = testCreateServer({ secret: null })
+    await (
+      request(server)
+      .get('/')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ query: '{claim(name:"yolo")}' })
+      .expect(200)
+      .expect(req => (req.body = req.body.data))
+      .expect({ claim: null })
     )
   })
 })

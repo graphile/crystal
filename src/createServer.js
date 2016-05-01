@@ -25,7 +25,7 @@ const createServer = ({
   graphqlSchema,
   pgConfig,
   route = '/',
-  secret = 'secret',
+  secret,
   development = true,
   log = true,
 }) => {
@@ -43,7 +43,9 @@ const createServer = ({
 
     // Start a transaction for our client and set it up.
     await client.queryAsync('begin')
-    await setupRequestTransaction(req, client, { secret })
+
+    // If we have a secret, let’s setup the request transaction.
+    if (secret) await setupRequestTransaction(req, client, secret)
 
     // Make sure we release our client back to the pool once the response has
     // finished.
@@ -74,7 +76,7 @@ const createServer = ({
 
 export default createServer
 
-const setupRequestTransaction = async (req, client, { secret }) => {
+const setupRequestTransaction = async (req, client, secret) => {
   // First, get the possible `Bearer` token from the request. If it does not
   // exist, exit.
   const token = getToken(req)

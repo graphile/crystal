@@ -25,7 +25,7 @@ const main = async () => {
   .option('-p, --port <integer>', 'a URL port the server will listen to. defaults to 3000', parseInt)
   .option('-d, --development', 'enables a development mode which enables GraphiQL, nicer errors, and JSON pretty printing')
   .option('-r, --route <path>', 'the route to mount the GraphQL server on. defaults to /')
-  .option('-e, --secret <string>', 'the secret to be used to encrypt tokens. defaults to \'secret\'')
+  .option('-e, --secret <string>', 'the secret to be used to encrypt tokens. token authentication disabled if this is not set')
   .option('-m, --max-pool-size <integer>', 'the maximum number of connections to keep in the connection pool. defaults to 10')
   .parse(process.argv)
   /* eslint-enable max-len */
@@ -37,12 +37,11 @@ const main = async () => {
     port = 3000,
     development = false,
     route = '/',
-    secret = 'secret',
+    secret,
     maxPoolSize = 10,
   } = program
 
   if (!connection) throw new Error('Must define a PostgreSQL connection string to connect to.')
-  if (secret === 'secret') console.log('Running in insecure mode. Token secret is default value \'secret\'')
 
   // Parse out the connection string into an object and attach a
   // `poolSize` option.

@@ -126,6 +126,8 @@ PostGraphQL let’s you use token based authentication with [JSON Web Tokens][jw
 
 PostGraphQL follows the [PostgreSQL JSON Web Token Serialization Specification][pg-jwt-spec] for serializing JWTs to the database for your use in authorization. The `role` claim of your JWT will become your PostgreSQL role and all other claims can be found under the `jwt.claims` namespace (see [retrieving claims in PostgreSQL][retrieving-claims]).
 
+To enable token based authorization use the `--secret <string>` command line argument with a secure string PostGraphQL will use to sign and verify tokens. And if you don’t want authorization, just don’t set the `--secret` argument and PostGraphQL will ignore all authorization information!
+
 [jwt]: https://jwt.io
 [grants]: http://www.postgresql.org/docs/current/static/sql-grant.html
 [row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
