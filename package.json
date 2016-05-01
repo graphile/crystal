@@ -34,6 +34,7 @@
   },
   "scripts": {
     "lint": "scripts/lint.sh",
+    "clean": "scripts/clean.sh",
     "build": "scripts/build.sh",
     "test": "scripts/test.sh",
     "test-watch": "scripts/test-watch.sh",
@@ -41,7 +42,7 @@
     "schema-down": "npm --prefix examples/forum run schema-down",
     "start": "scripts/start.sh",
     "preversion": "npm test",
-    "prepublish": "scripts/build.sh"
+    "prepublish": "scripts/clean.sh && scripts/build.sh"
   },
   "dependencies": {
     "bluebird": "^3.3.4",
