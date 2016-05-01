@@ -29,7 +29,7 @@ So instead of selecting the `headline` field in JavaScript like this:
 personNodes.nodes[0].postNodesByAuthorId.nodes[0].headline
 ```
 
-You could insted do this:
+You could instead do this:
 
 ```js
 allPeople.people[0].authoredPosts.posts[0].headline
