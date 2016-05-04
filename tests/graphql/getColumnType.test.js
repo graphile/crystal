@@ -84,6 +84,12 @@ describe('getColumnType', () => {
       expect(enumType.name).toEqual('TestEnum')
     })
 
+    it('will return same reference for enum with same name', () => {
+      const enumFirst = getEnum()
+      const enumSecond = getEnum()
+      expect(enumFirst).toBe(enumSecond)
+    })
+
     it('will correctly format variants', () => {
       const enumType = getEnum()
       expect(enumType.getValues()).toEqual([
