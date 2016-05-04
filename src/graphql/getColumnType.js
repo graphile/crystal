@@ -108,7 +108,9 @@ const getColumnEnumType = memoize(enum_ => {
       .map(variant => [toUpper(snakeCase(variant)), { value: variant }])
     ),
   })
-}, enum_ => { return enum_.name })
+}, enum_ => {
+  return enum_.name
+})
 
 const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
@@ -119,10 +121,9 @@ const getColumnGraphqlType = memoize(column => {
     return wrapType(internalType)
 
   // If the column has an enum type, we need to create a `GraphQLEnumType`.
-  const enum_ = column.getEnum();
-  if (enum_) {
-    return wrapType(getColumnEnumType(enum_));
-  }
+  const enum_ = column.getEnum()
+  if (enum_)
+    return wrapType(getColumnEnumType(enum_))
 
   // Otherwise, just return `GraphQLString`.
   return wrapType(GraphQLString)
