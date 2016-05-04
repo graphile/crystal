@@ -14,7 +14,7 @@ create schema forum_example;
 create schema forum_example_utils;
 
 -- By setting the `search_path`, whenever we create something in the default
--- namespace it is actually created in the `blog_example` schema.
+-- namespace it is actually created in the `forum_example` schema.
 --
 -- For example, this lets us write `create table person …` instead of
 -- `create table forum_example.person …`.
