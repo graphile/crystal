@@ -1,6 +1,6 @@
 import { memoize } from 'lodash'
-import { GraphQLNonNull } from 'graphql'
-import { NodeType, IDType } from '../types.js'
+import { GraphQLNonNull, GraphQLID } from 'graphql'
+import { NodeType, fromID } from '../types.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
 const createNodeQueryField = schema => ({
@@ -9,19 +9,20 @@ const createNodeQueryField = schema => ({
 
   args: {
     id: {
-      type: new GraphQLNonNull(IDType),
+      type: new GraphQLNonNull(GraphQLID),
       description: 'The `ID` of the node.',
     },
   },
 
   resolve: (source, args, context) => {
     const { id } = args
-    const table = schema.getTable(id.tableName)
+    const { tableName, values } = fromID(id)
+    const table = schema.getTable(tableName)
 
     if (!table)
-      throw new Error(`No table '${id.tableName}' in schema '${schema.name}'.`)
+      throw new Error(`No table '${tableName}' in schema '${schema.name}'.`)
 
-    return getResolver(table)(source, args, context)
+    return getResolver(table)({ values }, {}, context)
   },
 })
 
@@ -32,5 +33,5 @@ export default createNodeQueryField
 const getResolver = memoize(table => resolveTableSingle(
   table,
   table.getPrimaryKeyColumns(),
-  (source, args) => args.id.values,
+  ({ values }) => values,
 ))

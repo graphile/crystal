@@ -1,5 +1,5 @@
-import { GraphQLNonNull } from 'graphql'
-import { IDType } from '../types.js'
+import { GraphQLNonNull, GraphQLID } from 'graphql'
+import { fromID } from '../types.js'
 import createTableType from '../createTableType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
@@ -22,7 +22,7 @@ const createSingleQueryField = table => {
 
     args: {
       id: {
-        type: new GraphQLNonNull(IDType),
+        type: new GraphQLNonNull(GraphQLID),
         description: `The \`ID\` of the ${table.getMarkdownTypeName()} node.`,
       },
     },
@@ -30,7 +30,8 @@ const createSingleQueryField = table => {
     resolve: resolveTableSingle(
       table,
       primaryKeyColumns,
-      (source, { id: { tableName, values } }) => {
+      (source, { id }) => {
+        const { tableName, values } = fromID(id)
         if (tableName !== table.name) return null
         return values
       }

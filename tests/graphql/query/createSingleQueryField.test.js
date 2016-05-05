@@ -1,6 +1,6 @@
 import expect from 'expect'
 import { keys } from 'lodash'
-import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
+import { GraphQLObjectType, GraphQLNonNull, GraphQLID } from 'graphql'
 import { TestTable, TestColumn } from '../../helpers.js'
 import createSingleQueryField from '#/graphql/query/createSingleQueryField.js'
 
@@ -38,10 +38,10 @@ describe('createSingleQueryField', () => {
 
     expect(keys(person.args)).toEqual(['id'])
     expect(person.args.id.type).toBeA(GraphQLNonNull)
-    expect(person.args.id.type.ofType.name).toEqual('ID')
+    expect(person.args.id.type.ofType).toBe(GraphQLID)
     expect(keys(compoundKey.args)).toEqual(['id'])
     expect(compoundKey.args.id.type).toBeA(GraphQLNonNull)
-    expect(compoundKey.args.id.type.ofType.name).toEqual('ID')
+    expect(compoundKey.args.id.type.ofType).toBe(GraphQLID)
   })
 
   it('it will return null for tables without primary keys', () => {

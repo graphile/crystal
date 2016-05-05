@@ -1,5 +1,5 @@
 import expect from 'expect'
-import { GraphQLObjectType } from 'graphql'
+import { GraphQLObjectType, GraphQLID } from 'graphql'
 import { TestTable, TestColumn } from '../helpers.js'
 import createTableType from '#/graphql/createTableType.js'
 
@@ -48,6 +48,7 @@ describe('createTableType', () => {
     const type = createTableType(new TestTable())
     expect(type.getInterfaces()[0].name).toEqual('Node')
     expect(type.getFields()).toIncludeKey('id')
+    expect(type.getFields().id.type).toBe(GraphQLID)
   })
 
   it('will not implement the `Node` type for tables without primary keys', () => {

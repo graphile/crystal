@@ -1,6 +1,6 @@
 import { memoize, fromPairs, camelCase } from 'lodash'
-import { GraphQLObjectType } from 'graphql'
-import { IDType, NodeType } from './types.js'
+import { GraphQLObjectType, GraphQLID } from 'graphql'
+import { NodeType, toID } from './types.js'
 import getColumnType from './getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
 import createConnectionType from './createConnectionType.js'
@@ -51,12 +51,9 @@ const createTableType = memoize(table => {
       // anything.
       ...(isNode ? {
         id: {
-          type: IDType,
+          type: GraphQLID,
           description: `The globally unique identifier for this ${table.getMarkdownTypeName()}.`,
-          resolve: source => ({
-            tableName: table.name,
-            values: primaryKeyColumns.map(column => source[column.name]),
-          }),
+          resolve: source => toID(table.name, primaryKeyColumns.map(column => source[column.name])),
         },
       } : {}),
       ...fromPairs(

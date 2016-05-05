@@ -3,6 +3,7 @@ import {
   GraphQLBoolean,
   GraphQLInt,
   GraphQLFloat,
+  GraphQLID,
   GraphQLNonNull,
   GraphQLScalarType,
   GraphQLObjectType,
@@ -29,9 +30,9 @@ const createStringScalarType = ({ name, description }) =>
  * Node Types
  * ========================================================================= */
 
-const toID = id => toBase64(`${id.tableName}:${id.values.join(',')}`)
+export const toID = (tableName, values) => toBase64(`${tableName}:${values.join(',')}`)
 
-const fromID = encodedString => {
+export const fromID = encodedString => {
   const string = fromBase64(encodedString)
   if (!string) throw new Error(`Invalid ID '${encodedString}'.`)
   const [tableName, valueString] = string.split(':', 2)
@@ -40,24 +41,13 @@ const fromID = encodedString => {
   return { tableName, values }
 }
 
-export const IDType =
-  new GraphQLScalarType({
-    name: 'ID',
-    description:
-      'A globally unique identifier used to refetch an object or as a key for a ' +
-      'cache. It is not intended to be human readable.',
-    serialize: toID,
-    parseValue: fromID,
-    parseLiteral: ast => (ast.kind === Kind.STRING ? fromID(ast.value) : null),
-  })
-
 export const NodeType =
   new GraphQLInterfaceType({
     name: 'Node',
     description: 'A single node object in the graph with a globally unique identifier.',
     fields: {
       id: {
-        type: IDType,
+        type: GraphQLID,
         description: 'The `Node`’s globally unique identifier used to refetch the node.',
       },
     },
