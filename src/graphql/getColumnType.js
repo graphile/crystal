@@ -94,11 +94,24 @@ const postgresToGraphQLTypes = new Map([
 ])
 
 /**
- * Gets a GraphQL type for a PostgreSQL type.
- *
- * @param {Column} column
- * @returns {GraphQLType}
- */
+* Gets a GraphQL type for a PostgreSQL type.
+*
+* @param {Column} column
+* @returns {GraphQLType}
+*/
+const getColumnEnumType = memoize(enum_ => {
+  return new GraphQLEnumType({
+    name: upperFirst(camelCase(enum_.name)),
+    description: enum_.description,
+    values: fromPairs(
+      enum_.variants
+      .map(variant => [toUpper(snakeCase(variant)), { value: variant }])
+    ),
+  })
+}, enum_ => {
+  return enum_.name
+})
+
 const getColumnGraphqlType = memoize(column => {
   const wrapType = type => (column.isNullable ? type : new GraphQLNonNull(type))
   const internalType = postgresToGraphQLTypes.get(column.type)
@@ -107,19 +120,10 @@ const getColumnGraphqlType = memoize(column => {
   if (internalType)
     return wrapType(internalType)
 
-  const enum_ = column.getEnum()
-
   // If the column has an enum type, we need to create a `GraphQLEnumType`.
-  if (enum_) {
-    return wrapType(new GraphQLEnumType({
-      name: upperFirst(camelCase(enum_.name)),
-      description: enum_.description,
-      values: fromPairs(
-        enum_.variants
-        .map(variant => [toUpper(snakeCase(variant)), { value: variant }])
-      ),
-    }))
-  }
+  const enum_ = column.getEnum()
+  if (enum_)
+    return wrapType(getColumnEnumType(enum_))
 
   // Otherwise, just return `GraphQLString`.
   return wrapType(GraphQLString)

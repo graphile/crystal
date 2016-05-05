@@ -19,13 +19,16 @@ set search_path = forum_example, forum_example_utils;
 -------------------------------------------------------------------------------
 -- Basic Tables
 
+create type entity_status as enum('new','updated','deleted');
+
 create table person (
   id               serial not null primary key,
   given_name       varchar(64) not null,
   family_name      varchar(64),
   about            text,
   created_at       timestamp,
-  updated_at       timestamp
+  updated_at       timestamp,
+  status           entity_status
 );
 
 comment on table person is 'A user of the forum.';
@@ -45,7 +48,8 @@ create table post (
   topic            post_topic,
   body             text,
   created_at       timestamp,
-  updated_at       timestamp
+  updated_at       timestamp,
+  status           entity_status
 );
 
 comment on table post is 'A forum post written by a user.';
