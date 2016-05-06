@@ -95,7 +95,8 @@ create function latest_post(person) returns post as $$
   order by created_at desc
   limit 1
 $$ language sql
-stable;
+stable
+set search_path from current;
 
 comment on function latest_post(person) is 'Get’s the latest post written by the person.';
 
@@ -118,7 +119,8 @@ comment on function summary(post, int, varchar) is 'A truncated version of the b
 create function search_posts(search varchar) returns setof post as $$
   select * from post where body ilike ('%' || search || '%')
 $$ language sql
-stable;
+stable
+set search_path from current;
 
 comment on function search_posts(varchar) is 'Returns posts containing a given search term.';
 

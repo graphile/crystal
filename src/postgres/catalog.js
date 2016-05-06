@@ -296,6 +296,10 @@ export class Procedure {
     this.returnType = returnType
   }
 
+  hasTableArg () {
+    return Boolean(Array.from(this.args).find(([, type]) => type.isTableType))
+  }
+
   getFieldName () {
     return camelCaseInsideUnderscores(this.name)
   }

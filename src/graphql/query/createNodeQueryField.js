@@ -24,7 +24,7 @@ const createNodeQueryField = schema => {
       if (!table)
         throw new Error(`No table '${tableName}' in schema '${schema.name}'.`)
 
-      return getResolver(table)({ values }, {}, context)
+      return getResolveNode(table)({ values }, {}, context)
     },
   }
 }
@@ -35,7 +35,7 @@ export default createNodeQueryField
 // must be) memoized.
 //
 // Because this is memoized, fetching primary keys is ok here.
-const getResolver = memoize(table => resolveTableSingle(
+const getResolveNode = memoize(table => resolveTableSingle(
   table,
   table.getPrimaryKeys(),
   ({ values }) => values,

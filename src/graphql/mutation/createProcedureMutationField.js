@@ -1,6 +1,8 @@
-import { fromPairs, camelCase, upperFirst, lowerFirst, assign } from 'lodash'
+import { camelCase, upperFirst, lowerFirst, memoize } from 'lodash'
 import { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInputObjectType } from 'graphql'
 import getType from '../getType.js'
+import createProcedureArgs from '../createProcedureArgs.js'
+import resolveProcedure from '../resolveProcedure.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
 
 const createProcedureMutationField = procedure => ({
@@ -13,7 +15,14 @@ const createProcedureMutationField = procedure => ({
     },
   },
 
-  resolve: resolveProcedure(procedure),
+  resolve: async (source, args, context) => {
+    const { input } = args
+    const { clientMutationId } = input
+    return {
+      output: await getResolveProcedure(procedure)(source, args, context),
+      clientMutationId,
+    }
+  },
 })
 
 export default createProcedureMutationField
@@ -24,18 +33,7 @@ const createInputType = procedure =>
     description: `The input object for the ${procedure.getMarkdownFieldName()} procedure.`,
 
     fields: {
-      ...fromPairs(
-        // For all of our argument types, make a key/value pair which will
-        // eventually be transformed into a GraphQL argument object. We use the
-        // name from `argNames` and the type from `argTypes` (we also assume they
-        // are arrays of equal lengths). If the procedure is marked as strict, all
-        // arguments also must be required.
-        Array.from(procedure.args).map(([name, type]) => [camelCase(name), {
-          type: procedure.isStrict ?
-            new GraphQLNonNull(getType(type)) :
-            getType(type),
-        }])
-      ),
+      ...createProcedureArgs(procedure),
       clientMutationId: inputClientMutationId,
     },
   })
@@ -58,51 +56,14 @@ const createPayloadType = procedure => {
         // as well.
         type: procedure.returnsSet ? new GraphQLList(returnType) : returnType,
         description: `The actual value returned by ${procedure.getMarkdownFieldName()}`,
-        resolve: source => source.returnValue,
+        resolve: ({ output }) => output,
       },
       clientMutationId: payloadClientMutationId,
     },
   })
 }
 
-const resolveProcedure = procedure => {
-  const returnsTable = procedure.returnType.isTableType
-  const argEntries = Array.from(procedure.args)
-
-  // Construct the procedure call. It is pretty long so having it on multiple
-  // lines is helpful.
-  const procedureName = `"${procedure.schema.name}"."${procedure.name}"`
-  const procedureArgs = argEntries.map((entry, i) => `$${i + 1}`).join(', ')
-  const procedureCall = `${procedureName}(${procedureArgs})`
-
-  // Construct the query.
-  //
-  // If the procedure returns a table type let’s select all of its values
-  // instead of just a tuple.
-  const query = {
-    name: `procedure_${procedure.name}`,
-    text: returnsTable ?
-      `select * from ${procedureCall}` :
-      `select ${procedureCall} as "returnValue"`,
-  }
-
-  return async (source, args, { client }) => {
-    const { input } = args
-    const { clientMutationId } = input
-
-    // Actuall run the procedure using our arguments.
-    const result = await client.queryAsync({
-      name: query.name,
-      text: query.text,
-      values: argEntries.map(([name]) => input[camelCase(name)]),
-    })
-
-    return {
-      clientMutationId,
-      // If this is a table type, the return value is the entire object.
-      returnValue: returnsTable ?
-        assign(result.rows[0], { table: procedure.returnType.table }) :
-        result.rows[0].returnValue,
-    }
-  }
-}
+const getResolveProcedure = memoize(procedure => resolveProcedure(
+  procedure,
+  (source, { input }) => input,
+))

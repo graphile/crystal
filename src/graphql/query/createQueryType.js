@@ -1,7 +1,8 @@
-import { ary, assign } from 'lodash'
+import { fromPairs, ary, assign } from 'lodash'
 import { GraphQLObjectType } from 'graphql'
 import createNodeQueryField from './createNodeQueryField.js'
 import createTableQueryFields from './createTableQueryFields.js'
+import createProcedureQueryField from './createProcedureQueryField.js'
 
 /**
  * Creates the Query type for the entire schema. To see the fields created for
@@ -15,7 +16,17 @@ const createQueryType = schema =>
     name: 'Query',
     description: schema.description || 'The entry type for GraphQL queries.',
     fields: {
+      // Add the node query field.
       node: createNodeQueryField(schema),
+      // Add fields for procedures.
+      ...fromPairs(
+        schema
+        .getProcedures()
+        .filter(({ isMutation }) => !isMutation)
+        .filter(procedure => !procedure.hasTableArg())
+        .map(procedure => [procedure.getFieldName(), createProcedureQueryField(procedure)])
+      ),
+      // Add the table query fields.
       ...(
         schema
         .getTables()

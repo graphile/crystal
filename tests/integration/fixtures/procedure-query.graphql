@@ -1,0 +1,11 @@
+query ProcedureQuery {
+  a: searchPosts { ...post }
+  b: searchPosts(search: "Lorem") { ...post }
+  c: searchPosts(search: "adIpiscing") { ...post }
+  d: searchPosts(search: "x") { ...post }
+}
+
+fragment post on Post {
+  id
+  headline
+}
