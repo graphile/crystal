@@ -5,7 +5,7 @@ mutation ProcedureTest {
 
 fragment payload on RegisterPersonPayload {
   clientMutationId
-  person {
+  output {
     id
     rowId
     givenName

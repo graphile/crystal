@@ -49,8 +49,8 @@ describe('createProcedureMutationField', () => {
     expect(field.type.name).toEqual('TestPayload')
   })
 
-  it('the payload will have a field name which is the type name', () => {
+  it('the payload will have a field name named output', () => {
     const field = createProcedureMutationField(new TestProcedure())
-    expect(field.type.getFields().string.type).toBe(GraphQLString)
+    expect(field.type.getFields().output.type).toBe(GraphQLString)
   })
 })

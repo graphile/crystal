@@ -50,7 +50,7 @@ const createPayloadType = procedure => {
     // `Person` would have a field name of `person`. And the Relay required
     // `clientPayloadId` field.
     fields: {
-      [lowerFirst(returnType.name)]: {
+      output: {
         // Get the GraphQL return type for the procedure’s return type. If the
         // procedure is to return a set, we need to reflect that in our GraphQL type
         // as well.
