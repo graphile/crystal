@@ -80,15 +80,15 @@ comment on column person_account.pass_hash is 'An opaque hash of the person’s 
 
 -- Computes the full name for a person using the person’s `given_name` and a
 -- `family_name`.
-create function full_name(person) returns varchar as $$
+create function person_full_name(person) returns varchar as $$
   select $1.given_name || ' ' || $1.family_name
 $$ language sql
 stable;
 
-comment on function full_name(person) is 'A person’s full name including their first and last name.';
+comment on function person_full_name(person) is 'A person’s full name including their first and last name.';
 
 -- Fetches and returns the latest post authored by our person.
-create function latest_post(person) returns post as $$
+create function person_latest_post(person) returns post as $$
   select *
   from post
   where author_id = $1.id
@@ -98,10 +98,10 @@ $$ language sql
 stable
 set search_path from current;
 
-comment on function latest_post(person) is 'Get’s the latest post written by the person.';
+comment on function person_latest_post(person) is 'Get’s the latest post written by the person.';
 
 -- Truncates the body with a given length and a given omission character.
-create function summary(
+create function post_summary(
   post,
   length int default 50,
   omission varchar default '…'
@@ -113,7 +113,7 @@ create function summary(
 $$ language sql
 stable;
 
-comment on function summary(post, int, varchar) is 'A truncated version of the body for summaries.';
+comment on function post_summary(post, int, varchar) is 'A truncated version of the body for summaries.';
 
 -- A procedure to search all posts using a given search term.
 create function search_posts(search varchar) returns setof post as $$
