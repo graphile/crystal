@@ -23,6 +23,12 @@ import resolveProcedure from './resolveProcedure.js'
  * @param {Table} table
  * @returns {GraphQLObjectType}
  */
+// TODO: Reverse foreign keys, and computed columns each run a seperate
+// query for each table type causing an O(n + 1) scenario. This could be
+// improved, but it requires some real SQL dark magicks… ideas welcome!
+//
+// Foreign keys (not reverse foreign keys) are optimized using dataloader (see
+// `resolveTableSingle`).
 const createTableType = memoize(table => {
   const columns = table.getColumns()
 
