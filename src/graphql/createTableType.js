@@ -1,5 +1,6 @@
-import { memoize, fromPairs, camelCase, assign, omit } from 'lodash'
+import { memoize, fromPairs, camelCase, assign } from 'lodash'
 import { GraphQLObjectType, GraphQLID } from 'graphql'
+import { $$rowTable } from '../symbols.js'
 import { NodeType, toID } from './types.js'
 import getColumnType from './getColumnType.js'
 import resolveTableSingle from './resolveTableSingle.js'
@@ -47,7 +48,7 @@ const createTableType = memoize(table => {
     // If the table has no primary keys, it shouldn’t implement `Node`.
     interfaces: isNode ? [NodeType] : [],
 
-    isTypeOf: value => value.table === table,
+    isTypeOf: value => value[$$rowTable] === table,
 
     // Make sure all of our columns have a corresponding field. This is a thunk
     // because `createForeignKeyField` may have a circular dependency.
@@ -143,7 +144,7 @@ const createProcedureField = procedure => {
     // Resolve the procedure, using the source row as the argument we omit.
     resolve: resolveProcedure(
       procedure,
-      (source, args) => assign(args, { [camelCase(tableArgName)]: omit(source, 'table') }),
+      (source, args) => assign(args, { [camelCase(tableArgName)]: source }),
     ),
   }
 }

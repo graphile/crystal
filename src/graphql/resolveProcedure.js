@@ -1,7 +1,10 @@
-import { camelCase, assign } from 'lodash'
+import { camelCase } from 'lodash'
+import { $$rowTable } from '../symbols.js'
 
 const resolveProcedure = (procedure, getProcedureArgs) => {
-  const returnsTable = procedure.returnType.isTableType
+  // If this type is a table type, this variable will be a reference to that table.
+  const returnTable = procedure.returnType.isTableType && procedure.returnType.table
+
   const argEntries = Array.from(procedure.args)
 
   // Construct the qualified procedure name.
@@ -29,15 +32,15 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   // instead of just a tuple.
   const query = {
     name: `procedure_${procedure.name}`,
-    text: returnsTable ?
+    text: returnTable ?
       `select * from ${procedureCall}` :
       `select ${procedureCall} as "output"`,
   }
 
   // If this is a table type, the return value is the entire object.
   const getOutput = row => (
-    returnsTable ?
-      assign(row, { table: procedure.returnType.table }) :
+    returnTable ?
+      (row[$$rowTable] = returnTable, row) :
       row.output
   )
 

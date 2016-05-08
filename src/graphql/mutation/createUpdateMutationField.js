@@ -1,4 +1,5 @@
-import { fromPairs, upperFirst, assign } from 'lodash'
+import { fromPairs, upperFirst } from 'lodash'
+import { $$rowTable } from '../../symbols.js'
 import getTableSql from '../../getTableSql.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
@@ -66,7 +67,7 @@ const createPayloadType = table =>
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The updated ${table.getMarkdownTypeName()}.`,
-        resolve: source => source[table.name],
+        resolve: source => source.output,
       },
       clientMutationId: payloadClientMutationId,
     },
@@ -100,7 +101,7 @@ const resolveUpdate = table => {
     )
 
     return {
-      [table.name]: row ? assign(row, { table }) : null,
+      output: row ? (row[$$rowTable] = table, row) : null,
       clientMutationId,
     }
   }

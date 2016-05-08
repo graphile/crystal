@@ -1,4 +1,5 @@
 import { constant, assign, mapKeys, once, isEmpty, camelCase } from 'lodash'
+import { $$rowTable } from '../symbols.js'
 import getTableSql from '../getTableSql.js'
 
 const resolveConnection = (table, getExtraConditions = constant({})) => {
@@ -66,7 +67,10 @@ const resolveConnection = (table, getExtraConditions = constant({})) => {
       // user gets what they expected.
       if (last) rows = rows.reverse()
 
-      return rows.map(row => assign(row, { table }))
+      // Add the row table property for every row so it can be identified.
+      rows.forEach(row => (row[$$rowTable] = table))
+
+      return rows
     })
 
     const getStartCursor = once(() => getRows().then(rows => {

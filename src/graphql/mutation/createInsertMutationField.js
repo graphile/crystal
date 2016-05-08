@@ -1,4 +1,5 @@
-import { fromPairs, identity, assign } from 'lodash'
+import { fromPairs, identity } from 'lodash'
+import { $$rowTable } from '../../symbols.js'
 import getTableSql from '../../getTableSql.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
@@ -56,7 +57,7 @@ const createPayloadType = table =>
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The inserted ${table.getMarkdownTypeName()}.`,
-        resolve: source => source[table.name],
+        resolve: source => source.output,
       },
       clientMutationId: payloadClientMutationId,
     },
@@ -88,7 +89,7 @@ const resolveInsert = table => {
 
     // Return the first (and likely only) row.
     return {
-      [table.name]: row ? assign(row, { table }) : null,
+      output: row ? (row[$$rowTable] = table, row) : null,
       clientMutationId,
     }
   }

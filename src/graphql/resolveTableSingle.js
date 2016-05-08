@@ -1,5 +1,6 @@
 import { memoize, every } from 'lodash'
 import DataLoader from 'dataloader'
+import { $$rowTable } from '../symbols.js'
 
 /**
  * Creates a resolver for querying a single value.
@@ -74,7 +75,7 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
     if (!values) return null
     const row = await getDataLoader(client).load(values)
     if (!row) return row
-    row.table = table
+    row[$$rowTable] = table
     return row
   }
 }
