@@ -33,16 +33,21 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   const query = {
     name: `procedure_${procedure.name}`,
     text: returnTable ?
-      `select * from ${procedureCall}` :
+      `select row_to_json(${procedureCall}) as "output"` :
       `select ${procedureCall} as "output"`,
   }
 
-  // If this is a table type, the return value is the entire object.
-  const getOutput = row => (
-    returnTable ?
-      (row[$$rowTable] = returnTable, row) :
-      row.output
-  )
+  // Gets the output from a row returned by our query.
+  const getOutput = ({ output }) => {
+    if (!output) return null
+
+    // If we are returning a table, we need to make sure to add the row table
+    // identifier property to our output object.
+    if (returnTable)
+      output[$$rowTable] = returnTable
+
+    return output
+  }
 
   return async (source, args, { client }) => {
     const procedureArgs = getProcedureArgs(source, args)
@@ -56,9 +61,11 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
       values,
     })
 
-    return procedure.returnsSet ?
-      result.rows.map(getOutput) :
-      getOutput(result.rows[0])
+    // If the procedure returns a set, return all of the rows.
+    if (procedure.returnsSet)
+      return result.rows.map(getOutput)
+
+    return getOutput(result.rows[0])
   }
 }
 

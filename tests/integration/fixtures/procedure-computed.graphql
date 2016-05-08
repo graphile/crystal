@@ -4,6 +4,9 @@ query ProcedureComputed {
       givenName
       familyName
       fullName
+      latestPost {
+        headline
+      }
     }
   }
 }

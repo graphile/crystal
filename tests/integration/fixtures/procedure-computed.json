@@ -5,72 +5,94 @@
         {
           "givenName": "Kathryn",
           "familyName": "Ramirez",
-          "fullName": "Kathryn Ramirez"
+          "fullName": "Kathryn Ramirez",
+          "latestPost": {
+            "headline": "I hate yogurt. It’s just stuff with bits in."
+          }
         },
         {
           "givenName": "Johnny",
           "familyName": "Tucker",
-          "fullName": "Johnny Tucker"
+          "fullName": "Johnny Tucker",
+          "latestPost": {
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
+          }
         },
         {
           "givenName": "Nancy",
           "familyName": "Diaz",
-          "fullName": "Nancy Diaz"
+          "fullName": "Nancy Diaz",
+          "latestPost": {
+            "headline": "Stop talking, brain thinking. Hush."
+          }
         },
         {
           "givenName": "Russell",
           "familyName": "Gardner",
-          "fullName": "Russell Gardner"
+          "fullName": "Russell Gardner",
+          "latestPost": null
         },
         {
           "givenName": "Ann",
           "familyName": "West",
-          "fullName": "Ann West"
+          "fullName": "Ann West",
+          "latestPost": {
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!"
+          }
         },
         {
           "givenName": "Joe",
           "familyName": "Cruz",
-          "fullName": "Joe Cruz"
+          "fullName": "Joe Cruz",
+          "latestPost": null
         },
         {
           "givenName": "Scott",
           "familyName": "Torres",
-          "fullName": "Scott Torres"
+          "fullName": "Scott Torres",
+          "latestPost": null
         },
         {
           "givenName": "David",
           "familyName": "Bell",
-          "fullName": "David Bell"
+          "fullName": "David Bell",
+          "latestPost": null
         },
         {
           "givenName": "Carl",
           "familyName": "Ward",
-          "fullName": "Carl Ward"
+          "fullName": "Carl Ward",
+          "latestPost": null
         },
         {
           "givenName": "Jonathan",
           "familyName": "Campbell",
-          "fullName": "Jonathan Campbell"
+          "fullName": "Jonathan Campbell",
+          "latestPost": null
         },
         {
           "givenName": "Beverly",
           "familyName": "Kelly",
-          "fullName": "Beverly Kelly"
+          "fullName": "Beverly Kelly",
+          "latestPost": null
         },
         {
           "givenName": "Kelly",
           "familyName": "Reed",
-          "fullName": "Kelly Reed"
+          "fullName": "Kelly Reed",
+          "latestPost": null
         },
         {
           "givenName": "Nicholas",
           "familyName": "Perry",
-          "fullName": "Nicholas Perry"
+          "fullName": "Nicholas Perry",
+          "latestPost": null
         },
         {
           "givenName": "Carol",
           "familyName": "Taylor",
-          "fullName": "Carol Taylor"
+          "fullName": "Carol Taylor",
+          "latestPost": null
         }
       ]
     }
