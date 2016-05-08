@@ -1,0 +1,9 @@
+query ProcedureComputed {
+  personNodes {
+    nodes {
+      givenName
+      familyName
+      fullName
+    }
+  }
+}
