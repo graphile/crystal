@@ -100,15 +100,17 @@ set search_path from current;
 
 comment on function person_latest_post(person) is 'Get’s the latest post written by the person.';
 
--- Truncates the body with a given length and a given omission character.
+-- Truncates the body with a given length and a given omission character. The
+-- reason we don’t use defaults is because PostGraphQL will always send three
+-- parameters and if one parameter is null, the default won’t be used.
 create function post_summary(
   post,
-  length int default 50,
-  omission varchar default '…'
+  length int,
+  omission varchar
 ) returns text as $$
   select case
     when $1.body is null then null
-    else substring($1.body from 0 for $2) || omission
+    else substring($1.body from 0 for coalesce(length, 50)) || coalesce(omission, '…')
   end
 $$ language sql
 stable;

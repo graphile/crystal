@@ -9,4 +9,12 @@ query ProcedureComputed {
       }
     }
   }
+  post(id: "cG9zdDox") {
+    headline
+    body
+    a: summary
+    b: summary(length: 5)
+    c: summary(omission: " [...]")
+    d: summary(length: 5, omission: " [...]")
+  }
 }

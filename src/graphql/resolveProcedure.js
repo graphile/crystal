@@ -52,13 +52,11 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   return async (source, args, { client }) => {
     const procedureArgs = getProcedureArgs(source, args)
 
-    const values = argEntries.map(([name]) => procedureArgs[camelCase(name)])
-
     // Actuall run the procedure using our arguments.
     const result = await client.queryAsync({
       name: query.name,
       text: query.text,
-      values,
+      values: argEntries.map(([name]) => procedureArgs[camelCase(name)]),
     })
 
     // If the procedure returns a set, return all of the rows.
