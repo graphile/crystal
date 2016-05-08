@@ -115,9 +115,10 @@ stable;
 
 comment on function post_summary(post, int, varchar) is 'A truncated version of the body for summaries.';
 
--- A procedure to search all posts using a given search term.
+-- A procedure to search the headline and body of all posts using a given
+-- search term.
 create function search_posts(search varchar) returns setof post as $$
-  select * from post where body ilike ('%' || search || '%')
+  select * from post where headline ilike ('%' || search || '%') or body ilike ('%' || search || '%')
 $$ language sql
 stable
 set search_path from current;
