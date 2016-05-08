@@ -1,6 +1,6 @@
-import { camelCase, upperFirst, lowerFirst, memoize } from 'lodash'
-import { GraphQLObjectType, GraphQLList, GraphQLNonNull, GraphQLInputObjectType } from 'graphql'
-import getType from '../getType.js'
+import { camelCase, upperFirst, memoize } from 'lodash'
+import { GraphQLObjectType, GraphQLNonNull, GraphQLInputObjectType } from 'graphql'
+import createProcedureReturnType from '../createProcedureReturnType.js'
 import createProcedureArgs from '../createProcedureArgs.js'
 import resolveProcedure from '../resolveProcedure.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -38,10 +38,8 @@ const createInputType = procedure =>
     },
   })
 
-const createPayloadType = procedure => {
-  const returnType = getType(procedure.returnType)
-
-  return new GraphQLObjectType({
+const createPayloadType = procedure =>
+  new GraphQLObjectType({
     name: `${upperFirst(camelCase(procedure.name))}Payload`,
     description: `The payload returned by the ${procedure.getMarkdownFieldName()}`,
 
@@ -54,14 +52,13 @@ const createPayloadType = procedure => {
         // Get the GraphQL return type for the procedure’s return type. If the
         // procedure is to return a set, we need to reflect that in our GraphQL type
         // as well.
-        type: procedure.returnsSet ? new GraphQLList(returnType) : returnType,
+        type: createProcedureReturnType(procedure),
         description: `The actual value returned by ${procedure.getMarkdownFieldName()}`,
         resolve: ({ output }) => output,
       },
       clientMutationId: payloadClientMutationId,
     },
   })
-}
 
 const getResolveProcedure = memoize(procedure => resolveProcedure(
   procedure,

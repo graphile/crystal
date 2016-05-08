@@ -4,10 +4,23 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   const returnsTable = procedure.returnType.isTableType
   const argEntries = Array.from(procedure.args)
 
-  // Construct the procedure call. It is pretty long so having it on multiple
-  // lines is helpful.
+  // Construct the qualified procedure name.
   const procedureName = `"${procedure.schema.name}"."${procedure.name}"`
-  const procedureArgsList = argEntries.map((entry, i) => `$${i + 1}`).join(', ')
+
+  // Construct the argument list for the procedure call.
+  const procedureArgsList = argEntries.map(([name, type], i) => {
+    const placeholder = `$${i + 1}`
+
+    // If the type of this argument is a table type, we will be expecting JSON
+    // but we need that JSON to be a table. Therefore we run it through
+    // `json_populate_record`.
+    if (type.isTableType)
+      return `json_populate_record(null::"${type.table.schema.name}"."${type.table.name}", ${placeholder})`
+
+    return placeholder
+  }).join(', ')
+
+  // Add the procedure name with the procedure argument list.
   const procedureCall = `${procedureName}(${procedureArgsList})`
 
   // Construct the query.
@@ -31,11 +44,13 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   return async (source, args, { client }) => {
     const procedureArgs = getProcedureArgs(source, args)
 
+    const values = argEntries.map(([name]) => procedureArgs[camelCase(name)])
+
     // Actuall run the procedure using our arguments.
     const result = await client.queryAsync({
       name: query.name,
       text: query.text,
-      values: argEntries.map(([name]) => procedureArgs[camelCase(name)]),
+      values,
     })
 
     return procedure.returnsSet ?

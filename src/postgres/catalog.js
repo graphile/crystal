@@ -1,4 +1,4 @@
-import { once, camelCase, upperFirst } from 'lodash'
+import { once, camelCase, upperFirst, startsWith } from 'lodash'
 
 const replaceInsideUnderscores = (string, replacer) => {
   const [, start, substring, finish] = /^(_*)(.*?)(_*)$/.exec(string)
@@ -143,6 +143,17 @@ export class Table {
 
   getReverseForeignKeys = once(() => {
     return this.schema.catalog._foreignKeys.filter(({ foreignTable }) => foreignTable === this)
+  })
+
+  getComputedColumns = once(() => {
+    // Our computed columns will be any procedure where the first argument is
+    // a table type.
+    return Array.from(this.schema.catalog._procedures).map(entry => entry[1]).filter(procedure => {
+      const firstArgEntry = Array.from(procedure.args)[0]
+      if (!firstArgEntry) return false
+      const firstArgType = firstArgEntry[1]
+      return firstArgType && firstArgType.isTableType && firstArgType.table === this
+    })
   })
 
   getFieldName () {
@@ -300,7 +311,10 @@ export class Procedure {
     return Boolean(Array.from(this.args).find(([, type]) => type.isTableType))
   }
 
-  getFieldName () {
+  getFieldName (prefix) {
+    if (prefix && startsWith(this.name, `${prefix}_`))
+      return camelCaseInsideUnderscores(this.name.slice(prefix.length + 1))
+
     return camelCaseInsideUnderscores(this.name)
   }
 

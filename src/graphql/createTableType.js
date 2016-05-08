@@ -1,4 +1,4 @@
-import { memoize, fromPairs, camelCase } from 'lodash'
+import { memoize, fromPairs, camelCase, assign, omit } from 'lodash'
 import { GraphQLObjectType, GraphQLID } from 'graphql'
 import { NodeType, toID } from './types.js'
 import getColumnType from './getColumnType.js'
@@ -6,6 +6,9 @@ import resolveTableSingle from './resolveTableSingle.js'
 import createConnectionType from './createConnectionType.js'
 import createConnectionArgs from './createConnectionArgs.js'
 import resolveConnection from './resolveConnection.js'
+import createProcedureReturnType from './createProcedureReturnType.js'
+import createProcedureArgs from './createProcedureArgs.js'
+import resolveProcedure from './resolveProcedure.js'
 
 /**
  * Creates the `GraphQLObjectType` for a table.
@@ -58,9 +61,18 @@ const createTableType = memoize(table => {
           resolve: source => toID(table.name, primaryKeys.map(column => source[column.name])),
         },
       } : {}),
+      // Add the column fields.
       ...fromPairs(
         columns.map(column => [column.getFieldName(), createColumnField(column)])
       ),
+      // Add the computed column fields.
+      ...fromPairs(
+        table.getComputedColumns().map(procedure => [
+          procedure.getFieldName(table.name),
+          createProcedureField(procedure),
+        ])
+      ),
+      // Add foreign key field references.
       ...fromPairs(
         table.getForeignKeys().map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
@@ -68,6 +80,7 @@ const createTableType = memoize(table => {
           return [camelCase(name), createForeignKeyField(foreignKey)]
         })
       ),
+      // Add reverse foreign key field references.
       ...fromPairs(
         table.getReverseForeignKeys().map(foreignKey => {
           const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
@@ -81,25 +94,12 @@ const createTableType = memoize(table => {
 
 export default createTableType
 
-/**
- * Creates a field to be used with `GraphQLObjectType` from a column.
- *
- * @param {Column} column
- * @returns {GraphQLFieldConfig}
- */
 const createColumnField = column => ({
   type: getColumnType(column),
   description: column.description,
   resolve: source => source[column.name],
 })
 
-/**
- * Creates a field for use with a table type to select a single object
- * referenced by a foreign key.
- *
- * @param {ForeignKey} foreignKey
- * @returns {GraphQLFieldConfig}
- */
 const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createTableType(foreignTable),
   description:
@@ -113,13 +113,6 @@ const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, forei
   ),
 })
 
-/**
- * Creates a field to be used for selecting a foreign key in the reverse. This
- * will return a connection.
- *
- * @param {ForeignKey} foreignKey
- * @returns {GraphQLFieldConfig}
- */
 const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createConnectionType(nativeTable),
   description:
@@ -134,3 +127,23 @@ const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable
     source => fromPairs(foreignColumns.map(({ name }, i) => [nativeColumns[i].name, source[name]]))
   ),
 })
+
+const createProcedureField = procedure => {
+  const [tableArgName, tableArgType] = Array.from(procedure.args)[0]
+  return {
+    type: createProcedureReturnType(procedure),
+    description: procedure.description,
+
+    // Create the arguments and omit the table argument.
+    args: createProcedureArgs(
+      procedure,
+      (argName, argType) => argName === tableArgName && argType === tableArgType,
+    ),
+
+    // Resolve the procedure, using the source row as the argument we omit.
+    resolve: resolveProcedure(
+      procedure,
+      (source, args) => assign(args, { [camelCase(tableArgName)]: omit(source, 'table') }),
+    ),
+  }
+}
