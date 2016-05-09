@@ -17,17 +17,17 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
   if (columns.length === 0)
     throw new Error('To resolve a single row, some columns must be used.')
 
-  const queryTuple =
+  const primaryKeyMatch =
     `(${columns.map(column =>
       `"${column.table.schema.name}"."${column.table.name}"."${column.name}"`
-    ).join(', ')})`
+    ).join(' || \',\' || ')})`
 
   // We aren’t using the `sql` module here because the most efficient way to
   // run this query is with the `= any (…)` field. This feature is PostgreSQL
   // specific and can’t be done with `sql`.
   const query = {
     name: `${table.schema.name}_${table.name}_single`,
-    text: `select * from "${table.schema.name}"."${table.name}" where ${queryTuple} = any ($1)`,
+    text: `select * from "${table.schema.name}"."${table.name}" where ${primaryKeyMatch} = any ($1)`,
   }
 
   // Because we don’t want to run 30+ SQL queries to fetch single rows if we
@@ -47,7 +47,8 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
     const { rowCount, rows } = await client.queryAsync({
       name: query.name,
       text: query.text,
-      values: [columnValueses],
+      // We expect to pass an array of strings with concatenated values.
+      values: [columnValueses.map(columnValues => columnValues.join(','))],
     })
 
     // Gets the row from the result set given a few column values.
