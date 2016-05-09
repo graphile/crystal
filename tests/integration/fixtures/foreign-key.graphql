@@ -1,13 +1,17 @@
-{
-  postNodes {
+query ForeignKey {
+  relationNodes {
     nodes {
-      rowId
-      authorId
-      headline
-      author: personByAuthorId {
+      aThingId
+      bThingId
+      thingByAThingId {
+        id
         rowId
-        givenName
-        familyName
+        note
+      }
+      thingByBThingId {
+        id
+        rowId
+        note
       }
     }
   }

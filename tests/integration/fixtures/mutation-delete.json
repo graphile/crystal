@@ -1,0 +1,46 @@
+{
+  "data": {
+    "a": {
+      "clientMutationId": null,
+      "thing": {
+        "rowId": 1,
+        "note": "hello"
+      }
+    },
+    "b": {
+      "clientMutationId": null,
+      "thing": {
+        "rowId": 2,
+        "note": "world"
+      }
+    },
+    "c": {
+      "clientMutationId": null,
+      "thing": null
+    },
+    "d": {
+      "relation": {
+        "aThingId": 4,
+        "bThingId": 3
+      }
+    },
+    "e": {
+      "clientMutationId": "hello",
+      "thing": {
+        "rowId": 4,
+        "note": "bar"
+      }
+    },
+    "f": {
+      "clientMutationId": "yolo",
+      "thing": {
+        "rowId": 6,
+        "note": "bux"
+      }
+    },
+    "g": {
+      "clientMutationId": null,
+      "thing": null
+    }
+  }
+}

@@ -1,18 +1,140 @@
 {
   "data": {
-    "a": [],
-    "b": [
+    "a": 3,
+    "b": 7,
+    "c": {
+      "id": "dGhpbmc6MQ==",
+      "rowId": 1,
+      "note": "hello"
+    },
+    "d": 200,
+    "e": 418,
+    "f": [
       {
-        "id": "cG9zdDox",
-        "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
+        "id": "dGhpbmc6MQ==",
+        "rowId": 1,
+        "note": "hello"
+      },
+      {
+        "id": "dGhpbmc6Mw==",
+        "rowId": 3,
+        "note": "foo"
+      },
+      {
+        "id": "dGhpbmc6NQ==",
+        "rowId": 5,
+        "note": "baz"
+      },
+      {
+        "id": "dGhpbmc6Nw==",
+        "rowId": 7,
+        "note": "qux"
       }
     ],
-    "c": [
-      {
-        "id": "cG9zdDox",
-        "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
-      }
-    ],
-    "d": []
+    "g": {
+      "nodes": [
+        {
+          "id": "dGhpbmc6MQ==",
+          "rowId": 1,
+          "note": "hello",
+          "display": "1: hello!",
+          "add": 3,
+          "bThings": [
+            {
+              "id": "dGhpbmc6Mg==",
+              "rowId": 2,
+              "note": "world"
+            },
+            {
+              "id": "dGhpbmc6Mw==",
+              "rowId": 3,
+              "note": "foo"
+            },
+            {
+              "id": "dGhpbmc6Nw==",
+              "rowId": 7,
+              "note": "qux"
+            }
+          ]
+        },
+        {
+          "id": "dGhpbmc6Mg==",
+          "rowId": 2,
+          "note": "world",
+          "display": "2: world!",
+          "add": 3,
+          "bThings": [
+            {
+              "id": "dGhpbmc6Mw==",
+              "rowId": 3,
+              "note": "foo"
+            }
+          ]
+        },
+        {
+          "id": "dGhpbmc6Mw==",
+          "rowId": 3,
+          "note": "foo",
+          "display": "3: foo!",
+          "add": 3,
+          "bThings": [
+            {
+              "id": "dGhpbmc6NA==",
+              "rowId": 4,
+              "note": "bar"
+            },
+            {
+              "id": "dGhpbmc6NQ==",
+              "rowId": 5,
+              "note": "baz"
+            }
+          ]
+        },
+        {
+          "id": "dGhpbmc6NA==",
+          "rowId": 4,
+          "note": "bar",
+          "display": "4: bar!",
+          "add": 3,
+          "bThings": [
+            {
+              "id": "dGhpbmc6Mw==",
+              "rowId": 3,
+              "note": "foo"
+            }
+          ]
+        },
+        {
+          "id": "dGhpbmc6NQ==",
+          "rowId": 5,
+          "note": "baz",
+          "display": "5: baz!",
+          "add": 3,
+          "bThings": []
+        },
+        {
+          "id": "dGhpbmc6Ng==",
+          "rowId": 6,
+          "note": "bux",
+          "display": "6: bux!",
+          "add": 3,
+          "bThings": []
+        },
+        {
+          "id": "dGhpbmc6Nw==",
+          "rowId": 7,
+          "note": "qux",
+          "display": "7: qux!",
+          "add": 3,
+          "bThings": [
+            {
+              "id": "dGhpbmc6MQ==",
+              "rowId": 1,
+              "note": "hello"
+            }
+          ]
+        }
+      ]
+    }
   }
 }

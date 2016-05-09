@@ -85,7 +85,9 @@ create function c.types(a bigint, b boolean, c varchar) returns boolean as $$ se
 create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
 `
 
-describe('getCatalog', () => {
+describe('getCatalog', function testGetCatalog () {
+  this.timeout(5000)
+
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 

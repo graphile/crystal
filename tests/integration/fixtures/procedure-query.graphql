@@ -1,11 +1,22 @@
-query ProcedureQuery {
-  a: searchPosts { ...post }
-  b: searchPosts(search: "Lorem") { ...post }
-  c: searchPosts(search: "adIpiscing") { ...post }
-  d: searchPosts(search: "x") { ...post }
+query Procedure {
+  a: add(a: 1, b: 2)
+  b: add(a: 3, b: 4)
+  c: firstThing { ...thing }
+  d: httpStatusCode(status: OK)
+  e: httpStatusCode(status: IM_A_TEAPOT)
+  f: oddThings { ...thing }
+  g: thingNodes {
+    nodes {
+      ...thing
+      display
+      add(a: 1, b: 2)
+      bThings { ...thing }
+    }
+  }
 }
 
-fragment post on Post {
+fragment thing on Thing {
   id
-  headline
+  rowId
+  note
 }

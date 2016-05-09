@@ -1,195 +1,157 @@
 {
   "data": {
-    "personNodes": {
+    "thingNodes": {
       "nodes": [
         {
+          "id": "dGhpbmc6MQ==",
           "rowId": 1,
-          "givenName": "Kathryn",
-          "familyName": "Ramirez",
-          "postNodesByAuthorId": {
-            "totalCount": 4,
+          "note": "hello",
+          "relationNodesByAThingId": {
             "nodes": [
               {
-                "rowId": 2,
-                "headline": "I hate yogurt. It’s just stuff with bits in.",
-                "authorId": 1
+                "aThingId": 1,
+                "bThingId": 2
               },
               {
-                "rowId": 3,
-                "headline": "Is that a cooking show?",
-                "authorId": 1
+                "aThingId": 1,
+                "bThingId": 3
               },
               {
-                "rowId": 4,
-                "headline": "You hit me with a cricket bat.",
-                "authorId": 1
-              },
+                "aThingId": 1,
+                "bThingId": 7
+              }
+            ]
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
               {
-                "rowId": 7,
-                "headline": "Large bet on myself in round one.",
-                "authorId": 1
+                "aThingId": 7,
+                "bThingId": 1
               }
             ]
           }
         },
         {
+          "id": "dGhpbmc6Mg==",
           "rowId": 2,
-          "givenName": "Johnny",
-          "familyName": "Tucker",
-          "postNodesByAuthorId": {
-            "totalCount": 3,
+          "note": "world",
+          "relationNodesByAThingId": {
             "nodes": [
               {
-                "rowId": 1,
-                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
-                "authorId": 2
-              },
+                "aThingId": 2,
+                "bThingId": 3
+              }
+            ]
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
               {
-                "rowId": 8,
-                "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
-                "authorId": 2
-              },
-              {
-                "rowId": 10,
-                "headline": "What’s with you kids? Every other day it’s food, food, food.",
-                "authorId": 2
+                "aThingId": 1,
+                "bThingId": 2
               }
             ]
           }
         },
         {
+          "id": "dGhpbmc6Mw==",
           "rowId": 3,
-          "givenName": "Nancy",
-          "familyName": "Diaz",
-          "postNodesByAuthorId": {
-            "totalCount": 3,
+          "note": "foo",
+          "relationNodesByAThingId": {
             "nodes": [
               {
-                "rowId": 6,
-                "headline": "Stop talking, brain thinking. Hush.",
-                "authorId": 3
+                "aThingId": 3,
+                "bThingId": 4
               },
               {
-                "rowId": 9,
-                "headline": "You know how I sometimes have really brilliant ideas?",
-                "authorId": 3
+                "aThingId": 3,
+                "bThingId": 5
+              }
+            ]
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
+              {
+                "aThingId": 1,
+                "bThingId": 3
               },
               {
-                "rowId": 11,
-                "headline": "They’re not aliens, they’re Earth…liens!",
-                "authorId": 3
+                "aThingId": 2,
+                "bThingId": 3
+              },
+              {
+                "aThingId": 4,
+                "bThingId": 3
               }
             ]
           }
         },
         {
+          "id": "dGhpbmc6NA==",
           "rowId": 4,
-          "givenName": "Russell",
-          "familyName": "Gardner",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 5,
-          "givenName": "Ann",
-          "familyName": "West",
-          "postNodesByAuthorId": {
-            "totalCount": 2,
+          "note": "bar",
+          "relationNodesByAThingId": {
             "nodes": [
               {
-                "rowId": 5,
-                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
-                "authorId": 5
-              },
+                "aThingId": 4,
+                "bThingId": 3
+              }
+            ]
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
               {
-                "rowId": 12,
-                "headline": "You’ve swallowed a planet!",
-                "authorId": 5
+                "aThingId": 3,
+                "bThingId": 4
               }
             ]
           }
         },
         {
+          "id": "dGhpbmc6NQ==",
+          "rowId": 5,
+          "note": "baz",
+          "relationNodesByAThingId": {
+            "nodes": []
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
+              {
+                "aThingId": 3,
+                "bThingId": 5
+              }
+            ]
+          }
+        },
+        {
+          "id": "dGhpbmc6Ng==",
           "rowId": 6,
-          "givenName": "Joe",
-          "familyName": "Cruz",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
+          "note": "bux",
+          "relationNodesByAThingId": {
+            "nodes": []
+          },
+          "relationNodesByBThingId": {
             "nodes": []
           }
         },
         {
+          "id": "dGhpbmc6Nw==",
           "rowId": 7,
-          "givenName": "Scott",
-          "familyName": "Torres",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 8,
-          "givenName": "David",
-          "familyName": "Bell",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 9,
-          "givenName": "Carl",
-          "familyName": "Ward",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 10,
-          "givenName": "Jonathan",
-          "familyName": "Campbell",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 11,
-          "givenName": "Beverly",
-          "familyName": "Kelly",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 12,
-          "givenName": "Kelly",
-          "familyName": "Reed",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 13,
-          "givenName": "Nicholas",
-          "familyName": "Perry",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
-          }
-        },
-        {
-          "rowId": 14,
-          "givenName": "Carol",
-          "familyName": "Taylor",
-          "postNodesByAuthorId": {
-            "totalCount": 0,
-            "nodes": []
+          "note": "qux",
+          "relationNodesByAThingId": {
+            "nodes": [
+              {
+                "aThingId": 7,
+                "bThingId": 1
+              }
+            ]
+          },
+          "relationNodesByBThingId": {
+            "nodes": [
+              {
+                "aThingId": 1,
+                "bThingId": 7
+              }
+            ]
           }
         }
       ]

@@ -1,15 +1,14 @@
 {
   "data": {
-    "person": {
-      "__typename": "Person",
-      "id": "cGVyc29uOjI=",
-      "givenName": "Johnny",
-      "familyName": "Tucker"
+    "thing": {
+      "id": "dGhpbmc6MQ==",
+      "rowId": 1,
+      "note": "hello"
     },
-    "post": {
-      "__typename": "Post",
-      "id": "cG9zdDo0",
-      "headline": "You hit me with a cricket bat."
+    "relation": {
+      "id": "cmVsYXRpb246NCwz",
+      "aThingId": 4,
+      "bThingId": 3
     }
   }
 }

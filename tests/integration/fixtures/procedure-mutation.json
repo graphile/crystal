@@ -3,19 +3,31 @@
     "a": {
       "clientMutationId": null,
       "output": {
-        "id": "cGVyc29uOjE1",
-        "rowId": 15,
-        "givenName": "Caleb",
-        "familyName": "Meredith"
+        "thingByAThingId": {
+          "id": "dGhpbmc6OQ==",
+          "rowId": 9,
+          "note": "a"
+        },
+        "thingByBThingId": {
+          "id": "dGhpbmc6MTA=",
+          "rowId": 10,
+          "note": "b"
+        }
       }
     },
     "b": {
-      "clientMutationId": "56",
+      "clientMutationId": "12345",
       "output": {
-        "id": "cGVyc29uOjE2",
-        "rowId": 16,
-        "givenName": "Caleb",
-        "familyName": "Meredith"
+        "thingByAThingId": {
+          "id": "dGhpbmc6MTE=",
+          "rowId": 11,
+          "note": "a"
+        },
+        "thingByBThingId": {
+          "id": "dGhpbmc6MTI=",
+          "rowId": 12,
+          "note": "b"
+        }
       }
     }
   }

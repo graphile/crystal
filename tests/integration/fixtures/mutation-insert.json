@@ -1,0 +1,37 @@
+{
+  "data": {
+    "a": {
+      "clientMutationId": null,
+      "thing": {
+        "id": "dGhpbmc6OA==",
+        "rowId": 8,
+        "note": "a"
+      }
+    },
+    "b": {
+      "clientMutationId": "hello",
+      "thing": {
+        "id": "dGhpbmc6OQ==",
+        "rowId": 9,
+        "note": "b"
+      }
+    },
+    "c": {
+      "clientMutationId": null,
+      "relation": {
+        "aThingId": 8,
+        "bThingId": 9,
+        "thingByAThingId": {
+          "id": "dGhpbmc6OA==",
+          "rowId": 8,
+          "note": "a"
+        },
+        "thingByBThingId": {
+          "id": "dGhpbmc6OQ==",
+          "rowId": 9,
+          "note": "b"
+        }
+      }
+    }
+  }
+}
