@@ -1,4 +1,4 @@
-const placeholderRE = /\$(\d+)/g
+const placeholderRE = /\$(\d*)/g
 
 class SQLBuilder {
   _placeholder = 1
