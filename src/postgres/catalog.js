@@ -156,17 +156,21 @@ export class Table {
     })
   })
 
-  getFieldName () {
+  getIdentifier = once(() => {
+    return `"${this.schema.name}"."${this.name}"`
+  })
+
+  getFieldName = once(() => {
     return camelCaseInsideUnderscores(this.name)
-  }
+  })
 
-  getTypeName () {
+  getTypeName = once(() => {
     return pascalCaseInsideUnderscores(this.name)
-  }
+  })
 
-  getMarkdownTypeName () {
+  getMarkdownTypeName = once(() => {
     return `\`${this.getTypeName()}\``
-  }
+  })
 }
 
 /**
@@ -202,15 +206,19 @@ export class Column {
     this.hasDefault = hasDefault
   }
 
-  getFieldName () {
+  getIdentifier = once(() => {
+    return `${this.table.getIdentifier()}."${this.name}"`
+  })
+
+  getFieldName = once(() => {
     // There is a conflict with the `Node` interface. Therefore we need to alias `rowId`.
     if (this.name === 'id') return 'rowId'
     return camelCaseInsideUnderscores(this.name)
-  }
+  })
 
-  getMarkdownFieldName () {
+  getMarkdownFieldName = once(() => {
     return `\`${this.getFieldName()}\``
-  }
+  })
 }
 
 /**

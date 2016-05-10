@@ -1,6 +1,6 @@
 import { fromPairs, upperFirst } from 'lodash'
 import { $$rowTable } from '../../symbols.js'
-import getTableSql from '../../getTableSql.js'
+import SQLBuilder from '../../SQLBuilder.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -76,7 +76,6 @@ const createPayloadType = table =>
 const resolveUpdate = table => {
   // We use our SQL builder here instead of a prepared statement/data loader
   // solution because this query can get super dynamic.
-  const tableSql = getTableSql(table)
   const columns = table.getColumns()
   const primaryKeys = table.getPrimaryKeys()
 
@@ -84,20 +83,32 @@ const resolveUpdate = table => {
     const { input } = args
     const { clientMutationId } = input
 
+    const setClauses = []
+    const setValues = []
+    const whereClauses = []
+    const whereValues = []
+
+    for (const column of columns) {
+      const value = input[`new${upperFirst(column.getFieldName())}`]
+      if (!value) continue
+      setClauses.push(`"${column.name}" = $`)
+      setValues.push(value)
+    }
+
+    for (const column of primaryKeys) {
+      const value = input[column.getFieldName()]
+      whereClauses.push(`${column.getIdentifier()} = $`)
+      whereValues.push(value)
+    }
+
     const { rows: [row] } = await client.queryAsync(
-      tableSql
-      .update(fromPairs(
-        columns
-        .map(column => [column.name, input[`new${upperFirst(column.getFieldName())}`]])
-        .filter(([, value]) => value)
-      ))
-      .where(fromPairs(
-        primaryKeys
-        .map(column => [column.name, input[column.getFieldName()]])
-        .filter(([, value]) => value)
-      ))
-      .returning(tableSql.star())
-      .toQuery()
+      new SQLBuilder()
+      .add(`update ${table.getIdentifier()}`)
+      .add('set')
+      .add(setClauses.join(', '), setValues)
+      .add('where')
+      .add(whereClauses.join(' and '), whereValues)
+      .add('returning *')
     )
 
     return {

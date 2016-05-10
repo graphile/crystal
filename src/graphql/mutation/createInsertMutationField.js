@@ -1,6 +1,6 @@
-import { fromPairs, identity } from 'lodash'
+import { fromPairs, identity, constant } from 'lodash'
 import { $$rowTable } from '../../symbols.js'
-import getTableSql from '../../getTableSql.js'
+import SQLBuilder from '../../SQLBuilder.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -69,22 +69,26 @@ const resolveInsert = table => {
   //
   // A better solution for batch inserts is a custom batch insert field.
   const columns = table.getColumns()
-  const tableSql = getTableSql(table)
 
   return async (source, args, { client }) => {
     // Get the input object value from the args.
     const { input } = args
     const { clientMutationId } = input
+
+    const valueEntries = (
+      columns
+      .map(column => [column, input[column.getFieldName()]])
+      .filter(([, value]) => value)
+    )
+
     // Insert the thing making sure we return the newly inserted row.
     const { rows: [row] } = await client.queryAsync(
-      tableSql
-      .insert(fromPairs(
-        columns
-        .map(column => [column.name, input[column.getFieldName()]])
-        .filter(([, value]) => value)
-      ))
-      .returning(tableSql.star())
-      .toQuery()
+      new SQLBuilder()
+      .add(`insert into ${table.getIdentifier()}`)
+      .add(`(${valueEntries.map(([column]) => `"${column.name}"`).join(', ')})`)
+      .add('values')
+      .add(`(${valueEntries.map(constant('$')).join(', ')})`, valueEntries.map(([, value]) => value))
+      .add('returning *')
     )
 
     // Return the first (and likely only) row.
