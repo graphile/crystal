@@ -13,6 +13,7 @@ query Procedure {
       bThings { ...thing }
     }
   }
+  h: notes
 }
 
 fragment thing on Thing {

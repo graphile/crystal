@@ -1,3 +1,4 @@
 {
-  "presets": ["modern-node/4.0"]
+  "presets": ["modern-node/4.0"],
+  "sourceMaps": true
 }

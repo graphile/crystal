@@ -66,6 +66,12 @@ $$ language sql
 stable
 set search_path from current;
 
+create function notes() returns setof text as $$
+  select note from thing
+$$ language sql
+stable
+set search_path from current;
+
 create function thing_add(thing, a int, b int) returns int as $$
   select a + b
 $$ language sql
