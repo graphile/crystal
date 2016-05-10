@@ -5,6 +5,7 @@ import SQLBuilder from '../SQLBuilder.js'
 const resolveConnection = (
   table,
   getExtraConditions = constant({}),
+  getFromClause = constant(table.getIdentifier()),
 ) => {
   const columns = table.getColumns()
 
@@ -24,7 +25,9 @@ const resolveConnection = (
 
     // Get the column we are ordering by.
     const orderBy = columns.find(({ name }) => orderByName === name)
+    const fromClause = getFromClause(source, args)
 
+    // Get the cursor value for a row using the `orderBy` column.
     const getRowCursorValue = row => row[orderBy.name] || ''
 
     // Transforms object keys (which are field names) into column names.
@@ -50,12 +53,12 @@ const resolveConnection = (
 
     const getRows = once(async () => {
       // Start our query.
-      const sql = new SQLBuilder().add(`select * from ${table.getIdentifier()} where`)
+      const sql = new SQLBuilder().add('select * from').add(fromClause).add('where')
 
       // Add the conditions for `after` and `before` which will narrow our
       // range.
-      if (before) sql.add(`${orderBy.getIdentifier()} < $1 and`, [before])
-      if (after) sql.add(`${orderBy.getIdentifier()} > $1 and`, [after])
+      if (before) sql.add(`"${orderBy.name}" < $1 and`, [before])
+      if (after) sql.add(`"${orderBy.name}" > $1 and`, [after])
 
       // Add the conditions…
       sql.add(getWhereClause())
@@ -64,7 +67,7 @@ const resolveConnection = (
       // If a `last` argument was defined we are querying from the bottom so we
       // need to flip our order.
       const actuallyDescending = last ? !descending : descending
-      sql.add(`order by ${orderBy.getIdentifier()} ${actuallyDescending ? 'desc' : 'asc'}`)
+      sql.add(`order by "${orderBy.name}" ${actuallyDescending ? 'desc' : 'asc'}`)
 
       // Set the correct range.
       if (first) sql.add('limit $1', [first])
@@ -114,8 +117,9 @@ const resolveConnection = (
                 // Try to find one row with a greater cursor. If one exists
                 // we know there is a next page.
                 new SQLBuilder()
-                .add(`select null from ${table.getIdentifier()}`)
-                .add(`where ${orderBy.getIdentifier()} ${descending ? '<' : '>'} $1 and`, [endCursor])
+                .add('select null from')
+                .add(fromClause)
+                .add(`where "${orderBy.name}" ${descending ? '<' : '>'} $1 and`, [endCursor])
                 .add(getWhereClause())
                 .add('limit 1')
               )
@@ -136,8 +140,9 @@ const resolveConnection = (
                 // Try to find one row with a lesser cursor. If one exists
                 // we know there is a previous page.
                 new SQLBuilder()
-                .add(`select null from ${table.getIdentifier()}`)
-                .add(`where ${orderBy.getIdentifier()} ${descending ? '>' : '<'} $1 and`, [startCursor])
+                .add('select null from')
+                .add(fromClause)
+                .add(`where "${orderBy.name}" ${descending ? '>' : '<'} $1 and`, [startCursor])
                 .add(getWhereClause())
                 .add('limit 1')
               )
@@ -165,7 +170,9 @@ const resolveConnection = (
         return (
           client.queryAsync(
             new SQLBuilder()
-            .add(`select count(*) as count from ${table.getIdentifier()} where`)
+            .add('select count(*) as count from')
+            .add(fromClause)
+            .add('where')
             .add(getWhereClause())
           )
           .then(({ rows: [{ count }] }) => parseInt(count, 10))

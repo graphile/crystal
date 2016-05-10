@@ -53,12 +53,19 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   ...fromPairs(
     table
     .getColumns()
-    .filter(column => !includes(ignoreColumnConditions, column))
+    // If `ignoreColumnConditions` is set to true, all column conditions will
+    // be disabled. If `ignoreColumnConditions` is an array, only certain
+    // conditions will be ignored.
+    .filter(column => (ignoreColumnConditions === true ? false : !includes(ignoreColumnConditions, column)))
     .map(column => [column.getFieldName(), {
       type: getType(column.type),
       description:
         'Filters the resulting set with an equality test on the ' +
         `${column.getMarkdownFieldName()} field.`,
+      // TODO: Deprecate this…
+      // deprecationReason:
+      //   'Simple equality testing is insufficient for the nodes field and just ' +
+      //   'adds noise. Instead use procedures for custom set filtering.',
     }])
   ),
 })

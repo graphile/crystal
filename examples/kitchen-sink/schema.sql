@@ -49,8 +49,8 @@ $$ language sql
 stable
 strict;
 
-create function odd_things() returns setof thing as $$
-  select * from thing where id % 2 = 1
+create function things_modulo(modulo int, remainder int) returns setof thing as $$
+  select * from thing where id % coalesce(modulo, 2) = coalesce(remainder, 1)
 $$ language sql
 stable
 set search_path from current;

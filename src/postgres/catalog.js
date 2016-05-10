@@ -319,6 +319,10 @@ export class Procedure {
     return Boolean(Array.from(this.args).find(([, type]) => type.isTableType))
   }
 
+  getReturnTable () {
+    return this.returnType.isTableType && this.returnType.table
+  }
+
   getFieldName (prefix) {
     if (prefix && startsWith(this.name, `${prefix}_`))
       return camelCaseInsideUnderscores(this.name.slice(prefix.length + 1))

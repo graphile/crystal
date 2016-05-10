@@ -4,20 +4,60 @@ query Procedure {
   c: firstThing { ...thing }
   d: httpStatusCode(status: OK)
   e: httpStatusCode(status: IM_A_TEAPOT)
-  f: oddThings { ...thing }
-  g: thingNodes {
+  f: thingNodes {
     nodes {
       ...thing
       display
       add(a: 1, b: 2)
-      bThings { ...thing }
+      bThings(first: 1) {
+        totalCount
+        edges {
+          cursor
+          node { ...thing }
+        }
+      }
     }
   }
-  h: notes
+  g: notes
+  h: thingsModulo {
+    nodes {
+      ...thing
+    }
+    edges {
+      cursor
+      node {
+        ...thing
+      }
+    }
+  }
+  i: thingsModulo(remainder: 0) {
+    nodes {
+      ...thing
+    }
+  }
+  j: thingsModulo(first: 2) {
+		pageInfo { ...pageInfo }
+    nodes {
+      ...thing
+    }
+  }
+  k: thingsModulo(after: "MQ==", before: "Nw==") {
+		pageInfo { ...pageInfo }
+    nodes {
+      ...thing
+    }
+  }
 }
 
 fragment thing on Thing {
   id
   rowId
   note
+}
+
+fragment pageInfo on PageInfo {
+  hasNextPage
+  hasPreviousPage
+  startCursor
+  endCursor
 }

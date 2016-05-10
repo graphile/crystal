@@ -1,4 +1,4 @@
-import { memoize, fromPairs, camelCase, assign } from 'lodash'
+import { memoize, fromPairs, camelCase, constant, assign } from 'lodash'
 import { GraphQLObjectType, GraphQLID } from 'graphql'
 import { $$rowTable } from '../symbols.js'
 import { NodeType, toID } from './types.js'
@@ -10,6 +10,7 @@ import resolveConnection from './resolveConnection.js'
 import createProcedureReturnType from './createProcedureReturnType.js'
 import createProcedureArgs from './createProcedureArgs.js'
 import resolveProcedure from './resolveProcedure.js'
+import createProcedureCall from './createProcedureCall.js'
 
 /**
  * Creates the `GraphQLObjectType` for a table.
@@ -23,12 +24,6 @@ import resolveProcedure from './resolveProcedure.js'
  * @param {Table} table
  * @returns {GraphQLObjectType}
  */
-// TODO: Reverse foreign keys, and computed columns each run a seperate
-// query for each table type causing an O(n + 1) scenario. This could be
-// improved, but it requires some real SQL dark magicks… ideas welcome!
-//
-// Foreign keys (not reverse foreign keys) are optimized using dataloader (see
-// `resolveTableSingle`).
 const createTableType = memoize(table => {
   const columns = table.getColumns()
 
@@ -136,16 +131,48 @@ const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable
 })
 
 const createProcedureField = procedure => {
-  const [tableArgName, tableArgType] = Array.from(procedure.args)[0]
+  const [tableArg, ...argEntries] = Array.from(procedure.args)
+  const [tableArgName, tableArgType] = tableArg
+  const returnTable = procedure.getReturnTable()
+
+  const procedureArgs = createProcedureArgs(
+    procedure,
+    (argName, argType) => argName === tableArgName && argType === tableArgType,
+  )
+
+  // If this is a connection, return a completely different field…
+  if (procedure.returnsSet && returnTable) {
+    return {
+      type: createConnectionType(returnTable),
+      description: procedure.description,
+
+      args: {
+        // Add the arguments for the procedure…
+        ...procedureArgs,
+        // Add the arguments for connections…
+        ...createConnectionArgs(returnTable, true),
+      },
+
+      // Resolve the connection.
+      resolve: resolveConnection(
+        returnTable,
+        constant({}),
+        (source, args) => ({
+          // Use the text from the procedure call.
+          text: createProcedureCall(procedure),
+          // Use values from argument entries and the table source value.
+          values: [source, ...argEntries.map(([name]) => args[camelCase(name)])],
+        }),
+      ),
+    }
+  }
+
   return {
     type: createProcedureReturnType(procedure),
     description: procedure.description,
 
     // Create the arguments and omit the table argument.
-    args: createProcedureArgs(
-      procedure,
-      (argName, argType) => argName === tableArgName && argType === tableArgType,
-    ),
+    args: procedureArgs,
 
     // Resolve the procedure, using the source row as the argument we omit.
     resolve: resolveProcedure(
