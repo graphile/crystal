@@ -1,19 +1,47 @@
-import { constant, assign, once, camelCase } from 'lodash'
+import { constant, assign, once, camelCase, isEmpty } from 'lodash'
 import { $$rowTable } from '../symbols.js'
 import SQLBuilder from '../SQLBuilder.js'
 
+let warnedExtraConditionDeprecation = false
+
 const resolveConnection = (
   table,
-  getExtraConditions = constant({}),
+  getConditions = constant({}),
   getFromClause = constant(table.getIdentifier()),
 ) => {
   const columns = table.getColumns()
 
   return (source, args, { client }) => {
+    // DEPRECATED: ...conditions
     const { orderBy: orderByName, first, last, after, before, offset, descending, ...conditions } = args
 
+    if (!warnedExtraConditionDeprecation && !isEmpty(conditions)) {
+      console.error([ // eslint-disable-line no-console
+        '',
+
+        'Using columns for equality filtering in nodes fields has been ' +
+        'deprecated. Queries like `postNodes(topic: HELP)` will not be ' +
+        'supported in the next version of PostGraphQL.',
+
+        'Instead use a procedure to specify exactly the query you want to run ' +
+        'on your data. This method is more expressive, flexible, and extensible ' +
+        'hence why this method is deprecated.',
+
+        'In the future, this functionality may be re-added in a different form ' +
+        'which allows more complex queries which include operators outside of ' +
+        'a simple equality test.',
+
+        'For more information on advanced queries, refer to our documentation here: ' +
+        'https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md',
+
+        '',
+      ].join('\n'))
+
+      warnedExtraConditionDeprecation = true
+    }
+
     // Add extra conditions to the leftover `conditions` argument.
-    assign(conditions, getExtraConditions(source, args))
+    assign(conditions, getConditions(source, args))
 
     // Throw an error if `orderBy` is not defined.
     if (!orderByName)
@@ -38,6 +66,7 @@ const resolveConnection = (
       for (const fieldName in conditions) {
         // Find the column for the field name and if there is no column, skip
         // this field.
+        // DEPRECATED: remove `camelCase` because we removed ...conditions
         const column = columns.find(c => c.getFieldName() === camelCase(fieldName))
         if (!column) continue
 

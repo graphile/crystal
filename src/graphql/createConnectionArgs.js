@@ -50,6 +50,7 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
       'items will be in ascending order. `false` by default.',
     defaultValue: false,
   },
+  // DEPRECATED: Remove this entirely
   ...fromPairs(
     table
     .getColumns()
@@ -62,10 +63,6 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
       description:
         'Filters the resulting set with an equality test on the ' +
         `${column.getMarkdownFieldName()} field.`,
-      // TODO: Deprecate this…
-      // deprecationReason:
-      //   'Simple equality testing is insufficient for the nodes field and just ' +
-      //   'adds noise. Instead use procedures for custom set filtering.',
     }])
   ),
 })
