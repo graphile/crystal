@@ -1,6 +1,6 @@
 import { GraphQLObjectType } from 'graphql'
+import createViewerField from '../createViewerField.js'
 import createQueryFields from './createQueryFields.js'
-import createViewerField from './createViewerField.js'
 
 /**
  * Creates the Query type for the entire schema. To see the fields created for

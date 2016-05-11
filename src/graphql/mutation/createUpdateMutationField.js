@@ -3,7 +3,9 @@ import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
-import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
+import getPayloadInterface from './getPayloadInterface.js'
+import getPayloadFields from './getPayloadFields.js'
+import { inputClientMutationId } from './clientMutationId.js'
 
 import {
   GraphQLNonNull,
@@ -63,13 +65,14 @@ const createPayloadType = table =>
   new GraphQLObjectType({
     name: `Update${table.getTypeName()}Payload`,
     description: `Contains the ${table.getMarkdownTypeName()} node updated by the mutation.`,
+    interfaces: [getPayloadInterface(table.schema)],
     fields: {
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The updated ${table.getMarkdownTypeName()}.`,
         resolve: source => source.output,
       },
-      clientMutationId: payloadClientMutationId,
+      ...getPayloadFields(table.schema),
     },
   })
 

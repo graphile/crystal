@@ -1,6 +1,6 @@
 import { memoize } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull } from 'graphql'
-import createQueryFields from './createQueryFields.js'
+import createQueryFields from './query/createQueryFields.js'
 
 const createViewerField = memoize(schema => ({
   type: new GraphQLNonNull(new GraphQLObjectType({

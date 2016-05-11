@@ -3,7 +3,9 @@ import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
 import getType from '../getType.js'
 import createTableType from '../createTableType.js'
-import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
+import getPayloadInterface from './getPayloadInterface.js'
+import getPayloadFields from './getPayloadFields.js'
+import { inputClientMutationId } from './clientMutationId.js'
 
 import {
   GraphQLNonNull,
@@ -53,13 +55,14 @@ const createPayloadType = table =>
   new GraphQLObjectType({
     name: `Delete${table.getTypeName()}Payload`,
     description: `Contains the ${table.getMarkdownTypeName()} node deleted by the mutation.`,
+    interfaces: [getPayloadInterface(table.schema)],
     fields: {
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The deleted ${table.getMarkdownTypeName()}.`,
         resolve: source => source.output,
       },
-      clientMutationId: payloadClientMutationId,
+      ...getPayloadFields(table.schema),
     },
   })
 
