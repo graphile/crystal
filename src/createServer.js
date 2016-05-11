@@ -1,24 +1,23 @@
-import assert from 'assert'
 import path from 'path'
-import http from 'http'
 import { forEach } from 'lodash'
 import Express from 'express'
 import onFinished from 'on-finished'
 import logger from 'morgan'
 import favicon from 'serve-favicon'
+import finalHandler from 'finalhandler'
 import jwt from 'jsonwebtoken'
 import pg from 'pg'
-import { GraphQLSchema, formatError } from 'graphql'
+import { formatError } from 'graphql'
 import graphqlHTTP from 'express-graphql'
 
 /**
  * Creates an HTTP server with the provided configuration.
  *
- * @param {Object} config
- * @param {GraphQLSchema} config.graphqlSchema
- * @param {Object} config.pgConfig
- * @param {string} config.route
- * @param {boolean} config.development
+ * @param {Object} options
+ * @param {GraphQLSchema} options.graphqlSchema
+ * @param {Object} options.pgConfig
+ * @param {string} options.route
+ * @param {boolean} options.development
  * @returns {Server}
  */
 const createServer = ({
@@ -29,9 +28,6 @@ const createServer = ({
   development = true,
   log = true,
 }) => {
-  assert(graphqlSchema instanceof GraphQLSchema, 'Must be an instance of GraphQL schema must be defined')
-  assert(pgConfig, 'A PostgreSQL config must be defined')
-
   const server = new Express()
 
   if (log) server.use(logger(development ? 'dev' : 'common'))
@@ -63,7 +59,8 @@ const createServer = ({
     })
 
     return {
-      schema: graphqlSchema,
+      // Await the `graphqlSchema` because it may be a promise.
+      schema: await graphqlSchema,
       context: { client },
       pretty: development,
       graphiql: development,
@@ -71,7 +68,8 @@ const createServer = ({
     }
   }))
 
-  return http.createServer(server)
+  // If next is not defined, use the `finalHandler`.
+  return (req, res, next) => server(req, res, next || finalHandler(req, res))
 }
 
 export default createServer
