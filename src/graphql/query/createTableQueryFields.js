@@ -1,5 +1,5 @@
 import createSingleQueryField from './createSingleQueryField.js'
-import createListQueryField from './createListQueryField.js'
+import createNodesQueryField from './createNodesQueryField.js'
 
 /**
  * Creates the fields for a single table in the database. To see the type these
@@ -9,11 +9,11 @@ import createListQueryField from './createListQueryField.js'
  * @param {Table} table
  * @returns {GraphQLFieldConfig}
  */
-const createQueryFields = table => {
+const createTableQueryFields = table => {
   const fields = {}
 
   const singleField = createSingleQueryField(table)
-  const listField = createListQueryField(table)
+  const listField = createNodesQueryField(table)
 
   // `createSingleQueryField` and others may return `null`, so we must check
   // for that.
@@ -23,4 +23,4 @@ const createQueryFields = table => {
   return fields
 }
 
-export default createQueryFields
+export default createTableQueryFields

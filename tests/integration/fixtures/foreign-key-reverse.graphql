@@ -1,15 +1,19 @@
-{
-  personNodes {
+query ForeignKeyReverse {
+  thingNodes {
     nodes {
+      id
       rowId
-      givenName
-      familyName
-      postNodesByAuthorId {
-        totalCount
+      note
+      relationNodesByAThingId {
         nodes {
-          rowId
-          headline
-          authorId
+          aThingId
+          bThingId
+        }
+      }
+      relationNodesByBThingId {
+        nodes {
+          aThingId
+          bThingId
         }
       }
     }

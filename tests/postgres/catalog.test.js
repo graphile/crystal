@@ -1,5 +1,5 @@
 import expect from 'expect'
-import { Table, Column } from '#/postgres/catalog.js'
+import { Table, Column, Procedure } from '#/postgres/catalog.js'
 
 describe('catalog', () => {
   describe('Table', () => {
@@ -39,6 +39,20 @@ describe('catalog', () => {
 
     it('will maintain privacy underscores in field name', () => {
       expect(new Column({ name: '__hello_world__' }).getFieldName()).toEqual('__helloWorld__')
+    })
+  })
+
+  describe('Procedure', () => {
+    it('will correctly camel case the field name', () => {
+      expect(new Procedure({ name: 'hello_world' }).getFieldName()).toEqual('helloWorld')
+    })
+
+    it('will remove prefixes in camel case field names', () => {
+      expect(new Procedure({ name: 'hello_world' }).getFieldName('hello')).toEqual('world')
+    })
+
+    it('will not remove prefixes that do not exist', () => {
+      expect(new Procedure({ name: 'hello_world' }).getFieldName('person')).toEqual('helloWorld')
     })
   })
 })

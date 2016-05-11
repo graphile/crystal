@@ -1,0 +1,18 @@
+mutation Procedure {
+  a: insertRelatedNodes(input: { noteA: "a", noteB: "b" }) { ...payload }
+  b: insertRelatedNodes(input: { noteA: "a", noteB: "b", clientMutationId: "12345" }) { ...payload }
+}
+
+fragment payload on InsertRelatedNodesPayload {
+  clientMutationId
+  output {
+    thingByAThingId { ...thing }
+    thingByBThingId { ...thing }
+  }
+}
+
+fragment thing on Thing {
+  id
+  rowId
+  note
+}

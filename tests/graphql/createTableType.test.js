@@ -17,7 +17,8 @@ describe('createTableType', () => {
   })
 
   it('camel cases table columns', () => {
-    const table = new TestTable({ columns: [new TestColumn({ name: 'camel_case_me' })] })
+    const table = new TestTable()
+    table.schema.catalog.addColumn(new TestColumn({ table, name: 'camel_case_me' }))
     const type = createTableType(table)
     expect(type.getFields()).toIncludeKey('camelCaseMe')
   })
@@ -40,7 +41,9 @@ describe('createTableType', () => {
   })
 
   it('will rename `id` columns to `rowId`', () => {
-    const type = createTableType(new TestTable({ columns: [new TestColumn({ name: 'id', isPrimaryKey: true })] }))
+    const table = new TestTable()
+    table.schema.catalog.addColumn(new TestColumn({ table, name: 'id', isPrimaryKey: true }))
+    const type = createTableType(table)
     expect(type.getFields().rowId).toExist()
   })
 
@@ -52,7 +55,9 @@ describe('createTableType', () => {
   })
 
   it('will not implement the `Node` type for tables without primary keys', () => {
-    const type = createTableType(new TestTable({ columns: [new TestColumn()] }))
+    const table = new TestTable()
+    table.schema.catalog.addColumn(new TestColumn({ table }))
+    const type = createTableType(table)
     expect(type.getInterfaces()).toEqual([])
     expect(type.getFields()).toExcludeKey('id')
   })

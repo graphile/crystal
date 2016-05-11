@@ -72,6 +72,43 @@ Can query relations like so:
 }
 ```
 
+### Procedures for Mutations, Advanced Queries, and Computed Columns
+Procedures in PostgreSQL are powerful for writing business logic in your database schema, and PostGraphQL allows you to access those procedures through a GraphQL interface. Create a custom mutation, write an advanced SQL query, or even extend your tables with computed columns! Procedures allow you to write logic for your app in SQL instead of in the client all while being accessible through the GraphQL interface.
+
+So a search query could be written like this:
+
+```sql
+create function search_posts(search text) returns setof post as $$
+  select *
+  from post
+  where
+    headline ilike ('%' || search || '%') or
+    body ilike ('%' || search || '%')
+$$ language sql stable;
+```
+
+And queried through GraphQL like this:
+
+```graphql
+{
+  searchPosts(search: "Hello world", first: 5) {
+    pageInfo {
+      hasNextPage
+    }
+    totalCount
+    nodes {
+      headline
+      body
+    }
+  }
+}
+```
+
+For more information, check out our [procedure documentation][] and our [advanced queries documentation][].
+
+[procedure documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md
+[advanced queries documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md
+
 ### Fully Documented APIs
 Introspection of a GraphQL schema is powerful for developer tooling and one element of introspection is that every type in GraphQL has an associated `description` field. As PostgreSQL allows you to document your database objects, naturally PostGraphQL exposes these documentation comments through GraphQL.
 

@@ -1,125 +1,117 @@
 {
   "data": {
-    "postNodes": {
+    "relationNodes": {
       "nodes": [
         {
-          "rowId": 1,
-          "authorId": 2,
-          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
-          "author": {
+          "aThingId": 1,
+          "bThingId": 2,
+          "thingByAThingId": {
+            "id": "dGhpbmc6MQ==",
+            "rowId": 1,
+            "note": "hello"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6Mg==",
             "rowId": 2,
-            "givenName": "Johnny",
-            "familyName": "Tucker"
+            "note": "world"
           }
         },
         {
-          "rowId": 2,
-          "authorId": 1,
-          "headline": "I hate yogurt. It’s just stuff with bits in.",
-          "author": {
+          "aThingId": 1,
+          "bThingId": 3,
+          "thingByAThingId": {
+            "id": "dGhpbmc6MQ==",
             "rowId": 1,
-            "givenName": "Kathryn",
-            "familyName": "Ramirez"
+            "note": "hello"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6Mw==",
+            "rowId": 3,
+            "note": "foo"
           }
         },
         {
-          "rowId": 3,
-          "authorId": 1,
-          "headline": "Is that a cooking show?",
-          "author": {
+          "aThingId": 1,
+          "bThingId": 7,
+          "thingByAThingId": {
+            "id": "dGhpbmc6MQ==",
             "rowId": 1,
-            "givenName": "Kathryn",
-            "familyName": "Ramirez"
+            "note": "hello"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6Nw==",
+            "rowId": 7,
+            "note": "qux"
           }
         },
         {
-          "rowId": 4,
-          "authorId": 1,
-          "headline": "You hit me with a cricket bat.",
-          "author": {
-            "rowId": 1,
-            "givenName": "Kathryn",
-            "familyName": "Ramirez"
+          "aThingId": 2,
+          "bThingId": 3,
+          "thingByAThingId": {
+            "id": "dGhpbmc6Mg==",
+            "rowId": 2,
+            "note": "world"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6Mw==",
+            "rowId": 3,
+            "note": "foo"
           }
         },
         {
-          "rowId": 5,
-          "authorId": 5,
-          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
-          "author": {
+          "aThingId": 3,
+          "bThingId": 4,
+          "thingByAThingId": {
+            "id": "dGhpbmc6Mw==",
+            "rowId": 3,
+            "note": "foo"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6NA==",
+            "rowId": 4,
+            "note": "bar"
+          }
+        },
+        {
+          "aThingId": 3,
+          "bThingId": 5,
+          "thingByAThingId": {
+            "id": "dGhpbmc6Mw==",
+            "rowId": 3,
+            "note": "foo"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6NQ==",
             "rowId": 5,
-            "givenName": "Ann",
-            "familyName": "West"
+            "note": "baz"
           }
         },
         {
-          "rowId": 6,
-          "authorId": 3,
-          "headline": "Stop talking, brain thinking. Hush.",
-          "author": {
+          "aThingId": 4,
+          "bThingId": 3,
+          "thingByAThingId": {
+            "id": "dGhpbmc6NA==",
+            "rowId": 4,
+            "note": "bar"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6Mw==",
             "rowId": 3,
-            "givenName": "Nancy",
-            "familyName": "Diaz"
+            "note": "foo"
           }
         },
         {
-          "rowId": 7,
-          "authorId": 1,
-          "headline": "Large bet on myself in round one.",
-          "author": {
+          "aThingId": 7,
+          "bThingId": 1,
+          "thingByAThingId": {
+            "id": "dGhpbmc6Nw==",
+            "rowId": 7,
+            "note": "qux"
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6MQ==",
             "rowId": 1,
-            "givenName": "Kathryn",
-            "familyName": "Ramirez"
-          }
-        },
-        {
-          "rowId": 8,
-          "authorId": 2,
-          "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
-          "author": {
-            "rowId": 2,
-            "givenName": "Johnny",
-            "familyName": "Tucker"
-          }
-        },
-        {
-          "rowId": 9,
-          "authorId": 3,
-          "headline": "You know how I sometimes have really brilliant ideas?",
-          "author": {
-            "rowId": 3,
-            "givenName": "Nancy",
-            "familyName": "Diaz"
-          }
-        },
-        {
-          "rowId": 10,
-          "authorId": 2,
-          "headline": "What’s with you kids? Every other day it’s food, food, food.",
-          "author": {
-            "rowId": 2,
-            "givenName": "Johnny",
-            "familyName": "Tucker"
-          }
-        },
-        {
-          "rowId": 11,
-          "authorId": 3,
-          "headline": "They’re not aliens, they’re Earth…liens!",
-          "author": {
-            "rowId": 3,
-            "givenName": "Nancy",
-            "familyName": "Diaz"
-          }
-        },
-        {
-          "rowId": 12,
-          "authorId": 5,
-          "headline": "You’ve swallowed a planet!",
-          "author": {
-            "rowId": 5,
-            "givenName": "Ann",
-            "familyName": "West"
+            "note": "hello"
           }
         }
       ]

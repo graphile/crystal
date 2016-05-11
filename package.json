@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "1.2.3",
+  "version": "1.3.0-beta.1",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
@@ -58,8 +58,7 @@
     "on-finished": "^2.3.0",
     "pg": "^4.5.2",
     "pg-connection-string": "^0.1.3",
-    "serve-favicon": "^2.3.0",
-    "sql": "^0.67.0"
+    "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

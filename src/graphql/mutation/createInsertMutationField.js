@@ -1,4 +1,6 @@
-import { fromPairs, identity, assign } from 'lodash'
+import { fromPairs, identity, constant } from 'lodash'
+import { $$rowTable } from '../../symbols.js'
+import SQLBuilder from '../../SQLBuilder.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
@@ -37,7 +39,7 @@ const createInputType = table =>
     description: `The ${table.getMarkdownTypeName()} to insert.`,
     fields: {
       ...fromPairs(
-        table.columns.map(column => [column.getFieldName(), {
+        table.getColumns().map(column => [column.getFieldName(), {
           type: (column.hasDefault ? getNullableType : identity)(getColumnType(column)),
           description: column.description,
         }]),
@@ -55,7 +57,7 @@ const createPayloadType = table =>
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The inserted ${table.getMarkdownTypeName()}.`,
-        resolve: source => source[table.name],
+        resolve: source => source.output,
       },
       clientMutationId: payloadClientMutationId,
     },
@@ -66,27 +68,32 @@ const resolveInsert = table => {
   // improvements because mutations are executed in sequence, not parallel.
   //
   // A better solution for batch inserts is a custom batch insert field.
-  const tableSql = table.sql()
+  const columns = table.getColumns()
 
   return async (source, args, { client }) => {
     // Get the input object value from the args.
     const { input } = args
     const { clientMutationId } = input
+
+    const valueEntries = (
+      columns
+      .map(column => [column, input[column.getFieldName()]])
+      .filter(([, value]) => value)
+    )
+
     // Insert the thing making sure we return the newly inserted row.
     const { rows: [row] } = await client.queryAsync(
-      tableSql
-      .insert(fromPairs(
-        table.columns
-        .map(column => [column.name, input[column.getFieldName()]])
-        .filter(([, value]) => value)
-      ))
-      .returning(tableSql.star())
-      .toQuery()
+      new SQLBuilder()
+      .add(`insert into ${table.getIdentifier()}`)
+      .add(`(${valueEntries.map(([column]) => `"${column.name}"`).join(', ')})`)
+      .add('values')
+      .add(`(${valueEntries.map(constant('$')).join(', ')})`, valueEntries.map(([, value]) => value))
+      .add('returning *')
     )
 
     // Return the first (and likely only) row.
     return {
-      [table.name]: row ? assign(row, { table }) : null,
+      output: row ? (row[$$rowTable] = table, row) : null,
       clientMutationId,
     }
   }

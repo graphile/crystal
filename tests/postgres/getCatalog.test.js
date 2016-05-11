@@ -67,9 +67,27 @@ create table a.types (
   "varchar" varchar,
   "enum" b.color
 );
+
+create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
+create function a.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function a.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
+
+comment on function a.add_1(int, int) is 'lol, add some stuff';
+
+create function b.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
+create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
+create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
+create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
+
+create function c.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
+
+create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
 `
 
-describe('getCatalog', () => {
+describe('getCatalog', function testGetCatalog () {
+  this.timeout(5000)
+
   // Because catalog is not mutated in these tests, we cache it.
   let catalog = null
 
@@ -116,7 +134,7 @@ describe('getCatalog', () => {
   })
 
   it('gets columns in definition order', () => {
-    expect(catalog.getTable('a', 'hello').columns.map(({ name }) => name))
+    expect(catalog.getTable('a', 'hello').getColumns().map(({ name }) => name))
     .toEqual(['z_some', 'world', 'moon', 'abc', 'yoyo'])
   })
 
@@ -155,9 +173,9 @@ describe('getCatalog', () => {
   })
 
   it('gets column types', () => {
-    expect(catalog.getColumn('a', 'types', 'bigint').type).toEqual(20)
-    expect(catalog.getColumn('a', 'types', 'boolean').type).toEqual(16)
-    expect(catalog.getColumn('a', 'types', 'varchar').type).toEqual(1043)
+    expect(catalog.getColumn('a', 'types', 'bigint').type.id).toEqual(20)
+    expect(catalog.getColumn('a', 'types', 'boolean').type.id).toEqual(16)
+    expect(catalog.getColumn('a', 'types', 'varchar').type.id).toEqual(1043)
   })
 
   it('gets enums', () => {
@@ -171,11 +189,10 @@ describe('getCatalog', () => {
     expect(catalog.getEnum('b', 'color').variants).toEqual(['red', 'green', 'blue'])
   })
 
-  it('will let a column get its enum type', () => {
-    expect(catalog.getColumn('a', 'types', 'enum').getEnum()).toInclude({
-      name: 'color',
-      variants: ['red', 'green', 'blue'],
-    })
+  it('enum columns will have an enum type', () => {
+    expect(catalog.getColumn('a', 'types', 'enum').type.isEnum).toBe(true)
+    expect(catalog.getColumn('a', 'types', 'enum').type.name).toEqual('color')
+    expect(catalog.getColumn('a', 'types', 'enum').type.variants).toEqual(['red', 'green', 'blue'])
   })
 
   it('will get foreign keys', () => {
@@ -200,18 +217,19 @@ describe('getCatalog', () => {
         foreignColumns: ['id'],
       },
     ])
+
     expect(catalog.getTable('a', 'foreign_key').getForeignKeys().map(simplifyForeignKey)).toEqual([
-      {
-        nativeTable: 'foreign_key',
-        nativeColumns: ['person_id'],
-        foreignTable: 'person',
-        foreignColumns: ['id'],
-      },
       {
         nativeTable: 'foreign_key',
         nativeColumns: ['compound_key_1', 'compound_key_2'],
         foreignTable: 'compound_key',
         foreignColumns: ['person_id_1', 'person_id_2'],
+      },
+      {
+        nativeTable: 'foreign_key',
+        nativeColumns: ['person_id'],
+        foreignTable: 'person',
+        foreignColumns: ['id'],
       },
     ])
   })
@@ -224,5 +242,57 @@ describe('getCatalog', () => {
     expect(catalog.getColumn('a', 'hello', 'abc').hasDefault).toBe(true)
     expect(catalog.getColumn('a', 'hello', 'world').hasDefault).toBe(false)
     expect(catalog.getColumn('a', 'hello', 'moon').hasDefault).toBe(false)
+  })
+
+  it('will get procedures', () => {
+    expect(catalog.getProcedure('a', 'add_1')).toExist()
+    expect(catalog.getProcedure('b', 'add_1')).toNotExist()
+  })
+
+  it('will ignore procedures without argument names', () => {
+    expect(catalog.getProcedure('c', 'no_names')).toNotExist()
+  })
+
+  it('will get a procedure’s mutation status', () => {
+    expect(catalog.getProcedure('a', 'add_1').isMutation).toBe(false)
+    expect(catalog.getProcedure('a', 'add_2').isMutation).toBe(false)
+    expect(catalog.getProcedure('a', 'add_3').isMutation).toBe(true)
+    expect(catalog.getProcedure('a', 'add_4').isMutation).toBe(true)
+  })
+
+  it('will get if a procedure is strict', () => {
+    expect(catalog.getProcedure('b', 'mult_1').isStrict).toBe(false)
+    expect(catalog.getProcedure('b', 'mult_2').isStrict).toBe(false)
+    expect(catalog.getProcedure('b', 'mult_3').isStrict).toBe(true)
+    expect(catalog.getProcedure('b', 'mult_4').isStrict).toBe(true)
+  })
+
+  it('will correctly get argument names', () => {
+    expect(Array.from(catalog.getProcedure('a', 'add_1').args.keys())).toEqual(['arg_1', 'arg_2'])
+    expect(Array.from(catalog.getProcedure('a', 'add_2').args.keys())).toEqual(['a', 'b'])
+    expect(Array.from(catalog.getProcedure('a', 'add_3').args.keys())).toEqual(['a', 'arg_2'])
+    expect(Array.from(catalog.getProcedure('a', 'add_4').args.keys())).toEqual(['arg_1', 'b'])
+    expect(Array.from(catalog.getProcedure('a', 'set').args.keys())).toEqual([])
+  })
+
+  it('will correctly get argument types', () => {
+    expect(Array.from(catalog.getProcedure('a', 'add_1').args.values()).map(({ id }) => id)).toEqual([23, 23])
+    expect(Array.from(catalog.getProcedure('b', 'mult_1').args.values()).map(({ id }) => id)).toEqual([23, 23])
+    expect(Array.from(catalog.getProcedure('c', 'types').args.values()).map(({ id }) => id)).toEqual([20, 16, 1043])
+    expect(Array.from(catalog.getProcedure('a', 'set').args.values()).map(({ id }) => id)).toEqual([])
+  })
+
+  it('will correctly get the return type', () => {
+    expect(catalog.getProcedure('a', 'add_1').returnType.id).toEqual(23)
+    expect(catalog.getProcedure('c', 'types').returnType.id).toEqual(16)
+  })
+
+  it('will correctly get if a procedure is returning a set', () => {
+    expect(catalog.getProcedure('a', 'add_1').returnsSet).toBe(false)
+    expect(catalog.getProcedure('a', 'set').returnsSet).toBe(true)
+  })
+
+  it('will get comments on procedures', () => {
+    expect(catalog.getProcedure('a', 'add_1').description).toEqual('lol, add some stuff')
   })
 })

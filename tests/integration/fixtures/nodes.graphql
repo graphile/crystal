@@ -1,97 +1,38 @@
-{
-  a: personNodes(orderBy: ROW_ID, first: 3) {
-    nodes {
-      givenName
-      familyName
-    }
+query Nodes {
+  a: thingNodes {
+    nodes { ...thing }
   }
-  b: personNodes(orderBy: GIVEN_NAME, last: 5) {
-    totalCount
-    nodes {
-      rowId
-    }
+  b: thingNodes(first: 2) {
+    pageInfo { ...pageInfo }
+    edges { cursor, node { ...thing } }
   }
-  c: personNodes(orderBy: FAMILY_NAME, descending: true, first: 3) {
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-    }
-    edges {
-      cursor
-      node {
-        rowId
-        givenName
-        familyName
-      }
-    }
+  c: thingNodes(last: 2) {
+		pageInfo { ...pageInfo }
+    nodes { ...thing }
   }
-  d: personNodes(orderBy: ROW_ID, after: "NA==", first: 6) {
-    pageInfo {
-      startCursor
-      endCursor
-    }
-    nodes {
-      givenName
-    }
+  d: thingNodes(orderBy: NOTE) {
+    nodes { ...thing }
   }
-  e: personNodes(orderBy: ROW_ID, descending: true, before: "NA==", last: 3) {
-    pageInfo {
-      prev: hasPreviousPage
-      next: hasNextPage
-    }
-    nodes {
-      familyName
-    }
+  e: thingNodes(orderBy: NOTE, descending: true) {
+    edges { cursor, node { ...thing } }
   }
-  f: personNodes {
-    edges {
-      cursor
-      node {
-        givenName
-      }
-    }
+  f: thingNodes(before: "NQ==") {
+    nodes { ...thing }
   }
-  g: postNodes(authorId: 2) {
-		totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-    }
-    nodes {
-      rowId
-      headline
-      authorId
-    }
+  g: thingNodes(after: "NA==") {
+    nodes { ...thing }
   }
-  h: postNodes(topic: INSPIRATION) {
-		totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-    }
-    nodes {
-      rowId
-      headline
-      topic
-    }
-  }
-  i: postNodes(authorId: 1, first: 2, offset: 1) {
-		totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-    }
-    nodes {
-      rowId
-      headline
-      topic
-      authorId
-    }
-  }
-  j: personNodes(rowId: 1) {
-    nodes {
-      id
-      familyName
-    }
-  }
+}
+
+fragment thing on Thing {
+  id
+  rowId
+  note
+}
+
+fragment pageInfo on PageInfo {
+  hasNextPage
+  hasPreviousPage
+  startCursor
+  endCursor
 }

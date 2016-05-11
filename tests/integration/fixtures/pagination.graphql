@@ -1,39 +1,34 @@
-{
-  aa: personNodes(orderBy: ROW_ID) { ...page }
-  ab: personNodes(orderBy: ROW_ID, first: 2) { ...page }
-  ac: personNodes(orderBy: ROW_ID, first: 3) { ...page }
-  ad: personNodes(orderBy: ROW_ID, first: 5) { ...page }
-  ae: personNodes(orderBy: ROW_ID, first: 14) { ...page }
-  af: personNodes(orderBy: ROW_ID, offset: 1) { ...page }
-  ag: personNodes(orderBy: ROW_ID, offset: 3) { ...page }
-  ah: personNodes(orderBy: ROW_ID, offset: 50) { ...page }
-  ai: personNodes(orderBy: ROW_ID, first: 1, offset: 1) { ...page }
-  aj: personNodes(orderBy: ROW_ID, first: 4, offset: 10) { ...page }
-  ak: personNodes(orderBy: ROW_ID, first: 4, offset: 9) { ...page }
-  al: personNodes(orderBy: ROW_ID, after: "NA==") { ...page }
-  am: personNodes(orderBy: ROW_ID, after: "MTQ=") { ...page }
-  an: personNodes(orderBy: ROW_ID, after: "MTA=") { ...page }
-  ao: personNodes(orderBy: ROW_ID, after: "NTA=") { ...page }
-  ap: personNodes(orderBy: ROW_ID, before: "MQ==") { ...page }
-  aq: personNodes(orderBy: ROW_ID, before: "NA==") { ...page }
-  ar: personNodes(orderBy: ROW_ID, before: "MTQ=") { ...page }
-  as: personNodes(orderBy: ROW_ID, before: "NTA=") { ...page }
-  at: personNodes(orderBy: ROW_ID, after: "NTA=", before: "NTA=") { ...page }
-  au: personNodes(orderBy: ROW_ID, after: "NA==", before: "MTA=") { ...page }
-  av: personNodes(orderBy: ROW_ID, after: "Mw==", first: 4) { ...page }
-  aw: personNodes(orderBy: ROW_ID, after: "Mw==", first: 20) { ...page }
-  ax: personNodes(orderBy: ROW_ID, before: "NTA=", last: 2) { ...page }
-  ay: personNodes(orderBy: ROW_ID, before: "MTQ=", last: 2) { ...page }
-  az: personNodes(orderBy: ROW_ID, before: "MTQ=", first: 2) { ...page }
+query Pagination {
+  a: thingNodes { ...page }
+  b: thingNodes(first: 2) { ...page }
+  c: thingNodes(first: 7) { ...page }
+  d: thingNodes(first: 100) { ...page }
+  e: thingNodes(offset: 3) { ...page }
+  f: thingNodes(offset: 50) { ...page }
+  g: thingNodes(first: 1, offset: 1) { ...page }
+  h: thingNodes(first: 4, offset: 5) { ...page }
+  i: thingNodes(first: 4, offset: 5) { ...page }
+  j: thingNodes(after: "NQ==") { ...page }
+  k: thingNodes(after: "Nw==") { ...page }
+  l: thingNodes(before: "Mw==") { ...page }
+  m: thingNodes(before: "MQ==") { ...page }
+  n: thingNodes(after: "NQ==", before: "NQ==") { ...page }
+  o: thingNodes(after: "Mg==", before: "Ng==") { ...page }
+  p: thingNodes(after: "NA==", first: 2) { ...page }
+  q: thingNodes(after: "NA==", first: 40) { ...page }
+  r: thingNodes(before: "NA==", last: 2) { ...page }
+  s: thingNodes(before: "NA==", first: 2) { ...page }
+  t: thingNodes(before: "NA==", last: 40) { ...page }
 }
 
-fragment page on PersonConnection {
+fragment page on ThingConnection {
   pageInfo {
     hasNextPage
     hasPreviousPage
   }
   nodes {
+    id
     rowId
-    givenName
+    note
   }
 }

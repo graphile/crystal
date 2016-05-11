@@ -1,0 +1,31 @@
+mutation Update {
+  a: updateThing(input: { rowId: 1, newNote: "a" }) { ...thingPayload }
+  b: updateThing(input: { rowId: 1, newNote: "b", clientMutationId: "1234" }) { ...thingPayload }
+  c: updateThing(input: { rowId: 5, newNote: "c" }) { ...thingPayload }
+  d: updateRelation(input: { aThingId: 1, bThingId: 2, newBThingId: 5 }) { ...relationPayload }
+}
+
+fragment thingPayload on UpdateThingPayload {
+  clientMutationId
+  thing {
+    id
+    rowId
+    note
+  }
+}
+
+fragment relationPayload on UpdateRelationPayload {
+  clientMutationId
+  relation {
+    thingByAThingId {
+      id
+      rowId
+      note
+    }
+    thingByBThingId {
+      id
+      rowId
+      note
+    }
+  }
+}

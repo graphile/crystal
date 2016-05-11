@@ -1,5 +1,4 @@
-import { flatten, camelCase, upperFirst } from 'lodash'
-import sql from 'sql'
+import { once, camelCase, upperFirst, startsWith } from 'lodash'
 
 const replaceInsideUnderscores = (string, replacer) => {
   const [, start, substring, finish] = /^(_*)(.*?)(_*)$/.exec(string)
@@ -15,82 +14,68 @@ const pascalCaseInsideUnderscores = string => replaceInsideUnderscores(
 
 /**
  * A catalog of all objects relevant in the database to PostGraphQL.
- *
- * The `Catalog` class also contains a `pgConfig` object which allows it to
- * acquire clients from the `pg` connection pool at will.
- *
- * @member {Object} pgConfig
- * @member {Schema[]} schemas
- * @member {ForeignKey[]} foreignKeys
  */
 export class Catalog {
-  schemas = []
-  foreignKeys = []
+  _schemas = new Map()
+  _tables = new Map()
+  _columns = new Map()
+  _types = new Map()
+  _enums = new Map()
+  _foreignKeys = []
+  _procedures = new Map()
 
-  constructor ({ pgConfig }) {
-    this.pgConfig = pgConfig
+  addSchema (schema) {
+    this._schemas.set(schema.name, schema)
   }
 
-  /**
-   * Gets the schema of a certain name.
-   *
-   * @param {string} schemaName
-   * @returns {?Schema}
-   */
-  getSchema (schemaName) {
-    return this.schemas.find(({ name }) => name === schemaName)
+  getSchema (s) {
+    return this._schemas.get(s)
   }
 
-  /**
-   * Gets a table in a schema.
-   *
-   * @param {string} schemaName
-   * @param {string} tableName
-   * @returns {?Table}
-   */
-  getTable (schemaName, tableName) {
-    return this.getSchema(schemaName).getTable(tableName)
+  addTable (table) {
+    this._tables.set(`${table.schema.name}.${table.name}`, table)
   }
 
-  /**
-   * Gets all tables in all of our schemas.
-   *
-   * @returns {Table[]}
-   */
-  getAllTables () {
-    return flatten(this.schemas.map(schema => schema.getAllTables()))
+  getTable (s, t) {
+    return this._tables.get(`${s}.${t}`)
   }
 
-  /**
-   * Gets an enum in a schema.
-   *
-   * @param {string} schemaName
-   * @param {string} enumName
-   * @returns {?Enum}
-   */
-  getEnum (schemaName, enumName) {
-    return this.getSchema(schemaName).getEnum(enumName)
+  addColumn (column) {
+    this._columns.set(`${column.table.schema.name}.${column.table.name}.${column.name}`, column)
   }
 
-  /**
-   * Gets all enums in all of our schemas.
-   *
-   * @returns {Enum[]}
-   */
-  getAllEnums () {
-    return flatten(this.schemas.map(({ enums }) => enums))
+  getColumn (s, t, c) {
+    return this._columns.get(`${s}.${t}.${c}`)
   }
 
-  /**
-   * Gets the column of a table in a schema.
-   *
-   * @param {string} schemaName
-   * @param {string} tableName
-   * @param {string} columnName
-   * @returns {?Column}
-   */
-  getColumn (schemaName, tableName, columnName) {
-    return this.getSchema(schemaName).getTable(tableName).getColumn(columnName)
+  addType (type) {
+    this._types.set(type.id, type)
+  }
+
+  getType (typeId) {
+    if (!this._types.has(typeId)) this._types.set(typeId, new Type(typeId))
+    return this._types.get(typeId)
+  }
+
+  addEnum (enum_) {
+    this._enums.set(`${enum_.schema.name}.${enum_.name}`, enum_)
+    this.addType(enum_)
+  }
+
+  getEnum (s, e) {
+    return this._enums.get(`${s}.${e}`)
+  }
+
+  addForeignKey (foreignKey) {
+    this._foreignKeys.push(foreignKey)
+  }
+
+  addProcedure (procedure) {
+    this._procedures.set(`${procedure.schema.name}.${procedure.name}`, procedure)
+  }
+
+  getProcedure (s, p) {
+    return this._procedures.get(`${s}.${p}`)
   }
 }
 
@@ -101,68 +86,27 @@ export class Catalog {
  * @member {string} name
  * @member {string} description
  * @member {Table[]} tables
- * @member {Enum[]} enums
  */
 export class Schema {
-  tables = []
-  enums = []
-
-  constructor ({ _oid, catalog, name, description }) {
-    this._oid = _oid
+  constructor ({ catalog, name, description }) {
     this.catalog = catalog
     this.name = name
     this.description = description
   }
 
-  /**
-   * Gets the escaped name of the schema to be used as an identifier in SQL
-   * queries.
-   *
-   * @returns {string}
-   */
-  getIdentifier () {
-    return `"${this.name}"`
-  }
+  getTables = once(() => {
+    const tables = []
+    for (const [, table] of this.catalog._tables.entries())
+      if (table.schema === this) tables.push(table)
+    return tables
+  })
 
-  /**
-   * Gets a table in this schema.
-   *
-   * @param {string} tableName
-   * @returns {?Table}
-   */
-  getTable (tableName) {
-    return this.tables.find(({ name }) => name === tableName)
-  }
-
-  /**
-   * Return all of our tables.
-   *
-   * @returns {Table[]}
-   */
-  getAllTables () {
-    return this.tables
-  }
-
-  /**
-   * Gets an enum in this schema.
-   *
-   * @param {string} enumName
-   * @returns {?Enum}
-   */
-  getEnum (enumName) {
-    return this.enums.find(({ name }) => name === enumName)
-  }
-
-  /**
-   * Gets a column in a table in the schema.
-   *
-   * @param {string} tableName
-   * @param {string} columnName
-   * @returns {?Column}
-   */
-  getColumn (tableName, columnName) {
-    return this.getTable(tableName).getColumn(columnName)
-  }
+  getProcedures = once(() => {
+    const procedures = []
+    for (const [, procedure] of this.catalog._procedures.entries())
+      if (procedure.schema === this) procedures.push(procedure)
+    return procedures
+  })
 }
 
 /**
@@ -172,81 +116,61 @@ export class Schema {
  * @member {string} name
  * @member {string} description
  * @member {Column[]} columns
+ * @member {ForeignKey[]} foreignKeys
+ * @member {ForeignKey[]} reverseForeignKeys
  */
 export class Table {
-  columns = []
-
-  constructor ({ _oid, schema, name, description }) {
-    this._oid = _oid
+  constructor ({ schema, name, description }) {
     this.schema = schema
     this.name = name
     this.description = description
   }
 
-  getFieldName () {
-    return camelCaseInsideUnderscores(this.name)
-  }
+  getColumns = once(() => {
+    const columns = []
+    for (const [, column] of this.schema.catalog._columns.entries())
+      if (column.table === this) columns.push(column)
+    return columns
+  })
 
-  getTypeName () {
-    return pascalCaseInsideUnderscores(this.name)
-  }
+  getPrimaryKeys = once(() => {
+    return this.getColumns().filter(({ isPrimaryKey }) => isPrimaryKey)
+  })
 
-  getMarkdownTypeName () {
-    return `\`${this.getTypeName()}\``
-  }
+  getForeignKeys = once(() => {
+    return this.schema.catalog._foreignKeys.filter(({ nativeTable }) => nativeTable === this)
+  })
 
-  /**
-   * Returns a table type from the `sql` module based off of this table. This
-   * is so we can use the superior capabilities of the `sql` module to
-   * construct SQL queries with our table type.
-   *
-   * @returns {SqlTable}
-   */
-  sql () {
-    return sql.define({
-      schema: this.schema.name,
-      name: this.name,
-      columns: this.columns.map(({ name }) => name),
+  getReverseForeignKeys = once(() => {
+    return this.schema.catalog._foreignKeys.filter(({ foreignTable }) => foreignTable === this)
+  })
+
+  getComputedColumns = once(() => {
+    // Our computed columns will be any procedure where the first argument is
+    // a table type.
+    return Array.from(this.schema.catalog._procedures).map(entry => entry[1]).filter(procedure => {
+      const firstArgEntry = Array.from(procedure.args)[0]
+      if (!firstArgEntry) return false
+      const firstArgType = firstArgEntry[1]
+      return firstArgType && firstArgType.isTableType && firstArgType.table === this
     })
-  }
+  })
 
-  /**
-   * Gets a column in the table.
-   *
-   * @param {string} columnName
-   * @returns {?Column}
-   */
-  getColumn (columnName) {
-    return this.columns.find(({ name }) => name === columnName)
-  }
+  getIdentifier = once(() => {
+    return `"${this.schema.name}"."${this.name}"`
+  })
 
-  /**
-   * Gets the primary key columns for this table. If there is no primary key
-   * this will return an array with a length of 0.
-   *
-   * @returns {Column[]}
-   */
-  getPrimaryKeyColumns () {
-    return this.columns.filter(({ isPrimaryKey }) => isPrimaryKey)
-  }
+  getFieldName = once(() => {
+    return camelCaseInsideUnderscores(this.name)
+  })
 
-  /**
-   * Gets the foreign keys for this table.
-   *
-   * @returns {ForeignKey[]}
-   */
-  getForeignKeys () {
-    return this.schema.catalog.foreignKeys.filter(({ nativeTable }) => this === nativeTable)
-  }
+  getTypeName = once(() => {
+    return pascalCaseInsideUnderscores(this.name)
+  })
 
-  /**
-   * Gets foreign keys in the opposite direction for this table.
-   *
-   * @returns {ForeignKey[]}
-   */
-  getReverseForeignKeys () {
-    return this.schema.catalog.foreignKeys.filter(({ foreignTable }) => this === foreignTable)
-  }
+  getMarkdownTypeName = once(() => {
+    return `\`${this.getTypeName()}\``
+  })
 }
 
 /**
@@ -255,52 +179,56 @@ export class Table {
  * @member {Table} table
  * @member {string} name
  * @member {string} description
- * @member {number} type
+ * @member {number} num
+ * @member {Type} type
  * @member {boolean} isNullable
  * @member {boolean} isPrimaryKey
  * @member {boolean} hasDefault
  */
 export class Column {
   constructor ({
-    _num,
     table,
     name,
     description,
+    num,
     type,
     isNullable = true,
     isPrimaryKey,
     hasDefault = false,
   }) {
-    this._num = _num
     this.table = table
     this.name = name
     this.description = description
+    this.num = num
     this.type = type
     this.isNullable = isNullable
     this.isPrimaryKey = isPrimaryKey
     this.hasDefault = hasDefault
   }
 
-  getFieldName () {
+  getIdentifier = once(() => {
+    return `${this.table.getIdentifier()}."${this.name}"`
+  })
+
+  getFieldName = once(() => {
     // There is a conflict with the `Node` interface. Therefore we need to alias `rowId`.
-    if (this.name === 'id')
-      return 'rowId'
-
+    if (this.name === 'id') return 'rowId'
     return camelCaseInsideUnderscores(this.name)
-  }
+  })
 
-  getMarkdownFieldName () {
+  getMarkdownFieldName = once(() => {
     return `\`${this.getFieldName()}\``
-  }
+  })
+}
 
-  /**
-   * Gets an enum based on the column’s type. If there is no enum for the
-   * column’s type, null is returned.
-   *
-   * @returns {?Enum}
-   */
-  getEnum () {
-    return this.table.schema.catalog.getAllEnums().find(({ _oid }) => _oid === this.type)
+/**
+ * Represents a type defined in a PostgreSQL database.
+ *
+ * @member {number} id
+ */
+export class Type {
+  constructor (id) {
+    this.id = id
   }
 }
 
@@ -311,12 +239,28 @@ export class Column {
  * @member {string} name
  * @member {string[]} variants
  */
-export class Enum {
-  constructor ({ _oid, schema, name, variants }) {
-    this._oid = _oid
+export class Enum extends Type {
+  isEnum = true
+
+  constructor ({ id, schema, name, variants }) {
+    super(id)
     this.schema = schema
     this.name = name
     this.variants = variants
+  }
+}
+
+/**
+ * Represents a composite PostgreSQL table type.
+ *
+ * @member {Table} table
+ */
+export class TableType extends Type {
+  isTableType = true
+
+  constructor ({ id, table }) {
+    super(id)
+    this.table = table
   }
 }
 
@@ -330,11 +274,63 @@ export class Enum {
  * @member {Column[]} foreignColumns
  */
 export class ForeignKey {
-  constructor ({ catalog, nativeTable, nativeColumns, foreignTable, foreignColumns }) {
-    this.catalog = catalog
+  constructor ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) {
     this.nativeTable = nativeTable
     this.nativeColumns = nativeColumns
     this.foreignTable = foreignTable
     this.foreignColumns = foreignColumns
+  }
+}
+
+/**
+ * A user defined remote procedure in PostgreSQL which can be called by
+ * PostGraphQL.
+ *
+ * @member {Schema} schema
+ * @member {string} name
+ * @member {boolean} isMutation
+ * @member {boolean} isStrict
+ * @member {boolean} returnsSet
+ * @member {Map.<string, Type>} args
+ * @member {Type} returnType
+ */
+export class Procedure {
+  constructor ({
+    schema,
+    name,
+    description,
+    isMutation = true,
+    isStrict = false,
+    returnsSet = false,
+    args = new Map(),
+    returnType,
+  }) {
+    this.schema = schema
+    this.name = name
+    this.description = description
+    this.isMutation = isMutation
+    this.isStrict = isStrict
+    this.returnsSet = returnsSet
+    this.args = args
+    this.returnType = returnType
+  }
+
+  hasTableArg () {
+    return Boolean(Array.from(this.args).find(([, type]) => type.isTableType))
+  }
+
+  getReturnTable () {
+    return this.returnType.isTableType && this.returnType.table
+  }
+
+  getFieldName (prefix) {
+    if (prefix && startsWith(this.name, `${prefix}_`))
+      return camelCaseInsideUnderscores(this.name.slice(prefix.length + 1))
+
+    return camelCaseInsideUnderscores(this.name)
+  }
+
+  getMarkdownFieldName () {
+    return `\`${this.getFieldName()}\``
   }
 }

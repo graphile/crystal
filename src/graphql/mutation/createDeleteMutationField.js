@@ -1,5 +1,7 @@
-import { fromPairs, assign } from 'lodash'
-import getColumnType from '../getColumnType.js'
+import { fromPairs } from 'lodash'
+import { $$rowTable } from '../../symbols.js'
+import SQLBuilder from '../../SQLBuilder.js'
+import getType from '../getType.js'
 import createTableType from '../createTableType.js'
 import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
 
@@ -8,8 +10,6 @@ import {
   GraphQLObjectType,
   GraphQLInputObjectType,
 } from 'graphql'
-
-const getNonNullType = type => (type instanceof GraphQLNonNull ? type : new GraphQLNonNull(type))
 
 /**
  * Creates a mutation which will delete a single existing row.
@@ -40,8 +40,8 @@ const createInputType = table =>
       'its required primary key fields.',
     fields: {
       ...fromPairs(
-        table.getPrimaryKeyColumns().map(column => [column.getFieldName(), {
-          type: getNonNullType(getColumnType(column)),
+        table.getPrimaryKeys().map(column => [column.getFieldName(), {
+          type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
         }])
       ),
@@ -57,34 +57,32 @@ const createPayloadType = table =>
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The deleted ${table.getMarkdownTypeName()}.`,
-        resolve: source => source[table.name],
+        resolve: source => source.output,
       },
       clientMutationId: payloadClientMutationId,
     },
   })
 
 const resolveDelete = table => {
-  const tableSql = table.sql()
-  const primaryKeyColumns = table.getPrimaryKeyColumns()
+  const primaryKeys = table.getPrimaryKeys()
 
   return async (source, args, { client }) => {
     const { input } = args
     const { clientMutationId } = input
 
-    const { rows: [row] } = await client.queryAsync(
-      tableSql
-      .delete()
-      .where(fromPairs(
-        primaryKeyColumns
-        .map(column => [column.name, input[column.getFieldName()]])
-        .filter(([, value]) => value)
-      ))
-      .returning(tableSql.star())
-      .toQuery()
-    )
+    const sql = new SQLBuilder().add(`delete from ${table.getIdentifier()} where`)
+
+    for (const column of primaryKeys) {
+      const value = input[column.getFieldName()]
+      sql.add(`${column.getIdentifier()} = $ and`, [value])
+    }
+
+    sql.add('true returning *')
+
+    const { rows: [row] } = await client.queryAsync(sql)
 
     return {
-      [table.name]: row ? assign(row, { table }) : null,
+      output: row ? (row[$$rowTable] = table, row) : null,
       clientMutationId,
     }
   }

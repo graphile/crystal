@@ -1,0 +1,43 @@
+{
+  "data": {
+    "a": {
+      "clientMutationId": null,
+      "thing": {
+        "id": "dGhpbmc6MQ==",
+        "rowId": 1,
+        "note": "a"
+      }
+    },
+    "b": {
+      "clientMutationId": "1234",
+      "thing": {
+        "id": "dGhpbmc6MQ==",
+        "rowId": 1,
+        "note": "b"
+      }
+    },
+    "c": {
+      "clientMutationId": null,
+      "thing": {
+        "id": "dGhpbmc6NQ==",
+        "rowId": 5,
+        "note": "c"
+      }
+    },
+    "d": {
+      "clientMutationId": null,
+      "relation": {
+        "thingByAThingId": {
+          "id": "dGhpbmc6MQ==",
+          "rowId": 1,
+          "note": "b"
+        },
+        "thingByBThingId": {
+          "id": "dGhpbmc6NQ==",
+          "rowId": 5,
+          "note": "c"
+        }
+      }
+    }
+  }
+}

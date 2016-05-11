@@ -9,15 +9,17 @@ import createGraphqlSchema from '#/createGraphqlSchema.js'
 
 const TEST_FIXTURES = 'tests/integration/fixtures'
 
-describe('integration', () => {
+describe('integration', function testIntegration () {
+  this.timeout(5000)
+
   before(async () => {
     const client = await pg.connectAsync(PG_CONFIG)
-    await client.queryAsync('drop schema if exists forum_example, forum_example_utils cascade')
-    await client.queryAsync(readFileSync('examples/forum/schema.sql', 'utf8'))
+    await client.queryAsync('drop schema if exists kitchen_sink cascade')
+    await client.queryAsync(readFileSync('examples/kitchen-sink/schema.sql', 'utf8'))
     client.end()
   })
 
-  const getGraphqlSchema = once(() => createGraphqlSchema(PG_CONFIG, 'forum_example'))
+  const getGraphqlSchema = once(() => createGraphqlSchema(PG_CONFIG, 'kitchen_sink'))
 
   readdirSync(TEST_FIXTURES).forEach(fileName => {
     if (path.extname(fileName) === '.graphql') {

@@ -1,7 +1,7 @@
 import { memoize, fromPairs, includes, snakeCase, toUpper } from 'lodash'
-import { getNullableType, GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
+import { GraphQLEnumType, GraphQLInt, GraphQLBoolean } from 'graphql'
 import { CursorType } from './types.js'
-import getColumnType from './getColumnType.js'
+import getType from './getType.js'
 
 const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
   // The column specified by `orderBy` means more than just the order to
@@ -14,7 +14,7 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
       'is also important as it is used in creating pagination cursors. This ' +
       'value’s default is the primary key for the object.',
     defaultValue: (() => {
-      const column = table.getPrimaryKeyColumns()[0]
+      const column = table.getPrimaryKeys()[0]
       if (column) return column.name
       return null
     })(),
@@ -51,13 +51,21 @@ const createConnectionArgs = (table, ignoreColumnConditions = []) => ({
     defaultValue: false,
   },
   ...fromPairs(
-    table.columns
-    .filter(column => !includes(ignoreColumnConditions, column))
+    table
+    .getColumns()
+    // If `ignoreColumnConditions` is set to true, all column conditions will
+    // be disabled. If `ignoreColumnConditions` is an array, only certain
+    // conditions will be ignored.
+    .filter(column => (ignoreColumnConditions === true ? false : !includes(ignoreColumnConditions, column)))
     .map(column => [column.getFieldName(), {
-      type: getNullableType(getColumnType(column)),
+      type: getType(column.type),
       description:
         'Filters the resulting set with an equality test on the ' +
         `${column.getMarkdownFieldName()} field.`,
+      // TODO: Deprecate this…
+      // deprecationReason:
+      //   'Simple equality testing is insufficient for the nodes field and just ' +
+      //   'adds noise. Instead use procedures for custom set filtering.',
     }])
   ),
 })
@@ -77,7 +85,8 @@ const createTableOrderingEnum = memoize(table =>
     description: `Properties with which ${table.getMarkdownTypeName()} can be ordered.`,
 
     values: fromPairs(
-      table.columns
+      table
+      .getColumns()
       .map(column => [toUpper(snakeCase(column.getFieldName())), {
         value: column.name,
         description: column.description,

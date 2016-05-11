@@ -1,47 +1,57 @@
 /* eslint-disable no-process-env */
 
-import { assign } from 'lodash'
-import { Catalog, Schema, Table, Column, Enum } from '#/postgres/catalog.js'
+import * as c from '#/postgres/catalog.js'
 
 export const PG_CONFIG = process.env.TEST_DB || 'postgres://localhost:5432/postgraphql_test'
 
-export class TestCatalog extends Catalog {
+export class TestCatalog extends c.Catalog {
   constructor ({ ...config } = {}) {
     super({ ...config })
   }
 }
 
-export class TestSchema extends Schema {
-  constructor ({ name = 'test', catalog = new TestCatalog(), tables, ...config } = {}) {
+export class TestSchema extends c.Schema {
+  constructor ({ name = 'test', catalog = new TestCatalog(), ...config } = {}) {
     super({ name, catalog, ...config })
-    this.tables =
-      (tables || [new TestTable({ schema: this })])
-      .map(table => assign(table, { schema: this }))
+    this.catalog.addSchema(this)
+    this.catalog.addTable(new TestTable({ schema: this }))
   }
 }
 
-export class TestTable extends Table {
-  constructor ({ name = 'test', schema = new TestSchema(), columns, ...config } = {}) {
-    super({ name, schema, ...config })
-    this.columns =
-      (columns || [new TestColumn({ table: this, isPrimaryKey: true })])
-      .map(column => assign(column, { table: this }))
-  }
-}
-
-export class TestColumn extends Column {
-  constructor ({ name = 'test', table = new TestTable(), enum_, ...config } = {}) {
-    super({ name, table, ...config })
-    this._enum = enum_
-  }
-
-  getEnum () {
-    return this._enum || super.getEnum()
-  }
-}
-
-export class TestEnum extends Enum {
+export class TestTable extends c.Table {
   constructor ({ name = 'test', schema = new TestSchema(), ...config } = {}) {
     super({ name, schema, ...config })
+    this.schema.catalog.addTable(this)
+    this.schema.catalog.addColumn(new TestColumn({ table: this, isPrimaryKey: true }))
+  }
+}
+
+export class TestColumn extends c.Column {
+  constructor ({ name = 'test', table = new TestTable(), type = new TestType(), ...config } = {}) {
+    super({ name, table, type, ...config })
+    this.table.schema.catalog.addColumn(this)
+  }
+}
+
+export class TestType extends c.Type {
+  constructor (id = 0) {
+    super(id)
+  }
+}
+
+export class TestEnum extends c.Enum {
+  constructor ({ name = 'test', schema = new TestSchema(), ...config } = {}) {
+    super({ name, schema, ...config })
+  }
+}
+
+export class TestProcedure extends c.Procedure {
+  constructor ({
+    name = 'test',
+    schema = new TestSchema(),
+    returnType = new TestType(),
+    ...config,
+  } = {}) {
+    super({ name, schema, returnType, ...config })
   }
 }
