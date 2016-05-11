@@ -1,4 +1,3 @@
-import expect from 'expect'
 import request from 'supertest-as-promised'
 import { ary } from 'lodash'
 import jwt from 'jsonwebtoken'
