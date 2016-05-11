@@ -62,18 +62,6 @@ describe('createServer', () => {
     client.end()
   })
 
-  it('will fail without a GraphQL schema', () => {
-    expect(() => createServer({ pgConfig: PG_CONFIG })).toThrow('GraphQL schema')
-  })
-
-  it('will fail if schema is not a GraphQL schema', () => {
-    expect(() => createServer({ graphqlSchema: {}, pgConfig: PG_CONFIG })).toThrow('GraphQL schema')
-  })
-
-  it('will fail without a PostgreSQL config', () => {
-    expect(() => createServer({ graphqlSchema })).toThrow('PostgreSQL config')
-  })
-
   it('can make a query', async () => {
     const server = testCreateServer()
     await (
