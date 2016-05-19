@@ -68,6 +68,11 @@ create table a.types (
   "enum" b.color
 );
 
+create type c.my_custom_type as (
+  field1 int,
+  field2 text
+);
+
 create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
 create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
 create function a.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
@@ -81,6 +86,7 @@ create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language 
 create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
 create function c.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
+create function c.custom_types(a int, b text) returns c.my_custom_type as $$ select a, b $$ language sql;
 
 create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
 `
@@ -112,7 +118,9 @@ describe('getCatalog', function testGetCatalog () {
 
   it('gets tables', () => {
     expect(catalog.getTable('c', 'person')).toExist()
+    expect(catalog.getTable('c', 'person').kind).toEqual('r')
     expect(catalog.getTable('a', 'hello')).toExist()
+    expect(catalog.getTable('a', 'hello').kind).toEqual('r')
   })
 
   it('gets table description', () => {
@@ -123,6 +131,12 @@ describe('getCatalog', function testGetCatalog () {
 
   it('gets views', () => {
     expect(catalog.getTable('b', 'yo')).toExist()
+    expect(catalog.getTable('b', 'yo').kind).toEqual('v')
+  })
+
+  it('gets custom types', () => {
+    expect(catalog.getTable('c', 'my_custom_type')).toExist()
+    expect(catalog.getTable('c', 'my_custom_type').kind).toEqual('c')
   })
 
   it('gets columns', () => {
@@ -142,6 +156,11 @@ describe('getCatalog', function testGetCatalog () {
     expect(catalog.getColumn('b', 'yo', 'world')).toExist()
     expect(catalog.getColumn('b', 'yo', 'moon')).toExist()
     expect(catalog.getColumn('b', 'yo', 'constant')).toExist()
+  })
+
+  it('gets columns for custom types', () => {
+    expect(catalog.getColumn('c', 'my_custom_type', 'field1')).toExist()
+    expect(catalog.getColumn('c', 'my_custom_type', 'field2')).toExist()
   })
 
   it('gets column nullability', () => {
@@ -285,6 +304,10 @@ describe('getCatalog', function testGetCatalog () {
   it('will correctly get the return type', () => {
     expect(catalog.getProcedure('a', 'add_1').returnType.id).toEqual(23)
     expect(catalog.getProcedure('c', 'types').returnType.id).toEqual(16)
+  })
+
+  it('will correctly get the return type for custom types', () => {
+    expect(catalog.getProcedure('c', 'custom_types').returnType.table.name).toEqual('my_custom_type')
   })
 
   it('will correctly get if a procedure is returning a set', () => {

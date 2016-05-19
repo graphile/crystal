@@ -22,6 +22,7 @@ const createMutationType = schema =>
       ...(
         schema
         .getTables()
+        .filter(table => table.kind === 'r')
         .map(table => createMutationFields(table))
         .reduce(ary(assign, 2), {})
       ),

@@ -120,10 +120,11 @@ export class Schema {
  * @member {ForeignKey[]} reverseForeignKeys
  */
 export class Table {
-  constructor ({ schema, name, description }) {
+  constructor ({ schema, name, description, kind }) {
     this.schema = schema
     this.name = name
     this.description = description
+    this.kind = kind
   }
 
   getColumns = once(() => {
