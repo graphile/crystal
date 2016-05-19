@@ -1,0 +1,28 @@
+---
+# SETUP:
+#   docker-compose pull
+#   docker-compose run base npm install
+#   docker-compose up -d db
+#   docker-compose run test
+
+base:
+  image: node:5
+  volumes:
+    - ".:/app"
+  working_dir: /app
+  ports:
+    - "3000:3000"
+
+test:
+  extends:
+    service: base
+  links:
+    - db
+  environment:
+    - TEST_DB=postgres://postgres@db/postgraphql
+  command: "npm run test"
+
+db:
+  image: postgres:9.4
+  environment:
+    - POSTGRES_USER=postgraphql
