@@ -6,14 +6,14 @@ import './promisify'
 
 import path from 'path'
 import { readFileSync } from 'fs'
+import http from 'http'
 import { Command } from 'commander'
 import { parse as parseConnectionString } from 'pg-connection-string'
-import createGraphqlSchema from './createGraphqlSchema.js'
-import createServer from './createServer.js'
+import postgraphql from './postgraphql.js'
 
 const manifest = JSON.parse(readFileSync(path.resolve(__dirname, '../package.json')))
 
-const main = async () => {
+const main = () => {
   const program = new Command('postgraphql')
 
   /* eslint-disable max-len */
@@ -32,7 +32,7 @@ const main = async () => {
 
   const {
     args: [connection],
-    schema: schemaName = 'public',
+    schema: schemaName,
     hostname = 'localhost',
     port = 3000,
     development = false,
@@ -41,7 +41,8 @@ const main = async () => {
     maxPoolSize = 10,
   } = program
 
-  if (!connection) throw new Error('Must define a PostgreSQL connection string to connect to.')
+  if (!connection)
+    throw new Error('Must define a PostgreSQL connection string to connect to.')
 
   // Parse out the connection string into an object and attach a
   // `poolSize` option.
@@ -50,21 +51,21 @@ const main = async () => {
     poolSize: maxPoolSize,
   }
 
-  // Create the GraphQL schema.
-  const graphqlSchema = await createGraphqlSchema(pgConfig, schemaName)
-
   // Create the GraphQL HTTP server.
-  const server = createServer({
-    graphqlSchema,
-    pgConfig,
+  const handler = postgraphql(pgConfig, schemaName, {
     route,
     secret,
     development,
   })
 
-  server.listen(port, hostname, () => {
+  http.createServer(handler).listen(port, hostname, () => {
     console.log(`GraphQL server listening at http://${hostname}:${port}${route} 🚀`)
   })
 }
 
-main().catch(error => console.error(error.stack))
+try {
+  main()
+}
+catch (error) {
+  console.error(error.stack)
+}

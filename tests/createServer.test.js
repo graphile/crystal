@@ -1,4 +1,3 @@
-import expect from 'expect'
 import request from 'supertest-as-promised'
 import { ary } from 'lodash'
 import jwt from 'jsonwebtoken'
@@ -60,18 +59,6 @@ describe('createServer', () => {
     await ignorePromiseError(client.queryAsync(`drop role ${TEST_ROLE}`))
     await ignorePromiseError(client.queryAsync(`create role ${TEST_ROLE}`))
     client.end()
-  })
-
-  it('will fail without a GraphQL schema', () => {
-    expect(() => createServer({ pgConfig: PG_CONFIG })).toThrow('GraphQL schema')
-  })
-
-  it('will fail if schema is not a GraphQL schema', () => {
-    expect(() => createServer({ graphqlSchema: {}, pgConfig: PG_CONFIG })).toThrow('GraphQL schema')
-  })
-
-  it('will fail without a PostgreSQL config', () => {
-    expect(() => createServer({ graphqlSchema })).toThrow('PostgreSQL config')
   })
 
   it('can make a query', async () => {
