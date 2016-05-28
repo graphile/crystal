@@ -6,6 +6,15 @@
       "note": "baz"
     },
     "viewer": {
+      "id": "viewer",
+      "thing": {
+        "id": "dGhpbmc6NQ==",
+        "rowId": 5,
+        "note": "baz"
+      }
+    },
+    "node": {
+      "id": "viewer",
       "thing": {
         "id": "dGhpbmc6NQ==",
         "rowId": 5,

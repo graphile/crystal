@@ -1,7 +1,14 @@
 query Viewer {
   thing(id: "dGhpbmc6NQ==") { ...thing }
   viewer {
+    id
     thing(id: "dGhpbmc6NQ==") { ...thing }
+  }
+  node(id: "viewer") {
+    id
+    ... on Viewer {
+      thing(id: "dGhpbmc6NQ==") { ...thing }
+    }
   }
 }
 
