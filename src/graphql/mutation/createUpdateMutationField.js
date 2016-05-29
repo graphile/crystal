@@ -90,7 +90,7 @@ const resolveUpdate = table => {
 
     for (const column of columns) {
       const value = input[`new${upperFirst(column.getFieldName())}`]
-      if (!value) continue
+      if (typeof value === 'undefined') continue
       setClauses.push(`"${column.name}" = $`)
       setValues.push(value)
     }
