@@ -16,6 +16,13 @@ create table relation (
   primary key (a_thing_id, b_thing_id)
 );
 
+create table another_thing (
+  id               serial not null primary key,
+  note             text not null,
+  published        boolean not null,
+  tags             text[] not null
+);
+
 create function add(a int, b int) returns int as $$
   select a + b
 $$ language sql
@@ -78,6 +85,26 @@ $$ language sql
 stable
 strict;
 
+create function another_thing_display(another_thing another_thing) returns text as $$
+  select another_thing.id || ': ' || another_thing.note || '!'
+$$ language sql
+stable;
+
+create function insert_node(
+  note text,
+  published boolean,
+  tags text[]
+) returns another_thing as $$
+declare
+  row another_thing;
+begin
+  insert into another_thing (note, published, tags) values (note, published, tags) returning * into row;
+  return row;
+end;
+$$ language plpgsql
+strict
+set search_path from current;
+
 create function insert_related_nodes(
   note_a text,
   note_b text
@@ -95,6 +122,11 @@ end;
 $$ language plpgsql
 strict
 set search_path from current;
+
+insert into another_thing (note, published, tags) values
+  ('hello', true, '{"a", "b"}'),
+  ('world', true, '{"c", "d"}'),
+  ('foo', false, '{"a"}');
 
 insert into thing (note) values
   ('hello'),
