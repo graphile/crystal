@@ -91,9 +91,11 @@ const resolveInsert = table => {
       .add('returning *')
     )
 
+    const output = row ? (row[$$rowTable] = table, row) : null
+
     // Return the first (and likely only) row.
     return {
-      output: row ? (row[$$rowTable] = table, row) : null,
+      output,
       clientMutationId,
     }
   }

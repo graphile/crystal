@@ -111,8 +111,10 @@ const resolveUpdate = table => {
       .add('returning *')
     )
 
+    const output = row ? (row[$$rowTable] = table, row) : null
+
     return {
-      output: row ? (row[$$rowTable] = table, row) : null,
+      output,
       clientMutationId,
     }
   }

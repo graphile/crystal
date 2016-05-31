@@ -80,9 +80,10 @@ const resolveDelete = table => {
     sql.add('true returning *')
 
     const { rows: [row] } = await client.queryAsync(sql)
+    const output = row ? (row[$$rowTable] = table, row) : null
 
     return {
-      output: row ? (row[$$rowTable] = table, row) : null,
+      output,
       clientMutationId,
     }
   }
