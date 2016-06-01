@@ -3,7 +3,9 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLInputObjectType } from 'graph
 import createProcedureReturnType from '../createProcedureReturnType.js'
 import createProcedureArgs from '../createProcedureArgs.js'
 import resolveProcedure from '../resolveProcedure.js'
-import { inputClientMutationId, payloadClientMutationId } from './clientMutationId.js'
+import getPayloadInterface from './getPayloadInterface.js'
+import getPayloadFields from './getPayloadFields.js'
+import { inputClientMutationId } from './clientMutationId.js'
 
 const createProcedureMutationField = procedure => ({
   type: createPayloadType(procedure),
@@ -42,6 +44,7 @@ const createPayloadType = procedure =>
   new GraphQLObjectType({
     name: `${upperFirst(camelCase(procedure.name))}Payload`,
     description: `The payload returned by the ${procedure.getMarkdownFieldName()}`,
+    interfaces: [getPayloadInterface(procedure.schema)],
 
     // Our payload has two fields, one is the return type. The name of which is
     // the type name, so a `Circle` would have a field name of `circle` and a
@@ -56,7 +59,7 @@ const createPayloadType = procedure =>
         description: `The actual value returned by ${procedure.getMarkdownFieldName()}`,
         resolve: ({ output }) => output,
       },
-      clientMutationId: payloadClientMutationId,
+      ...getPayloadFields(procedure.schema),
     },
   })
 

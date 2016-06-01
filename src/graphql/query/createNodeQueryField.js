@@ -1,5 +1,6 @@
 import { memoize } from 'lodash'
 import { GraphQLNonNull, GraphQLID } from 'graphql'
+import { $$isViewer } from '../../symbols.js'
 import { NodeType, fromID } from '../types.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
@@ -18,6 +19,11 @@ const createNodeQueryField = schema => {
 
     resolve: (source, args, context) => {
       const { id } = args
+
+      // If the id is just `viewer`, we are trying to refetch the viewer node.
+      if (id === 'viewer')
+        return { [$$isViewer]: true }
+
       const { tableName, values } = fromID(id)
       const table = getTable(tableName)
 
