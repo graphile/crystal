@@ -72,7 +72,7 @@ Can query relations like so:
 }
 ```
 
-### Procedures for Mutations, Advanced Queries, and Computed Columns
+### Custom Mutations and Computed Columns
 Procedures in PostgreSQL are powerful for writing business logic in your database schema, and PostGraphQL allows you to access those procedures through a GraphQL interface. Create a custom mutation, write an advanced SQL query, or even extend your tables with computed columns! Procedures allow you to write logic for your app in SQL instead of in the client all while being accessible through the GraphQL interface.
 
 So a search query could be written like this:
