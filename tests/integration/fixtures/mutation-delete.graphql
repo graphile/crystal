@@ -2,7 +2,7 @@ mutation Delete {
   a: deleteThing(input: { rowId: 1 }) { ...payload }
   b: deleteThing(input: { rowId: 2 }) { ...payload }
   c: deleteThing(input: { rowId: 2 }) { ...payload }
-  d: deleteRelation(input: { aThingId: 4, bThingId: 3 }) { relation { aThingId, bThingId } }
+  d: deleteRelation(input: { aThingId: 4, bThingId: 3 }) { ...relationPayload }
   e: deleteThing(input: { rowId: 4, clientMutationId: "hello" }) { ...payload }
   f: deleteThing(input: { rowId: 6, clientMutationId: "yolo" }) { ...payload }
   g: deleteThing(input: { rowId: 2 }) { ...payload }
@@ -10,8 +10,15 @@ mutation Delete {
 
 fragment payload on DeleteThingPayload {
   clientMutationId
+  deletedThingId
   thing {
     rowId
     note
   }
+}
+
+fragment relationPayload on DeleteRelationPayload {
+  clientMutationId
+  deletedRelationId
+  relation { aThingId, bThingId }
 }

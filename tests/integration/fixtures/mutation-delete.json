@@ -2,6 +2,7 @@
   "data": {
     "a": {
       "clientMutationId": null,
+      "deletedThingId": "dGhpbmc6MQ==",
       "thing": {
         "rowId": 1,
         "note": "hello"
@@ -9,6 +10,7 @@
     },
     "b": {
       "clientMutationId": null,
+      "deletedThingId": "dGhpbmc6Mg==",
       "thing": {
         "rowId": 2,
         "note": "world"
@@ -16,9 +18,12 @@
     },
     "c": {
       "clientMutationId": null,
+      "deletedThingId": null,
       "thing": null
     },
     "d": {
+      "clientMutationId": null,
+      "deletedRelationId": "cmVsYXRpb246NCwz",
       "relation": {
         "aThingId": 4,
         "bThingId": 3
@@ -26,6 +31,7 @@
     },
     "e": {
       "clientMutationId": "hello",
+      "deletedThingId": "dGhpbmc6NA==",
       "thing": {
         "rowId": 4,
         "note": "bar"
@@ -33,6 +39,7 @@
     },
     "f": {
       "clientMutationId": "yolo",
+      "deletedThingId": "dGhpbmc6Ng==",
       "thing": {
         "rowId": 6,
         "note": "bux"
@@ -40,6 +47,7 @@
     },
     "g": {
       "clientMutationId": null,
+      "deletedThingId": null,
       "thing": null
     }
   }
