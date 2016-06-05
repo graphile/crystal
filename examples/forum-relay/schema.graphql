@@ -1,0 +1,233 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+scalar Cursor
+
+scalar Date
+
+input DeletePersonInput {
+  rowId: Int!
+  clientMutationId: String
+}
+
+type DeletePersonPayload implements Payload {
+  person: Person
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+input DeletePostInput {
+  rowId: Int!
+  clientMutationId: String
+}
+
+type DeletePostPayload implements Payload {
+  post: Post
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+input InsertPersonInput {
+  rowId: Int
+  givenName: String!
+  familyName: String
+  about: String
+  createdAt: Date
+  updatedAt: Date
+  clientMutationId: String
+}
+
+type InsertPersonPayload implements Payload {
+  person: Person
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+input InsertPostInput {
+  rowId: Int
+  authorId: Int!
+  headline: String!
+  topic: PostTopic
+  body: String
+  createdAt: Date
+  updatedAt: Date
+  clientMutationId: String
+}
+
+type InsertPostPayload implements Payload {
+  post: Post
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+type Mutation {
+  registerPerson(input: RegisterPersonInput!): RegisterPersonPayload
+  insertPerson(input: InsertPersonInput!): InsertPersonPayload
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload
+  insertPost(input: InsertPostInput!): InsertPostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
+}
+
+interface Node {
+  id: ID
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+interface Payload {
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+type Person implements Node {
+  id: ID
+  rowId: Int!
+  givenName: String!
+  familyName: String
+  about: String
+  createdAt: Date
+  updatedAt: Date
+  fullName: String
+  latestPost: Post
+  postNodesByAuthorId(orderBy: PostOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false, rowId: Int, headline: String, topic: PostTopic, body: String, createdAt: Date, updatedAt: Date): PostConnection
+}
+
+type PersonConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  nodes: [Person]
+  edges: [PersonEdge]
+}
+
+type PersonEdge {
+  cursor: Cursor!
+  node: Person
+}
+
+enum PersonOrdering {
+  ROW_ID
+  GIVEN_NAME
+  FAMILY_NAME
+  ABOUT
+  CREATED_AT
+  UPDATED_AT
+}
+
+type Post implements Node {
+  id: ID
+  rowId: Int!
+  authorId: Int!
+  headline: String!
+  topic: PostTopic
+  body: String
+  createdAt: Date
+  updatedAt: Date
+  summary(length: Int, omission: String): String
+  personByAuthorId: Person
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  nodes: [Post]
+  edges: [PostEdge]
+}
+
+type PostEdge {
+  cursor: Cursor!
+  node: Post
+}
+
+enum PostOrdering {
+  ROW_ID
+  AUTHOR_ID
+  HEADLINE
+  TOPIC
+  BODY
+  CREATED_AT
+  UPDATED_AT
+}
+
+enum PostTopic {
+  DISCUSSION
+  INSPIRATION
+  HELP
+}
+
+type Query {
+  node(id: ID!): Node
+  searchPosts(search: String, orderBy: PostOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false): PostConnection
+  person(id: ID!): Person
+  personNodes(orderBy: PersonOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false, rowId: Int, givenName: String, familyName: String, about: String, createdAt: Date, updatedAt: Date): PersonConnection
+  post(id: ID!): Post
+  postNodes(orderBy: PostOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false, rowId: Int, authorId: Int, headline: String, topic: PostTopic, body: String, createdAt: Date, updatedAt: Date): PostConnection
+  viewer: Viewer!
+}
+
+input RegisterPersonInput {
+  givenName: String!
+  familyName: String!
+  email: String!
+  password: String!
+  clientMutationId: String
+}
+
+type RegisterPersonPayload implements Payload {
+  output: Person
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+input UpdatePersonInput {
+  rowId: Int!
+  newRowId: Int
+  newGivenName: String
+  newFamilyName: String
+  newAbout: String
+  newCreatedAt: Date
+  newUpdatedAt: Date
+  clientMutationId: String
+}
+
+type UpdatePersonPayload implements Payload {
+  person: Person
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+input UpdatePostInput {
+  rowId: Int!
+  newRowId: Int
+  newAuthorId: Int
+  newHeadline: String
+  newTopic: PostTopic
+  newBody: String
+  newCreatedAt: Date
+  newUpdatedAt: Date
+  clientMutationId: String
+}
+
+type UpdatePostPayload implements Payload {
+  post: Post
+  clientMutationId: String
+  viewer: Viewer!
+}
+
+type Viewer implements Node {
+  node(id: ID!): Node
+  searchPosts(search: String, orderBy: PostOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false): PostConnection
+  person(id: ID!): Person
+  personNodes(orderBy: PersonOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false, rowId: Int, givenName: String, familyName: String, about: String, createdAt: Date, updatedAt: Date): PersonConnection
+  post(id: ID!): Post
+  postNodes(orderBy: PostOrdering = id, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, descending: Boolean = false, rowId: Int, authorId: Int, headline: String, topic: PostTopic, body: String, createdAt: Date, updatedAt: Date): PostConnection
+  id: ID
+}
