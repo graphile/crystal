@@ -39,6 +39,12 @@ export class TestType extends c.Type {
   }
 }
 
+export class TestDomain extends c.Domain {
+  constructor ({ id = 0, baseTypeId = 0, name = 'test', schema = new TestSchema() } = {}) {
+    super({ id, name, schema, baseType: new TestType(baseTypeId) })
+  }
+}
+
 export class TestEnum extends c.Enum {
   constructor ({ name = 'test', schema = new TestSchema(), ...config } = {}) {
     super({ name, schema, ...config })

@@ -98,6 +98,10 @@ const getType = memoize(type => {
     })
   }
 
+  // If the type is a domain, return the underlying type
+  if (type.isDomain)
+    return getType(type.baseType)
+
   // If this type is a table type, use the PostGraphQL table type.
   if (type.isTableType)
     return createTableType(type.table)

@@ -61,11 +61,16 @@ comment on column b.yo.constant is 'This is constantly 2';
 create type a.letter as enum ('a', 'b', 'c', 'd');
 create type b.color as enum ('red', 'green', 'blue');
 
+create domain a.an_int as integer;
+create domain b.another_int as a.an_int;
+
 create table a.types (
   "bigint" bigint,
   "boolean" boolean,
   "varchar" varchar,
-  "enum" b.color
+  "enum" b.color,
+  "domain" a.an_int,
+  "domain2" b.another_int
 );
 
 create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
@@ -193,6 +198,13 @@ describe('getCatalog', function testGetCatalog () {
     expect(catalog.getColumn('a', 'types', 'enum').type.isEnum).toBe(true)
     expect(catalog.getColumn('a', 'types', 'enum').type.name).toEqual('color')
     expect(catalog.getColumn('a', 'types', 'enum').type.variants).toEqual(['red', 'green', 'blue'])
+  })
+
+  it('domain columns will have the base type', () => {
+    expect(catalog.getColumn('a', 'types', 'domain').type.isDomain).toBe(true)
+    expect(catalog.getColumn('a', 'types', 'domain').type.baseType.id).toEqual(23)
+    expect(catalog.getColumn('a', 'types', 'domain2').type.isDomain).toBe(true)
+    expect(catalog.getColumn('a', 'types', 'domain2').type.baseType.id).toEqual(23)
   })
 
   it('will get foreign keys', () => {
