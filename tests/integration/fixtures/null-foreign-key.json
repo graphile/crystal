@@ -1,0 +1,33 @@
+{
+  "data": {
+    "anotherThingNodes": {
+      "edges": [
+        {
+          "node": {
+            "id": "YW5vdGhlcl90aGluZzox",
+            "rowId": 1,
+            "thingByThingId": {
+                "note": "hello"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "YW5vdGhlcl90aGluZzoy",
+            "rowId": 2,
+            "thingByThingId": null
+          }
+        },
+        {
+          "node": {
+            "id": "YW5vdGhlcl90aGluZzoz",
+            "rowId": 3,
+            "thingByThingId": {
+              "note": "world"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
