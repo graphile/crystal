@@ -1,0 +1,10 @@
+query ProcedureWithArray {
+  anotherThingNodes {
+    nodes {
+      note
+      published
+      tags
+      display
+    }
+  }
+}

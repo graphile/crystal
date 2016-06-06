@@ -1,0 +1,34 @@
+{
+  "data": {
+    "anotherThingNodes": {
+      "nodes": [
+        {
+          "display": "1: hello!",
+          "note": "hello",
+          "published": true,
+          "tags": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "display": "2: world!",
+          "note": "world",
+          "published": true,
+          "tags": [
+            "c",
+            "d"
+          ]
+        },
+        {
+          "display": "3: foo!",
+          "note": "foo",
+          "published": false,
+          "tags": [
+            "a"
+          ]
+        }
+      ]
+    }
+  }
+}

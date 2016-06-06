@@ -1,6 +1,11 @@
-import { camelCase } from 'lodash'
+import { camelCase, isArray, mapValues } from 'lodash'
 import { $$rowTable } from '../symbols.js'
 import createProcedureCall from './createProcedureCall.js'
+
+function asPgValue (value) {
+  const newValue = isArray(value) ? `{${value.map(i => JSON.stringify(i)).join(',')}}` : value
+  return newValue
+}
 
 const resolveProcedure = (procedure, getProcedureArgs) => {
   // If this type is a table type, this variable will be a reference to that table.
@@ -34,12 +39,21 @@ const resolveProcedure = (procedure, getProcedureArgs) => {
   return async (source, args, { client }) => {
     const procedureArgs = getProcedureArgs(source, args)
 
-    // Actuall run the procedure using our arguments.
-    const result = await client.queryAsync({
-      name: query.name,
-      text: query.text,
-      values: argEntries.map(([name]) => procedureArgs[camelCase(name)]),
+    const values = argEntries.map(([name, type]) => {
+      const obj = procedureArgs[camelCase(name)]
+
+      // See https://github.com/calebmer/postgraphql/pull/58
+      if (type.isTableType) {
+        mapValues(obj, (val, key) => {
+          obj[key] = asPgValue(val)
+        })
+      }
+
+      return obj
     })
+
+    // Actuall run the procedure using our arguments.
+    const result = await client.queryAsync({ ...query, values })
 
     // If the procedure returns a set, return all of the rows.
     if (procedure.returnsSet)
