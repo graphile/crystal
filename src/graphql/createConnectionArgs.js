@@ -79,7 +79,7 @@ export default createConnectionArgs
  * @returns {GraphQLEnumType}
  */
 // TODO: Some way to eliminate some columns from ordering enum?
-const createTableOrderingEnum = memoize(table =>
+export const createTableOrderingEnum = memoize(table =>
   new GraphQLEnumType({
     name: `${table.getTypeName()}Ordering`,
     description: `Properties with which ${table.getMarkdownTypeName()} can be ordered.`,

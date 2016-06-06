@@ -6,6 +6,22 @@
         "id": "dGhpbmc6OA==",
         "rowId": 8,
         "note": "a"
+      },
+      "withArg": {
+        "cursor": "OA==",
+        "node": {
+          "id": "dGhpbmc6OA==",
+          "note": "a",
+          "rowId": 8
+        }
+      },
+      "withoutArg": {
+        "cursor": "OA==",
+        "node": {
+          "id": "dGhpbmc6OA==",
+          "note": "a",
+          "rowId": 8
+        }
       }
     },
     "b": {
@@ -14,6 +30,22 @@
         "id": "dGhpbmc6OQ==",
         "rowId": 9,
         "note": "b"
+      },
+      "withArg": {
+        "cursor": "OQ==",
+        "node": {
+          "id": "dGhpbmc6OQ==",
+          "note": "b",
+          "rowId": 9
+        }
+      },
+      "withoutArg": {
+        "cursor": "OQ==",
+        "node": {
+          "id": "dGhpbmc6OQ==",
+          "note": "b",
+          "rowId": 9
+        }
       }
     },
     "c": {
@@ -30,6 +62,23 @@
           "id": "dGhpbmc6OQ==",
           "rowId": 9,
           "note": "b"
+        }
+      },
+      "relationEdge": {
+        "cursor": "OA==",
+        "node": {
+          "aThingId": 8,
+          "bThingId": 9,
+          "thingByAThingId": {
+            "id": "dGhpbmc6OA==",
+            "note": "a",
+            "rowId": 8
+          },
+          "thingByBThingId": {
+            "id": "dGhpbmc6OQ==",
+            "note": "b",
+            "rowId": 9
+          }
         }
       }
     }

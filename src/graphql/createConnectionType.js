@@ -43,7 +43,7 @@ const createTableConnectionType = memoize(table =>
 
 export default createTableConnectionType
 
-const createTableEdgeType = table =>
+export const createTableEdgeType = memoize(table =>
   new GraphQLObjectType({
     name: `${table.getTypeName()}Edge`,
     description: `An edge in the \`${table.getTypeName()}Connection\`.`,
@@ -61,3 +61,4 @@ const createTableEdgeType = table =>
       },
     },
   })
+)

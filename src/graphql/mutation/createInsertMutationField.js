@@ -10,6 +10,8 @@ import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
 import getColumnType from '../getColumnType.js'
 import createTableType from '../createTableType.js'
+import { createTableEdgeType } from '../createConnectionType.js'
+import { createTableOrderingEnum } from '../createConnectionArgs.js'
 import getPayloadInterface from './getPayloadInterface.js'
 import getPayloadFields from './getPayloadFields.js'
 import { inputClientMutationId } from './clientMutationId.js'
@@ -39,6 +41,7 @@ const createInputType = table =>
   new GraphQLInputObjectType({
     name: `Insert${table.getTypeName()}Input`,
     description: `The ${table.getMarkdownTypeName()} to insert.`,
+
     fields: {
       ...fromPairs(
         table.getColumns().map(column => [column.getFieldName(), {
@@ -60,8 +63,31 @@ const createPayloadType = table =>
       [table.getFieldName()]: {
         type: createTableType(table),
         description: `The inserted ${table.getMarkdownTypeName()}.`,
-        resolve: source => source.output,
+        resolve: ({ output }) => output,
       },
+
+      [`${table.getFieldName()}Edge`]: {
+        type: createTableEdgeType(table),
+        args: {
+          orderBy: {
+            type: createTableOrderingEnum(table),
+            description:
+              'The value by which the cursor is created so relay knows where to insert ' +
+              'the edge in the connection.',
+            defaultValue: (() => {
+              const column = table.getPrimaryKeys()[0]
+              if (column) return column.name
+              return null
+            })(),
+          },
+        },
+        description: 'An edge to be inserted in a connection with help of the containing cursor.',
+        resolve: ({ output }, { orderBy }) => ({
+          cursor: orderBy && output[orderBy],
+          node: output,
+        }),
+      },
+
       ...getPayloadFields(table.schema),
     },
   })
@@ -96,7 +122,6 @@ const resolveInsert = table => {
 
     const output = row ? (row[$$rowTable] = table, row) : null
 
-    // Return the first (and likely only) row.
     return {
       output,
       clientMutationId,
