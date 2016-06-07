@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { assign, noop } from 'lodash'
 import { GraphQLEnumType } from 'graphql'
-import { TestType, TestEnum } from '../helpers.js'
+import { TestType, TestEnum, TestDomain } from '../helpers.js'
 import getType from '#/graphql/getType.js'
 
 describe('getType', () => {
@@ -45,7 +45,6 @@ describe('getType', () => {
     expect(graphqlType1a).toNotBe(graphqlType2a)
   })
 
-  // TODO: Move this to a `getType` test file.
   describe('enums', () => {
     const enum_ = new TestEnum({
       name: 'test_enum',
@@ -87,6 +86,12 @@ describe('getType', () => {
         { name: 'TOMATO', value: 'tomato' },
         { name: 'HELLO_WORLD', value: 'hello_world' },
       ].map(variant => assign(variant, { description: noop(), deprecationReason: noop() })))
+    })
+  })
+
+  describe('domains', () => {
+    it('will map a domain type to the underlying type', () => {
+      expect(getType(new TestDomain({ id: 16714, baseTypeId: 23, name: 'an_int' })).name).toEqual('Int')
     })
   })
 })

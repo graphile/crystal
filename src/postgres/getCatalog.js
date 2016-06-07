@@ -8,8 +8,10 @@ import {
   Column,
   Enum,
   TableType,
+  Domain,
   ForeignKey,
   Procedure,
+  Type,
 } from './catalog.js'
 
 const withClient = fn => async pgConfig => {
@@ -38,6 +40,7 @@ const getCatalog = withClient(async client => {
   await Promise.all([
     addEnumTypes(client, catalog),
     addTableTypes(client, catalog),
+    addDomainTypes(client, catalog),
   ])
 
   await addColumns(client, catalog)
@@ -173,6 +176,84 @@ const addTableTypes = (client, catalog) =>
     table: catalog.getTable(row.schemaName, row.tableName),
   }))
   .each(type => catalog.addType(type))
+
+const addDomainTypes = (client, catalog) =>
+    client.queryAsync(`
+      with recursive domains as (
+        -- select all user defined domains
+          select
+            t.oid as "id",
+            n.nspname as "schemaName",
+            t.typname as "name",
+            t.typbasetype as "baseType",
+            t.typtype as "typtype"
+          from
+            pg_catalog.pg_type as t
+            left join pg_catalog.pg_namespace as n on n.oid = t.typnamespace
+          where
+            n.nspname not in ('pg_catalog', 'information_schema')
+            and t.typtype in ('d')
+      ),
+      builtin_types as (
+        -- select all builtin types
+          select
+            t.oid as "id",
+            n.nspname as "schemaName",
+            t.typname as "name",
+            t.typbasetype as "baseType",
+            t.typtype as "typtype"
+          from
+            pg_catalog.pg_type as t
+            left join pg_catalog.pg_namespace as n on n.oid = t.typnamespace
+          where
+            n.nspname not in ('information_schema')
+            and t.typtype in ('b')
+      ),
+      domain_or_builtin_type as (
+          select *, false as is_builtin
+          from domains
+            union all
+          select *, true as is_builtin
+          from builtin_types
+      ),
+      domains_resolved_basetype as (
+        -- begin recursion with user defined domains
+        -- each iteration joins to domain_or_builtin_type until we reach a builtin type
+        select
+          domains."id",
+          domains."schemaName",
+          domains."name",
+          domains."baseType",
+          domains."typtype" as "iter_typtype",
+          domains."baseType" as "iter_baseType"
+        from domains
+        join domain_or_builtin_type on domain_or_builtin_type."id" = domains."baseType"
+          union all
+        select
+          domains_resolved_basetype."id",
+          domains_resolved_basetype."schemaName",
+          domains_resolved_basetype."name",
+          domain_or_builtin_type."baseType",
+          domain_or_builtin_type."typtype" as "iter_typtype",
+          domain_or_builtin_type."id" as "iter_baseType"
+        from domains_resolved_basetype
+        join domain_or_builtin_type on domain_or_builtin_type."id" = domains_resolved_basetype."baseType"
+      )
+      select
+        "id",
+        "schemaName",
+        "name",
+        "iter_baseType" as "baseType"
+      from domains_resolved_basetype
+      where "iter_typtype" = 'b';
+    `)
+    .then(({ rows }) => rows)
+    .map(row => new Domain({
+      ...row,
+      baseType: new Type(row.baseType),
+      schema: catalog.getSchema(row.schemaName),
+    }))
+    .each(type => catalog.addType(type))
 
 const addForeignKeys = (client, catalog) =>
   client.queryAsync(`

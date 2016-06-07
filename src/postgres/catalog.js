@@ -251,6 +251,24 @@ export class Enum extends Type {
 }
 
 /**
+ * Represents a user defined domain PostgreSQL column.
+ *
+ * @member {Schema} schema
+ * @member {string} name
+ * @member {Type} baseType
+ */
+export class Domain extends Type {
+  isDomain = true
+
+  constructor ({ id, schema, name, baseType }) {
+    super(id)
+    this.schema = schema
+    this.name = name
+    this.baseType = baseType
+  }
+}
+
+/**
  * Represents a composite PostgreSQL table type.
  *
  * @member {Table} table
