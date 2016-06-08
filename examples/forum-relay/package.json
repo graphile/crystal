@@ -25,6 +25,8 @@
     "react": "15.1.0",
     "react-dom": "15.1.0",
     "react-relay": "^0.8.1",
+    "react-router": "^2.4.1",
+    "react-router-relay": "^0.13.2",
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1"
   }

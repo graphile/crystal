@@ -1,13 +1,37 @@
-import App from './components/App';
-import AppHomeRoute from './routes/AppHomeRoute';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Relay from 'react-relay';
+import React from 'react'
+import { render } from 'react-dom'
+import Relay from 'react-relay'
+import { Router, Route, Redirect, IndexRoute, browserHistory, applyRouterMiddleware } from 'react-router'
+import useRelay from 'react-router-relay'
+import App from './components/App'
+import PostIndex from './components/PostIndex'
+import Post from './components/Post'
+import { ViewerQueries, PostQueries } from './queries'
 
-ReactDOM.render(
-  <Relay.RootContainer
-    Component={App}
-    route={new AppHomeRoute()}
+const routes = (
+  <Route path="/" component={App}>
+    <Route path="posts">
+      <IndexRoute
+        component={PostIndex}
+        queries={ViewerQueries}
+      />
+      <Route
+        path=":postId"
+        component={Post}
+        queries={PostQueries}
+      />
+    </Route>
+  </Route>
+)
+
+const mountNode = document.getElementById('root')
+
+render(
+  <Router
+    history={browserHistory}
+    routes={routes}
+    render={applyRouterMiddleware(useRelay)}
+    environment={Relay.Store}
   />,
-  document.getElementById('root')
-);
+  mountNode
+)
