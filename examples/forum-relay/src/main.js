@@ -1,6 +1,6 @@
 import React from 'react'
-import { render } from 'react-dom'
 import Relay from 'react-relay'
+import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, browserHistory, applyRouterMiddleware } from 'react-router'
 import useRelay from 'react-router-relay'
 import App from './components/App'

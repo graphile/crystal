@@ -936,6 +936,11 @@
       "from": "domain-browser@>=1.1.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/domain-browser/-/domain-browser-1.1.7.tgz"
     },
+    "dotenv": {
+      "version": "2.0.0",
+      "from": "dotenv@latest",
+      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-2.0.0.tgz"
+    },
     "ecc-jsbn": {
       "version": "0.1.1",
       "from": "ecc-jsbn@>=0.1.1 <0.2.0",
@@ -1146,7 +1151,7 @@
     },
     "fs-promise": {
       "version": "0.5.0",
-      "from": "fs-promise@>=0.5.0 <0.6.0",
+      "from": "fs-promise@latest",
       "resolved": "https://registry.npmjs.org/fs-promise/-/fs-promise-0.5.0.tgz"
     },
     "fs-readdir-recursive": {
@@ -2758,16 +2763,9 @@
       "resolved": "https://registry.npmjs.org/right-align/-/right-align-0.1.3.tgz"
     },
     "rimraf": {
-      "version": "2.5.2",
-      "from": "rimraf@>=2.2.8 <3.0.0",
-      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.5.2.tgz",
-      "dependencies": {
-        "glob": {
-          "version": "7.0.3",
-          "from": "glob@>=7.0.0 <8.0.0",
-          "resolved": "https://registry.npmjs.org/glob/-/glob-7.0.3.tgz"
-        }
-      }
+      "version": "2.2.8",
+      "from": "rimraf@>=2.2.5 <2.3.0",
+      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.2.8.tgz"
     },
     "ripemd160": {
       "version": "0.2.0",

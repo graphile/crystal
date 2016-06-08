@@ -1,37 +1,28 @@
-// We need to call promisify the node-postgres
-import 'postgraphql/dist/promisify'
-import fsp from 'fs-promise'
+import dotenv from 'dotenv'
 import path from 'path'
-import { graphql } from 'graphql'
+import fetch from 'isomorphic-fetch'
+import fsp from 'fs-promise'
 import { introspectionQuery, printSchema } from 'graphql/utilities'
-import { createGraphqlSchema } from 'postgraphql'
 
-async function updateSchema() {
-  console.log('Updating schema.json and schema.graphql …')
+// load config from .env file
+dotenv.load()
+const { APP_PORT } = process.env
 
-  const schema = await createGraphqlSchema('postgres://localhost:5432', 'forum_example')
-    .catch(err => console.error('Error creating graphql schema. Details: ', err))
-
-  const result = await graphql(schema, introspectionQuery)
-    .catch(err => console.error('Error while introspecting graphql schema. Details: ', err))
-
-  if (result.errors) {
-    console.error('Error introspecting schema. Message: ', result.errors)
-    return
-  }
-  
-  return Promise.all([
-    fsp.writeFile(
-      path.join(__dirname, '../schema.json'),
-      JSON.stringify(result, null, 2)
-    ),
-    fsp.writeFile(
-      path.join(__dirname, '../schema.graphql'),
-      printSchema(schema)
-    ),
-  ]).catch(err => console.error('Error while writing to the file system. Details: ', err))
+// introspect the schema from the graphql endpoint
+const fetchSchema = url => {
+  return fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({query: introspectionQuery}),
+    headers: { 'Content-Type': 'application/json' },
+  })
+  .then(res => res.text())
 }
 
-updateSchema()
-  .then(() => console.log('Update successfull!'))
-  .catch(err => console.error('Error updating schema: ', err))
+fetchSchema(`http://localhost:${APP_PORT}/graphql`).then(json => {
+  return fsp.writeFile(
+    path.join(__dirname, '../schema.json'),
+    json
+  )
+})
+.then(() => console.log('The schema.json file was successfully created'))
+.catch(err => console.log(`There was an error fetching the GraphQL schema. ${err}`))
