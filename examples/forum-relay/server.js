@@ -1,16 +1,17 @@
 import express from 'express'
 import path from 'path'
+import dotenv from 'dotenv'
 import webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import postgraphql from 'postgraphql'
 
-const APP_PORT = 3000
-const CN_STRING = 'postgres://localhost:5432'
-const SCHEMA = 'forum_example'
+// Load the config from .env file.
+dotenv.load()
+const { APP_PORT, CN_STRING, SCHEMA } = process.env
 
-// webpack configuration
+// Our webpack configuration.
 const compiler = webpack({
-  entry: path.resolve(__dirname, 'src/app.js'),
+  entry: path.resolve(__dirname, 'src/main.js'),
   module: {
     loaders: [{
       include: [path.resolve(__dirname, 'src')],
@@ -24,23 +25,26 @@ const compiler = webpack({
   },
 })
 
-// webpack dev server returns an express app
+// This allows use compile the front-end app on the fly.
+// Do not use this in production.
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   publicPath: '/src/',
   stats: { colors: true },
 })
 
-// mount the postgraphql as middleware at `/graphql`
+// The webpack dev server exposes the `.use` of the express app instance.
+// Mount the postgraphql as middleware at `/graphql`.
 app.use('/graphql', postgraphql(CN_STRING, SCHEMA, {
     development: true,
     log: true,
   }
 ))
 
-// anything else load the index.html file
+// Any other path will match this and will load the index.html file.
 app.use('*', (req, res) => {
-  res.sendfile(path.resolve(__dirname, 'public/index.html'))
+  res.sendFile(path.resolve(__dirname, 'public/index.html'))
 })
 
+// Start the app server.
 app.listen(APP_PORT)

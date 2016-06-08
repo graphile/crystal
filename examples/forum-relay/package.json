@@ -4,11 +4,10 @@
   "version": "1.0.0",
   "description": "A PostGraphQL forum example with a Relay frontend.",
   "scripts": {
-    "schema-up": "psql -f ../forum/schema.sql",
+    "schema-up": "psql -f ./schema.sql",
     "schema-down": "psql -c 'drop schema if exists forum_example, forum_example_utils cascade'",
     "schema": "npm run schema-down && npm run schema-up",
-    "start": "babel-node ./server.js",
-    "update-schema": "babel-node ./scripts/updateSchema.js"
+    "start": "babel-node ./server.js"
   },
   "dependencies": {
     "babel-cli": "^6.9.0",
@@ -19,8 +18,9 @@
     "babel-preset-react": "6.5.0",
     "babel-preset-stage-0": "6.5.0",
     "babel-relay-plugin": "^0.8.1",
+    "dotenv": "^2.0.0",
     "express": "4.13.4",
-    "fs-promise": "^0.5.0",
+    "isomorphic-fetch": "^2.2.1",
     "postgraphql": "^1.5.0",
     "react": "15.1.0",
     "react-dom": "15.1.0",
