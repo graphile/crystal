@@ -20,7 +20,8 @@ create table another_thing (
   id               serial not null primary key,
   note             text not null,
   published        boolean not null,
-  tags             text[] not null
+  tags             text[] not null,
+  thing_id         int references thing(id) on delete cascade
 );
 
 create function add(a int, b int) returns int as $$
@@ -123,11 +124,6 @@ $$ language plpgsql
 strict
 set search_path from current;
 
-insert into another_thing (note, published, tags) values
-  ('hello', true, '{"a", "b"}'),
-  ('world', true, '{"c", "d"}'),
-  ('foo', false, '{"a"}');
-
 insert into thing (note) values
   ('hello'),
   ('world'),
@@ -146,5 +142,10 @@ insert into relation (a_thing_id, b_thing_id) values
   (3, 5),
   (4, 3),
   (7, 1);
+
+insert into another_thing (note, published, tags, thing_id) values
+  ('hello', true, '{"a", "b"}', 1),
+  ('world', true, '{"c", "d"}', null),
+  ('foo', false, '{"a"}', 2);
 
 commit;

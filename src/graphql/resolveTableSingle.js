@@ -44,12 +44,10 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
   const getDataLoader = memoize(client => new DataLoader(async columnValueses => {
     // Query the client with our list of column values and prepared query.
     // Results can be returned in any order.
-    const { rowCount, rows } = await client.queryAsync({
-      name: query.name,
-      text: query.text,
-      // We expect to pass an array of strings with concatenated values.
-      values: [columnValueses.map(columnValues => columnValues.join(','))],
-    })
+
+    // We expect to pass an array of strings with concatenated values.
+    const values = [columnValueses.map(columnValues => (columnValues.join(',') || null))]
+    const { rowCount, rows } = await client.queryAsync({ ...query, values })
 
     // Gets the row from the result set given a few column values.
     let getRow = columnValues => rows.find(row =>

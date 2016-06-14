@@ -1,0 +1,11 @@
+query NullForeignKey {
+  anotherThingNodes { edges { node { ...anotherThing } } }
+}
+
+fragment anotherThing on AnotherThing {
+  id
+  rowId
+  thingByThingId {
+    note
+  }
+}
