@@ -47,6 +47,7 @@ const getCatalog = withClient(async client => {
 
   await Promise.all([
     addForeignKeys(client, catalog),
+    addUniqueConstraints(client, catalog),
     addProcedures(client, catalog),
   ])
 
@@ -320,6 +321,28 @@ const addForeignKeys = (client, catalog) =>
     })
   })
   .each(foreignKey => catalog.addForeignKey(foreignKey))
+
+const addUniqueConstraints = (client, catalog) =>
+  client.queryAsync(`
+    select
+      n.nspname as "schemaName",
+      t.relname as "tableName",
+      c.conkey as "columnNums"
+    from
+      pg_catalog.pg_constraint as c
+      left join pg_catalog.pg_class as t on t.oid = c.conrelid
+      left join pg_catalog.pg_namespace as n on n.oid = t.relnamespace
+    where
+      n.nspname not in ('pg_catalog', 'information_schema') and
+      (c.contype = 'u' or c.contype = 'p');
+  `)
+  .then(({ rows }) => rows)
+  .each(({ schemaName, tableName, columnNums }) => {
+    const table = catalog.getTable(schemaName, tableName)
+    const allColumns = table.getColumns()
+    const columns = columnNums.map(colNum => allColumns.find(({ num }) => num === colNum))
+    table._uniqueConstraints.push(columns)
+  })
 
 const addProcedures = (client, catalog) =>
   client.queryAsync(`

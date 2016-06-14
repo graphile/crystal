@@ -1,11 +1,11 @@
 import { memoize, fromPairs, ary, assign } from 'lodash'
-import createNodeQueryField from './createNodeQueryField.js'
+import createAllNodeQueryField from './createAllNodeQueryField.js'
 import createTableQueryFields from './createTableQueryFields.js'
 import createProcedureQueryField from './createProcedureQueryField.js'
 
 const createQueryFields = memoize(schema => ({
   // Add the node query field.
-  node: createNodeQueryField(schema),
+  node: createAllNodeQueryField(schema),
   // Add fields for procedures.
   ...fromPairs(
     schema

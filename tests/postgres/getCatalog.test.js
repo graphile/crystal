@@ -92,6 +92,14 @@ create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language 
 create function c.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
 
 create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
+
+create table b.so_unique (
+  id uuid primary key,
+  lucky_number int unique,
+  a text not null,
+  b text not null,
+  unique (a, b)
+);
 `
 
 describe('getCatalog', function testGetCatalog () {
@@ -327,5 +335,16 @@ describe('getCatalog', function testGetCatalog () {
 
   it('will get comments on procedures', () => {
     expect(catalog.getProcedure('a', 'add_1').description).toEqual('lol, add some stuff')
+  })
+
+  it('will get uniqueness constraints', () => {
+    expect(catalog.getTable('b', 'so_unique').getUniqueConstraints()).toEqual([
+      [catalog.getColumn('b', 'so_unique', 'a'), catalog.getColumn('b', 'so_unique', 'b')],
+      [catalog.getColumn('b', 'so_unique', 'lucky_number')],
+      [catalog.getColumn('b', 'so_unique', 'id')],
+    ])
+    expect(catalog.getTable('c', 'compound_key').getUniqueConstraints()).toEqual([
+      [catalog.getColumn('c', 'compound_key', 'person_id_1'), catalog.getColumn('c', 'compound_key', 'person_id_2')],
+    ])
   })
 })

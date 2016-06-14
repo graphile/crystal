@@ -2,17 +2,17 @@ import expect from 'expect'
 import { keys } from 'lodash'
 import { GraphQLObjectType, GraphQLNonNull, GraphQLID } from 'graphql'
 import { TestTable, TestColumn } from '../../helpers.js'
-import createSingleQueryField from '#/graphql/query/createSingleQueryField.js'
+import createNodeQueryField from '#/graphql/query/createNodeQueryField.js'
 
-describe('createSingleQueryField', () => {
+describe('createNodeQueryField', () => {
   it('is an object type', async () => {
-    const person = createSingleQueryField(new TestTable({ name: 'person' }))
+    const person = createNodeQueryField(new TestTable({ name: 'person' }))
     expect(person.type).toBeA(GraphQLObjectType)
     expect(person.type.name).toEqual('Person')
   })
 
   it('has args for only the node `id`', () => {
-    const person = createSingleQueryField(
+    const person = createNodeQueryField(
       new TestTable({
         name: 'person',
         columns: [
@@ -23,7 +23,7 @@ describe('createSingleQueryField', () => {
       })
     )
 
-    const compoundKey = createSingleQueryField(
+    const compoundKey = createNodeQueryField(
       new TestTable({
         name: 'compound_key',
         columns: [
@@ -47,6 +47,6 @@ describe('createSingleQueryField', () => {
   it('it will return null for tables without primary keys', () => {
     const table = new TestTable()
     table.schema.catalog.addColumn(new TestColumn({ table }))
-    expect(createSingleQueryField(table)).toNotExist()
+    expect(createNodeQueryField(table)).toNotExist()
   })
 })

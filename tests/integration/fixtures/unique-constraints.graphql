@@ -1,0 +1,17 @@
+query UniqueConstraints {
+  thingByRowId(rowId: 1) { ...thing }
+  relationByAThingIdAndBThingId(aThingId: 1, bThingId: 2) {
+    id
+    aThingId
+    bThingId
+    thingByAThingId { ...thing }
+    thingByBThingId { ...thing }
+  }
+  thingByLuckyNumber(luckyNumber: 98) { ...thing }
+}
+
+fragment thing on Thing {
+  id
+  rowId
+  note
+}

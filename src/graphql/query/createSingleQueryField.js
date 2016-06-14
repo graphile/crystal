@@ -1,42 +1,28 @@
-import { GraphQLNonNull, GraphQLID } from 'graphql'
-import { fromID } from '../types.js'
+import { fromPairs } from 'lodash'
+import { GraphQLNonNull, getNullableType } from 'graphql'
 import createTableType from '../createTableType.js'
+import getColumnType from '../getColumnType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
-/**
- * Creates an object field for selecting a single row of a table.
- *
- * @param {Table} table
- * @returns {GraphQLFieldConfig}
- */
-const createSingleQueryField = table => {
-  const primaryKeys = table.getPrimaryKeys()
+const createSingleQueryField = (table, columns) => ({
+  type: createTableType(table),
+  description:
+    `Queries a single ${table.getMarkdownTypeName()} using a uniqueness ` +
+    `constraint with field${columns.length === 1 ? '' : 's'} ` +
+    `${columns.map(column => column.getMarkdownFieldName()).join(', ')}.`,
 
-  // Can’t query a single node of a table if it does not have a primary key.
-  if (primaryKeys.length === 0)
-    return null
+  args: fromPairs(
+    columns.map(column => [column.getFieldName(), {
+      type: new GraphQLNonNull(getNullableType(getColumnType(column))),
+      description: `The exact value of the ${column.getMarkdownFieldName()} field to match.`,
+    }])
+  ),
 
-  return {
-    type: createTableType(table),
-    description: `Queries a single ${table.getMarkdownTypeName()} using its primary keys.`,
-
-    args: {
-      id: {
-        type: new GraphQLNonNull(GraphQLID),
-        description: `The \`ID\` of the ${table.getMarkdownTypeName()} node.`,
-      },
-    },
-
-    resolve: resolveTableSingle(
-      table,
-      primaryKeys,
-      (source, { id }) => {
-        const { tableName, values } = fromID(id)
-        if (tableName !== table.name) return null
-        return values
-      }
-    ),
-  }
-}
+  resolve: resolveTableSingle(
+    table,
+    columns,
+    (source, args) => columns.map(column => args[column.getFieldName()])
+  ),
+})
 
 export default createSingleQueryField

@@ -1,48 +1,42 @@
-import { memoize } from 'lodash'
 import { GraphQLNonNull, GraphQLID } from 'graphql'
-import { $$isViewer } from '../../symbols.js'
-import { NodeType, fromID } from '../types.js'
+import { fromID } from '../types.js'
+import createTableType from '../createTableType.js'
 import resolveTableSingle from '../resolveTableSingle.js'
 
-const createNodeQueryField = schema => {
-  const getTable = memoize(tableName => schema.catalog.getTable(schema.name, tableName))
+/**
+ * Creates an object field for selecting a single row of a table.
+ *
+ * @param {Table} table
+ * @returns {GraphQLFieldConfig}
+ */
+const createNodeQueryField = table => {
+  const primaryKeys = table.getPrimaryKeys()
+
+  // Can’t query a single node of a table if it does not have a primary key.
+  if (primaryKeys.length === 0)
+    return null
+
   return {
-    type: NodeType,
-    description: 'Fetches an object given its globally unique `ID`.',
+    type: createTableType(table),
+    description: `Queries a single ${table.getMarkdownTypeName()} using its primary keys.`,
 
     args: {
       id: {
         type: new GraphQLNonNull(GraphQLID),
-        description: 'The `ID` of the node.',
+        description: `The \`ID\` of the ${table.getMarkdownTypeName()} node.`,
       },
     },
 
-    resolve: (source, args, context) => {
-      const { id } = args
-
-      // If the id is just `viewer`, we are trying to refetch the viewer node.
-      if (id === 'viewer')
-        return { [$$isViewer]: true }
-
-      const { tableName, values } = fromID(id)
-      const table = getTable(tableName)
-
-      if (!table)
-        throw new Error(`No table '${tableName}' in schema '${schema.name}'.`)
-
-      return getResolveNode(table)({ values }, {}, context)
-    },
+    resolve: resolveTableSingle(
+      table,
+      primaryKeys,
+      (source, { id }) => {
+        const { tableName, values } = fromID(id)
+        if (tableName !== table.name) return null
+        return values
+      }
+    ),
   }
 }
 
 export default createNodeQueryField
-
-// This function will be called for every resolution, therefore it is (and
-// must be) memoized.
-//
-// Because this is memoized, fetching primary keys is ok here.
-const getResolveNode = memoize(table => resolveTableSingle(
-  table,
-  table.getPrimaryKeys(),
-  ({ values }) => values,
-))

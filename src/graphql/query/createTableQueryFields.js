@@ -1,5 +1,7 @@
-import createSingleQueryField from './createSingleQueryField.js'
+import { upperFirst } from 'lodash'
+import createNodeQueryField from './createNodeQueryField.js'
 import createNodesQueryField from './createNodesQueryField.js'
+import createSingleQueryField from './createSingleQueryField.js'
 
 /**
  * Creates the fields for a single table in the database. To see the type these
@@ -12,13 +14,18 @@ import createNodesQueryField from './createNodesQueryField.js'
 const createTableQueryFields = table => {
   const fields = {}
 
-  const singleField = createSingleQueryField(table)
-  const listField = createNodesQueryField(table)
+  // `createSingleQueryField` may return `null`, so we must check for that.
+  const nodeField = createNodeQueryField(table)
+  if (nodeField) fields[table.getFieldName()] = nodeField
 
-  // `createSingleQueryField` and others may return `null`, so we must check
-  // for that.
-  if (singleField) fields[table.getFieldName()] = singleField
-  if (listField) fields[`${table.getFieldName()}Nodes`] = listField
+  for (const columns of table.getUniqueConstraints()) {
+    const fieldName =
+      `${table.getFieldName()}By${columns.map(column => upperFirst(column.getFieldName())).join('And')}`
+
+    fields[fieldName] = createSingleQueryField(table, columns)
+  }
+
+  fields[`${table.getFieldName()}Nodes`] = createNodesQueryField(table)
 
   return fields
 }
