@@ -1,13 +1,13 @@
-import { memoize } from 'lodash'
-import createTableType from './createTableType.js'
-import { PageInfoType, CursorType } from './types.js'
-
 import {
   GraphQLObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLInt,
 } from 'graphql'
+
+import { memoize } from 'lodash'
+import createTableType from './createTableType.js'
+import { PageInfoType, CursorType } from './types.js'
 
 const createTableConnectionType = memoize(table =>
   new GraphQLObjectType({

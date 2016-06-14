@@ -1,7 +1,7 @@
 import { memoize } from 'lodash'
 import { GraphQLInterfaceType } from 'graphql'
-import { payloadClientMutationId } from './clientMutationId.js'
 import createViewerField from '../createViewerField.js'
+import { payloadClientMutationId } from './clientMutationId.js'
 
 const getPayloadInterface = memoize(schema =>
   new GraphQLInterfaceType({

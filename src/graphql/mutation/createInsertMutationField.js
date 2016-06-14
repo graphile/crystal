@@ -1,3 +1,10 @@
+import {
+  getNullableType,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+} from 'graphql'
+
 import { fromPairs, identity, constant } from 'lodash'
 import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
@@ -6,13 +13,6 @@ import createTableType from '../createTableType.js'
 import getPayloadInterface from './getPayloadInterface.js'
 import getPayloadFields from './getPayloadFields.js'
 import { inputClientMutationId } from './clientMutationId.js'
-
-import {
-  getNullableType,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-} from 'graphql'
 
 /**
  * Creates a mutation which will create a new row.

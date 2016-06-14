@@ -1,8 +1,6 @@
 # Using PostGraphQL as a Library
 Some people may want to use PostGraphQL as a dependency of their current node projects. This is a functionality PostGraphQL intends to support. As long as you are using a server framework that supports [connect][]-styled middleware, you can use PostGraphQL as a dependency.
 
-> Unfortunately at the moment you can only use PostGraphQL as a library in [express][] applications. PostGraphQL wants to support all frameworks that work with connect-styled middleware, but we are blocked on that goal until [graphql/express-graphql#82][] gets merged.
-
 To use PostGraphQL as a library just do the following:
 
 ```js
