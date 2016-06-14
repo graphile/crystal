@@ -2,6 +2,7 @@ import path from 'path'
 import { forEach } from 'lodash'
 import Express from 'express'
 import onFinished from 'on-finished'
+import { Forbidden, BadRequest } from 'http-errors'
 import logger from 'morgan'
 import favicon from 'serve-favicon'
 import finalHandler from 'finalhandler'
@@ -80,7 +81,16 @@ const setupRequestTransaction = async (req, client, secret) => {
   const token = getToken(req)
   if (!token) return
 
-  const decoded = await jwt.verifyAsync(token, secret, { audience: 'postgraphql' })
+  let decoded
+
+  // If `jwt.verifyAsync` throws an error, catch it and re-throw it as a 403 error.
+  try {
+    decoded = await jwt.verifyAsync(token, secret, { audience: 'postgraphql' })
+  }
+  catch (error) {
+    throw new Forbidden(error.message)
+  }
+
   const { role } = decoded
   const values = []
   const querySelection = []
@@ -120,8 +130,10 @@ const bearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
 
 const getToken = req => {
   const { authorization } = req.headers
+  if (authorization == null) return null
   const match = bearerRex.exec(authorization)
-  if (!match) return null
+  if (!match)
+    throw new BadRequest('Authorization header is not in the correct bearer token format.')
   return match[1]
 }
 

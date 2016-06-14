@@ -159,6 +159,34 @@ describe('createServer', () => {
     )
   })
 
+  it('will fail for poorly formed Authorization headers', async () => {
+    const server = testCreateServer()
+    await (
+      request(server)
+      .get('/')
+      .set('Authorization', 'qwerty')
+      .query({ query: '{hello}' })
+      .expect(400)
+      .expect({ errors: [{ message: 'Authorization header is not in the correct bearer token format.' }] })
+    )
+    await (
+      request(server)
+      .get('/')
+      .set('Authorization', 'Basic asd')
+      .query({ query: '{hello}' })
+      .expect(400)
+      .expect({ errors: [{ message: 'Authorization header is not in the correct bearer token format.' }] })
+    )
+    await (
+      request(server)
+      .get('/')
+      .set('Authorization', 'Bearer ')
+      .query({ query: '{hello}' })
+      .expect(400)
+      .expect({ errors: [{ message: 'Authorization header is not in the correct bearer token format.' }] })
+    )
+  })
+
   it('requires tokens to have an audience of \'postgraphql\'', async () => {
     const tokenA = await jwt.signAsync({ yolo: 'swag' }, 'secret', {})
     const tokenB = await jwt.signAsync({ aud: 'anything else', yolo: 'hat' }, 'secret', {})
@@ -169,7 +197,7 @@ describe('createServer', () => {
       .get('/')
       .set('Authorization', `Bearer ${tokenA}`)
       .query({ query: '{hello}' })
-      .expect(500)
+      .expect(403)
       .expect({ errors: [{ message: 'jwt audience invalid. expected: postgraphql' }] })
     )
     await (
@@ -177,7 +205,7 @@ describe('createServer', () => {
       .get('/')
       .set('Authorization', `Bearer ${tokenB}`)
       .query({ query: '{hello}' })
-      .expect(500)
+      .expect(403)
       .expect({ errors: [{ message: 'jwt audience invalid. expected: postgraphql' }] })
     )
     await (
