@@ -15,13 +15,13 @@ const createMutationType = schema =>
         schema
         .getProcedures()
         .filter(({ isMutation }) => isMutation)
-        .filter(procedure => !procedure.hasTableArg())
         .map(procedure => [procedure.getFieldName(), createProcedureMutationField(procedure)])
       ),
       // Add standard fields for tables.
       ...(
         schema
         .getTables()
+        .filter(table => table.kind === 'r')
         .map(table => createMutationFields(table))
         .reduce(ary(assign, 2), {})
       ),

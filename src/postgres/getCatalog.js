@@ -75,14 +75,15 @@ const addTables = (client, catalog) =>
     select
       n.nspname as "schemaName",
       c.relname as "name",
-      d.description as "description"
+      d.description as "description",
+      c.relkind as "kind"
     from
       pg_catalog.pg_class as c
       left join pg_catalog.pg_namespace as n on n.oid = c.relnamespace
       left join pg_catalog.pg_description as d on d.objoid = c.oid and d.objsubid = 0
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
-      c.relkind in ('r', 'v', 'm', 'f');
+      c.relkind in ('r', 'v', 'm', 'f', 'c');
   `)
   .then(({ rows }) => rows)
   .map(row => new Table({
@@ -114,7 +115,7 @@ const addColumns = (client, catalog) =>
         cp.conkey::int[] @> array[a.attnum::int]
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
-      c.relkind in ('r', 'v', 'm', 'f') and
+      c.relkind in ('r', 'v', 'm', 'f', 'c') and
       a.attnum > 0 and
       not a.attisdropped
     order by
@@ -168,7 +169,7 @@ const addTableTypes = (client, catalog) =>
       left join pg_catalog.pg_namespace as n on n.oid = c.relnamespace
     where
       n.nspname not in ('pg_catalog', 'information_schema') and
-      c.relkind in ('r', 'v', 'm', 'f');
+      c.relkind in ('r', 'v', 'm', 'f', 'c');
   `)
   .then(({ rows }) => rows)
   .map(row => new TableType({
