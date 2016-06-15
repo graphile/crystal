@@ -1,0 +1,27 @@
+query {
+  noInsertMutation: __type(name: "InsertNonMutationViewPayload") {
+    name
+  }
+  noUpdateMutation: __type(name: "UpdateNonMutationViewPayload") {
+    name
+  }
+  noDeleteMutation: __type(name: "DeleteNonMutationViewPayload") {
+    name
+  }
+
+  insertMutation: __type(name: "InsertMutationViewForThingPayload") {
+    name
+  }
+  updateMutation: __type(name: "UpdateMutationViewForThingPayload") {
+    name
+  }
+  deleteMutation: __type(name: "DeleteMutationViewForThingPayload") {
+    name
+  }
+
+  nonMutationViewNodes(orderBy: COLUMN) {
+    nodes {
+      column
+    }
+  }
+}

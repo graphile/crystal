@@ -19,8 +19,8 @@ export class TestSchema extends c.Schema {
 }
 
 export class TestTable extends c.Table {
-  constructor ({ name = 'test', schema = new TestSchema(), ...config } = {}) {
-    super({ name, schema, ...config })
+  constructor ({ name = 'test', schema = new TestSchema(), isInsertable = true, isUpdatable = true, isDeletable = true, ...config } = {}) {
+    super({ name, schema, isInsertable, isUpdatable, isDeletable, ...config })
     this.schema.catalog.addTable(this)
     this.schema.catalog.addColumn(new TestColumn({ table: this, isPrimaryKey: true }))
   }
