@@ -11,6 +11,22 @@ fragment payloadThing on InsertThingPayload {
     rowId
     note
   }
+  withArg: thingEdge(orderBy: ROW_ID) {
+    cursor
+    node {
+      id
+      rowId
+      note
+    }
+  }
+  withoutArg: thingEdge {
+    cursor
+    node {
+      id
+      rowId
+      note
+    }
+  }
 }
 
 fragment payloadRelation on InsertRelationPayload {
@@ -27,6 +43,23 @@ fragment payloadRelation on InsertRelationPayload {
       id
       rowId
       note
+    }
+  }
+  relationEdge {
+    cursor
+    node {
+      aThingId
+      bThingId
+      thingByAThingId {
+        id
+        rowId
+        note
+      }
+      thingByBThingId {
+        id
+        rowId
+        note
+      }
     }
   }
 }
