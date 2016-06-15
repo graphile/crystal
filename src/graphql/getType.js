@@ -1,6 +1,3 @@
-import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
-import createTableType from './createTableType.js'
-
 import {
   GraphQLBoolean,
   GraphQLInt,
@@ -9,6 +6,9 @@ import {
   GraphQLList,
   GraphQLEnumType,
 } from 'graphql'
+
+import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
+import createTableType from './createTableType.js'
 
 import {
   DateType,

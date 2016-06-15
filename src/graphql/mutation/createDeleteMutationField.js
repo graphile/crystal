@@ -1,3 +1,9 @@
+import {
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+} from 'graphql'
+
 import { fromPairs } from 'lodash'
 import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
@@ -6,12 +12,6 @@ import createTableType from '../createTableType.js'
 import getPayloadInterface from './getPayloadInterface.js'
 import getPayloadFields from './getPayloadFields.js'
 import { inputClientMutationId } from './clientMutationId.js'
-
-import {
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-} from 'graphql'
 
 /**
  * Creates a mutation which will delete a single existing row.
