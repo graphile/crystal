@@ -338,11 +338,12 @@ describe('getCatalog', function testGetCatalog () {
   })
 
   it('will get uniqueness constraints', () => {
-    expect(catalog.getTable('b', 'so_unique').getUniqueConstraints()).toEqual([
-      [catalog.getColumn('b', 'so_unique', 'a'), catalog.getColumn('b', 'so_unique', 'b')],
-      [catalog.getColumn('b', 'so_unique', 'lucky_number')],
-      [catalog.getColumn('b', 'so_unique', 'id')],
-    ])
+    const uniqueConstraints = catalog.getTable('b', 'so_unique').getUniqueConstraints()
+    expect(uniqueConstraints.length).toBe(3)
+    expect(uniqueConstraints)
+    .toInclude([catalog.getColumn('b', 'so_unique', 'id')])
+    .toInclude([catalog.getColumn('b', 'so_unique', 'lucky_number')])
+    .toInclude([catalog.getColumn('b', 'so_unique', 'a'), catalog.getColumn('b', 'so_unique', 'b')])
     expect(catalog.getTable('c', 'compound_key').getUniqueConstraints()).toEqual([
       [catalog.getColumn('c', 'compound_key', 'person_id_1'), catalog.getColumn('c', 'compound_key', 'person_id_2')],
     ])
