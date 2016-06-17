@@ -55,6 +55,10 @@ create view b.yo as
   from
     a.hello;
 
+create view c.no_update as
+  select
+    (1 + 1) as col1;
+
 comment on view b.yo is 'YOYOYO!!';
 comment on column b.yo.constant is 'This is constantly 2';
 
@@ -205,6 +209,23 @@ describe('getCatalog', function testGetCatalog () {
     expect(catalog.getColumn('a', 'types', 'domain').type.baseType.id).toEqual(23)
     expect(catalog.getColumn('a', 'types', 'domain2').type.isDomain).toBe(true)
     expect(catalog.getColumn('a', 'types', 'domain2').type.baseType.id).toEqual(23)
+  })
+
+  it('contains relation updatable information', () => {
+    // non updatable view
+    expect(catalog.getTable('c', 'no_update').isInsertable).toBe(false)
+    expect(catalog.getTable('c', 'no_update').isUpdatable).toBe(false)
+    expect(catalog.getTable('c', 'no_update').isDeletable).toBe(false)
+
+    // updatable view
+    expect(catalog.getTable('b', 'yo').isInsertable).toBe(true)
+    expect(catalog.getTable('b', 'yo').isUpdatable).toBe(true)
+    expect(catalog.getTable('b', 'yo').isDeletable).toBe(true)
+
+    // table
+    expect(catalog.getTable('a', 'hello').isInsertable).toBe(true)
+    expect(catalog.getTable('a', 'hello').isUpdatable).toBe(true)
+    expect(catalog.getTable('a', 'hello').isDeletable).toBe(true)
   })
 
   it('will get foreign keys', () => {

@@ -115,15 +115,21 @@ export class Schema {
  * @member {Schema} schema
  * @member {string} name
  * @member {string} description
+ * @member {boolean} isInsertable
+ * @member {boolean} isUpdatable
+ * @member {boolean} isDeletable
  * @member {Column[]} columns
  * @member {ForeignKey[]} foreignKeys
  * @member {ForeignKey[]} reverseForeignKeys
  */
 export class Table {
-  constructor ({ schema, name, description }) {
+  constructor ({ schema, name, description, isInsertable, isUpdatable, isDeletable }) {
     this.schema = schema
     this.name = name
     this.description = description
+    this.isInsertable = isInsertable
+    this.isUpdatable = isUpdatable
+    this.isDeletable = isDeletable
   }
 
   getColumns = once(() => {

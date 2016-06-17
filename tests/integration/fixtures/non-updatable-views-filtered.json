@@ -1,0 +1,23 @@
+{
+  "data": {
+    "noInsertMutation": null,
+    "noUpdateMutation": null,
+    "noDeleteMutation": null,
+    "insertMutation": {
+      "name": "InsertMutationViewForThingPayload"
+    },
+    "updateMutation": {
+      "name": "UpdateMutationViewForThingPayload"
+    },
+    "deleteMutation": {
+      "name": "DeleteMutationViewForThingPayload"
+    },
+    "nonMutationViewNodes": {
+      "nodes": [
+        {
+          "column": 1
+        }
+      ]
+    }
+  }
+}

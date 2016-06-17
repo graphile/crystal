@@ -30,8 +30,15 @@ const createMutationType = schema =>
 
 export default createMutationType
 
-const createMutationFields = table => ({
-  [`insert${upperFirst(camelCase(table.name))}`]: createInsertMutationField(table),
-  [`update${upperFirst(camelCase(table.name))}`]: createUpdateMutationField(table),
-  [`delete${upperFirst(camelCase(table.name))}`]: createDeleteMutationField(table),
-})
+const createMutationFields = table => {
+  const mutations = {}
+
+  if (table.isInsertable)
+    mutations[`insert${upperFirst(camelCase(table.name))}`] = createInsertMutationField(table)
+  if (table.isUpdatable)
+    mutations[`update${upperFirst(camelCase(table.name))}`] = createUpdateMutationField(table)
+  if (table.isDeletable)
+    mutations[`delete${upperFirst(camelCase(table.name))}`] = createDeleteMutationField(table)
+
+  return mutations
+}

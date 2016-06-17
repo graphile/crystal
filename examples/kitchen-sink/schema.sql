@@ -24,6 +24,12 @@ create table another_thing (
   thing_id         int references thing(id) on delete cascade
 );
 
+create view non_mutation_view as
+  select 1;
+
+create view mutation_view_for_thing as
+  select * from thing;
+
 create function add(a int, b int) returns int as $$
   select a + b
 $$ language sql
