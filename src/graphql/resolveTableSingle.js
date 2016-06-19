@@ -26,7 +26,7 @@ const resolveTableSingle = (table, columns, getColumnValues) => {
   // run this query is with the `= any (…)` field. This feature is PostgreSQL
   // specific and can’t be done with `sql`.
   const query = {
-    name: `${table.schema.name}_${table.name}_single`,
+    name: `${table.schema.name}_${table.name}_single_${columns.map(column => column.name).join('_')}`,
     text: `select * from "${table.schema.name}"."${table.name}" where ${primaryKeyMatch} = any ($1)`,
   }
 

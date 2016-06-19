@@ -123,6 +123,8 @@ export class Schema {
  * @member {ForeignKey[]} reverseForeignKeys
  */
 export class Table {
+  _uniqueConstraints = []
+
   constructor ({ schema, name, description, isInsertable, isUpdatable, isDeletable }) {
     this.schema = schema
     this.name = name
@@ -161,6 +163,8 @@ export class Table {
       return firstArgType && firstArgType.isTableType && firstArgType.table === this
     })
   })
+
+  getUniqueConstraints = () => this._uniqueConstraints
 
   getIdentifier = once(() => {
     return `"${this.schema.name}"."${this.name}"`

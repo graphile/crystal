@@ -6,7 +6,8 @@ set search_path = kitchen_sink;
 
 create table thing (
   id               serial not null primary key,
-  note             text not null
+  note             text not null,
+  lucky_number     int unique
 );
 
 create table relation (
@@ -130,14 +131,14 @@ $$ language plpgsql
 strict
 set search_path from current;
 
-insert into thing (note) values
-  ('hello'),
-  ('world'),
-  ('foo'),
-  ('bar'),
-  ('baz'),
-  ('bux'),
-  ('qux');
+insert into thing (note, lucky_number) values
+  ('hello', 42),
+  ('world', 420),
+  ('foo', 12),
+  ('bar', 7),
+  ('baz', 98),
+  ('bux', 66),
+  ('qux', 0);
 
 insert into relation (a_thing_id, b_thing_id) values
   (1, 2),
