@@ -1,4 +1,14 @@
-# PostGraphQL
+# Getable Fork of PostGraphQL v1.7.0
+
+We decided to table implementation of GraphQL because we didn't have an immediate need for it. If you want to continue setting it up for marketable, here are some problems you'll have to solve:
+
+## TODO
+  - [ ] API authentication/authorization. A short-term solution would be to whitelist the tables that we don't mind exposing publicly (i.e. any that doesn't refer to a person) where PostgraphQL creates the schema. The longer-term solution would be to take advantage of PostgraphQL's JSON Web Token authorization system, which would require us to create database users, roles, and permissions in Postgres. See [PostGraphQL's JWT spec](https://github.com/calebmer/postgraphql/blob/master/docs/pg-jwt-spec.md). Another possibility is to continue updating this postgraphql fork and do authorization checks with graphQL (potentially helpful article on node-level permissions [here](https://medium.com/apollo-stack/auth-in-graphql-part-2-c6441bcc4302#.3iz2n34f8)).
+  - [ ] Set up ApolloClient in marketable. A partial implementation can be found on the branch called `apollo`. It's only set up for  development mode on marketable and we don't yet have a working page example (though you can see `page-type` for a skeleton).
+  - [ ] Spin up a Heroku app to host GraphQL. Rather than using a Procfile we can update `scripts/starts.sh` to start the server, pointing at our database using creds in environment variables. Don't forget to add `?ssl=true` at the end of the db connection string
+  - [ ] Enabling [procedures](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md). We added an option to disable procedures in this fork, because we found that postgis procedures were breaking a GraphQL constraint that all types need to have a unique name. We talked about replacing all our location queries with Algolia's geo search so we could get rid of the postgis extension but decided that was way too big of a project.  is a nice-to-have if we want to use the full power of graphQL.
+
+## PostGraphQL README
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Gitter chat room](https://badges.gitter.im/calebmer/postgraphql.svg)](https://gitter.im/calebmer/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
