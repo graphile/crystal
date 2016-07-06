@@ -20,7 +20,7 @@ const postgraphql = (pgConfig, schemaName, options) => {
   options = options || {}
 
   // `createServer` allows us to give it a promise for a `graphqlSchema`
-  const graphqlSchema = createGraphqlSchema(pgConfig, schemaName)
+  const graphqlSchema = createGraphqlSchema(pgConfig, schemaName, options)
 
   return createServer({
     ...options,

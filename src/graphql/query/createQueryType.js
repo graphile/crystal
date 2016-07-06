@@ -9,12 +9,12 @@ import createQueryFields from './createQueryFields.js'
  * @param {Schema} schema
  * @returns {GraphQLObjectType}
  */
-const createQueryType = schema =>
+const createQueryType = (schema, options) =>
   new GraphQLObjectType({
     name: 'Query',
     description: schema.description || 'The entry type for GraphQL queries.',
     fields: {
-      ...createQueryFields(schema),
+      ...createQueryFields(schema, options),
       viewer: createViewerField(schema),
     },
   })

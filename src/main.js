@@ -27,6 +27,7 @@ const main = () => {
   .option('-r, --route <path>', 'the route to mount the GraphQL server on. defaults to /')
   .option('-e, --secret <string>', 'the secret to be used to encrypt tokens. token authentication disabled if this is not set')
   .option('-m, --max-pool-size <integer>', 'the maximum number of connections to keep in the connection pool. defaults to 10')
+  .option('--disableProcedures', 'disable procedures in graphQL schema')
   .parse(process.argv)
   /* eslint-enable max-len */
 
@@ -36,6 +37,7 @@ const main = () => {
     hostname = 'localhost',
     port = 3000,
     development = false,
+    disableProcedures = false,
     route = '/',
     secret,
     maxPoolSize = 10,
@@ -56,10 +58,11 @@ const main = () => {
     route,
     secret,
     development,
+    disableProcedures,
   })
 
   http.createServer(handler).listen(port, hostname, () => {
-    console.log(`GraphQL server listening at http://${hostname}:${port}${route} 🚀`)
+    console.log(`A nice little GraphQL server listening at http://${hostname}:${port}${route} 🚀`)
   })
 }
 

@@ -34,6 +34,21 @@ const createServer = ({
   if (log) server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
+  // enable CORS
+  server.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    next()
+  })
+
+  // handle pre-flight OPTIONS req
+  server.options('/*', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
+    res.send(200)
+  })
+
   server.all(route, graphqlHTTP(async req => {
     // Acquire a new client for every request.
     const client = await pg.connectAsync(pgConfig)

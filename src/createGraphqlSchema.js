@@ -9,11 +9,11 @@ import createSchema from './graphql/createSchema.js'
  * @param {string} schemaName
  * @returns {GraphQLSchema}
  */
-const createGraphqlSchema = async (pgConfig, schemaName) => {
+const createGraphqlSchema = async (pgConfig, schemaName, options) => {
   const pgCatalog = await getCatalog(pgConfig)
   const pgSchema = pgCatalog.getSchema(schemaName)
   if (!pgSchema) throw new Error(`No schema named '${schemaName}' found.`)
-  const graphqlSchema = createSchema(pgSchema)
+  const graphqlSchema = createSchema(pgSchema, options)
   return graphqlSchema
 }
 

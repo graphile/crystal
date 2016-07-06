@@ -5,19 +5,23 @@ import createUpdateMutationField from './createUpdateMutationField.js'
 import createDeleteMutationField from './createDeleteMutationField.js'
 import createProcedureMutationField from './createProcedureMutationField.js'
 
-const createMutationType = schema =>
-  new GraphQLObjectType({
+const getProcedureMutationField = schema => {
+  return fromPairs(
+    schema
+    .getProcedures()
+    .filter(({ isMutation }) => isMutation)
+    .filter(procedure => !procedure.hasTableArg())
+    .map(procedure => [procedure.getFieldName(), createProcedureMutationField(procedure)])
+  )
+}
+
+const createMutationType = (schema, options) => {
+  return new GraphQLObjectType({
     name: 'Mutation',
     description: 'The entry type for GraphQL mutations.',
     fields: {
       // Add fields for procedures.
-      ...fromPairs(
-        schema
-        .getProcedures()
-        .filter(({ isMutation }) => isMutation)
-        .filter(procedure => !procedure.hasTableArg())
-        .map(procedure => [procedure.getFieldName(), createProcedureMutationField(procedure)])
-      ),
+      ...(options.disableProcedures ? {} : getProcedureMutationField(schema) ),
       // Add standard fields for tables.
       ...(
         schema
@@ -27,6 +31,7 @@ const createMutationType = schema =>
       ),
     },
   })
+}
 
 export default createMutationType
 
