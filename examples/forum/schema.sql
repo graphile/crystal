@@ -194,7 +194,7 @@ $$ language plpgsql;
 --
 -- This is not a good example to copy if you are looking for a good way to
 -- indent and style your trigger statements. They are all on one line to
--- conserve space 😊
+-- conserve space :)
 
 create trigger created_at before insert on person for each row execute procedure set_created_at();
 create trigger updated_at before update on person for each row execute procedure set_updated_at();
