@@ -313,4 +313,34 @@ describe('createServer', () => {
       .expect({ claim: null })
     )
   })
+
+  it('will respond with CORS headers to an OPTIONS request', async () => {
+    const server = testCreateServer()
+    await (
+      request(server)
+      .options('/')
+      .expect(200)
+      .expect('Access-Control-Allow-Origin', '*')
+      .expect('Access-Control-Request-Method', 'GET, POST')
+      .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
+    )
+  })
+
+  it('will respond to any request with CORS headers', async () => {
+    const server = testCreateServer()
+    await (
+      request(server)
+      .get('/')
+      .expect('Access-Control-Allow-Origin', '*')
+      .expect('Access-Control-Request-Method', 'GET, POST')
+      .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
+    )
+    await (
+      request(server)
+      .post('/')
+      .expect('Access-Control-Allow-Origin', '*')
+      .expect('Access-Control-Request-Method', 'GET, POST')
+      .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
+    )
+  })
 })

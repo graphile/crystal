@@ -63,7 +63,7 @@ const createServer = ({
 
   // Don’t execute our GraphQL stuffs for options requests.
   server.options('/*', (req, res) => {
-    res.send(200)
+    res.sendStatus(200)
   })
 
   server.all(route, graphqlHTTP(async req => {
