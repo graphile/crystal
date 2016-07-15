@@ -31,8 +31,40 @@ const createServer = ({
 }) => {
   const server = new Express()
 
+  server.disable('x-powered-by')
+
   if (log) server.use(logger(development ? 'dev' : 'common'))
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
+
+  // Enabels CORS. See [this][1] flowchart for an explanation of how CORS
+  // works. Note that these headers are set for all requests, CORS algorithms
+  // normally run a preflight request using the `OPTIONS` method to get these
+  // headers.
+  //
+  // [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
+  server.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Request-Method', 'GET, POST')
+    res.header('Access-Control-Allow-Headers', [
+      'Origin',
+      'X-Requested-With',
+      // Used by `express-graphql` to determine whether to expose the GraphiQL
+      // interface (`text/html`) or not.
+      'Accept',
+      // Used by PostGraphQL for auth purposes.
+      'Authorization',
+      // The `Content-*` headers are used when making requests with a body,
+      // like in a POST request.
+      'Content-Type',
+      'Content-Length',
+    ].join(', '))
+    next()
+  })
+
+  // Don’t execute our GraphQL stuffs for options requests.
+  server.options('/*', (req, res) => {
+    res.send(200)
+  })
 
   server.all(route, graphqlHTTP(async req => {
     // Acquire a new client for every request.
