@@ -8,7 +8,7 @@ export default class App extends React.Component {
         <header>
           <h1>Forum Example</h1>
           <Link to="/">Home</Link>
-          <Link to="posts">Posts</Link>
+          <Link to="/posts">Posts</Link>
         </header>
         <main>
           {this.props.children}

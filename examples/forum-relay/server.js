@@ -33,7 +33,7 @@ const compiler = webpack({
 // Do not use this in production.
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
-  publicPath: '/src/',
+  publicPath: '/static/',
   noInfo: true,
   stats: { colors: true },
 })
