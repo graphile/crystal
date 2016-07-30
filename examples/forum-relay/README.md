@@ -15,6 +15,8 @@ cd postgraphql/examples/forum-relay
 Before you start you may wish to change the default env variables (PORT, etc.). Check the `.env` file the root directory of this example.
 Once you are in the `forum-relay` directory, run the following:
 
+**Note:** If you havn’t added the forum table yet do also run `npm run schema-up`.
+
 ```bash
 npm install
 npm start
