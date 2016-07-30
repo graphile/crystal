@@ -25,6 +25,10 @@ create table another_thing (
   thing_id         int references thing(id) on delete cascade
 );
 
+create table anything_goes (
+  interval         interval
+);
+
 create view non_mutation_view as
   select 1;
 

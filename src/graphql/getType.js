@@ -7,6 +7,7 @@ import {
   GraphQLEnumType,
 } from 'graphql'
 
+import { types } from 'pg'
 import { memoize, fromPairs, upperFirst, camelCase, snakeCase, toUpper } from 'lodash'
 import createTableType from './createTableType.js'
 
@@ -78,6 +79,12 @@ const postgresToGraphQLTypes = new Map([
   [25, GraphQLString],
   [1043, GraphQLString],
 ])
+
+// Override custom type parsers.
+// TODO: This is a temporary solution.
+types.setTypeParser(600, String)
+types.setTypeParser(718, String)
+types.setTypeParser(1186, String)
 
 /**
  * Gets a GraphQL type for a PostgreSQL type.
