@@ -1,8 +1,6 @@
 import {
   Kind,
   GraphQLBoolean,
-  GraphQLInt,
-  GraphQLFloat,
   GraphQLID,
   GraphQLNonNull,
   GraphQLScalarType,
@@ -108,52 +106,19 @@ export const DateType = createStringScalarType({
   description: 'Some time value',
 })
 
-export const PointType = new GraphQLObjectType({
+export const PointType = createStringScalarType({
   name: 'Point',
   description: 'A geometric point on a plane',
-  fields: {
-    x: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The x coordinate of the point',
-    },
-    y: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The y coordinate of the point',
-    },
-  },
 })
 
-export const CircleType = new GraphQLObjectType({
+export const CircleType = createStringScalarType({
   name: 'Circle',
   description: 'Some circle on a plane made of a point and a radius',
-  fields: {
-    x: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The x coordinate of the circle',
-    },
-    y: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The y coordinate of the circle',
-    },
-    radius: {
-      type: new GraphQLNonNull(GraphQLFloat),
-      description: 'The radius of the circle',
-    },
-  },
 })
 
-export const IntervalType = new GraphQLObjectType({
+export const IntervalType = createStringScalarType({
   name: 'Interval',
   description: 'Some time span',
-  fields: {
-    milliseconds: { type: GraphQLInt },
-    seconds: { type: GraphQLInt },
-    minutes: { type: GraphQLInt },
-    hours: { type: GraphQLInt },
-    days: { type: GraphQLInt },
-    months: { type: GraphQLInt },
-    years: { type: GraphQLInt },
-  },
 })
 
 export const JSONType = createStringScalarType({
