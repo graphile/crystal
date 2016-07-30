@@ -34,6 +34,7 @@ const compiler = webpack({
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   publicPath: '/src/',
+  noInfo: true,
   stats: { colors: true },
 })
 
