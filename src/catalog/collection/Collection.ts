@@ -20,6 +20,7 @@ abstract class Collection<TValue> {
     private _type: ObjectType<TValue>,
   ) {
     // This should always exist, but in tests we don’t need it.
+    // TODO: I’m not sure I like this pattern.
     if (_catalog && _catalog.addCollection)
       _catalog.addCollection(this)
   }
@@ -66,6 +67,9 @@ abstract class Collection<TValue> {
    * @see Collection#getKeys
    * @see Collection#setPrimaryKey
    */
+  // TODO: Maybe key’s should be an implementation detail. What collection
+  // wants external sources adding keys to the collection? Some collections
+  // might, but this is probably not the right default.
   public addKey (key: CollectionKey<TValue, any>): this {
     if (key.getCollection() !== this)
       throw new Error('Cannot add key to a collection it does not represent.')
@@ -95,6 +99,9 @@ abstract class Collection<TValue> {
    * @see Collection#getPrimaryKey
    * @see Collection#addKey
    */
+  // TODO: Do we really want external things to change a collection’s primary
+  // key? I don’t think so. See the note on `Collection#addKey`, similar
+  // reservations here too.
   public setPrimaryKey (key: CollectionKey<TValue, any>): this {
     if (!this._keys.has(key))
       throw new Error('Must add key to the collection before making it the primary key.')

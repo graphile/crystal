@@ -14,6 +14,7 @@ abstract class CollectionKey<TValue, TKey> {
     private _name: string,
     private _type: Type<TKey>
   ) {
+    // TODO: I’m not sure I like this pattern.
     if (_collection && _collection.addKey)
       _collection.addKey(this)
   }
