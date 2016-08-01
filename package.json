@@ -1,0 +1,36 @@
+{
+  "name": "postgraphql",
+  "version": "2.0.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "dist",
+    "queries"
+  ],
+  "scripts": {
+    "test": "ava",
+    "test-watch": "ava -w"
+  },
+  "dependencies": {
+    "change-case": "^3.0.0",
+    "dataloader": "^1.2.0",
+    "graphql": "^0.6.1",
+    "pg": "^6.0.1"
+  },
+  "devDependencies": {
+    "ava": "^0.15.2",
+    "ts-node": "^0.9.3",
+    "typescript": "^2.0.0-dev.20160707"
+  },
+  "ava": {
+    "files": [
+      "src/**/__tests__/*.js",
+      "src/**/**/__tests__/*.js",
+      "src/**/**/**/__tests__/*.js",
+      "src/**/**/**/**/__tests__/*.js"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}

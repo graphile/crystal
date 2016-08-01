@@ -1,0 +1,43 @@
+schema {
+  query: Query
+}
+
+scalar Email
+
+interface Node {
+  __id: ID!
+}
+
+type Person implements Node {
+  __id: ID!
+  id: Int!
+  name: String!
+  email: Email!
+  firstName: String
+  lastName: String
+}
+
+type Post implements Node {
+  __id: ID!
+  id: Int!
+  authorId: Int!
+  status: PostStatus!
+  headline: String!
+  body: String
+  author: Person
+}
+
+enum PostStatus {
+  UNPUBLISHED
+  PUBLISHED
+}
+
+type Query {
+  node(__id: ID!): Node
+  person(__id: ID!): Person
+  personById(id: Int!): Person
+  personByName(name: String!): Person
+  personByEmail(email: String!): Person
+  post(__id: ID!): Post
+  postById(id: Int!): Post
+}
