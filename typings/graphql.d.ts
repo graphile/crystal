@@ -213,17 +213,17 @@ type GraphQLIsTypeOfFn<TSource> = (
   info: GraphQLResolveInfo<TSource, any>
 ) => boolean
 
-type GraphQLResolveInfo<TSource, TResolve> = {
-  fieldName: string,
-  fieldASTs: Field[],
-  returnType: GraphQLOutputType<TResolve>,
-  parentType: GraphQLCompositeType<TSource>,
-  path: (string | number)[],
-  schema: GraphQLSchema,
+interface GraphQLResolveInfo<TSource, TResolve> {
+  fieldName: string
+  fieldASTs: Field[]
+  returnType: GraphQLOutputType<TResolve>
+  parentType: GraphQLCompositeType<TSource>
+  path: (string | number)[]
+  schema: GraphQLSchema
   fragments: { [fragmentName: string]: FragmentDefinition }
-  rootValue: any,
-  operation: OperationDefinition,
-  variableValues: { [variableName: string]: any },
+  rootValue: any
+  operation: OperationDefinition
+  variableValues: { [variableName: string]: any }
 }
 
 export class GraphQLInterfaceType<TSource> {
