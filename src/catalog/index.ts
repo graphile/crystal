@@ -2,8 +2,8 @@ import Catalog from './Catalog'
 import Relation from './Relation'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
-import Selection from './collection/selection/Selection'
-import Condition from './collection/selection/Condition'
+import CollectionPaginator from './collection/CollectionPaginator'
+import Condition from './collection/Condition'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
 import ListType from './type/ListType'
@@ -24,7 +24,7 @@ export {
   Relation,
   Collection,
   CollectionKey,
-  Selection,
+  CollectionPaginator,
   Condition,
   Type,
   NullableType,

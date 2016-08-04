@@ -1,8 +1,9 @@
 import Catalog from '../Catalog'
 import Relation from '../Relation'
 import ObjectType from '../type/object/ObjectType'
-import Selection from './selection/Selection'
 import CollectionKey from './CollectionKey'
+import CollectionPaginator from './CollectionPaginator'
+import Condition from './Condition'
 
 /**
  * A collection represents a set of typed values that can be operated on in
@@ -124,6 +125,19 @@ abstract class Collection<TValue> {
   }
 
   /**
+   * Returns an array of paginators that can be used to paginate through all of
+   * the values in the collection. Each paginator provides a different “view”
+   * or “sort” on the values. The values returned by each paginator should not
+   * be different, only the order in which the values are returned.
+   *
+   * Cursors may not be shared across different paginators and paginator names
+   * must be unique.
+   */
+  public getPaginators (): CollectionPaginator<TValue>[] {
+    return []
+  }
+
+  /**
    * Get all the relations for which this collection is the tail.
    * That means the relations in which the values of this collection point to
    * the values of other collections.
@@ -146,8 +160,15 @@ abstract class Collection<TValue> {
   }
 
   /**
-   * Statically specifies whether or not you can create a value with this collection.
-   * if false, `Collection#create` should not be called.
+   * Gets the total count of values in our collection. If a condition is
+   * supplied then we will get the total count of all values in the collection
+   * that meet the specified condition.
+   */
+  public abstract count (context: any, condition?: Condition): Promise<number>
+
+  /**
+   * Statically specifies whether or not you can create a value within this
+   * collection. If false, `Collection#create` should not be called.
    *
    * @see Collection#create
    */
@@ -168,29 +189,6 @@ abstract class Collection<TValue> {
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
   public abstract create (context: any, value: TValue): Promise<TValue>
-
-  /**
-   * Statically specifies whether or not you can read many values in this
-   * collection. If false, `Collection#readMany` should not be called.
-   *
-   * @see `Collection#readMany`
-   */
-  public canReadMany (): boolean {
-    return true
-  }
-
-  /**
-   * Reads a subset of the collection’s values. This is returned as an
-   * observable to allow for streaming the values one at a time to the
-   * consumer.
-   *
-   * @see `Collection#canReadMany`
-   */
-  // TODO: Cursors.
-  // TODO: Test that the config is correctly applied. The condition should
-  // have passed, the limit should be correct, and the skip (hard to test)
-  // should pass.
-  public abstract readMany (context: any, selection: Selection): Observable<TValue>
 }
 
 export default Collection
