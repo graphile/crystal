@@ -1,7 +1,6 @@
 import {
   Catalog,
   Collection,
-  Selection,
   NullableType,
   ObjectType,
   BasicObjectType,
@@ -174,9 +173,9 @@ class PGCollection extends Collection<Value> {
     return this._pgClass.isSelectable
   }
 
-  public readMany ({ client }: Context, { condition, limit, skip }: Selection): Observable<Value> {
+  // public readMany ({ client }: Context, { condition, limit, skip }: Selection): Observable<Value> {
 
-  }
+  // }
 }
 
 export default PGCollection

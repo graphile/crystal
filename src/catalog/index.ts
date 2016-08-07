@@ -2,7 +2,7 @@ import Catalog from './Catalog'
 import Relation from './Relation'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
-import CollectionPaginator from './collection/CollectionPaginator'
+import Paginator from './collection/Paginator'
 import Condition from './collection/Condition'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
@@ -24,7 +24,7 @@ export {
   Relation,
   Collection,
   CollectionKey,
-  CollectionPaginator,
+  Paginator,
   Condition,
   Type,
   NullableType,

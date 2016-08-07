@@ -23,10 +23,17 @@
  * assert.deepEqual(actual, expected)
  * ```
  */
-export default function buildObject <T>(...entriess: [string, T][][]): { [key: string]: T } {
+export default function buildObject <T>(
+  ...entriess: ([string, T] | undefined)[][]
+): { [key: string]: T } {
   const object = {}
 
-  entriess.forEach(entries => entries.forEach(([key, value]) => {
+  entriess.forEach(entries => entries.forEach(entry => {
+    if (!entry)
+      return
+
+    const [key, value] = entry
+
     if (object.hasOwnProperty(key))
       throw new Error(`Naming conflict. Cannot have two definitions for key '${key}'.`)
 

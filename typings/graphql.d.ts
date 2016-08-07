@@ -262,38 +262,38 @@ type GraphQLTypeResolveFn<TSource> = (
   info: GraphQLResolveInfo<TSource, any>
 ) => GraphQLObjectType<TSource>
 
-export class GraphQLEnumType<TSource> {
+export class GraphQLEnumType<TValue> {
   name: string
   description: string | undefined
-  constructor (config: GraphQLEnumTypeConfig<TSource>)
-  getValues (): GraphQLEnumValueDefinition<TSource>[]
-  serialize (value: TSource): string | undefined
-  parseValue (value: any): TSource | undefined
-  parseLiteral (valueAST: Value): TSource | undefined
+  constructor (config: GraphQLEnumTypeConfig<TValue>)
+  getValues (): GraphQLEnumValueDefinition<TValue>[]
+  serialize (value: TValue): string | undefined
+  parseValue (value: any): TValue | undefined
+  parseLiteral (valueAST: Value): TValue | undefined
   toString (): string
 }
 
-type GraphQLEnumTypeConfig<TSource> = {
+type GraphQLEnumTypeConfig<TValue> = {
   name: string,
-  values: GraphQLEnumValueConfigMap<TSource>,
+  values: GraphQLEnumValueConfigMap<TValue>,
   description?: string | undefined,
 }
 
-type GraphQLEnumValueConfigMap<TSource> = {
-  [valueName: string]: GraphQLEnumValueConfig<TSource>,
+type GraphQLEnumValueConfigMap<TValue> = {
+  [valueName: string]: GraphQLEnumValueConfig<TValue>,
 }
 
-type GraphQLEnumValueConfig<TSource> = {
-  value?: TSource,
+type GraphQLEnumValueConfig<TValue> = {
+  value?: TValue,
   deprecationReason?: string | undefined,
   description?: string | undefined,
 }
 
-type GraphQLEnumValueDefinition<TSource> = {
+type GraphQLEnumValueDefinition<TValue> = {
   name: string,
   description: string | undefined,
   deprecationReason: string | undefined,
-  value: TSource,
+  value: TValue,
 }
 
 export class GraphQLInputObjectType<TSource> {
@@ -464,13 +464,52 @@ export function print (ast: any): string
 export function visit (root: any, visitor: any, keyMap: any): any
 export function visitInParallel (visitors: any): any
 export function visitWithTypeInfo (typeInfo: any, visitor: any): any
-export type Kind = string
+
+export const Kind: {
+  NAME: 'Name',
+  DOCUMENT: 'Document',
+  OPERATION_DEFINITION: 'OperationDefinition',
+  VARIABLE_DEFINITION: 'VariableDefinition',
+  VARIABLE: 'Variable',
+  SELECTION_SET: 'SelectionSet',
+  FIELD: 'Field',
+  ARGUMENT: 'Argument',
+  FRAGMENT_SPREAD: 'FragmentSpread',
+  INLINE_FRAGMENT: 'InlineFragment',
+  FRAGMENT_DEFINITION: 'FragmentDefinition',
+  INT: 'IntValue',
+  FLOAT: 'FloatValue',
+  STRING: 'StringValue',
+  BOOLEAN: 'BooleanValue',
+  ENUM: 'EnumValue',
+  LIST: 'ListValue',
+  OBJECT: 'ObjectValue',
+  OBJECT_FIELD: 'ObjectField',
+  DIRECTIVE: 'Directive',
+  NAMED_TYPE: 'NamedType',
+  LIST_TYPE: 'ListType',
+  NON_NULL_TYPE: 'NonNullType',
+  SCHEMA_DEFINITION: 'SchemaDefinition',
+  OPERATION_TYPE_DEFINITION: 'OperationTypeDefinition',
+  SCALAR_TYPE_DEFINITION: 'ScalarTypeDefinition',
+  OBJECT_TYPE_DEFINITION: 'ObjectTypeDefinition',
+  FIELD_DEFINITION: 'FieldDefinition',
+  INPUT_VALUE_DEFINITION: 'InputValueDefinition',
+  INTERFACE_TYPE_DEFINITION: 'InterfaceTypeDefinition',
+  UNION_TYPE_DEFINITION: 'UnionTypeDefinition',
+  ENUM_TYPE_DEFINITION: 'EnumTypeDefinition',
+  ENUM_VALUE_DEFINITION: 'EnumValueDefinition',
+  INPUT_OBJECT_TYPE_DEFINITION: 'InputObjectTypeDefinition',
+  TYPE_EXTENSION_DEFINITION: 'TypeExtensionDefinition',
+  DIRECTIVE_DEFINITION: 'DirectiveDefinition',
+}
+
 export const BREAK: {}
 
-export type Location = {
-  start: number,
-  end: number,
-  source?: Source | undefined,
+export interface Location {
+  start: number
+  end: number
+  source?: Source | undefined
 }
 
 export type Node =

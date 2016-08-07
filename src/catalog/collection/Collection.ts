@@ -2,7 +2,7 @@ import Catalog from '../Catalog'
 import Relation from '../Relation'
 import ObjectType from '../type/object/ObjectType'
 import CollectionKey from './CollectionKey'
-import CollectionPaginator from './CollectionPaginator'
+import Paginator from './Paginator'
 import Condition from './Condition'
 
 /**
@@ -125,7 +125,7 @@ abstract class Collection<TValue> {
   }
 
   /**
-   * Returns an array of paginators that can be used to paginate through all of
+   * Returns a paginators that can be used to paginate through all of
    * the values in the collection. Each paginator provides a different “view”
    * or “sort” on the values. The values returned by each paginator should not
    * be different, only the order in which the values are returned.
@@ -133,8 +133,8 @@ abstract class Collection<TValue> {
    * Cursors may not be shared across different paginators and paginator names
    * must be unique.
    */
-  public getPaginators (): CollectionPaginator<TValue>[] {
-    return []
+  public getPaginator (): Paginator<TValue, any> | undefined {
+    return undefined
   }
 
   /**
@@ -158,13 +158,6 @@ abstract class Collection<TValue> {
   public getHeadRelations (): Relation<any, TValue, any>[] {
     return this._catalog.getRelations().filter(relation => relation.getHeadCollectionKey().getCollection() === this)
   }
-
-  /**
-   * Gets the total count of values in our collection. If a condition is
-   * supplied then we will get the total count of all values in the collection
-   * that meet the specified condition.
-   */
-  public abstract count (context: any, condition?: Condition): Promise<number>
 
   /**
    * Statically specifies whether or not you can create a value within this
