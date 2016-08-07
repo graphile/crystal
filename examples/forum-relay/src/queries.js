@@ -1,7 +1,8 @@
 export const ViewerQueries = {
-  viewer: () => Relay.QL`query { viewer }`
+  viewer: () => Relay.QL`query { viewer }`,
 }
 
 export const PostQueries = {
-  post: () => Relay.QL`query { post(id: $postId) }`
+  viewer: () => Relay.QL`query { viewer }`,
+  post: () => Relay.QL`query { post(id: $postId) }`,
 }
