@@ -20,8 +20,6 @@ class Post extends React.Component {
   }
 
   handleDelete(event) {
-    console.log(this.props.post, this.props.viewer)
-    debugger
     this.props.relay.commitUpdate(
       new DeletePostMutation({
         post: { rowId: this.props.post.rowId },
