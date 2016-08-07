@@ -1,10 +1,10 @@
 import React from 'react'
 import Relay from 'react-relay'
-import { Link } from 'react-router'
+import { Link, withRouter } from 'react-router'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
 class Post extends React.Component {
-  handleEdit(event) {
+  handleUpdate(event) {
     this.props.relay.commitUpdate(
       new UpdatePostMutation({
         post: this.props.post,
@@ -17,10 +17,11 @@ class Post extends React.Component {
   }
 
   handleDelete(event) {
+    this.props.router.replace('/posts')
     this.props.relay.commitUpdate(
       new DeletePostMutation({
-        post: { rowId: this.props.post.rowId },
-        viewer: { id: this.props.viewer.id },
+        post: this.props.post,
+        viewer: this.props.viewer,
       })
     )
   }
@@ -29,8 +30,8 @@ class Post extends React.Component {
   render() {
     return (
       <div>
-        <h1 data-name="headline" contentEditable={true} onBlur={::this.handleEdit}>{this.props.post.headline}</h1>
-        <p data-name="body" contentEditable={true} onBlur={::this.handleEdit}>{this.props.post.body}</p>
+        <h1 data-name="headline" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.headline}</h1>
+        <p data-name="body" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.body}</p>
         <Link to="/posts">back to Posts</Link>
         <button onClick={::this.handleDelete}>Delete Post</button>
       </div>
@@ -42,7 +43,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export default Relay.createContainer(Post, {
+export default Relay.createContainer(withRouter(Post), {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

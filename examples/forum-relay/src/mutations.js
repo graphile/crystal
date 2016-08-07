@@ -72,15 +72,53 @@ export class DeletePostMutation extends Relay.Mutation {
   }
 
   getVariables() {
-    return {rowId: this.props.post.rowId};
+    return { rowId: this.props.post.rowId }
   }
 
   getFatQuery() {
     return Relay.QL`
-      fragment on DeletePostPayload @relay(pattern: true) {
-        deletedPostId
-        viewer { postNodes }
+      fragment on DeletePostPayload {
+        deletedPostId,
+        viewer { postNodes },
       }
-    `;
+    `
+  }
+}
+
+export class InsertPostMutation extends Relay.Mutation {
+  static fragments = {
+    viewer: () => Relay.QL`fragment on Viewer { id }`,
+  }
+
+  getMutation() {
+    return Relay.QL`mutation { insertPost }`
+  }
+
+  getConfigs() {
+    return [{
+      type: 'RANGE_ADD',
+      parentName: 'viewer',
+      parentID: this.props.viewer.id,
+      connectionName: 'postNodes',
+      edgeName: 'postEdge',
+      rangeBehaviors: {
+        '': 'prepend',
+    }
+    }]
+  }
+
+  getVariables() {
+    return this.props.post
+  }
+
+  getFatQuery() {
+    return Relay.QL`
+      fragment on InsertPostPayload {
+        postEdge
+        viewer {
+          postNodes
+        }
+      }
+    `
   }
 }
