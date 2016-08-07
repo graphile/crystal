@@ -22,40 +22,6 @@ import * as formatName from '../utils/formatName'
 import NodeForge from './NodeForge'
 import TypeForge from './TypeForge'
 
-interface Connection<TValue, TCursor> {
-  paginator: any
-  ordering: Paginator.Ordering | undefined
-  condition: Condition
-  page: Paginator.Page<TValue, TCursor>
-}
-
-interface Edge<TValue, TCursor> {
-  paginator: any
-  ordering: Paginator.Ordering | undefined
-  cursor: TCursor
-  value: TValue
-}
-
-type ConnectionArgs = {
-  orderBy?: Paginator.Ordering,
-  before?: string,
-  after?: string,
-  first?: number,
-  last?: number,
-  condition?: any,
-}
-
-type ConditionConfig<TValue> = {
-  type: GraphQLInputType<TValue>,
-  getCondition: (value: TValue) => Condition,
-}
-
-type NamespacedCursor<TCursor> = {
-  paginatorName: string,
-  orderingName: string | undefined,
-  cursor: TCursor,
-}
-
 class ConnectionForge {
   constructor (
     private _nodeForge: NodeForge,
@@ -78,6 +44,16 @@ class ConnectionForge {
 
     const gqlConnectionType = this._createConnectionType(paginator, gqlType)
     const gqlOrderByEnum = this._createOrderByEnumType(paginator, gqlType)
+
+    // This is the type of all the connection arguments.
+    type ConnectionArgs = {
+      orderBy?: Paginator.Ordering,
+      before?: NamespacedCursor<TCursor>,
+      after?: NamespacedCursor<TCursor>,
+      first?: number,
+      last?: number,
+      condition?: any,
+    }
 
     return {
       type: gqlConnectionType,
@@ -114,15 +90,12 @@ class ConnectionForge {
       resolve: async (source: any, args: ConnectionArgs, context: any): Promise<Connection<TValue, TCursor>> => {
         const {
           orderBy: ordering,
-          before: serializedBeforeCursor,
-          after: serializedAfterCursor,
+          before: beforeCursor,
+          after: afterCursor,
           first,
           last,
           condition: argCondition,
         } = args
-
-        const beforeCursor = serializedBeforeCursor && ConnectionForge._deserializeCursor(serializedBeforeCursor)
-        const afterCursor = serializedAfterCursor && ConnectionForge._deserializeCursor(serializedAfterCursor)
 
         // Throw an error if the user is trying to use a cursor from another
         // paginator.
@@ -186,7 +159,7 @@ class ConnectionForge {
       fields: {
         pageInfo: {
           type: new GraphQLNonNull(this._pageInfoType),
-          resolve: ({ page }) => page,
+          resolve: source => source,
           // TODO: description
         },
         totalCount: {
@@ -399,3 +372,56 @@ class ConnectionForge {
 }
 
 export default ConnectionForge
+
+/**
+ * When creating a connection field, the user has the option to allow
+ * conditions with that connection. If the user chooses to use conditions,
+ * they must provide this extra config object.
+ */
+type ConditionConfig<TValue> = {
+  type: GraphQLInputType<TValue>,
+  getCondition: (value: TValue) => Condition,
+}
+
+/**
+ * This is the type for the value of all connection types. It contains the
+ * paginator for identification, ordering for cursor serialization, condition
+ * for fetching the correct count, and of course the actual page of data.
+ *
+ * @private
+ */
+interface Connection<TValue, TCursor> {
+  paginator: any
+  ordering: Paginator.Ordering | undefined
+  condition: Condition
+  page: Paginator.Page<TValue, TCursor>
+}
+
+/**
+ * This is the type for the value of all edge types. Similarly to the
+ * connection value it has a paginator for identification, ordering for cursor
+ * serialization, and of course a value and its associated cursor.
+ *
+ * @private
+ */
+interface Edge<TValue, TCursor> {
+  paginator: any
+  ordering: Paginator.Ordering | undefined
+  cursor: TCursor
+  value: TValue
+}
+
+/**
+ * A namespaced cursor is a cursor with identifying information. A cursor that
+ * was returned by one paginator can not be used by another paginator and a
+ * cursor created with one ordering can not be used with another ordering.
+ * Therefore we need to serialize this information with our cursor to make the
+ * appropriate checks and ensure the cursor is valid for our resolve context.
+ *
+ * @private
+ */
+type NamespacedCursor<TCursor> = {
+  paginatorName: string,
+  orderingName: string | undefined,
+  cursor: TCursor,
+}
