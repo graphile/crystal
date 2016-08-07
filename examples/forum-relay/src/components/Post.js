@@ -7,14 +7,11 @@ class Post extends React.Component {
   handleEdit(event) {
     this.props.relay.commitUpdate(
       new UpdatePostMutation({
-        post: {
-          id: this.props.post.id,
-          rowId: this.props.post.rowId,
-          // PostGrahpQL expects the prop names of the new values
-          // to be prefixed with `new`
-          [`new${capitalizeFirstLetter(event.target.dataset.name)}`]:
-            event.target.innerText
-        }
+        post: this.props.post,
+        newPost: {
+          // PostGrahpQL expects the prop names of the new values to be prefixed with `new`
+          [`new${capitalizeFirstLetter(event.target.dataset.name)}`]: event.target.innerText,
+        },
       })
     )
   }

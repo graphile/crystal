@@ -20,10 +20,10 @@ export class UpdatePostMutation extends Relay.Mutation {
   // This method is used to prepare the variables that will be used as
   // input to the mutation.
   getVariables() {
-    // We are omitting the relay id otherwise the server will complain
-    // about an unknown field
-    delete this.props.post.id
-    return this.props.post
+    return {
+      rowId: this.props.post.rowId,
+      ...this.props.newPost,
+    }
   }
 
   // Represents every field in your data model that could change
