@@ -12,7 +12,7 @@ const { APP_PORT } = process.env
 const fetchSchema = url => {
   return fetch(url, {
     method: 'POST',
-    body: JSON.stringify({query: introspectionQuery}),
+    body: JSON.stringify({ query: introspectionQuery }),
     headers: { 'Content-Type': 'application/json' },
   })
   .then(res => res.text())

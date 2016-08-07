@@ -63,7 +63,7 @@
                     "name": "PostOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -162,6 +162,33 @@
               "deprecationReason": null
             },
             {
+              "name": "personByRowId",
+              "description": "Queries a single `Person` using a uniqueness constraint with field `rowId`.",
+              "args": [
+                {
+                  "name": "rowId",
+                  "description": "The exact value of the `rowId` field to match.",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Person",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "personNodes",
               "description": "Queries and returns a set of items with some metatadata for `Person`. Note that cursors will not work across different `orderBy` values. If you want to reuse a cursor, make sure you don’t change `orderBy`.",
               "args": [
@@ -173,7 +200,7 @@
                     "name": "PersonOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -332,6 +359,33 @@
               "deprecationReason": null
             },
             {
+              "name": "postByRowId",
+              "description": "Queries a single `Post` using a uniqueness constraint with field `rowId`.",
+              "args": [
+                {
+                  "name": "rowId",
+                  "description": "The exact value of the `rowId` field to match.",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Post",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "postNodes",
               "description": "Queries and returns a set of items with some metatadata for `Post`. Note that cursors will not work across different `orderBy` values. If you want to reuse a cursor, make sure you don’t change `orderBy`.",
               "args": [
@@ -343,7 +397,7 @@
                     "name": "PostOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -1128,7 +1182,7 @@
                     "name": "PostOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -1521,7 +1575,7 @@
                     "name": "PostOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -1620,6 +1674,33 @@
               "deprecationReason": null
             },
             {
+              "name": "personByRowId",
+              "description": "Queries a single `Person` using a uniqueness constraint with field `rowId`.",
+              "args": [
+                {
+                  "name": "rowId",
+                  "description": "The exact value of the `rowId` field to match.",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Person",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "personNodes",
               "description": "Queries and returns a set of items with some metatadata for `Person`. Note that cursors will not work across different `orderBy` values. If you want to reuse a cursor, make sure you don’t change `orderBy`.",
               "args": [
@@ -1631,7 +1712,7 @@
                     "name": "PersonOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -1790,6 +1871,33 @@
               "deprecationReason": null
             },
             {
+              "name": "postByRowId",
+              "description": "Queries a single `Post` using a uniqueness constraint with field `rowId`.",
+              "args": [
+                {
+                  "name": "rowId",
+                  "description": "The exact value of the `rowId` field to match.",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Post",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "postNodes",
               "description": "Queries and returns a set of items with some metatadata for `Post`. Note that cursors will not work across different `orderBy` values. If you want to reuse a cursor, make sure you don’t change `orderBy`.",
               "args": [
@@ -1801,7 +1909,7 @@
                     "name": "PostOrdering",
                     "ofType": null
                   },
-                  "defaultValue": "\"id\""
+                  "defaultValue": "ROW_ID"
                 },
                 {
                   "name": "first",
@@ -2478,6 +2586,29 @@
               "deprecationReason": null
             },
             {
+              "name": "personEdge",
+              "description": "An edge to be inserted in a connection with help of the containing cursor.",
+              "args": [
+                {
+                  "name": "orderBy",
+                  "description": "The value by which the cursor is created so relay knows where to insert the edge in the connection.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "PersonOrdering",
+                    "ofType": null
+                  },
+                  "defaultValue": "ROW_ID"
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PersonEdge",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "clientMutationId",
               "description": "If the mutation was passed a `clientMutationId` in the input object this is the exact same value echoed back.",
               "args": [],
@@ -2722,6 +2853,18 @@
               "deprecationReason": null
             },
             {
+              "name": "deletedPersonId",
+              "description": "The deleted `Person` id.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "clientMutationId",
               "description": "If the mutation was passed a `clientMutationId` in the input object this is the exact same value echoed back.",
               "args": [],
@@ -2872,6 +3015,29 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Post",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "postEdge",
+              "description": "An edge to be inserted in a connection with help of the containing cursor.",
+              "args": [
+                {
+                  "name": "orderBy",
+                  "description": "The value by which the cursor is created so relay knows where to insert the edge in the connection.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "PostOrdering",
+                    "ofType": null
+                  },
+                  "defaultValue": "ROW_ID"
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PostEdge",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3132,6 +3298,18 @@
               "deprecationReason": null
             },
             {
+              "name": "deletedPostId",
+              "description": "The deleted `Post` id.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "clientMutationId",
               "description": "If the mutation was passed a `clientMutationId` in the input object this is the exact same value echoed back.",
               "args": [],
@@ -3191,7 +3369,8 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "__Type"
+                      "name": "__Type",
+                      "ofType": null
                     }
                   }
                 }
@@ -3254,7 +3433,8 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "__Directive"
+                      "name": "__Directive",
+                      "ofType": null
                     }
                   }
                 }
@@ -3560,7 +3740,8 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "__InputValue"
+                      "name": "__InputValue",
+                      "ofType": null
                     }
                   }
                 }
@@ -3755,7 +3936,7 @@
         {
           "kind": "OBJECT",
           "name": "__Directive",
-          "description": "A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\n\nIn some cases, you need to provide options to alter GraphQL’s execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.",
+          "description": "A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\n\nIn some cases, you need to provide options to alter GraphQL's execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.",
           "fields": [
             {
               "name": "name",
@@ -3800,7 +3981,8 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "__DirectiveLocation"
+                      "name": "__DirectiveLocation",
+                      "ofType": null
                     }
                   }
                 }
@@ -3823,7 +4005,8 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "__InputValue"
+                      "name": "__InputValue",
+                      "ofType": null
                     }
                   }
                 }
@@ -3934,6 +4117,72 @@
               "description": "Location adjacent to an inline fragment.",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "SCHEMA",
+              "description": "Location adjacent to a schema definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SCALAR",
+              "description": "Location adjacent to a scalar definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "OBJECT",
+              "description": "Location adjacent to an object type definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "FIELD_DEFINITION",
+              "description": "Location adjacent to a field definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ARGUMENT_DEFINITION",
+              "description": "Location adjacent to an argument definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "INTERFACE",
+              "description": "Location adjacent to an interface definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "UNION",
+              "description": "Location adjacent to a union definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ENUM",
+              "description": "Location adjacent to an enum definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ENUM_VALUE",
+              "description": "Location adjacent to an enum value definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "INPUT_OBJECT",
+              "description": "Location adjacent to an input object type definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "INPUT_FIELD_DEFINITION",
+              "description": "Location adjacent to an input object field definition.",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
@@ -3987,6 +4236,26 @@
                 }
               },
               "defaultValue": null
+            }
+          ]
+        },
+        {
+          "name": "deprecated",
+          "description": "Marks an element of a GraphQL schema as no longer supported.",
+          "locations": [
+            "FIELD_DEFINITION",
+            "ENUM_VALUE"
+          ],
+          "args": [
+            {
+              "name": "reason",
+              "description": "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted in [Markdown](https://daringfireball.net/projects/markdown/).",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": "\"No longer supported\""
             }
           ]
         }
