@@ -138,7 +138,7 @@ class CollectionForge {
       isTypeOf: value => type.isTypeOf(value),
 
       // If there is a primary key, this is a node.
-      interfaces: primaryKey ? [this._nodeForge.getInterface()] : [],
+      interfaces: primaryKey ? [this._nodeForge.getInterfaceType()] : [],
 
       fields: buildObject<GraphQLFieldConfig<T, any>>(
         // Our `__id` field. It is powered by the collection’s primary key. If

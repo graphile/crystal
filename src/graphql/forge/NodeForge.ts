@@ -20,8 +20,8 @@ type ID = {
 }
 
 class NodeForge {
-  private _nodeInterface = (
-    new GraphQLInterfaceType({
+  private _interfaceType = (
+    new GraphQLInterfaceType<any>({
       name: 'Node',
       // TODO: description
       fields: {
@@ -34,12 +34,10 @@ class NodeForge {
   )
 
   /**
-   * Gets the GraphQL interface object that represents a `Node`. A `Node` is defined
-   * in the Relay GraphQL specifications as any object in the GraphQL data
-   * universe with a globally unique id.
+   * Returns the GraphQL `Node` interface type.
    */
-  public getInterface (): GraphQLInterfaceType<any> {
-    return this._nodeInterface
+  public getInterfaceType (): GraphQLInterfaceType<any> {
+    return this._interfaceType
   }
 
   /**
@@ -49,7 +47,7 @@ class NodeForge {
   public createNodeFieldEntry (catalog: Catalog): [string, GraphQLFieldConfig<any, any>] {
     return ['node', {
       // TODO: description
-      type: this.getInterface(),
+      type: this.getInterfaceType(),
       args: {
         __id: {
           // TODO: description,

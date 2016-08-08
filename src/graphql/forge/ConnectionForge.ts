@@ -36,14 +36,14 @@ class ConnectionForge {
     conditionConfig?: ConditionConfig<any>,
   ): GraphQLFieldConfig<any, Connection<TValue, TCursor>> {
     const paginatorName = paginator.getName()
-    const type = paginator.getType()
-    const gqlType = getNamedType(this._typeForge.getOutputType(type)) as GraphQLObjectType<TValue>
+    const paginatorType = paginator.getType()
+    const gqlPaginatorType = getNamedType(this._typeForge.getOutputType(paginatorType)) as GraphQLObjectType<TValue>
 
-    if (gqlType.getInterfaces().indexOf(this._nodeForge.getInterface()) === -1)
+    if (gqlPaginatorType.getInterfaces().indexOf(this._nodeForge.getInterfaceType()) === -1)
       throw new Error('GraphQL object type must implement the Node interface.')
 
-    const gqlConnectionType = this._createConnectionType(paginator, gqlType)
-    const gqlOrderByEnum = this._createOrderByEnumType(paginator, gqlType)
+    const gqlConnectionType = this._createConnectionType(paginator, gqlPaginatorType)
+    const gqlOrderByEnum = this._createOrderByEnumType(paginator, gqlPaginatorType)
 
     // This is the type of all the connection arguments.
     type ConnectionArgs = {
@@ -65,11 +65,11 @@ class ConnectionForge {
           // TODO: description
         }],
         ['before', {
-          type: this._cursorType,
+          type: ConnectionForge._cursorType,
           // TODO: description
         }],
         ['after', {
-          type: this._cursorType,
+          type: ConnectionForge._cursorType,
           // TODO: description
         }],
         ['first', {
@@ -99,18 +99,18 @@ class ConnectionForge {
 
         // Throw an error if the user is trying to use a cursor from another
         // paginator.
-        if (!beforeCursor || beforeCursor.paginatorName !== paginatorName)
+        if (beforeCursor && beforeCursor.paginatorName !== paginatorName)
           throw new Error('`before` cursor can not be used with this connection.')
-        if (!afterCursor || afterCursor.paginatorName !== paginatorName)
+        if (afterCursor && afterCursor.paginatorName !== paginatorName)
           throw new Error('`after` cursor can not be used with this connection.')
 
         // Throw an error if the user is trying to use a cursor from another
         // ordering. Note that if no ordering is defined we expect the
         // `orderingName` to be `null`. This is because when we deserialize the
         // base64 encoded JSON any undefineds will become nulls.
-        if (!beforeCursor || beforeCursor.orderingName !== (ordering ? ordering.name : null))
+        if (beforeCursor && beforeCursor.orderingName !== (ordering ? ordering.name : null))
           throw new Error('`before` cursor can not be used for this `orderBy` value.')
-        if (!afterCursor || afterCursor.orderingName !== (ordering ? ordering.name : null))
+        if (afterCursor && afterCursor.orderingName !== (ordering ? ordering.name : null))
           throw new Error('`after` cursor can not be used for this `orderBy` value.')
 
         // Get our condition from the condition input type. If we had no
@@ -147,18 +147,18 @@ class ConnectionForge {
    */
   private _createConnectionType <TValue, TCursor>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
+    gqlPaginatorType: GraphQLObjectType<TValue>,
   ): GraphQLObjectType<Connection<TValue, TCursor>> {
-    const gqlEdgeType = this._createEdgeType(paginator, gqlType)
+    const gqlEdgeType = this._createEdgeType(paginator, gqlPaginatorType)
 
     return new GraphQLObjectType<Connection<TValue, TCursor>>({
-      name: formatName.type(`${gqlType.name}-connection`),
+      name: formatName.type(`${gqlPaginatorType.name}-connection`),
       // TODO: description
       isTypeOf: value => value.paginator === paginator,
-      interfaces: [this._connectionInterface],
+      interfaces: [this._connectionInterfaceType],
       fields: {
         pageInfo: {
-          type: new GraphQLNonNull(this._pageInfoType),
+          type: new GraphQLNonNull(ConnectionForge._pageInfoType),
           resolve: source => source,
           // TODO: description
         },
@@ -174,7 +174,7 @@ class ConnectionForge {
           // TODO: description
         },
         nodes: {
-          type: new GraphQLList(gqlType),
+          type: new GraphQLList(gqlPaginatorType),
           resolve: ({ page }): Array<TValue> =>
             page.values.map(({ value }) => value),
           // TODO: description
@@ -188,27 +188,27 @@ class ConnectionForge {
    */
   private _createEdgeType <TValue, TCursor>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
+    gqlPaginatorType: GraphQLObjectType<TValue>,
   ): GraphQLObjectType<Edge<TValue, TCursor>> {
     const paginatorName = paginator.getName()
 
     return new GraphQLObjectType<Edge<TValue, TCursor>>({
-      name: formatName.type(`${gqlType.name}-edge`),
+      name: formatName.type(`${gqlPaginatorType.name}-edge`),
       // TODO: description
       isTypeOf: value => value.paginator === paginator,
-      interfaces: [this._edgeInterface],
+      interfaces: [this._edgeInterfaceType],
       fields: {
         cursor: {
-          type: new GraphQLNonNull(this._cursorType),
+          type: new GraphQLNonNull(ConnectionForge._cursorType),
           resolve: ({ ordering, cursor }): NamespacedCursor<TCursor> => ({
             paginatorName,
-            orderingName: ordering && ordering.name,
+            orderingName: ordering ? ordering.name : null,
             cursor,
           }),
           // TODO: description
         },
         node: {
-          type: gqlType,
+          type: gqlPaginatorType,
           resolve: ({ value }) => value,
           // TODO: description
         },
@@ -257,7 +257,7 @@ class ConnectionForge {
    *
    * @private
    */
-  private _cursorType: GraphQLScalarType<NamespacedCursor<any>> = (
+  private static _cursorType: GraphQLScalarType<NamespacedCursor<any>> = (
     new GraphQLScalarType<NamespacedCursor<any>>({
       name: 'Cursor',
       // TODO: description
@@ -273,7 +273,7 @@ class ConnectionForge {
    *
    * @private
    */
-  private _pageInfoType = (
+  private static _pageInfoType = (
     new GraphQLObjectType<Connection<any, any>>({
       name: 'PageInfo',
       // TODO: description
@@ -289,19 +289,19 @@ class ConnectionForge {
           // TODO: description
         },
         startCursor: {
-          type: this._cursorType,
+          type: ConnectionForge._cursorType,
           resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
             paginatorName: paginator.getName(),
-            orderingName: ordering && ordering.name,
+            orderingName: ordering ? ordering.name : null,
             cursor: page.values[0].cursor,
           }),
           // TODO: description
         },
         endCursor: {
-          type: this._cursorType,
+          type: ConnectionForge._cursorType,
           resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
             paginatorName: paginator.getName(),
-            orderingName: ordering && ordering.name,
+            orderingName: ordering ? ordering.name : null,
             cursor: page.values[page.values.length - 1].cursor,
           }),
           // TODO: description
@@ -318,17 +318,17 @@ class ConnectionForge {
    *
    * @private
    */
-  private _edgeInterface = (
+  private _edgeInterfaceType = (
     new GraphQLInterfaceType({
       name: 'Edge',
       // TODO: description
       fields: {
         cursor: {
-          type: new GraphQLNonNull(this._cursorType),
+          type: new GraphQLNonNull(ConnectionForge._cursorType),
           // TODO: description
         },
         node: {
-          type: this._nodeForge.getInterface(),
+          type: this._nodeForge.getInterfaceType(),
           // TODO: description
         },
       },
@@ -345,13 +345,13 @@ class ConnectionForge {
    *
    * @private
    */
-  private _connectionInterface = (
+  private _connectionInterfaceType = (
     new GraphQLInterfaceType({
       name: 'Connection',
       // TODO: description
       fields: {
         pageInfo: {
-          type: new GraphQLNonNull(this._pageInfoType),
+          type: new GraphQLNonNull(ConnectionForge._pageInfoType),
           // TODO: description
         },
         totalCount: {
@@ -359,11 +359,11 @@ class ConnectionForge {
           // TODO: description
         },
         edges: {
-          type: new GraphQLList(this._edgeInterface),
+          type: new GraphQLList(this._edgeInterfaceType),
           // TODO: description
         },
         nodes: {
-          type: new GraphQLList(this._nodeForge.getInterface()),
+          type: new GraphQLList(this._nodeForge.getInterfaceType()),
           // TODO: description
         },
       },
@@ -422,6 +422,6 @@ interface Edge<TValue, TCursor> {
  */
 type NamespacedCursor<TCursor> = {
   paginatorName: string,
-  orderingName: string | undefined,
+  orderingName: string | null,
   cursor: TCursor,
 }
