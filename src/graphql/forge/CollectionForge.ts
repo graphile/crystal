@@ -21,6 +21,7 @@ import * as formatName from '../utils/formatName'
 import * as id from '../utils/id'
 import TypeForge from './TypeForge'
 import NodeForge from './NodeForge'
+import ConnectionForge from './ConnectionForge'
 
 /**
  * The collection forge will create GraphQL types out of collections.
@@ -29,6 +30,7 @@ class CollectionForge {
   constructor (
     private _typeForge: TypeForge,
     private _nodeForge: NodeForge,
+    private _connectionForge: ConnectionForge,
   ) {}
 
   /**
@@ -39,12 +41,16 @@ class CollectionForge {
     const type = collection.getType()
     const entries: [string, GraphQLFieldConfig<any, any>][] = []
     const primaryKey = collection.getPrimaryKey()
+    const paginator = collection.getPaginator()
 
-    // if (collection.canReadMany()) {
-    //   entries.push([formatName.field(`all-${collection.getName()}`), {
-    //     type: this._connectionForge.createConnection(),
-    //   }])
-    // }
+    // If the collection has a paginator, let’s use it to create a connection
+    // field for our collection.
+    if (paginator) {
+      entries.push([
+        formatName.field(`all-${collection.getName()}`),
+        this._connectionForge.createField(paginator, this.getType(collection)),
+      ])
+    }
 
     // Add a field to select our collection by its primary key, if the
     // collection has a primary key. Note that we abstract away the shape of
@@ -115,8 +121,6 @@ class CollectionForge {
         },
       }])
     }
-
-    // TODO: Connection fields
 
     return entries
   }

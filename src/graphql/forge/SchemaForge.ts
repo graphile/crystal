@@ -4,6 +4,7 @@ import buildObject from '../utils/buildObject'
 import * as id from '../utils/id'
 import TypeForge from './TypeForge'
 import NodeForge from './NodeForge'
+import ConnectionForge from './ConnectionForge'
 import CollectionForge from './CollectionForge'
 
 /**
@@ -43,7 +44,8 @@ import CollectionForge from './CollectionForge'
 class SchemaForge {
   private _typeForge = new TypeForge()
   private _nodeForge = new NodeForge()
-  private _collectionForge = new CollectionForge(this._typeForge, this._nodeForge)
+  private _connectionForge = new ConnectionForge(this._nodeForge)
+  private _collectionForge = new CollectionForge(this._typeForge, this._nodeForge, this._connectionForge)
 
   /**
    * Creates a GraphQL schema from our abstract catalog data structure.
