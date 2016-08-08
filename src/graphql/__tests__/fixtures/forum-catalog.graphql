@@ -2,10 +2,31 @@ schema {
   query: Query
 }
 
+interface Connection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [Edge]
+  nodes: [Node]
+}
+
+scalar Cursor
+
+interface Edge {
+  cursor: Cursor!
+  node: Node
+}
+
 scalar Email
 
 interface Node {
   __id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
 }
 
 type Person implements Node {
@@ -15,6 +36,30 @@ type Person implements Node {
   email: Email!
   firstName: String
   lastName: String
+  about: String
+}
+
+type PersonConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PersonEdge]
+  nodes: [Person]
+}
+
+type PersonEdge implements Edge {
+  cursor: Cursor!
+  node: Person
+}
+
+enum PersonOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
+  LAST_NAME_ASC
+  LAST_NAME_DESC
 }
 
 type Post implements Node {
@@ -27,6 +72,29 @@ type Post implements Node {
   author: Person
 }
 
+type PostConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PostEdge]
+  nodes: [Post]
+}
+
+type PostEdge implements Edge {
+  cursor: Cursor!
+  node: Post
+}
+
+enum PostOrderBy {
+  ID_ASC
+  ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  STATUS_ASC
+  STATUS_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+}
+
 enum PostStatus {
   UNPUBLISHED
   PUBLISHED
@@ -34,10 +102,12 @@ enum PostStatus {
 
 type Query {
   node(__id: ID!): Node
+  allPeople(orderBy: PersonOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PersonConnection
   person(__id: ID!): Person
   personById(id: Int!): Person
   personByName(name: String!): Person
   personByEmail(email: String!): Person
+  allPosts(orderBy: PostOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
 }

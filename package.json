@@ -14,7 +14,7 @@
   "dependencies": {
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
-    "graphql": "^0.6.1",
+    "graphql": "^0.6.2",
     "pg": "^6.0.1"
   },
   "devDependencies": {

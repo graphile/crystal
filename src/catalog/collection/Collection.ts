@@ -12,19 +12,11 @@ import Condition from './Condition'
 abstract class Collection<TValue> {
   private _description: string | undefined = undefined
 
-  private _keys: Set<CollectionKey<TValue, any>> = new Set()
-  private _primaryKey: CollectionKey<TValue, any> | undefined = undefined
-
   constructor (
     private _catalog: Catalog,
     private _name: string,
     private _type: ObjectType<TValue>,
-  ) {
-    // This should always exist, but in tests we don’t need it.
-    // TODO: I’m not sure I like this pattern.
-    if (_catalog && _catalog.addCollection)
-      _catalog.addCollection(this)
-  }
+  ) {}
 
   /**
    * Returns the catalog this collection belongs to.
@@ -63,53 +55,15 @@ abstract class Collection<TValue> {
   }
 
   /**
-   * Adds a key to our collection, checking if the key’s collection is correct.
-   *
-   * @see Collection#getKeys
-   * @see Collection#setPrimaryKey
-   */
-  // TODO: Maybe key’s should be an implementation detail. What collection
-  // wants external sources adding keys to the collection? Some collections
-  // might, but this is probably not the right default.
-  public addKey (key: CollectionKey<TValue, any>): this {
-    if (key.getCollection() !== this)
-      throw new Error('Cannot add key to a collection it does not represent.')
-
-    this._keys.add(key)
-
-    return this
-  }
-
-  /**
    * Get all of the unique identifiers for this collection. A key is a token
    * that can be used to select and reselect any singular value in a collection
    * by.
    *
-   * @see Collection#addKey
    * @see Collection#getPrimaryKey
    */
   // TODO: Test that we don’t have any keys with the same name.
-  public getKeys (): CollectionKey<TValue, any>[] {
-    return Array.from(this._keys)
-  }
-
-  /**
-   * Sets the primary key for the collection. In order to set the primary key,
-   * the key argument *must* have already been added using `Collection#addKey`.
-   *
-   * @see Collection#getPrimaryKey
-   * @see Collection#addKey
-   */
-  // TODO: Do we really want external things to change a collection’s primary
-  // key? I don’t think so. See the note on `Collection#addKey`, similar
-  // reservations here too.
-  public setPrimaryKey (key: CollectionKey<TValue, any>): this {
-    if (!this._keys.has(key))
-      throw new Error('Must add key to the collection before making it the primary key.')
-
-    this._primaryKey = key
-
-    return this
+  public getKeys (): Array<CollectionKey<TValue, any>> {
+    return []
   }
 
   /**
@@ -117,11 +71,10 @@ abstract class Collection<TValue> {
    * collection may have many keys, only one is the *primary* identifier.
    * However, a collection may not have a primary key.
    *
-   * @see Collection#setPrimaryKey
    * @see Collection#getKeys
    */
   public getPrimaryKey (): CollectionKey<TValue, any> | undefined {
-    return this._primaryKey
+    return undefined
   }
 
   /**
@@ -132,6 +85,11 @@ abstract class Collection<TValue> {
    *
    * Cursors may not be shared across different paginators and paginator names
    * must be unique.
+   *
+   * A paginator has a `Type` instance associated with it, similar to our
+   * `Collection`. The `Collection`’s `Paginator` instance should really have
+   * the same `Type` as the `Collection`. This isn’t a hard requirement and
+   * things might work fine if they’re different, but it may not work forever.
    */
   public getPaginator (): Paginator<TValue, any> | undefined {
     return undefined
@@ -144,7 +102,7 @@ abstract class Collection<TValue> {
    *
    * @see Relation
    */
-  public getTailRelations (): Relation<TValue, any, any>[] {
+  public getTailRelations (): Array<Relation<TValue, any, any>> {
     return this._catalog.getRelations().filter(relation => relation.getTailCollection() === this)
   }
 
@@ -155,7 +113,7 @@ abstract class Collection<TValue> {
    *
    * @see Relation
    */
-  public getHeadRelations (): Relation<any, TValue, any>[] {
+  public getHeadRelations (): Array<Relation<any, TValue, any>> {
     return this._catalog.getRelations().filter(relation => relation.getHeadCollectionKey().getCollection() === this)
   }
 
