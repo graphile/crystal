@@ -41,10 +41,19 @@ query Procedure {
       ...thing
     }
   }
-  k: thingsModulo(after: "W1sxXSwxXQ==", before: "W1s3XSw3XQ==") {
+  k: thingsModulo(after: "W1tdLDFd", before: "W1tdLDdd") {
 		pageInfo { ...pageInfo }
     nodes {
       ...thing
+    }
+  }
+  l: thingsModulo(orderBy: LUCKY_NUMBER, after: "W1s3XSwwXQ==", before: "W1s1XSw5OF0=") {
+    edges {
+      cursor
+      node {
+        ...thing
+        luckyNumber
+      }
     }
   }
 }

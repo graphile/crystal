@@ -21,7 +21,7 @@
             "totalCount": 3,
             "edges": [
               {
-                "cursor": "W1syXSwyXQ==",
+                "cursor": "W1tdLDJd",
                 "node": {
                   "id": "dGhpbmc6Mg==",
                   "rowId": 2,
@@ -41,7 +41,7 @@
             "totalCount": 1,
             "edges": [
               {
-                "cursor": "W1szXSwzXQ==",
+                "cursor": "W1tdLDNd",
                 "node": {
                   "id": "dGhpbmc6Mw==",
                   "rowId": 3,
@@ -61,7 +61,7 @@
             "totalCount": 2,
             "edges": [
               {
-                "cursor": "W1s0XSw0XQ==",
+                "cursor": "W1tdLDRd",
                 "node": {
                   "id": "dGhpbmc6NA==",
                   "rowId": 4,
@@ -81,7 +81,7 @@
             "totalCount": 1,
             "edges": [
               {
-                "cursor": "W1szXSwzXQ==",
+                "cursor": "W1tdLDNd",
                 "node": {
                   "id": "dGhpbmc6Mw==",
                   "rowId": 3,
@@ -123,7 +123,7 @@
             "totalCount": 1,
             "edges": [
               {
-                "cursor": "W1sxXSwxXQ==",
+                "cursor": "W1tdLDFd",
                 "node": {
                   "id": "dGhpbmc6MQ==",
                   "rowId": 1,
@@ -169,7 +169,7 @@
       ],
       "edges": [
         {
-          "cursor": "W1sxXSwxXQ==",
+          "cursor": "W1tdLDFd",
           "node": {
             "id": "dGhpbmc6MQ==",
             "rowId": 1,
@@ -177,7 +177,7 @@
           }
         },
         {
-          "cursor": "W1szXSwzXQ==",
+          "cursor": "W1tdLDNd",
           "node": {
             "id": "dGhpbmc6Mw==",
             "rowId": 3,
@@ -185,7 +185,7 @@
           }
         },
         {
-          "cursor": "W1s1XSw1XQ==",
+          "cursor": "W1tdLDVd",
           "node": {
             "id": "dGhpbmc6NQ==",
             "rowId": 5,
@@ -193,7 +193,7 @@
           }
         },
         {
-          "cursor": "W1s3XSw3XQ==",
+          "cursor": "W1tdLDdd",
           "node": {
             "id": "dGhpbmc6Nw==",
             "rowId": 7,
@@ -225,8 +225,8 @@
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": false,
-        "startCursor": "W1sxXSwxXQ==",
-        "endCursor": "W1szXSwzXQ=="
+        "startCursor": "W1tdLDFd",
+        "endCursor": "W1tdLDNd"
       },
       "nodes": [
         {
@@ -245,8 +245,8 @@
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": true,
-        "startCursor": "W1szXSwzXQ==",
-        "endCursor": "W1s1XSw1XQ=="
+        "startCursor": "W1tdLDNd",
+        "endCursor": "W1tdLDVd"
       },
       "nodes": [
         {
@@ -258,6 +258,28 @@
           "id": "dGhpbmc6NQ==",
           "rowId": 5,
           "note": "baz"
+        }
+      ]
+    },
+    "l": {
+      "edges": [
+        {
+          "cursor": "W1szXSwxMl0=",
+          "node": {
+            "id": "dGhpbmc6Mw==",
+            "rowId": 3,
+            "note": "foo",
+            "luckyNumber": 12
+          }
+        },
+        {
+          "cursor": "W1sxXSw0Ml0=",
+          "node": {
+            "id": "dGhpbmc6MQ==",
+            "rowId": 1,
+            "note": "hello",
+            "luckyNumber": 42
+          }
         }
       ]
     }

@@ -43,12 +43,12 @@
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": false,
-        "startCursor": "W1sxXSwxXQ==",
-        "endCursor": "W1syXSwyXQ=="
+        "startCursor": "W1tdLDFd",
+        "endCursor": "W1tdLDJd"
       },
       "edges": [
         {
-          "cursor": "W1sxXSwxXQ==",
+          "cursor": "W1tdLDFd",
           "node": {
             "id": "dGhpbmc6MQ==",
             "rowId": 1,
@@ -56,7 +56,7 @@
           }
         },
         {
-          "cursor": "W1syXSwyXQ==",
+          "cursor": "W1tdLDJd",
           "node": {
             "id": "dGhpbmc6Mg==",
             "rowId": 2,
@@ -69,8 +69,8 @@
       "pageInfo": {
         "hasNextPage": false,
         "hasPreviousPage": true,
-        "startCursor": "W1s2XSw2XQ==",
-        "endCursor": "W1s3XSw3XQ=="
+        "startCursor": "W1tdLDZd",
+        "endCursor": "W1tdLDdd"
       },
       "nodes": [
         {
@@ -230,6 +230,28 @@
     "h": {
       "edges": [
         {
+          "cursor": "W1s1XSw5OF0=",
+          "node": {
+            "id": "dGhpbmc6NQ==",
+            "rowId": 5,
+            "note": "baz",
+            "luckyNumber": 98
+          }
+        },
+        {
+          "cursor": "W1syXSw0MjBd",
+          "node": {
+            "id": "dGhpbmc6Mg==",
+            "rowId": 2,
+            "note": "world",
+            "luckyNumber": 420
+          }
+        }
+      ]
+    },
+    "i": {
+      "edges": [
+        {
           "cursor": "W1tdLDJd",
           "node": {
             "foo": 2,
@@ -245,59 +267,52 @@
         }
       ]
     },
-    "i": {
+    "j": {
       "edges": [
         {
-          "cursor": "W1sxLDJdLDFd",
-          "node": {
-            "aThingId": 1,
-            "bThingId": 2
-          }
-        },
-        {
-          "cursor": "W1sxLDNdLDFd",
+          "cursor": "W1szXSwxXQ==",
           "node": {
             "aThingId": 1,
             "bThingId": 3
           }
         },
         {
-          "cursor": "W1sxLDddLDFd",
+          "cursor": "W1s3XSwxXQ==",
           "node": {
             "aThingId": 1,
             "bThingId": 7
           }
         },
         {
-          "cursor": "W1syLDNdLDJd",
+          "cursor": "W1szXSwyXQ==",
           "node": {
             "aThingId": 2,
             "bThingId": 3
           }
         },
         {
-          "cursor": "W1szLDRdLDNd",
+          "cursor": "W1s0XSwzXQ==",
           "node": {
             "aThingId": 3,
             "bThingId": 4
           }
         },
         {
-          "cursor": "W1szLDVdLDNd",
+          "cursor": "W1s1XSwzXQ==",
           "node": {
             "aThingId": 3,
             "bThingId": 5
           }
         },
         {
-          "cursor": "W1s0LDNdLDRd",
+          "cursor": "W1szXSw0XQ==",
           "node": {
             "aThingId": 4,
             "bThingId": 3
           }
         },
         {
-          "cursor": "W1s3LDFdLDdd",
+          "cursor": "W1sxXSw3XQ==",
           "node": {
             "aThingId": 7,
             "bThingId": 1

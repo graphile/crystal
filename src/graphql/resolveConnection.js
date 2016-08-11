@@ -8,7 +8,7 @@ const resolveConnection = (
   getFromClause = constant(table.getIdentifier()),
 ) => {
   const columns = table.getColumns()
-  const primaryKey = table.getPrimaryKeys()
+  const fullPrimaryKey = table.getPrimaryKeys()
 
   return (source, args, { client }) => {
     const { orderBy: orderByName, first, last, after, before, offset, descending, ...conditions } = args
@@ -28,10 +28,12 @@ const resolveConnection = (
     const orderBy = columns.find(({ name }) => orderByName === name)
     const fromClause = getFromClause(source, args)
 
+    const primaryKeyNoOrderBy = fullPrimaryKey.filter(({ name }) => name !== orderBy.name)
+
     // Get the cursor value for a row using the `orderBy` column.
     const getRowCursorValue = row => ({
-      value: row[orderBy.name] || '',
-      primaryKey: primaryKey.map(({ name }) => row[name]),
+      value: row[orderBy.name],
+      primaryKey: primaryKeyNoOrderBy.map(({ name }) => row[name]),
     })
 
     // Transforms object keys (which are field names) into column names.
@@ -59,17 +61,14 @@ const resolveConnection = (
     const getCursorCondition = (cursor, operator) => {
       const sql = new SQLBuilder()
 
-      if (primaryKey.length === 1 && primaryKey[0].name === orderBy.name)
-        return sql.add(`"${orderBy.name}" ${operator} $1`, [cursor.value])
-
       const cursorCompareLHS = `(${
-        [orderBy.name, ...primaryKey.map(({ name }) => name)]
+        [orderBy.name, ...primaryKeyNoOrderBy.map(({ name }) => name)]
           .map(name => `"${name}"`)
           .join(', ')
       })`
 
       const cursorCompareRHS = `(${
-        [null, ...primaryKey].map((x, i) => `$${i + 1}`).join(', ')
+        [null, ...primaryKeyNoOrderBy].map((x, i) => `$${i + 1}`).join(', ')
       })`
 
       sql.add(`${cursorCompareLHS} ${operator} ${cursorCompareRHS}`, [cursor.value, ...cursor.primaryKey])
@@ -96,7 +95,7 @@ const resolveConnection = (
 
       const orderings = [
         `"${orderBy.name}" ${actuallyDescending ? 'desc' : 'asc'}`,
-        ...primaryKey.map(({ name }) => `"${name}" ${last ? 'desc' : 'asc'}`),
+        ...primaryKeyNoOrderBy.map(({ name }) => `"${name}" ${last ? 'desc' : 'asc'}`),
       ].join(', ')
 
       sql.add(`order by ${orderings}`)
