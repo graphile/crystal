@@ -74,7 +74,10 @@ const resolveConnection = (
       })`
 
       const cursorCompareRHS = `(${
-        [null, ...primaryKeyNoOrderBy].map((x, i) => `$${i + 1}`).join(', ')
+        // Here we only want to create a string of placeholders: `$1, $2, $3`
+        // etc. So we create an array of nulls of the appropriate length and
+        // then use the index (`i`) to generate the actual placeholder.
+        Array(1 + primaryKeyNoOrderBy.length).fill(null).map((x, i) => `$${i + 1}`).join(', ')
       })`
 
       sql.add(`${cursorCompareLHS} ${operator} ${cursorCompareRHS}`, [cursor.value, ...cursor.primaryKey])
