@@ -8,7 +8,7 @@ const resolveConnection = (
   getFromClause = constant(table.getIdentifier()),
 ) => {
   const columns = table.getColumns()
-  const fullPrimaryKey = table.getPrimaryKeys()
+  const primaryKey = table.getPrimaryKeys()
 
   return (source, args, { client }) => {
     const { orderBy: orderByName, first, last, after, before, offset, descending, ...conditions } = args
@@ -28,7 +28,13 @@ const resolveConnection = (
     const orderBy = columns.find(({ name }) => orderByName === name)
     const fromClause = getFromClause(source, args)
 
-    const primaryKeyNoOrderBy = fullPrimaryKey.filter(({ name }) => name !== orderBy.name)
+    // Here we take the full primary key for our table and filter out columns
+    // with the same name as the `orderBy`. This is because in some instances
+    // of PostgreSQL (specifically 9.5beta1) an operation like
+    // `(id, id) > (1, 1)` would *include* the row with an `id` of `1`. Even if
+    // this bug were a beta bug, however, it still makes sense to dedupe a
+    // comparison with a tuple like `(id, id)`.
+    const primaryKeyNoOrderBy = primaryKey.filter(({ name }) => name !== orderBy.name)
 
     // Get the cursor value for a row using the `orderBy` column.
     const getRowCursorValue = row => ({
