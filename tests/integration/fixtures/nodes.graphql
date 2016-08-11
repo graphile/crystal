@@ -16,11 +16,38 @@ query Nodes {
   e: thingNodes(orderBy: NOTE, descending: true) {
     edges { cursor, node { ...thing } }
   }
-  f: thingNodes(before: "NQ==") {
+  f: thingNodes(before: "W1tdLDVd") {
     nodes { ...thing }
   }
-  g: thingNodes(after: "NA==") {
+  g: thingNodes(after: "W1tdLDRd") {
     nodes { ...thing }
+  }
+  h: thingNodes(orderBy: LUCKY_NUMBER, after: "W1s2XSw2Nl0=") {
+    edges {
+      cursor
+      node { ...thing, luckyNumber }
+    }
+  }
+  # Test a table that does not have a primary key.
+  i: anythingGoesNodes(orderBy: FOO, after: "W1tdLDFd") {
+    edges {
+      cursor
+      node {
+        foo
+        bar
+      }
+    }
+  }
+  # If we only checked cursor values and not primary keys as well, this would
+  # fail.
+  j: relationNodes(orderBy: A_THING_ID, after: "W1syXSwxXQ==") {
+    edges {
+      cursor
+      node {
+        aThingId
+        bThingId
+      }
+    }
   }
 }
 

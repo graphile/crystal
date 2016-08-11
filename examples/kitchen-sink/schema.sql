@@ -25,7 +25,10 @@ create table another_thing (
   thing_id         int references thing(id) on delete cascade
 );
 
+-- Do not add a primary key to this table.
 create table anything_goes (
+  foo              int,
+  bar              int,
   interval         interval
 );
 
@@ -158,5 +161,10 @@ insert into another_thing (note, published, tags, thing_id) values
   ('hello', true, '{"a", "b"}', 1),
   ('world', true, '{"c", "d"}', null),
   ('foo', false, '{"a"}', 2);
+
+insert into anything_goes (foo, bar) values
+  (1, 2),
+  (2, 3),
+  (3, 4);
 
 commit;

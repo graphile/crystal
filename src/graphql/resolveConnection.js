@@ -8,6 +8,7 @@ const resolveConnection = (
   getFromClause = constant(table.getIdentifier()),
 ) => {
   const columns = table.getColumns()
+  const primaryKey = table.getPrimaryKeys()
 
   return (source, args, { client }) => {
     const { orderBy: orderByName, first, last, after, before, offset, descending, ...conditions } = args
@@ -27,8 +28,19 @@ const resolveConnection = (
     const orderBy = columns.find(({ name }) => orderByName === name)
     const fromClause = getFromClause(source, args)
 
+    // Here we take the full primary key for our table and filter out columns
+    // with the same name as the `orderBy`. This is because in some instances
+    // of PostgreSQL (specifically 9.5beta1) an operation like
+    // `(id, id) > (1, 1)` would *include* the row with an `id` of `1`. Even if
+    // this bug were a beta bug, however, it still makes sense to dedupe a
+    // comparison with a tuple like `(id, id)`.
+    const primaryKeyNoOrderBy = primaryKey.filter(({ name }) => name !== orderBy.name)
+
     // Get the cursor value for a row using the `orderBy` column.
-    const getRowCursorValue = row => row[orderBy.name] || ''
+    const getRowCursorValue = row => ({
+      value: row[orderBy.name],
+      primaryKey: primaryKeyNoOrderBy.map(({ name }) => row[name]),
+    })
 
     // Transforms object keys (which are field names) into column names.
     const getWhereClause = once(() => {
@@ -51,14 +63,36 @@ const resolveConnection = (
       return sql
     })
 
+    // Gets the condition for filtering our result set using a cursor.
+    const getCursorCondition = (cursor, operator) => {
+      const sql = new SQLBuilder()
+
+      const cursorCompareLHS = `(${
+        [orderBy.name, ...primaryKeyNoOrderBy.map(({ name }) => name)]
+          .map(name => `"${name}"`)
+          .join(', ')
+      })`
+
+      const cursorCompareRHS = `(${
+        // Here we only want to create a string of placeholders: `$1, $2, $3`
+        // etc. So we create an array of nulls of the appropriate length and
+        // then use the index (`i`) to generate the actual placeholder.
+        Array(1 + primaryKeyNoOrderBy.length).fill(null).map((x, i) => `$${i + 1}`).join(', ')
+      })`
+
+      sql.add(`${cursorCompareLHS} ${operator} ${cursorCompareRHS}`, [cursor.value, ...cursor.primaryKey])
+
+      return sql
+    }
+
     const getRows = once(async () => {
       // Start our query.
       const sql = new SQLBuilder().add('select * from').add(fromClause).add('where')
 
       // Add the conditions for `after` and `before` which will narrow our
       // range.
-      if (before) sql.add(`"${orderBy.name}" < $1 and`, [before])
-      if (after) sql.add(`"${orderBy.name}" > $1 and`, [after])
+      if (before) sql.add(getCursorCondition(before, '<')).add('and')
+      if (after) sql.add(getCursorCondition(after, '>')).add('and')
 
       // Add the conditions…
       sql.add(getWhereClause())
@@ -67,7 +101,13 @@ const resolveConnection = (
       // If a `last` argument was defined we are querying from the bottom so we
       // need to flip our order.
       const actuallyDescending = last ? !descending : descending
-      sql.add(`order by "${orderBy.name}" ${actuallyDescending ? 'desc' : 'asc'}`)
+
+      const orderings = [
+        `"${orderBy.name}" ${actuallyDescending ? 'desc' : 'asc'}`,
+        ...primaryKeyNoOrderBy.map(({ name }) => `"${name}" ${last ? 'desc' : 'asc'}`),
+      ].join(', ')
+
+      sql.add(`order by ${orderings}`)
 
       // Set the correct range.
       if (first) sql.add('limit $1', [first])
@@ -119,7 +159,9 @@ const resolveConnection = (
                 new SQLBuilder()
                 .add('select null from')
                 .add(fromClause)
-                .add(`where "${orderBy.name}" ${descending ? '<' : '>'} $1 and`, [endCursor])
+                .add('where')
+                .add(getCursorCondition(endCursor, descending ? '<' : '>'))
+                .add('and')
                 .add(getWhereClause())
                 .add('limit 1')
               )
@@ -142,7 +184,9 @@ const resolveConnection = (
                 new SQLBuilder()
                 .add('select null from')
                 .add(fromClause)
-                .add(`where "${orderBy.name}" ${descending ? '>' : '<'} $1 and`, [startCursor])
+                .add('where')
+                .add(getCursorCondition(startCursor, descending ? '>' : '<'))
+                .add('and')
                 .add(getWhereClause())
                 .add('limit 1')
               )

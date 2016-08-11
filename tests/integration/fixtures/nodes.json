@@ -43,12 +43,12 @@
       "pageInfo": {
         "hasNextPage": true,
         "hasPreviousPage": false,
-        "startCursor": "MQ==",
-        "endCursor": "Mg=="
+        "startCursor": "W1tdLDFd",
+        "endCursor": "W1tdLDJd"
       },
       "edges": [
         {
-          "cursor": "MQ==",
+          "cursor": "W1tdLDFd",
           "node": {
             "id": "dGhpbmc6MQ==",
             "rowId": 1,
@@ -56,7 +56,7 @@
           }
         },
         {
-          "cursor": "Mg==",
+          "cursor": "W1tdLDJd",
           "node": {
             "id": "dGhpbmc6Mg==",
             "rowId": 2,
@@ -69,8 +69,8 @@
       "pageInfo": {
         "hasNextPage": false,
         "hasPreviousPage": true,
-        "startCursor": "Ng==",
-        "endCursor": "Nw=="
+        "startCursor": "W1tdLDZd",
+        "endCursor": "W1tdLDdd"
       },
       "nodes": [
         {
@@ -127,7 +127,7 @@
     "e": {
       "edges": [
         {
-          "cursor": "d29ybGQ=",
+          "cursor": "W1syXSwid29ybGQiXQ==",
           "node": {
             "id": "dGhpbmc6Mg==",
             "rowId": 2,
@@ -135,7 +135,7 @@
           }
         },
         {
-          "cursor": "cXV4",
+          "cursor": "W1s3XSwicXV4Il0=",
           "node": {
             "id": "dGhpbmc6Nw==",
             "rowId": 7,
@@ -143,7 +143,7 @@
           }
         },
         {
-          "cursor": "aGVsbG8=",
+          "cursor": "W1sxXSwiaGVsbG8iXQ==",
           "node": {
             "id": "dGhpbmc6MQ==",
             "rowId": 1,
@@ -151,7 +151,7 @@
           }
         },
         {
-          "cursor": "Zm9v",
+          "cursor": "W1szXSwiZm9vIl0=",
           "node": {
             "id": "dGhpbmc6Mw==",
             "rowId": 3,
@@ -159,7 +159,7 @@
           }
         },
         {
-          "cursor": "YnV4",
+          "cursor": "W1s2XSwiYnV4Il0=",
           "node": {
             "id": "dGhpbmc6Ng==",
             "rowId": 6,
@@ -167,7 +167,7 @@
           }
         },
         {
-          "cursor": "YmF6",
+          "cursor": "W1s1XSwiYmF6Il0=",
           "node": {
             "id": "dGhpbmc6NQ==",
             "rowId": 5,
@@ -175,7 +175,7 @@
           }
         },
         {
-          "cursor": "YmFy",
+          "cursor": "W1s0XSwiYmFyIl0=",
           "node": {
             "id": "dGhpbmc6NA==",
             "rowId": 4,
@@ -224,6 +224,99 @@
           "id": "dGhpbmc6Nw==",
           "rowId": 7,
           "note": "qux"
+        }
+      ]
+    },
+    "h": {
+      "edges": [
+        {
+          "cursor": "W1s1XSw5OF0=",
+          "node": {
+            "id": "dGhpbmc6NQ==",
+            "rowId": 5,
+            "note": "baz",
+            "luckyNumber": 98
+          }
+        },
+        {
+          "cursor": "W1syXSw0MjBd",
+          "node": {
+            "id": "dGhpbmc6Mg==",
+            "rowId": 2,
+            "note": "world",
+            "luckyNumber": 420
+          }
+        }
+      ]
+    },
+    "i": {
+      "edges": [
+        {
+          "cursor": "W1tdLDJd",
+          "node": {
+            "foo": 2,
+            "bar": 3
+          }
+        },
+        {
+          "cursor": "W1tdLDNd",
+          "node": {
+            "foo": 3,
+            "bar": 4
+          }
+        }
+      ]
+    },
+    "j": {
+      "edges": [
+        {
+          "cursor": "W1szXSwxXQ==",
+          "node": {
+            "aThingId": 1,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1s3XSwxXQ==",
+          "node": {
+            "aThingId": 1,
+            "bThingId": 7
+          }
+        },
+        {
+          "cursor": "W1szXSwyXQ==",
+          "node": {
+            "aThingId": 2,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1s0XSwzXQ==",
+          "node": {
+            "aThingId": 3,
+            "bThingId": 4
+          }
+        },
+        {
+          "cursor": "W1s1XSwzXQ==",
+          "node": {
+            "aThingId": 3,
+            "bThingId": 5
+          }
+        },
+        {
+          "cursor": "W1szXSw0XQ==",
+          "node": {
+            "aThingId": 4,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1sxXSw3XQ==",
+          "node": {
+            "aThingId": 7,
+            "bThingId": 1
+          }
         }
       ]
     }

@@ -55,13 +55,21 @@ export const NodeType =
  * Connection Types
  * ========================================================================= */
 
+const serializeCursor = cursor =>
+  toBase64(JSON.stringify([cursor.primaryKey, cursor.value]))
+
+const deserializeCursor = serializedCursor => {
+  const [primaryKey, value] = JSON.parse(fromBase64(serializedCursor))
+  return { primaryKey, value }
+}
+
 export const CursorType =
   new GraphQLScalarType({
     name: 'Cursor',
     description: 'An opaque base64 encoded string describing a location in a list of items.',
-    serialize: toBase64,
-    parseValue: fromBase64,
-    parseLiteral: ast => (ast.kind === Kind.STRING ? fromBase64(ast.value) : null),
+    serialize: serializeCursor,
+    parseValue: deserializeCursor,
+    parseLiteral: ast => (ast.kind === Kind.STRING ? deserializeCursor(ast.value) : null),
   })
 
 export const PageInfoType =

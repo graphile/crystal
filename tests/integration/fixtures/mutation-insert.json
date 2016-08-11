@@ -8,19 +8,19 @@
         "note": "a"
       },
       "withArg": {
-        "cursor": "OA==",
+        "cursor": "W251bGwsbnVsbF0=",
         "node": {
           "id": "dGhpbmc6OA==",
-          "note": "a",
-          "rowId": 8
+          "rowId": 8,
+          "note": "a"
         }
       },
       "withoutArg": {
-        "cursor": "OA==",
+        "cursor": "W251bGwsbnVsbF0=",
         "node": {
           "id": "dGhpbmc6OA==",
-          "note": "a",
-          "rowId": 8
+          "rowId": 8,
+          "note": "a"
         }
       }
     },
@@ -32,19 +32,19 @@
         "note": "b"
       },
       "withArg": {
-        "cursor": "OQ==",
+        "cursor": "W251bGwsbnVsbF0=",
         "node": {
           "id": "dGhpbmc6OQ==",
-          "note": "b",
-          "rowId": 9
+          "rowId": 9,
+          "note": "b"
         }
       },
       "withoutArg": {
-        "cursor": "OQ==",
+        "cursor": "W251bGwsbnVsbF0=",
         "node": {
           "id": "dGhpbmc6OQ==",
-          "note": "b",
-          "rowId": 9
+          "rowId": 9,
+          "note": "b"
         }
       }
     },
@@ -65,19 +65,19 @@
         }
       },
       "relationEdge": {
-        "cursor": "OA==",
+        "cursor": "W251bGwsbnVsbF0=",
         "node": {
           "aThingId": 8,
           "bThingId": 9,
           "thingByAThingId": {
             "id": "dGhpbmc6OA==",
-            "note": "a",
-            "rowId": 8
+            "rowId": 8,
+            "note": "a"
           },
           "thingByBThingId": {
             "id": "dGhpbmc6OQ==",
-            "note": "b",
-            "rowId": 9
+            "rowId": 9,
+            "note": "b"
           }
         }
       }
