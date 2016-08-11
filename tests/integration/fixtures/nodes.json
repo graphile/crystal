@@ -226,6 +226,84 @@
           "note": "qux"
         }
       ]
+    },
+    "h": {
+      "edges": [
+        {
+          "cursor": "W1tdLDJd",
+          "node": {
+            "foo": 2,
+            "bar": 3
+          }
+        },
+        {
+          "cursor": "W1tdLDNd",
+          "node": {
+            "foo": 3,
+            "bar": 4
+          }
+        }
+      ]
+    },
+    "i": {
+      "edges": [
+        {
+          "cursor": "W1sxLDJdLDFd",
+          "node": {
+            "aThingId": 1,
+            "bThingId": 2
+          }
+        },
+        {
+          "cursor": "W1sxLDNdLDFd",
+          "node": {
+            "aThingId": 1,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1sxLDddLDFd",
+          "node": {
+            "aThingId": 1,
+            "bThingId": 7
+          }
+        },
+        {
+          "cursor": "W1syLDNdLDJd",
+          "node": {
+            "aThingId": 2,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1szLDRdLDNd",
+          "node": {
+            "aThingId": 3,
+            "bThingId": 4
+          }
+        },
+        {
+          "cursor": "W1szLDVdLDNd",
+          "node": {
+            "aThingId": 3,
+            "bThingId": 5
+          }
+        },
+        {
+          "cursor": "W1s0LDNdLDRd",
+          "node": {
+            "aThingId": 4,
+            "bThingId": 3
+          }
+        },
+        {
+          "cursor": "W1s3LDFdLDdd",
+          "node": {
+            "aThingId": 7,
+            "bThingId": 1
+          }
+        }
+      ]
     }
   }
 }

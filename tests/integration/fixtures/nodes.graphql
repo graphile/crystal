@@ -22,6 +22,27 @@ query Nodes {
   g: thingNodes(after: "W1s0XSw0XQ==") {
     nodes { ...thing }
   }
+  # Test a table that does not have a primary key.
+  h: anythingGoesNodes(orderBy: FOO, after: "W1tdLDFd") {
+    edges {
+      cursor
+      node {
+        foo
+        bar
+      }
+    }
+  }
+  # If we only checked cursor values and not primary keys as well, this would
+  # fail.
+  i: relationNodes(orderBy: A_THING_ID, after: "W1sxLDJdLDFd") {
+    edges {
+      cursor
+      node {
+        aThingId
+        bThingId
+      }
+    }
+  }
 }
 
 fragment thing on Thing {
