@@ -8,17 +8,17 @@ query Pagination {
   g: thingNodes(first: 1, offset: 1) { ...page }
   h: thingNodes(first: 4, offset: 5) { ...page }
   i: thingNodes(first: 4, offset: 5) { ...page }
-  j: thingNodes(after: "NQ==") { ...page }
-  k: thingNodes(after: "Nw==") { ...page }
-  l: thingNodes(before: "Mw==") { ...page }
-  m: thingNodes(before: "MQ==") { ...page }
-  n: thingNodes(after: "NQ==", before: "NQ==") { ...page }
-  o: thingNodes(after: "Mg==", before: "Ng==") { ...page }
-  p: thingNodes(after: "NA==", first: 2) { ...page }
-  q: thingNodes(after: "NA==", first: 40) { ...page }
-  r: thingNodes(before: "NA==", last: 2) { ...page }
-  s: thingNodes(before: "NA==", first: 2) { ...page }
-  t: thingNodes(before: "NA==", last: 40) { ...page }
+  j: thingNodes(after: "W1s1XSw1XQ==") { ...page }
+  k: thingNodes(after: "W1s3XSw3XQ==") { ...page }
+  l: thingNodes(before: "W1szXSwzXQ==") { ...page }
+  m: thingNodes(before: "W1sxXSwxXQ==") { ...page }
+  n: thingNodes(after: "W1s1XSw1XQ==", before: "W1s1XSw1XQ==") { ...page }
+  o: thingNodes(after: "W1syXSwyXQ==", before: "W1s2XSw2XQ==") { ...page }
+  p: thingNodes(after: "W1s0XSw0XQ==", first: 2) { ...page }
+  q: thingNodes(after: "W1s0XSw0XQ==", first: 40) { ...page }
+  r: thingNodes(before: "W1s0XSw0XQ==", last: 2) { ...page }
+  s: thingNodes(before: "W1s0XSw0XQ==", first: 2) { ...page }
+  t: thingNodes(before: "W1s0XSw0XQ==", last: 40) { ...page }
 }
 
 fragment page on ThingConnection {

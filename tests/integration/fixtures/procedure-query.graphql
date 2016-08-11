@@ -41,7 +41,7 @@ query Procedure {
       ...thing
     }
   }
-  k: thingsModulo(after: "MQ==", before: "Nw==") {
+  k: thingsModulo(after: "W1sxXSwxXQ==", before: "W1s3XSw3XQ==") {
 		pageInfo { ...pageInfo }
     nodes {
       ...thing

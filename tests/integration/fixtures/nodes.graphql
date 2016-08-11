@@ -16,10 +16,10 @@ query Nodes {
   e: thingNodes(orderBy: NOTE, descending: true) {
     edges { cursor, node { ...thing } }
   }
-  f: thingNodes(before: "NQ==") {
+  f: thingNodes(before: "W1s1XSw1XQ==") {
     nodes { ...thing }
   }
-  g: thingNodes(after: "NA==") {
+  g: thingNodes(after: "W1s0XSw0XQ==") {
     nodes { ...thing }
   }
 }
