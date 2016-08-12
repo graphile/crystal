@@ -7,12 +7,9 @@ const mockNodeInterfaceType = new GraphQLInterfaceType({
     fields: { __id: { type: new GraphQLNonNull(GraphQLID) } },
   })
 
-const mockNodeForge = () => {
-  return {
-    _interfaceType: mockNodeInterfaceType,
-    getInterfaceType: () => mockNodeInterfaceType,
-  }
-}
+const mockTypeForge = () => ({
+  getOutputType: value => value,
+})
 
 const mockGQLType = (name = 'Paginator') => new GraphQLObjectType({
   name,
@@ -23,6 +20,7 @@ const mockGQLType = (name = 'Paginator') => new GraphQLObjectType({
 
 const mockPaginator = ({
   name = 'paginator',
+  gqlType = mockGQLType(),
   orderings = [{ name: 'up' }, { name: 'down' }],
   defaultOrdering = orderings[0],
   readPage = () => {},
@@ -109,36 +107,36 @@ test('_pageInfoType will get the correct end cursor', t => {
   })
 })
 
-test('_createEdgeType will create an object type', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(mockPaginator(), mockGQLType())
+test('_getEdgeType will create an object type', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(mockPaginator())
   t.true(edgeType instanceof GraphQLObjectType)
 })
 
-test('_createEdgeType will have the correct name', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(mockPaginator({ name: 'foo' }), mockGQLType('bar'))
-  t.is(edgeType.name, 'BarEdge')
+test('_getEdgeType will have the correct name', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(mockPaginator({ name: 'foo', gqlType: mockGQLType('bar') }))
+  t.is(edgeType.name, 'FooEdge')
 })
 
-test('_createEdgeType implements the correct is type of check', t => {
+test('_getEdgeType implements the correct is type of check', t => {
   const paginator1 = mockPaginator()
   const paginator2 = mockPaginator()
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(paginator1, mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(paginator1, mockGQLType())
   t.true(edgeType.isTypeOf({ paginator: paginator1 }))
   t.false(edgeType.isTypeOf({ paginator: paginator2 }))
 })
 
-test('_createEdgeType will implement the edge interface', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(mockPaginator(), mockGQLType())
+test('_getEdgeType will implement the edge interface', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(mockPaginator())
   t.is(edgeType.getInterfaces()[0], connectionForge._edgeInterfaceType)
 })
 
-test('_createEdgeType will correctly return a namespaced cursor', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(mockPaginator({ name: 'foo' }), mockGQLType())
+test('_getEdgeType will correctly return a namespaced cursor', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(mockPaginator({ name: 'foo' }), mockGQLType())
   t.deepEqual(edgeType.getFields().cursor.resolve({ cursor: 'foobar' }), {
     paginatorName: 'foo',
     orderingName: null,
@@ -151,20 +149,20 @@ test('_createEdgeType will correctly return a namespaced cursor', t => {
   })
 })
 
-test('_createEdgeType will just return the value for the node field', t => {
+test('_getEdgeType will just return the value for the node field', t => {
   const value = Symbol('value')
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const edgeType = connectionForge._createEdgeType(mockPaginator(), mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const edgeType = connectionForge._getEdgeType(mockPaginator())
   t.is(edgeType.getFields().node.resolve({ value }), value)
 })
 
-test('_createOrderByEnumType will create an enum type with all the paginator orderings', t => {
+test('_getOrderByEnumType will create an enum type with all the paginator orderings', t => {
   const a = Symbol('a')
   const b = Symbol('b')
   const orderings = [{ name: 'a', a }, { name: 'b', b }]
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const enumType = connectionForge._createOrderByEnumType(mockPaginator({ orderings }), mockGQLType('Foo'))
-  t.is(enumType.name, 'FooOrderBy')
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const enumType = connectionForge._getOrderByEnumType(mockPaginator({ name: 'bar', orderings, gqlType: mockGQLType('Foo') }))
+  t.is(enumType.name, 'BarOrderBy')
   t.deepEqual(enumType.getValues(), [{
     name: 'A',
     value: orderings[0],
@@ -178,35 +176,35 @@ test('_createOrderByEnumType will create an enum type with all the paginator ord
   }])
 })
 
-test('_createConnectionType will have the right name', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(mockPaginator(), mockGQLType('Foo'))
-  t.is(connectionType.name, 'FooConnection')
+test('_getConnectionType will have the right name', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(mockPaginator({ name: 'bar', gqlType: mockGQLType('Foo') }))
+  t.is(connectionType.name, 'BarConnection')
 })
 
-test('_createConnectionType will implement the connection interface', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(mockPaginator(), mockGQLType())
+test('_getConnectionType will implement the connection interface', t => {
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(mockPaginator())
   t.is(connectionType.getInterfaces()[0], connectionForge._connectionInterfaceType)
 })
 
-test('_createConnectionType will correctly implment isTypeOf', t => {
+test('_getConnectionType will correctly implment isTypeOf', t => {
   const paginator1 = mockPaginator()
   const paginator2 = mockPaginator()
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(paginator1, mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(paginator1, mockGQLType())
   t.true(connectionType.isTypeOf({ paginator: paginator1 }))
   t.false(connectionType.isTypeOf({ paginator: paginator2 }))
 })
 
-test('_createConnectionType will resolve the source verbatim for pageInfo', t => {
+test('_getConnectionType will resolve the source verbatim for pageInfo', t => {
   const source = Symbol('source')
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(mockPaginator(), mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(mockPaginator())
   t.is(connectionType.getFields().pageInfo.resolve(source), source)
 })
 
-test('_createConnectionType will use the paginators count method for totalCount', t => {
+test('_getConnectionType will use the paginators count method for totalCount', t => {
   t.plan(3)
 
   const count = Symbol('count')
@@ -216,6 +214,7 @@ test('_createConnectionType will use the paginators count method for totalCount'
 
   const paginator = {
     getName: () => 'paginator',
+    getType: () => mockGQLType(),
     count: (countContext, countCondition) => {
       t.is(countContext, context)
       t.is(countCondition, condition)
@@ -223,90 +222,70 @@ test('_createConnectionType will use the paginators count method for totalCount'
     },
   }
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(paginator, mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(paginator, mockGQLType())
 
   t.is(connectionType.getFields().totalCount.resolve({ condition }, args, context), count)
 })
 
-test('_createConnectionType will get the edges from the source page with some extra info', t => {
+test('_getConnectionType will get the edges from the source page with some extra info', t => {
   const paginator = Symbol('paginator')
   const ordering = Symbol('ordering')
   const values = [{ value: 'a', cursor: 1 }, { value: 'b', cursor: 2 }]
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(mockPaginator(), mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(mockPaginator())
   t.deepEqual(
     connectionType.getFields().edges.resolve({ paginator, ordering, page: { values } }),
     [{ value: 'a', cursor: 1, paginator, ordering }, { value: 'b', cursor: 2, paginator, ordering }],
   )
 })
 
-test('_createConnectionType will use _createEdgeType in a list for the edges field type', t => {
-  t.plan(4)
+test('_getConnectionType will use _getEdgeType in a list for the edges field type', t => {
+  t.plan(3)
 
   let edgeGqlType
 
   const paginator = mockPaginator()
-  const gqlPaginatorType = mockGQLType()
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const { _createEdgeType } = connectionForge
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const { _getEdgeType } = connectionForge
 
-  connectionForge._createEdgeType = (edgePaginator, edgeGQLPaginatorType) => {
+  connectionForge._getEdgeType = edgePaginator => {
     t.is(edgePaginator, paginator)
-    t.is(edgeGQLPaginatorType, gqlPaginatorType)
-    return (edgeGqlType = _createEdgeType.call(connectionForge, edgePaginator, edgeGQLPaginatorType))
+    return (edgeGqlType = _getEdgeType.call(connectionForge, edgePaginator))
   }
 
-  const connectionType = connectionForge._createConnectionType(paginator, gqlPaginatorType)
+  const connectionType = connectionForge._getConnectionType(paginator)
 
   t.true(connectionType.getFields().edges.type instanceof GraphQLList)
   t.is(connectionType.getFields().edges.type.ofType, edgeGqlType)
 })
 
-test('_createConnectionType will map the nodes field to page values', t => {
+test('_getConnectionType will map the nodes field to page values', t => {
   const value1 = Symbol('value1')
   const value2 = Symbol('value2')
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  const connectionType = connectionForge._createConnectionType(mockPaginator(), mockGQLType())
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  const connectionType = connectionForge._getConnectionType(mockPaginator())
   t.deepEqual(
     connectionType.getFields().nodes.resolve({ page: { values: [{ value: value1 }, { value: value2 }] } }),
     [value1, value2],
   )
 })
 
-test('createField requires the named type implement the node type interface', t => {
-  const type1 = new GraphQLObjectType({
-    name: 'Type1',
-    isTypeOf: () => true,
-    interfaces: [mockNodeInterfaceType],
-    fields: { __id: { type: new GraphQLNonNull(GraphQLID), resolve: () => '__id' } },
-  })
-  const type2 = new GraphQLObjectType({
-    name: 'Type2',
-    fields: { __id: { type: new GraphQLNonNull(GraphQLID), resolve: () => '__id' } },
-  })
-
-  const connectionForge = new ConnectionForge(mockNodeForge())
-
-  t.notThrows(() => connectionForge.createField(mockPaginator(), type1))
-  t.throws(() => connectionForge.createField(mockPaginator(), type2))
-})
-
 test('createField will only include a condition argument if a condition config was included', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
-  t.falsy(connectionForge.createField(mockPaginator(), mockGQLType()).args.condition)
-  t.truthy(connectionForge.createField(mockPaginator(), mockGQLType(), { type: GraphQLID }).args.condition)
+  const connectionForge = new ConnectionForge(mockTypeForge())
+  t.falsy(connectionForge.createField(mockPaginator()).args.condition)
+  t.truthy(connectionForge.createField(mockPaginator(), { conditionType: GraphQLID }).args.condition)
 })
 
 test('createField will throw when trying to resolve with cursors from different paginators', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
   const field = connectionForge.createField(mockPaginator({ name: 'foo' }), mockGQLType())
   t.throws(field.resolve(null, { before: { paginatorName: 'bar' } }), '`before` cursor can not be used with this connection.')
   t.throws(field.resolve(null, { after: { paginatorName: 'bar' } }), '`after` cursor can not be used with this connection.')
 })
 
 test('createField will throw when trying to resolve with cursors from different orderings', t => {
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
   const field = connectionForge.createField(mockPaginator({ name: 'foo' }), mockGQLType())
   t.throws(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: null } }), '`before` cursor can not be used for this `orderBy` value.')
   t.throws(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: null } }), '`after` cursor can not be used for this `orderBy` value.')
@@ -331,7 +310,7 @@ test('createField resolver will call Paginator#readPage and return the resulting
     },
   })
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
   const field = connectionForge.createField(paginator, mockGQLType())
 
   t.deepEqual(await field.resolve(null, {}, context), {
@@ -343,8 +322,9 @@ test('createField resolver will call Paginator#readPage and return the resulting
 })
 
 test('createField resolver will have a condition other than true if a config is provided', async t => {
-  t.plan(5)
+  t.plan(4)
 
+  const source = Symbol('source')
   const conditionArg = Symbol('conditionArg')
   const condition = Symbol('condition')
 
@@ -356,18 +336,18 @@ test('createField resolver will have a condition other than true if a config is 
     },
   })
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
 
-  const field = connectionForge.createField(paginator, mockGQLType(), {
-    type: GraphQLID,
-    getCondition: value => {
-      t.is(value, conditionArg)
+  const field = connectionForge.createField(paginator, {
+    conditionType: GraphQLID,
+    getCondition: (conditionSource, conditionValue) => {
+      t.is(conditionSource, source)
+      t.is(conditionValue, conditionArg)
       return condition
     },
   })
 
-  t.true((await field.resolve(null, {}, null)).condition)
-  t.is((await field.resolve(null, { condition: conditionArg })).condition, condition)
+  t.is((await field.resolve(source, { condition: conditionArg })).condition, condition)
 })
 
 test('createField will pass down valid cursors without orderings', async t => {
@@ -399,7 +379,7 @@ test('createField will pass down valid cursors without orderings', async t => {
     },
   })
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
 
   connectionForge.createField(paginator1, mockGQLType()).resolve(null, { before: beforeCursor })
   connectionForge.createField(paginator2, mockGQLType()).resolve(null, { after: afterCursor })
@@ -436,7 +416,7 @@ test('createField will pass down valid cursors without orderings', async t => {
     },
   })
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
 
   await connectionForge.createField(paginator1, mockGQLType()).resolve(null, { orderBy: ordering, before: beforeCursor })
   await connectionForge.createField(paginator2, mockGQLType()).resolve(null, { orderBy: ordering, after: afterCursor })
@@ -464,7 +444,7 @@ test('createField will pass down first/last integers', async t => {
     },
   })
 
-  const connectionForge = new ConnectionForge(mockNodeForge())
+  const connectionForge = new ConnectionForge(mockTypeForge())
 
   await connectionForge.createField(paginator1, mockGQLType()).resolve(null, { first })
   await connectionForge.createField(paginator2, mockGQLType()).resolve(null, { last })

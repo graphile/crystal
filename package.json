@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "ava",
-    "test-watch": "ava -w"
+    "watch:test": "ava -w"
   },
   "dependencies": {
     "change-case": "^3.0.0",

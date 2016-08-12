@@ -12,7 +12,7 @@ import {
   Collection,
   ObjectType,
   ObjectField,
-  Relation
+  Relation,
 } from '../../catalog'
 
 import memoize from '../utils/memoize'
@@ -48,7 +48,7 @@ class CollectionForge {
     if (paginator) {
       entries.push([
         formatName.field(`all-${collection.getName()}`),
-        this._connectionForge.createField(paginator, this.getType(collection)),
+        this._connectionForge.createField(paginator),
       ])
     }
 
@@ -131,11 +131,11 @@ class CollectionForge {
    * and relations (head and tail).
    */
   @memoize
-  public getType <T>(collection: Collection<T>): GraphQLObjectType<T> {
+  public getType <TValue>(collection: Collection<TValue>): GraphQLObjectType<TValue> {
     const type = collection.getType()
     const primaryKey = collection.getPrimaryKey()
 
-    return new GraphQLObjectType<T>({
+    return new GraphQLObjectType<TValue>({
       name: formatName.type(type.getName()),
       description: type.getDescription(),
 
@@ -144,7 +144,9 @@ class CollectionForge {
       // If there is a primary key, this is a node.
       interfaces: primaryKey ? [this._nodeForge.getInterfaceType()] : [],
 
-      fields: buildObject<GraphQLFieldConfig<T, any>>(
+      // We make `fields` here a thunk because we don’t want to eagerly create
+      // types for collections used in this type.
+      fields: () => buildObject<GraphQLFieldConfig<TValue, any>>(
         // Our `__id` field. It is powered by the collection’s primary key. If
         // we have no primary key, we have no `__id` field.
         primaryKey ? [
@@ -169,11 +171,11 @@ class CollectionForge {
         // TODO: Computed columns
         // Add all of our many-to-one relations (aka tail relations).
         collection.getTailRelations().map(
-          <T, H, K>(relation: Relation<T, H, K>): [string, GraphQLFieldConfig<T, H>] => {
+          <THeadValue, TKey>(relation: Relation<TValue, THeadValue, TKey>): [string, GraphQLFieldConfig<TValue, THeadValue>] => {
             const headCollectionKey = relation.getHeadCollectionKey()
             const headCollection = headCollectionKey.getCollection()
 
-            return [formatName.field(relation.getName()), {
+            return [formatName.field(`${headCollection.getType().getName()}-by-${relation.getName()}`), {
               // TODO: description
               type: this.getType(headCollection),
               resolve: source => {
@@ -183,7 +185,23 @@ class CollectionForge {
             }]
           }
         ),
-        // TODO: Head relations
+        // Add all of our one-to-many relations (aka head relations).
+        collection.getHeadRelations().map(
+          <TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
+            const headCollectionKey = relation.getHeadCollectionKey()
+            const tailCollection = relation.getTailCollection()
+            const tailPaginator = tailCollection.getPaginator()
+
+            return tailPaginator && [
+              formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
+              this._connectionForge.createField(tailPaginator, {
+                // We use the config when creating a connection field to inject
+                // a condition that limits what we select from the paginator.
+                getCondition: (source: TValue) => relation.getTailConditionFromHeadValue(source),
+              }),
+            ]
+          }
+        )
       ),
     })
   }

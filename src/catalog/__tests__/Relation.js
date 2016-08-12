@@ -42,3 +42,19 @@ test('getHeadKeyFromTailValue will use the passed function', t => {
   const relation = new Relation(name, tailCollection, headCollectionKey, getHeadKeyFromTailValue)
   t.is(relation.getHeadKeyFromTailValue(value), headKey)
 })
+
+test('getTailConditionFromHeadValue will used the passed function', t => {
+  t.plan(2)
+  const name = Symbol('name')
+  const tailCollection = Symbol('tailCollection')
+  const headCollectionKey = Symbol('headCollectionKey')
+  const getHeadKeyFromTailValue = Symbol('getHeadKeyFromTailValue')
+  const headKey = Symbol('headKey')
+  const condition = Symbol('condition')
+  const getTailConditionFromHeadValue = param => {
+    t.is(param, headKey)
+    return condition
+  }
+  const relation = new Relation(name, tailCollection, headCollectionKey, getHeadKeyFromTailValue, getTailConditionFromHeadValue)
+  t.is(relation.getTailConditionFromHeadValue(headKey), condition)
+})

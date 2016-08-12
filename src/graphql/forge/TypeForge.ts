@@ -53,14 +53,14 @@ class TypeForge {
    */
   public getOutputType (type: Type<any>): GraphQLOutputType<any> {
     if (!this._outputTypes.has(type)) {
-      const outputType = this._createType(false, type) as GraphQLOutputType<any>
+      const gqlOutputType = this._createType(false, type) as GraphQLOutputType<any>
 
       // If the created output type is also an input type, also set it to the
       // input types memoization map.
-      if (isInputType(outputType))
-        this._inputTypes.set(type, outputType)
+      if (isInputType(gqlOutputType))
+        this._inputTypes.set(type, gqlOutputType)
 
-      this._outputTypes.set(type, outputType)
+      this._outputTypes.set(type, gqlOutputType)
     }
 
     return this._outputTypes.get(type)!
@@ -71,17 +71,25 @@ class TypeForge {
    */
   public getInputType (type: Type<any>): GraphQLInputType<any> {
     if (!this._inputTypes.has(type)) {
-      const inputType = this._createType(true, type) as GraphQLInputType<any>
+      const gqlInputType = this._createType(true, type) as GraphQLInputType<any>
 
       // If the created input type is also an output type, also set it to the
       // output types memoization map.
-      if (isOutputType(inputType))
-        this._outputTypes.set(type, inputType)
+      if (isOutputType(gqlInputType))
+        this._outputTypes.set(type, gqlInputType)
 
-      this._inputTypes.set(type, inputType)
+      this._inputTypes.set(type, gqlInputType)
     }
 
     return this._inputTypes.get(type)!
+  }
+
+  /**
+   * Override an output type. This allows for custom types like those for
+   * collections.
+   */
+  public overrideOutputType (type: Type<any>, gqlType: GraphQLOutputType<any>) {
+    this._outputTypes.set(type, gqlType);
   }
 
   /**

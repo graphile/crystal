@@ -44,13 +44,19 @@ import CollectionForge from './CollectionForge'
 class SchemaForge {
   private _typeForge = new TypeForge()
   private _nodeForge = new NodeForge()
-  private _connectionForge = new ConnectionForge(this._nodeForge)
+  private _connectionForge = new ConnectionForge(this._typeForge)
   private _collectionForge = new CollectionForge(this._typeForge, this._nodeForge, this._connectionForge)
 
   /**
    * Creates a GraphQL schema from our abstract catalog data structure.
    */
   public createSchema (catalog: Catalog): GraphQLSchema {
+    // Override all of the output types for collections.
+    for (const collection of catalog.getCollections()) {
+      const gqlCollectionType = this._collectionForge.getType(collection);
+      this._typeForge.overrideOutputType(collection.getType(), gqlCollectionType);
+    }
+
     return new GraphQLSchema({
       query: this._createQueryType(catalog),
     })

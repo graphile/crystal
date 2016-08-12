@@ -1,4 +1,5 @@
 import {
+  GraphQLOutputType,
   GraphQLInputType,
   GraphQLScalarType,
   GraphQLInterfaceType,
@@ -16,14 +17,15 @@ import {
 } from 'graphql'
 
 import { Paginator, Condition } from '../../catalog'
+import memoize from '../utils/memoize'
 import buildObject from '../utils/buildObject'
 import * as formatName from '../utils/formatName'
 import TypeForge from './TypeForge'
-import NodeForge from './NodeForge'
+import CollectionForge from './CollectionForge'
 
 class ConnectionForge {
   constructor (
-    private _nodeForge: NodeForge,
+    private _typeForge: TypeForge,
   ) {}
 
   /**
@@ -38,18 +40,13 @@ class ConnectionForge {
    * *extra* fields. Therefore we’d have to pass in that custom type here
    * instead of letting a `TypeForge` generate it.
    */
-  public createField <TValue, TCursor>(
+  public createField <TValue, TCursor, TCondition>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
-    conditionConfig?: ConditionConfig<any>,
+    config: ConnectionFieldConfig<TCondition> = {},
   ): GraphQLFieldConfig<any, Connection<TValue, TCursor>> {
     const paginatorName = paginator.getName()
-
-    if (gqlType.getInterfaces().indexOf(this._nodeForge.getInterfaceType()) === -1)
-      throw new Error('GraphQL object type must implement the Node interface.')
-
-    const gqlConnectionType = this._createConnectionType(paginator, gqlType)
-    const gqlOrderByEnum = this._createOrderByEnumType(paginator, gqlType)
+    const gqlConnectionType = this._getConnectionType(paginator)
+    const gqlOrderByEnum = this._getOrderByEnumType(paginator)
 
     // This is the type of all the connection arguments.
     type ConnectionArgs = {
@@ -58,7 +55,7 @@ class ConnectionForge {
       after?: NamespacedCursor<TCursor>,
       first?: number,
       last?: number,
-      condition?: any,
+      condition?: TCondition,
     }
 
     return {
@@ -86,8 +83,8 @@ class ConnectionForge {
           type: GraphQLInt,
           // TODO: description
         }],
-        conditionConfig && ['condition', {
-          type: conditionConfig.type,
+        config.conditionType && ['condition', {
+          type: config.conditionType,
           // TODO: description
         }],
       ]),
@@ -122,8 +119,8 @@ class ConnectionForge {
         // Get our condition from the condition input type. If we had no
         // condition or we had no condition config, the condition will just be
         // `true`. Everything passes! 🎉
-        const condition: Condition = conditionConfig && argCondition
-          ? conditionConfig.getCondition(argCondition)
+        const condition: Condition = config.getCondition
+          ? config.getCondition(source, argCondition)
           : true
 
         // Finally, actually get the page data.
@@ -151,17 +148,17 @@ class ConnectionForge {
   /**
    * Creates a concrete GraphQL connection object type.
    */
-  private _createConnectionType <TValue, TCursor>(
+  @memoize
+  private _getConnectionType <TValue, TCursor>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
   ): GraphQLObjectType<Connection<TValue, TCursor>> {
-    const gqlEdgeType = this._createEdgeType(paginator, gqlType)
+    const gqlType = this._typeForge.getOutputType(paginator.getType())
+    const gqlEdgeType = this._getEdgeType(paginator)
 
     return new GraphQLObjectType<Connection<TValue, TCursor>>({
-      name: formatName.type(`${gqlType.name}-connection`),
+      name: formatName.type(`${paginator.getName()}-connection`),
       // TODO: description
       isTypeOf: value => value.paginator === paginator,
-      interfaces: [this._connectionInterfaceType],
       fields: {
         pageInfo: {
           type: new GraphQLNonNull(ConnectionForge._pageInfoType),
@@ -192,17 +189,17 @@ class ConnectionForge {
   /**
    * Creates a concrete GraphQL edge object type.
    */
-  private _createEdgeType <TValue, TCursor>(
+  @memoize
+  private _getEdgeType <TValue, TCursor>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
   ): GraphQLObjectType<Edge<TValue, TCursor>> {
     const paginatorName = paginator.getName()
+    const gqlType = this._typeForge.getOutputType(paginator.getType())
 
     return new GraphQLObjectType<Edge<TValue, TCursor>>({
-      name: formatName.type(`${gqlType.name}-edge`),
+      name: formatName.type(`${paginator.getName()}-edge`),
       // TODO: description
       isTypeOf: value => value.paginator === paginator,
-      interfaces: [this._edgeInterfaceType],
       fields: {
         cursor: {
           type: new GraphQLNonNull(ConnectionForge._cursorType),
@@ -226,12 +223,12 @@ class ConnectionForge {
    * Creates a GraphQL type which can be used by the user to select an ordering
    * strategy.
    */
-  private _createOrderByEnumType <TValue, TCursor>(
+  @memoize
+  private _getOrderByEnumType <TValue, TCursor>(
     paginator: Paginator<TValue, TCursor>,
-    gqlType: GraphQLObjectType<TValue>,
   ): GraphQLEnumType<Paginator.Ordering> {
     return new GraphQLEnumType<Paginator.Ordering>({
-      name: formatName.type(`${gqlType.name}-order-by`),
+      name: formatName.type(`${paginator.getName()}-order-by`),
       // TODO: description
       values: buildObject<GraphQLEnumValueConfig<Paginator.Ordering>>(
         paginator.getOrderings().map<[string, GraphQLEnumValueConfig<Paginator.Ordering>]>(ordering =>
@@ -315,66 +312,6 @@ class ConnectionForge {
       },
     })
   )
-
-  /**
-   * The edge interface. Implemented by every type that’s a connection edge.
-   *
-   * An edge represents a node and a cursor. The cursor is used to paginate
-   * the connection.
-   *
-   * @private
-   */
-  private _edgeInterfaceType = (
-    new GraphQLInterfaceType({
-      name: 'Edge',
-      // TODO: description
-      fields: {
-        cursor: {
-          type: new GraphQLNonNull(ConnectionForge._cursorType),
-          // TODO: description
-        },
-        node: {
-          type: this._nodeForge.getInterfaceType(),
-          // TODO: description
-        },
-      },
-    })
-  )
-
-  /**
-   * The connection interface. This is the interface that every connection
-   * in our schema implements. A connection represents a list of edges between
-   * one type and another.
-   *
-   * While the connections implement the Relay specification, we consider
-   * connections to be idiomatic GraphQL.
-   *
-   * @private
-   */
-  private _connectionInterfaceType = (
-    new GraphQLInterfaceType({
-      name: 'Connection',
-      // TODO: description
-      fields: {
-        pageInfo: {
-          type: new GraphQLNonNull(ConnectionForge._pageInfoType),
-          // TODO: description
-        },
-        totalCount: {
-          type: GraphQLInt,
-          // TODO: description
-        },
-        edges: {
-          type: new GraphQLList(this._edgeInterfaceType),
-          // TODO: description
-        },
-        nodes: {
-          type: new GraphQLList(this._nodeForge.getInterfaceType()),
-          // TODO: description
-        },
-      },
-    })
-  )
 }
 
 export default ConnectionForge
@@ -384,9 +321,9 @@ export default ConnectionForge
  * conditions with that connection. If the user chooses to use conditions,
  * they must provide this extra config object.
  */
-type ConditionConfig<TValue> = {
-  type: GraphQLInputType<TValue>,
-  getCondition: (value: TValue) => Condition,
+type ConnectionFieldConfig<TCondition> = {
+  conditionType?: GraphQLInputType<TCondition>,
+  getCondition?: (source: any, conditionValue: TCondition | undefined) => Condition,
 }
 
 /**
