@@ -149,8 +149,8 @@ class CollectionForge {
       fields: () => buildObject<GraphQLFieldConfig<TValue, any>>(
         // Our `__id` field. It is powered by the collection’s primary key. If
         // we have no primary key, we have no `__id` field.
-        primaryKey ? [
-          ['__id', {
+        [
+          primaryKey && ['__id', {
             // TODO: description
             type: new GraphQLNonNull(GraphQLID),
             resolve: value =>
@@ -159,7 +159,7 @@ class CollectionForge {
                 key: primaryKey.getKeyForValue(value),
               }),
           }],
-        ] : [],
+        ],
 
         // Add all of the basic fields to our type.
         type.getFields().map(<O, F>(field: ObjectField<O, F>): [string, GraphQLFieldConfig<O, F>] =>
