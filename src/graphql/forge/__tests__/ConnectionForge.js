@@ -1,6 +1,6 @@
 import test from 'ava'
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLID } from 'graphql'
-import ConnectionForge from '../ConnectionForge'
+import ConnectionForge, { _getOptimizations } from '../ConnectionForge'
 
 const mockNodeInterfaceType = new GraphQLInterfaceType({
     name: 'Node',

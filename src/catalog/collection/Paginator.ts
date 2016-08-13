@@ -1,4 +1,4 @@
-import ObjectType from '../type/object/ObjectType'
+import Type from '../type/Type'
 import Condition from './Condition'
 
 /**
@@ -31,7 +31,7 @@ import Condition from './Condition'
 abstract class Paginator<TValue, TCursor> {
   constructor (
     private _name: string,
-    private _type: ObjectType<TValue>,
+    private _type: Type<TValue>,
   ) {}
 
   /**
@@ -45,7 +45,7 @@ abstract class Paginator<TValue, TCursor> {
   /**
    * Returns the type of the values returned by this paginator.
    */
-  public getType (): ObjectType<TValue> {
+  public getType (): Type<TValue> {
     return this._type
   }
 
@@ -88,7 +88,8 @@ abstract class Paginator<TValue, TCursor> {
    */
   public abstract readPage (
     context: any,
-    config: Paginator.PageConfig<TCursor>
+    config: Paginator.PageConfig<TCursor>,
+    optimizations?: Paginator.Optimizations<TValue>,
   ): Promise<Paginator.Page<TValue, TCursor>>
 }
 
@@ -137,6 +138,43 @@ namespace Paginator {
     values: Array<{ value: TValue, cursor: TCursor }>,
     hasNext: boolean,
     hasPrevious: boolean,
+  }
+
+  /**
+   * Optimizations for the `Paginator#readPage` operation. All optimizations
+   * are optional and may or may not be implemented and may or may not be
+   * respected. Any service has the freedom to not define any optimizations and
+   * any driver has the freedom to not respect the optimizations. The same
+   * result should be returned from `Paginator#readPage` no matter what the
+   * optimizations object holds. The optimizations object is exclusively used
+   * to make the querying of data more efficient by informing the `Paginator`
+   * up front what data it will need instead of lazily fetching that data.
+   *
+   * Optimizations are not tied to the type system mostly because optimizations
+   * don’t really need to make logical “sense” in our type system. Rather they
+   * are decoupled from the system to allow the expression of characteristics
+   * outside of the core abstractions.
+   */
+  export type Optimizations<TValue> = {
+    /**
+     * The specific set of field names for the object we are reading for. If
+     * the paginator’s type is not an object, this optimization doesn’t make a
+     * lot of sense. The driver then may choose to either exclusively select
+     * these fields or select all fields as is the default.
+     *
+     * There may be field names that do not exist in this array. If such exist,
+     * they may be handled however the implementor may want.
+     */
+    fieldNames?: Array<string>,
+
+    // TODO:
+    // /**
+    //  * Some fields can be called like a function. This optimization allows
+    //  * services to define in advance which computations will be called and with
+    //  * what arguments so the computations can be eagerly evaluated and not
+    //  * lazily evaluated.
+    //  */
+    // computedFields?: Array<{ name: string, arguments: { [name: string]: any } }>,
   }
 }
 

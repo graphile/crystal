@@ -7,6 +7,7 @@ import {
   GraphQLObjectType,
   GraphQLFieldConfig,
   GraphQLArgumentConfig,
+  GraphQLResolveInfo,
   GraphQLEnumType,
   GraphQLEnumValueConfig,
   GraphQLList,
@@ -90,7 +91,12 @@ class ConnectionForge {
       ]),
       // Note that this resolver is an arrow function. This is so that we can
       // keep the correct `this` reference.
-      resolve: async (source: any, args: ConnectionArgs, context: any): Promise<Connection<TValue, TCursor>> => {
+      resolve: async (
+        source: any,
+        args: ConnectionArgs,
+        context: any,
+        info: GraphQLResolveInfo<any, any>,
+      ): Promise<Connection<TValue, TCursor>> => {
         const {
           orderBy: ordering,
           before: beforeCursor,
@@ -123,15 +129,22 @@ class ConnectionForge {
           ? config.getCondition(source, argCondition)
           : true
 
-        // Finally, actually get the page data.
-        const page = await paginator.readPage(context, {
+        // Construct the page config.
+        const pageConfig: Paginator.PageConfig<TCursor> = {
           beforeCursor: beforeCursor && beforeCursor.cursor,
           afterCursor: afterCursor && afterCursor.cursor,
           first,
           last,
           ordering,
           condition,
-        })
+        }
+
+        // Gets the optimizations for this `Paginator#readPage` request from
+        // the GraphQL resolution info.
+        const optimizations = getOptimizations(info)
+
+        // Finally, actually get the page data.
+        const page = await paginator.readPage(context, pageConfig, optimizations)
 
         return {
           paginator,
@@ -367,4 +380,20 @@ type NamespacedCursor<TCursor> = {
   paginatorName: string,
   orderingName: string | null,
   cursor: TCursor,
+}
+
+/**
+ * Will create a paginator optimizations object from the `GraphQLResolveInfo`
+ * object.
+ */
+// TODO: Test this lots.
+function getOptimizations <TValue>(info: GraphQLResolveInfo<any, any>): Paginator.Optimizations<TValue> {
+  return {
+    fieldNames:
+      info.fieldASTs
+        // Filter out field ASTs with arguments. Probably don’t want those.
+        .filter(field => !field.arguments || field.arguments.length === 0)
+        // Map to just the string name.
+        .map(field => field.name.value),
+  }
 }
