@@ -160,6 +160,7 @@ class CollectionForge {
               }),
           }],
         ] : [],
+
         // Add all of the basic fields to our type.
         type.getFields().map(<O, F>(field: ObjectField<O, F>): [string, GraphQLFieldConfig<O, F>] =>
           [formatName.field(field.getName()), {
@@ -169,6 +170,7 @@ class CollectionForge {
           }]
         ),
         // TODO: Computed columns
+
         // Add all of our many-to-one relations (aka tail relations).
         collection.getTailRelations().map(
           <THeadValue, TKey>(relation: Relation<TValue, THeadValue, TKey>): [string, GraphQLFieldConfig<TValue, THeadValue>] => {
@@ -185,6 +187,7 @@ class CollectionForge {
             }]
           }
         ),
+
         // Add all of our one-to-many relations (aka head relations).
         collection.getHeadRelations().map(
           <TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
