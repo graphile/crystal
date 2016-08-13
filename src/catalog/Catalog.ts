@@ -1,4 +1,6 @@
 import NamedType from './type/NamedType'
+import AliasType from './type/AliasType'
+import ObjectType from './type/object/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './Relation'
 
@@ -22,13 +24,63 @@ import Relation from './Relation'
  * *mutable*. Scary, I know.
  */
 class Catalog {
+  private _types = new Map<string, NamedType<any>>()
   private _collections = new Map<string, Collection<any>>()
-  private _relations = new Set<Relation<any, any, any>>()
+  private _relations = new Map<string, Relation<any, any, any>>()
+
+  /**
+   * Add a type to our catalog. If the type is a composite named type (like an
+   * alias type or an object type), we will also add the types it is composed
+   * of to the catalog.
+   *
+   * Type names must be unique. So if you had already added a type with the
+   * same name to the catalog, an error will be thrown.
+   */
+  // TODO: add tests!
+  public addType (type: NamedType<any>): this {
+    // If the type has already been added, we good!
+    if (this.hasType(type))
+      return this
+
+    const name = type.getName()
+
+    if (this._types.has(name))
+      throw new Error(`Type of name '${name}' already exists in the catalog.`)
+
+    this._types.set(name, type)
+
+    // Add the base type if this is an alias type.
+    if (type instanceof AliasType)
+      this.addType(type.getBaseType().getNamedType())
+
+    // Add the type for all of the fields if this is an object type.
+    if (type instanceof ObjectType)
+      type.getFields().forEach(field => this.addType(field.getType().getNamedType()))
+
+    return this
+  }
+
+  /**
+   * Get all of the types in our catalog.
+   */
+  public getTypes (): Array<NamedType<any>> {
+    return Array.from(this._types.values())
+  }
+
+  /**
+   * Returns true if the exact same type exists in this catalog, false if it
+   * doesn’t.
+   */
+  public hasType (type: NamedType<any>): boolean {
+    return this._types.get(type.getName()) === type
+  }
 
   /**
    * Adds a single collection to our catalog. If a collection with the same
    * name already exists, an error is thrown. If the collection has a
    * different catalog, an error is thrown.
+   *
+   * We will also add the type for this collection to the catalog.
    */
   public addCollection (collection: Collection<any>): this {
     if (collection.getCatalog() !== this)
@@ -37,9 +89,12 @@ class Catalog {
     const name = collection.getName()
 
     if (this._collections.has(name))
-      throw new Error(`Type of name '${name}' already exists in the catalog.`)
+      throw new Error(`Collection of name '${name}' already exists in the catalog.`)
 
     this._collections.set(name, collection)
+
+    // Add the type for this collection.
+    this.addType(collection.getType())
 
     return this
   }
@@ -52,7 +107,7 @@ class Catalog {
    */
   // TODO: Test that the collection object type is returned by `getTypes`.
   // TODO: Test that collections do not have the same name.
-  public getCollections (): Collection<any>[] {
+  public getCollections (): Array<Collection<any>> {
     return Array.from(this._collections.values())
   }
 
@@ -86,7 +141,12 @@ class Catalog {
     if (!this.hasCollection(headCollection))
       throw new Error(`Head collection named '${headCollection.getName()}' is not in this catalog.`)
 
-    this._relations.add(relation)
+    const name = relation.getName()
+
+    if (this._relations.has(name))
+      throw new Error(`Relation of name '${name}' already exists in the catalog.`)
+
+    this._relations.set(name, relation)
 
     return this
   }
@@ -99,8 +159,8 @@ class Catalog {
    * In a graph representation of our catalog, collections would be nodes and
    * relations would be directed edges.
    */
-  public getRelations (): Relation<any, any, any>[] {
-    return Array.from(this._relations)
+  public getRelations (): Array<Relation<any, any, any>> {
+    return Array.from(this._relations.values())
   }
 }
 

@@ -14,10 +14,10 @@ import NamedType from './NamedType'
  * services that don’t support type aliasing. Like in GraphQL which doesn’t
  * support aliasing unnamed types.
  */
-class AliasType<TValue, TType extends Type<TValue>> extends NamedType<TValue> {
+class AliasType<TValue> extends NamedType<TValue> {
   constructor (
     name: string,
-    private _baseType: TType,
+    private _baseType: Type<TValue>,
   ) {
     super(name)
   }
@@ -32,7 +32,7 @@ class AliasType<TValue, TType extends Type<TValue>> extends NamedType<TValue> {
   /**
    * Returns the base type for this alias type.
    */
-  public getBaseType (): TType {
+  public getBaseType (): Type<TValue> {
     return this._baseType
   }
 }

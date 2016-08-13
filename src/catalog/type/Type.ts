@@ -1,3 +1,5 @@
+import NamedType from './NamedType'
+
 /**
  * Any type in our system.
  *
@@ -17,6 +19,13 @@ abstract class Type<TValue> {
    * `typeof value === 'string'`.
    */
   public abstract isTypeOf (value: any): value is TValue
+
+  /**
+   * Every type should have a named type at it’s “heart” as unnamed types are
+   * inherently abstract. As catalogs will only let us register named types, we
+   * need to get the named type.
+   */
+  public abstract getNamedType (): NamedType<any>
 }
 
 export default Type

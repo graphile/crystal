@@ -36,6 +36,14 @@ abstract class NamedType<TValue> extends Type<TValue> {
   public getDescription (): string | undefined {
     return this._description
   }
+
+  /**
+   * In this case this method just returns the `NamedType` instance straight
+   * up. Easy.
+   */
+  public getNamedType (): this {
+    return this
+  }
 }
 
 export default NamedType

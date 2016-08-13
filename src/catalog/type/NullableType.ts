@@ -1,4 +1,5 @@
 import Type from './Type'
+import NamedType from './NamedType'
 
 /**
  * A nullable type is an unnamed wrapper around any other type that signifies
@@ -29,9 +30,9 @@ import Type from './Type'
  * Also note that it is possible that a nullable type could wrap another
  * nullable type. This may lead to unexpected behavior.
  */
-class NullableType<TValue, TBaseType extends Type<TValue>> extends Type<TValue | null> {
+class NullableType<TValue> extends Type<TValue | null> {
   constructor (
-    private _baseType: TBaseType,
+    private _baseType: Type<TValue>,
   ) {
     super()
   }
@@ -50,8 +51,15 @@ class NullableType<TValue, TBaseType extends Type<TValue>> extends Type<TValue |
   /**
    * Gets the base type for this nullable type.
    */
-  public getBaseType (): TBaseType {
+  public getBaseType (): Type<TValue> {
     return this._baseType
+  }
+
+  /**
+   * Returns the base type.
+   */
+  public getNamedType (): NamedType<any> {
+    return this._baseType.getNamedType()
   }
 }
 
