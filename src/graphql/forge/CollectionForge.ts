@@ -169,6 +169,7 @@ class CollectionForge {
             resolve: value => field.getFieldValueFromObject(value),
           }]
         ),
+
         // TODO: Computed columns
 
         // Add all of our many-to-one relations (aka tail relations).
