@@ -17,14 +17,14 @@ type PageInfo {
   endCursor: Cursor
 }
 
-type PeopleConnection {
+type PersonConnection {
   pageInfo: PageInfo!
   totalCount: Int
-  edges: [PeopleEdge]
+  edges: [PersonEdge]
   nodes: [Person]
 }
 
-type PeopleEdge {
+type PersonEdge {
   cursor: Cursor!
   node: Person
 }
@@ -48,7 +48,9 @@ type Person implements Node {
   firstName: String
   lastName: String
   about: String
-  postsByAuthor(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
+  fullName: String
+  latestPost: Post
+  postsByAuthor(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostConnection
 }
 
 type Post implements Node {
@@ -58,17 +60,18 @@ type Post implements Node {
   status: PostStatus!
   headline: String!
   body: String
+  summary: String
   personByAuthor: Person
 }
 
-type PostsConnection {
+type PostConnection {
   pageInfo: PageInfo!
   totalCount: Int
-  edges: [PostsEdge]
+  edges: [PostEdge]
   nodes: [Post]
 }
 
-type PostsEdge {
+type PostEdge {
   cursor: Cursor!
   node: Post
 }
@@ -91,12 +94,13 @@ enum PostStatus {
 
 type Query {
   node(__id: ID!): Node
-  allPeople(orderBy: PeopleOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
+  searchPosts(search: String, orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostConnection
+  allPeople(orderBy: PeopleOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PersonConnection
   person(__id: ID!): Person
   personById(id: Int!): Person
   personByName(name: String!): Person
   personByEmail(email: String!): Person
-  allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
+  allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
 }

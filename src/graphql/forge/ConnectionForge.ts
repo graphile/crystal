@@ -17,7 +17,7 @@ import {
   Kind,
 } from 'graphql'
 
-import { Paginator, Condition } from '../../catalog'
+import { Paginator, Condition, Type } from '../../catalog'
 import memoize from '../utils/memoize'
 import buildObject from '../utils/buildObject'
 import * as formatName from '../utils/formatName'
@@ -46,7 +46,8 @@ class ConnectionForge {
     config: ConnectionFieldConfig<TCondition> = {},
   ): GraphQLFieldConfig<any, Connection<TValue, TCursor>> {
     const paginatorName = paginator.getName()
-    const gqlConnectionType = this._getConnectionType(paginator)
+    const paginatorType = paginator.getType()
+    const gqlConnectionType = this._getConnectionType(paginatorType)
     const gqlOrderByEnum = this._getOrderByEnumType(paginator)
 
     // This is the type of all the connection arguments.
@@ -163,15 +164,14 @@ class ConnectionForge {
    */
   @memoize
   private _getConnectionType <TValue, TCursor>(
-    paginator: Paginator<TValue, TCursor>,
+    type: Type<TValue>,
   ): GraphQLObjectType<Connection<TValue, TCursor>> {
-    const gqlType = this._typeForge.getOutputType(paginator.getType())
-    const gqlEdgeType = this._getEdgeType(paginator)
+    const gqlType = this._typeForge.getOutputType(type)
+    const gqlEdgeType = this._getEdgeType(type)
 
     return new GraphQLObjectType<Connection<TValue, TCursor>>({
-      name: formatName.type(`${paginator.getName()}-connection`),
+      name: formatName.type(`${type.getNamedType().getName()}-connection`),
       // TODO: description
-      isTypeOf: value => value.paginator === paginator,
       fields: {
         pageInfo: {
           type: new GraphQLNonNull(ConnectionForge._pageInfoType),
@@ -180,7 +180,7 @@ class ConnectionForge {
         },
         totalCount: {
           type: GraphQLInt,
-          resolve: ({ condition }, args, context) => paginator.count(context, condition),
+          resolve: ({ paginator, condition }, args, context) => paginator.count(context, condition),
           // TODO: description
         },
         edges: {
@@ -204,20 +204,18 @@ class ConnectionForge {
    */
   @memoize
   private _getEdgeType <TValue, TCursor>(
-    paginator: Paginator<TValue, TCursor>,
+    type: Type<TValue>,
   ): GraphQLObjectType<Edge<TValue, TCursor>> {
-    const paginatorName = paginator.getName()
-    const gqlType = this._typeForge.getOutputType(paginator.getType())
+    const gqlType = this._typeForge.getOutputType(type)
 
     return new GraphQLObjectType<Edge<TValue, TCursor>>({
-      name: formatName.type(`${paginator.getName()}-edge`),
+      name: formatName.type(`${type.getNamedType().getName()}-edge`),
       // TODO: description
-      isTypeOf: value => value.paginator === paginator,
       fields: {
         cursor: {
           type: new GraphQLNonNull(ConnectionForge._cursorType),
-          resolve: ({ ordering, cursor }): NamespacedCursor<TCursor> => ({
-            paginatorName,
+          resolve: ({ paginator, ordering, cursor }): NamespacedCursor<TCursor> => ({
+            paginatorName: paginator.getName(),
             orderingName: ordering ? ordering.name : null,
             cursor,
           }),
@@ -347,7 +345,7 @@ type ConnectionFieldConfig<TCondition> = {
  * @private
  */
 interface Connection<TValue, TCursor> {
-  paginator: any
+  paginator: Paginator<TValue, TCursor>
   ordering: Paginator.Ordering | undefined
   condition: Condition
   page: Paginator.Page<TValue, TCursor>
@@ -361,7 +359,7 @@ interface Connection<TValue, TCursor> {
  * @private
  */
 interface Edge<TValue, TCursor> {
-  paginator: any
+  paginator: Paginator<TValue, TCursor>
   ordering: Paginator.Ordering | undefined
   cursor: TCursor
   value: TValue

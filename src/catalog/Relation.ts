@@ -1,5 +1,6 @@
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
+import Paginator from './collection/Paginator'
 import Condition from './collection/Condition'
 
 /**
@@ -14,6 +15,9 @@ import Condition from './collection/Condition'
  * tail => head
  * ```
  *
+ * The “tail” would be the “many” in a many-to-one relation and the “head”
+ * would be the “one” in a many-to-one relation.
+ *
  * So for example, say we had a `post` collection and a `person` collection.
  * Let’s also say that the `post` collection has an `author` field which is a
  * collection key for the `person` collection. In this case where `post` is
@@ -26,13 +30,12 @@ import Condition from './collection/Condition'
  *
  * @see https://en.wikipedia.org/wiki/Directed_graph#Basic_terminology
  */
-class Relation<TTailValue, THeadValue, TKey> {
+abstract class Relation<TTailValue, THeadValue, TKey> {
   constructor (
     private _name: string,
     private _tailCollection: Collection<TTailValue>,
     private _headCollectionKey: CollectionKey<THeadValue, TKey>,
-    private _getHeadKeyFromTailValue: (value: TTailValue) => TKey,
-    private _getTailConditionFromHeadValue: (value: THeadValue) => Condition,
+    private _tailPaginator: Paginator<TTailValue, unknown>,
   ) {}
 
   /**
@@ -58,39 +61,33 @@ class Relation<TTailValue, THeadValue, TKey> {
 
   /**
    * Gets the key for a value in the head collection from the tail collection
-   * value.
+   * value. This allows us to see the “one” in a many-to-one mental model.
    */
-  public getHeadKeyFromTailValue (value: TTailValue): TKey {
-    return this._getHeadKeyFromTailValue(value)
+  public abstract getHeadKeyFromTailValue (value: TTailValue): TKey
+
+  /**
+   * Gets the paginator for values in the tail collection which we will use
+   * with a condition from `Relation#getTailConditionFromHeadValue`.
+   *
+   * The reason we have two seperate methods (one for the paginator, one for
+   * the condition) is that we need to statically know information about the
+   * paginator. Such as orderings, type, and name information.
+   *
+   * @see Relation#getTailConditionFromHeadValue
+   */
+  public getTailPaginator (): Paginator<TTailValue, unknown> {
+    return this._tailPaginator
   }
 
   /**
-   * This method can look super confusing, so let’s break it down. The
-   * `Relation` object has a way to select a head value from a tail value,
-   * that’s the way the arrow normally points, `tail => head`. But what if we
-   * want to select the other way around? What if we want to take a “head”
-   * value and get *all* the “tail” values that point at it.
+   * Gets a condition which will be used with the tail paginator from
+   * `Relation#getTailPaginator` to select all of the tail values from the
+   * single head value. This allows us to see the “many” in a one-to-many
+   * mental model.
    *
-   * That’s where this method comes in.
-   *
-   * It takes a head value (similar to how `Relation#getHeadKeyFromTailValue`
-   * takes a tail value) and returns a condition. Now why would it return a
-   * condition, you may very well ask.
-   *
-   * Well, there always could be many tail values for a single head value (thus
-   * is the nature of a directional relationship) so we’d need to query a set
-   * of values. In our `Collection` object we query a set of values with
-   * `Paginator`s. So why don’t we just return a paginator from here? The
-   * reason we don’t is we don’t want to bust caches. Ideally we’d like to use
-   * the same `Paginator` instance (the one in the tail collection
-   * specifically) so our interface consumers have to derive less information
-   * from two seperate paginator instances. Instead we return a condition that
-   * can be used *with* the already created paginator.
+   * @see Relation#getTailPaginator
    */
-  // TODO: Is returning a condition correct here, or should we return a paginator?
-  public getTailConditionFromHeadValue (value: THeadValue): Condition {
-    return this._getTailConditionFromHeadValue(value)
-  }
+  public abstract getTailConditionFromHeadValue (value: THeadValue): Condition
 }
 
 export default Relation

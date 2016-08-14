@@ -192,16 +192,15 @@ class CollectionForge {
         // Add all of our one-to-many relations (aka head relations).
         collection.getHeadRelations().map(
           <TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
-            const headCollectionKey = relation.getHeadCollectionKey()
             const tailCollection = relation.getTailCollection()
-            const tailPaginator = tailCollection.getPaginator()
+            const tailPaginator = relation.getTailPaginator()
 
-            return tailPaginator && [
+            return [
               formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
               this._connectionForge.createField(tailPaginator, {
                 // We use the config when creating a connection field to inject
                 // a condition that limits what we select from the paginator.
-                getCondition: (source: TValue) => relation.getTailConditionFromHeadValue(source),
+                getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),
               }),
             ]
           }
