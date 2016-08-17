@@ -51,6 +51,7 @@
     "debug": "^2.2.0",
     "express": "^4.13.4",
     "express-graphql": "^0.5.3",
+    "finalhandler": "^0.5.0",
     "graphql": "^0.6.0",
     "http-errors": "^1.5.0",
     "jsonwebtoken": "^7.0.1",
