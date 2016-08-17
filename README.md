@@ -36,6 +36,8 @@ postgraphql --help
 
 Check out the **[forum example][]** for a demo of PostGraphQL in action.
 
+Also check out relevant [documentation links](https://github.com/calebmer/postgraphql#documentation).
+
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 
 ## Benefits
