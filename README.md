@@ -189,6 +189,11 @@ The specific specs PostGraphQL implements are:
 
 * * *
 
+## Documentation
+- [Using PostGraphQL as ExpressJS or Connect middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
+- [Adding advanced queries to PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md)
+- [Using PostgreSQL functions to extend your PostGraphQL schema.](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md)
+
 ## Roadmap
 In the future, things PostGraphQL will be able to do will include:
 
