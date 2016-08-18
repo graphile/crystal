@@ -36,7 +36,7 @@ postgraphql --help
 
 Check out the **[forum example][]** for a demo of PostGraphQL in action.
 
-Also check out relevant [documentation links](https://github.com/calebmer/postgraphql#documentation).
+Also check out relevant [documentation links](#documentation).
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 
@@ -195,6 +195,7 @@ The specific specs PostGraphQL implements are:
 - [Using PostGraphQL as ExpressJS or Connect middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
 - [Adding advanced queries to PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md)
 - [Using PostgreSQL functions to extend your PostGraphQL schema.](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md)
+- [A crash course in PostgreSQL roles for PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/anonymous-role.md)
 
 ## Roadmap
 In the future, things PostGraphQL will be able to do will include:
