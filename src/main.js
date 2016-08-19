@@ -21,6 +21,7 @@ const main = () => {
   .version(manifest.version)
   .usage('[options] <url>')
   .option('-s, --schema <identifier>', 'the PostgreSQL schema to serve a GraphQL server of. defaults to public')
+  .option('-a, --anonymous-role <name>', 'the PostgreSQL role to use for requests that are non-authenticated. no role is set by default')
   .option('-n, --hostname <name>', 'a URL hostname the server will listen to. defaults to localhost')
   .option('-p, --port <integer>', 'a URL port the server will listen to. defaults to 3000', parseInt)
   .option('-d, --development', 'enables a development mode which enables GraphiQL, nicer errors, and JSON pretty printing')
@@ -33,6 +34,7 @@ const main = () => {
   const {
     args: [connection],
     schema: schemaName,
+    anonymousRole,
     hostname = 'localhost',
     port = 3000,
     development = false,
@@ -53,6 +55,7 @@ const main = () => {
 
   // Create the GraphQL HTTP server.
   const handler = postgraphql(pgConfig, schemaName, {
+    anonymousRole,
     route,
     secret,
     development,

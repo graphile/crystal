@@ -24,6 +24,7 @@ import graphqlHTTP from 'express-graphql'
 const createServer = ({
   graphqlSchema,
   pgConfig,
+  anonymousRole,
   route = '/',
   secret,
   development = true,
@@ -74,7 +75,7 @@ const createServer = ({
     await client.queryAsync('begin')
 
     // If we have a secret, let’s setup the request transaction.
-    if (secret) await setupRequestTransaction(req, client, secret)
+    await setupRequestTransaction(req, client, secret, anonymousRole)
 
     // Make sure we release our client back to the pool once the response has
     // finished.
@@ -84,11 +85,11 @@ const createServer = ({
       // the pool, but also report that it failed. We cannot report an error in
       // the request at this point because it has finished.
       client.queryAsync('commit')
-      .then(() => client.end())
-      .catch(error => {
-        console.error(error.stack) // eslint-disable-line no-console
-        client.end()
-      })
+        .then(() => client.end())
+        .catch(error => {
+          console.error(error.stack) // eslint-disable-line no-console
+          client.end()
+        })
     })
 
     return {
@@ -107,11 +108,24 @@ const createServer = ({
 
 export default createServer
 
-const setupRequestTransaction = async (req, client, secret) => {
+const setupRequestTransaction = async (req, client, secret, anonymousRole) => {
   // First, get the possible `Bearer` token from the request. If it does not
   // exist, exit.
   const token = getToken(req)
-  if (!token) return
+
+  // If there is no secret or there is no token, set the `anonymousRole` if it
+  // exists, but always return.
+  if (!secret || !token) {
+    // Set the anonymous role if it exists.
+    if (anonymousRole) {
+      await client.queryAsync(
+        'select set_config(\'role\', $1, true)',
+        [anonymousRole],
+      )
+    }
+
+    return
+  }
 
   let decoded
 
@@ -123,7 +137,7 @@ const setupRequestTransaction = async (req, client, secret) => {
     throw new Forbidden(error.message)
   }
 
-  const { role } = decoded
+  const role = decoded.role || anonymousRole
   const values = []
   const querySelection = []
 

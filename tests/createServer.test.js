@@ -1,25 +1,24 @@
+import url from 'url'
 import request from 'supertest-as-promised'
-import { ary } from 'lodash'
 import jwt from 'jsonwebtoken'
 import pg from 'pg'
 import { GraphQLSchema, GraphQLObjectType, GraphQLNonNull, GraphQLString } from 'graphql'
 import { PG_CONFIG } from './helpers.js'
 import createServer from '#/createServer.js'
 
-const ignorePromiseError = promise => new Promise(resolve =>
-  promise
-  .then(ary(resolve, 0))
-  .catch(ary(resolve, 0))
-)
-
 describe('createServer', () => {
+  const AUTH_ROLE = 'postgraphql_test_auth_role'
+  const ANONYMOUS_ROLE = 'postgraphql_test_anonymous_role'
   const TEST_ROLE = 'postgraphql_test_role'
 
   let graphqlSchema
 
   const testCreateServer = (config = {}) => createServer({
     graphqlSchema,
-    pgConfig: PG_CONFIG,
+    pgConfig: url.format({
+      ...url.parse(PG_CONFIG),
+      auth: AUTH_ROLE,
+    }),
     log: false,
     development: false,
     secret: 'secret',
@@ -42,12 +41,13 @@ describe('createServer', () => {
             },
             resolve: (source, { name }, { client }) =>
               client.queryAsync('select current_setting(\'jwt.claims.\' || $1) as param', [name])
-              .then(result => result.rows[0].param),
+                .then(result => result.rows[0].param),
           },
           role: {
             type: GraphQLString,
             resolve: (source, args, { client }) =>
-              client.queryAsync('show role').then(result => result.rows[0].role),
+              client.queryAsync('select current_user')
+                .then(result => result.rows[0].current_user),
           },
         },
       }),
@@ -56,8 +56,11 @@ describe('createServer', () => {
 
   before(async () => {
     const client = await pg.connectAsync(PG_CONFIG)
-    await ignorePromiseError(client.queryAsync(`drop role ${TEST_ROLE}`))
-    await ignorePromiseError(client.queryAsync(`create role ${TEST_ROLE}`))
+    await client.queryAsync(`drop role if exists ${AUTH_ROLE}, ${ANONYMOUS_ROLE}, ${TEST_ROLE}`)
+    await client.queryAsync(`create user ${AUTH_ROLE}`)
+    await client.queryAsync(`create role ${ANONYMOUS_ROLE}`)
+    await client.queryAsync(`create role ${TEST_ROLE}`)
+    await client.queryAsync(`grant ${ANONYMOUS_ROLE}, ${TEST_ROLE} to ${AUTH_ROLE}`)
     client.end()
   })
 
@@ -280,9 +283,10 @@ describe('createServer', () => {
 
   it('can set a role that does exist', async () => {
     const token = await jwt.signAsync({ aud: 'postgraphql', role: TEST_ROLE }, 'secret', {})
-    const server = testCreateServer()
+    const server1 = testCreateServer()
+    const server2 = testCreateServer({ anonymousRole: ANONYMOUS_ROLE })
     await (
-      request(server)
+      request(server1)
       .get('/')
       .set('Authorization', `Bearer ${token}`)
       .query({ query: '{role,claim(name:"role")}' })
@@ -291,12 +295,21 @@ describe('createServer', () => {
       .expect({ role: TEST_ROLE, claim: TEST_ROLE })
     )
     await (
-      request(server)
+      request(server1)
       .get('/')
       .query({ query: '{role,claim(name:"role")}' })
       .expect(200)
       .expect(req => (req.body = req.body.data))
-      .expect({ role: 'none', claim: null })
+      .expect({ role: AUTH_ROLE, claim: null })
+    )
+    await (
+      request(server2)
+      .get('/')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ query: '{role,claim(name:"role")}' })
+      .expect(200)
+      .expect(req => (req.body = req.body.data))
+      .expect({ role: TEST_ROLE, claim: TEST_ROLE })
     )
   })
 
@@ -341,6 +354,77 @@ describe('createServer', () => {
       .expect('Access-Control-Allow-Origin', '*')
       .expect('Access-Control-Request-Method', 'GET, POST')
       .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
+    )
+  })
+
+  it('will use the auth role when no other role is specified', async () => {
+    const server = testCreateServer()
+    await (
+      request(server)
+      .get('/')
+      .query({ query: '{role,claim(name:"role")}' })
+      .expect(200)
+      .expect(req => (req.body = req.body.data))
+      .expect({ role: AUTH_ROLE, claim: null })
+    )
+  })
+
+  it('will use the anonymous role when no other role is specified if an anonymous role was configured', async () => {
+    const server = testCreateServer({ anonymousRole: ANONYMOUS_ROLE })
+    await (
+      request(server)
+      .get('/')
+      .query({ query: '{role,claim(name:"role")}' })
+      .expect(200)
+      .expect(req => (req.body = req.body.data))
+      .expect({ role: ANONYMOUS_ROLE, claim: null })
+    )
+  })
+
+  it('will use the anonymous role when no other role is specified if an anonymous role was configured even with no secret', async () => {
+    const server = testCreateServer({ anonymousRole: ANONYMOUS_ROLE, secret: null })
+    await (
+      request(server)
+      .get('/')
+      .query({ query: '{role,claim(name:"role")}' })
+      .expect(200)
+      .expect(req => (req.body = req.body.data))
+      .expect({ role: ANONYMOUS_ROLE, claim: null })
+    )
+  })
+
+  it('will use the anonymous role when configured even with a token without a role', async () => {
+    const token = await jwt.signAsync({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
+    const server1 = testCreateServer()
+    const server2 = testCreateServer({ anonymousRole: ANONYMOUS_ROLE })
+
+    await (
+      request(server1)
+      .get('/')
+      .set('Authorization', `Bearer ${token}`)
+      .query({
+        query: `{
+          role
+          aud: claim(name: "aud")
+          yolo: claim(name: "yolo")
+        }`,
+      })
+      .expect(200)
+      .expect({ data: { role: AUTH_ROLE, aud: 'postgraphql', yolo: 'swag' } })
+    )
+    await (
+      request(server2)
+      .get('/')
+      .set('Authorization', `Bearer ${token}`)
+      .query({
+        query: `{
+          role
+          aud: claim(name: "aud")
+          yolo: claim(name: "yolo")
+        }`,
+      })
+      .expect(200)
+      .expect({ data: { role: ANONYMOUS_ROLE, aud: 'postgraphql', yolo: 'swag' } })
     )
   })
 })
