@@ -1,9 +1,9 @@
-import express from 'express'
 import path from 'path'
 import dotenv from 'dotenv'
 import webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import postgraphql from 'postgraphql'
+import authentication from './auth'
 
 // Load the config from .env file.
 dotenv.load()
@@ -11,6 +11,7 @@ const {
   APP_PORT,
   DB_STRING,
   DB_SCHEMA,
+  SECRET,
 } = process.env
 
 // Our webpack configuration.
@@ -38,13 +39,16 @@ const app = new WebpackDevServer(compiler, {
   stats: { colors: true },
 })
 
+// We mount the authentication service
+app.use(authentication)
+
 // The webpack dev server exposes the `.use` of the express app instance.
 // Mount the postgraphql as middleware at `/graphql`.
 app.use('/graphql', postgraphql(DB_STRING, DB_SCHEMA, {
-    development: true,
-    log: true,
-  }
-))
+  development: true,
+  log: true,
+  secret: SECRET,
+}))
 
 // Any other path will match this and will load the index.html file.
 app.use('*', (req, res) => {
