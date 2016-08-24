@@ -6,9 +6,11 @@ export default class App extends React.Component {
     return (
       <div>
         <header>
-          <h1>Forum Example</h1>
-          <Link to="/">Home</Link>
-          <Link to="/posts">Posts</Link>
+          <Link to="/"><h1>Forum Example</h1></Link>
+          <nav>
+            <Link to="/">Home</Link>
+            <Link to="/posts">Posts</Link>
+          </nav>
         </header>
         <main>
           {this.props.children}

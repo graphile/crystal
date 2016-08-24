@@ -85,7 +85,8 @@ function PostItem ({
   topic,
   summary,
   author,
-  createdAt
+  createdAt,
+  updatedAt,
 }) {
   return (
     <div>
@@ -95,17 +96,18 @@ function PostItem ({
       </header>
       <div><p>{summary}</p></div>
       <aside>
-        <PostTimestamp date={createdAt}/>
-        {topic && <p>Filed under <span>{topic}</span></p>}
+        <Timestamp label="Created on " date={createdAt}/>
+        <Timestamp label="Updated on " date={updatedAt}/>
+        <p>Filed under <span>{topic ? topic : 'n/a'}</span></p>
       </aside>
     </div>
   )
 }
 
-function PostTimestamp ({ date }) {
+function Timestamp ({ label, date }) {
   const timestamp = new Date(date)
   return (
-    <p>Created on <time>{timestamp.toDateString()}</time></p>
+    <p>{label}<time>{timestamp.toDateString()}</time></p>
   )
 }
 
@@ -122,6 +124,7 @@ export default Relay.createContainer(PostIndex, {
               topic,
               summary,
               createdAt,
+              updatedAt,
               author: personByAuthorId {
                 fullName,
               },

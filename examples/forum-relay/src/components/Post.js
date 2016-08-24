@@ -30,9 +30,9 @@ class Post extends React.Component {
   render() {
     return (
       <div>
+        <Link to="/posts">back to Posts</Link>
         <h1 data-name="headline" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.headline}</h1>
         <p data-name="body" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.body}</p>
-        <Link to="/posts">back to Posts</Link>
         <button onClick={::this.handleDelete}>Delete Post</button>
       </div>
     )
