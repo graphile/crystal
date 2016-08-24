@@ -20,6 +20,9 @@ create schema forum_example_utils;
 -- `create table forum_example.person …`.
 set search_path = forum_example, forum_example_utils, public;
 
+-- create our anonymous role
+create role forum_anonymous_role;
+
 -------------------------------------------------------------------------------
 -- Public Tables
 
@@ -240,6 +243,8 @@ alter sequence post_id_seq restart with 13;
 
 -------------------------------------------------------------------------------
 -- Permissions
+
+grant usage on schema forum_example to forum_anonymous_role;
 
 grant select on person, post to public;
 
