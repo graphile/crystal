@@ -45,6 +45,7 @@ app.use(authentication)
 // The webpack dev server exposes the `.use` of the express app instance.
 // Mount the postgraphql as middleware at `/graphql`.
 app.use('/graphql', postgraphql(DB_STRING, DB_SCHEMA, {
+  anonymousRole: 'forum_anonymous_role',
   development: true,
   log: true,
   secret: SECRET,
