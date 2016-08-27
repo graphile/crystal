@@ -3,9 +3,9 @@ Procedures in PostgreSQL are very important to understand in order to make the m
 
 There are a few ways procedures in PostGraphQL can be used. All of these will be covered in their own section.
 
-1. As [mutations](#mutation-procedure).
-2. As [queries](#query-procedure).
-3. As [connections](#connection-procedure) (list of nodes, like `postNodes`).
+1. As [mutations](#mutation-procedures).
+2. As [queries](#query-procedures).
+3. As [connections](#connection-procedures) (list of nodes, like `postNodes`).
 4. As [computed columns](#computed-columns).
 
 For an example of what procedures look like, see the [forum example SQL schema][].
