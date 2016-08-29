@@ -40,9 +40,11 @@ Arguments include:
   - `secret`: The secret for your application. This enables PostGraphQL’s authorization features. Make it something secure and obscure!
   - `development`: Enables development features like GraphiQL and more descriptive error formatting.
   - `log`: If true, PostGraphQL will log every request using the dev style of [morgan][].
+  - `logger`: Custom logger middleware to use instead of the default. e.g. [express-winston]
 
 [connect]: https://www.npmjs.com/connect
 [express]: https://www.npmjs.com/express
+[express-winston]: https://www.npmjs.com/express-winston
 [graphql/express-graphql#82]: https://github.com/graphql/express-graphql/pull/82
 [`pg`]: https://www.npmjs.com/pg
 [morgan]: https://www.npmjs.com/morgan

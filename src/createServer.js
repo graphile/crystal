@@ -3,7 +3,7 @@ import { forEach } from 'lodash'
 import Express from 'express'
 import onFinished from 'on-finished'
 import { Forbidden, BadRequest } from 'http-errors'
-import logger from 'morgan'
+import morgan from 'morgan'
 import favicon from 'serve-favicon'
 import finalHandler from 'finalhandler'
 import jwt from 'jsonwebtoken'
@@ -19,6 +19,8 @@ import graphqlHTTP from 'express-graphql'
  * @param {Object} options.pgConfig
  * @param {string} options.route
  * @param {boolean} options.development
+ * @param {boolean} options.log - Whether to enable logging.
+ * @param {Object} options.logger - Custom logging middleware.
  * @returns {Server}
  */
 const createServer = ({
@@ -29,12 +31,13 @@ const createServer = ({
   secret,
   development = true,
   log = true,
+  logger = morgan(development ? 'dev' : 'common'),
 }) => {
   const server = new Express()
 
   server.disable('x-powered-by')
 
-  if (log) server.use(logger(development ? 'dev' : 'common'))
+  if (log) server.use(logger)
   server.use(favicon(path.join(__dirname, '../assets/favicon.ico')))
 
   // Enabels CORS. See [this][1] flowchart for an explanation of how CORS
