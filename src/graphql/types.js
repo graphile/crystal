@@ -7,6 +7,7 @@ import {
   GraphQLObjectType,
   GraphQLInterfaceType,
 } from 'graphql'
+import JSONType from 'graphql-type-json'
 
 /* ============================================================================
  * Utilities
@@ -104,6 +105,8 @@ export const PageInfoType =
  * PostgreSQL Types
  * ========================================================================= */
 
+export { JSONType }
+
 export const BigIntType = createStringScalarType({
   name: 'BigInt',
   description: 'A signed eight-byte integer represented as a string',
@@ -127,11 +130,6 @@ export const CircleType = createStringScalarType({
 export const IntervalType = createStringScalarType({
   name: 'Interval',
   description: 'Some time span',
-})
-
-export const JSONType = createStringScalarType({
-  name: 'JSON',
-  description: 'An object not queryable by GraphQL',
 })
 
 export const UUIDType = createStringScalarType({
