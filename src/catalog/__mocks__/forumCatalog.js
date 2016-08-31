@@ -75,6 +75,7 @@ catalog.addCollection(postCollection)
 const postIdKey = new CollectionKey(postCollection, 'id', integerType)
 
 const postPaginator = new MockPaginator('posts', postType)
+
 const postOrderings = [
   { name: 'id-asc' }, { name: 'id-desc' },
   { name: 'authorId-asc' }, { name: 'authorId-desc' },

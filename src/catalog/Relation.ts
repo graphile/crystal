@@ -35,7 +35,7 @@ abstract class Relation<TTailValue, THeadValue, TKey> {
     private _name: string,
     private _tailCollection: Collection<TTailValue>,
     private _headCollectionKey: CollectionKey<THeadValue, TKey>,
-    private _tailPaginator: Paginator<TTailValue, unknown>,
+    private _tailPaginator: Paginator<TTailValue, unknown> | undefined,
   ) {}
 
   /**
@@ -75,7 +75,8 @@ abstract class Relation<TTailValue, THeadValue, TKey> {
    *
    * @see Relation#getTailConditionFromHeadValue
    */
-  public getTailPaginator (): Paginator<TTailValue, unknown> {
+  // TODO: Is this really the right way to do this?
+  public getTailPaginator (): Paginator<TTailValue, unknown> | undefined {
     return this._tailPaginator
   }
 

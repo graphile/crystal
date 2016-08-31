@@ -5,11 +5,15 @@ function mockCollection (catalog, name) {
   return {
     getCatalog: () => catalog,
     getName: () => name,
+    getType: () => ({
+      getName: () => Symbol('collectionTypeName'),
+    }),
   }
 }
 
 function mockRelation (tailCollection, headCollection) {
   return {
+    getName: () => Symbol('relationName'),
     getTailCollection: () => tailCollection,
     getHeadCollectionKey: () => ({ getCollection: () => headCollection }),
   }

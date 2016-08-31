@@ -140,12 +140,8 @@ class ConnectionForge {
           condition,
         }
 
-        // Gets the optimizations for this `Paginator#readPage` request from
-        // the GraphQL resolution info.
-        const optimizations = getOptimizations(info)
-
         // Finally, actually get the page data.
-        const page = await paginator.readPage(context, pageConfig, optimizations)
+        const page = await paginator.readPage(context, pageConfig)
 
         return {
           paginator,
@@ -378,20 +374,4 @@ type NamespacedCursor<TCursor> = {
   paginatorName: string,
   orderingName: string | null,
   cursor: TCursor,
-}
-
-/**
- * Will create a paginator optimizations object from the `GraphQLResolveInfo`
- * object.
- */
-// TODO: Test this lots.
-function getOptimizations <TValue>(info: GraphQLResolveInfo<any, any>): Paginator.Optimizations<TValue> {
-  return {
-    fieldNames:
-      info.fieldASTs
-        // Filter out field ASTs with arguments. Probably don’t want those.
-        .filter(field => !field.arguments || field.arguments.length === 0)
-        // Map to just the string name.
-        .map(field => field.name.value),
-  }
 }

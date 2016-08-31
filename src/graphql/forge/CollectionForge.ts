@@ -195,6 +195,8 @@ class CollectionForge {
             const tailCollection = relation.getTailCollection()
             const tailPaginator = relation.getTailPaginator()
 
+            if (!tailPaginator) return undefined
+
             return [
               formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
               this._connectionForge.createField(tailPaginator, {

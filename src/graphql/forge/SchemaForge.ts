@@ -47,6 +47,10 @@ class SchemaForge {
   private _connectionForge = new ConnectionForge(this._typeForge)
   private _collectionForge = new CollectionForge(this._typeForge, this._nodeForge, this._connectionForge)
 
+  constructor (private _options: {
+    nodeIdName?: string,
+  } = {}) {}
+
   /**
    * Creates a GraphQL schema from our abstract catalog data structure.
    */
