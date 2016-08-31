@@ -24,10 +24,10 @@
   },
   "ava": {
     "files": [
-      "src/**/__tests__/*.js",
-      "src/**/**/__tests__/*.js",
-      "src/**/**/**/__tests__/*.js",
-      "src/**/**/**/**/__tests__/*.js"
+      "src/**/__tests__/*-test.js",
+      "src/**/**/__tests__/*-test.js",
+      "src/**/**/**/__tests__/*-test.js",
+      "src/**/**/**/**/__tests__/*-test.js"
     ],
     "require": [
       "ts-node/register"
