@@ -9,7 +9,7 @@ import PGCatalog from './PGCatalog'
  * is SQL.
  */
 export const introspectionQuery =
-  readFileSync(resolve(__dirname, '../../../sql/introspection.sql')).toString()
+  readFileSync(resolve(__dirname, '../sql/introspection.sql')).toString()
 
 /**
  * Takes a PostgreSQL client and introspects it, returning an instance of
