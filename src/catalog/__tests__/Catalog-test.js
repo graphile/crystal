@@ -1,9 +1,8 @@
 import test from 'ava'
 import Catalog from '../Catalog'
 
-function mockCollection (catalog, name) {
+function mockCollection (name) {
   return {
-    getCatalog: () => catalog,
     getName: () => name,
     getType: () => ({
       getName: () => Symbol('collectionTypeName'),
@@ -19,31 +18,28 @@ function mockRelation (tailCollection, headCollection) {
   }
 }
 
-test('addCollection will not add a collection which has a different catalog', t => {
-  const catalog1 = new Catalog()
-  const catalog2 = new Catalog()
-  const collection1 = mockCollection(catalog1, 'a')
-  const collection2 = mockCollection(catalog2, 'b')
-  catalog1.addCollection(collection1)
-  t.throws(() => catalog1.addCollection(collection2))
-  t.throws(() => catalog2.addCollection(collection1))
-  catalog2.addCollection(collection2)
+test('addCollection will add a collection', t => {
+  const catalog = new Catalog()
+  const collection = mockCollection('a')
+  t.false(catalog.hasCollection(collection))
+  catalog.addCollection(collection)
+  t.true(catalog.hasCollection(collection))
 })
 
 test('addCollection will not add a collection with the same name', t => {
   const catalog = new Catalog()
-  catalog.addCollection(mockCollection(catalog, 'a')).addCollection(mockCollection(catalog, 'b'))
-  t.throws(() => catalog.addCollection(mockCollection(catalog, 'a')))
-  t.throws(() => catalog.addCollection(mockCollection(catalog, 'b')))
-  catalog.addCollection(mockCollection(catalog, 'c'))
-  t.throws(() => catalog.addCollection(mockCollection(catalog, 'c')))
+  catalog.addCollection(mockCollection('a')).addCollection(mockCollection('b'))
+  t.throws(() => catalog.addCollection(mockCollection('a')))
+  t.throws(() => catalog.addCollection(mockCollection('b')))
+  catalog.addCollection(mockCollection('c'))
+  t.throws(() => catalog.addCollection(mockCollection('c')))
 })
 
 test('getCollections will return all collections added by addCollection', t => {
   const catalog = new Catalog()
-  const collectionA = mockCollection(catalog, 'a')
-  const collectionB = mockCollection(catalog, 'b')
-  const collectionC = mockCollection(catalog, 'c')
+  const collectionA = mockCollection('a')
+  const collectionB = mockCollection('b')
+  const collectionC = mockCollection('c')
   t.deepEqual(catalog.getCollections(), [])
   catalog.addCollection(collectionA).addCollection(collectionB)
   t.deepEqual(catalog.getCollections(), [collectionA, collectionB])
@@ -54,15 +50,15 @@ test('getCollections will return all collections added by addCollection', t => {
 test('getCollection will get a collection by name if it exists', t => {
   const catalog = new Catalog()
   t.is(catalog.getCollection('a'), undefined)
-  const collection = mockCollection(catalog, 'a')
+  const collection = mockCollection('a')
   catalog.addCollection(collection)
   t.is(catalog.getCollection('a'), collection)
 })
 
 test('hasCollection will return if the exact collection exists in the catalog', t => {
   const catalog = new Catalog()
-  const collection1 = mockCollection(catalog, 'a')
-  const collection2 = mockCollection(catalog, 'a')
+  const collection1 = mockCollection('a')
+  const collection2 = mockCollection('a')
   t.false(catalog.hasCollection(collection1))
   t.false(catalog.hasCollection(collection2))
   catalog.addCollection(collection1)
@@ -72,8 +68,8 @@ test('hasCollection will return if the exact collection exists in the catalog', 
 
 test('addRelation will fail unless both the head and tail collections exist in the catalog', t => {
   const catalog = new Catalog()
-  const collection1 = mockCollection(catalog, 'a')
-  const collection2 = mockCollection(catalog, 'b')
+  const collection1 = mockCollection('a')
+  const collection2 = mockCollection('b')
   const relation1 = mockRelation(collection1, collection2)
   const relation2 = mockRelation(collection2, collection1)
   t.throws(() => catalog.addRelation(relation1))
@@ -88,8 +84,8 @@ test('addRelation will fail unless both the head and tail collections exist in t
 
 test('getRelations will get all of the relations that have been added to the catalog', t => {
   const catalog = new Catalog()
-  const collection1 = mockCollection(catalog, 'a')
-  const collection2 = mockCollection(catalog, 'b')
+  const collection1 = mockCollection('a')
+  const collection2 = mockCollection('b')
   const relation1 = mockRelation(collection1, collection2)
   const relation2 = mockRelation(collection2, collection1)
   t.deepEqual(catalog.getRelations(), [])

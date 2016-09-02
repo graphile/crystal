@@ -30,7 +30,7 @@ const personType =
     .addField(new BasicObjectField('about', new NullableType(stringType)))
 
 const personCollection =
-  new MockCollection(catalog, 'people', personType)
+  new MockCollection('people', personType)
 
 catalog.addCollection(personCollection)
 
@@ -68,7 +68,7 @@ const postType =
     .addField(new BasicObjectField('body', new NullableType(stringType)))
 
 const postCollection =
-  new MockCollection(catalog, 'posts', postType)
+  new MockCollection('posts', postType)
 
 catalog.addCollection(postCollection)
 

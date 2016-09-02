@@ -1,5 +1,4 @@
 import {
-  Catalog,
   Collection,
   NullableType,
   ObjectType,
@@ -72,11 +71,10 @@ class PGCollection extends Collection<Value> {
   private _pgAttributes: PGAttribute[]
 
   constructor (
-    catalog: Catalog,
     pgCatalog: PGCatalog,
     pgClass: PGClass,
   ) {
-    super(catalog, pgClass.name, PGCollection._createType(pgCatalog, pgClass))
+    super(pgClass.name, PGCollection._createType(pgCatalog, pgClass))
     this._pgNamespace = pgCatalog.assertGetNamespace(pgClass.namespaceId)
     this._pgClass = pgClass
     this._pgAttributes = pgCatalog.getClassAttributes(pgClass.id)

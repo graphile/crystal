@@ -45,12 +45,12 @@ import * as formatName from '../utils/formatName'
  * Creates GraphQL types. Both of the input and output variety.
  */
 class TypeForge {
-  private _outputTypes = new WeakMap<Type<any>, GraphQLOutputType<any>>()
-  private _inputTypes = new WeakMap<Type<any>, GraphQLInputType<any>>()
-
   constructor (
     private _options: {},
   ) {}
+
+  private _outputTypes = new WeakMap<Type<any>, GraphQLOutputType<any>>()
+  private _inputTypes = new WeakMap<Type<any>, GraphQLInputType<any>>()
 
   /**
    * Gets a GraphQL output type from any catalog type. This method is memoized.

@@ -13,17 +13,9 @@ abstract class Collection<TValue> {
   private _description: string | undefined = undefined
 
   constructor (
-    private _catalog: Catalog,
     private _name: string,
     private _type: ObjectType<TValue>,
   ) {}
-
-  /**
-   * Returns the catalog this collection belongs to.
-   */
-  public getCatalog (): Catalog {
-    return this._catalog
-  }
 
   /**
    * Gets the name of our collection.
@@ -93,28 +85,6 @@ abstract class Collection<TValue> {
    */
   public getPaginator (): Paginator<TValue, any> | undefined {
     return undefined
-  }
-
-  /**
-   * Get all the relations for which this collection is the tail.
-   * That means the relations in which the values of this collection point to
-   * the values of other collections.
-   *
-   * @see Relation
-   */
-  public getTailRelations (): Array<Relation<TValue, any, any>> {
-    return this._catalog.getRelations().filter(relation => relation.getTailCollection() === this)
-  }
-
-  /**
-   * Get all the relations for which this collection is the head. That means
-   * the relations in which another collections values point to a value in this
-   * collection.
-   *
-   * @see Relation
-   */
-  public getHeadRelations (): Array<Relation<any, TValue, any>> {
-    return this._catalog.getRelations().filter(relation => relation.getHeadCollectionKey().getCollection() === this)
   }
 
   /**

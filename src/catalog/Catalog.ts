@@ -83,9 +83,6 @@ class Catalog {
    * We will also add the type for this collection to the catalog.
    */
   public addCollection (collection: Collection<any>): this {
-    if (collection.getCatalog() !== this)
-      throw new Error('Collection is not in this catalog.')
-
     const name = collection.getName()
 
     if (this._collections.has(name))

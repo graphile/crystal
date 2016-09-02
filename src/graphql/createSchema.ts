@@ -19,5 +19,5 @@ export default function createSchema (catalog: Catalog, config: Config = {}) {
     nodeIdFieldName,
   }
 
-  return new SchemaForge(options).createSchema(catalog)
+  return new SchemaForge(options, catalog).create()
 }

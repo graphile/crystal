@@ -42,28 +42,31 @@ import CollectionForge from './CollectionForge'
  * [1]: https://en.wikipedia.org/wiki/Abstract_factory_pattern
  */
 class SchemaForge {
+  constructor (
+    private _options: {
+      nodeIdFieldName: string,
+    },
+    private _catalog: Catalog,
+  ) {}
+
   private _typeForge = new TypeForge(this._options)
   private _nodeForge = new NodeForge(this._options)
   private _connectionForge = new ConnectionForge(this._options, this._typeForge)
-  private _collectionForge = new CollectionForge(this._options, this._typeForge, this._nodeForge, this._connectionForge)
-
-  constructor (private _options: {
-    nodeIdFieldName: string,
-  }) {}
+  private _collectionForge = new CollectionForge(this._options, this._catalog, this._typeForge, this._nodeForge, this._connectionForge)
 
   /**
    * Creates a GraphQL schema from our abstract catalog data structure.
    */
-  public createSchema (catalog: Catalog): GraphQLSchema {
+  public create (): GraphQLSchema {
     // Override all of the output types for collections. Collection object
     // types have all sorts of extra trimming we want to include.
-    for (const collection of catalog.getCollections()) {
+    for (const collection of this._catalog.getCollections()) {
       const gqlCollectionType = this._collectionForge.getType(collection);
       this._typeForge.overrideOutputType(collection.getType(), gqlCollectionType);
     }
 
     return new GraphQLSchema({
-      query: this._createQueryType(catalog),
+      query: this._createQueryType(this._catalog),
     })
   }
 
