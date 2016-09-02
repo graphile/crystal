@@ -75,9 +75,10 @@ class SchemaForge {
       // TODO: description
       fields: buildObject<GraphQLFieldConfig<any, any>>(
         [this._nodeForge.createNodeFieldEntry(catalog)],
-        ...catalog
+        catalog
           .getCollections()
-          .map(collection => this._collectionForge.createRootFieldEntries(collection)),
+          .map(collection => this._collectionForge.createRootFieldEntries(collection))
+          .reduce((a, b) => a.concat(b), []),
       ),
     })
   }
