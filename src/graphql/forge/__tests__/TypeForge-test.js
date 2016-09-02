@@ -49,14 +49,16 @@ const mockObjectType = {
 
 Object.setPrototypeOf(mockObjectType, ObjectType.prototype)
 
+const defaultOptions = {}
+
 test('getOutputType and getInputType will return the exact same thing for types that are both inputs and outputs', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   t.is(typeForge.getOutputType(mockEnumType), typeForge.getInputType(mockEnumType))
   t.not(typeForge.getOutputType(mockObjectType), typeForge.getInputType(mockObjectType))
 })
 
 test('getOutputType and getInputType are memoized', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   t.is(typeForge.getOutputType(mockEnumType), typeForge.getOutputType(mockEnumType))
   t.is(typeForge.getInputType(mockEnumType), typeForge.getInputType(mockEnumType))
   t.is(typeForge.getOutputType(mockObjectType), typeForge.getOutputType(mockObjectType))
@@ -64,7 +66,7 @@ test('getOutputType and getInputType are memoized', t => {
 })
 
 test('will invert nullable types', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType1 = typeForge.getOutputType(booleanType)
   t.true(gqlType1 instanceof GraphQLNonNull)
   t.is(gqlType1.ofType, GraphQLBoolean)
@@ -73,13 +75,13 @@ test('will invert nullable types', t => {
 })
 
 test('will remove many nullable wrappers', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType = typeForge.getOutputType(new NullableType(new NullableType(new NullableType(booleanType))))
   t.is(gqlType, GraphQLBoolean)
 })
 
 test('will clone base types for aliases', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType1 = typeForge.getOutputType(new AliasType('yo', booleanType))
   t.true(gqlType1 instanceof GraphQLNonNull)
   t.is(Object.getPrototypeOf(gqlType1.ofType), GraphQLBoolean)
@@ -93,7 +95,7 @@ test('will clone base types for aliases', t => {
 })
 
 test('will create lists correctly', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType1 = typeForge.getOutputType(new ListType(booleanType))
   t.true(gqlType1 instanceof GraphQLNonNull)
   t.true(gqlType1.ofType instanceof GraphQLList)
@@ -105,7 +107,7 @@ test('will create lists correctly', t => {
 })
 
 test('will correctly create enums', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType = typeForge.getOutputType(new NullableType(mockEnumType))
   t.true(gqlType instanceof GraphQLEnumType)
   t.is(gqlType.name, 'Enoom')
@@ -113,7 +115,7 @@ test('will correctly create enums', t => {
 })
 
 test('will correctly return primitive types', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   t.is(typeForge.getOutputType(new NullableType(booleanType)), GraphQLBoolean)
   t.is(typeForge.getOutputType(new NullableType(integerType)), GraphQLInt)
   t.is(typeForge.getOutputType(new NullableType(floatType)), GraphQLFloat)
@@ -121,7 +123,7 @@ test('will correctly return primitive types', t => {
 })
 
 test('getOutputType will correctly make an object type', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType = typeForge.getOutputType(new NullableType(mockObjectType))
   t.true(gqlType instanceof GraphQLObjectType)
   t.is(gqlType.name, 'Yo')
@@ -138,7 +140,7 @@ test('getOutputType will correctly make an object type', t => {
 })
 
 test('getInputType will correctly make an object type', t => {
-  const typeForge = new TypeForge()
+  const typeForge = new TypeForge(defaultOptions)
   const gqlType = typeForge.getInputType(new NullableType(mockObjectType))
   t.true(gqlType instanceof GraphQLInputObjectType)
   t.is(gqlType.name, 'YoInput')

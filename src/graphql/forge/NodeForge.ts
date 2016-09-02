@@ -20,12 +20,16 @@ type ID = {
 }
 
 class NodeForge {
+  constructor (
+    private _options: { nodeIdFieldName: string },
+  ) {}
+
   private _interfaceType = (
     new GraphQLInterfaceType<any>({
       name: 'Node',
       // TODO: description
       fields: {
-        __id: {
+        [this._options.nodeIdFieldName]: {
           type: new GraphQLNonNull(GraphQLID),
           // TODO: description
         },
@@ -49,22 +53,22 @@ class NodeForge {
       // TODO: description
       type: this.getInterfaceType(),
       args: {
-        __id: {
+        [this._options.nodeIdFieldName]: {
           // TODO: description,
           type: new GraphQLNonNull(GraphQLID),
         },
       },
-      resolve (source, { __id }) {
-        const { name, key } = this.deserializeId(__id)
+      resolve (source, args) {
+        const { name, key } = this.deserializeId(args[this._options.nodeIdFieldName])
         const collection = catalog.getCollection(name)
 
         if (!collection)
-          throw new Error(`Invalid __id, no collection exists named '${name}'.`)
+          throw new Error(`Invalid id, no collection exists named '${name}'.`)
 
         const primaryKey = collection.getPrimaryKey()
 
         if (!primaryKey)
-          throw new Error(`Invalid __id, no primary key on collection named '${name}'.`)
+          throw new Error(`Invalid id, no primary key on collection named '${name}'.`)
 
         return primaryKey.read(key)
       },

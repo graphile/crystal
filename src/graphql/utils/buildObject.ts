@@ -24,7 +24,7 @@
  * ```
  */
 export default function buildObject <T>(
-  ...entriess: ([string, T] | undefined)[][]
+  ...entriess: Array<Array<[string, T] | undefined>>
 ): { [key: string]: T } {
   const object = {}
 

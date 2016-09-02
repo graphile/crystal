@@ -28,6 +28,7 @@ import ConnectionForge from './ConnectionForge'
  */
 class CollectionForge {
   constructor (
+    private _options: { nodeIdFieldName: string },
     private _typeForge: TypeForge,
     private _nodeForge: NodeForge,
     private _connectionForge: ConnectionForge,
@@ -55,22 +56,22 @@ class CollectionForge {
     // Add a field to select our collection by its primary key, if the
     // collection has a primary key. Note that we abstract away the shape of
     // the primary key in this instance. Instead using a GraphQL native format,
-    // the `__id` format.
+    // the id format.
     if (primaryKey) {
       entries.push([formatName.field(type.getName()), {
         // TODO: description
         type: this.getType(collection),
         args: {
-          __id: {
+          [this._options.nodeIdFieldName]: {
             // TODO: description,
             type: new GraphQLNonNull(GraphQLID),
           },
         },
-        resolve: (source, { __id }) => {
-          const { name, key } = id.deserialize(__id)
+        resolve: (source, args) => {
+          const { name, key } = id.deserialize(args[this._options.nodeIdFieldName])
 
           if (name !== collection.getName())
-            throw new Error(`__id is for collection '${name}', not expected collection '${collection.getName()}'.`)
+            throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.getName()}'.`)
 
           return primaryKey.read(key)
         },
@@ -127,8 +128,8 @@ class CollectionForge {
 
   /**
    * Creates the output object type for a collection. This type will include all
-   * of the fields in the object, as well as an `__id` field, computed columns,
-   * and relations (head and tail).
+   * of the fields in the object, as well as an id field, computed columns, and
+   * relations (head and tail).
    */
   @memoize
   public getType <TValue>(collection: Collection<TValue>): GraphQLObjectType<TValue> {
@@ -147,10 +148,10 @@ class CollectionForge {
       // We make `fields` here a thunk because we don’t want to eagerly create
       // types for collections used in this type.
       fields: () => buildObject<GraphQLFieldConfig<TValue, any>>(
-        // Our `__id` field. It is powered by the collection’s primary key. If
-        // we have no primary key, we have no `__id` field.
+        // Our id field. It is powered by the collection’s primary key. If we
+        // have no primary key, we have no id field.
         [
-          primaryKey && ['__id', {
+          primaryKey && [this._options.nodeIdFieldName, {
             // TODO: description
             type: new GraphQLNonNull(GraphQLID),
             resolve: value =>

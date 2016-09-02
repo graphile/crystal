@@ -26,6 +26,7 @@ import CollectionForge from './CollectionForge'
 
 class ConnectionForge {
   constructor (
+    private _options: {},
     private _typeForge: TypeForge,
   ) {}
 

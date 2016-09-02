@@ -48,6 +48,10 @@ class TypeForge {
   private _outputTypes = new WeakMap<Type<any>, GraphQLOutputType<any>>()
   private _inputTypes = new WeakMap<Type<any>, GraphQLInputType<any>>()
 
+  constructor (
+    private _options: {},
+  ) {}
+
   /**
    * Gets a GraphQL output type from any catalog type. This method is memoized.
    */
@@ -200,14 +204,14 @@ class TypeForge {
     return new GraphQLObjectType<T>({
       name: formatName.type(type.getName()),
       description: type.getDescription(),
-      fields: buildObject<GraphQLFieldConfig<T, any>>(
+      fields: () => buildObject<GraphQLFieldConfig<T, any>>(
         type.getFields().map<[string, GraphQLFieldConfig<T, any>]>(field =>
           [formatName.field(field.getName()), {
             description: field.getDescription(),
             type: this.getOutputType(field.getType()),
             resolve: object => field.getFieldValueFromObject(object),
           }]
-        )
+        ),
       ),
     })
   }
@@ -221,7 +225,7 @@ class TypeForge {
     return new GraphQLInputObjectType<T>({
       name: formatName.type(`${type.getName()}-input`),
       description: type.getDescription(),
-      fields: buildObject<GraphQLInputFieldConfig<any>>(
+      fields: () => buildObject<GraphQLInputFieldConfig<any>>(
         type.getFields().map<[string, GraphQLInputFieldConfig<any>]>(field =>
           [formatName.field(field.getName()), {
             description: field.getDescription(),
