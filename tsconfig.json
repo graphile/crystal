@@ -16,6 +16,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "examples"
+    "examples",
+    "src/postgres"
   ]
 }

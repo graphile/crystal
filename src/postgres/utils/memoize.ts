@@ -2,7 +2,7 @@
  * Decorator that memoizes a function so that for the each referentially
  * identical input, there is the *exact* same output.
  */
-export default function memoize <T extends {}, I, O>(
+export default function memoize <T, I, O>(
   target: T,
   propertyKey: string,
   descriptor: TypedPropertyDescriptor<(input: I) => O>,

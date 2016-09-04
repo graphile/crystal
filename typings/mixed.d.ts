@@ -8,9 +8,11 @@
  * useful type information and shouldn’t be used unless you know what you’re
  * doing.
  *
- * The `unknown` type is similar to the `mixed` type in Flow.
+ * With `mixed` you must *prove* the type is what you want to use.
+ *
+ * The `mixed` type is identical to the `mixed` type in Flow.
  *
  * @see https://github.com/Microsoft/TypeScript/issues/9999
  * @see https://flowtype.org/docs/builtins.html#mixed
  */
-declare type unknown = {} | undefined | null | void
+declare type mixed = {} | void

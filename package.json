@@ -8,6 +8,7 @@
     "queries"
   ],
   "scripts": {
+    "build": "tsc",
     "test": "ava",
     "watch:test": "ava -w"
   },

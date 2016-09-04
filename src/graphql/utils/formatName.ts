@@ -9,22 +9,26 @@ const camelCaseInsideUnderscores = formatInsideUnderscores(camelCase)
 const pascalCaseInsideUnderscores = formatInsideUnderscores(pascalCase)
 const constantCaseInsideUnderscores = formatInsideUnderscores(constantCase)
 
-/**
- * Formats a GraphQL type name using PascalCase.
- */
-export const type = pascalCaseInsideUnderscores
+namespace formatName {
+  /**
+   * Formats a GraphQL type name using PascalCase.
+   */
+  export const type = pascalCaseInsideUnderscores
 
-/**
- * Formats a GraphQL field name using camelCase.
- */
-export const field = camelCaseInsideUnderscores
+  /**
+   * Formats a GraphQL field name using camelCase.
+   */
+  export const field = camelCaseInsideUnderscores
 
-/**
- * Formats a GraphQL argument name using camelCase.
- */
-export const arg = camelCaseInsideUnderscores
+  /**
+   * Formats a GraphQL argument name using camelCase.
+   */
+  export const arg = camelCaseInsideUnderscores
 
-/**
- * Formats a GraphQL enum value name using CONSTANT_CASE.
- */
-export const enumValue = constantCaseInsideUnderscores
+  /**
+   * Formats a GraphQL enum value name using CONSTANT_CASE.
+   */
+  export const enumValue = constantCaseInsideUnderscores
+}
+
+export default formatName

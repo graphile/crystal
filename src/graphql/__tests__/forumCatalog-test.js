@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import test from 'ava'
 import { printSchema } from 'graphql'
 import forumCatalog from '../../catalog/__mocks__/forumCatalog'
-import createSchema from '../createSchema'
+import createSchema from '../schema/createSchema'
 
 const expectedForumCatalogSchema =
   readFileSync(resolve(__dirname, 'fixtures/forum-catalog.graphql')).toString()

@@ -17,7 +17,7 @@ abstract class ObjectType<TValue> extends NamedType<TValue> {
    * Creates a value with all of the fields in key/value pair format. If not
    * all fields are available, an error should be thrown.
    */
-  public abstract createFromFieldValues (fieldValues: [string, any][]): TValue
+  public abstract createFromFieldValues (fieldValues: [string, mixed][]): TValue
 }
 
 export default ObjectType

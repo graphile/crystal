@@ -337,7 +337,7 @@ export class GraphQLList<TSource, TGraphQLType extends GraphQLType<any>> {
   toString (): string
 }
 
-export class GraphQLNonNull<TSource, TGraphQLType extends GraphQLNullableType<TSource>> {
+export class GraphQLNonNull<TSource, TGraphQLType extends GraphQLNullableType<any>> {
   ofType: TGraphQLType
   constructor (type: TGraphQLType)
   toString (): string

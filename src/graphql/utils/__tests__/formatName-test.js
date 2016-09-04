@@ -1,5 +1,5 @@
 import test from 'ava'
-import * as formatName from '../formatName'
+import formatName from '../formatName'
 
 test('type will format in pascal case', t => {
   t.is(formatName.type('hello_world'), 'HelloWorld')

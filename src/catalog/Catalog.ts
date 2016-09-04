@@ -24,9 +24,9 @@ import Relation from './Relation'
  * *mutable*. Scary, I know.
  */
 class Catalog {
-  private _types = new Map<string, NamedType<any>>()
-  private _collections = new Map<string, Collection<any>>()
-  private _relations = new Map<string, Relation<any, any, any>>()
+  private _types = new Map<string, NamedType<mixed>>()
+  private _collections = new Map<string, Collection<mixed>>()
+  private _relations = new Map<string, Relation<mixed, mixed, mixed>>()
 
   /**
    * Add a type to our catalog. If the type is a composite named type (like an
@@ -37,7 +37,7 @@ class Catalog {
    * same name to the catalog, an error will be thrown.
    */
   // TODO: add tests!
-  public addType (type: NamedType<any>): this {
+  public addType (type: NamedType<mixed>): this {
     // If the type has already been added, we good!
     if (this.hasType(type))
       return this
@@ -63,7 +63,7 @@ class Catalog {
   /**
    * Get all of the types in our catalog.
    */
-  public getTypes (): Array<NamedType<any>> {
+  public getTypes (): Array<NamedType<mixed>> {
     return Array.from(this._types.values())
   }
 
@@ -71,7 +71,7 @@ class Catalog {
    * Returns true if the exact same type exists in this catalog, false if it
    * doesn’t.
    */
-  public hasType (type: NamedType<any>): boolean {
+  public hasType (type: NamedType<mixed>): boolean {
     return this._types.get(type.getName()) === type
   }
 
@@ -82,7 +82,7 @@ class Catalog {
    *
    * We will also add the type for this collection to the catalog.
    */
-  public addCollection (collection: Collection<any>): this {
+  public addCollection (collection: Collection<mixed>): this {
     const name = collection.getName()
 
     if (this._collections.has(name))
@@ -104,14 +104,14 @@ class Catalog {
    */
   // TODO: Test that the collection object type is returned by `getTypes`.
   // TODO: Test that collections do not have the same name.
-  public getCollections (): Array<Collection<any>> {
+  public getCollections (): Array<Collection<mixed>> {
     return Array.from(this._collections.values())
   }
 
   /**
    * Gets a single collection by name.
    */
-  public getCollection (name: string): Collection<any> | undefined {
+  public getCollection (name: string): Collection<mixed> | undefined {
     return this._collections.get(name)
   }
 
@@ -120,7 +120,7 @@ class Catalog {
    * the exact reference to the collection argument exists in the catalog this
    * method returns true, otherwise it returns false.
    */
-  public hasCollection (collection: Collection<any>): boolean {
+  public hasCollection (collection: Collection<mixed>): boolean {
     return this._collections.get(collection.getName()) === collection
   }
 
@@ -128,7 +128,7 @@ class Catalog {
    * Adds a single relation to our catalog. If the related collections are not
    * members of this catalog we fail with an error.
    */
-  public addRelation (relation: Relation<any, any, any>): this {
+  public addRelation (relation: Relation<mixed, mixed, mixed>): this {
     const tailCollection = relation.getTailCollection()
     const headCollection = relation.getHeadCollectionKey().getCollection()
 
@@ -156,7 +156,7 @@ class Catalog {
    * In a graph representation of our catalog, collections would be nodes and
    * relations would be directed edges.
    */
-  public getRelations (): Array<Relation<any, any, any>> {
+  public getRelations (): Array<Relation<mixed, mixed, mixed>> {
     return Array.from(this._relations.values())
   }
 }
