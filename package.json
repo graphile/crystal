@@ -1,12 +1,27 @@
 {
   "name": "postgraphql",
   "version": "2.0.0",
-  "main": "index.js",
-  "files": [
-    "index.js",
-    "dist",
-    "queries"
+  "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
+  "author": "Caleb Meredith <calebmeredith8@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/calebmer/postgraphql#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calebmer/postgraphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/calebmer/postgraphql/issues"
+  },
+  "keywords": [
+    "graphql",
+    "postgres",
+    "schema",
+    "reflection",
+    "server",
+    "relay",
+    "connection"
   ],
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "ava",
