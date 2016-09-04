@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
