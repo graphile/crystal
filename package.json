@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "ava",
-    "watch:test": "ava -w"
+    "test-watch": "ava -w"
   },
   "dependencies": {
     "change-case": "^3.0.0",
