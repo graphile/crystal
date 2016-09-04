@@ -32,7 +32,6 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
   } = {},
 ): GraphQLFieldConfig<mixed, Connection<TValue, TCursor>> {
   const paginatorName = paginator.getName()
-  const paginatorType = paginator.getType()
 
   // This is the type of all the connection arguments.
   type ConnectionArgs = {
@@ -45,7 +44,7 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
   }
 
   return {
-    type: getConnectionType(context, paginatorType),
+    type: getConnectionType(context, paginator),
     // TODO: description
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       ['orderBy', {
@@ -146,13 +145,13 @@ const getConnectionType = memoize2(createConnectionType)
  */
 function createConnectionType <TValue, TCursor>(
   context: Context,
-  type: Type<TValue>,
+  paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Connection<TValue, TCursor>> {
-  const gqlType = getType(context, type, false)
-  const gqlEdgeType = getEdgeType(context, type)
+  const gqlType = getType(context, paginator.getType(), false)
+  const gqlEdgeType = getEdgeType(context, paginator)
 
   return new GraphQLObjectType<Connection<TValue, TCursor>>({
-    name: formatName.type(`${type.getNamedType().getName()}-connection`),
+    name: formatName.type(`${paginator.getName()}-connection`),
     // TODO: description
     fields: {
       pageInfo: {
@@ -188,12 +187,12 @@ const getEdgeType = memoize2(createEdgeType)
  */
 function createEdgeType <TValue, TCursor>(
   context: Context,
-  type: Type<TValue>,
+  paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Edge<TValue, TCursor>> {
-  const gqlType = getType(context, type, false)
+  const gqlType = getType(context, paginator.getType(), false)
 
   return new GraphQLObjectType<Edge<TValue, TCursor>>({
-    name: formatName.type(`${type.getNamedType().getName()}-edge`),
+    name: formatName.type(`${paginator.getName()}-edge`),
     // TODO: description
     fields: {
       cursor: {

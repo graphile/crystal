@@ -97,6 +97,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
           const tailCollection = relation.getTailCollection()
           const tailPaginator = relation.getTailPaginator()
 
+          // TODO: This shouldn’t be optional?
           if (!tailPaginator) return undefined
 
           return [

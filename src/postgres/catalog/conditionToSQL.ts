@@ -4,7 +4,7 @@ import * as sql from '../utils/sql'
 /**
  * Converts a `Condition` object into a SQL query.
  */
-export default function conditionToSQL (condition: Condition, path: string[] = []): sql.SQL {
+export default function conditionToSQL (condition: Condition, path: Array<string> = []): sql.SQL {
   if (typeof condition === 'boolean')
     return condition ? sql.query`true` : sql.query`false`
 

@@ -39,14 +39,8 @@
     "typescript": "^2.1.0-dev.20160903"
   },
   "ava": {
-    "files": [
-      "src/**/__tests__/*-test.js",
-      "src/**/**/__tests__/*-test.js",
-      "src/**/**/**/__tests__/*-test.js",
-      "src/**/**/**/**/__tests__/*-test.js"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
+    "files": ["**/__tests__/*-test.js"],
+    "source": ["**/*.ts"],
+    "require": ["ts-node/register"]
   }
 }

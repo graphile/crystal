@@ -14,7 +14,7 @@ export type SQLItem =
  * An object that represents a dynamicly generated SQL query. This query needs
  * to be compiled before being sent to PostgreSQL.
  */
-export type SQL = SQLItem[]
+export type SQL = Array<SQLItem>
 
 /**
  * A template string tag that creates a `SQL` query out of some strings and
@@ -24,7 +24,7 @@ export type SQL = SQLItem[]
  * Note that using this function, the user *must* specify if they are injecting
  * raw text. This makes a SQL injection vulnerability harder to create.
  */
-export function query (strings: string[], ...values: (SQLItem | SQLItem[])[]): SQL {
+export function query (strings: TemplateStringsArray, ...values: Array<SQLItem | Array<SQLItem>>): SQL {
   return strings.reduce<SQL>((items, string, i) => {
     const value = values[i]
 
@@ -65,7 +65,7 @@ export function compile (sqlOrName: SQL | string, maybeSQL?: SQL): (values: { [n
   // Values hold the JavaScript values that are represented in the query
   // string by placeholders. They are eager because they were provided before
   // compile time.
-  const eagerValues: any[] = []
+  const eagerValues: Array<mixed> = []
 
   // The lazy indexes map holds a reference of lazy value names to their index
   // in the `eagerValues` array. This way later on when we get our lazy values
@@ -129,7 +129,7 @@ export const raw = (text: string): SQLItem => ({ type: 'RAW', text })
  * a table, schema, or column name. An identifier may also have a namespace,
  * thus why many names are accepted.
  */
-export const identifier = (...names: string[]): SQLItem => ({ type: 'IDENTIFIER', names })
+export const identifier = (...names: Array<string>): SQLItem => ({ type: 'IDENTIFIER', names })
 
 /**
  * Creates a SQL item for a value that will be included in our final query.
@@ -149,7 +149,7 @@ export const placeholder = (name: string): SQLItem => ({ type: 'VALUE_LAZY', nam
  * Join some SQL items together seperated by a string. Useful when dealing
  * with lists of SQL items that doesn’t make sense as a SQL query.
  */
-export const join = (items: SQLItem[] | SQLItem[][], seperator?: string): SQLItem[] =>
+export const join = (items: Array<SQLItem> | Array<Array<SQLItem>>, seperator?: string): Array<SQLItem> =>
   (items as SQLItem[]).reduce<SQLItem[]>((currentItems, item, i) =>
     i === 0 || !seperator
       ? [...currentItems, ...flatten(item)]
@@ -161,7 +161,7 @@ export const join = (items: SQLItem[] | SQLItem[][], seperator?: string): SQLIte
  *
  * @private
  */
-function flatten <T>(array: T | T[] | T[][]): T[] {
+function flatten <T>(array: T | Array<T> | Array<Array<T>>): Array<T> {
   if (!Array.isArray(array))
     return [array]
 
