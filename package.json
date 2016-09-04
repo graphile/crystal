@@ -14,13 +14,13 @@
   "dependencies": {
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
-    "graphql": "^0.6.2",
-    "pg": "^6.0.1"
+    "graphql": ">=0.6.0 <1.0.0",
+    "pg": "^6.1.0"
   },
   "devDependencies": {
     "ava": "^0.15.2",
     "ts-node": "^0.9.3",
-    "typescript": "^2.0.0-dev.20160707"
+    "typescript": "^2.1.0-dev.20160903"
   },
   "ava": {
     "files": [
