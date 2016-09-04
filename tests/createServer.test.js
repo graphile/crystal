@@ -191,9 +191,9 @@ describe('createServer', () => {
   })
 
   it('requires tokens to have an audience of \'postgraphql\'', async () => {
-    const tokenA = await jwt.signAsync({ yolo: 'swag' }, 'secret', {})
-    const tokenB = await jwt.signAsync({ aud: 'anything else', yolo: 'hat' }, 'secret', {})
-    const tokenC = await jwt.signAsync({ aud: 'postgraphql', swag: 'yolo' }, 'secret', {})
+    const tokenA = jwt.sign({ yolo: 'swag' }, 'secret', {})
+    const tokenB = jwt.sign({ aud: 'anything else', yolo: 'hat' }, 'secret', {})
+    const tokenC = jwt.sign({ aud: 'postgraphql', swag: 'yolo' }, 'secret', {})
     const server = testCreateServer()
     await (
       request(server)
@@ -227,8 +227,8 @@ describe('createServer', () => {
       yolo: claim(name: "yolo")
     }`
 
-    const tokenA = await jwt.signAsync({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
-    const tokenB = await jwt.signAsync({ aud: 'postgraphql', yolo: 'hat' }, 'secret', {})
+    const tokenA = jwt.sign({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
+    const tokenB = jwt.sign({ aud: 'postgraphql', yolo: 'hat' }, 'secret', {})
 
     const server = testCreateServer()
 
@@ -269,7 +269,7 @@ describe('createServer', () => {
   })
 
   it('cannot set a role that does not exist', async () => {
-    const token = await jwt.signAsync({ aud: 'postgraphql', role: 'does_not_exist' }, 'secret', {})
+    const token = jwt.sign({ aud: 'postgraphql', role: 'does_not_exist' }, 'secret', {})
     const server = testCreateServer()
     await (
       request(server)
@@ -282,7 +282,7 @@ describe('createServer', () => {
   })
 
   it('can set a role that does exist', async () => {
-    const token = await jwt.signAsync({ aud: 'postgraphql', role: TEST_ROLE }, 'secret', {})
+    const token = jwt.sign({ aud: 'postgraphql', role: TEST_ROLE }, 'secret', {})
     const server1 = testCreateServer()
     const server2 = testCreateServer({ anonymousRole: ANONYMOUS_ROLE })
     await (
@@ -314,7 +314,7 @@ describe('createServer', () => {
   })
 
   it('ignores authorization if a secret is not set', async () => {
-    const token = await jwt.signAsync({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
+    const token = jwt.sign({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
     const server = testCreateServer({ secret: null })
     await (
       request(server)
@@ -394,7 +394,7 @@ describe('createServer', () => {
   })
 
   it('will use the anonymous role when configured even with a token without a role', async () => {
-    const token = await jwt.signAsync({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
+    const token = jwt.sign({ aud: 'postgraphql', yolo: 'swag' }, 'secret', {})
     const server1 = testCreateServer()
     const server2 = testCreateServer({ anonymousRole: ANONYMOUS_ROLE })
 

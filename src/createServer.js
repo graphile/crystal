@@ -67,38 +67,46 @@ const createServer = ({
     res.sendStatus(200)
   })
 
-  server.all(route, graphqlHTTP(async req => {
+  server.all(route, graphqlHTTP(async (req, res) => {
     // Acquire a new client for every request.
     const client = await pg.connectAsync(pgConfig)
 
-    // Start a transaction for our client and set it up.
-    await client.queryAsync('begin')
+    try {
+      // Start a transaction for our client and set it up.
+      await client.queryAsync('begin')
 
-    // If we have a secret, let’s setup the request transaction.
-    await setupRequestTransaction(req, client, secret, anonymousRole)
+      // If we have a secret, let’s setup the request transaction.
+      await setupRequestTransaction(req, client, secret, anonymousRole)
 
-    // Make sure we release our client back to the pool once the response has
-    // finished.
-    onFinished(req.res, () => {
-      // Try to end our session with a commit. If it succeeds, release the
-      // client back into the pool. If it fails, release the client back into
-      // the pool, but also report that it failed. We cannot report an error in
-      // the request at this point because it has finished.
-      client.queryAsync('commit')
-        .then(() => client.end())
-        .catch(error => {
-          console.error(error.stack) // eslint-disable-line no-console
-          client.end()
-        })
-    })
+      // Make sure we release our client back to the pool once the response has
+      // finished.
+      onFinished(res, () => {
+        // Try to end our session with a commit. If it succeeds, release the
+        // client back into the pool. If it fails, release the client back into
+        // the pool, but also report that it failed. We cannot report an error in
+        // the request at this point because it has finished.
+        client.queryAsync('commit')
+          .then(() => client.end())
+          .catch(error => {
+            console.error(error.stack) // eslint-disable-line no-console
+            client.end()
+          })
+      })
 
-    return {
-      // Await the `graphqlSchema` because it may be a promise.
-      schema: await graphqlSchema,
-      context: { client },
-      pretty: development,
-      graphiql: development,
-      formatError: development ? developmentFormatError : formatError,
+      return {
+        // Await the `graphqlSchema` because it may be a promise.
+        schema: await graphqlSchema,
+        context: { client },
+        pretty: development,
+        graphiql: development,
+        formatError: development ? developmentFormatError : formatError,
+      }
+    }
+    catch (error) {
+      // Release our client back into the pool.
+      client.end()
+      // Re-throw the error so that `express-graphql` will report it.
+      throw error
     }
   }))
 
@@ -129,9 +137,9 @@ const setupRequestTransaction = async (req, client, secret, anonymousRole) => {
 
   let decoded
 
-  // If `jwt.verifyAsync` throws an error, catch it and re-throw it as a 403 error.
+  // If `jwt.verify` throws an error, catch it and re-throw it as a 403 error.
   try {
-    decoded = await jwt.verifyAsync(token, secret, { audience: 'postgraphql' })
+    decoded = jwt.verify(token, secret, { audience: 'postgraphql' })
   }
   catch (error) {
     throw new Forbidden(error.message)
