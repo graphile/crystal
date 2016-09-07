@@ -53,8 +53,9 @@ class PostForm extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault()
+    const userId = localStorage.getItem('userId')
     const data = {
-      authorId: 1,
+      authorId: userId,
       headline: this.fields.headline.value,
       body: this.fields.body.value,
     }
@@ -116,7 +117,7 @@ export default Relay.createContainer(PostIndex, {
     viewer: () => Relay.QL`
       fragment on Viewer {
         ${InsertPostMutation.getFragment('viewer')},
-        posts: postNodes(first: 10) {
+        posts: postNodes(first: 20, orderBy: CREATED_AT, descending: true) {
           edges {
             node {
               id,

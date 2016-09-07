@@ -20,8 +20,11 @@ create schema forum_example_utils;
 -- `create table forum_example.person …`.
 set search_path = forum_example, forum_example_utils, public;
 
--- We create a role for anonymous access
-create role forum_anonymous_role;
+-------------------------------------------------------------------------------
+-- Roles
+
+create role anon_role;
+create role user_role;
 
 -------------------------------------------------------------------------------
 -- Public Tables
@@ -43,6 +46,12 @@ comment on column person.about is 'A short description about the user, written b
 comment on column person.created_at is 'The time this person was created.';
 comment on column person.updated_at is 'The latest time this person was updated.';
 
+alter table person enable row level security;
+
+create policy view_policy on person
+  for select
+  using(true);
+
 create type post_topic as enum ('discussion', 'inspiration', 'help');
 
 create table post (
@@ -54,6 +63,31 @@ create table post (
   created_at       timestamp,
   updated_at       timestamp
 );
+
+-- about row level security
+-- all normal access to the table for selecting rows or modifying rows must be allowed by a row security policy
+-- If no policy exists for the table, a default-deny policy is used, meaning that no rows are visible or can be modified
+alter table post enable row level security;
+
+create policy view_policy on post
+  for select
+  using(true);
+
+create policy insert_policy on post
+  for insert
+  to user_role
+  with check(true);
+
+create policy update_policy on post
+  for update
+  to user_role
+  with check (author_id = (select current_setting('jwt.claims.person_id')::integer));
+
+create policy delete_policy on post
+  for delete
+  to user_role
+  using (author_id = (select current_setting('jwt.claims.person_id')::integer));
+
 
 comment on table post is 'A forum post written by a user.';
 comment on column post.id is 'The primary key for the post.';
@@ -225,6 +259,8 @@ insert into person (id, given_name, family_name, about) values
 
 alter sequence person_id_seq restart with 15;
 
+select register_person('John', 'Doe', 'john@doe.com', 'password');
+
 insert into post (id, author_id, headline, topic, body) values
   (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ullamcorper, sem sed pulvinar rutrum, nisl dui faucibus velit, eget sodales urna mauris nec lorem. Vivamus faucibus augue sit amet semper fringilla. Cras nec vulputate eros. Proin fermentum purus posuere ipsum accumsan interdum. Nunc vitae urna non mauris pellentesque sodales vel nec elit. Suspendisse pulvinar ornare turpis ac vestibulum. Cras eu congue magna. Nulla vel sodales enim, vel semper dolor. Curabitur pellentesque dolor elit. Aenean cursus posuere dui, vitae mollis felis rhoncus ac. In at orci a erat congue consequat ut sed risus. Etiam euismod elit eu lobortis varius. Praesent lacinia lobortis nisi, vel faucibus turpis sodales in. In interdum lectus tellus, facilisis mollis diam feugiat vitae.'),
   (2, 1, 'I hate yogurt. It’s just stuff with bits in.', 'inspiration', null),
@@ -244,8 +280,13 @@ alter sequence post_id_seq restart with 13;
 -------------------------------------------------------------------------------
 -- Permissions
 
-grant usage on schema forum_example to forum_anonymous_role;
-grant select on person, post to public;
+grant usage on schema forum_example to anon_role;
+grant select on person, post to anon_role;
+
+grant anon_role to user_role;
+grant usage on all sequences in schema forum_example to user_role;
+alter default privileges in schema forum_example grant usage on sequences to user_role;
+grant insert, update, delete on all tables in schema forum_example to user_role;
 
 -- Commit all the changes from this transaction. If any statement failed,
 -- these statements will not have succeeded.
