@@ -53,11 +53,11 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
         // TODO: description
       }],
       ['before', {
-        type: cursorType,
+        type: _cursorType,
         // TODO: description
       }],
       ['after', {
-        type: cursorType,
+        type: _cursorType,
         // TODO: description
       }],
       ['first', {
@@ -155,7 +155,7 @@ function createConnectionType <TValue, TCursor>(
     // TODO: description
     fields: {
       pageInfo: {
-        type: new GraphQLNonNull(pageInfoType),
+        type: new GraphQLNonNull(_pageInfoType),
         resolve: source => source,
         // TODO: description
       },
@@ -180,12 +180,12 @@ function createConnectionType <TValue, TCursor>(
   })
 }
 
-const getEdgeType = memoize2(createEdgeType)
+const getEdgeType = memoize2(_createEdgeType)
 
 /**
  * Creates a concrete GraphQL edge object type.
  */
-function createEdgeType <TValue, TCursor>(
+export function _createEdgeType <TValue, TCursor>(
   context: Context,
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Edge<TValue, TCursor>> {
@@ -196,7 +196,7 @@ function createEdgeType <TValue, TCursor>(
     // TODO: description
     fields: {
       cursor: {
-        type: new GraphQLNonNull(cursorType),
+        type: new GraphQLNonNull(_cursorType),
         resolve: ({ paginator, ordering, cursor }): NamespacedCursor<TCursor> => ({
           paginatorName: paginator.getName(),
           orderingName: ordering ? ordering.name : null,
@@ -240,7 +240,7 @@ function createOrderByEnumType <TValue, TCursor>(
  *
  * @private
  */
-const cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
+export const _cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
   new GraphQLScalarType<NamespacedCursor<mixed>>({
     name: 'Cursor',
     // TODO: description
@@ -275,7 +275,7 @@ function deserializeCursor (serializedCursor: string): NamespacedCursor<any> {
  *
  * @private
  */
-const pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
+export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
   new GraphQLObjectType<Connection<mixed, mixed>>({
     name: 'PageInfo',
     // TODO: description
@@ -291,7 +291,7 @@ const pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
         // TODO: description
       },
       startCursor: {
-        type: cursorType,
+        type: _cursorType,
         resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
           paginatorName: paginator.getName(),
           orderingName: ordering ? ordering.name : null,
@@ -300,7 +300,7 @@ const pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
         // TODO: description
       },
       endCursor: {
-        type: cursorType,
+        type: _cursorType,
         resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
           paginatorName: paginator.getName(),
           orderingName: ordering ? ordering.name : null,

@@ -43,7 +43,7 @@ function createEmptyCache <T>(): Cache<T> {
  */
 // TODO: Have this use variadic types when they are added to Typescript. Then
 // we shouldn’t need `memoize1`, `memoize2`, etc.
-function memoize <T>(fn: (...args: Array<mixed>) => T): (...args: Array<mixed>) => T {
+export function _memoize <T>(fn: (...args: Array<mixed>) => T): (...args: Array<mixed>) => T {
   const initialCache: Cache<T> = createEmptyCache<T>()
 
   return (...args: Array<mixed>): T => {
@@ -77,7 +77,7 @@ function memoize <T>(fn: (...args: Array<mixed>) => T): (...args: Array<mixed>) 
   }
 }
 
-export const memoize1 = <T, A>(fn: (a: A) => T): (a: A) => T => memoize(fn)
-export const memoize2 = <T, A, B>(fn: (a: A, b: B) => T): (a: A, b: B) => T => memoize(fn)
-export const memoize3 = <T, A, B, C>(fn: (a: A, b: B, c: C) => T): (a: A, b: B, c: C) => T => memoize(fn)
-export const memoize4 = <T, A, B, C, D>(fn: (a: A, b: B, c: C, d: D) => T): (a: A, b: B, c: C, d: D) => T => memoize(fn)
+export const memoize1 = <T, A>(fn: (a: A) => T): (a: A) => T => _memoize(fn)
+export const memoize2 = <T, A, B>(fn: (a: A, b: B) => T): (a: A, b: B) => T => _memoize(fn)
+export const memoize3 = <T, A, B, C>(fn: (a: A, b: B, c: C) => T): (a: A, b: B, c: C) => T => _memoize(fn)
+export const memoize4 = <T, A, B, C, D>(fn: (a: A, b: B, c: C, d: D) => T): (a: A, b: B, c: C, d: D) => T => _memoize(fn)

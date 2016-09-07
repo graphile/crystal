@@ -17,6 +17,8 @@ import {
   GraphQLFloat,
   GraphQLString,
   getNullableType,
+  isInputType,
+  isOutputType,
 } from 'graphql'
 
 import {
@@ -34,19 +36,38 @@ import {
   stringType,
 } from '../../../catalog'
 
-import { memoize3, buildObject, formatName } from '../../utils'
+import { buildObject, formatName } from '../../utils'
 import getCollectionType from '../collection/getCollectionType'
 import Context from '../Context'
 
-// We add some function overloads for more intelligent typing to `getType`.
-// This is the untyped variant.
-const _getType = memoize3(createType)
+type CacheLv1 = WeakMap<Context, CacheLv2>
+type CacheLv2 = WeakMap<Type<mixed>, CacheLv3>
+type CacheLv3 = { input?: GraphQLInputType<mixed>, output?: GraphQLOutputType<mixed> }
+
+const cacheLv1: CacheLv1 = new WeakMap()
 
 // TODO: doc
+// Instead of using our utility memoization function, we implement our own
+// memoization logic here because in some scenarios we want to return the same
+// result regardless of whether the `input` is true or false.
 function getType (context: Context, type: Type<mixed>, input: true): GraphQLInputType<mixed>
 function getType (context: Context, type: Type<mixed>, input: false): GraphQLOutputType<mixed>
 function getType (context: Context, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
-  return _getType(context, type, input)
+  if (!cacheLv1.get(context))
+    cacheLv1.set(context, new WeakMap())
+
+  const cacheLv2: CacheLv2 = cacheLv1.get(context)!
+
+  if (!cacheLv2.get(type)) {
+    const cacheLv3: CacheLv3 = {}
+    cacheLv2.set(type, cacheLv3)
+    const gqlType = createType(context, type, input)
+
+    if (isInputType(gqlType)) cacheLv3.input = gqlType
+    if (isOutputType(gqlType)) cacheLv3.output = gqlType
+  }
+
+  return input ? cacheLv2.get(type)!.input! : cacheLv2.get(type)!.output!
 }
 
 export default getType
