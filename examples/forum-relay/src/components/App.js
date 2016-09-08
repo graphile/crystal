@@ -1,8 +1,8 @@
 import React from 'react';
-import Relay from 'react-relay'
 import { Link, withRouter } from 'react-router'
-import { RelayNetworkLayer, authMiddleware } from 'react-relay-network-layer';
 import jwtDecode from 'jwt-decode'
+import Relay from 'react-relay'
+import { RelayNetworkLayer, authMiddleware } from 'react-relay-network-layer';
 
 Relay.injectNetworkLayer(new RelayNetworkLayer([
   authMiddleware({
@@ -22,22 +22,21 @@ class App extends React.Component {
 
   authenticate() {
     const token = localStorage.getItem('token')
-    if (!token) {
-      return
-    }
+    if (!token) return
+
     const payload = jwtDecode(token)
     const expiryDate = new Date(payload.exp * 1000)
     const currentDate = new Date()
-    if (expiryDate <= currentDate) {
-      this.handleLogout()
+    if (expiryDate < currentDate) {
       // TODO(Ferdi): notify that your token has expired
+      this.handleLogout()
     }
 
     this.setState({ authenticated: true })
   }
 
   handleLogin = (data) => {
-    return fetch('http://localhost:3000/authenticate', {
+    return fetch(AUTH_URL, {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
@@ -47,13 +46,12 @@ class App extends React.Component {
     })
     .then(res => res.json())
     .then(({ success, token }) => {
-      if (success) {
-        const payload = jwtDecode(token)
-        localStorage.setItem('token', token)
-        localStorage.setItem('userId', payload.person_id)
-        this.setState({ authenticated: true })
-        this.props.router.push('/posts')
-      }
+      if (!success) return
+      const { person_id } = jwtDecode(token)
+      localStorage.setItem('token', token)
+      localStorage.setItem('userId', person_id)
+      this.setState({ authenticated: true })
+      this.props.router.push('/posts')
     })
   }
 

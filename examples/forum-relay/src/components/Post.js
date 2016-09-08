@@ -27,6 +27,7 @@ class Post extends React.Component {
   }
 
   // contenteditable is used here out of simplicity, for the moment
+  // react complains; I chose to ignore it
   render() {
     return (
       <div>

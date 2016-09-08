@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import postgraphql from 'postgraphql'
+import webpackConfig from './build/webpack.config'
 import authentication from './auth'
 
 // Load the config from .env file.
@@ -14,24 +15,11 @@ const {
   SECRET,
 } = process.env
 
-// Our webpack configuration.
-const compiler = webpack({
-  entry: path.resolve(__dirname, 'src/main.js'),
-  module: {
-    loaders: [{
-      include: [path.resolve(__dirname, 'src')],
-      loader: 'babel',
-      test: /\.js$/,
-    }]
-  },
-  output: {
-    filename: 'app.js',
-    path: '/',
-  },
-})
+// we compile the frontend with webpack/babel
+const compiler = webpack(webpackConfig)
 
 // This allows use compile the front-end app on the fly.
-// Do not use this in production.
+// Do not use this in production!
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   publicPath: '/static/',
