@@ -81,6 +81,7 @@ create policy insert_policy on post
 create policy update_policy on post
   for update
   to user_role
+  using(true)
   with check (author_id = (select current_setting('jwt.claims.person_id')::integer));
 
 create policy delete_policy on post
