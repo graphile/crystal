@@ -1,6 +1,11 @@
 {
   "extends": "calebmer",
+  "env": {
+    "node": true
+  },
   "rules": {
-    "max-nested-callbacks": 0
+    "max-len": "off",
+    "max-nested-callbacks": "off",
+    "babel/func-params-comma-dangle": "off"
   }
 }

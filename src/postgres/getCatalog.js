@@ -72,13 +72,11 @@ const addSchemas = (client, catalog) =>
   .each(schema => catalog.addSchema(schema))
 
 const addTables = (client, catalog) =>
-  /* eslint-disable */
   // Determine any views or other objects that we cannot mutate with
   // pg_relation_is_updatable, more info:
   // https://www.postgresql.org/message-id/CAEZATCV2_qN9P3zbvADwME_TkYf2gR_X2cLQR4R+pqkwxGxqJg@mail.gmail.com
   // https://github.com/postgres/postgres/blob/2410a2543e77983dab1f63f48b2adcd23dba994e/src/backend/utils/adt/misc.c#L684
   // https://github.com/postgres/postgres/blob/3aff33aa687e47d52f453892498b30ac98a296af/src/backend/rewrite/rewriteHandler.c#L2351
-  /* eslint-enable */
   client.queryAsync(`
     select
       n.nspname as "schemaName",
