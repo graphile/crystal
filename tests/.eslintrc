@@ -1,6 +1,0 @@
-{
-  "extends": "calebmer/tests",
-  "rules": {
-    "import/no-unresolved": 0
-  }
-}
