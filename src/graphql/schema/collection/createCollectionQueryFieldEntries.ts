@@ -2,8 +2,8 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } 
 import { Collection, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject } from '../../utils'
 import BuildToken from '../BuildToken'
-import getType from '../type/getType'
-import createConnectionField from '../connection/createConnectionField'
+import getType from '../getType'
+import createConnectionField from '../createConnectionField'
 import getCollectionType from './getCollectionType'
 
 /**

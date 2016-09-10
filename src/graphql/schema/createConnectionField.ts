@@ -17,10 +17,10 @@ import {
   Kind,
 } from 'graphql'
 
-import { Paginator, Condition, Type } from '../../../interface'
-import { buildObject, formatName, memoize2 } from '../../utils'
-import getType from '../type/getType'
-import BuildToken from '../BuildToken'
+import { Paginator, Condition, Type } from '../../interface'
+import { buildObject, formatName, memoize2 } from '../utils'
+import getType from './getType'
+import BuildToken from './BuildToken'
 
 // TODO: doc
 export default function createConnectionField <TValue, TCursor, TCondition>(

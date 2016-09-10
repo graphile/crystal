@@ -33,11 +33,11 @@ import {
   integerType,
   floatType,
   stringType,
-} from '../../../interface'
+} from '../../interface'
 
-import { buildObject, formatName } from '../../utils'
-import getCollectionType from '../collection/getCollectionType'
-import BuildToken from '../BuildToken'
+import { buildObject, formatName } from '../utils'
+import getCollectionType from './collection/getCollectionType'
+import BuildToken from './BuildToken'
 
 // TODO: doc
 const cache = new WeakMap<BuildToken, {

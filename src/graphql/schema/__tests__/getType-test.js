@@ -20,7 +20,7 @@ import {
   floatType,
   stringType,
   ObjectType,
-} from '../../../../interface'
+} from '../../../interface'
 
 import getType from '../getType'
 

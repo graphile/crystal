@@ -1,9 +1,9 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, ObjectField, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
-import getType from '../type/getType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
-import createConnectionField from '../connection/createConnectionField'
+import getType from '../getType'
+import createConnectionField from '../createConnectionField'
 import BuildToken from '../BuildToken'
 
 // Private implementation of `getCollectionType`, types aren’t that great.
