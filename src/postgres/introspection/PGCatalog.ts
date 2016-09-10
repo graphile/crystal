@@ -81,7 +81,7 @@ class PGCatalog {
    * Gets a single class object by the provided id, and if no class object
    * exists an error is thrown instead of returning `undefined`.
    */
-  public assertGetClass (id: string): PGClass {
+  public assertGetClass (id: string): PGClassObject {
     const clazz = this.getClass(id)
 
     if (!clazz)

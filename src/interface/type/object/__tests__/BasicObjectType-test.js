@@ -53,20 +53,20 @@ test('isTypeOf will ignore extraneous fields on the value', () => {
   expect(objectType.isTypeOf({ a: 1, b: 2, c: 3, d: 4 })).toBe(true)
 })
 
-test('createFromFieldValueInputs will build an object from field entries', () => {
+test('createFromFieldValues will build an object from field entries', () => {
   const objectType = new BasicObjectType()
-  expect(objectType.createFromFieldValueInputs([['a', 1], ['b', 2], ['c', 3]])).toEqual({ a: 1, b: 2, c: 3 })
-  expect(objectType.createFromFieldValueInputs([['a', 1], ['a', 2]])).toEqual({ a: 2 })
+  expect(objectType.createFromFieldValues(new Map([['a', 1], ['b', 2], ['c', 3]]))).toEqual({ a: 1, b: 2, c: 3 })
+  expect(objectType.createFromFieldValues(new Map([['a', 1], ['a', 2]]))).toEqual({ a: 2 })
 })
 
-test('createFromFieldValueInputs will fail if an isTypeOf is false', () => {
+test('createFromFieldValues will fail if an isTypeOf is false', () => {
   const fieldA = mockField('a', value => value === 1)
   const fieldB = mockField('b', value => value === 2)
   const objectType = new BasicObjectType()
-  expect(objectType.createFromFieldValueInputs([['a', 1], ['b', 1]])).toEqual({ a: 1, b: 1 })
+  expect(objectType.createFromFieldValues(new Map([['a', 1], ['b', 1]]))).toEqual({ a: 1, b: 1 })
   objectType.addField(fieldA).addField(fieldB)
-  expect(() => objectType.createFromFieldValueInputs([['a', 1], ['b', 1]])).toThrow()
-  expect(objectType.createFromFieldValueInputs([['a', 1], ['b', 2]])).toEqual({ a: 1, b: 2 })
+  expect(() => objectType.createFromFieldValues(new Map([['a', 1], ['b', 1]]))).toThrow()
+  expect(objectType.createFromFieldValues(new Map([['a', 1], ['b', 2]]))).toEqual({ a: 1, b: 2 })
 })
 
 test('getFields will get fields added by addField', () => {

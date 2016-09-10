@@ -18,7 +18,7 @@ abstract class Type<TValue> {
    * string type with a `TValue` of `string` may implement this method as
    * `typeof value === 'string'`.
    */
-  public abstract isTypeOf (value: any): value is TValue
+  public abstract isTypeOf (value: mixed): value is TValue
 
   /**
    * Every type should have a named type at it’s “heart” as unnamed types are

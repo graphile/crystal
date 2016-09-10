@@ -5,7 +5,6 @@ import typeFromPGType from '../typeFromPGType'
 /**
  * The interface type of all values to flow through a Postgres collection.
  */
-// TODO: tests
 class PGCollectionType extends ObjectType<PGCollectionValue> {
   constructor (
     pgCatalog: PGCatalog,
@@ -32,18 +31,18 @@ class PGCollectionType extends ObjectType<PGCollectionValue> {
   }
 
   /**
-   * Turns a Postgres collection value into a row.
-   */
-  public toRow (value: PGCollectionValue): PGRow {
-    return value._getRow()
-  }
-
-  /**
    * Turns a row into a Postgres collection value *without performing safety
    * checks*. This method should not be used with user input.
    */
   public fromRow (row: PGRow): PGCollectionValue {
     return new PGCollectionValue(this, row)
+  }
+
+  /**
+   * Turns a Postgres collection value into a row.
+   */
+  public toRow (value: PGCollectionValue): PGRow {
+    return value._getRow()
   }
 
   /**
@@ -55,14 +54,20 @@ class PGCollectionType extends ObjectType<PGCollectionValue> {
   private _fields: Map<string, PGCollectionObjectField<mixed>> = new Map()
 
   public getFields (): Array<PGCollectionObjectField<mixed>> {
-    return Array.from(this._fields.values())
+    return Array.from(this._fields.values()).sort((a, b) => {
+      const aNum = a.getPGAttribute().num
+      const bNum = b.getPGAttribute().num
+      if (aNum > bNum) return 1
+      if (aNum < bNum) return -1
+      return 0
+    })
   }
 
   /**
-   * A strict implementation of `createFromFieldValueInputs` which makes sure all
+   * A strict implementation of `createFromFieldValues` which makes sure all
    * fields have correct values.
    */
-  public createFromFieldValueInputs (fieldValues: Array<[string, mixed]>): PGCollectionValue {
+  public createFromFieldValues (fieldValues: Map<string, mixed>): PGCollectionValue {
     // Initialize two variables, a `fieldsLeft` variable which tracks how many
     // of our internal fields have been detected so far, and the actual row
     // object.
@@ -70,7 +75,7 @@ class PGCollectionType extends ObjectType<PGCollectionValue> {
     const row = Object.create(null)
 
     // For all of the provided field values…
-    for (const [fieldName, value] of fieldValues) {
+    for (const [fieldName, value] of fieldValues.entries()) {
       const field = this._fields.get(fieldName)
 
       // If there was no field for this name, throw an error.
