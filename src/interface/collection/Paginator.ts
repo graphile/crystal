@@ -75,7 +75,7 @@ abstract class Paginator<TValue, TCursor> {
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  public abstract count (context: any, condition?: Condition): Promise<number>
+  public abstract count (context: mixed, condition?: Condition): Promise<number>
 
   /**
    * Reads values in a collection relative to a cursor which is used as a
@@ -87,7 +87,7 @@ abstract class Paginator<TValue, TCursor> {
    * @see Paginator.PageConfig
    */
   public abstract readPage (
-    context: any,
+    context: mixed,
     config: Paginator.PageConfig<TCursor>,
   ): Promise<Paginator.Page<TValue, TCursor>>
 }

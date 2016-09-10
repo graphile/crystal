@@ -71,7 +71,7 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
    * as key/value pairs and adds them to an object. Performs an `isTypeOf`
    * check at the end. If it fails than an error is thrown.
    */
-  public createFromFieldValues (fieldValues: [string, any][]): BasicObjectValue {
+  public createFromFieldValueInputs (fieldValues: [string, any][]): BasicObjectValue {
     const object = {}
 
     for (const [key, value] of fieldValues)

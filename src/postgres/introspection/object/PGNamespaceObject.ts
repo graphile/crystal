@@ -3,11 +3,11 @@
  *
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-namespace.html
  */
-type PGNamespace = {
+type PGNamespaceObject = {
   kind: 'namespace',
   id: string,
   name: string,
   description: string,
 }
 
-export default PGNamespace
+export default PGNamespaceObject

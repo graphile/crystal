@@ -108,7 +108,7 @@ abstract class Collection<TValue> {
   // TODO: Test that we can use this method on an empty collection and then
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
-  public abstract create (context: any, value: TValue): Promise<TValue>
+  public abstract create (context: mixed, value: TValue): Promise<TValue>
 }
 
 export default Collection

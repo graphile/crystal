@@ -81,7 +81,7 @@ export default function createCollectionQueryFieldEntries <T>(
           )
         ),
         resolve: (source, args) =>
-          key.read(keyType.createFromFieldValues(fields.map((field, i): [string, mixed] => [field.getName(), args[fieldArgNames[i]]]))),
+          key.read(keyType.createFromFieldValueInputs(fields.map((field, i): [string, mixed] => [field.getName(), args[fieldArgNames[i]]]))),
       }])
     }
     // Otherwise if this is not an object type, we’ll just expose one argument

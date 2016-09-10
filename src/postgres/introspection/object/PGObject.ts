@@ -1,7 +1,7 @@
-import PGNamespace from './PGNamespace'
-import PGClass from './PGClass'
-import PGAttribute from './PGAttribute'
-import PGType from './PGType'
+import PGNamespaceObject from './PGNamespaceObject'
+import PGClassObject from './PGClassObject'
+import PGAttributeObject from './PGAttributeObject'
+import PGTypeObject from './PGTypeObject'
 
 /**
  * `PGObject` is a type that represents all of the different shapes of objects
@@ -10,9 +10,9 @@ import PGType from './PGType'
  * just for statically checking the resulting rows of that query.
  */
 type PGObject =
-  PGNamespace |
-  PGClass |
-  PGAttribute |
-  PGType
+  PGNamespaceObject |
+  PGClassObject |
+  PGAttributeObject |
+  PGTypeObject
 
 export default PGObject

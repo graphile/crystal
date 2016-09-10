@@ -11,13 +11,13 @@ abstract class ObjectType<TValue> extends NamedType<TValue> {
   /**
    * Gets all of the fields on our object type. Order matters.
    */
-  public abstract getFields (): ObjectField<TValue, any>[]
+  public abstract getFields (): Array<ObjectField<TValue, mixed>>
 
   /**
    * Creates a value with all of the fields in key/value pair format. If not
    * all fields are available, an error should be thrown.
    */
-  public abstract createFromFieldValues (fieldValues: [string, mixed][]): TValue
+  public abstract createFromFieldValueInputs (fieldValues: Array<[string, mixed]>): TValue
 }
 
 export default ObjectType

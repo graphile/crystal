@@ -4,7 +4,7 @@
  *
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-attribute.html
  */
-type PGAttribute = {
+type PGAttributeObject = {
   kind: 'attribute',
   classId: string,
   num: number,
@@ -15,4 +15,4 @@ type PGAttribute = {
   hasDefault: boolean,
 }
 
-export default PGAttribute
+export default PGAttributeObject

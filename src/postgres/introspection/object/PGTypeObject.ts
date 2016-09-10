@@ -7,21 +7,21 @@
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html
  */
 // TODO: We should probably make a special case for range types.
-type PGType =
-  PGCompositeType |
-  PGDomainType |
-  PGEnumType |
-  (_PGType & {
+type PGTypeObject =
+  PGCompositeTypeObject |
+  PGDomainTypeObject |
+  PGEnumTypeObject |
+  (_PGTypeObject & {
     type: 'b' | 'p' | 'r',
   })
 
-export default PGType
+export default PGTypeObject
 
 /**
  * A composite type is a type with an associated class. So any type which may
  * have attributes (or fields).
  */
-type PGCompositeType = _PGType & {
+type PGCompositeTypeObject = _PGTypeObject & {
   type: 'c',
   classId: string,
 }
@@ -30,7 +30,7 @@ type PGCompositeType = _PGType & {
  * A domain type is a named alias of another type with some extra constraints
  * added on top. One such constraint is the `is_not_null` constraint.
  */
-type PGDomainType = _PGType & {
+type PGDomainTypeObject = _PGTypeObject & {
   type: 'd',
   baseTypeId: string,
   isNotNull: boolean,
@@ -40,7 +40,7 @@ type PGDomainType = _PGType & {
  * An enum type is a type with a set of predefined string values. A value of
  * an enum type may only be one of those values.
  */
-type PGEnumType = _PGType & {
+type PGEnumTypeObject = _PGTypeObject & {
   type: 'e',
   enumVariants: string[],
 }
@@ -53,7 +53,7 @@ type PGEnumType = _PGType & {
  * @private
  * @see PGType
  */
-type _PGType = {
+type _PGTypeObject = {
   kind: 'type',
   id: string,
   name: string,
