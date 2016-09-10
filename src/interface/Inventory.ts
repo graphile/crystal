@@ -4,37 +4,35 @@ import ObjectType from './type/object/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './Relation'
 
-// TODO: Validate catalog function. There are a lot of assumptions we make that
+// TODO: Validate inventory functions. There are a lot of assumptions we make that
 // cannot be statically typed. We should have a test utility function to prove
 // those assumptions are correct. We will mostly test things not defined in
 // the type system.
 // TODO: Is this the right way to do it?
 // TODO: Test this!
-// TODO: Use a different name. Having a `Catalog` and a `PGCatalog` can be
-// confusing!
 /**
  * In order to build awesome tools from any database we need an abstract
- * static data definition language. Catalog is the root level interface
+ * static data definition language. Inventory is the root level interface
  * to this definition.
  *
  * If a database is strongly typed (like PostgreSQL) it may implement the
- * catalog interfaces to expose its underlying data.
+ * inventory interfaces to expose its underlying data.
  *
- * Believe it or not, a `Catalog` and all of the objects inside it are
+ * Believe it or not, a `Inventory` and all of the objects inside it are
  * *mutable*. Scary, I know.
  */
-class Catalog {
+class Inventory {
   private _types = new Map<string, NamedType<mixed>>()
   private _collections = new Map<string, Collection<mixed>>()
   private _relations = new Map<string, Relation<mixed, mixed, mixed>>()
 
   /**
-   * Add a type to our catalog. If the type is a composite named type (like an
+   * Add a type to our inventory. If the type is a composite named type (like an
    * alias type or an object type), we will also add the types it is composed
-   * of to the catalog.
+   * of to the inventory.
    *
    * Type names must be unique. So if you had already added a type with the
-   * same name to the catalog, an error will be thrown.
+   * same name to the inventory, an error will be thrown.
    */
   // TODO: add tests!
   public addType (type: NamedType<mixed>): this {
@@ -45,7 +43,7 @@ class Catalog {
     const name = type.getName()
 
     if (this._types.has(name))
-      throw new Error(`Type of name '${name}' already exists in the catalog.`)
+      throw new Error(`Type of name '${name}' already exists in the inventory.`)
 
     this._types.set(name, type)
 
@@ -61,14 +59,14 @@ class Catalog {
   }
 
   /**
-   * Get all of the types in our catalog.
+   * Get all of the types in our inventory.
    */
   public getTypes (): Array<NamedType<mixed>> {
     return Array.from(this._types.values())
   }
 
   /**
-   * Returns true if the exact same type exists in this catalog, false if it
+   * Returns true if the exact same type exists in this inventory, false if it
    * doesn’t.
    */
   public hasType (type: NamedType<mixed>): boolean {
@@ -76,17 +74,17 @@ class Catalog {
   }
 
   /**
-   * Adds a single collection to our catalog. If a collection with the same
+   * Adds a single collection to our inventory. If a collection with the same
    * name already exists, an error is thrown. If the collection has a
-   * different catalog, an error is thrown.
+   * different inventory, an error is thrown.
    *
-   * We will also add the type for this collection to the catalog.
+   * We will also add the type for this collection to the inventory.
    */
   public addCollection (collection: Collection<mixed>): this {
     const name = collection.getName()
 
     if (this._collections.has(name))
-      throw new Error(`Collection of name '${name}' already exists in the catalog.`)
+      throw new Error(`Collection of name '${name}' already exists in the inventory.`)
 
     this._collections.set(name, collection)
 
@@ -116,8 +114,8 @@ class Catalog {
   }
 
   /**
-   * Determines if a *specific* collection has been added to the catalog. If
-   * the exact reference to the collection argument exists in the catalog this
+   * Determines if a *specific* collection has been added to the inventory. If
+   * the exact reference to the collection argument exists in the inventory this
    * method returns true, otherwise it returns false.
    */
   public hasCollection (collection: Collection<mixed>): boolean {
@@ -125,23 +123,23 @@ class Catalog {
   }
 
   /**
-   * Adds a single relation to our catalog. If the related collections are not
-   * members of this catalog we fail with an error.
+   * Adds a single relation to our inventory. If the related collections are not
+   * members of this inventory we fail with an error.
    */
   public addRelation (relation: Relation<mixed, mixed, mixed>): this {
     const tailCollection = relation.getTailCollection()
     const headCollection = relation.getHeadCollectionKey().getCollection()
 
     if (!this.hasCollection(tailCollection))
-      throw new Error(`Tail collection named '${tailCollection.getName()}' is not in this catalog.`)
+      throw new Error(`Tail collection named '${tailCollection.getName()}' is not in this inventory.`)
 
     if (!this.hasCollection(headCollection))
-      throw new Error(`Head collection named '${headCollection.getName()}' is not in this catalog.`)
+      throw new Error(`Head collection named '${headCollection.getName()}' is not in this inventory.`)
 
     const name = relation.getName()
 
     if (this._relations.has(name))
-      throw new Error(`Relation of name '${name}' already exists in the catalog.`)
+      throw new Error(`Relation of name '${name}' already exists in the inventory.`)
 
     this._relations.set(name, relation)
 
@@ -149,11 +147,11 @@ class Catalog {
   }
 
   /**
-   * Gets all of the relations in our catalog. A relationship is formed when
+   * Gets all of the relations in our inventory. A relationship is formed when
    * the values of one collection reference another. A relation can be used to
    * track that reference and perform operations using that reference.
    *
-   * In a graph representation of our catalog, collections would be nodes and
+   * In a graph representation of our inventory, collections would be nodes and
    * relations would be directed edges.
    */
   public getRelations (): Array<Relation<mixed, mixed, mixed>> {
@@ -161,4 +159,4 @@ class Catalog {
   }
 }
 
-export default Catalog
+export default Inventory

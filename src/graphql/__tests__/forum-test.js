@@ -1,9 +1,9 @@
 import { printSchema } from 'graphql'
-import forumCatalog from './fixtures/forumCatalog'
+import forumInventory from './fixtures/forumInventory'
 import createSchema from '../schema/createSchema'
 
 test('will generate the correct schema', () => {
-  const gqlSchema = createSchema(forumCatalog)
+  const gqlSchema = createSchema(forumInventory)
   const printedSchema = printSchema(gqlSchema)
   expect(printedSchema).toMatchSnapshot()
 })

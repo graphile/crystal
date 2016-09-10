@@ -1,4 +1,4 @@
-import { ObjectType, NullableType, AliasType, EnumType, ListType } from '../../../catalog'
+import { ObjectType, NullableType, AliasType, EnumType, ListType } from '../../../interface'
 import PGCatalog from '../../introspection/PGCatalog'
 import typeFromPGType from '../typeFromPGType'
 

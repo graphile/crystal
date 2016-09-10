@@ -20,12 +20,12 @@ import {
   floatType,
   stringType,
   ObjectType,
-} from '../../../../catalog'
+} from '../../../../interface'
 
 import getType from '../getType'
 
 const mockContext = () => ({
-  catalog: {
+  inventory: {
     getCollections: () => [],
   },
 })

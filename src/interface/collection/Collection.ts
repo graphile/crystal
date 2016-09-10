@@ -1,4 +1,3 @@
-import Catalog from '../Catalog'
 import Relation from '../Relation'
 import ObjectType from '../type/object/ObjectType'
 import CollectionKey from './CollectionKey'

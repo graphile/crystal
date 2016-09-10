@@ -1,9 +1,9 @@
-import { Catalog } from '../../catalog'
+import { Inventory } from '../../interface'
 
 // TODO: doc
 type Context = {
   // TODO: doc
-  catalog: Catalog,
+  inventory: Inventory,
   // TODO: doc
   options: {
     nodeIdFieldName: string,

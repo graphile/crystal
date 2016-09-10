@@ -10,7 +10,7 @@ import {
   integerType,
   floatType,
   stringType,
-} from '../../catalog'
+} from '../../interface'
 
 import PGCatalog from '../introspection/PGCatalog'
 import PGType from '../introspection/object/PGType'

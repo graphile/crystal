@@ -1,4 +1,4 @@
-import { Collection } from '../../../catalog'
+import { Collection } from '../../../interface'
 
 class MockCollection extends Collection {
   constructor () {

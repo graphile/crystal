@@ -22,7 +22,6 @@ import {
 } from 'graphql'
 
 import {
-  Catalog,
   Type,
   NullableType,
   ListType,
@@ -34,7 +33,7 @@ import {
   integerType,
   floatType,
   stringType,
-} from '../../../catalog'
+} from '../../../interface'
 
 import { buildObject, formatName } from '../../utils'
 import getCollectionType from '../collection/getCollectionType'
@@ -168,8 +167,8 @@ function createNamedType (context: Context, type: NamedType<mixed>, input: boole
  * @private
  */
 function createOutputObjectType <T>(context: Context, type: ObjectType<T>): GraphQLObjectType<T> {
-  const { catalog } = context
-  const collection = catalog.getCollections().find(collection => collection.getType() === type)
+  const { inventory } = context
+  const collection = inventory.getCollections().find(collection => collection.getType() === type)
 
   // If there is a collection which uses this type, we should use the
   // collection’s type and not create our own.

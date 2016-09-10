@@ -1,5 +1,5 @@
 import {
-  Catalog,
+  Inventory,
   CollectionKey,
   Relation,
   BasicObjectType,
@@ -9,14 +9,14 @@ import {
   EnumType,
   integerType,
   stringType,
-} from '../../../catalog'
+} from '../../../interface'
 
 import MockCollection from './MockCollection'
 import MockPaginator from './MockPaginator'
 
-const catalog = new Catalog()
+const inventory = new Inventory()
 
-export default catalog
+export default inventory
 
 const emailType = new AliasType('email', stringType)
 
@@ -32,7 +32,7 @@ const personType =
 const personCollection =
   new MockCollection('people', personType)
 
-catalog.addCollection(personCollection)
+inventory.addCollection(personCollection)
 
 const personIdKey = new CollectionKey(personCollection, 'id', integerType)
 const personNameKey = new CollectionKey(personCollection, 'name', stringType)
@@ -70,7 +70,7 @@ const postType =
 const postCollection =
   new MockCollection('posts', postType)
 
-catalog.addCollection(postCollection)
+inventory.addCollection(postCollection)
 
 const postIdKey = new CollectionKey(postCollection, 'id', integerType)
 
@@ -92,5 +92,5 @@ postCollection
   .setPrimaryKey(postIdKey)
   .setPaginator(postPaginator)
 
-catalog
+inventory
   .addRelation(new Relation('author', postCollection, personIdKey))

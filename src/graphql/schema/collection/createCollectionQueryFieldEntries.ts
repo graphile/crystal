@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
-import { Catalog, Collection, ObjectType } from '../../../catalog'
+import { Collection, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject } from '../../utils'
 import Context from '../Context'
 import getType from '../type/getType'

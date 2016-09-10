@@ -1,5 +1,4 @@
 import { GraphQLInterfaceType, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Catalog } from '../../../catalog'
 import { memoize1 } from '../../utils/memoize'
 import Context from '../Context'
 

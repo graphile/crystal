@@ -1,4 +1,4 @@
-import { Condition } from '../../../catalog'
+import { Condition } from '../../../interface'
 import sql from '../../utils/sql'
 import conditionToSQL from '../conditionToSQL'
 

@@ -22,7 +22,7 @@ abstract class Type<TValue> {
 
   /**
    * Every type should have a named type at it’s “heart” as unnamed types are
-   * inherently abstract. As catalogs will only let us register named types, we
+   * inherently abstract. As inventories will only let us register named types, we
    * need to get the named type.
    */
   public abstract getNamedType (): NamedType<any>

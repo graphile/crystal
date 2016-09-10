@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Catalog, Collection, ObjectField, Relation } from '../../../catalog'
+import { Collection, ObjectField, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getType from '../type/getType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
@@ -26,7 +26,7 @@ export default getCollectionType
  * @private
  */
 function createCollectionType <TValue>(context: Context, collection: Collection<TValue>): GraphQLObjectType<TValue> {
-  const { options, catalog } = context
+  const { options, inventory } = context
   const type = collection.getType()
   const primaryKey = collection.getPrimaryKey()
 
@@ -68,7 +68,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
       // TODO: Computed fields
 
       // Add all of our many-to-one relations (aka tail relations).
-      catalog.getRelations()
+      inventory.getRelations()
         // We only want the relations for which this collection is the tail
         // collection.
         .filter(relation => relation.getTailCollection() === collection)
@@ -88,7 +88,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
         }),
 
       // Add all of our one-to-many relations (aka head relations).
-      catalog.getRelations()
+      inventory.getRelations()
         // We only want the relations for which this collection is the head
         // collection.
         .filter(relation => relation.getHeadCollectionKey().getCollection() === collection)

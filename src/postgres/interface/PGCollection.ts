@@ -4,7 +4,7 @@ import {
   ObjectType,
   BasicObjectType,
   BasicObjectField,
-} from '../../catalog'
+} from '../../interface'
 
 import { Client } from 'pg'
 import DataLoader from 'dataloader'

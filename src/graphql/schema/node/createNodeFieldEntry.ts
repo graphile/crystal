@@ -1,12 +1,11 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Catalog } from '../../../catalog'
 import idSerde from '../../utils/idSerde'
 import Context from '../Context'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
 // TODO: doc
 export default function createNodeFieldEntry (context: Context): [string, GraphQLFieldConfig<mixed, mixed>] {
-  const { catalog, options } = context
+  const { inventory, options } = context
   return ['node', {
     // TODO: description
     type: getNodeInterfaceType(context),
@@ -18,7 +17,7 @@ export default function createNodeFieldEntry (context: Context): [string, GraphQ
     },
     resolve (source, args) {
       const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName])
-      const collection = catalog.getCollection(name)
+      const collection = inventory.getCollection(name)
 
       if (!collection)
         throw new Error(`Invalid id, no collection exists named '${name}'.`)

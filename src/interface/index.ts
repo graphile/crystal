@@ -1,4 +1,4 @@
-import Catalog from './Catalog'
+import Inventory from './Inventory'
 import Relation from './Relation'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
@@ -20,7 +20,7 @@ import BasicObjectType from './type/object/BasicObjectType'
 import BasicObjectField from './type/object/BasicObjectField'
 
 export {
-  Catalog,
+  Inventory,
   Relation,
   Collection,
   CollectionKey,

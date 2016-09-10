@@ -1,5 +1,5 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
-import { Catalog } from '../../catalog'
+import { Inventory } from '../../interface'
 import buildObject from '../utils/buildObject'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
@@ -10,13 +10,13 @@ type Options = {
 }
 
 // TODO: doc
-export default function createSchema (catalog: Catalog, options: Options = {}): GraphQLSchema {
+export default function createSchema (inventory: Inventory, options: Options = {}): GraphQLSchema {
   // We take our user-friendly arguments to `createSchema` and convert them
   // into a context token. One nice side effect of always creating our own
   // context object is that we have the guarantee that every context object
   // will always maintain its own memoization map.
   const context: Context = {
-    catalog,
+    inventory,
     options: {
       // The default node id field name is `__id` as it is the emerging
       // standard.
@@ -31,7 +31,7 @@ export default function createSchema (catalog: Catalog, options: Options = {}): 
 
 // TODO: doc
 function createQueryType <T>(context: Context): GraphQLObjectType<T> {
-  const { catalog } = context
+  const { inventory } = context
   return new GraphQLObjectType({
     name: 'Query',
     // TODO: description
@@ -39,7 +39,7 @@ function createQueryType <T>(context: Context): GraphQLObjectType<T> {
       [
         createNodeFieldEntry(context),
       ],
-      catalog
+      inventory
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(context, collection))
         .reduce((a, b) => a.concat(b), []),

@@ -1,4 +1,4 @@
-import { Paginator } from '../../../catalog'
+import { Paginator } from '../../../interface'
 
 class MockPaginator extends Paginator {
   constructor () {
