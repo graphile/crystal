@@ -6,6 +6,7 @@ import {
   BasicObjectField,
 } from '../../../interface'
 
+import pluralize = require('pluralize')
 import DataLoader from 'dataloader'
 import { memoize, sql } from '../../utils'
 import { PGCatalog, PGClassObject, PGNamespaceObject, PGAttributeObject } from '../../introspection'
@@ -21,7 +22,7 @@ class PGCollection extends Collection<PGCollectionType.Value> {
     pgCatalog: PGCatalog,
     private _pgClass: PGClassObject,
   ) {
-    super(_pgClass.name, new PGCollectionType(pgCatalog, _pgClass))
+    super(pluralize(_pgClass.name), new PGCollectionType(pgCatalog, _pgClass))
     this._pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
     this._pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
     this._pgIdentifier = sql.identifier(this._pgNamespace.name, _pgClass.name)

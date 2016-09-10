@@ -27,12 +27,14 @@
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
     "graphql": ">=0.6.0 <1.0.0",
-    "pg": "^6.1.0"
+    "pg": "^6.1.0",
+    "pluralize": "^3.0.0"
   },
   "devDependencies": {
     "@types/change-case": "0.0.29",
     "@types/jest": "^0.9.30",
     "@types/node": "^6.0.38",
+    "@types/pluralize": "0.0.26",
     "jest": "^15.1.1",
     "source-map-support": "^0.4.2",
     "typescript": "^2.1.0-dev.20160903"
