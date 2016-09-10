@@ -9,7 +9,7 @@ namespace sql {
    */
   export type SQLItem =
     { type: 'RAW', text: string } |
-    { type: 'IDENTIFIER', names: string[] } |
+    { type: 'IDENTIFIER', names: Array<string> } |
     { type: 'VALUE_EAGER', value: mixed } |
     { type: 'VALUE_LAZY', name: string }
 
@@ -167,7 +167,7 @@ namespace sql {
 
     // Type cheats ahead! Making TypeScript compile here is more important then
     // making the code statically correct.
-    return (array as T[]).reduce<T[]>((currentArray, item) =>
+    return (array as Array<T>).reduce<Array<T>>((currentArray, item) =>
       Array.isArray(item)
         ? [...currentArray, ...flatten(item)]
         : [...currentArray, item]
