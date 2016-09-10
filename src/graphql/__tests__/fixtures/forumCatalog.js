@@ -1,4 +1,4 @@
-const {
+import {
   Catalog,
   CollectionKey,
   Relation,
@@ -9,14 +9,14 @@ const {
   EnumType,
   integerType,
   stringType,
-} = require('../')
+} from '../../../catalog'
 
-const MockCollection = require('./MockCollection')
-const MockPaginator = require('./MockPaginator')
+import MockCollection from './MockCollection'
+import MockPaginator from './MockPaginator'
 
 const catalog = new Catalog()
 
-module.exports = catalog
+export default catalog
 
 const emailType = new AliasType('email', stringType)
 

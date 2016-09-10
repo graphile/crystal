@@ -1,30 +1,29 @@
-import test from 'ava'
 import NamedType from '../NamedType'
 import AliasType from '../AliasType'
 
-test('is a named type', t => {
-  t.true(new AliasType() instanceof NamedType)
+test('is a named type', () => {
+  expect(new AliasType() instanceof NamedType).toBe(true)
 })
 
-test('getBaseType will return the base type', t => {
+test('getBaseType will return the base type', () => {
   const name = Symbol('name')
   const baseType = Symbol('baseType')
   const aliasType = new AliasType(name, baseType)
-  t.is(aliasType.getBaseType(), baseType)
+  expect(aliasType.getBaseType()).toBe(baseType)
 })
 
-test('isTypeOf will use the base type isTypeOf', t => {
+test('isTypeOf will use the base type isTypeOf', () => {
   const name = Symbol('name')
   const baseType = { isTypeOf: value => value === 5 }
   const aliasType = new AliasType(name, baseType)
-  t.false(aliasType.isTypeOf(-5))
-  t.false(aliasType.isTypeOf(6))
-  t.true(aliasType.isTypeOf(5))
-  t.false(aliasType.isTypeOf(undefined))
-  t.false(aliasType.isTypeOf(null))
-  t.false(aliasType.isTypeOf('a'))
-  t.false(aliasType.isTypeOf(true))
-  t.false(aliasType.isTypeOf({}))
-  t.false(aliasType.isTypeOf([]))
-  t.false(aliasType.isTypeOf(() => {}))
+  expect(aliasType.isTypeOf(-5)).toBe(false)
+  expect(aliasType.isTypeOf(6)).toBe(false)
+  expect(aliasType.isTypeOf(5)).toBe(true)
+  expect(aliasType.isTypeOf(undefined)).toBe(false)
+  expect(aliasType.isTypeOf(null)).toBe(false)
+  expect(aliasType.isTypeOf('a')).toBe(false)
+  expect(aliasType.isTypeOf(true)).toBe(false)
+  expect(aliasType.isTypeOf({})).toBe(false)
+  expect(aliasType.isTypeOf([])).toBe(false)
+  expect(aliasType.isTypeOf(() => {})).toBe(false)
 })

@@ -1,94 +1,92 @@
-import test from 'ava'
 import ObjectType from '../ObjectType'
 import BasicObjectType from '../BasicObjectType'
 
-function mockField (name, isTypeOf) {
-  return {
-    getName: () => name,
-    getType: () => ({ isTypeOf }),
-  }
-}
-
-test('is instanceof ObjectType', t => {
-  t.true(new BasicObjectType() instanceof ObjectType)
+const mockField = (name, isTypeOf) => ({
+  getName: () => name,
+  getType: () => ({ isTypeOf }),
 })
 
-test('isTypeOf will be false for non-objects', t => {
+test('is instanceof ObjectType', () => {
+  expect(new BasicObjectType() instanceof ObjectType).toBe(true)
+})
+
+test('isTypeOf will be false for non-objects', () => {
   const objectType = new BasicObjectType()
-  t.false(objectType.isTypeOf(undefined))
-  t.false(objectType.isTypeOf(null))
-  t.false(objectType.isTypeOf(true))
-  t.false(objectType.isTypeOf(false))
-  t.false(objectType.isTypeOf(42))
-  t.false(objectType.isTypeOf(3.14))
-  t.false(objectType.isTypeOf('hello'))
-  t.false(objectType.isTypeOf(() => {}))
+  expect(objectType.isTypeOf(undefined)).toBe(false)
+  expect(objectType.isTypeOf(null)).toBe(false)
+  expect(objectType.isTypeOf(true)).toBe(false)
+  expect(objectType.isTypeOf(false)).toBe(false)
+  expect(objectType.isTypeOf(42)).toBe(false)
+  expect(objectType.isTypeOf(3.14)).toBe(false)
+  expect(objectType.isTypeOf('hello')).toBe(false)
+  expect(objectType.isTypeOf(() => {})).toBe(false)
 })
 
-test('isTypeOf will return true for objects when there are no fields defined', t => {
+test('isTypeOf will return true for objects when there are no fields defined', () => {
   const objectType = new BasicObjectType()
-  t.true(objectType.isTypeOf({}))
-  t.true(objectType.isTypeOf({ a: 1, b: 2 }))
+  expect(objectType.isTypeOf({})).toBe(true)
+  expect(objectType.isTypeOf({ a: 1, b: 2 })).toBe(true)
 })
 
-test('isTypeOf will check isTypeOf for all fields', t => {
+test('isTypeOf will check isTypeOf for all fields', () => {
   const fieldA = mockField('a', value => value === 1)
   const fieldB = mockField('b', value => value === 2)
   const fieldC = mockField('c', value => value === 3)
   const objectType = new BasicObjectType()
   objectType.addField(fieldA).addField(fieldB)
-  t.true(objectType.isTypeOf({ a: 1, b: 2 }))
-  t.false(objectType.isTypeOf({ a: 2, b: 2 }))
-  t.false(objectType.isTypeOf({ a: 1, b: 1 }))
-  t.false(objectType.isTypeOf({ a: 3, b: 3 }))
+  expect(objectType.isTypeOf({ a: 1, b: 2 })).toBe(true)
+  expect(objectType.isTypeOf({ a: 2, b: 2 })).toBe(false)
+  expect(objectType.isTypeOf({ a: 1, b: 1 })).toBe(false)
+  expect(objectType.isTypeOf({ a: 3, b: 3 })).toBe(false)
   objectType.addField(fieldC)
-  t.false(objectType.isTypeOf({ a: 1, b: 2 }))
-  t.true(objectType.isTypeOf({ a: 1, b: 2, c: 3 }))
+  expect(objectType.isTypeOf({ a: 1, b: 2 })).toBe(false)
+  expect(objectType.isTypeOf({ a: 1, b: 2, c: 3 })).toBe(true)
+  expect(objectType.isTypeOf({ a: 3, b: 1, c: 2 })).toBe(false)
 })
 
-test('isTypeOf will ignore extraneous fields on the value', t => {
+test('isTypeOf will ignore extraneous fields on the value', () => {
   const fieldA = mockField('a', value => value === 1)
   const fieldB = mockField('b', value => value === 2)
   const objectType = new BasicObjectType()
   objectType.addField(fieldA).addField(fieldB)
-  t.true(objectType.isTypeOf({ a: 1, b: 2 }))
-  t.true(objectType.isTypeOf({ a: 1, b: 2, c: 3, d: 4 }))
+  expect(objectType.isTypeOf({ a: 1, b: 2 })).toBe(true)
+  expect(objectType.isTypeOf({ a: 1, b: 2, c: 3, d: 4 })).toBe(true)
 })
 
-test('createFromFieldValues will build an object from field entries', t => {
+test('createFromFieldValues will build an object from field entries', () => {
   const objectType = new BasicObjectType()
-  t.deepEqual(objectType.createFromFieldValues([['a', 1], ['b', 2], ['c', 3]]), { a: 1, b: 2, c: 3 })
-  t.deepEqual(objectType.createFromFieldValues([['a', 1], ['a', 2]]), { a: 2 })
+  expect(objectType.createFromFieldValues([['a', 1], ['b', 2], ['c', 3]])).toEqual({ a: 1, b: 2, c: 3 })
+  expect(objectType.createFromFieldValues([['a', 1], ['a', 2]])).toEqual({ a: 2 })
 })
 
-test('createFromFieldValues will fail if an isTypeOf is false', t => {
+test('createFromFieldValues will fail if an isTypeOf is false', () => {
   const fieldA = mockField('a', value => value === 1)
   const fieldB = mockField('b', value => value === 2)
   const objectType = new BasicObjectType()
-  t.deepEqual(objectType.createFromFieldValues([['a', 1], ['b', 1]]), { a: 1, b: 1 })
+  expect(objectType.createFromFieldValues([['a', 1], ['b', 1]])).toEqual({ a: 1, b: 1 })
   objectType.addField(fieldA).addField(fieldB)
-  t.throws(() => objectType.createFromFieldValues([['a', 1], ['b', 1]]))
-  t.deepEqual(objectType.createFromFieldValues([['a', 1], ['b', 2]]), { a: 1, b: 2 })
+  expect(() => objectType.createFromFieldValues([['a', 1], ['b', 1]])).toThrow()
+  expect(objectType.createFromFieldValues([['a', 1], ['b', 2]])).toEqual({ a: 1, b: 2 })
 })
 
-test('getFields will get fields added by addField', t => {
+test('getFields will get fields added by addField', () => {
   const objectType = new BasicObjectType()
   const fields = [
     mockField('a'),
     mockField('b'),
     mockField('c'),
   ]
-  t.deepEqual(objectType.getFields(), [])
+  expect(objectType.getFields()).toEqual([])
   objectType.addField(fields[0]).addField(fields[1])
-  t.deepEqual(objectType.getFields(), [fields[0], fields[1]])
+  expect(objectType.getFields()).toEqual([fields[0], fields[1]])
   objectType.addField(fields[2])
-  t.deepEqual(objectType.getFields(), fields)
+  expect(objectType.getFields()).toEqual(fields)
 })
 
-test('addField will not add two fields of the same name', t => {
+test('addField will not add two fields of the same name', () => {
   const objectType = new BasicObjectType()
   objectType.addField(mockField('a'))
-  t.throws(() => objectType.addField(mockField('a')))
+  expect(() => objectType.addField(mockField('a'))).toThrow()
   objectType.addField(mockField('b'))
-  t.throws(() => objectType.addField(mockField('c')).addField(mockField('c')))
+  expect(() => objectType.addField(mockField('c')).addField(mockField('c'))).toThrow()
 })

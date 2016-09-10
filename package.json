@@ -22,11 +22,7 @@
     "connection"
   ],
   "main": "index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "ava",
-    "test-watch": "ava -w"
-  },
+  "scripts": {},
   "dependencies": {
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
@@ -34,13 +30,27 @@
     "pg": "^6.1.0"
   },
   "devDependencies": {
-    "ava": "^0.15.2",
-    "ts-node": "^0.9.3",
+    "@types/change-case": "0.0.29",
+    "@types/jest": "^0.9.30",
+    "@types/node": "^6.0.38",
+    "jest": "^15.1.1",
+    "source-map-support": "^0.4.2",
     "typescript": "^2.1.0-dev.20160903"
   },
-  "ava": {
-    "files": ["**/__tests__/*-test.js"],
-    "source": ["**/*.ts"],
-    "require": ["ts-node/register"]
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/utils/jest-preprocessor.js",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/node_modules/source-map-support/register.js"
+    ],
+    "browser": false,
+    "testEnvironment": "node",
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
+    "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   }
 }

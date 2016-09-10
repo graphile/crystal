@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "rootDir": "src",
     "outDir": "build",
     "target": "es6",
@@ -14,8 +15,10 @@
     "noFallthroughCasesInSwitch": true
   },
   "exclude": [
+    "index.js",
     "node_modules",
-    "dist",
-    "examples"
+    "build",
+    "examples",
+    "utils"
   ]
 }

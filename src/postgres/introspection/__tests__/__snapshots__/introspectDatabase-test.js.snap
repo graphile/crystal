@@ -1,0 +1,415 @@
+exports[`test will get everything needed in an introspection 1`] = `
+Object {
+  "attributes": Array [
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "a",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "b",
+      "num": 2,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "c",
+      "num": 3,
+      "typeId": "color"
+    },
+    Object {
+      "classId": "no_update",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "?column?",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "person",
+      "description": "The person’s name",
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "name",
+      "num": 2,
+      "typeId": "varchar"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "about",
+      "num": 3,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "yo",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "__id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "yo",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "name",
+      "num": 2,
+      "typeId": "varchar"
+    },
+    Object {
+      "classId": "yo",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "description",
+      "num": 3,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "yo",
+      "description": "This is constantly 2",
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "constant",
+      "num": 4,
+      "typeId": "int4"
+    }
+  ],
+  "classes": Array [
+    Object {
+      "description": null,
+      "id": "compound_type",
+      "isDeletable": false,
+      "isInsertable": false,
+      "isSelectable": false,
+      "isUpdatable": false,
+      "kind": "class",
+      "name": "compound_type",
+      "namespaceId": "c",
+      "typeId": "compound_type"
+    },
+    Object {
+      "description": null,
+      "id": "no_update",
+      "isDeletable": false,
+      "isInsertable": false,
+      "isSelectable": true,
+      "isUpdatable": false,
+      "kind": "class",
+      "name": "no_update",
+      "namespaceId": "a",
+      "typeId": "no_update"
+    },
+    Object {
+      "description": "Person test comment",
+      "id": "person",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "person",
+      "namespaceId": "c",
+      "typeId": "person"
+    },
+    Object {
+      "description": "YOYOYO!!",
+      "id": "yo",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "yo",
+      "namespaceId": "b",
+      "typeId": "yo"
+    }
+  ],
+  "namespaces": Array [
+    Object {
+      "description": "The a schema.",
+      "id": "a",
+      "kind": "namespace",
+      "name": "a"
+    },
+    Object {
+      "description": "qwerty",
+      "id": "b",
+      "kind": "namespace",
+      "name": "b"
+    },
+    Object {
+      "description": null,
+      "id": "c",
+      "kind": "namespace",
+      "name": "c"
+    }
+  ],
+  "types": Array [
+    Object {
+      "baseTypeId": null,
+      "category": "E",
+      "classId": null,
+      "description": null,
+      "enumVariants": Array [
+        "red",
+        "green",
+        "blue"
+      ],
+      "id": "color",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "color",
+      "namespaceId": "b",
+      "type": "e"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "compound_type",
+      "description": "Awesome feature!",
+      "enumVariants": null,
+      "id": "compound_type",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "compound_type",
+      "namespaceId": "c",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "N",
+      "classId": null,
+      "description": "-2 billion to 2 billion integer, 4-byte storage",
+      "enumVariants": null,
+      "id": "int4",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "int4",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "no_update",
+      "description": null,
+      "enumVariants": null,
+      "id": "no_update",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "no_update",
+      "namespaceId": "a",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "person",
+      "description": null,
+      "enumVariants": null,
+      "id": "person",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "person",
+      "namespaceId": "c",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "S",
+      "classId": null,
+      "description": "variable-length string, no limit specified",
+      "enumVariants": null,
+      "id": "text",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "text",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "D",
+      "classId": null,
+      "description": "date and time with time zone",
+      "enumVariants": null,
+      "id": "timestamptz",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "timestamptz",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "S",
+      "classId": null,
+      "description": "varchar(length), non-blank-padded string, variable storage length",
+      "enumVariants": null,
+      "id": "varchar",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "varchar",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "yo",
+      "description": null,
+      "enumVariants": null,
+      "id": "yo",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "yo",
+      "namespaceId": "b",
+      "type": "c"
+    }
+  ]
+}
+`;
+
+exports[`test will get everything needed in an introspection 2`] = `
+Object {
+  "attributes": Array [
+    Object {
+      "classId": "no_update",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "?column?",
+      "num": 1,
+      "typeId": "int4"
+    }
+  ],
+  "classes": Array [
+    Object {
+      "description": null,
+      "id": "no_update",
+      "isDeletable": false,
+      "isInsertable": false,
+      "isSelectable": true,
+      "isUpdatable": false,
+      "kind": "class",
+      "name": "no_update",
+      "namespaceId": "a",
+      "typeId": "no_update"
+    }
+  ],
+  "namespaces": Array [
+    Object {
+      "description": "The a schema.",
+      "id": "a",
+      "kind": "namespace",
+      "name": "a"
+    }
+  ],
+  "types": Array [
+    Object {
+      "baseTypeId": null,
+      "category": "N",
+      "classId": null,
+      "description": "-2 billion to 2 billion integer, 4-byte storage",
+      "enumVariants": null,
+      "id": "int4",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "int4",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "no_update",
+      "description": null,
+      "enumVariants": null,
+      "id": "no_update",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "no_update",
+      "namespaceId": "a",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "D",
+      "classId": null,
+      "description": "date and time with time zone",
+      "enumVariants": null,
+      "id": "timestamptz",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "timestamptz",
+      "namespaceId": "external",
+      "type": "b"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "S",
+      "classId": null,
+      "description": "varchar(length), non-blank-padded string, variable storage length",
+      "enumVariants": null,
+      "id": "varchar",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "varchar",
+      "namespaceId": "external",
+      "type": "b"
+    }
+  ]
+}
+`;

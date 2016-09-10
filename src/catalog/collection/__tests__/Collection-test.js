@@ -1,34 +1,33 @@
-import test from 'ava'
 import Collection from '../Collection'
 
-test('getName will return the name', t => {
+test('getName will return the name', () => {
   const name = Symbol('name')
   const type = Symbol('type')
   const collection = new Collection(name, type)
-  t.is(collection.getName(), name)
+  expect(collection.getName()).toBe(name)
 })
 
-test('getType will return the type', t => {
+test('getType will return the type', () => {
   const name = Symbol('name')
   const type = Symbol('type')
   const collection = new Collection(name, type)
-  t.is(collection.getType(), type)
+  expect(collection.getType()).toBe(type)
 })
 
-test('setDescription will set the description', t => {
+test('setDescription will set the description', () => {
   const description = Symbol('description')
   const collection = new Collection()
-  t.is(collection.getDescription(), undefined)
+  expect(collection.getDescription()).toBe(undefined)
   collection.setDescription(description)
-  t.is(collection.getDescription(), description)
+  expect(collection.getDescription()).toBe(description)
 })
 
-test('getKeys returns an empty list by default', t => {
+test('getKeys returns an empty list by default', () => {
   const collection = new Collection()
-  t.deepEqual(collection.getKeys(), [])
+  expect(collection.getKeys()).toEqual([])
 })
 
-test('getPrimaryKey returns undefined by default', t => {
+test('getPrimaryKey returns undefined by default', () => {
   const collection = new Collection()
-  t.is(collection.getPrimaryKey(), undefined)
+  expect(collection.getPrimaryKey()).toBe(undefined)
 })

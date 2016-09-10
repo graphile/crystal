@@ -1,38 +1,37 @@
-import test from 'ava'
 import Relation from '../Relation'
 
-test('getName will get the relation’s name', t => {
+test('getName will get the relation’s name', () => {
   const name = Symbol('name')
   const tailCollection = Symbol('tailCollection')
   const headCollectionKey = Symbol('headCollectionKey')
   const tailPaginator = Symbol('tailPaginator')
   const relation = new Relation(name, tailCollection, headCollectionKey, tailPaginator)
-  t.is(relation.getName(), name)
+  expect(relation.getName()).toBe(name)
 })
 
-test('getTailCollection will return the tail collection', t => {
+test('getTailCollection will return the tail collection', () => {
   const name = Symbol('name')
   const tailCollection = Symbol('tailCollection')
   const headCollectionKey = Symbol('headCollectionKey')
   const tailPaginator = Symbol('tailPaginator')
   const relation = new Relation(name, tailCollection, headCollectionKey, tailPaginator)
-  t.is(relation.getTailCollection(), tailCollection)
+  expect(relation.getTailCollection()).toBe(tailCollection)
 })
 
-test('getHeadCollectionKey will return the head collection key', t => {
+test('getHeadCollectionKey will return the head collection key', () => {
   const name = Symbol('name')
   const tailCollection = Symbol('tailCollection')
   const headCollectionKey = Symbol('headCollectionKey')
   const tailPaginator = Symbol('tailPaginator')
   const relation = new Relation(name, tailCollection, headCollectionKey, tailPaginator)
-  t.is(relation.getHeadCollectionKey(), headCollectionKey)
+  expect(relation.getHeadCollectionKey()).toBe(headCollectionKey)
 })
 
-test('getTailPaginator will return the passed paginator', t => {
+test('getTailPaginator will return the passed paginator', () => {
   const name = Symbol('name')
   const tailCollection = Symbol('tailCollection')
   const headCollectionKey = Symbol('headCollectionKey')
   const tailPaginator = Symbol('tailPaginator')
   const relation = new Relation(name, tailCollection, headCollectionKey, tailPaginator)
-  t.is(relation.getTailPaginator(), tailPaginator)
+  expect(relation.getTailPaginator()).toBe(tailPaginator)
 })

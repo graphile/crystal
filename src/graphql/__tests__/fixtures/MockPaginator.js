@@ -1,4 +1,4 @@
-const { Paginator } = require('../')
+import { Paginator } from '../../../catalog'
 
 class MockPaginator extends Paginator {
   constructor () {
@@ -30,4 +30,4 @@ class MockPaginator extends Paginator {
   }
 }
 
-module.exports = MockPaginator
+export default MockPaginator

@@ -5,3 +5,5 @@ TODO.md
 .vscode
 src
 typings
+**/__tests__
+**/__mocks__

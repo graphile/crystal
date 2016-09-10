@@ -1,24 +1,23 @@
-import test from 'ava'
 import CollectionKey from '../CollectionKey'
 
-test('getName will get the key name', t => {
+test('getName will get the key name', () => {
   const name = Symbol('name')
   const collection = Symbol('collection')
   const collectionKey = new CollectionKey(collection, name)
-  t.is(collectionKey.getName(), name)
+  expect(collectionKey.getName()).toBe(name)
 })
 
-test('getCollection will get the key collection', t => {
+test('getCollection will get the key collection', () => {
   const name = Symbol('name')
   const collection = Symbol('collection')
   const collectionKey = new CollectionKey(collection, name)
-  t.is(collectionKey.getCollection(), collection)
+  expect(collectionKey.getCollection()).toBe(collection)
 })
 
-test('setDescription will set the description', t => {
+test('setDescription will set the description', () => {
   const description = Symbol('description')
   const collectionKey = new CollectionKey()
-  t.is(collectionKey.getDescription(), undefined)
+  expect(collectionKey.getDescription()).toBe(undefined)
   collectionKey.setDescription(description)
-  t.is(collectionKey.getDescription(), description)
+  expect(collectionKey.getDescription()).toBe(description)
 })

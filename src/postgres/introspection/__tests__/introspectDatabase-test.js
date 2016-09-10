@@ -1,182 +1,99 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import test from 'ava'
-import pg from 'pg'
-import testConnection from '../../__tests__/fixtures/testConnection'
+import { Client } from 'pg'
 import PGCatalog from '../PGCatalog'
 import introspectDatabase from '../introspectDatabase'
 
-const testSchema = readFileSync(resolve(__dirname, 'fixtures/test-schema.sql')).toString()
-const namespaceNames = ['a', 'b', 'c']
+const testSchema = readFileSync(resolve(__dirname, 'fixtures/kitchen-sink-schema.sql')).toString()
 
 /**
- * @type {PGCatalog}
+ * Gets a local identifier that is independent of the object id assigned by
+ * PostgreSQL which will be consistent across tests.
+ *
+ * Just a concatenation of the PostgreSQL object’s kind and name. For
+ * attributes we also include the number.
  */
-let catalog
+const getLocalId = pgObject => {
+  if (pgObject.kind === 'attribute')
+    return `${pgObject.kind}-${pgObject.name}-${pgObject.num}`
 
-test.before(async () => {
-  const client = await pg.connect(testConnection)
+  return `${pgObject.kind}-${pgObject.name}`
+}
+
+/**
+ * A utility for the following `format` function that creates a helper to
+ * replace certain properties with their local id equivalents (see
+ * `getLocalId` above).
+ */
+const withLocalIds = properties => pgObject => {
+  const pgObjectLocalIds = {}
+
+  for (const property of properties)
+    if (pgObject[property] != null)
+      pgObjectLocalIds[property] = getLocalId(pgObject)
+
+  return Object.assign({}, pgObject, pgObjectLocalIds)
+}
+
+/**
+ * A utility function to help sort arrays. Almost identical to the Lodash
+ * `_.sortBy` function.
+ */
+const sortBy = getKey => (a, b) => {
+  const aKey = getKey(a)
+  const bKey = getKey(b)
+  if (aKey > bKey) return 1
+  if (aKey < bKey) return -1
+  return 0
+}
+
+/**
+ * Formats a `PGCatalog` object into a form that is easily snapshotable by
+ * Jest. This gives us all the benefits of snapshot testing.
+ */
+const format = catalog => ({
+  namespaces: Array.from(catalog._namespaces.values())
+    .map(namespace => Object.assign({}, namespace, {
+      id: namespace.name,
+    }))
+    .sort(sortBy(({ id }) => id)),
+
+  classes: Array.from(catalog._classes.values())
+    .map(klass => Object.assign({}, klass, {
+      id: klass.name,
+      namespaceId: catalog.getNamespace(klass.namespaceId).name,
+      typeId: catalog.getType(klass.typeId).name,
+    }))
+    .sort(sortBy(({ id }) => id)),
+
+  attributes: Array.from(catalog._attributes.values())
+    .map(attribute => Object.assign({}, attribute, {
+      classId: catalog.getClass(attribute.classId).name,
+      typeId: catalog.getType(attribute.typeId).name,
+    }))
+    .sort(sortBy(({ classId, num }) => `${classId}-${num}`)),
+
+  types: Array.from(catalog._types.values())
+    .map(type => Object.assign({}, type, {
+      id: type.name,
+      namespaceId: catalog.getNamespace(type.namespaceId) ? catalog.getNamespace(type.namespaceId).name : 'external',
+      classId: type.classId ? catalog.getClass(type.classId).name : null,
+      baseTypeId: type.baseTypeId ? catalog.getType(type.baseTypeId) : null,
+    }))
+    .sort(sortBy(({ id }) => id)),
+})
+
+test('will get everything needed in an introspection', async () => {
+  const client = new Client({
+    database: 'postgraphql_test',
+    port: 5432,
+  })
+
+  await client.connect()
   await client.query(testSchema)
-  catalog = await introspectDatabase(client, namespaceNames)
+
+  expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
+  expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
+
   client.end()
 })
-
-const getNamespace = n =>
-  catalog.getNamespaces().find(({ name }) => name === n)
-
-const getClass = (n, c) =>
-  catalog
-    .getClasses()
-    .find(({ name, namespaceId }) =>
-      catalog.getNamespace(namespaceId).name === n &&
-      name === c
-    )
-
-const getAttribute = (n, c, a) =>
-  catalog
-    .getClassAttributes(getClass(n, c).id)
-    .find(({ name }) => name === a)
-
-const getType = (n, t) =>
-  catalog
-    .getClasses()
-    .find(({ name, namespaceId }) =>
-      catalog.getNamespace(namespaceId).name === n &&
-      name === c
-    )
-
-test('will only get objects for the namespaces specified', t => {
-  t.deepEqual(
-    catalog.getNamespaces().map(({ name }) => name),
-    ['a', 'b', 'c'],
-  )
-})
-
-test('will get the descriptions of namespaces', t => {
-  t.is(getNamespace('a').description, 'The a schema.')
-  t.is(getNamespace('b').description, 'qwerty')
-  t.falsy(getNamespace('c').description)
-})
-
-test('will only get classes that are in our selected namespaces', t => {
-  const namespaceIds = catalog.getNamespaces().map(({ id }) => id)
-
-  for (const clazz of catalog.getClasses())
-    t.not(namespaceIds.indexOf(clazz.namespaceId), -1)
-})
-
-test('will get tables', t => {
-  t.truthy(getClass('c', 'person'))
-})
-
-test('will get comments on a table', t => {
-  t.is(getClass('c', 'person').description, 'Person test comment')
-})
-
-test('will get columns', t => {
-  t.truthy(getAttribute('c', 'person', 'id'))
-  t.truthy(getAttribute('c', 'person', 'name'))
-  t.truthy(getAttribute('c', 'person', 'about'))
-})
-
-test('will get descriptions for columns', t => {
-  t.falsy(getAttribute('c', 'person', 'id').description)
-  t.is(getAttribute('c', 'person', 'name').description, 'The person’s name')
-  t.falsy(getAttribute('c', 'person', 'about').description)
-})
-
-test('will understand if an column is not null', t => {
-  t.true(getAttribute('c', 'person', 'id').isNotNull)
-  t.true(getAttribute('c', 'person', 'name').isNotNull)
-  t.false(getAttribute('c', 'person', 'about').isNotNull)
-})
-
-test('will get the number of an attribute', t => {
-  t.is(getAttribute('c', 'person', 'id').num, 1)
-  t.is(getAttribute('c', 'person', 'name').num, 2)
-  t.is(getAttribute('c', 'person', 'about').num, 3)
-})
-
-test('will get compound types', t => {
-  t.truthy(getClass('c', 'compound_type'))
-})
-
-test('will get comments on a compound type', t => {
-  t.is(catalog.getType(getClass('c', 'compound_type').typeId).description, 'Awesome feature!')
-})
-
-test('will get attributes of a compound type', t => {
-  t.truthy(getAttribute('c', 'compound_type', 'a'))
-  t.truthy(getAttribute('c', 'compound_type', 'b'))
-  t.truthy(getAttribute('c', 'compound_type', 'c'))
-})
-
-test('will get views', t => {
-  t.truthy(getClass('b', 'yo'))
-  t.truthy(getClass('a', 'no_update'))
-})
-
-test('will get comments on views', t => {
-  t.is(getClass('b', 'yo').description, 'YOYOYO!!')
-})
-
-test('will get columns of a view', t => {
-  t.truthy(getAttribute('b', 'yo', '__id'))
-  t.truthy(getAttribute('b', 'yo', 'name'))
-  t.truthy(getAttribute('b', 'yo', 'description'))
-  t.truthy(getAttribute('b', 'yo', 'constant'))
-})
-
-test('will get comments on view columns', t => {
-  t.is(getAttribute('b', 'yo', 'constant').description, 'This is constantly 2')
-})
-
-test('will get CRUDibility of tables', t => {
-  const clazz = getClass('c', 'person')
-  t.true(clazz.isSelectable)
-  t.true(clazz.isInsertable)
-  t.true(clazz.isUpdatable)
-  t.true(clazz.isDeletable)
-})
-
-test('will get CRUDibility of compound keys', t => {
-  const clazz = getClass('c', 'compound_type')
-  t.false(clazz.isSelectable)
-  t.false(clazz.isInsertable)
-  t.false(clazz.isUpdatable)
-  t.false(clazz.isDeletable)
-})
-
-test('will get CRUDibility of auto updatable views', t => {
-  const clazz = getClass('b', 'yo')
-  t.true(clazz.isSelectable)
-  t.true(clazz.isInsertable)
-  t.true(clazz.isUpdatable)
-  t.true(clazz.isDeletable)
-})
-
-test('will get CRUDibility of non-updatable views', t => {
-  const clazz = getClass('a', 'no_update')
-  t.true(clazz.isSelectable)
-  t.false(clazz.isInsertable)
-  t.false(clazz.isUpdatable)
-  t.false(clazz.isDeletable)
-})
-
-test('will get types for classes', t => {
-  for (const clazz of catalog.getClasses()) {
-    const type = catalog.getType(clazz.typeId)
-    t.truthy(type)
-    t.is(clazz.name, type.name)
-    t.is(type.classId, clazz.id)
-  }
-})
-
-test('will get types for attributes', t => {
-  for (const attribute of catalog.getAttributes()) {
-    const type = catalog.getType(attribute.typeId)
-    t.truthy(type)
-  }
-})
-
-// TODO: Needs tests for `PGType`

@@ -1,5 +1,5 @@
 import { Condition } from '../../catalog'
-import * as sql from '../utils/sql'
+import { sql } from '../utils'
 
 /**
  * Converts a `Condition` object into a SQL query.

@@ -1,27 +1,26 @@
-import test from 'ava'
 import ListType from '../ListType'
 
-test('getItemType will return the item type', t => {
+test('getItemType will return the item type', () => {
   const itemType = Symbol('itemType')
   const listType = new ListType(itemType)
-  t.is(listType.getItemType(), itemType)
+  expect(listType.getItemType()).toBe(itemType)
 })
 
-test('isTypeOf will be true for empty arrays', t => {
+test('isTypeOf will be true for empty arrays', () => {
   const itemType = { isTypeOf: () => false }
   const listType = new ListType(itemType)
-  t.true(listType.isTypeOf([]))
+  expect(listType.isTypeOf([])).toBe(true)
 })
 
-test('isTypeOf will only be true if all items in an array pass the item isTypeOf', t => {
+test('isTypeOf will only be true if all items in an array pass the item isTypeOf', () => {
   const itemType = { isTypeOf: value => value === 5 }
   const listType = new ListType(itemType)
-  t.true(itemType.isTypeOf(5))
-  t.false(itemType.isTypeOf(6))
-  t.false(listType.isTypeOf([1, 2, 3, 5]))
-  t.false(listType.isTypeOf([5, 6, 5]))
-  t.true(listType.isTypeOf([5, 5, 5]))
-  t.true(listType.isTypeOf([5]))
-  t.false(listType.isTypeOf([1]))
-  t.true(listType.isTypeOf(Array(100).fill(5)))
+  expect(itemType.isTypeOf(5)).toBe(true)
+  expect(itemType.isTypeOf(6)).toBe(false)
+  expect(listType.isTypeOf([1, 2, 3, 5])).toBe(false)
+  expect(listType.isTypeOf([5, 6, 5])).toBe(false)
+  expect(listType.isTypeOf([5, 5, 5])).toBe(true)
+  expect(listType.isTypeOf([5])).toBe(true)
+  expect(listType.isTypeOf([1])).toBe(false)
+  expect(listType.isTypeOf(Array(100).fill(5))).toBe(true)
 })

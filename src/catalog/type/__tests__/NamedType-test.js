@@ -1,16 +1,15 @@
-import test from 'ava'
 import NamedType from '../NamedType'
 
-test('getName will return the name', t => {
+test('getName will return the name', () => {
   const name = Symbol('name')
   const namedType = new NamedType(name)
-  t.is(namedType.getName(), name)
+  expect(namedType.getName()).toBe(name)
 })
 
-test('setDescription will set the description', t => {
+test('setDescription will set the description', () => {
   const description = Symbol('description')
   const namedType = new NamedType()
-  t.is(namedType.getDescription(), undefined)
+  expect(namedType.getDescription()).toBe(undefined)
   namedType.setDescription(description)
-  t.is(namedType.getDescription(), description)
+  expect(namedType.getDescription()).toBe(description)
 })

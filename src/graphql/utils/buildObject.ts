@@ -30,7 +30,7 @@
  * ```
  */
 export default function buildObject <T>(
-  ...entriess: Array<Array<[string, T] | undefined>>
+  ...entriess: Array<Array<[string, T] | undefined | false>>
 ): { [key: string]: T } {
   const object = {}
 

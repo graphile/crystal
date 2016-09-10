@@ -1,4 +1,3 @@
-import test from 'ava'
 import PGCatalog from '../PGCatalog'
 
 const mockNamespaces = [
@@ -38,85 +37,85 @@ const mockObjects = [
 
 const catalog = new PGCatalog(mockObjects)
 
-test('will fail if there is an unrecognized object kind', t => {
-  t.throws(() => new PGCatalog([{ kind: 'yo' }]))
+test('will fail if there is an unrecognized object kind', () => {
+  expect(() => new PGCatalog([{ kind: 'yo' }])).toThrow()
 })
 
-test('getNamespaces will get all of the namespaces', t => {
-  t.deepEqual(catalog.getNamespaces(), mockNamespaces)
+test('getNamespaces will get all of the namespaces', () => {
+  expect(catalog.getNamespaces()).toEqual(mockNamespaces)
 })
 
-test('getNamespace will get a single namespace', t => {
-  t.is(catalog.getNamespace('0'), mockNamespaces[0])
-  t.is(catalog.getNamespace('1'), mockNamespaces[1])
-  t.is(catalog.getNamespace('2'), undefined)
+test('getNamespace will get a single namespace', () => {
+  expect(catalog.getNamespace('0')).toEqual(mockNamespaces[0])
+  expect(catalog.getNamespace('1')).toEqual(mockNamespaces[1])
+  expect(catalog.getNamespace('2')).toEqual(undefined)
 })
 
-test('assertGetNamespace will get a single namespace or fail', t => {
-  t.is(catalog.assertGetNamespace('0'), mockNamespaces[0])
-  t.is(catalog.assertGetNamespace('1'), mockNamespaces[1])
-  t.throws(() => catalog.assertGetNamespace('2'))
+test('assertGetNamespace will get a single namespace or fail', () => {
+  expect(catalog.assertGetNamespace('0')).toEqual(mockNamespaces[0])
+  expect(catalog.assertGetNamespace('1')).toEqual(mockNamespaces[1])
+  expect(() => catalog.assertGetNamespace('2')).toThrow()
 })
 
-test('getClasses will get all of the classes', t => {
-  t.deepEqual(catalog.getClasses(), mockClasses)
+test('getClasses will get all of the classes', () => {
+  expect(catalog.getClasses()).toEqual(mockClasses)
 })
 
-test('getClass will get a single class', t => {
-  t.is(catalog.getClass('1'), undefined)
-  t.is(catalog.getClass('2'), mockClasses[0])
-  t.is(catalog.getClass('3'), mockClasses[1])
-  t.is(catalog.getClass('4'), mockClasses[2])
+test('getClass will get a single class', () => {
+  expect(catalog.getClass('1')).toBe(undefined)
+  expect(catalog.getClass('2')).toBe(mockClasses[0])
+  expect(catalog.getClass('3')).toBe(mockClasses[1])
+  expect(catalog.getClass('4')).toBe(mockClasses[2])
 })
 
-test('assertGetClass will get a single class or fail', t => {
-  t.throws(() => catalog.assertGetClass('1'))
-  t.is(catalog.assertGetClass('2'), mockClasses[0])
-  t.is(catalog.assertGetClass('3'), mockClasses[1])
-  t.is(catalog.assertGetClass('4'), mockClasses[2])
+test('assertGetClass will get a single class or fail', () => {
+  expect(() => catalog.assertGetClass('1')).toThrow()
+  expect(catalog.assertGetClass('2')).toBe(mockClasses[0])
+  expect(catalog.assertGetClass('3')).toBe(mockClasses[1])
+  expect(catalog.assertGetClass('4')).toBe(mockClasses[2])
 })
 
-test('getAttributes will get all of the attributes', t => {
-  t.deepEqual(catalog.getAttributes(), mockAttributes)
+test('getAttributes will get all of the attributes', () => {
+  expect(catalog.getAttributes()).toEqual(mockAttributes)
 })
 
-test('getAttribute will get a single attribute', t => {
-  t.is(catalog.getAttribute('0', '0'), undefined)
-  t.is(catalog.getAttribute('2', '0'), mockAttributes[0])
-  t.is(catalog.getAttribute('2', '1'), mockAttributes[1])
-  t.is(catalog.getAttribute('2', '2'), mockAttributes[2])
-  t.is(catalog.getAttribute('2', '3'), undefined)
-  t.is(catalog.getAttribute('3', '0'), mockAttributes[3])
+test('getAttribute will get a single attribute', () => {
+  expect(catalog.getAttribute('0', '0')).toBe(undefined)
+  expect(catalog.getAttribute('2', '0')).toBe(mockAttributes[0])
+  expect(catalog.getAttribute('2', '1')).toBe(mockAttributes[1])
+  expect(catalog.getAttribute('2', '2')).toBe(mockAttributes[2])
+  expect(catalog.getAttribute('2', '3')).toBe(undefined)
+  expect(catalog.getAttribute('3', '0')).toBe(mockAttributes[3])
 })
 
-test('getClassAttributes will get all the attributes for a class', t => {
-  t.deepEqual(catalog.getClassAttributes('0'), [])
-  t.deepEqual(catalog.getClassAttributes('2'), [mockAttributes[0], mockAttributes[1], mockAttributes[2]])
-  t.deepEqual(catalog.getClassAttributes('3'), [mockAttributes[3]])
-  t.deepEqual(catalog.getClassAttributes('4'), [mockAttributes[4], mockAttributes[5]])
+test('getClassAttributes will get all the attributes for a class', () => {
+  expect(catalog.getClassAttributes('0')).toEqual([])
+  expect(catalog.getClassAttributes('2')).toEqual([mockAttributes[0], mockAttributes[1], mockAttributes[2]])
+  expect(catalog.getClassAttributes('3')).toEqual([mockAttributes[3]])
+  expect(catalog.getClassAttributes('4')).toEqual([mockAttributes[4], mockAttributes[5]])
 })
 
-test('getTypes will get all of the types', t => {
-  t.deepEqual(catalog.getTypes(), mockTypes)
+test('getTypes will get all of the types', () => {
+  expect(catalog.getTypes()).toEqual(mockTypes)
 })
 
-test('getType will get a single type', t => {
-  t.is(catalog.getType('4'), undefined)
-  t.is(catalog.getType('5'), mockTypes[0])
-  t.is(catalog.getType('6'), mockTypes[1])
-  t.is(catalog.getType('7'), mockTypes[2])
+test('getType will get a single type', () => {
+  expect(catalog.getType('4')).toBe(undefined)
+  expect(catalog.getType('5')).toBe(mockTypes[0])
+  expect(catalog.getType('6')).toBe(mockTypes[1])
+  expect(catalog.getType('7')).toBe(mockTypes[2])
 })
 
-test('hasType will detect if a specific type exists', t => {
-  t.true(catalog.hasType(mockTypes[0]))
-  t.true(catalog.hasType(mockTypes[1]))
-  t.true(catalog.hasType(mockTypes[2]))
-  t.false(catalog.hasType({ kind: 'type', id: '5' }))
+test('hasType will detect if a specific type exists', () => {
+  expect(catalog.hasType(mockTypes[0])).toBe(true)
+  expect(catalog.hasType(mockTypes[1])).toBe(true)
+  expect(catalog.hasType(mockTypes[2])).toBe(true)
+  expect(catalog.hasType(Object.assign({}, mockTypes[0]))).toBe(false)
 })
 
-test('assertGetType will get a single type or throw an error', t => {
-  t.throws(() => catalog.assertGetType('4'))
-  t.is(catalog.assertGetType('5'), mockTypes[0])
-  t.is(catalog.assertGetType('6'), mockTypes[1])
-  t.is(catalog.assertGetType('7'), mockTypes[2])
+test('assertGetType will get a single type or throw an error', () => {
+  expect(() => catalog.assertGetType('4')).toThrow()
+  expect(catalog.assertGetType('5')).toBe(mockTypes[0])
+  expect(catalog.assertGetType('6')).toBe(mockTypes[1])
+  expect(catalog.assertGetType('7')).toBe(mockTypes[2])
 })

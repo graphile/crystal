@@ -47,7 +47,9 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
     type: getConnectionType(context, paginator),
     // TODO: description
     args: buildObject<GraphQLArgumentConfig<mixed>>([
-      ['orderBy', {
+      // Only include an `orderBy` field if there are ways in which we can
+      // order.
+      paginator.getOrderings().length > 0 && ['orderBy', {
         type: getOrderByEnumType(context, paginator),
         defaultValue: paginator.getDefaultOrdering(),
         // TODO: description
@@ -138,12 +140,12 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
   }
 }
 
-const getConnectionType = memoize2(createConnectionType)
+const getConnectionType = memoize2(_createConnectionType)
 
 /**
  * Creates a concrete GraphQL connection object type.
  */
-function createConnectionType <TValue, TCursor>(
+export function _createConnectionType <TValue, TCursor>(
   context: Context,
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Connection<TValue, TCursor>> {
@@ -153,7 +155,7 @@ function createConnectionType <TValue, TCursor>(
   return new GraphQLObjectType<Connection<TValue, TCursor>>({
     name: formatName.type(`${paginator.getName()}-connection`),
     // TODO: description
-    fields: {
+    fields: () => ({
       pageInfo: {
         type: new GraphQLNonNull(_pageInfoType),
         resolve: source => source,
@@ -176,7 +178,7 @@ function createConnectionType <TValue, TCursor>(
           page.values.map(({ value }) => value),
         // TODO: description
       },
-    },
+    }),
   })
 }
 
@@ -194,7 +196,7 @@ export function _createEdgeType <TValue, TCursor>(
   return new GraphQLObjectType<Edge<TValue, TCursor>>({
     name: formatName.type(`${paginator.getName()}-edge`),
     // TODO: description
-    fields: {
+    fields: () => ({
       cursor: {
         type: new GraphQLNonNull(_cursorType),
         resolve: ({ paginator, ordering, cursor }): NamespacedCursor<TCursor> => ({
@@ -209,17 +211,17 @@ export function _createEdgeType <TValue, TCursor>(
         resolve: ({ value }) => value,
         // TODO: description
       },
-    },
+    }),
   })
 }
 
-const getOrderByEnumType = memoize2(createOrderByEnumType)
+const getOrderByEnumType = memoize2(_createOrderByEnumType)
 
 /**
  * Creates a GraphQL type which can be used by the user to select an ordering
  * strategy.
  */
-function createOrderByEnumType <TValue, TCursor>(
+export function _createOrderByEnumType <TValue, TCursor>(
   context: Context,
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLEnumType<Paginator.Ordering> {

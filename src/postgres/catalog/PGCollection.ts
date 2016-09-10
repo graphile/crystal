@@ -8,8 +8,7 @@ import {
 
 import { Client } from 'pg'
 import DataLoader from 'dataloader'
-import memoize from '../utils/memoize'
-import * as sql from '../utils/sql'
+import { memoize, sql } from '../utils'
 import PGCatalog from '../introspection/PGCatalog'
 import PGClass from '../introspection/object/PGClass'
 import PGNamespace from '../introspection/object/PGNamespace'

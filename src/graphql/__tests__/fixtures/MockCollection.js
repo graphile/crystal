@@ -1,4 +1,4 @@
-const { Collection } = require('../')
+import { Collection } from '../../../catalog'
 
 class MockCollection extends Collection {
   constructor () {
@@ -48,4 +48,4 @@ class MockCollection extends Collection {
   }
 }
 
-module.exports = MockCollection
+export default MockCollection

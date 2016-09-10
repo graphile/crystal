@@ -40,11 +40,11 @@ import { buildObject, formatName } from '../../utils'
 import getCollectionType from '../collection/getCollectionType'
 import Context from '../Context'
 
-type CacheLv1 = WeakMap<Context, CacheLv2>
-type CacheLv2 = WeakMap<Type<mixed>, CacheLv3>
-type CacheLv3 = { input?: GraphQLInputType<mixed>, output?: GraphQLOutputType<mixed> }
-
-const cacheLv1: CacheLv1 = new WeakMap()
+// TODO: doc
+const cache = new WeakMap<Context, {
+  inputCache: WeakMap<Type<mixed>, GraphQLInputType<mixed>>,
+  outputCache: WeakMap<Type<mixed>, GraphQLOutputType<mixed>>,
+}>()
 
 // TODO: doc
 // Instead of using our utility memoization function, we implement our own
@@ -53,21 +53,24 @@ const cacheLv1: CacheLv1 = new WeakMap()
 function getType (context: Context, type: Type<mixed>, input: true): GraphQLInputType<mixed>
 function getType (context: Context, type: Type<mixed>, input: false): GraphQLOutputType<mixed>
 function getType (context: Context, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
-  if (!cacheLv1.get(context))
-    cacheLv1.set(context, new WeakMap())
+  if (!cache.get(context))
+    cache.set(context, { inputCache: new WeakMap(), outputCache: new WeakMap() })
 
-  const cacheLv2: CacheLv2 = cacheLv1.get(context)!
+  const { inputCache, outputCache } = cache.get(context)!
 
-  if (!cacheLv2.get(type)) {
-    const cacheLv3: CacheLv3 = {}
-    cacheLv2.set(type, cacheLv3)
-    const gqlType = createType(context, type, input)
-
-    if (isInputType(gqlType)) cacheLv3.input = gqlType
-    if (isOutputType(gqlType)) cacheLv3.output = gqlType
+  if (input === true && !inputCache.has(type)) {
+    const gqlType = createType(context, type, true)
+    if (isInputType(gqlType)) inputCache.set(type, gqlType)
+    if (isOutputType(gqlType)) outputCache.set(type, gqlType)
   }
 
-  return input ? cacheLv2.get(type)!.input! : cacheLv2.get(type)!.output!
+  if (input === false && !outputCache.has(type)) {
+    const gqlType = createType(context, type, false)
+    if (isInputType(gqlType)) inputCache.set(type, gqlType)
+    if (isOutputType(gqlType)) outputCache.set(type, gqlType)
+  }
+
+  return input ? inputCache.get(type)! : outputCache.get(type)!
 }
 
 export default getType

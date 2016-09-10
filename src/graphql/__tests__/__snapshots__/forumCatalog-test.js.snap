@@ -1,4 +1,5 @@
-schema {
+exports[`test will generate the correct schema 1`] = `
+"schema {
   query: Query
 }
 
@@ -99,3 +100,5 @@ type Query {
   post(__id: ID!): Post
   postById(id: Int!): Post
 }
+"
+`;
