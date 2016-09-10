@@ -20,6 +20,8 @@ test('forum example', async () => {
   const inventory = createInventory(catalog)
   const schema = createSchema(inventory)
 
+  await client.query('drop schema if exists forum_example, forum_example_utils cascade;')
+
   expect(printSchema(schema)).toMatchSnapshot()
 
   client.end()

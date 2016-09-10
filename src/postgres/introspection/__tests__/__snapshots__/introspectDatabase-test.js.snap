@@ -384,20 +384,6 @@ Object {
     },
     Object {
       "baseTypeId": null,
-      "category": "S",
-      "classId": null,
-      "description": "variable-length string, no limit specified",
-      "enumVariants": null,
-      "id": "text",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "text",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
       "category": "D",
       "classId": null,
       "description": "date and time with time zone",
