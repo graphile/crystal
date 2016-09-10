@@ -3,7 +3,7 @@ import { Inventory } from '../../interface'
 import buildObject from '../utils/buildObject'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
-import Context from './Context'
+import BuildToken from './BuildToken'
 
 type Options = {
   nodeIdFieldName?: string,
@@ -15,7 +15,7 @@ export default function createSchema (inventory: Inventory, options: Options = {
   // into a context token. One nice side effect of always creating our own
   // context object is that we have the guarantee that every context object
   // will always maintain its own memoization map.
-  const context: Context = {
+  const buildToken: BuildToken = {
     inventory,
     options: {
       // The default node id field name is `__id` as it is the emerging
@@ -25,23 +25,23 @@ export default function createSchema (inventory: Inventory, options: Options = {
   }
 
   return new GraphQLSchema({
-    query: createQueryType(context),
+    query: createQueryType(buildToken),
   })
 }
 
 // TODO: doc
-function createQueryType <T>(context: Context): GraphQLObjectType<T> {
-  const { inventory } = context
+function createQueryType <T>(buildToken: BuildToken): GraphQLObjectType<T> {
+  const { inventory } = buildToken
   return new GraphQLObjectType({
     name: 'Query',
     // TODO: description
     fields: buildObject<GraphQLFieldConfig<T, mixed>>(
       [
-        createNodeFieldEntry(context),
+        createNodeFieldEntry(buildToken),
       ],
       inventory
         .getCollections()
-        .map(collection => createCollectionQueryFieldEntries(context, collection))
+        .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
         .reduce((a, b) => a.concat(b), []),
     ),
   })

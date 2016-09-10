@@ -1,7 +1,7 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
 import { Collection, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject } from '../../utils'
-import Context from '../Context'
+import BuildToken from '../BuildToken'
 import getType from '../type/getType'
 import createConnectionField from '../connection/createConnectionField'
 import getCollectionType from './getCollectionType'
@@ -11,10 +11,10 @@ import getCollectionType from './getCollectionType'
  * will be on the root query type.
  */
 export default function createCollectionQueryFieldEntries <T>(
-  context: Context,
+  buildToken: BuildToken,
   collection: Collection<T>,
 ): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
-  const { options } = context
+  const { options } = buildToken
   const type = collection.getType()
   const entries: Array<[string, GraphQLFieldConfig<any, any>]> = []
   const primaryKey = collection.getPrimaryKey()
@@ -25,7 +25,7 @@ export default function createCollectionQueryFieldEntries <T>(
   if (paginator) {
     entries.push([
       formatName.field(`all-${collection.getName()}`),
-      createConnectionField(context, paginator),
+      createConnectionField(buildToken, paginator),
     ])
   }
 
@@ -36,7 +36,7 @@ export default function createCollectionQueryFieldEntries <T>(
   if (primaryKey) {
     entries.push([formatName.field(type.getName()), {
       // TODO: description
-      type: getCollectionType(context, collection),
+      type: getCollectionType(buildToken, collection),
 
       args: {
         [options.nodeIdFieldName]: {
@@ -62,7 +62,7 @@ export default function createCollectionQueryFieldEntries <T>(
     const keyName = key.getName()
     const keyType = key.getType()
     const fieldName = formatName.field(`${type.getName()}-by-${keyName}`)
-    const collectionType = getCollectionType(context, collection)
+    const collectionType = getCollectionType(buildToken, collection)
 
     // If the key type is an object type, we want to flatten the object fields
     // into distinct arguments.
@@ -76,7 +76,7 @@ export default function createCollectionQueryFieldEntries <T>(
           fields.map<[string, GraphQLArgumentConfig<mixed>]>((field, i) =>
             [fieldArgNames[i], {
               description: field.getDescription(),
-              type: getType(context, field.getType(), true),
+              type: getType(buildToken, field.getType(), true),
             }]
           )
         ),
@@ -94,7 +94,7 @@ export default function createCollectionQueryFieldEntries <T>(
         args: {
           [argName]: {
             // TODO: description
-            type: getType(context, keyType, true),
+            type: getType(buildToken, keyType, true),
           },
         },
         resolve: (source, args) =>

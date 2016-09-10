@@ -37,10 +37,10 @@ import {
 
 import { buildObject, formatName } from '../../utils'
 import getCollectionType from '../collection/getCollectionType'
-import Context from '../Context'
+import BuildToken from '../BuildToken'
 
 // TODO: doc
-const cache = new WeakMap<Context, {
+const cache = new WeakMap<BuildToken, {
   inputCache: WeakMap<Type<mixed>, GraphQLInputType<mixed>>,
   outputCache: WeakMap<Type<mixed>, GraphQLOutputType<mixed>>,
 }>()
@@ -49,22 +49,22 @@ const cache = new WeakMap<Context, {
 // Instead of using our utility memoization function, we implement our own
 // memoization logic here because in some scenarios we want to return the same
 // result regardless of whether the `input` is true or false.
-function getType (context: Context, type: Type<mixed>, input: true): GraphQLInputType<mixed>
-function getType (context: Context, type: Type<mixed>, input: false): GraphQLOutputType<mixed>
-function getType (context: Context, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
-  if (!cache.get(context))
-    cache.set(context, { inputCache: new WeakMap(), outputCache: new WeakMap() })
+function getType (buildToken: BuildToken, type: Type<mixed>, input: true): GraphQLInputType<mixed>
+function getType (buildToken: BuildToken, type: Type<mixed>, input: false): GraphQLOutputType<mixed>
+function getType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
+  if (!cache.get(buildToken))
+    cache.set(buildToken, { inputCache: new WeakMap(), outputCache: new WeakMap() })
 
-  const { inputCache, outputCache } = cache.get(context)!
+  const { inputCache, outputCache } = cache.get(buildToken)!
 
   if (input === true && !inputCache.has(type)) {
-    const gqlType = createType(context, type, true)
+    const gqlType = createType(buildToken, type, true)
     if (isInputType(gqlType)) inputCache.set(type, gqlType)
     if (isOutputType(gqlType)) outputCache.set(type, gqlType)
   }
 
   if (input === false && !outputCache.has(type)) {
-    const gqlType = createType(context, type, false)
+    const gqlType = createType(buildToken, type, false)
     if (isInputType(gqlType)) inputCache.set(type, gqlType)
     if (isOutputType(gqlType)) outputCache.set(type, gqlType)
   }
@@ -80,14 +80,14 @@ export default getType
  *
  * @private
  */
-function createType (context: Context, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
+function createType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
   // We want to ignore the nullability rules for `AliasType`. If the type we
   // are aliasing is nullable or non null then `AliasType` will automatically
   // pick that up.
   if (type instanceof AliasType) {
     return createGraphQLTypeAlias(
       // TODO: Remove the `input as any` when the Typescript bug is fixed.
-      getType(context, type.getBaseType(), input as any),
+      getType(buildToken, type.getBaseType(), input as any),
       formatName.type(type.getName()),
       type.getDescription(),
     )
@@ -95,9 +95,9 @@ function createType (context: Context, type: Type<mixed>, input: boolean): Graph
 
   if (type instanceof NullableType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-    return getNullableType(getType(context, type.getBaseType(), input as any))
+    return getNullableType(getType(buildToken, type.getBaseType(), input as any))
 
-  return new GraphQLNonNull(createNullableType(context, type, input))
+  return new GraphQLNonNull(createNullableType(buildToken, type, input))
 }
 
 /**
@@ -107,10 +107,10 @@ function createType (context: Context, type: Type<mixed>, input: boolean): Graph
  *
  * @private
  */
-function createNullableType (context: Context, type: Type<mixed>, input: boolean): GraphQLNullableType<mixed> {
+function createNullableType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLNullableType<mixed> {
   if (type instanceof ListType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-    return new GraphQLList(getType(context, type.getItemType(), input as any))
+    return new GraphQLList(getType(buildToken, type.getItemType(), input as any))
 
   if (!(type instanceof NamedType)) {
     throw new Error(
@@ -119,7 +119,7 @@ function createNullableType (context: Context, type: Type<mixed>, input: boolean
     )
   }
 
-  return createNamedType(context, type, input)
+  return createNamedType(buildToken, type, input)
 }
 
 /**
@@ -127,7 +127,7 @@ function createNullableType (context: Context, type: Type<mixed>, input: boolean
  *
  * @private
  */
-function createNamedType (context: Context, type: NamedType<mixed>, input: boolean): GraphQLNamedType<mixed> {
+function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input: boolean): GraphQLNamedType<mixed> {
   if (type instanceof EnumType) {
     return new GraphQLEnumType({
       name: formatName.type(type.getName()),
@@ -143,7 +143,7 @@ function createNamedType (context: Context, type: NamedType<mixed>, input: boole
   }
 
   if (type instanceof ObjectType)
-    return input ? createInputObjectType(context, type) : createOutputObjectType(context, type)
+    return input ? createInputObjectType(buildToken, type) : createOutputObjectType(buildToken, type)
 
   // The primitive types are constants, so let’s just return their constant
   // GraphQL type.
@@ -166,14 +166,14 @@ function createNamedType (context: Context, type: NamedType<mixed>, input: boole
  *
  * @private
  */
-function createOutputObjectType <T>(context: Context, type: ObjectType<T>): GraphQLObjectType<T> {
-  const { inventory } = context
+function createOutputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>): GraphQLObjectType<T> {
+  const { inventory } = buildToken
   const collection = inventory.getCollections().find(collection => collection.getType() === type)
 
   // If there is a collection which uses this type, we should use the
   // collection’s type and not create our own.
   if (collection)
-    return getCollectionType(context, collection)
+    return getCollectionType(buildToken, collection)
 
   return new GraphQLObjectType<T>({
     name: formatName.type(type.getName()),
@@ -182,7 +182,7 @@ function createOutputObjectType <T>(context: Context, type: ObjectType<T>): Grap
       type.getFields().map<[string, GraphQLFieldConfig<T, mixed>]>(field =>
         [formatName.field(field.getName()), {
           description: field.getDescription(),
-          type: getType(context, field.getType(), false),
+          type: getType(buildToken, field.getType(), false),
           resolve: object => field.getFieldValueFromObject(object),
         }]
       ),
@@ -195,7 +195,7 @@ function createOutputObjectType <T>(context: Context, type: ObjectType<T>): Grap
  *
  * @private
  */
-function createInputObjectType <T>(context: Context, type: ObjectType<T>): GraphQLInputObjectType<T> {
+function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>): GraphQLInputObjectType<T> {
   return new GraphQLInputObjectType<T>({
     name: formatName.type(`${type.getName()}-input`),
     description: type.getDescription(),
@@ -203,7 +203,7 @@ function createInputObjectType <T>(context: Context, type: ObjectType<T>): Graph
       type.getFields().map<[string, GraphQLInputFieldConfig<mixed>]>(field =>
         [formatName.field(field.getName()), {
           description: field.getDescription(),
-          type: getType(context, field.getType(), true),
+          type: getType(buildToken, field.getType(), true),
         }]
       )
     ),

@@ -4,7 +4,7 @@ import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getType from '../type/getType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import createConnectionField from '../connection/createConnectionField'
-import Context from '../Context'
+import BuildToken from '../BuildToken'
 
 // Private implementation of `getCollectionType`, types aren’t that great.
 const _getCollectionType = memoize2(createCollectionType)
@@ -14,8 +14,8 @@ const _getCollectionType = memoize2(createCollectionType)
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionType <TValue>(context: Context, collection: Collection<TValue>): GraphQLObjectType<TValue> {
-  return _getCollectionType(context, collection)
+function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection<TValue>): GraphQLObjectType<TValue> {
+  return _getCollectionType(buildToken, collection)
 }
 
 export default getCollectionType
@@ -25,8 +25,8 @@ export default getCollectionType
  *
  * @private
  */
-function createCollectionType <TValue>(context: Context, collection: Collection<TValue>): GraphQLObjectType<TValue> {
-  const { options, inventory } = context
+function createCollectionType <TValue>(buildToken: BuildToken, collection: Collection<TValue>): GraphQLObjectType<TValue> {
+  const { options, inventory } = buildToken
   const type = collection.getType()
   const primaryKey = collection.getPrimaryKey()
 
@@ -37,7 +37,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
     isTypeOf: value => type.isTypeOf(value),
 
     // If there is a primary key, this is a node.
-    interfaces: primaryKey ? [getNodeInterfaceType(context)] : [],
+    interfaces: primaryKey ? [getNodeInterfaceType(buildToken)] : [],
 
     // We make `fields` here a thunk because we don’t want to eagerly create
     // types for collections used in this type.
@@ -60,7 +60,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
       type.getFields().map((field: ObjectField<TValue, mixed>): [string, GraphQLFieldConfig<TValue, mixed>] =>
         [formatName.field(field.getName()), {
           description: field.getDescription(),
-          type: getType(context, field.getType(), false),
+          type: getType(buildToken, field.getType(), false),
           resolve: value => field.getFieldValueFromObject(value),
         }]
       ),
@@ -79,7 +79,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
 
           return [formatName.field(`${headCollection.getType().getName()}-by-${relation.getName()}`), {
             // TODO: description
-            type: getCollectionType(context, headCollection),
+            type: getCollectionType(buildToken, headCollection),
             resolve: source => {
               const key = relation.getHeadKeyFromTailValue(source)
               return headCollectionKey.read(key)
@@ -102,7 +102,7 @@ function createCollectionType <TValue>(context: Context, collection: Collection<
 
           return [
             formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
-            createConnectionField(context, tailPaginator, {
+            createConnectionField(buildToken, tailPaginator, {
               // We use the config when creating a connection field to inject
               // a condition that limits what we select from the paginator.
               getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),

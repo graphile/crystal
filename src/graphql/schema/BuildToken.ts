@@ -1,7 +1,7 @@
 import { Inventory } from '../../interface'
 
 // TODO: doc
-type Context = {
+type BuildToken = {
   // TODO: doc
   inventory: Inventory,
   // TODO: doc
@@ -10,4 +10,4 @@ type Context = {
   },
 }
 
-export default Context
+export default BuildToken

@@ -1,6 +1,6 @@
 import { GraphQLInterfaceType, GraphQLNonNull, GraphQLID } from 'graphql'
 import { memoize1 } from '../../utils/memoize'
-import Context from '../Context'
+import BuildToken from '../BuildToken'
 
 // TODO: doc why this is memoized
 const getNodeInterfaceType = memoize1(createNodeInterfaceType)
@@ -8,8 +8,8 @@ const getNodeInterfaceType = memoize1(createNodeInterfaceType)
 export default getNodeInterfaceType
 
 // TODO: doc
-function createNodeInterfaceType (context: Context): GraphQLInterfaceType<mixed> {
-  const { options } = context
+function createNodeInterfaceType (buildToken: BuildToken): GraphQLInterfaceType<mixed> {
+  const { options } = buildToken
   return new GraphQLInterfaceType<mixed>({
     name: 'Node',
     // TODO: description

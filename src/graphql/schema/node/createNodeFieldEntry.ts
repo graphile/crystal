@@ -1,14 +1,14 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import idSerde from '../../utils/idSerde'
-import Context from '../Context'
+import BuildToken from '../BuildToken'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
 // TODO: doc
-export default function createNodeFieldEntry (context: Context): [string, GraphQLFieldConfig<mixed, mixed>] {
-  const { inventory, options } = context
+export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<mixed, mixed>] {
+  const { inventory, options } = buildToken
   return ['node', {
     // TODO: description
-    type: getNodeInterfaceType(context),
+    type: getNodeInterfaceType(buildToken),
     args: {
       [options.nodeIdFieldName]: {
         // TODO: description,
