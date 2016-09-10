@@ -2,6 +2,7 @@ import { GraphQLSchema, GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
 import { Inventory } from '../../interface'
 import buildObject from '../utils/buildObject'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
+import getCollectionType from './collection/getCollectionType'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
 import BuildToken from './BuildToken'
 
@@ -12,8 +13,8 @@ type Options = {
 // TODO: doc
 export default function createSchema (inventory: Inventory, options: Options = {}): GraphQLSchema {
   // We take our user-friendly arguments to `createSchema` and convert them
-  // into a context token. One nice side effect of always creating our own
-  // context object is that we have the guarantee that every context object
+  // into a build token. One nice side effect of always creating our own
+  // build token object is that we have the guarantee that every build token
   // will always maintain its own memoization map.
   const buildToken: BuildToken = {
     inventory,
@@ -26,6 +27,11 @@ export default function createSchema (inventory: Inventory, options: Options = {
 
   return new GraphQLSchema({
     query: createQueryType(buildToken),
+    types: [
+      // Make sure to always include the types for our collections, even if
+      // they have no other output.
+      ...inventory.getCollections().map(collection => getCollectionType(buildToken, collection)),
+    ],
   })
 }
 

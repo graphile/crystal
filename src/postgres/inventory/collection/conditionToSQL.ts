@@ -1,5 +1,5 @@
-import { Condition } from '../../interface'
-import { sql } from '../utils'
+import { Condition } from '../../../interface'
+import { sql } from '../../utils'
 
 /**
  * Converts a `Condition` object into a SQL query.

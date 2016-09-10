@@ -1,0 +1,49 @@
+exports[`test forum example 1`] = `
+"schema {
+  query: Query
+}
+
+scalar Email
+
+interface Node {
+  __id: ID!
+}
+
+type Person {
+  id: Uuid!
+  givenName: String!
+  familyName: String
+  about: String
+  createdAt: String
+  updatedAt: String
+}
+
+type PersonAccount {
+  personId: Uuid!
+  email: Email
+  passHash: String!
+}
+
+type Post {
+  id: Uuid!
+  authorId: Uuid!
+  headline: String!
+  topic: PostTopic!
+  body: String
+  createdAt: String
+  updatedAt: String
+}
+
+enum PostTopic {
+  DISCUSSION
+  INSPIRATION
+  HELP
+}
+
+type Query {
+  node(__id: ID!): Node
+}
+
+scalar Uuid
+"
+`;

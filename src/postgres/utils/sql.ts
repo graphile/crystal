@@ -35,15 +35,15 @@ namespace sql {
     , [])
   }
 
-  type QueryConfigThunk = (values?: { [name: string]: mixed }) => QueryConfig
+  export type QueryThunk = (values?: { [name: string]: mixed }) => QueryConfig
 
   /**
    * Compiles a SQL query (with an optional name) to a query that can be
    * executed by our PostgreSQL driver. Escapes all of the relevant values.
    */
-  export function compile (sql: SQL): QueryConfigThunk
-  export function compile (name: string, sql: SQL): QueryConfigThunk
-  export function compile (sqlOrName: SQL | string, maybeSQL?: SQL): QueryConfigThunk {
+  export function compile (sql: SQL): QueryThunk
+  export function compile (name: string, sql: SQL): QueryThunk
+  export function compile (sqlOrName: SQL | string, maybeSQL?: SQL): QueryThunk {
     let name: string | undefined
     let sql: SQL
 

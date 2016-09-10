@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { Client } from 'pg'
+import testPGConnection from '../../__tests__/fixtures/testPGConnection'
 import PGCatalog from '../PGCatalog'
 import introspectDatabase from '../introspectDatabase'
 
@@ -84,10 +85,7 @@ const format = catalog => ({
 })
 
 test('will get everything needed in an introspection', async () => {
-  const client = new Client({
-    database: 'postgraphql_test',
-    port: 5432,
-  })
+  const client = new Client(testPGConnection)
 
   await client.connect()
   await client.query(testSchema)

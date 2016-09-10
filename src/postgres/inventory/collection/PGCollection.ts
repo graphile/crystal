@@ -24,6 +24,17 @@ class PGCollection extends Collection<PGCollectionType.Value> {
     super(_pgClass.name, new PGCollectionType(pgCatalog, _pgClass))
     this._pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
     this._pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
+    this._pgIdentifier = sql.identifier(this._pgNamespace.name, _pgClass.name)
+
+    this._insertQuery = sql.compile(
+      `${this._pgClass.name}_insert_many`,
+      sql.query`
+        insert into ${this._pgIdentifier}
+        (${sql.join(this._pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
+        select * from json_populate_recordset(null::${this._pgIdentifier}, ${sql.placeholder('rows')})
+        returning *
+      `,
+    )
   }
 
   /**
@@ -46,7 +57,7 @@ class PGCollection extends Collection<PGCollectionType.Value> {
    *
    * @private
    */
-  private _pgIdentifier: sql.SQLItem = sql.identifier(this._pgNamespace.name, this._pgClass.name)
+  private _pgIdentifier: sql.SQLItem
 
   /**
    * True if we can insert rows into the class.
@@ -60,15 +71,7 @@ class PGCollection extends Collection<PGCollectionType.Value> {
    *
    * @private
    */
-  private _insertQuery = sql.compile(
-    `${this._pgClass.name}_insert_many`,
-    sql.query`
-      insert into ${this._pgIdentifier}
-      (${sql.join(this._pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
-      select * from json_populate_recordset(null::${this._pgIdentifier}, ${sql.placeholder('rows')})
-      returning *
-    `,
-  )
+  private _insertQuery: sql.QueryThunk
 
   /**
    * Get’s a loader for inserting rows into the database. This function is

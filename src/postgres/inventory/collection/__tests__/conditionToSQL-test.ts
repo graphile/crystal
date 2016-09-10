@@ -1,5 +1,5 @@
-import { Condition } from '../../../interface'
-import sql from '../../utils/sql'
+import { Condition } from '../../../../interface'
+import sql from '../../../utils/sql'
 import conditionToSQL from '../conditionToSQL'
 
 test('will correctly output true and false constants', () => {

@@ -13,7 +13,7 @@ import {
 } from '../../interface'
 
 import PGCatalog from '../introspection/PGCatalog'
-import PGType from '../introspection/object/PGType'
+import PGTypeObject from '../introspection/object/PGTypeObject'
 
 /**
  * The type for a JSON blob. It’s just a string…
@@ -70,7 +70,7 @@ const pgTypeIdToType = new Map<string, Type<any>>([
 // We use `var` here for hoisting so that we can recursively call the function
 // without getting type errors.
 // TODO: Is this the best name?
-var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGType): Type<any> => {
+var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGTypeObject): Type<any> => {
   if (!pgCatalog.hasType(pgType))
     throw new Error(`PostgreSQL type of name '${pgType.name}' and id '${pgType.id}' does not exist.`)
 

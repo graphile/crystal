@@ -1,4 +1,4 @@
-exports[`test will generate the correct schema 1`] = `
+exports[`test will generate the correct forum schema 1`] = `
 "schema {
   query: Query
 }
