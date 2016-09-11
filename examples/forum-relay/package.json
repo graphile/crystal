@@ -22,6 +22,7 @@
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
+    "css-loader": "^0.25.0",
     "dotenv": "^2.0.0",
     "fs-promise": "^0.5.0",
     "http-errors": "^1.5.0",
@@ -36,6 +37,8 @@
     "react-relay-network-layer": "^1.3.4",
     "react-router": "^2.6.1",
     "react-router-relay": "^0.13.3",
+    "sanitize.css": "^4.1.0",
+    "style-loader": "^0.13.1",
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1"
   },
