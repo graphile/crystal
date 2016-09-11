@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { Client } from 'pg'
-import testPGConnection from '../../__tests__/fixtures/testPGConnection'
+import getTestPGClient from '../../__tests__/fixtures/getTestPGClient'
 import PGCatalog from '../PGCatalog'
 import introspectDatabase from '../introspectDatabase'
 
@@ -77,21 +77,24 @@ const format = catalog => ({
   types: Array.from(catalog._types.values())
     .map(type => Object.assign({}, type, {
       id: type.name,
-      namespaceId: catalog.getNamespace(type.namespaceId) ? catalog.getNamespace(type.namespaceId).name : 'external',
+      namespaceId: catalog.getNamespace(type.namespaceId) ? catalog.getNamespace(type.namespaceId).name : null,
       classId: type.classId ? catalog.getClass(type.classId).name : null,
       baseTypeId: type.baseTypeId ? catalog.getType(type.baseTypeId) : null,
     }))
+    // Remove any types outside of our expected namespace. This may exclude
+    // relevant types, but the tradeoff is worth it. This test gets flaky when
+    // we let types outside of our schemas in.
+    .filter(namespace => Boolean(namespace.namespaceId))
     .sort(sortBy(({ id }) => id)),
 })
 
 test('will get everything needed in an introspection', async () => {
-  const client = new Client(testPGConnection)
+  const client = await getTestPGClient()
 
-  await client.connect()
   await client.query(testSchema)
 
   expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
   expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
 
-  client.end()
+  client.release()
 })

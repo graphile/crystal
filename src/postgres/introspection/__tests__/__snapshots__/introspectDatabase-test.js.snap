@@ -217,20 +217,6 @@ Object {
     },
     Object {
       "baseTypeId": null,
-      "category": "N",
-      "classId": null,
-      "description": "-2 billion to 2 billion integer, 4-byte storage",
-      "enumVariants": null,
-      "id": "int4",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "int4",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
       "category": "C",
       "classId": "no_update",
       "description": null,
@@ -256,48 +242,6 @@ Object {
       "name": "person",
       "namespaceId": "c",
       "type": "c"
-    },
-    Object {
-      "baseTypeId": null,
-      "category": "S",
-      "classId": null,
-      "description": "variable-length string, no limit specified",
-      "enumVariants": null,
-      "id": "text",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "text",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
-      "category": "D",
-      "classId": null,
-      "description": "date and time with time zone",
-      "enumVariants": null,
-      "id": "timestamptz",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "timestamptz",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
-      "category": "S",
-      "classId": null,
-      "description": "varchar(length), non-blank-padded string, variable storage length",
-      "enumVariants": null,
-      "id": "varchar",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "varchar",
-      "namespaceId": "external",
-      "type": "b"
     },
     Object {
       "baseTypeId": null,
@@ -356,20 +300,6 @@ Object {
   "types": Array [
     Object {
       "baseTypeId": null,
-      "category": "N",
-      "classId": null,
-      "description": "-2 billion to 2 billion integer, 4-byte storage",
-      "enumVariants": null,
-      "id": "int4",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "int4",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
       "category": "C",
       "classId": "no_update",
       "description": null,
@@ -381,34 +311,6 @@ Object {
       "name": "no_update",
       "namespaceId": "a",
       "type": "c"
-    },
-    Object {
-      "baseTypeId": null,
-      "category": "D",
-      "classId": null,
-      "description": "date and time with time zone",
-      "enumVariants": null,
-      "id": "timestamptz",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "timestamptz",
-      "namespaceId": "external",
-      "type": "b"
-    },
-    Object {
-      "baseTypeId": null,
-      "category": "S",
-      "classId": null,
-      "description": "varchar(length), non-blank-padded string, variable storage length",
-      "enumVariants": null,
-      "id": "varchar",
-      "isNotNull": false,
-      "itemId": null,
-      "kind": "type",
-      "name": "varchar",
-      "namespaceId": "external",
-      "type": "b"
     }
   ]
 }

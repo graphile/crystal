@@ -1,3 +1,5 @@
+// TODO: Write new `pg` types that actually support `pg` 6.1.0
+
 declare module 'pg' {
 
 import events = require("events")
@@ -50,6 +52,9 @@ export class Client extends events.EventEmitter {
 
   public connect (callback?: (err: Error) => void): void
   public end (): void
+
+  // TODO: This is only on clients acquired by the pool.
+  public release (): void
 
   public query (queryText: string, callback?: (err: Error, result: QueryResult) => void): Query
   public query (config: QueryConfig, callback?: (err: Error, result: QueryResult) => void): Query
