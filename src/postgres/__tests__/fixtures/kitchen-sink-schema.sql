@@ -9,10 +9,14 @@ create schema c;
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
 
+create domain b.email as text
+  check (value ~* '^.+@.+\..+$');
+
 create table c.person (
   id serial primary key,
   name varchar not null,
-  about text
+  about text,
+  email b.email not null unique
 );
 
 comment on table c.person is 'Person test comment';
@@ -24,12 +28,13 @@ create type b.color as enum ('red', 'green', 'blue');
 create type c.compound_type as (
   a int,
   b text,
-  c b.color
+  c b.color,
+  d uuid
 );
 
 comment on type c.compound_type is 'Awesome feature!';
 
-create view b.yo as
+create view b.updatable_view as
   select
     id as __id,
     name,
@@ -38,8 +43,8 @@ create view b.yo as
   from
     c.person;
 
-comment on view b.yo is 'YOYOYO!!';
-comment on column b.yo.constant is 'This is constantly 2';
+comment on view b.updatable_view is 'YOYOYO!!';
+comment on column b.updatable_view.constant is 'This is constantly 2';
 
 create view a.no_update as select 2;
 

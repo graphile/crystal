@@ -1,11 +1,8 @@
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
-import { Client } from 'pg'
+import createKitchenSinkPGSchema from '../../__tests__/fixtures/createKitchenSinkPGSchema'
 import getTestPGClient from '../../__tests__/fixtures/getTestPGClient'
-import PGCatalog from '../PGCatalog'
 import introspectDatabase from '../introspectDatabase'
 
-const testSchema = readFileSync(resolve(__dirname, 'fixtures/kitchen-sink-schema.sql')).toString()
+beforeAll(createKitchenSinkPGSchema)
 
 /**
  * Gets a local identifier that is independent of the object id assigned by
@@ -90,11 +87,7 @@ const format = catalog => ({
 
 test('will get everything needed in an introspection', async () => {
   const client = await getTestPGClient()
-
-  await client.query(testSchema)
-
   expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
   expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
-
   client.release()
 })

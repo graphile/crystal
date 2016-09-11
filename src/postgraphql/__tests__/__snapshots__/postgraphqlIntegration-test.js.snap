@@ -3,45 +3,45 @@ exports[`test forum example 1`] = `
   query: Query
 }
 
+enum Color {
+  RED
+  GREEN
+  BLUE
+}
+
+type CompoundType {
+  a: Int
+  b: String
+  c: Color!
+  d: Uuid
+}
+
 scalar Email
 
 interface Node {
   __id: ID!
 }
 
+type NoUpdate {
+  column: Int
+}
+
 type Person {
-  id: Uuid!
-  givenName: String!
-  familyName: String
+  id: Int!
+  name: String!
   about: String
-  createdAt: String
-  updatedAt: String
-}
-
-type PersonAccount {
-  personId: Uuid!
   email: Email
-  passHash: String!
-}
-
-type Post {
-  id: Uuid!
-  authorId: Uuid!
-  headline: String!
-  topic: PostTopic!
-  body: String
-  createdAt: String
-  updatedAt: String
-}
-
-enum PostTopic {
-  DISCUSSION
-  INSPIRATION
-  HELP
 }
 
 type Query {
   node(__id: ID!): Node
+}
+
+type UpdatableView {
+  __id: Int
+  name: String
+  description: String
+  constant: Int
 }
 
 scalar Uuid
