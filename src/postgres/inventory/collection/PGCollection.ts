@@ -23,42 +23,26 @@ class PGCollection extends Collection<PGCollectionType.Value> {
     private _pgClass: PGClassObject,
   ) {
     super(pluralize(_pgClass.name), new PGCollectionType(pgCatalog, _pgClass))
-    this._pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
-    this._pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
-    this._pgIdentifier = sql.identifier(this._pgNamespace.name, _pgClass.name)
+
+    const pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
+    const pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
+
+    const pgIdentifier = sql.identifier(pgNamespace.name, _pgClass.name)
 
     this._insertQuery = sql.compile(
       `${this._pgClass.name}_insert_many`,
       sql.query`
-        insert into ${this._pgIdentifier}
-        (${sql.join(this._pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
-        select * from json_populate_recordset(null::${this._pgIdentifier}, ${sql.placeholder('rows')})
+        insert into ${pgIdentifier}
+        (${sql.join(pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
+        select * from json_populate_recordset(null::${pgIdentifier}, ${sql.placeholder('rows')})
         returning *
       `,
     )
   }
 
-  /**
-   * Some helpful private properties.
-   *
-   * @private
-   */
-  private _pgNamespace: PGNamespaceObject
-  private _pgAttributes: Array<PGAttributeObject>
-
   public getType (): PGCollectionType {
     return super.getType() as any
   }
-
-  /**
-   * The escaped class identifier that we will use in SQL to reference
-   * this collection. The identifier is just the namespace name followed by a
-   * dot and the class name. So for a namespace name of `forum` and a class
-   * name of `person`, the SQL identifier would be `"forum"."person"`.
-   *
-   * @private
-   */
-  private _pgIdentifier: sql.SQLItem
 
   /**
    * True if we can insert rows into the class.
