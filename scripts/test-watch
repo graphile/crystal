@@ -1,5 +1,0 @@
-#!/bin/bash
-
-npm_bin=$(npm bin)
-
-$npm_bin/jest --watch

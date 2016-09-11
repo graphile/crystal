@@ -2,4 +2,4 @@
 
 npm_bin=$(npm bin)
 
-$npm_bin/jest
+$npm_bin/jest $@
