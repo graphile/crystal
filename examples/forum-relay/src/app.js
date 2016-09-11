@@ -10,17 +10,15 @@ import { ViewerQueries, PostQueries } from './queries'
 
 const routes = (
   <Route path="/" component={App}>
-    <Route path="posts">
-      <IndexRoute
-        component={PostIndex}
-        queries={ViewerQueries}
-      />
-      <Route
-        path=":postId"
-        component={Post}
-        queries={PostQueries}
-      />
-    </Route>
+    <IndexRoute
+      component={PostIndex}
+      queries={ViewerQueries}
+    />
+    <Route
+      path=":postId"
+      component={Post}
+      queries={PostQueries}
+    />
   </Route>
 )
 
