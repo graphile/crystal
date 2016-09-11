@@ -18,27 +18,26 @@ const app = express()
 app.use(bodyParser.json())
 
 app.post('/', wrap(async (req, res) => {
-  const { email, password } = req.body
   const query = 'SELECT person_id, email, pass_hash FROM forum_example_utils.person_account WHERE email = $1'
   const client = await pg.connectAsync(DB_STRING)
-  const result = await client.queryAsync(query, [email])
+  const result = await client.queryAsync(query, [req.body.email])
   client.end()
 
   const user = result.rows[0]
-  if (!user || !bcrypt.compareSync(password, user.pass_hash)) {
+  if (!user || !bcrypt.compareSync(req.body.password, user.pass_hash)) {
     throw new Forbidden('Your email and password are incorrect.')
   }
 
   user.aud = 'postgraphql'
   user.role = 'user_role'
   const token = jwt.sign(user, SECRET, { expiresIn: '30 min' })
-  return res.json({ success: true, token })
+  return res.json({ token })
 }))
 
 app.use((err, req, res, next) => {
   if (err instanceof Forbidden) {
     res.status(403)
-    return res.json({ message: err.message })
+    return res.json({ token: null })
   }
 })
 
