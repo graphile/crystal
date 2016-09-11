@@ -18,6 +18,13 @@ import PGCollectionType from './PGCollectionType'
  * The PostgreSQL collection, or in relational terms, table.
  */
 class PGCollection extends Collection<PGCollectionType.Value> {
+  /**
+   * The query to be used when inserting rows into the database.
+   *
+   * @private
+   */
+  private _insertQuery: sql.QueryThunk
+
   constructor (
     pgCatalog: PGCatalog,
     private _pgClass: PGClassObject,
@@ -52,13 +59,6 @@ class PGCollection extends Collection<PGCollectionType.Value> {
   public canCreate (): boolean {
     return this._pgClass.isInsertable
   }
-
-  /**
-   * The query to be used when inserting rows into the database.
-   *
-   * @private
-   */
-  private _insertQuery: sql.QueryThunk
 
   /**
    * Get’s a loader for inserting rows into the database. This function is
