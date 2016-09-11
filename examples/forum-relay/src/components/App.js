@@ -1,114 +1,86 @@
 import React from 'react'
+import { Link } from 'react-router'
+import { StyleSheet, css } from 'aphrodite'
+import authDecorator from '../utils/authDecorator'
 import 'sanitize.css/sanitize.css'
-import { Link, withRouter } from 'react-router'
-import jwtDecode from 'jwt-decode'
-import Relay from 'react-relay'
-import { RelayNetworkLayer, authMiddleware, urlMiddleware } from 'react-relay-network-layer'
-
-const defaultState = {
-  authenticated: false,
-  token: null,
-}
-
-const fetchToken = (data) => {
-  return fetch(AUTH_URL, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-  })
-  .then(res => res.json())
-  .then(({ token }) => token)
-  .catch(err => console.log(err))
-}
-
-const setupNetwork = (token) => {
-  Relay.injectNetworkLayer(new RelayNetworkLayer([
-    authMiddleware({
-      allowEmptyToken: true,
-      token,
-    }),
-  ], { disableBatchQuery: true }))
-}
-
-const isTokenExpired = (token) => {
-  const tokenPayload = jwtDecode(token)
-  const expiryDate = new Date(tokenPayload.exp * 1000)
-  const currentDate = new Date()
-  return expiryDate < currentDate
-}
 
 class App extends React.Component {
-  state = { ...defaultState }
-
   static childContextTypes = {
     user: React.PropTypes.object,
   }
 
   getChildContext() {
-    return { user: this.state }
-  }
-
-  componentWillMount() {
-    const token = localStorage.getItem('token')
-    if (!token)
-      return
-    else if (isTokenExpired(token))
-      this.clearAuth()
-    else
-      this.setAuth(token)
-  }
-
-  setAuth(token) {
-    setupNetwork(token)
-    this.setState({
-      token,
-      authenticated: true,
-      ...jwtDecode(token),
-    })
-  }
-
-  clearAuth() {
-    localStorage.removeItem('token')
-    setupNetwork(null) // remove token from fetch headers
-    this.setState({
-      ...defaultState
-    })
-  }
-
-  handleLogin = (data) => {
-    fetchToken(data).then(token => {
-      localStorage.setItem('token', token)
-      this.setAuth(token)
-    })
-  }
-
-  handleLogout = () => {
-    this.clearAuth()
+    return { user: this.props.user }
   }
 
   render() {
     return (
-      <div>
-        <header>
-          <Link to="/"><h1>Forum Example</h1></Link>
-          {this.state.authenticated
-            ? <button onClick={this.handleLogout}>Logout</button>
-            : <LoginForm handleLogin={this.handleLogin}>Login</LoginForm>
+      <div className={css(styles.container)}>
+        <header className={css(styles.header)}>
+          <Logo />
+          {this.props.user.authenticated
+            ? <button onClick={this.props.handleLogout}>Logout</button>
+            : <LoginForm handleLogin={this.props.handleLogin}>Login</LoginForm>
           }
         </header>
         <main>
           {this.props.children}
         </main>
-        <footer>
+        <footer className={css(styles.footer)}>
           <p>An example application for PostGraphQL and Relay</p>
         </footer>
       </div>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: '0 1.5em',
+  },
+  header: {
+    padding: '1.5em 0',
+  },
+  footer: {
+    borderTop: '2px solid #0095ff',
+    paddingTop: '1.5em',
+    marginTop: '1.5em',
+    color: '#0095ff',
+  },
+})
+
+function Logo() {
+  return (
+    <Link className={css(logoStyles.link)} to="/">
+      <h1 className={css(logoStyles.heading)}>
+        <span className={css(logoStyles.db)}>Post</span>
+        <span className={css(logoStyles.graphql)}>GraphQL</span>
+      </h1>
+      <p className={css(logoStyles.tagline)}>Forum Example with Relay</p>
+    </Link>
+  )
+}
+
+const logoStyles = StyleSheet.create({
+  link: {
+    textDecoration: 'none',
+  },
+  heading: {
+    fontSize: '3em',
+    margin: 0,
+  },
+  db: {
+    color: '#0095ff',
+  },
+  graphql: {
+    color: '#e535ab',
+  },
+  tagline: {
+    margin: 0,
+    fontSize: 1.25,
+    color: '#333',
+  }
+})
 
 class LoginForm extends React.Component {
   onSubmit = (event) => {
@@ -136,4 +108,4 @@ class LoginForm extends React.Component {
   }
 }
 
-export default App
+export default authDecorator(App)

@@ -11,6 +11,7 @@
     "update-schema": "babel-node ./scripts/updateSchema.js"
   },
   "dependencies": {
+    "aphrodite": "^0.5.0",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",
     "babel-loader": "6.2.4",

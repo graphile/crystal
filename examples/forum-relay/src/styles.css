@@ -1,0 +1,24 @@
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  color: #333;
+}
+
+a {
+  color: #0095ff;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Source Serif Pro', sans-serif;
+}
+
+label {
+  display: block;
+}
+
+input {
+  font-family: 'Source Sans Pro', sans-serif;
+  border: 1px solid #ccc;
+  padding: 0.5em;
+}

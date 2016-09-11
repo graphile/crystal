@@ -4,19 +4,20 @@ import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, browserHistory, applyRouterMiddleware } from 'react-router'
 import useRelay from 'react-router-relay'
 import App from './components/App'
-import PostIndex from './components/PostIndex'
-import Post from './components/Post'
+import PostIndexPage from './components/PostIndexPage'
+import PostPage from './components/PostPage'
 import { ViewerQueries, PostQueries } from './queries'
+import './styles.css' // global css
 
 const routes = (
   <Route path="/" component={App}>
     <IndexRoute
-      component={PostIndex}
+      component={PostIndexPage}
       queries={ViewerQueries}
     />
     <Route
       path=":postId"
-      component={Post}
+      component={PostPage}
       queries={PostQueries}
     />
   </Route>

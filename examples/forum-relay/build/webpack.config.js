@@ -7,12 +7,12 @@ export default {
     loaders: [{
       test: /\.css$/,
       exclude: /node_modules/,
-      loaders: ['style', 'css'],
+      loader: 'style!css?modules',
       options: 'modules'
     }, {
       test: /\.css$/,
       include: /node_modules/,
-      loaders: ['style', 'css'],
+      loader: 'style!css',
     }, {
       test: /\.js$/,
       include: [path.resolve(__dirname, '../src')],
@@ -27,8 +27,5 @@ export default {
     new DefinePlugin({
       AUTH_URL: JSON.stringify('http://localhost:3000/authenticate'),
     })
-  ],
-  resolve: {
-    modules: ['src', 'node_modules'],
-  },
+  ]
 }
