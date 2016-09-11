@@ -8,7 +8,11 @@ class PostIndex extends React.Component {
     addingPost: false,
   }
 
-  insertPost(data) {
+  static contextTypes = {
+    user: React.PropTypes.object,
+  }
+
+  insertPost = (data) => {
     this.props.relay.commitUpdate(
       new InsertPostMutation({
         viewer: this.props.viewer,
@@ -18,8 +22,9 @@ class PostIndex extends React.Component {
     })
   }
 
-  setAddingPost(value) {
-    this.setState({ addingPost: value })
+  setAddingPost = (event, value) => {
+    const { addingPost } = this.state
+    this.setState({ addingPost: value || !addingPost })
   }
 
   render() {
@@ -27,13 +32,15 @@ class PostIndex extends React.Component {
       <div>
         <header>
           <h1>Posts</h1>
-          <button onClick={this.setAddingPost.bind(this, !this.state.addingPost)}>
-            {!this.state.addingPost ? 'Write Post' : 'Cancel'}
-          </button>
+          {this.context.user.authenticated &&
+            <button onClick={this.setAddingPost}>
+              {this.state.addingPost ? 'Cancel' : 'Write Post'}
+            </button>
+          }
         </header>
-
-        {this.state.addingPost && <PostForm onSubmit={::this.insertPost}/>}
-
+        {this.state.addingPost &&
+          <PostForm onSubmit={this.insertPost}/>
+        }
         <ul>
           {this.props.viewer.posts.edges.map(({ node: post }) =>
             <li key={post.id}>
@@ -92,7 +99,7 @@ function PostItem ({
   return (
     <div>
       <header>
-        <h2><Link to={`posts/${id}`}>{headline}</Link></h2>
+        <h2><Link to={`/${id}`}>{headline}</Link></h2>
         <h3>by {author.fullName}</h3>
       </header>
       <div><p>{summary}</p></div>

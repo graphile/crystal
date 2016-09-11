@@ -1,65 +1,92 @@
-import React from 'react';
+import React from 'react'
+import 'sanitize.css/sanitize.css'
 import { Link, withRouter } from 'react-router'
 import jwtDecode from 'jwt-decode'
 import Relay from 'react-relay'
-import { RelayNetworkLayer, authMiddleware } from 'react-relay-network-layer';
+import { RelayNetworkLayer, authMiddleware, urlMiddleware } from 'react-relay-network-layer'
 
-Relay.injectNetworkLayer(new RelayNetworkLayer([
-  authMiddleware({
-    token: localStorage.getItem('token'),
-    allowEmptyToken: true,
-  }),
-]))
+const defaultState = {
+  authenticated: false,
+  token: null,
+}
+
+const fetchToken = (data) => {
+  return fetch(AUTH_URL, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(res => res.json())
+  .then(({ token }) => token)
+  .catch(err => console.log(err))
+}
+
+const setupNetwork = (token) => {
+  Relay.injectNetworkLayer(new RelayNetworkLayer([
+    authMiddleware({
+      allowEmptyToken: true,
+      token,
+    }),
+  ], { disableBatchQuery: true }))
+}
+
+const isTokenExpired = (token) => {
+  const tokenPayload = jwtDecode(token)
+  const expiryDate = new Date(tokenPayload.exp * 1000)
+  const currentDate = new Date()
+  return expiryDate < currentDate
+}
 
 class App extends React.Component {
-  state = {
-    authenticated: false,
+  state = { ...defaultState }
+
+  static childContextTypes = {
+    user: React.PropTypes.object,
+  }
+
+  getChildContext() {
+    return { user: this.state }
   }
 
   componentWillMount() {
-    this.authenticate()
+    const token = localStorage.getItem('token')
+    if (!token)
+      return
+    else if (isTokenExpired(token))
+      this.clearAuth()
+    else
+      this.setAuth(token)
   }
 
-  authenticate() {
-    const token = localStorage.getItem('token')
-    if (!token) return
+  setAuth(token) {
+    setupNetwork(token)
+    this.setState({
+      token,
+      authenticated: true,
+      ...jwtDecode(token),
+    })
+  }
 
-    const payload = jwtDecode(token)
-    const expiryDate = new Date(payload.exp * 1000)
-    const currentDate = new Date()
-    if (expiryDate < currentDate) {
-      // TODO(Ferdi): notify that your token has expired
-      this.handleLogout()
-    }
-
-    this.setState({ authenticated: true })
+  clearAuth() {
+    localStorage.removeItem('token')
+    setupNetwork(null) // remove token from fetch headers
+    this.setState({
+      ...defaultState
+    })
   }
 
   handleLogin = (data) => {
-    return fetch(AUTH_URL, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(res => res.json())
-    .then(({ success, token }) => {
-      if (!success) return
-      const { person_id } = jwtDecode(token)
+    fetchToken(data).then(token => {
       localStorage.setItem('token', token)
-      localStorage.setItem('userId', person_id)
-      this.setState({ authenticated: true })
-      this.props.router.push('/posts')
+      this.setAuth(token)
     })
   }
 
   handleLogout = () => {
-    localStorage.removeItem('token')
-    this.props.router.push('/')
-    this.setState({ authenticated: false })
-    // TODO(Ferdi): Notify that you have logged out
+    this.clearAuth()
   }
 
   render() {
@@ -71,10 +98,6 @@ class App extends React.Component {
             ? <button onClick={this.handleLogout}>Logout</button>
             : <LoginForm handleLogin={this.handleLogin}>Login</LoginForm>
           }
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/posts">Posts</Link>
-          </nav>
         </header>
         <main>
           {this.props.children}
@@ -113,4 +136,4 @@ class LoginForm extends React.Component {
   }
 }
 
-export default withRouter(App)
+export default App

@@ -4,6 +4,10 @@ import { Link, withRouter } from 'react-router'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
 class Post extends React.Component {
+  static contextTypes = {
+    user: React.PropTypes.object,
+  }
+
   handleUpdate(event) {
     this.props.relay.commitUpdate(
       new UpdatePostMutation({
@@ -17,7 +21,7 @@ class Post extends React.Component {
   }
 
   handleDelete(event) {
-    this.props.router.replace('/posts')
+    this.props.router.replace('/')
     this.props.relay.commitUpdate(
       new DeletePostMutation({
         post: this.props.post,
@@ -29,12 +33,15 @@ class Post extends React.Component {
   // contenteditable is used here out of simplicity, for the moment
   // react complains; I chose to ignore it
   render() {
+    const { authenticated } = this.context.user
     return (
       <div>
-        <Link to="/posts">back to Posts</Link>
-        <h1 data-name="headline" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.headline}</h1>
-        <p data-name="body" contentEditable={true} onBlur={::this.handleUpdate}>{this.props.post.body}</p>
-        <button onClick={::this.handleDelete}>Delete Post</button>
+        <Link to="/">back to Posts</Link>
+        <h1 data-name="headline" contentEditable={authenticated} onBlur={::this.handleUpdate}>{this.props.post.headline}</h1>
+        <p data-name="body" contentEditable={authenticated} onBlur={::this.handleUpdate}>{this.props.post.body}</p>
+        {authenticated &&
+          <button onClick={::this.handleDelete}>Delete Post</button>
+        }
       </div>
     )
   }
