@@ -25,23 +25,6 @@ test('toRow will turn an object created by fromRow back into a row', () => {
   expect(type.toRow(type.fromRow(row))).toBe(row)
 })
 
-// test('getFields will correctly get fields from the catalog', () => {
-//   const classId = 'classId'
-//   const attribute1 = { kind: 'attribute', classId, num: 1, name: 'a', typeId: new NullableType(Symbol('type')), description: Symbol('description') }
-//   const attribute2 = { kind: 'attribute', classId, num: 2, name: 'b', typeId: new NullableType(Symbol('type')), isNotNull: true }
-//   const attribute3 = { kind: 'attribute', classId, num: 3, name: 'c', typeId: Symbol('type'), description: 'Hello, world!' }
-//   const catalog = new PGCatalog([attribute1, attribute3, attribute2])
-//   catalog.assertGetType = jest.fn(typeId => typeId)
-//   typeFromPGType.mockImplementation((catalog, typeId) => typeId)
-//   const type = new PGCollectionType(catalog, { id: classId })
-//   expect(type.getFields().map(field => field.getName())).toEqual([attribute1.name, attribute2.name, attribute3.name])
-//   expect(type.getFields()[0].getType()).toBe(attribute1.typeId)
-//   expect(type.getFields()[1].getType()).toBe(attribute2.typeId.getBaseType())
-//   expect(type.getFields()[2].getType()).toBe(attribute3.typeId)
-//   expect(type.getFields().map(field => field.getDescription())).toEqual([attribute1.description, attribute2.description, attribute3.description])
-//   expect(typeFromPGType.mock.calls).toEqual([[catalog, attribute1.typeId], [catalog, attribute2.typeId], [catalog, attribute3.typeId]])
-// })
-
 test('getFields will return return fields with the correct name', () => {
   const attribute = { name: Symbol('name') }
   const catalog = new PGCatalog([])
