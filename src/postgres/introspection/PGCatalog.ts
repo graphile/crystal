@@ -64,6 +64,14 @@ class PGCatalog {
   }
 
   /**
+   * Gets a namespace by its name. Helpful in tests where we know the name, but
+   * not the id it has been assigned.
+   */
+  public getNamespaceByName (namespaceName: string): PGNamespaceObject | undefined {
+    return this.getNamespaces().find(namespace => namespace.name === namespaceName)
+  }
+
+  /**
    * Gets all of the class objects.
    */
   public getClasses (): Array<PGClassObject> {
@@ -91,6 +99,17 @@ class PGCatalog {
   }
 
   /**
+   * Gets a class by its name, also use the namespace name to ensure
+   * there are no naming collisions. Helpful in tests where we know the name,
+   * but not the id it has been assigned.
+   */
+  public getClassByName (namespaceName: string, className: string): PGClassObject | undefined {
+    const namespace = this.getNamespaceByName(namespaceName)
+    if (!namespace) return
+    return this.getClasses().find(klass => klass.namespaceId === namespace.id && klass.name === className)
+  }
+
+  /**
    * Gets all of the attribute objects.
    */
   public getAttributes (): Array<PGAttributeObject> {
@@ -109,6 +128,17 @@ class PGCatalog {
    */
   public getClassAttributes (classId: string): Array<PGAttributeObject> {
     return Array.from(this._attributes.values()).filter(attribute => attribute.classId === classId)
+  }
+
+  /**
+   * Gets an attribute by its name and the name of the class and namespace it
+   * is in. This is helpful in tests where we know the name of an attribute,
+   * but not its `classId` or `num`.
+   */
+  public getAttributeByName (namespaceName: string, className: string, attributeName: string): PGAttributeObject | undefined {
+    const klass = this.getClassByName(namespaceName, className)
+    if (!klass) return
+    return this.getAttributes().find(attribute => attribute.classId === klass.id && attribute.name === attributeName)
   }
 
   /**
@@ -143,6 +173,17 @@ class PGCatalog {
       throw new Error(`No type was found with id ${id}`)
 
     return type
+  }
+
+  /**
+   * Gets a type by its name, also use the namespace name to ensure
+   * there are no naming collisions. Helpful in tests where we know the name,
+   * but not the id it has been assigned.
+   */
+  public getTypeByName (namespaceName: string, typeName: string): PGTypeObject | undefined {
+    const namespace = this.getNamespaceByName(namespaceName)
+    if (!namespace) return
+    return this.getTypes().find(type => type.namespaceId === namespace.id && type.name === typeName)
   }
 }
 
