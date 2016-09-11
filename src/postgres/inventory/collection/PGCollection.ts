@@ -40,6 +40,8 @@ class PGCollection extends Collection<PGCollectionType.Value> {
     )
   }
 
+  // We redefine `getType` only so that we can manually specify the return type
+  // as `PGCollectionType`.
   public getType (): PGCollectionType {
     return super.getType() as any
   }
