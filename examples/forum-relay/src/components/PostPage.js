@@ -26,7 +26,8 @@ class Post extends React.Component {
   }
 
   handleDelete = (event) => {
-    this.props.router.replace('/')
+    this.props.router.replace('/posts')
+    // TODO: Use applyUpdate and commit once navigated?
     this.props.relay.commitUpdate(
       new DeletePostMutation({
         post: this.props.post,
@@ -35,6 +36,7 @@ class Post extends React.Component {
     )
   }
 
+  // TODO: get rid of warnings
   // contenteditable is used here out of simplicity, for the moment
   // react complains; I chose to ignore it
   render() {
@@ -42,7 +44,7 @@ class Post extends React.Component {
     const { post } = this.props
     return (
       <div>
-        <Link to="/">back to Posts</Link>
+        <Link to="/posts">back to Posts</Link>
         <header>
           <h1 data-prop="headline" contentEditable={authenticated} onBlur={this.handleUpdate}>{post.headline}</h1>
           <p>by {post.author.fullName}</p>

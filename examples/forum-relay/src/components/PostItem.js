@@ -20,7 +20,7 @@ function PostItem ({
   return (
     <article className={css(styles.container)}>
       <header>
-        <h2><Link to={`/${id}`}>{headline}</Link></h2>
+        <h2><Link to={`/posts/${id}`}>{headline}</Link></h2>
         <p>by {author.fullName}</p>
       </header>
       <div><p>{summary}</p></div>

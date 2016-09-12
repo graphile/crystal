@@ -6,19 +6,32 @@ import useRelay from 'react-router-relay'
 import App from './components/App'
 import PostIndexPage from './components/PostIndexPage'
 import PostPage from './components/PostPage'
+import RegisterPage from './components/RegisterPage'
+import LoginPage from './components/LoginPage'
 import { ViewerQueries, PostQueries } from './queries'
 import './styles.css' // global css
 
 const routes = (
   <Route path="/" component={App}>
-    <IndexRoute
-      component={PostIndexPage}
-      queries={ViewerQueries}
+    <Route path="posts">
+      <IndexRoute
+        component={PostIndexPage}
+        queries={ViewerQueries}
+      />
+      <Route
+        path=":postId"
+        component={PostPage}
+        queries={PostQueries}
+      />
+    </Route>
+    <Route
+      path="login"
+      component={LoginPage}
     />
     <Route
-      path=":postId"
-      component={PostPage}
-      queries={PostQueries}
+      path="register"
+      component={RegisterPage}
+      queries={ViewerQueries}
     />
   </Route>
 )

@@ -40,7 +40,7 @@ class PostIndex extends React.Component {
             </button>
           }
           {this.state.addingPost &&
-            <PostForm onSubmit={this.insertPost}/>
+            <PostForm user={this.context.user} onSubmit={this.insertPost}/>
           }
         </div>
         <ul>

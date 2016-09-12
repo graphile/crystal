@@ -1,27 +1,46 @@
 import React from 'react'
-import { Link } from 'react-router'
 import { StyleSheet, css } from 'aphrodite'
+import { Link } from 'react-router'
+import Logo from './Logo'
 import authDecorator from '../utils/authDecorator'
-import 'sanitize.css/sanitize.css'
 
 class App extends React.Component {
+  // We use React Context to share state
+  // Redux might make sense though …
   static childContextTypes = {
     user: React.PropTypes.object,
+    auth: React.PropTypes.object,
   }
 
   getChildContext() {
-    return { user: this.props.user }
+    return {
+      user: this.props.user,
+      auth: this.props.auth,
+    }
   }
+
+  // TODO: Implement Navigation component
 
   render() {
     return (
       <div className={css(styles.container)}>
         <header className={css(styles.header)}>
           <Logo />
-          {this.props.user.authenticated
-            ? <button onClick={this.props.handleLogout}>Logout</button>
-            : <LoginForm handleLogin={this.props.handleLogin}>Login</LoginForm>
-          }
+          <nav>
+            <Link to="/">Home</Link>
+            {' '}
+            <Link to="/posts">Posts</Link>
+            {this.props.user.authenticated
+              ? <button onClick={this.props.auth.handleLogout}>Logout</button>
+              : (
+                <div>
+                  <Link to="/login">Login</Link>
+                  {' '}
+                  <Link to="/register">Register</Link>
+                </div>
+              )
+            }
+          </nav>
         </header>
         <main>
           {this.props.children}
@@ -48,64 +67,5 @@ const styles = StyleSheet.create({
     color: '#0095ff',
   },
 })
-
-function Logo() {
-  return (
-    <Link className={css(logoStyles.link)} to="/">
-      <h1 className={css(logoStyles.heading)}>
-        <span className={css(logoStyles.db)}>Post</span>
-        <span className={css(logoStyles.graphql)}>GraphQL</span>
-      </h1>
-      <p className={css(logoStyles.tagline)}>Forum Example with Relay</p>
-    </Link>
-  )
-}
-
-const logoStyles = StyleSheet.create({
-  link: {
-    textDecoration: 'none',
-  },
-  heading: {
-    fontSize: '3em',
-    margin: 0,
-  },
-  db: {
-    color: '#0095ff',
-  },
-  graphql: {
-    color: '#e535ab',
-  },
-  tagline: {
-    margin: 0,
-    fontSize: 1.25,
-    color: '#333',
-  }
-})
-
-class LoginForm extends React.Component {
-  onSubmit = (event) => {
-    event.preventDefault()
-    this.props.handleLogin({
-      email: this.email.value,
-      password: this.password.value,
-    })
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.onSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input ref={(ref) => this.email = ref} name="email" type="text"/>
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input ref={(ref) => this.password = ref} name="password" type="text"/>
-        </div>
-        <input type="submit"/>
-      </form>
-    )
-  }
-}
 
 export default authDecorator(App)

@@ -122,3 +122,40 @@ export class InsertPostMutation extends Relay.Mutation {
     `
   }
 }
+
+export class RegisterPersonMutation extends Relay.Mutation {
+  static fragments = {
+    viewer: () => Relay.QL`fragment on Viewer { id }`,
+  }
+
+  getMutation() {
+    return Relay.QL`mutation { registerPerson }`
+  }
+
+  getConfigs() {
+    return [{
+      type: 'RANGE_ADD',
+      parentName: 'viewer',
+      parentID: this.props.viewer.id,
+      connectionName: 'PersonNodes',
+      edgeName: 'PersonEdge',
+      rangeBehaviors: {
+        '': 'prepend',
+    }
+    }]
+  }
+
+  getVariables() {
+    return this.props.person
+  }
+
+  getFatQuery() {
+    return Relay.QL`
+      fragment on RegisterPersonPayload {
+        viewer {
+          postNodes
+        }
+      }
+    `
+  }
+}
