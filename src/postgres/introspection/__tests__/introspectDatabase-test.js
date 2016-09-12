@@ -89,5 +89,4 @@ test('will get everything needed in an introspection', async () => {
   const client = await getTestPGClient()
   expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
   expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
-  client.release()
 })

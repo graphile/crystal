@@ -16,8 +16,15 @@ export default async function createKitchenSinkSchema () {
   })
 
   const client = await getTestPGClient()
-  await client.query(testSchema)
-  client.release()
+
+  try {
+    await client.query(testSchema)
+  }
+  catch (error) {
+    // Make sure we log any errors we might run into.)
+    console.error('Failed to execute kitchen sink SQL:', error.stack)
+    throw error
+  }
 
   created = true
 }

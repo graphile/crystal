@@ -16,7 +16,8 @@ create table c.person (
   id serial primary key,
   name varchar not null,
   about text,
-  email b.email not null unique
+  email b.email not null unique,
+  created_at timestamp default current_timestamp
 );
 
 comment on table c.person is 'Person test comment';

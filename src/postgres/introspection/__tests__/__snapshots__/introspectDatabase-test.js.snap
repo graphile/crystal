@@ -92,6 +92,16 @@ Object {
       "typeId": "email"
     },
     Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "created_at",
+      "num": 5,
+      "typeId": "timestamp"
+    },
+    Object {
       "classId": "updatable_view",
       "description": null,
       "hasDefault": false,

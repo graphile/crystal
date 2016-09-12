@@ -31,6 +31,7 @@ type Person {
   name: String!
   about: String
   email: Email
+  createdAt: String
 }
 
 type Query {

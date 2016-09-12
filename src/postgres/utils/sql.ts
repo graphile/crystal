@@ -1,4 +1,5 @@
 import { QueryConfig } from 'pg'
+import minify = require('pg-minify')
 
 namespace sql {
   type NestedArray<T> = Array<T> | Array<Array<T>> | Array<Array<Array<T>>> | Array<Array<Array<Array<T>>>>
@@ -99,6 +100,9 @@ namespace sql {
           break
       }
     }
+
+    // Finally, minify our query text.
+    text = minify(text)
 
     return (lazyValues: { [name: string]: mixed } = {}): QueryConfig => {
       // Make a shallow copy of `eagerValues` so we can mutate it.

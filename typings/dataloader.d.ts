@@ -8,7 +8,7 @@ declare module 'dataloader' {
 
   type CacheMap<K, V> = Map<K, V>
 
-  export default class DataLoader<K, V> {
+  class DataLoader<K, V> {
     constructor (
       batchLoadFn: (keys: K[]) => Promise<(V | Error)[]>,
       options?: Options<K, V>
@@ -19,4 +19,6 @@ declare module 'dataloader' {
     public clearAll (): this
     public prime (key: K, value: V): this
   }
+
+  export = DataLoader
 }

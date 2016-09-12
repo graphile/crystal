@@ -7,7 +7,8 @@ import {
 } from '../../../interface'
 
 import pluralize = require('pluralize')
-import DataLoader from 'dataloader'
+import DataLoader = require('dataloader')
+import { Client } from 'pg'
 import { memoize, sql } from '../../utils'
 import { PGCatalog, PGClassObject, PGNamespaceObject, PGAttributeObject } from '../../introspection'
 import isPGContext from '../isPGContext'
@@ -18,12 +19,8 @@ import PGCollectionType from './PGCollectionType'
  * The PostgreSQL collection, or in relational terms, table.
  */
 class PGCollection extends Collection<PGCollectionType.Value> {
-  /**
-   * The query to be used when inserting rows into the database.
-   *
-   * @private
-   */
-  private _insertQuery: sql.QueryThunk
+  private _pgNamespace: PGNamespaceObject
+  private _pgAttributes: Array<PGAttributeObject>
 
   constructor (
     pgCatalog: PGCatalog,
@@ -31,20 +28,23 @@ class PGCollection extends Collection<PGCollectionType.Value> {
   ) {
     super(pluralize(_pgClass.name), new PGCollectionType(pgCatalog, _pgClass))
 
-    const pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
-    const pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
+    this._pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
+    this._pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
 
-    const pgIdentifier = sql.identifier(pgNamespace.name, _pgClass.name)
+    // const pgIdentifier = sql.identifier(pgNamespace.name, _pgClass.name)
 
-    this._insertQuery = sql.compile(
-      `${this._pgClass.name}_insert_many`,
-      sql.query`
-        insert into ${pgIdentifier}
-        (${sql.join(pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
-        select * from json_populate_recordset(null::${pgIdentifier}, ${sql.placeholder('rows')})
-        returning *
-      `,
-    )
+    // this._insertQuery = sql.compile(
+    //   `${this._pgClass.name}_insert_many`,
+    //   sql.query`
+    //     insert into ${pgIdentifier}
+    //     (${sql.join(pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
+    //     select * from json_populate_recordset(
+    //       (${sql.raw(pgAttributes.map(() => 'default').join(', '))})::${pgIdentifier},
+    //       ${sql.placeholder('rows')}
+    //     )
+    //     returning *
+    //   `,
+    // )
   }
 
   // We redefine `getType` only so that we can manually specify the return type
@@ -67,15 +67,33 @@ class PGCollection extends Collection<PGCollectionType.Value> {
    * @private
    */
   @memoize
-  private _getInsertLoader (context: mixed): DataLoader<PGCollectionType.Value, PGCollectionType.Value> {
-    if (!isPGContext(context)) throw isPGContext.error()
-
+  private _getInsertLoader (client: Client): DataLoader<PGCollectionType.Value, PGCollectionType.Value> {
     const type = this.getType()
-    const { client } = context
 
     return new DataLoader<PGCollectionType.Value, PGCollectionType.Value>(
       async (values: Array<PGCollectionType.Value>): Promise<Array<PGCollectionType.Value>> => {
-        const query = this._insertQuery({ rows: values.map(value => type.toRow(value)) })
+        // Create our insert query.
+        const query = sql.compile(sql.query`
+          -- Start by defining our header which will be the class we are
+          -- inserting into (prefixed by namespace of course).
+          insert into ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
+
+          -- Next, add all of our value tuples.
+          values ${sql.join(values.map(value => {
+            const row = type.toRow(value)
+            // Make sure we have one value for every attribute in the class,
+            // if there was no such value defined, we should just use
+            // `default` and use the database’s default value.
+            return sql.query`(${sql.join(this._pgAttributes.map(({ name }) =>
+              row.hasOwnProperty(name) ? sql.value(row[name]) : sql.raw('default')
+            ), ', ')})`
+          }), ', ')}
+
+          -- Finally, return everything.
+          -- TODO: This shouldn’t return *…
+          returning *
+        `)()
+
         const { rows } = await client.query(query)
         return rows.map(row => type.fromRow(row))
       }
@@ -86,7 +104,8 @@ class PGCollection extends Collection<PGCollectionType.Value> {
    * Creates a row in our collection. Batching is done in the background.
    */
   public create (context: mixed, value: PGCollectionType.Value): Promise<PGCollectionType.Value> {
-    return this._getInsertLoader(context).load(value)
+    if (!isPGContext(context)) throw isPGContext.error()
+    return this._getInsertLoader(context.client).load(value)
   }
 }
 
