@@ -3,8 +3,10 @@ import Relay from 'react-relay'
 import jwtDecode from 'jwt-decode'
 import { RelayNetworkLayer, authMiddleware, urlMiddleware } from 'react-relay-network-layer'
 
-const authDecorator = WrappedComponent => {
-  return class AuthDecorator extends React.Component {
+const AUTH_URL = 'http://localhost:3000/token'
+
+const authDecorator = WrappedComponent => 
+  class AuthDecorator extends React.Component {
     state = { ...defaultState }
 
     componentWillMount() {
@@ -28,17 +30,18 @@ const authDecorator = WrappedComponent => {
 
     clearAuth() {
       localStorage.removeItem('token')
-      setupNetwork(null) // remove token from fetch headers
+      setupNetwork(null) // removes token from fetch headers
       this.setState({
         ...defaultState
       })
     }
 
+    // use async here (babel)
     handleLogin = (data) => {
-      fetchToken(data).then(token => {
-        localStorage.setItem('token', token)
-        this.setAuth(token)
-      })
+      return fetchToken(data)
+        .then((token) => (this.setAuth(token), token))
+        .then((token) => localStorage.setItem('token', token))
+        .catch((err) => console.error(err))
     }
 
     handleLogout = () => {
@@ -49,32 +52,19 @@ const authDecorator = WrappedComponent => {
       return (
         <WrappedComponent
           user={this.state}
-          handleLogin={this.handleLogin}
-          handleLogout={this.handleLogout}
+          auth={{
+            handleLogin: this.handleLogin,
+            handleLogout: this.handleLogout,
+          }}
           {...this.props}
         />
       )
     }
   }
-}
 
 const defaultState = {
   authenticated: false,
   token: null,
-}
-
-const fetchToken = (data) => {
-  return fetch(AUTH_URL, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-  })
-  .then(res => res.json())
-  .then(({ token }) => token)
-  .catch(err => console.log(err))
 }
 
 const setupNetwork = (token) => {
@@ -92,5 +82,24 @@ const isTokenExpired = (token) => {
   const currentDate = new Date()
   return expiryDate < currentDate
 }
+
+const fetchToken = (data) => {
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  }
+  return fetch(AUTH_URL, options)
+    .then(res => res.json())
+    .then(({ err, token }) => {
+      if (err) throw new Error(err.message)
+      else return token
+    })
+    .then((token) => token)
+}
+
 
 export default authDecorator

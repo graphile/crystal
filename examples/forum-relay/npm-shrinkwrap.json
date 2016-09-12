@@ -714,11 +714,6 @@
         }
       }
     },
-    "bluebird": {
-      "version": "3.4.6",
-      "from": "bluebird@>=3.4.6 <4.0.0",
-      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.4.6.tgz"
-    },
     "body-parser": {
       "version": "1.15.2",
       "from": "body-parser@latest",
@@ -2888,9 +2883,9 @@
       "resolved": "https://registry.npmjs.org/pbkdf2-compat/-/pbkdf2-compat-2.0.1.tgz"
     },
     "pg": {
-      "version": "5.1.0",
-      "from": "pg@5.1.0",
-      "resolved": "https://registry.npmjs.org/pg/-/pg-5.1.0.tgz",
+      "version": "6.1.0",
+      "from": "pg@6.1.0",
+      "resolved": "https://registry.npmjs.org/pg/-/pg-6.1.0.tgz",
       "dependencies": {
         "semver": {
           "version": "4.3.2",
@@ -2904,15 +2899,20 @@
       "from": "pg-connection-string@>=0.1.3 <0.2.0",
       "resolved": "https://registry.npmjs.org/pg-connection-string/-/pg-connection-string-0.1.3.tgz"
     },
+    "pg-pool": {
+      "version": "1.4.3",
+      "from": "pg-pool@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/pg-pool/-/pg-pool-1.4.3.tgz"
+    },
     "pg-types": {
       "version": "1.11.0",
       "from": "pg-types@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/pg-types/-/pg-types-1.11.0.tgz"
     },
     "pgpass": {
-      "version": "0.0.6",
-      "from": "pgpass@0.0.6",
-      "resolved": "https://registry.npmjs.org/pgpass/-/pgpass-0.0.6.tgz"
+      "version": "1.0.1",
+      "from": "pgpass@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/pgpass/-/pgpass-1.0.1.tgz"
     },
     "pify": {
       "version": "2.3.0",
@@ -3151,6 +3151,16 @@
           "from": "negotiator@0.6.1",
           "resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.1.tgz"
         },
+        "pg": {
+          "version": "5.1.0",
+          "from": "pg@5.1.0",
+          "resolved": "https://registry.npmjs.org/pg/-/pg-5.1.0.tgz"
+        },
+        "pgpass": {
+          "version": "0.0.6",
+          "from": "pgpass@0.0.6",
+          "resolved": "https://registry.npmjs.org/pgpass/-/pgpass-0.0.6.tgz"
+        },
         "proxy-addr": {
           "version": "1.1.2",
           "from": "proxy-addr@>=1.1.2 <1.2.0",
@@ -3165,6 +3175,11 @@
           "version": "1.2.0",
           "from": "range-parser@>=1.2.0 <1.3.0",
           "resolved": "https://registry.npmjs.org/range-parser/-/range-parser-1.2.0.tgz"
+        },
+        "semver": {
+          "version": "4.3.2",
+          "from": "semver@4.3.2",
+          "resolved": "https://registry.npmjs.org/semver/-/semver-4.3.2.tgz"
         },
         "send": {
           "version": "0.14.1",

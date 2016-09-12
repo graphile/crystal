@@ -7,25 +7,20 @@ export default {
     loaders: [{
       test: /\.css$/,
       exclude: /node_modules/,
-      loader: 'style!css?modules',
+      loader: 'style-loader!css-loader?modules',
       options: 'modules'
     }, {
       test: /\.css$/,
       include: /node_modules/,
-      loader: 'style!css',
+      loader: 'style-loader!css-loader',
     }, {
       test: /\.js$/,
       include: [path.resolve(__dirname, '../src')],
-      loader: 'babel',
+      loader: 'babel-loader',
     }]
   },
   output: {
     filename: 'app.js',
     path: '/',
   },
-  plugins: [
-    new DefinePlugin({
-      AUTH_URL: JSON.stringify('http://localhost:3000/authenticate'),
-    })
-  ]
 }

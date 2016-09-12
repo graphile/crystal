@@ -28,7 +28,7 @@ const app = new WebpackDevServer(compiler, {
 })
 
 // We mount the authentication service
-app.use('/authenticate', authentication)
+app.use('/token', authentication)
 
 // The webpack dev server exposes the `.use` of the express app instance.
 // Mount the postgraphql as middleware at `/graphql`.
