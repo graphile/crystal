@@ -102,8 +102,9 @@ export class InsertPostMutation extends Relay.Mutation {
       connectionName: 'postNodes',
       edgeName: 'postEdge',
       rangeBehaviors: {
-        '': 'prepend',
-    }
+        '': 'append',
+        'descending(true).orderBy(CREATED_AT)': 'prepend',
+      },
     }]
   }
 
@@ -137,11 +138,12 @@ export class RegisterPersonMutation extends Relay.Mutation {
       type: 'RANGE_ADD',
       parentName: 'viewer',
       parentID: this.props.viewer.id,
-      connectionName: 'PersonNodes',
-      edgeName: 'PersonEdge',
+      connectionName: 'personNodes',
+      edgeName: 'personEdge',
       rangeBehaviors: {
-        '': 'prepend',
-    }
+        '': 'append',
+        'descending(true).orderBy(CREATED_AT)': 'prepend',
+      },
     }]
   }
 
@@ -153,7 +155,7 @@ export class RegisterPersonMutation extends Relay.Mutation {
     return Relay.QL`
       fragment on RegisterPersonPayload {
         viewer {
-          postNodes
+          personNodes
         }
       }
     `

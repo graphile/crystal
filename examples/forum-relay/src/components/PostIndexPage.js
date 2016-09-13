@@ -29,6 +29,8 @@ class PostIndex extends React.Component {
     this.setState({ addingPost: value || !addingPost })
   }
 
+  // TODO: Add some kind of pagination
+
   render() {
     return (
       <div>
@@ -59,22 +61,22 @@ export default Relay.createContainer(PostIndex, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${InsertPostMutation.getFragment('viewer')},
-        posts: postNodes(first: 20, orderBy: CREATED_AT, descending: true) {
+        ${InsertPostMutation.getFragment('viewer')}
+        posts: postNodes(first: 10, orderBy: CREATED_AT, descending: true) {
           edges {
             node {
-              id,
-              headline,
-              topic,
-              summary,
-              createdAt,
-              updatedAt,
+              id
+              headline
+              topic
+              summary
+              createdAt
+              updatedAt
               author: personByAuthorId {
-                fullName,
-              },
-            },
-          },
-        },
+                fullName
+              }
+            }
+          }
+        }
       }
     `,
   },

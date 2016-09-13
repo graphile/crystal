@@ -15,7 +15,7 @@ class RegisterPage extends React.Component {
       person: data,
     }), {
       onFailure: this.onFailure,
-      onSuccess: this.onSuccess.bind(this, data),
+      onSuccess: this.onSuccess(data),
     })
   }
 
@@ -23,7 +23,8 @@ class RegisterPage extends React.Component {
     console.error(transaction)
   }
 
-  onSuccess = (data) => {
+  onSuccess = (data) => (response) => {
+    console.log(data)
     this.context.auth.handleLogin({
       email: data.email,
       password: data.password,
@@ -39,7 +40,7 @@ export default Relay.createContainer(withRouter(RegisterPage), {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${RegisterPersonMutation.getFragment('viewer')},
+        ${RegisterPersonMutation.getFragment('viewer')}
       }
     `,
   },

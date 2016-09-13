@@ -4,6 +4,7 @@ import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, browserHistory, applyRouterMiddleware } from 'react-router'
 import useRelay from 'react-router-relay'
 import App from './components/App'
+import HomePage from './components/HomePage'
 import PostIndexPage from './components/PostIndexPage'
 import PostPage from './components/PostPage'
 import RegisterPage from './components/RegisterPage'
@@ -13,26 +14,13 @@ import './styles.css' // global css
 
 const routes = (
   <Route path="/" component={App}>
+    <IndexRoute component={HomePage} queries={ViewerQueries} />
     <Route path="posts">
-      <IndexRoute
-        component={PostIndexPage}
-        queries={ViewerQueries}
-      />
-      <Route
-        path=":postId"
-        component={PostPage}
-        queries={PostQueries}
-      />
+      <IndexRoute component={PostIndexPage} queries={ViewerQueries} />
+      <Route path=":postId" component={PostPage} queries={PostQueries} />
     </Route>
-    <Route
-      path="login"
-      component={LoginPage}
-    />
-    <Route
-      path="register"
-      component={RegisterPage}
-      queries={ViewerQueries}
-    />
+    <Route path="login" component={LoginPage} />
+    <Route path="register" component={RegisterPage} queries={ViewerQueries} />
   </Route>
 )
 

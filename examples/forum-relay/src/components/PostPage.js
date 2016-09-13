@@ -4,7 +4,7 @@ import { Link, withRouter } from 'react-router'
 import { StyleSheet, css } from 'aphrodite'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
-class Post extends React.Component {
+class PostPage extends React.Component {
   static contextTypes = {
     user: React.PropTypes.object,
   }
@@ -40,18 +40,19 @@ class Post extends React.Component {
   // contenteditable is used here out of simplicity, for the moment
   // react complains; I chose to ignore it
   render() {
-    const { authenticated } = this.context.user
     const { post } = this.props
+    const { authenticated, personId } = this.context.user
+    const authAndOwn = personId === post.authorId && authenticated
     return (
       <div>
         <Link to="/posts">back to Posts</Link>
         <header>
-          <h1 data-prop="headline" contentEditable={authenticated} onBlur={this.handleUpdate}>{post.headline}</h1>
+          <h1 data-prop="headline" contentEditable={authAndOwn} onBlur={this.handleUpdate}>{post.headline}</h1>
           <p>by {post.author.fullName}</p>
         </header>
-        <p data-prop="body" contentEditable={authenticated} onBlur={this.handleUpdate}>{post.body}</p>
+        <p data-prop="body" contentEditable={authAndOwn} onBlur={this.handleUpdate}>{post.body}</p>
         <aside>
-          {authenticated &&
+          {authAndOwn &&
             <button onClick={this.handleDelete}>Delete Post</button>
           }
         </aside>
@@ -64,22 +65,23 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export default Relay.createContainer(withRouter(Post), {
+export default Relay.createContainer(withRouter(PostPage), {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
-        ${DeletePostMutation.getFragment('viewer')},
+        ${DeletePostMutation.getFragment('viewer')}
       }
     `,
     post: () => Relay.QL`
       fragment on Post {
-        ${UpdatePostMutation.getFragment('post')},
-        ${DeletePostMutation.getFragment('post')},
-        headline,
-        body,
+        ${UpdatePostMutation.getFragment('post')}
+        ${DeletePostMutation.getFragment('post')}
+        headline
+        body
+        authorId
         author: personByAuthorId {
-          fullName,
-        },
+          fullName
+        }
       }
     `,
   },
