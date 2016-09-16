@@ -102,6 +102,46 @@ Object {
       "typeId": "timestamp"
     },
     Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "headline",
+      "num": 2,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "body",
+      "num": 3,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "author_id",
+      "num": 4,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "updatable_view",
       "description": null,
       "hasDefault": false,
@@ -180,6 +220,18 @@ Object {
       "typeId": "person"
     },
     Object {
+      "description": null,
+      "id": "post",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "post",
+      "namespaceId": "a",
+      "typeId": "post"
+    },
+    Object {
       "description": "YOYOYO!!",
       "id": "updatable_view",
       "isDeletable": true,
@@ -190,6 +242,50 @@ Object {
       "name": "updatable_view",
       "namespaceId": "b",
       "typeId": "updatable_view"
+    }
+  ],
+  "constraints": Array [
+    Object {
+      "classId": "person",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "type": "p"
+    },
+    Object {
+      "classId": "person",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        4
+      ],
+      "kind": "constraint",
+      "type": "u"
+    },
+    Object {
+      "classId": "post",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "type": "p"
+    },
+    Object {
+      "classId": "post",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        4
+      ],
+      "kind": "constraint",
+      "type": "f"
     }
   ],
   "namespaces": Array [
@@ -303,6 +399,20 @@ Object {
     Object {
       "baseTypeId": null,
       "category": "C",
+      "classId": "post",
+      "description": null,
+      "enumVariants": null,
+      "id": "post",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "post",
+      "namespaceId": "a",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
       "classId": "updatable_view",
       "description": null,
       "enumVariants": null,
@@ -330,6 +440,46 @@ Object {
       "name": "?column?",
       "num": 1,
       "typeId": "int4"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "headline",
+      "num": 2,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "body",
+      "num": 3,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "post",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "author_id",
+      "num": 4,
+      "typeId": "int4"
     }
   ],
   "classes": Array [
@@ -344,6 +494,30 @@ Object {
       "name": "no_update",
       "namespaceId": "a",
       "typeId": "no_update"
+    },
+    Object {
+      "description": null,
+      "id": "post",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "post",
+      "namespaceId": "a",
+      "typeId": "post"
+    }
+  ],
+  "constraints": Array [
+    Object {
+      "classId": "post",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "type": "p"
     }
   ],
   "namespaces": Array [
@@ -366,6 +540,20 @@ Object {
       "itemId": null,
       "kind": "type",
       "name": "no_update",
+      "namespaceId": "a",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "post",
+      "description": null,
+      "enumVariants": null,
+      "id": "post",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "post",
       "namespaceId": "a",
       "type": "c"
     }

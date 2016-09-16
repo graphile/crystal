@@ -8,10 +8,10 @@
  */
 // TODO: We should probably make a special case for range types.
 type PGCatalogType =
-  PGCompositeTypeObject |
-  PGDomainTypeObject |
-  PGEnumTypeObject |
-  (_PGTypeObject & {
+  PGCatalogCompositeType |
+  PGCatalogDomainType |
+  PGCatalogEnumType |
+  (PGCatalogBaseType & {
     type: 'b' | 'p' | 'r',
   })
 
@@ -21,7 +21,7 @@ export default PGCatalogType
  * A composite type is a type with an associated class. So any type which may
  * have attributes (or fields).
  */
-type PGCompositeTypeObject = _PGTypeObject & {
+type PGCatalogCompositeType = PGCatalogBaseType & {
   type: 'c',
   classId: string,
 }
@@ -30,7 +30,7 @@ type PGCompositeTypeObject = _PGTypeObject & {
  * A domain type is a named alias of another type with some extra constraints
  * added on top. One such constraint is the `is_not_null` constraint.
  */
-type PGDomainTypeObject = _PGTypeObject & {
+type PGCatalogDomainType = PGCatalogBaseType & {
   type: 'd',
   baseTypeId: string,
   isNotNull: boolean,
@@ -40,9 +40,9 @@ type PGDomainTypeObject = _PGTypeObject & {
  * An enum type is a type with a set of predefined string values. A value of
  * an enum type may only be one of those values.
  */
-type PGEnumTypeObject = _PGTypeObject & {
+type PGCatalogEnumType = PGCatalogBaseType & {
   type: 'e',
-  enumVariants: string[],
+  enumVariants: Array<string>,
 }
 
 /**
@@ -51,9 +51,8 @@ type PGEnumTypeObject = _PGTypeObject & {
  * reuse.
  *
  * @private
- * @see PGType
  */
-type _PGTypeObject = {
+type PGCatalogBaseType = {
   kind: 'type',
   id: string,
   name: string,

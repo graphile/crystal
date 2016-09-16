@@ -34,6 +34,13 @@ type Person {
   createdAt: String
 }
 
+type Post {
+  id: Int!
+  headline: String!
+  body: String
+  authorId: Int
+}
+
 type Query {
   node(__id: ID!): Node
 }

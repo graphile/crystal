@@ -83,6 +83,12 @@ const format = catalog => ({
     // we let types outside of our schemas in.
     .filter(namespace => Boolean(namespace.namespaceId))
     .sort(sortBy(({ id }) => id)),
+
+  constraints: Array.from(catalog._constraints)
+    .map(constraint => Object.assign({}, constraint, {
+      classId: catalog.getClass(constraint.classId).name,
+      foreignClassId: constraint.foreignClassId ? catalog.getClass(constraint.foreignClassId).name : null,
+    })),
 })
 
 test('will get everything needed in an introspection', async () => {

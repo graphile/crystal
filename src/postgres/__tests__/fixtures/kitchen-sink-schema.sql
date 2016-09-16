@@ -23,6 +23,13 @@ create table c.person (
 comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
 
+create table a.post (
+  id serial primary key,
+  headline text not null,
+  body text,
+  author_id int4 references c.person(id)
+);
+
 create type a.letter as enum ('a', 'b', 'c', 'd');
 create type b.color as enum ('red', 'green', 'blue');
 

@@ -28,11 +28,18 @@ const mockTypes = [
   { kind: 'type', id: '9', name: 'd', namespaceId: '1' },
 ]
 
+const mockConstraints = [
+  { kind: 'constraint' },
+  { kind: 'constraint' },
+  { kind: 'constraint' },
+]
+
 const mockObjects = [
   ...mockNamespaces,
   ...mockClasses,
   ...mockAttributes,
   ...mockTypes,
+  ...mockConstraints,
 ]
 
 const catalog = new PGCatalog(mockObjects)
@@ -153,4 +160,8 @@ test('getTypeByName will get a type by its name', () => {
   expect(catalog.getTypeByName('b', 'c')).toBe(undefined)
   expect(catalog.getTypeByName('a', 'c')).toBe(mockTypes[3])
   expect(catalog.getTypeByName('c', 'a')).toBe(undefined)
+})
+
+test('getConstraints will get all constraints', () => {
+  expect(catalog.getConstraints()).toEqual(mockConstraints)
 })

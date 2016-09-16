@@ -108,6 +108,31 @@ with
       -- code to read. So we prefer code readability over selecting like 3 or
       -- 4 less type rows.
       typ.id in (select "baseTypeId" from type_all)
+  ),
+  "constraint" as (
+    select
+      'constraint' as "kind",
+      con.contype as "type",
+      con.conrelid as "classId",
+      nullif(con.confrelid, 0) as "foreignClassId",
+      con.conkey as "keyAttributeNums",
+      con.confkey as "foreignKeyAttributeNums"
+    from
+      pg_catalog.pg_constraint as con
+    where
+      -- Only get constraints for classes we have selected.
+      con.conrelid in (select "id" from class) and
+      case
+        -- If this is a foreign key constraint, we want to ensure that the
+        -- foreign class is also in the list of classes we have already
+        -- selected.
+        when con.contype = 'f' then con.confrelid in (select "id" from class)
+        -- Otherwise, this should be true.
+        else true
+      end and
+      -- We only want foreign key, primary key, and unique constraints. We
+      -- made add support for more constraints in the future.
+      con.contype in ('f', 'p', 'u')
   )
 select to_json(namespace.*) as object from namespace
 union all
@@ -116,4 +141,6 @@ union all
 select to_json(attribute.*) as object from attribute
 union all
 select to_json(type.*) as object from type
+union all
+select to_json("constraint".*) as object from "constraint"
 ;

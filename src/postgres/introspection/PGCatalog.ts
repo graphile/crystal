@@ -3,6 +3,7 @@ import PGCatalogNamespace from './object/PGCatalogNamespace'
 import PGCatalogClass from './object/PGCatalogClass'
 import PGCatalogAttribute from './object/PGCatalogAttribute'
 import PGCatalogType from './object/PGCatalogType'
+import PGCatalogConstraint from './object/PGCatalogConstraint'
 
 /**
  * A utility class for interacting with the `PGCatalogObject`s returned from the
@@ -13,6 +14,7 @@ class PGCatalog {
   private _classes = new Map<string, PGCatalogClass>()
   private _attributes = new Map<string, PGCatalogAttribute>()
   private _types = new Map<string, PGCatalogType>()
+  private _constraints = new Set<PGCatalogConstraint>()
 
   constructor (objects: Array<PGCatalogObject>) {
     // Build an in-memory index of all our objects for ease of use:
@@ -29,6 +31,9 @@ class PGCatalog {
           break
         case 'type':
           this._types.set(object.id, object)
+          break
+        case 'constraint':
+          this._constraints.add(object)
           break
         default:
           throw new Error(`Object of kind '${object['kind']}' is not allowed.`)
@@ -184,6 +189,13 @@ class PGCatalog {
     const namespace = this.getNamespaceByName(namespaceName)
     if (!namespace) return
     return this.getTypes().find(type => type.namespaceId === namespace.id && type.name === typeName)
+  }
+
+  /**
+   * Gets all of the constraints found by our catalog.
+   */
+  public getConstraints (): Array<PGCatalogConstraint> {
+    return Array.from(this._constraints)
   }
 }
 
