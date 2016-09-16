@@ -30,21 +30,6 @@ class PGCollection extends Collection<PGCollectionType.Value> {
 
     this._pgNamespace = pgCatalog.assertGetNamespace(_pgClass.namespaceId)
     this._pgAttributes = pgCatalog.getClassAttributes(_pgClass.id)
-
-    // const pgIdentifier = sql.identifier(pgNamespace.name, _pgClass.name)
-
-    // this._insertQuery = sql.compile(
-    //   `${this._pgClass.name}_insert_many`,
-    //   sql.query`
-    //     insert into ${pgIdentifier}
-    //     (${sql.join(pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
-    //     select * from json_populate_recordset(
-    //       (${sql.raw(pgAttributes.map(() => 'default').join(', '))})::${pgIdentifier},
-    //       ${sql.placeholder('rows')}
-    //     )
-    //     returning *
-    //   `,
-    // )
   }
 
   // We redefine `getType` only so that we can manually specify the return type
