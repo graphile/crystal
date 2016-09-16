@@ -7,7 +7,7 @@
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html
  */
 // TODO: We should probably make a special case for range types.
-type PGTypeObject =
+type PGCatalogType =
   PGCompositeTypeObject |
   PGDomainTypeObject |
   PGEnumTypeObject |
@@ -15,7 +15,7 @@ type PGTypeObject =
     type: 'b' | 'p' | 'r',
   })
 
-export default PGTypeObject
+export default PGCatalogType
 
 /**
  * A composite type is a type with an associated class. So any type which may

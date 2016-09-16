@@ -1,5 +1,5 @@
 import { ObjectType, ObjectField, Type, NullableType } from '../../../interface'
-import { PGCatalog, PGClassObject, PGAttributeObject } from '../../introspection'
+import { PGCatalog, PGCatalogClass, PGCatalogAttribute } from '../../introspection'
 import typeFromPGType from '../typeFromPGType'
 
 /**
@@ -8,7 +8,7 @@ import typeFromPGType from '../typeFromPGType'
 class PGCollectionType extends ObjectType<PGCollectionValue> {
   constructor (
     pgCatalog: PGCatalog,
-    private _pgClass: PGClassObject,
+    private _pgClass: PGCatalogClass,
   ) {
     super(_pgClass.name)
 
@@ -156,13 +156,13 @@ class PGCollectionValue {
  */
 class PGCollectionObjectField<T> extends ObjectField<PGCollectionValue, T> {
   constructor (
-    private _pgAttribute: PGAttributeObject,
+    private _pgAttribute: PGCatalogAttribute,
     type: Type<T>,
   ) {
     super(_pgAttribute.name, type)
   }
 
-  public getPGAttribute (): PGAttributeObject {
+  public getPGAttribute (): PGCatalogAttribute {
     return this._pgAttribute
   }
 

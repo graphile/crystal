@@ -5,7 +5,7 @@
  *
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-class.html
  */
-type PGClassObject = {
+type PGCatalogClass = {
   kind: 'class',
   id: string,
   name: string,
@@ -18,4 +18,4 @@ type PGClassObject = {
   isDeletable: boolean,
 }
 
-export default PGClassObject
+export default PGCatalogClass

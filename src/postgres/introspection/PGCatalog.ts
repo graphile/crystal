@@ -1,20 +1,20 @@
-import PGObject from './object/PGObject'
-import PGNamespaceObject from './object/PGNamespaceObject'
-import PGClassObject from './object/PGClassObject'
-import PGAttributeObject from './object/PGAttributeObject'
-import PGTypeObject from './object/PGTypeObject'
+import PGCatalogObject from './object/PGCatalogObject'
+import PGCatalogNamespace from './object/PGCatalogNamespace'
+import PGCatalogClass from './object/PGCatalogClass'
+import PGCatalogAttribute from './object/PGCatalogAttribute'
+import PGCatalogType from './object/PGCatalogType'
 
 /**
- * A utility class for interacting with the `PGObject`s returned from the
+ * A utility class for interacting with the `PGCatalogObject`s returned from the
  * introspection query.
  */
 class PGCatalog {
-  private _namespaces = new Map<string, PGNamespaceObject>()
-  private _classes = new Map<string, PGClassObject>()
-  private _attributes = new Map<string, PGAttributeObject>()
-  private _types = new Map<string, PGTypeObject>()
+  private _namespaces = new Map<string, PGCatalogNamespace>()
+  private _classes = new Map<string, PGCatalogClass>()
+  private _attributes = new Map<string, PGCatalogAttribute>()
+  private _types = new Map<string, PGCatalogType>()
 
-  constructor (objects: Array<PGObject>) {
+  constructor (objects: Array<PGCatalogObject>) {
     // Build an in-memory index of all our objects for ease of use:
     for (const object of objects) {
       switch (object.kind) {
@@ -39,14 +39,14 @@ class PGCatalog {
   /**
    * Gets all of the namespace objects.
    */
-  public getNamespaces (): Array<PGNamespaceObject> {
+  public getNamespaces (): Array<PGCatalogNamespace> {
     return Array.from(this._namespaces.values())
   }
 
   /**
    * Gets a single namespace object of the provided id.
    */
-  public getNamespace (id: string): PGNamespaceObject | undefined {
+  public getNamespace (id: string): PGCatalogNamespace | undefined {
     return this._namespaces.get(id)
   }
 
@@ -54,7 +54,7 @@ class PGCatalog {
    * Gets a single namespace object by the provided id, and if no namespace
    * object exists an error is thrown instead of returning `undefined`.
    */
-  public assertGetNamespace (id: string): PGNamespaceObject {
+  public assertGetNamespace (id: string): PGCatalogNamespace {
     const namespace = this.getNamespace(id)
 
     if (!namespace)
@@ -67,21 +67,21 @@ class PGCatalog {
    * Gets a namespace by its name. Helpful in tests where we know the name, but
    * not the id it has been assigned.
    */
-  public getNamespaceByName (namespaceName: string): PGNamespaceObject | undefined {
+  public getNamespaceByName (namespaceName: string): PGCatalogNamespace | undefined {
     return this.getNamespaces().find(namespace => namespace.name === namespaceName)
   }
 
   /**
    * Gets all of the class objects.
    */
-  public getClasses (): Array<PGClassObject> {
+  public getClasses (): Array<PGCatalogClass> {
     return Array.from(this._classes.values())
   }
 
   /**
    * Gets a single class object of the provided id.
    */
-  public getClass (id: string): PGClassObject | undefined {
+  public getClass (id: string): PGCatalogClass | undefined {
     return this._classes.get(id)
   }
 
@@ -89,7 +89,7 @@ class PGCatalog {
    * Gets a single class object by the provided id, and if no class object
    * exists an error is thrown instead of returning `undefined`.
    */
-  public assertGetClass (id: string): PGClassObject {
+  public assertGetClass (id: string): PGCatalogClass {
     const clazz = this.getClass(id)
 
     if (!clazz)
@@ -103,7 +103,7 @@ class PGCatalog {
    * there are no naming collisions. Helpful in tests where we know the name,
    * but not the id it has been assigned.
    */
-  public getClassByName (namespaceName: string, className: string): PGClassObject | undefined {
+  public getClassByName (namespaceName: string, className: string): PGCatalogClass | undefined {
     const namespace = this.getNamespaceByName(namespaceName)
     if (!namespace) return
     return this.getClasses().find(klass => klass.namespaceId === namespace.id && klass.name === className)
@@ -112,21 +112,21 @@ class PGCatalog {
   /**
    * Gets all of the attribute objects.
    */
-  public getAttributes (): Array<PGAttributeObject> {
+  public getAttributes (): Array<PGCatalogAttribute> {
     return Array.from(this._attributes.values())
   }
 
   /**
    * Gets a single attribute object by the provided class id and number.
    */
-  public getAttribute (classId: string, num: number): PGAttributeObject | undefined {
+  public getAttribute (classId: string, num: number): PGCatalogAttribute | undefined {
     return this._attributes.get(`${classId}-${num}`)
   }
 
   /**
    * Gets all of the attributes for a single class.
    */
-  public getClassAttributes (classId: string): Array<PGAttributeObject> {
+  public getClassAttributes (classId: string): Array<PGCatalogAttribute> {
     return Array.from(this._attributes.values()).filter(attribute => attribute.classId === classId)
   }
 
@@ -135,7 +135,7 @@ class PGCatalog {
    * is in. This is helpful in tests where we know the name of an attribute,
    * but not its `classId` or `num`.
    */
-  public getAttributeByName (namespaceName: string, className: string, attributeName: string): PGAttributeObject | undefined {
+  public getAttributeByName (namespaceName: string, className: string, attributeName: string): PGCatalogAttribute | undefined {
     const klass = this.getClassByName(namespaceName, className)
     if (!klass) return
     return this.getAttributes().find(attribute => attribute.classId === klass.id && attribute.name === attributeName)
@@ -144,21 +144,21 @@ class PGCatalog {
   /**
    * Gets all of the type objects.
    */
-  public getTypes (): Array<PGTypeObject> {
+  public getTypes (): Array<PGCatalogType> {
     return Array.from(this._types.values())
   }
 
   /**
    * Gets a single type object by the provided id.
    */
-  public getType (id: string): PGTypeObject | undefined {
+  public getType (id: string): PGCatalogType | undefined {
     return this._types.get(id)
   }
 
   /**
    * Determines if our instance has this *exact* `PGType` instance.
    */
-  public hasType (type: PGTypeObject): boolean {
+  public hasType (type: PGCatalogType): boolean {
     return this._types.get(type.id) === type
   }
 
@@ -166,7 +166,7 @@ class PGCatalog {
    * Gets a single type object by the provided id, and if no type object
    * exists an error is thrown instead of returning `undefined`.
    */
-  public assertGetType (id: string): PGTypeObject {
+  public assertGetType (id: string): PGCatalogType {
     const type = this.getType(id)
 
     if (!type)
@@ -180,7 +180,7 @@ class PGCatalog {
    * there are no naming collisions. Helpful in tests where we know the name,
    * but not the id it has been assigned.
    */
-  public getTypeByName (namespaceName: string, typeName: string): PGTypeObject | undefined {
+  public getTypeByName (namespaceName: string, typeName: string): PGCatalogType | undefined {
     const namespace = this.getNamespaceByName(namespaceName)
     if (!namespace) return
     return this.getTypes().find(type => type.namespaceId === namespace.id && type.name === typeName)

@@ -10,7 +10,7 @@ import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { memoize, sql } from '../../utils'
-import { PGCatalog, PGClassObject, PGNamespaceObject, PGAttributeObject } from '../../introspection'
+import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import isPGContext from '../isPGContext'
 import typeFromPGType from '../typeFromPGType'
 import PGCollectionType from './PGCollectionType'
@@ -19,12 +19,12 @@ import PGCollectionType from './PGCollectionType'
  * The PostgreSQL collection, or in relational terms, table.
  */
 class PGCollection extends Collection<PGCollectionType.Value> {
-  private _pgNamespace: PGNamespaceObject
-  private _pgAttributes: Array<PGAttributeObject>
+  private _pgNamespace: PGCatalogNamespace
+  private _pgAttributes: Array<PGCatalogAttribute>
 
   constructor (
     pgCatalog: PGCatalog,
-    private _pgClass: PGClassObject,
+    private _pgClass: PGCatalogClass,
   ) {
     super(pluralize(_pgClass.name), new PGCollectionType(pgCatalog, _pgClass))
 
