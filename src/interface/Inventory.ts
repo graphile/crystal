@@ -81,15 +81,16 @@ class Inventory {
    * We will also add the type for this collection to the inventory.
    */
   public addCollection (collection: Collection<mixed>): this {
-    const name = collection.getName()
+    const { name } = collection
 
     if (this._collections.has(name))
       throw new Error(`Collection of name '${name}' already exists in the inventory.`)
 
     this._collections.set(name, collection)
 
-    // Add the type for this collection.
-    this.addType(collection.getType())
+    // Add the type for this collection if it exists.
+    if (collection.type)
+      this.addType(collection.type)
 
     return this
   }
@@ -119,7 +120,7 @@ class Inventory {
    * method returns true, otherwise it returns false.
    */
   public hasCollection (collection: Collection<mixed>): boolean {
-    return this._collections.get(collection.getName()) === collection
+    return this._collections.get(collection.name) === collection
   }
 
   /**
@@ -127,16 +128,16 @@ class Inventory {
    * members of this inventory we fail with an error.
    */
   public addRelation (relation: Relation<mixed, mixed, mixed>): this {
-    const tailCollection = relation.getTailCollection()
-    const headCollection = relation.getHeadCollectionKey().getCollection()
+    const { name, tailCollection, headCollection, headCollectionKey } = relation
+
+    if (headCollectionKey && !headCollection.keys.has(headCollectionKey))
+      throw new Error(`Head collection key '${headCollectionKey.name}' is not valid for head collection '${headCollection.name}'.`)
 
     if (!this.hasCollection(tailCollection))
-      throw new Error(`Tail collection named '${tailCollection.getName()}' is not in this inventory.`)
+      throw new Error(`Tail collection named '${tailCollection.name}' is not in this inventory.`)
 
     if (!this.hasCollection(headCollection))
-      throw new Error(`Head collection named '${headCollection.getName()}' is not in this inventory.`)
-
-    const name = relation.getName()
+      throw new Error(`Head collection named '${headCollection.name}' is not in this inventory.`)
 
     if (this._relations.has(name))
       throw new Error(`Relation of name '${name}' already exists in the inventory.`)

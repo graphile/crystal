@@ -1,22 +1,22 @@
 import createKitchenSinkPGSchema from '../../../__tests__/fixtures/createKitchenSinkPGSchema'
 import getTestPGCatalog from '../../../__tests__/fixtures/getTestPGCatalog'
 import getTestPGClient from '../../../__tests__/fixtures/getTestPGClient'
-import PGCollection from '../PGCollection'
+import createPGCollection from '../createPGCollection'
 
 beforeAll(createKitchenSinkPGSchema)
 
-let collection1: PGCollection
-let collection2: PGCollection
+let collection1
+let collection2
 
 beforeAll(async () => {
   const pgCatalog = await getTestPGCatalog()
-  collection1 = new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'person')!)
-  collection2 = new PGCollection(pgCatalog, pgCatalog.getClassByName('b', 'updatable_view')!)
+  collection1 = createPGCollection(pgCatalog, pgCatalog.getClassByName('c', 'person')!)
+  collection2 = createPGCollection(pgCatalog, pgCatalog.getClassByName('b', 'updatable_view')!)
 })
 
 test('create will insert new rows into the database', async () => {
   const client = await getTestPGClient()
-  const type1 = collection1.getType()
+  const type1 = collection1.type
   const value1 = type1.fromRow({ name: 'John Smith', about: 'Hello, world!', email: 'john.smith@email.com' })
   const value2 = type1.fromRow({ name: 'Sarah Smith', email: 'sarah.smith@email.com' })
   const value3 = type1.fromRow({ name: 'Budd Deey', email: 'budd.deey@email.com' })

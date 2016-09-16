@@ -30,65 +30,57 @@ import Condition from './collection/Condition'
  *
  * @see https://en.wikipedia.org/wiki/Directed_graph#Basic_terminology
  */
-abstract class Relation<TTailValue, THeadValue, TKey> {
-  constructor (
-    private _name: string,
-    private _tailCollection: Collection<TTailValue>,
-    private _headCollectionKey: CollectionKey<THeadValue, TKey>,
-    private _tailPaginator: Paginator<TTailValue, mixed> | undefined,
-  ) {}
+interface Relation<TTailValue, THeadValue, TKey> {
+  /**
+   * The name of the relation.
+   */
+  readonly name: string
 
   /**
-   * Gets the name of a relation.
+   * The tail collection in this relationship.
    */
-  public getName (): string {
-    return this._name
-  }
+  readonly tailCollection: Collection<TTailValue>
 
   /**
-   * Gets the tail collection in this relationship.
+   * The head collection in this relationship.
    */
-  public getTailCollection (): Collection<TTailValue> {
-    return this._tailCollection
-  }
+  readonly headCollection: Collection<THeadValue>
 
   /**
-   * Gets the head collection in this relationship.
+   * The head collection key in this relationship.
    */
-  public getHeadCollectionKey (): CollectionKey<THeadValue, TKey> {
-    return this._headCollectionKey
-  }
+  readonly headCollectionKey: CollectionKey<THeadValue, TKey>
 
   /**
    * Gets the key for a value in the head collection from the tail collection
    * value. This allows us to see the “one” in a many-to-one mental model.
    */
-  public abstract getHeadKeyFromTailValue (value: TTailValue): TKey
+  getHeadKeyFromTailValue (value: TTailValue): TKey
 
-  /**
-   * Gets the paginator for values in the tail collection which we will use
-   * with a condition from `Relation#getTailConditionFromHeadValue`.
-   *
-   * The reason we have two seperate methods (one for the paginator, one for
-   * the condition) is that we need to statically know information about the
-   * paginator. Such as orderings, type, and name information.
-   *
-   * @see Relation#getTailConditionFromHeadValue
-   */
-  // TODO: Is this really the right way to do this?
-  public getTailPaginator (): Paginator<TTailValue, mixed> | undefined {
-    return this._tailPaginator
-  }
+  // /**
+  //  * Gets the paginator for values in the tail collection which we will use
+  //  * with a condition from `Relation#getTailConditionFromHeadValue`.
+  //  *
+  //  * The reason we have two seperate methods (one for the paginator, one for
+  //  * the condition) is that we need to statically know information about the
+  //  * paginator. Such as orderings, type, and name information.
+  //  *
+  //  * @see Relation#getTailConditionFromHeadValue
+  //  */
+  // // TODO: Is this really the right way to do this?
+  // public getTailPaginator (): Paginator<TTailValue, mixed> | undefined {
+  //   return this._tailPaginator
+  // }
 
-  /**
-   * Gets a condition which will be used with the tail paginator from
-   * `Relation#getTailPaginator` to select all of the tail values from the
-   * single head value. This allows us to see the “many” in a one-to-many
-   * mental model.
-   *
-   * @see Relation#getTailPaginator
-   */
-  public abstract getTailConditionFromHeadValue (value: THeadValue): Condition
+  // /**
+  //  * Gets a condition which will be used with the tail paginator from
+  //  * `Relation#getTailPaginator` to select all of the tail values from the
+  //  * single head value. This allows us to see the “many” in a one-to-many
+  //  * mental model.
+  //  *
+  //  * @see Relation#getTailPaginator
+  //  */
+  // public abstract getTailConditionFromHeadValue (value: THeadValue): Condition
 }
 
 export default Relation

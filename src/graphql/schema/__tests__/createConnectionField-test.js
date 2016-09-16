@@ -63,7 +63,7 @@ test('_pageInfoType will get the correct start cursor', () => {
   const endCursor = Symbol('endCursor')
 
   expect(_pageInfoType.getFields().startCursor.resolve({
-    paginator: { getName: () => paginatorName },
+    paginator: { name: paginatorName },
     ordering: { name: orderingName },
     page: { values: [{ cursor: startCursor }, { cursor: endCursor }] },
   })).toEqual({
@@ -80,7 +80,7 @@ test('_pageInfoType will get the correct end cursor', () => {
   const endCursor = Symbol('endCursor')
 
   expect(_pageInfoType.getFields().endCursor.resolve({
-    paginator: { getName: () => paginatorName },
+    paginator: { name: paginatorName },
     ordering: { name: orderingName },
     page: { values: [{ cursor: startCursor }, { cursor: endCursor }] },
   })).toEqual({
@@ -91,21 +91,18 @@ test('_pageInfoType will get the correct end cursor', () => {
 })
 
 test('_createEdgeType will create an object type', () => {
-  const edgeType = _createEdgeType({}, new Paginator())
+  const edgeType = _createEdgeType({}, {})
   expect(edgeType instanceof GraphQLObjectType).toBe(true)
 })
 
 test('_createEdgeType will have the correct name', () => {
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  const edgeType = _createEdgeType({}, paginator)
+  const edgeType = _createEdgeType({}, { name: 'foo' })
   expect(edgeType.name).toBe('FooEdge')
 })
 
 test('_createEdgeType will correctly return a namespaced cursor', () => {
   getType.mockReturnValueOnce(GraphQLString)
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
+  const paginator = { name: 'foo' }
   const edgeType = _createEdgeType({}, paginator)
   expect(edgeType.getFields().cursor.resolve({ paginator, cursor: 'foobar' }))
     .toEqual({
@@ -124,44 +121,40 @@ test('_createEdgeType will correctly return a namespaced cursor', () => {
 test('_createEdgeType will just return the value for the node field', () => {
   getType.mockReturnValueOnce(GraphQLString)
   const value = Symbol('value')
-  const edgeType = _createEdgeType({}, new Paginator())
+  const edgeType = _createEdgeType({}, {})
   expect(edgeType.getFields().node.resolve({ value })).toBe(value)
 })
 
 test('_createOrderByEnumType will create an enum type with all the paginator orderings', () => {
   const a = Symbol('a')
   const b = Symbol('b')
-  const orderings = [{ name: 'a', a }, { name: 'b', b }]
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('bar')
-  paginator.getOrderings.mockReturnValue(orderings)
+  const orderings = new Set([{ name: 'a', a }, { name: 'b', b }])
+  const paginator = { name: 'bar', orderings }
   const enumType = _createOrderByEnumType({}, paginator)
 
   expect(enumType.name).toBe('BarOrderBy')
   expect(enumType.getValues()).toEqual([{
     name: 'A',
-    value: orderings[0],
+    value: Array.from(orderings)[0],
     description: undefined,
     deprecationReason: undefined,
   }, {
     name: 'B',
-    value: orderings[1],
+    value: Array.from(orderings)[1],
     description: undefined,
     deprecationReason: undefined,
   }])
 })
 
 test('_createConnectionType will have the right name', () => {
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('bar')
-  const connectionType = _createConnectionType({}, paginator)
+  const connectionType = _createConnectionType({}, { name: 'bar' })
   expect(connectionType.name).toBe('BarConnection')
 })
 
 test('_createConnectionType will resolve the source verbatim for pageInfo', () => {
   const source = Symbol('source')
   getType.mockReturnValueOnce(GraphQLString)
-  const connectionType = _createConnectionType({}, new Paginator())
+  const connectionType = _createConnectionType({}, {})
   expect(connectionType.getFields().pageInfo.resolve(source)).toBe(source)
 })
 
@@ -171,8 +164,7 @@ test('_createConnectionType will use the paginators count method for totalCount'
   const context = Symbol('context')
   const condition = Symbol('condition')
 
-  const paginator = new Paginator()
-  paginator.count = jest.fn(() => count)
+  const paginator = { count: jest.fn(() => count) }
 
   getType.mockReturnValueOnce(GraphQLString)
   const connectionType = _createConnectionType({}, paginator)
@@ -187,7 +179,7 @@ test('_createConnectionType will get the edges from the source page with some ex
   const values = [{ value: 'a', cursor: 1 }, { value: 'b', cursor: 2 }]
 
   getType.mockReturnValueOnce(GraphQLString)
-  const connectionType = _createConnectionType({}, new Paginator())
+  const connectionType = _createConnectionType({}, {})
 
   expect(connectionType.getFields().edges.resolve({ paginator, ordering, page: { values } }))
     .toEqual([{ value: 'a', cursor: 1, paginator, ordering }, { value: 'b', cursor: 2, paginator, ordering }])
@@ -197,31 +189,26 @@ test('_createConnectionType will map the nodes field to page values', () => {
   const value1 = Symbol('value1')
   const value2 = Symbol('value2')
   getType.mockReturnValueOnce(GraphQLString)
-  const connectionType = _createConnectionType({}, new Paginator())
+  const connectionType = _createConnectionType({}, {})
   expect(connectionType.getFields().nodes.resolve({ page: { values: [{ value: value1 }, { value: value2 }] } }))
     .toEqual([value1, value2])
 })
 
 test('createConnectionField will only include a condition argument if a condition config was included', () => {
-  const paginator = new Paginator()
-  paginator.getOrderings.mockReturnValue([])
+  const paginator = {}
   expect(createConnectionField({}, paginator).args.condition).toBeFalsy()
   expect(createConnectionField({}, paginator, { conditionType: GraphQLString }).args.condition).toBeTruthy()
 })
 
 test('createConnectionField will throw when trying to resolve with cursors from different paginators', async () => {
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
+  const paginator = { name: 'foo' }
   const field = createConnectionField({}, paginator)
   await expectPromiseToReject(field.resolve(null, { before: { paginatorName: 'bar' } }), '`before` cursor can not be used with this connection.')
   await expectPromiseToReject(field.resolve(null, { after: { paginatorName: 'bar' } }), '`after` cursor can not be used with this connection.')
 })
 
 test('createConnectionField will throw when trying to resolve with cursors from different orderings', async () => {
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
+  const paginator = { name: 'foo' }
   const field = createConnectionField({}, paginator)
   await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: null } }), '`before` cursor can not be used for this `orderBy` value.')
   await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: null } }), '`after` cursor can not be used for this `orderBy` value.')
@@ -235,10 +222,7 @@ test('createConnectionField resolver will call Paginator#readPage and return the
   const context = Symbol('context')
   const page = Symbol('page')
 
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
-  paginator.readPage = jest.fn(() => page)
+  const paginator = { name: 'foo', readPage: jest.fn(() => page) }
 
   const field = createConnectionField({}, paginator)
 
@@ -257,10 +241,7 @@ test('createConnectionField resolver will have a condition other than true if a 
   const conditionArg = Symbol('conditionArg')
   const condition = Symbol('condition')
 
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
-  paginator.readPage = jest.fn()
+  const paginator = { name: 'foo', readPage: jest.fn() }
 
   const getCondition = jest.fn(() => condition)
 
@@ -281,10 +262,7 @@ test('createConnectionField will pass down valid cursors without orderings', asy
   const beforeCursor = { paginatorName: 'foo', orderingName: null, cursor: cursor1 }
   const afterCursor = { paginatorName: 'foo', orderingName: null, cursor: cursor2 }
 
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
-  paginator.readPage = jest.fn()
+  const paginator = { name: 'foo', readPage: jest.fn() }
 
   await createConnectionField({}, paginator).resolve(null, { before: beforeCursor })
   await createConnectionField({}, paginator).resolve(null, { after: afterCursor })
@@ -299,10 +277,7 @@ test('createConnectionField will pass down first/last integers', async () => {
   const first = Symbol('first')
   const last = Symbol('last')
 
-  const paginator = new Paginator()
-  paginator.getName.mockReturnValue('foo')
-  paginator.getOrderings.mockReturnValue([])
-  paginator.readPage = jest.fn()
+  const paginator = { name: 'foo', readPage: jest.fn() }
 
   await createConnectionField({}, paginator).resolve(null, { first })
   await createConnectionField({}, paginator).resolve(null, { last })

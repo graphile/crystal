@@ -3,19 +3,6 @@ exports[`test forum example 1`] = `
   query: Query
 }
 
-enum Color {
-  RED
-  GREEN
-  BLUE
-}
-
-type CompoundType {
-  a: Int
-  b: String
-  c: Color!
-  d: Uuid
-}
-
 scalar Email
 
 interface Node {
@@ -51,7 +38,5 @@ type UpdatableView {
   description: String
   constant: Int
 }
-
-scalar Uuid
 "
 `;

@@ -27,8 +27,8 @@ export default getCollectionType
  */
 function createCollectionType <TValue>(buildToken: BuildToken, collection: Collection<TValue>): GraphQLObjectType<TValue> {
   const { options, inventory } = buildToken
-  const type = collection.getType()
-  const primaryKey = collection.getPrimaryKey()
+  const type = collection.type
+  const primaryKey = collection.primaryKey
 
   return new GraphQLObjectType<TValue>({
     name: formatName.type(type.getName()),
@@ -50,7 +50,7 @@ function createCollectionType <TValue>(buildToken: BuildToken, collection: Colle
           type: new GraphQLNonNull(GraphQLID),
           resolve: value =>
             idSerde.serialize({
-              name: collection.getName(),
+              name: collection.name,
               key: primaryKey.getKeyForValue(value),
             }),
         }],
@@ -71,13 +71,13 @@ function createCollectionType <TValue>(buildToken: BuildToken, collection: Colle
       inventory.getRelations()
         // We only want the relations for which this collection is the tail
         // collection.
-        .filter(relation => relation.getTailCollection() === collection)
+        .filter(relation => relation.tailCollection === collection)
         // Transform the relation into a field entry.
         .map(<THeadValue, TKey>(relation: Relation<TValue, THeadValue, TKey>): [string, GraphQLFieldConfig<TValue, THeadValue>] => {
-          const headCollectionKey = relation.getHeadCollectionKey()
-          const headCollection = headCollectionKey.getCollection()
+          const headCollection = relation.headCollection
+          const headCollectionKey = relation.headCollectionKey
 
-          return [formatName.field(`${headCollection.getType().getName()}-by-${relation.getName()}`), {
+          return [formatName.field(`${headCollection.type.getName()}-by-${relation.name}`), {
             // TODO: description
             type: getCollectionType(buildToken, headCollection),
             resolve: source => {
@@ -87,28 +87,28 @@ function createCollectionType <TValue>(buildToken: BuildToken, collection: Colle
           }]
         }),
 
-      // Add all of our one-to-many relations (aka head relations).
-      inventory.getRelations()
-        // We only want the relations for which this collection is the head
-        // collection.
-        .filter(relation => relation.getHeadCollectionKey().getCollection() === collection)
-        // Transform the relation into a field entry.
-        .map(<TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
-          const tailCollection = relation.getTailCollection()
-          const tailPaginator = relation.getTailPaginator()
+      // // Add all of our one-to-many relations (aka head relations).
+      // inventory.getRelations()
+      //   // We only want the relations for which this collection is the head
+      //   // collection.
+      //   .filter(relation => relation.getHeadCollectionKey().getCollection() === collection)
+      //   // Transform the relation into a field entry.
+      //   .map(<TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
+      //     const tailCollection = relation.getTailCollection()
+      //     const tailPaginator = relation.getTailPaginator()
 
-          // TODO: This shouldn’t be optional?
-          if (!tailPaginator) return undefined
+      //     // TODO: This shouldn’t be optional?
+      //     if (!tailPaginator) return undefined
 
-          return [
-            formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
-            createConnectionField(buildToken, tailPaginator, {
-              // We use the config when creating a connection field to inject
-              // a condition that limits what we select from the paginator.
-              getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),
-            }),
-          ]
-        }),
+      //     return [
+      //       formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
+      //       createConnectionField(buildToken, tailPaginator, {
+      //         // We use the config when creating a connection field to inject
+      //         // a condition that limits what we select from the paginator.
+      //         getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),
+      //       }),
+      //     ]
+      //   }),
     ),
   })
 }

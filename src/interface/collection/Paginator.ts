@@ -28,29 +28,20 @@ import Condition from './Condition'
  * that *all* of the cursors in the *entire* collection can change on seemingly
  * trivial writes which is non-ideal.
  */
-abstract class Paginator<TValue, TCursor> {
-  constructor (
-    private _name: string,
-    private _type: Type<TValue>,
-  ) {}
-
+interface Paginator<TValue, TCursor> {
   /**
-   * Returns the name of the paginator. This name can be used to help
+   * The name of the paginator. This name can be used to help
    * distinguish cursors when mixed with different paginators.
    */
-  public getName (): string {
-    return this._name
-  }
+  readonly name: string
 
   /**
-   * Returns the type of the values returned by this paginator.
+   * The type of the values returned by this paginator.
    */
-  public getType (): Type<TValue> {
-    return this._type
-  }
+  readonly type: Type<TValue>
 
   /**
-   * Gets a unique array of ordering objects which represent the different ways
+   * A unique array of ordering objects which represent the different ways
    * values from the paginator may be ordered.
    *
    * The name of each ordering object is unique.
@@ -59,23 +50,19 @@ abstract class Paginator<TValue, TCursor> {
   // should probably be checked in this abstract level as to prevent logic
   // duplication. Instead this function is currently delegated to the
   // consumers of this abstraction.
-  public getOrderings (): Array<Paginator.Ordering> {
-    return []
-  }
+  readonly orderings: Set<Paginator.Ordering>
 
   /**
-   * Gets the default ordering for our paginated values.
+   * The default ordering for our paginated values.
    */
-  public getDefaultOrdering (): Paginator.Ordering | undefined {
-    return undefined
-  }
+  readonly defaultOrdering: Paginator.Ordering | undefined
 
   /**
    * Gets the total count of values in our collection. If a condition is
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  public abstract count (context: mixed, condition?: Condition): Promise<number>
+  count (context: mixed, condition?: Condition): Promise<number>
 
   /**
    * Reads values in a collection relative to a cursor which is used as a
@@ -86,7 +73,7 @@ abstract class Paginator<TValue, TCursor> {
    *
    * @see Paginator.PageConfig
    */
-  public abstract readPage (
+  readPage (
     context: mixed,
     config: Paginator.PageConfig<TCursor>,
   ): Promise<Paginator.Page<TValue, TCursor>>

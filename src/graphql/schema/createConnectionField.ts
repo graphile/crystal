@@ -31,7 +31,7 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
     getCondition?: (source: mixed, conditionValue: TCondition | undefined) => Condition,
   } = {},
 ): GraphQLFieldConfig<mixed, Connection<TValue, TCursor>> {
-  const paginatorName = paginator.getName()
+  const paginatorName = paginator.name
 
   // This is the type of all the connection arguments.
   type ConnectionArgs = {
@@ -49,9 +49,9 @@ export default function createConnectionField <TValue, TCursor, TCondition>(
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
-      paginator.getOrderings().length > 0 && ['orderBy', {
+      paginator.orderings && paginator.orderings.size > 0 && ['orderBy', {
         type: getOrderByEnumType(buildToken, paginator),
-        defaultValue: paginator.getDefaultOrdering(),
+        defaultValue: paginator.defaultOrdering,
         // TODO: description
       }],
       ['before', {
@@ -149,11 +149,11 @@ export function _createConnectionType <TValue, TCursor>(
   buildToken: BuildToken,
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Connection<TValue, TCursor>> {
-  const gqlType = getType(buildToken, paginator.getType(), false)
+  const gqlType = getType(buildToken, paginator.type, false)
   const gqlEdgeType = getEdgeType(buildToken, paginator)
 
   return new GraphQLObjectType<Connection<TValue, TCursor>>({
-    name: formatName.type(`${paginator.getName()}-connection`),
+    name: formatName.type(`${paginator.name}-connection`),
     // TODO: description
     fields: () => ({
       pageInfo: {
@@ -191,16 +191,16 @@ export function _createEdgeType <TValue, TCursor>(
   buildToken: BuildToken,
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLObjectType<Edge<TValue, TCursor>> {
-  const gqlType = getType(buildToken, paginator.getType(), false)
+  const gqlType = getType(buildToken, paginator.type, false)
 
   return new GraphQLObjectType<Edge<TValue, TCursor>>({
-    name: formatName.type(`${paginator.getName()}-edge`),
+    name: formatName.type(`${paginator.name}-edge`),
     // TODO: description
     fields: () => ({
       cursor: {
         type: new GraphQLNonNull(_cursorType),
         resolve: ({ paginator, ordering, cursor }): NamespacedCursor<TCursor> => ({
-          paginatorName: paginator.getName(),
+          paginatorName: paginator.name,
           orderingName: ordering ? ordering.name : null,
           cursor,
         }),
@@ -226,10 +226,10 @@ export function _createOrderByEnumType <TValue, TCursor>(
   paginator: Paginator<TValue, TCursor>,
 ): GraphQLEnumType<Paginator.Ordering> {
   return new GraphQLEnumType<Paginator.Ordering>({
-    name: formatName.type(`${paginator.getName()}-order-by`),
+    name: formatName.type(`${paginator.name}-order-by`),
     // TODO: description
     values: buildObject<GraphQLEnumValueConfig<Paginator.Ordering>>(
-      paginator.getOrderings().map<[string, GraphQLEnumValueConfig<Paginator.Ordering>]>(ordering =>
+      Array.from(paginator.orderings).map<[string, GraphQLEnumValueConfig<Paginator.Ordering>]>(ordering =>
         [formatName.enumValue(ordering.name), { value: ordering }]
       )
     ),
@@ -295,7 +295,7 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
       startCursor: {
         type: _cursorType,
         resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
-          paginatorName: paginator.getName(),
+          paginatorName: paginator.name,
           orderingName: ordering ? ordering.name : null,
           cursor: page.values[0].cursor,
         }),
@@ -304,7 +304,7 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed>> =
       endCursor: {
         type: _cursorType,
         resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
-          paginatorName: paginator.getName(),
+          paginatorName: paginator.name,
           orderingName: ordering ? ordering.name : null,
           cursor: page.values[page.values.length - 1].cursor,
         }),

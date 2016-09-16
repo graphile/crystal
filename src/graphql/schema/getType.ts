@@ -168,7 +168,7 @@ function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input:
  */
 function createOutputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>): GraphQLObjectType<T> {
   const { inventory } = buildToken
-  const collection = inventory.getCollections().find(collection => collection.getType() === type)
+  const collection = inventory.getCollections().find(collection => collection.type === type)
 
   // If there is a collection which uses this type, we should use the
   // collection’s type and not create our own.

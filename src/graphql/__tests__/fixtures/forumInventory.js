@@ -1,7 +1,5 @@
 import {
   Inventory,
-  CollectionKey,
-  Relation,
   BasicObjectType,
   BasicObjectField,
   NullableType,
@@ -10,13 +8,6 @@ import {
   integerType,
   stringType,
 } from '../../../interface'
-
-import MockCollection from './MockCollection'
-import MockPaginator from './MockPaginator'
-
-const inventory = new Inventory()
-
-export default inventory
 
 const emailType = new AliasType('email', stringType)
 
@@ -29,16 +20,10 @@ const personType =
     .addField(new BasicObjectField('lastName', new NullableType(stringType)))
     .addField(new BasicObjectField('about', new NullableType(stringType)))
 
-const personCollection =
-  new MockCollection('people', personType)
+const personIdKey = { name: 'id', type: integerType }
+const personNameKey = { name: 'name', type: stringType }
+const personEmailKey = { name: 'email', type: stringType }
 
-inventory.addCollection(personCollection)
-
-const personIdKey = new CollectionKey(personCollection, 'id', integerType)
-const personNameKey = new CollectionKey(personCollection, 'name', stringType)
-const personEmailKey = new CollectionKey(personCollection, 'email', stringType)
-
-const personPaginator = new MockPaginator('people', personType)
 const personOrderings = [
   { name: 'id-asc' }, { name: 'id-desc' },
   { name: 'name-asc' }, { name: 'name-desc' },
@@ -46,16 +31,20 @@ const personOrderings = [
   { name: 'lastName-asc' }, { name: 'lastName-desc' },
 ]
 
-personPaginator
-  .setOrderings(personOrderings)
-  .setDefaultOrdering(personOrderings[0])
+const personPaginator = {
+  name: 'people',
+  type: personType,
+  orderings: new Set(personOrderings),
+  defaultOrdering: personOrderings[0],
+}
 
-personCollection
-  .addKey(personIdKey)
-  .addKey(personNameKey)
-  .addKey(personEmailKey)
-  .setPrimaryKey(personIdKey)
-  .setPaginator(personPaginator)
+const personCollection = {
+  name: 'people',
+  type: personType,
+  keys: new Set([personIdKey, personNameKey, personEmailKey]),
+  primaryKey: personIdKey,
+  paginator: personPaginator,
+}
 
 const postStatusType = new EnumType('postStatus', ['unpublished', 'published'])
 
@@ -67,14 +56,7 @@ const postType =
     .addField(new BasicObjectField('headline', stringType))
     .addField(new BasicObjectField('body', new NullableType(stringType)))
 
-const postCollection =
-  new MockCollection('posts', postType)
-
-inventory.addCollection(postCollection)
-
-const postIdKey = new CollectionKey(postCollection, 'id', integerType)
-
-const postPaginator = new MockPaginator('posts', postType)
+const postIdKey = { name: 'id', type: integerType }
 
 const postOrderings = [
   { name: 'id-asc' }, { name: 'id-desc' },
@@ -83,14 +65,31 @@ const postOrderings = [
   { name: 'headline-asc' }, { name: 'headline-desc' },
 ]
 
-postPaginator
-  .setOrderings(postOrderings)
-  .setDefaultOrdering(postOrderings[0])
+const postPaginator = {
+  name: 'posts',
+  type: postType,
+  orderings: new Set(postOrderings),
+  defaultOrdering: postOrderings[0],
+}
 
-postCollection
-  .addKey(postIdKey)
-  .setPrimaryKey(postIdKey)
-  .setPaginator(postPaginator)
+const postCollection = {
+  name: 'posts',
+  type: postType,
+  keys: new Set([postIdKey]),
+  primaryKey: postIdKey,
+  paginator: postPaginator,
+}
 
-inventory
-  .addRelation(new Relation('author', postCollection, personIdKey))
+const authorRelation = {
+  name: 'author',
+  tailCollection: postCollection,
+  headCollection: personCollection,
+  headCollectionKey: personIdKey,
+}
+
+export default (
+  new Inventory()
+    .addCollection(personCollection)
+    .addCollection(postCollection)
+    .addRelation(authorRelation)
+)

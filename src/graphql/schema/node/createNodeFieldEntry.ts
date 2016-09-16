@@ -22,7 +22,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       if (!collection)
         throw new Error(`Invalid id, no collection exists named '${name}'.`)
 
-      const primaryKey = collection.getPrimaryKey()
+      const primaryKey = collection.primaryKey
 
       if (!primaryKey)
         throw new Error(`Invalid id, no primary key on collection named '${name}'.`)

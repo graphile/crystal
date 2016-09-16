@@ -15,16 +15,16 @@ export default function createCollectionQueryFieldEntries <T>(
   collection: Collection<T>,
 ): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
   const { options } = buildToken
-  const type = collection.getType()
+  const type = collection.type
   const entries: Array<[string, GraphQLFieldConfig<any, any>]> = []
-  const primaryKey = collection.getPrimaryKey()
-  const paginator = collection.getPaginator()
+  const primaryKey = collection.primaryKey
+  const paginator = collection.paginator
 
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
     entries.push([
-      formatName.field(`all-${collection.getName()}`),
+      formatName.field(`all-${collection.name}`),
       createConnectionField(buildToken, paginator),
     ])
   }
@@ -48,8 +48,8 @@ export default function createCollectionQueryFieldEntries <T>(
       resolve: (source, args) => {
         const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
 
-        if (name !== collection.getName())
-          throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.getName()}'.`)
+        if (name !== collection.name)
+          throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.name}'.`)
 
         return primaryKey.read(key)
       },
@@ -58,9 +58,9 @@ export default function createCollectionQueryFieldEntries <T>(
 
   // Add a field to select any value in the collection by any key. So all
   // unique keys of an object will be usable to select a single value.
-  for (const key of collection.getKeys()) {
-    const keyName = key.getName()
-    const keyType = key.getType()
+  for (const key of collection.keys) {
+    const keyName = key.name
+    const keyType = key.type
     const fieldName = formatName.field(`${type.getName()}-by-${keyName}`)
     const collectionType = getCollectionType(buildToken, collection)
 
