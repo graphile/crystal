@@ -5,11 +5,11 @@ import {
   GraphQLInputObjectType,
 } from 'graphql'
 
-import { fromPairs, identity, constant } from 'lodash'
+import { fromPairs, identity, constant, camelCase } from 'lodash'
 import { $$rowTable } from '../../symbols.js'
 import SQLBuilder from '../../SQLBuilder.js'
 import getColumnType from '../getColumnType.js'
-import createTableType from '../createTableType.js'
+import createTableType, { createForeignKeyField, createForeignKeyReverseField } from '../createTableType.js'
 import { createTableEdgeType } from '../createConnectionType.js'
 import { createTableOrderingEnum } from '../createConnectionArgs.js'
 import getPayloadInterface from './getPayloadInterface.js'
@@ -87,7 +87,14 @@ const createPayloadType = table =>
           node: output,
         }),
       },
-
+      // Add foreign key field references.
+      ...fromPairs(
+        table.getForeignKeys().map(foreignKey => {
+          const columnNames = foreignKey.nativeColumns.map(({ name }) => name)
+          const name = `${foreignKey.foreignTable.name}_by_${columnNames.join('_and_')}`
+          return [camelCase(name), createForeignKeyField(foreignKey)]
+        })
+      ),
       ...getPayloadFields(table.schema),
     },
   })
