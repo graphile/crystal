@@ -109,6 +109,15 @@ test('getAttribute will get a single attribute', () => {
   expect(catalog.getAttribute('3', '0')).toBe(mockAttributes[3])
 })
 
+test('assertGetAttribute will get a single attribute or throw', () => {
+  expect(() => catalog.assertGetAttribute('0', '0')).toThrow()
+  expect(catalog.assertGetAttribute('2', '0')).toBe(mockAttributes[0])
+  expect(catalog.assertGetAttribute('2', '1')).toBe(mockAttributes[1])
+  expect(catalog.assertGetAttribute('2', '2')).toBe(mockAttributes[2])
+  expect(() => catalog.assertGetAttribute('2', '3')).toThrow()
+  expect(catalog.assertGetAttribute('3', '0')).toBe(mockAttributes[3])
+})
+
 test('getClassAttributes will get all the attributes for a class', () => {
   expect(catalog.getClassAttributes('0')).toEqual([])
   expect(catalog.getClassAttributes('2')).toEqual([mockAttributes[0], mockAttributes[1], mockAttributes[2]])

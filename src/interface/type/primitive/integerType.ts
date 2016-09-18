@@ -5,11 +5,7 @@ import NamedType from '../NamedType'
  *
  * @private
  */
-class IntegerType extends NamedType<number> {
-  public isTypeOf (value: any): value is number {
-    return Number.isInteger(value)
-  }
-}
+class IntegerType extends NamedType<number> {}
 
 /**
  * A singleton integer type that represents a number which is in integer, or

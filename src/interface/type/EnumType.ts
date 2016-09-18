@@ -13,20 +13,6 @@ class EnumType extends NamedType<string> {
   }
 
   /**
-   * Determines if the value is a string and that string value is in our enum
-   * variants array.
-   */
-  public isTypeOf (value: any): value is string {
-    if (typeof value !== 'string')
-      return false
-
-    if (this._variants.indexOf(value) === -1)
-      return false
-
-    return true
-  }
-
-  /**
    * Gets all of the variants of our enum type.
    */
   public getVariants (): string[] {

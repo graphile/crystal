@@ -1,7 +1,10 @@
+-- @see https://www.postgresql.org/docs/9.5/static/catalogs.html
+--
 -- ## Parameters
 -- - `$1`: An array of strings that represent the namespaces we are
 --   introspecting.
 with
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-namespace.html
   namespace as (
     select
       'namespace' as "kind",
@@ -14,6 +17,7 @@ with
     where
       nsp.nspname = any ($1)
   ),
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-class.html
   class as (
     select
       'class' as "kind",
@@ -46,6 +50,7 @@ with
       rel.relpersistence in ('p') and
       rel.relkind in ('r', 'v', 'm', 'c', 'f')
   ),
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-attribute.html
   attribute as (
     select
       'attribute' as "kind",
@@ -65,6 +70,7 @@ with
     order by
       att.attrelid, att.attnum
   ),
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html
   type as (
     -- Use another `WITH` statement here, because our `WHERE` clause will need
     -- to use it.
@@ -82,6 +88,8 @@ with
         nullif(typ.typrelid, 0) as "classId",
         nullif(typ.typbasetype, 0) as "baseTypeId",
         -- If this type is an enum type, let’s select all of its enum variants.
+        --
+        -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-enum.html
         case
           when typ.typtype = 'e' then array(
             select enm.enumlabel
@@ -109,9 +117,11 @@ with
       -- 4 less type rows.
       typ.id in (select "baseTypeId" from type_all)
   ),
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-constraint.html
   "constraint" as (
     select
       'constraint' as "kind",
+      con.conname as "name",
       con.contype as "type",
       con.conrelid as "classId",
       nullif(con.confrelid, 0) as "foreignClassId",
@@ -134,13 +144,13 @@ with
       -- made add support for more constraints in the future.
       con.contype in ('f', 'p', 'u')
   )
-select to_json(namespace.*) as object from namespace
+select row_to_json(namespace) as object from namespace
 union all
-select to_json(class.*) as object from class
+select row_to_json(class) as object from class
 union all
-select to_json(attribute.*) as object from attribute
+select row_to_json(attribute) as object from attribute
 union all
-select to_json(type.*) as object from type
+select row_to_json(type) as object from type
 union all
-select to_json("constraint".*) as object from "constraint"
+select row_to_json("constraint") as object from "constraint"
 ;

@@ -21,7 +21,7 @@ export default PGCatalogType
  * A composite type is a type with an associated class. So any type which may
  * have attributes (or fields).
  */
-type PGCatalogCompositeType = PGCatalogBaseType & {
+export type PGCatalogCompositeType = PGCatalogBaseType & {
   type: 'c',
   classId: string,
 }
@@ -30,7 +30,7 @@ type PGCatalogCompositeType = PGCatalogBaseType & {
  * A domain type is a named alias of another type with some extra constraints
  * added on top. One such constraint is the `is_not_null` constraint.
  */
-type PGCatalogDomainType = PGCatalogBaseType & {
+export type PGCatalogDomainType = PGCatalogBaseType & {
   type: 'd',
   baseTypeId: string,
   isNotNull: boolean,
@@ -40,7 +40,7 @@ type PGCatalogDomainType = PGCatalogBaseType & {
  * An enum type is a type with a set of predefined string values. A value of
  * an enum type may only be one of those values.
  */
-type PGCatalogEnumType = PGCatalogBaseType & {
+export type PGCatalogEnumType = PGCatalogBaseType & {
   type: 'e',
   enumVariants: Array<string>,
 }

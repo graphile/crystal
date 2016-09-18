@@ -18,7 +18,7 @@ namespace sql {
    * An object that represents a dynamicly generated SQL query. This query needs
    * to be compiled before being sent to PostgreSQL.
    */
-  export type SQL = Array<SQLItem>
+  export type SQL = SQLItem | Array<SQLItem>
 
   /**
    * A template string tag that creates a `SQL` query out of some strings and
@@ -28,8 +28,8 @@ namespace sql {
    * Note that using this function, the user *must* specify if they are injecting
    * raw text. This makes a SQL injection vulnerability harder to create.
    */
-  export function query (strings: TemplateStringsArray, ...values: Array<SQLItem | NestedArray<SQLItem>>): SQL {
-    return strings.reduce<SQL>((items, string, i) =>
+  export function query (strings: TemplateStringsArray, ...values: Array<SQLItem | NestedArray<SQLItem>>): Array<SQLItem> {
+    return strings.reduce<Array<SQLItem>>((items, string, i) =>
       !values[i]
         ? [...items, { type: 'RAW', text: string }]
         : [...items, { type: 'RAW', text: string }, ...flatten<SQLItem>(values[i])]
@@ -74,7 +74,7 @@ namespace sql {
     // values.
     const lazyIndexes: Map<string, number> = new Map()
 
-    for (const item of sql) {
+    for (const item of Array.isArray(sql) ? sql : [sql]) {
       switch (item.type) {
         case 'RAW':
           text += item.text

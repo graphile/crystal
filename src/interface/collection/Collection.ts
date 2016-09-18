@@ -17,7 +17,7 @@ interface Collection<TValue> {
   /**
    * The optional description of our collection.
    */
-  readonly description: string | undefined
+  readonly description?: string | undefined
 
   /**
    * The type of *all* the values in our collection.
@@ -30,14 +30,14 @@ interface Collection<TValue> {
    * by.
    */
   // TODO: Test that we don’t have any keys with the same name.
-  readonly keys: Set<CollectionKey<TValue, any>>
+  readonly keys: Set<CollectionKey<TValue, mixed>>
 
   /**
    * Gets the primary unique identifier for this collection. While a
    * collection may have many keys, only one is the *primary* identifier.
    * However, a collection may not have a primary key.
    */
-  readonly primaryKey: CollectionKey<TValue, any> | null
+  readonly primaryKey?: CollectionKey<TValue, mixed> | null
 
   /**
    * Returns a paginators that can be used to paginate through all of
@@ -53,7 +53,7 @@ interface Collection<TValue> {
    * the same `Type` as the `Collection`. This isn’t a hard requirement and
    * things might work fine if they’re different, but it may not work forever.
    */
-  readonly paginator: Paginator<TValue, any> | null
+  readonly paginator?: Paginator<TValue, mixed> | null
 
   /**
    * Creates a value in our collection. Returns the newly created value.
@@ -64,7 +64,7 @@ interface Collection<TValue> {
   // TODO: Test that we can use this method on an empty collection and then
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
-  create: ((context: mixed, value: TValue) => Promise<TValue>) | null
+  create?: ((context: mixed, value: TValue) => Promise<TValue>) | null
 }
 
 export default Collection

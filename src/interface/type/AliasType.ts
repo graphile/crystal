@@ -23,13 +23,6 @@ class AliasType<TValue> extends NamedType<TValue> {
   }
 
   /**
-   * Proxies the base type’s `isTypeOf` function.
-   */
-  public isTypeOf (value: any): value is TValue {
-    return this._baseType.isTypeOf(value)
-  }
-
-  /**
    * Returns the base type for this alias type.
    */
   public getBaseType (): Type<TValue> {

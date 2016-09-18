@@ -5,6 +5,7 @@ import PGCatalogNamespace from './object/PGCatalogNamespace'
 import PGCatalogClass from './object/PGCatalogClass'
 import PGCatalogAttribute from './object/PGCatalogAttribute'
 import PGCatalogType from './object/PGCatalogType'
+import PGCatalogConstraint from './object/PGCatalogConstraint'
 
 export {
   introspectDatabase,
@@ -14,4 +15,8 @@ export {
   PGCatalogClass,
   PGCatalogAttribute,
   PGCatalogType,
+  PGCatalogConstraint,
 }
+
+export * from './object/PGCatalogType'
+export * from './object/PGCatalogConstraint'

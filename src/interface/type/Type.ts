@@ -14,18 +14,11 @@ import NamedType from './NamedType'
  */
 abstract class Type<TValue> {
   /**
-   * Determines if the provided value is valid for this type. For example, a
-   * string type with a `TValue` of `string` may implement this method as
-   * `typeof value === 'string'`.
-   */
-  public abstract isTypeOf (value: mixed): value is TValue
-
-  /**
    * Every type should have a named type at it’s “heart” as unnamed types are
    * inherently abstract. As inventories will only let us register named types, we
    * need to get the named type.
    */
-  public abstract getNamedType (): NamedType<any>
+  public abstract getNamedType (): NamedType<mixed>
 }
 
 export default Type

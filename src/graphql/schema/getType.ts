@@ -166,7 +166,7 @@ function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input:
  *
  * @private
  */
-function createOutputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>): GraphQLObjectType<T> {
+function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed>): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
   const collection = inventory.getCollections().find(collection => collection.type === type)
 
@@ -175,11 +175,11 @@ function createOutputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>)
   if (collection)
     return getCollectionType(buildToken, collection)
 
-  return new GraphQLObjectType<T>({
+  return new GraphQLObjectType<mixed>({
     name: formatName.type(type.getName()),
     description: type.getDescription(),
-    fields: () => buildObject<GraphQLFieldConfig<T, mixed>>(
-      type.getFields().map<[string, GraphQLFieldConfig<T, mixed>]>(field =>
+    fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
+      type.getFields().map<[string, GraphQLFieldConfig<mixed, mixed>]>(field =>
         [formatName.field(field.getName()), {
           description: field.getDescription(),
           type: getType(buildToken, field.getType(), false),
@@ -203,6 +203,7 @@ function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>):
       type.getFields().map<[string, GraphQLInputFieldConfig<mixed>]>(field =>
         [formatName.field(field.getName()), {
           description: field.getDescription(),
+          internalName: field.getName(),
           type: getType(buildToken, field.getType(), true),
         }]
       )

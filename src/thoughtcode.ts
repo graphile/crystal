@@ -1,0 +1,3 @@
+type Type =
+  'string' |
+  'number'

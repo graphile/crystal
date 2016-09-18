@@ -31,28 +31,28 @@ interface CollectionKey<TValue, TKey> {
    * However, not all values must have a key therefore the return type is
    * nullable.
    */
-  getKeyForValue (value: TValue): TKey | undefined
+  getKeyFromValue (value: TValue): TKey | undefined
 
   /**
    * Reads a single value from the collection using that value’s key.
    */
   // TODO: Test this.
-  read (key: TKey): Promise<TValue | undefined>
+  read?: ((context: mixed, key: TKey) => Promise<TValue | undefined>) | null
 
-  // /**
-  //  * Updates a value in the collection by using that value’s key. Returned is
-  //  * value after the updates have been applied.
-  //  */
-  // // TODO: Patch object.
-  // // TODO: Test this.
-  // update (key: TKey): Promise<TValue>
+  /**
+   * Updates a value in the collection by using that value’s key. Returned is
+   * value after the updates have been applied.
+   */
+  // TODO: Patch object.
+  // TODO: Test this.
+  update?: ((context: mixed, key: TKey) => Promise<TValue>) | null
 
-  // /**
-  //  * Delete a value from the collection by using the value’s key. Returned is
-  //  * the value before it was deleted.
-  //  */
-  // // TODO: Test this.
-  // delete (key: TKey): Promise<TValue>
+  /**
+   * Delete a value from the collection by using the value’s key. Returned is
+   * the value before it was deleted.
+   */
+  // TODO: Test this.
+  delete?: ((context: mixed, key: TKey) => Promise<TValue>) | null
 }
 
 export default CollectionKey

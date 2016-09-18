@@ -129,6 +129,20 @@ class PGCatalog {
   }
 
   /**
+   * Gets a single attribute object by the provided class id and position
+   * number. If no attribute object exists an error is thrown instead of
+   * returning `undefined`.
+   */
+  public assertGetAttribute (classId: string, num: number): PGCatalogAttribute {
+    const attribute = this.getAttribute(classId, num)
+
+    if (!attribute)
+      throw new Error(`No attribute found for class ${classId} in position ${num}`)
+
+    return attribute
+  }
+
+  /**
    * Gets all of the attributes for a single class.
    */
   public getClassAttributes (classId: string): Array<PGCatalogAttribute> {

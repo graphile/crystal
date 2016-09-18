@@ -17,7 +17,7 @@ export default PGCatalogConstraint
  * A foreign key constrains the columns of a table to reference the columns of another
  * table.
  */
-type PGCatalogForeignKeyConstraint = PGCatalogBaseConstraint & {
+export type PGCatalogForeignKeyConstraint = PGCatalogBaseConstraint & {
   type: 'f',
   classId: string,
   foreignClassId: string,
@@ -29,7 +29,7 @@ type PGCatalogForeignKeyConstraint = PGCatalogBaseConstraint & {
  * A primary key indicates the main columns used to identify a single row in a
  * table.
  */
-type PGCatalogPrimaryKeyConstraint = PGCatalogBaseConstraint & {
+export type PGCatalogPrimaryKeyConstraint = PGCatalogBaseConstraint & {
   type: 'p',
   classId: string,
   keyAttributeNums: Array<number>,
@@ -39,7 +39,7 @@ type PGCatalogPrimaryKeyConstraint = PGCatalogBaseConstraint & {
  * Enforces a unique constraint on some columns. No distinct duplicate values
  * will be allowed in the columns specified by this constraint.
  */
-type PGCatalogUniqueConstraint = PGCatalogBaseConstraint & {
+export type PGCatalogUniqueConstraint = PGCatalogBaseConstraint & {
   type: 'u',
   classId: string,
   keyAttributeNums: Array<number>,
@@ -52,4 +52,5 @@ type PGCatalogUniqueConstraint = PGCatalogBaseConstraint & {
  */
 type PGCatalogBaseConstraint = {
   kind: 'constraint',
+  name: string,
 }

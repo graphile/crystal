@@ -25,23 +25,6 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
   private _fields = new Map<string, ObjectField<BasicObjectValue, any>>()
 
   /**
-   * To determine if the value is of this type, we loop through all of our
-   * fields and do a `isTypeOf` check on the property of `value` with the same
-   * name as our field. If just one field is not the correct type, the check
-   * fails. If the value has extra properties we don’t care.
-   */
-  public isTypeOf (value: any): value is BasicObjectValue {
-    if (value == null || typeof value !== 'object')
-      return false
-
-    for (const field of this.getFields())
-      if (!field.getType().isTypeOf(value[field.getName()]))
-        return false
-
-    return true
-  }
-
-  /**
    * Adds a field to our object type. If there is already a field with the same
    * name on our object type, we can’t add the field and an error is thrown.
    *
@@ -76,9 +59,6 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
 
     for (const [key, value] of fieldValues.entries())
       object[key] = value
-
-    if (!this.isTypeOf(object))
-      throw new Error('Provided fields did not create an object of the correct type.')
 
     return object
   }

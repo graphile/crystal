@@ -27,6 +27,7 @@
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
     "graphql": ">=0.6.0 <1.0.0",
+    "graphql": "calebmer/graphql#163f491f24563101ca525e39152f55bf74529961",
     "pg": "^6.1.0",
     "pg-minify": "^0.3.3",
     "pluralize": "^3.0.0"

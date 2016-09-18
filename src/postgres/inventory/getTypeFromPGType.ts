@@ -12,6 +12,7 @@ import {
   stringType,
 } from '../../interface'
 
+import { memoize2 } from '../utils'
 import PGCatalog from '../introspection/PGCatalog'
 import PGCatalogType from '../introspection/object/PGCatalogType'
 
@@ -67,10 +68,11 @@ const pgTypeIdToType = new Map<string, Type<any>>([
  * returned will be the *exact* same type. This way we can maintain refrential
  * equality.
  */
-// We use `var` here for hoisting so that we can recursively call the function
-// without getting type errors.
-// TODO: Is this the best name?
-var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGCatalogType): Type<any> => {
+const getTypeFromPGType = memoize2(createTypeFromPGType)
+
+export default getTypeFromPGType
+
+function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Type<mixed> {
   if (!pgCatalog.hasType(pgType))
     throw new Error(`PostgreSQL type of name '${pgType.name}' and id '${pgType.id}' does not exist.`)
 
@@ -92,7 +94,7 @@ var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
       // Add all our fields to the object.
       for (const pgAttribute of pgCatalog.getClassAttributes(pgClass.id)) {
         const pgType = pgCatalog.assertGetType(pgAttribute.typeId)
-        let type = typeFromPGType(pgCatalog, pgType)
+        let type = getTypeFromPGType(pgCatalog, pgType)
 
         // If the attribute has the `NOT NULL` constraint, we need to strip away the
         // `NullableType` wrapper that exists most of the time on PostgreSQL types.
@@ -111,7 +113,7 @@ var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // If this type is a domain type…
     case 'd': {
       const pgBaseType = pgCatalog.assertGetType(pgType.baseTypeId)
-      let baseType = typeFromPGType(pgCatalog, pgBaseType)
+      let baseType = getTypeFromPGType(pgCatalog, pgBaseType)
 
       // If the domain type has the `NOT NULL` contraint, we need to strip away the
       // `NullableType` wrapper that exists most of the time on PostgreSQL types.
@@ -139,7 +141,7 @@ var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
 
       const itemType = pgCatalog.assertGetType(pgType.itemId)
 
-      return new NullableType(new ListType(typeFromPGType(pgCatalog, itemType)))
+      return new NullableType(new ListType(getTypeFromPGType(pgCatalog, itemType)))
     }
     case 'B':
       return new NullableType(booleanType)
@@ -151,25 +153,4 @@ var typeFromPGType = memoize2((pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
 
   // If all else fails, we just return a nullable string :)
   return new NullableType(stringType)
-})
-
-export default typeFromPGType
-
-/**
- * Memoizes a function with two arguments using a two-dimensional `WeakMap`.
- */
-function memoize2 <I1, I2, O>(fn: (arg1: I1, arg2: I2) => O): (arg1: I1, arg2: I2) => O {
-  const caches: WeakMap<I1, WeakMap<I2, O>> = new WeakMap()
-
-  return (arg1: I1, arg2: I2): O => {
-    if (!caches.has(arg1))
-      caches.set(arg1, new WeakMap())
-
-    const cache = caches.get(arg1)!
-
-    if (!cache.has(arg2))
-      cache.set(arg2, fn(arg1, arg2))
-
-    return cache.get(arg2)!
-  }
 }

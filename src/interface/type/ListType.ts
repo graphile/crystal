@@ -15,21 +15,6 @@ class ListType<TValue> extends Type<TValue[]> {
   }
 
   /**
-   * Checks if the value is an array, then checks *every* value in that array
-   * making sure that the value is a type of the item type.
-   */
-  public isTypeOf (value: any): value is TValue[] {
-    if (!Array.isArray(value))
-      return false
-
-    for (const item of value)
-      if (!this._itemType.isTypeOf(item))
-        return false
-
-    return true
-  }
-
-  /**
    * Get’s the item type for this list type.
    */
   public getItemType (): Type<TValue> {

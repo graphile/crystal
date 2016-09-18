@@ -38,17 +38,6 @@ class NullableType<TValue> extends Type<TValue | null> {
   }
 
   /**
-   * First checks if the value is `null`, if it is we immeadiately return true.
-   * Then checks if the value is a type of the base type.
-   */
-  public isTypeOf (value: any): value is TValue | null {
-    if (value === null)
-      return true
-
-    return this._baseType.isTypeOf(value)
-  }
-
-  /**
    * Gets the base type for this nullable type.
    */
   public getBaseType (): Type<TValue> {

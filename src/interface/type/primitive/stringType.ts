@@ -5,11 +5,7 @@ import NamedType from '../NamedType'
  *
  * @private
  */
-class StringType extends NamedType<string> {
-  public isTypeOf (value: any): value is string {
-    return typeof value === 'string'
-  }
-}
+class StringType extends NamedType<string> {}
 
 /**
  * A singleton string type that represents a string value. Simply, a string can

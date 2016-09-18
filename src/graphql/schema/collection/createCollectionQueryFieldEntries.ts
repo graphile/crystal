@@ -68,37 +68,35 @@ export default function createCollectionQueryFieldEntries <T>(
     // into distinct arguments.
     if (keyType instanceof ObjectType) {
       const fields = keyType.getFields()
-      const fieldArgNames = fields.map(field => formatName.arg(field.getName()))
-
       entries.push([fieldName, {
         type: collectionType,
         args: buildObject<GraphQLArgumentConfig<mixed>>(
           fields.map<[string, GraphQLArgumentConfig<mixed>]>((field, i) =>
-            [fieldArgNames[i], {
+            [formatName.arg(field.getName()), {
               description: field.getDescription(),
+              internalName: field.getName(),
               type: getType(buildToken, field.getType(), true),
             }]
           )
         ),
         resolve: (source, args) =>
-          key.read(keyType.createFromFieldValues(new Map(fields.map((field, i): [string, mixed] => [field.getName(), args[fieldArgNames[i]]])))),
+          key.read(args),
       }])
     }
     // Otherwise if this is not an object type, we’ll just expose one argument
     // with the key’s name.
     else {
-      const argName = formatName.arg(keyName)
-
       entries.push([fieldName, {
         type: collectionType,
         args: {
-          [argName]: {
+          [formatName.arg(keyName)]: {
             // TODO: description
+            internalName: 'input',
             type: getType(buildToken, keyType, true),
           },
         },
         resolve: (source, args) =>
-          key.read(args[argName]),
+          key.read(args['input']),
       }])
     }
   }

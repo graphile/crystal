@@ -5,11 +5,7 @@ import NamedType from '../NamedType'
  *
  * @private
  */
-class BooleanType extends NamedType<boolean> {
-  public isTypeOf (value: any): value is boolean {
-    return typeof value === 'boolean'
-  }
-}
+class BooleanType extends NamedType<boolean> {}
 
 /**
  * A singleton boolean type that represents a boolean value. A boolean value

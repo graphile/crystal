@@ -6,11 +6,7 @@ import NamedType from '../NamedType'
  * @private
  */
 // TODO: Should this be called “Float”? Maybe “Fractional” or just “Number”?
-class FloatType extends NamedType<number> {
-  public isTypeOf (value: any): value is number {
-    return typeof value === 'number'
-  }
-}
+class FloatType extends NamedType<number> {}
 
 /**
  * A singleton float type which represents a float value as is specified by
