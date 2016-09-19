@@ -26,21 +26,7 @@ class App extends React.Component {
       <div className={css(styles.container)}>
         <header className={css(styles.header)}>
           <Logo />
-          <nav>
-            <Link to="/">Home</Link>
-            {' '}
-            <Link to="/posts">Posts</Link>
-            {this.props.user.authenticated
-              ? <button onClick={this.props.auth.handleLogout}>Logout</button>
-              : (
-                <div>
-                  <Link to="/login">Login</Link>
-                  {' '}
-                  <Link to="/register">Register</Link>
-                </div>
-              )
-            }
-          </nav>
+          <Navigation auth={this.props.auth} user={this.props.user} />
         </header>
         <main>
           {this.props.children}
@@ -67,5 +53,25 @@ const styles = StyleSheet.create({
     color: '#0095ff',
   },
 })
+
+// TODO: Implement Navigation component
+function Navigation({ auth, user }) {
+  return (
+    <nav>
+      <Link to="/">Home</Link>{' '}
+      <Link to="/posts">Posts</Link>
+      {user.authenticated
+        ? <button onClick={auth.handleLogout}>Logout</button>
+        : (
+          <div>
+            <Link to="/login">Login</Link>{' '}
+            <Link to="/register">Register</Link>
+          </div>
+        )
+      }
+    </nav>
+  )
+}
+
 
 export default authDecorator(App)
