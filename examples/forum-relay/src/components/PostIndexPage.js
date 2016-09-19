@@ -5,13 +5,19 @@ import PostItem from './PostItem'
 import PostForm from './PostForm'
 import { InsertPostMutation } from '../mutations'
 
-class PostIndex extends React.Component {
-  state = {
-    addingPost: false,
-  }
+// TODO:
+// # Pagination
+//   * Update url
+//   * hide buttons if no prev/next page
+//   * Button Component
 
+class PostIndex extends React.Component {
   static contextTypes = {
     user: React.PropTypes.object,
+  }
+
+  state = {
+    addingPost: false,
   }
 
   insertPost = (data) => {
@@ -29,7 +35,24 @@ class PostIndex extends React.Component {
     this.setState({ addingPost: value || !addingPost })
   }
 
-  // TODO: Add some kind of pagination
+  handleNextPage = () => {
+    const { totalCount } = this.props.viewer.posts
+    const { offset, first } = this.props.relay.variables
+    if (totalCount > offset + first) {
+      this.props.relay.setVariables({
+        offset: offset + first,
+      })
+    }
+  }
+
+  handlePrevPage = () => {
+    const { offset, first } = this.props.relay.variables
+    if (offset >= first) {
+      this.props.relay.setVariables({
+        offset: offset - first,
+      })
+    }
+  }
 
   render() {
     return (
@@ -45,6 +68,10 @@ class PostIndex extends React.Component {
             <PostForm user={this.context.user} onSubmit={this.insertPost}/>
           }
         </div>
+        <div>
+          <button onClick={this.handlePrevPage}>Previous Page</button>
+          <button onClick={this.handleNextPage}>Next Page</button>
+        </div>
         <ul>
           {this.props.viewer.posts.edges.map(({ node: post }) =>
             <li key={post.id}>
@@ -52,17 +79,31 @@ class PostIndex extends React.Component {
             </li>
           )}
         </ul>
+        <div>
+          <button onClick={this.handlePrevPage}>Previous Page</button>
+          <button onClick={this.handleNextPage}>Next Page</button>
+        </div>
       </div>
     )
   }
 }
 
 export default Relay.createContainer(PostIndex, {
+  initialVariables: {
+    offset: 0,
+    first: 5,
+  },
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
         ${InsertPostMutation.getFragment('viewer')}
-        posts: postNodes(first: 10, orderBy: CREATED_AT, descending: true) {
+        posts: postNodes(
+          descending: true
+          first: $first,
+          offset: $offset,
+          orderBy: CREATED_AT,
+        ) {
+          totalCount
           edges {
             node {
               id
