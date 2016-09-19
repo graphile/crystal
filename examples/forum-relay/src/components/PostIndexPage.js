@@ -7,6 +7,8 @@ import { InsertPostMutation } from '../mutations'
 
 // TODO:
 // # Pagination
+//   * Scrolling
+//   * how does it handle mutations?
 //   * Update url
 //   * hide buttons if no prev/next page
 //   * Button Component

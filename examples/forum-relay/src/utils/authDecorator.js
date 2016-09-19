@@ -5,6 +5,10 @@ import { RelayNetworkLayer, authMiddleware, urlMiddleware } from 'react-relay-ne
 
 const AUTH_URL = 'http://localhost:3000/token'
 
+// TODO: So much to do here :D
+// I feel like the my thinking how jwt works
+// is wrong. Will need to rethink this!
+
 const authDecorator = WrappedComponent => 
   class AuthDecorator extends React.Component {
     state = { ...defaultState }
@@ -95,8 +99,10 @@ const fetchToken = (data) => {
   return fetch(AUTH_URL, options)
     .then(res => res.json())
     .then(({ err, token }) => {
-      if (err) throw new Error(err.message)
-      else return token
+      if (err)
+        throw new Error(err.message)
+      else
+        return token
     })
     .then((token) => token)
 }
