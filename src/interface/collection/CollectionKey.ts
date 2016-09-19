@@ -6,7 +6,7 @@ import Collection from './Collection'
  * may then be used to reliably reselect the value. A collection may have many
  * keys, but only one primary key.
  */
-interface CollectionKey<TValue, TKey> {
+interface CollectionKey<TValue, TKey, TKeyType extends Type<TKey>> {
   /**
    * The name of our collection key.
    */
@@ -21,7 +21,7 @@ interface CollectionKey<TValue, TKey> {
    * The type for our key. With knowledge of the key’s type we can then
    * expose a way for the API to construct a key.
    */
-  readonly type: Type<TKey>
+  readonly type: TKeyType
 
   /**
    * Gets the key directly from a value. Using this method we are able to get a

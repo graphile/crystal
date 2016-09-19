@@ -1,5 +1,6 @@
 import {
   Collection,
+  Type,
   NullableType,
   ObjectType,
   BasicObjectType,
@@ -13,16 +14,13 @@ import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import isPGContext from '../isPGContext'
 import getTypeFromPGType from '../getTypeFromPGType'
-import PGCollectionType from './PGCollectionType'
-
-type Value = { [key: string]: mixed }
 
 /**
  * Creates a collection object for Postgres that can be used to access the
  * data. A collection aligns fairly well with a Postgres “class” that is
  * selectable. Non-selectable classes are generally compound types.
  */
-class PGCollection implements Collection<Value> {
+class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<BasicObjectField<mixed, Type<mixed>>>> {
   constructor (
     private _pgCatalog: PGCatalog,
     private _pgClass: PGCatalogClass,
@@ -54,7 +52,16 @@ class PGCollection implements Collection<Value> {
     (type, pgAttribute) => type.addField(
       new BasicObjectField(
         pgAttribute.name,
-        getTypeFromPGType(this._pgCatalog, this._pgCatalog.assertGetType(pgAttribute.typeId)),
+        (() => {
+          const type = getTypeFromPGType(this._pgCatalog, this._pgCatalog.assertGetType(pgAttribute.typeId))
+
+          // Make sure that if the attribute is non null, and the type we got
+          // is nullable to return the non null internal type.
+          if (pgAttribute.isNotNull && type instanceof NullableType)
+            return type.getNonNullType()
+
+          return type
+        })(),
       )
         .setDescription(pgAttribute.description)
     ),
@@ -70,7 +77,7 @@ class PGCollection implements Collection<Value> {
   public create = (
     !this._pgClass.isInsertable
       ? null
-      : (context: mixed, value: Value): Promise<Value> => {
+      : (context: mixed, value: BasicObjectType.Value): Promise<BasicObjectType.Value> => {
         if (!isPGContext(context)) throw isPGContext.error()
         return this._getInsertLoader(context.client).load(value)
       }
@@ -84,9 +91,9 @@ class PGCollection implements Collection<Value> {
    * @private
    */
   @memoizeMethod
-  private _getInsertLoader (client: Client): DataLoader<Value, Value> {
-    return new DataLoader<Value, Value>(
-      async (values: Array<Value>): Promise<Array<Value>> => {
+  private _getInsertLoader (client: Client): DataLoader<BasicObjectType.Value, BasicObjectType.Value> {
+    return new DataLoader<BasicObjectType.Value, BasicObjectType.Value>(
+      async (values: Array<BasicObjectType.Value>): Promise<Array<BasicObjectType.Value>> => {
         // Create our insert query.
         const query = sql.compile(sql.query`
           with insertion as (

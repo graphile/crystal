@@ -99,7 +99,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
         // If the attribute has the `NOT NULL` constraint, we need to strip away the
         // `NullableType` wrapper that exists most of the time on PostgreSQL types.
         if (pgAttribute.isNotNull && type instanceof NullableType)
-          type = type.getBaseType()
+          type = type.getNonNullType()
 
         const field = new BasicObjectField(pgAttribute.name, type)
 
@@ -118,7 +118,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
       // If the domain type has the `NOT NULL` contraint, we need to strip away the
       // `NullableType` wrapper that exists most of the time on PostgreSQL types.
       if (pgType.isNotNull && baseType instanceof NullableType)
-        baseType = baseType.getBaseType()
+        baseType = baseType.getNonNullType()
 
       const aliasType = new AliasType(pgType.name, baseType)
 

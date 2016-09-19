@@ -1,3 +1,0 @@
-type Type =
-  'string' |
-  'number'

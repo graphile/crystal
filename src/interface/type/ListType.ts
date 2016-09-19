@@ -7,9 +7,13 @@ import NamedType from './NamedType'
  * of a given type, there may be many items of a given type. A list may contain
  * any number of values and this type represents that construct.
  */
-class ListType<TValue> extends Type<TValue[]> {
+class ListType<
+  TItemValue,
+  TValue extends Array<TItemValue>,
+  TItemType extends Type<TItemValue>,
+> extends Type<TValue> {
   constructor (
-    private _itemType: Type<TValue>
+    private _itemType: TItemType
   ) {
     super()
   }
@@ -17,14 +21,14 @@ class ListType<TValue> extends Type<TValue[]> {
   /**
    * Get’s the item type for this list type.
    */
-  public getItemType (): Type<TValue> {
+  public getItemType (): TItemType {
     return this._itemType
   }
 
   /**
    * Returns the item type.
    */
-  public getNamedType (): NamedType<any> {
+  public getNamedType (): NamedType<mixed> {
     return this._itemType.getNamedType()
   }
 }

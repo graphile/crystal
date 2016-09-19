@@ -1,3 +1,4 @@
+import Type from '../Type'
 import ObjectType from './ObjectType'
 import ObjectField from './ObjectField'
 import BasicObjectField from './BasicObjectField'
@@ -6,9 +7,7 @@ import BasicObjectField from './BasicObjectField'
  * The value for the basic object type is just a plain‘ol JavaScript object
  * map.
  */
-export type BasicObjectValue = {
-  [type: string]: any
-}
+type BasicObjectValue = { [type: string]: mixed }
 
 /**
  * The basic object just represents a normal object. Nothing exciting going
@@ -21,8 +20,8 @@ export type BasicObjectValue = {
  * representations. If `BasicObjectType` were the default implementation
  * `TValue` would be set and couldn’t be customized.
  */
-class BasicObjectType extends ObjectType<BasicObjectValue> {
-  private _fields = new Map<string, ObjectField<BasicObjectValue, any>>()
+class BasicObjectType<TField extends BasicObjectField<mixed, Type<mixed>>> extends ObjectType<BasicObjectValue, TField> {
+  private _fields = new Map<string, TField>()
 
   /**
    * Adds a field to our object type. If there is already a field with the same
@@ -30,7 +29,7 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
    *
    * The order in which fields get added is preserved.
    */
-  public addField (field: BasicObjectField<any>): this {
+  public addField (field: TField): this {
     const name = field.getName()
 
     if (this._fields.has(name))
@@ -45,7 +44,7 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
    * Gets all of the fields on our object type. Returned in the order the
    * fields were added in.
    */
-  public getFields (): ObjectField<BasicObjectValue, any>[] {
+  public getFields (): Array<TField> {
     return Array.from(this._fields.values())
   }
 
@@ -62,6 +61,10 @@ class BasicObjectType extends ObjectType<BasicObjectValue> {
 
     return object
   }
+}
+
+namespace BasicObjectType {
+  export type Value = BasicObjectValue
 }
 
 export default BasicObjectType

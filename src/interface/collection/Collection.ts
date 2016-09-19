@@ -1,5 +1,7 @@
 import Relation from '../Relation'
+import Type from '../type/Type'
 import ObjectType from '../type/object/ObjectType'
+import ObjectField from '../type/object/ObjectField'
 import CollectionKey from './CollectionKey'
 import Paginator from './Paginator'
 import Condition from './Condition'
@@ -8,7 +10,7 @@ import Condition from './Condition'
  * A collection represents a set of typed values that can be operated on in
  * basic CRUD fashion in our system.
  */
-interface Collection<TValue> {
+interface Collection<TValue, TType extends ObjectType<TValue, ObjectField<TValue, mixed>>> {
   /**
    * The name of our collection.
    */
@@ -22,7 +24,7 @@ interface Collection<TValue> {
   /**
    * The type of *all* the values in our collection.
    */
-  readonly type: ObjectType<TValue>
+  readonly type: TType
 
   /**
    * Get all of the unique identifiers for this collection. A key is a token
@@ -30,14 +32,14 @@ interface Collection<TValue> {
    * by.
    */
   // TODO: Test that we don’t have any keys with the same name.
-  readonly keys: Set<CollectionKey<TValue, mixed>>
+  readonly keys: Set<CollectionKey<TValue, mixed, Type<mixed>>>
 
   /**
    * Gets the primary unique identifier for this collection. While a
    * collection may have many keys, only one is the *primary* identifier.
    * However, a collection may not have a primary key.
    */
-  readonly primaryKey?: CollectionKey<TValue, mixed> | null
+  readonly primaryKey?: CollectionKey<TValue, mixed, Type<mixed>> | null
 
   /**
    * Returns a paginators that can be used to paginate through all of

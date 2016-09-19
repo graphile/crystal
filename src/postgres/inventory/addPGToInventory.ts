@@ -10,5 +10,5 @@ export default function addPGToInventory (inventory: Inventory, pgCatalog: PGCat
   // compound type and we shouldn’t add a collection for it to our inventory.
   for (const pgClass of pgCatalog.getClasses())
     if (pgClass.isSelectable)
-      inventory.addCollection(PGCollection(pgCatalog, pgClass))
+      inventory.addCollection(new PGCollection(pgCatalog, pgClass))
 }

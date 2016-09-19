@@ -1,6 +1,7 @@
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
+import * as path from 'path'
+import { readFile } from 'fs'
 import { Client } from 'pg'
+import minify = require('pg-minify')
 import PGCatalog from './PGCatalog'
 
 /**
@@ -8,8 +9,12 @@ import PGCatalog from './PGCatalog'
  * synchronously at runtime. It’s just like requiring a file, except that file
  * is SQL.
  */
-export const introspectionQuery =
-  readFileSync(resolve(__dirname, '../../../queries/introspection.sql')).toString()
+const introspectionQuery = new Promise<string>((resolve, reject) => {
+  readFile(path.resolve(__dirname, '../../../queries/introspection.sql'), (error, data) => {
+    if (error) reject(error)
+    else resolve(minify(data.toString()))
+  })
+})
 
 /**
  * Takes a PostgreSQL client and introspects it, returning an instance of
@@ -20,7 +25,7 @@ export default async function introspectDatabase (client: Client, schemas: strin
   // Run our single introspection query in the database.
   const result = await client.query({
     name: 'introspectionQuery',
-    text: introspectionQuery,
+    text: await introspectionQuery,
     values: [schemas],
   })
 

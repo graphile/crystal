@@ -16,16 +16,6 @@ test('createFromFieldValues will build an object from field entries', () => {
   expect(objectType.createFromFieldValues(new Map([['a', 1], ['a', 2]]))).toEqual({ a: 2 })
 })
 
-test('createFromFieldValues will fail if an isTypeOf is false', () => {
-  const fieldA = mockField('a', value => value === 1)
-  const fieldB = mockField('b', value => value === 2)
-  const objectType = new BasicObjectType()
-  expect(objectType.createFromFieldValues(new Map([['a', 1], ['b', 1]]))).toEqual({ a: 1, b: 1 })
-  objectType.addField(fieldA).addField(fieldB)
-  expect(() => objectType.createFromFieldValues(new Map([['a', 1], ['b', 1]]))).toThrow()
-  expect(objectType.createFromFieldValues(new Map([['a', 1], ['b', 2]]))).toEqual({ a: 1, b: 2 })
-})
-
 test('getFields will get fields added by addField', () => {
   const objectType = new BasicObjectType()
   const fields = [

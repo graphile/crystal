@@ -253,6 +253,7 @@ Object {
         1
       ],
       "kind": "constraint",
+      "name": "person_pkey",
       "type": "p"
     },
     Object {
@@ -263,6 +264,7 @@ Object {
         4
       ],
       "kind": "constraint",
+      "name": "person_email_key",
       "type": "u"
     },
     Object {
@@ -273,6 +275,7 @@ Object {
         1
       ],
       "kind": "constraint",
+      "name": "post_pkey",
       "type": "p"
     },
     Object {
@@ -285,6 +288,7 @@ Object {
         4
       ],
       "kind": "constraint",
+      "name": "post_author_id_fkey",
       "type": "f"
     }
   ],
@@ -517,6 +521,7 @@ Object {
         1
       ],
       "kind": "constraint",
+      "name": "post_pkey",
       "type": "p"
     }
   ],

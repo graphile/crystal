@@ -29,6 +29,7 @@ import {
   AliasType,
   EnumType,
   ObjectType,
+  ObjectField,
   booleanType,
   integerType,
   floatType,
@@ -95,7 +96,7 @@ function createType (buildToken: BuildToken, type: Type<mixed>, input: boolean):
 
   if (type instanceof NullableType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-    return getNullableType(getType(buildToken, type.getBaseType(), input as any))
+    return getNullableType(getType(buildToken, type.getNonNullType(), input as any))
 
   return new GraphQLNonNull(createNullableType(buildToken, type, input))
 }
@@ -166,7 +167,7 @@ function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input:
  *
  * @private
  */
-function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed>): GraphQLObjectType<mixed> {
+function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed, ObjectField<mixed, mixed, Type<mixed>>>): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
   const collection = inventory.getCollections().find(collection => collection.type === type)
 
@@ -195,7 +196,7 @@ function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed>
  *
  * @private
  */
-function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType<T>): GraphQLInputObjectType<T> {
+function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType<T, ObjectField<T, mixed, Type<mixed>>>): GraphQLInputObjectType<T> {
   return new GraphQLInputObjectType<T>({
     name: formatName.type(`${type.getName()}-input`),
     description: type.getDescription(),

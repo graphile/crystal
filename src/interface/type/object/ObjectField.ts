@@ -5,12 +5,12 @@ import Type from '../Type'
  * field will contain a name which is unique to the object containing the field
  * and a value of any type.
  */
-abstract class ObjectField<TObjectValue, TValue> {
+abstract class ObjectField<TObjectValue, TFieldValue, TFieldType extends Type<TFieldValue>> {
   private _description: string | undefined = undefined
 
   constructor (
     private _name: string,
-    private _type: Type<TValue>,
+    private _type: TFieldType,
   ) {}
 
   /**
@@ -38,7 +38,7 @@ abstract class ObjectField<TObjectValue, TValue> {
   /**
    * Gets the type of our field.
    */
-  public getType (): Type<TValue> {
+  public getType (): TFieldType {
     return this._type
   }
 
@@ -46,7 +46,7 @@ abstract class ObjectField<TObjectValue, TValue> {
    * This method takes the object value for this field, and extracts the field
    * value from it.
    */
-  public abstract getFieldValueFromObject (object: TObjectValue): TValue
+  public abstract getFieldValueFromObject (object: TObjectValue): TFieldValue
 }
 
 export default ObjectField

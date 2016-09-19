@@ -1,3 +1,4 @@
+import Type from '../Type'
 import NamedType from '../NamedType'
 import ObjectField from './ObjectField'
 
@@ -7,11 +8,14 @@ import ObjectField from './ObjectField'
  * composed of many different types.
  */
 // TODO: Make sure no two fields have the same name.
-abstract class ObjectType<TValue> extends NamedType<TValue> {
+abstract class ObjectType<
+  TValue,
+  TField extends ObjectField<TValue, mixed, Type<mixed>>,
+> extends NamedType<TValue> {
   /**
    * Gets all of the fields on our object type. Order matters.
    */
-  public abstract getFields (): Array<ObjectField<TValue, mixed>>
+  public abstract getFields (): Array<TField>
 
   /**
    * Creates a value with all of the fields in key/value pair format. If not

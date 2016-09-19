@@ -144,13 +144,13 @@ with
       -- made add support for more constraints in the future.
       con.contype in ('f', 'p', 'u')
   )
-select row_to_json(namespace) as object from namespace
+select row_to_json(x) as object from namespace as x
 union all
-select row_to_json(class) as object from class
+select row_to_json(x) as object from class as x
 union all
-select row_to_json(attribute) as object from attribute
+select row_to_json(x) as object from attribute as x
 union all
-select row_to_json(type) as object from type
+select row_to_json(x) as object from type as x
 union all
-select row_to_json("constraint") as object from "constraint"
+select row_to_json(x) as object from "constraint" as x
 ;
