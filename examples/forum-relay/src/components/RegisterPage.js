@@ -1,11 +1,16 @@
 import React from 'react'
 import Relay from 'react-relay'
-import { RegisterPersonMutation } from '../mutations'
+import Redirect from 'react-router/Redirect'
 import RegisterForm from './RegisterForm'
+import { RegisterPersonMutation } from '../mutations'
 
 class RegisterPage extends React.Component {
   static contextTypes = {
     auth: React.PropTypes.object,
+  }
+
+  state = {
+    success: null,
   }
 
   onSubmit = (data) => {
@@ -19,7 +24,7 @@ class RegisterPage extends React.Component {
   }
 
   onFailure = (transaction) => {
-    console.error(transaction)
+    this.setState({ success: false })
   }
 
   onSuccess = (data) => (response) => {
@@ -27,10 +32,14 @@ class RegisterPage extends React.Component {
       email: data.email,
       password: data.password,
     })
-    //.then(() => this.props.router.push('/posts'))
+      .then(() => this.setState({ success: true }))
+      .catch(() => this.setState({ success: false }))
   }
 
   render() {
+    if (this.state.success)
+      return <Redirect to="/" />
+
     return <RegisterForm onSubmit={this.onSubmit} />
   }
 }

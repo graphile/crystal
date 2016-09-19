@@ -1,6 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
-import { Link } from 'react-router'
+import Redirect from 'react-router/Redirect'
+import Link from 'react-router/Link'
 import { StyleSheet, css } from 'aphrodite'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
@@ -9,16 +10,25 @@ class PostPage extends React.Component {
     user: React.PropTypes.object,
   }
 
+  state = {
+    clickedDelete: null,
+  }
+
   handleUpdate = (event) => {
     const propName = event.target.dataset.prop
     const newValue = event.target.innerText
     const oldValue = this.props.post[propName]
-    if (newValue === oldValue) return
+
+    if (newValue === oldValue)
+      return
+
+    // PostGrahpQL expects the prop names of the
+    // new values to be prefixed with `new`
+
     this.props.relay.commitUpdate(
       new UpdatePostMutation({
         post: this.props.post,
         newPost: {
-          // PostGrahpQL expects the prop names of the new values to be prefixed with `new`
           [`new${capitalizeFirstLetter(propName)}`]: newValue,
         },
       })
@@ -26,7 +36,8 @@ class PostPage extends React.Component {
   }
 
   handleDelete = (event) => {
-    this.props.router.replace('/posts')
+    this.setState({ clickedDelete: true })
+
     // TODO: Use applyUpdate and commit once navigated?
     this.props.relay.commitUpdate(
       new DeletePostMutation({
@@ -43,6 +54,10 @@ class PostPage extends React.Component {
     const { post } = this.props
     const { authenticated, personId } = this.context.user
     const authAndOwn = personId === post.authorId && authenticated
+
+    if (this.state.clickedDelete)
+      return <Redirect to="/posts" />
+
     return (
       <div>
         <Link to="/posts">back to Posts</Link>

@@ -1,16 +1,17 @@
 import React from 'react'
-import Relay from 'react-relay'
 import { StyleSheet, css } from 'aphrodite'
 import Match from 'react-router/Match'
-import Link from 'react-router/Link'
 import Miss from 'react-router/Miss'
+import MatchRelay from '../utils/MatchRelay'
 import authDecorator from '../utils/authDecorator'
 import Logo from './Logo'
+import Navigation from './Navigation'
 import HomePage from './HomePage'
 import PostIndexPage from './PostIndexPage'
 import PostPage from './PostPage'
 import RegisterPage from './RegisterPage'
 import LoginPage from './LoginPage'
+
 import {
   HomeQueries,
   PostIndexQueries,
@@ -18,26 +19,10 @@ import {
   RegisterQueries
 } from '../queries'
 
-const MatchRelay = ({ component, queries, ...rest }) =>
-  <Match {...rest} render={(props) => {
-    const queryConfig = {
-      name: props.pathname,
-      params: props.params,
-      queries,
-    }
-    return (
-      <Relay.Renderer
-        {...props}
-        Container={component}
-        queryConfig={queryConfig}
-        environment={Relay.Store}
-      />
-    )
-  }}/>
+// We use React Context to share state
+// Redux might make sense though …
 
 class App extends React.Component {
-  // We use React Context to share state
-  // Redux might make sense though …
   static childContextTypes = {
     user: React.PropTypes.object,
     auth: React.PropTypes.object,
@@ -86,24 +71,5 @@ const styles = StyleSheet.create({
     color: '#0095ff',
   },
 })
-
-function Navigation({ auth, user }) {
-  return (
-    <nav>
-      <Link to="/">Home</Link>{' '}
-      <Link to="/posts">Posts</Link>
-      {user.authenticated
-        ? <button onClick={auth.handleLogout}>Logout</button>
-        : (
-          <div>
-            <Link to="/login">Login</Link>{' '}
-            <Link to="/register">Register</Link>
-          </div>
-        )
-      }
-    </nav>
-  )
-}
-
 
 export default authDecorator(App)
