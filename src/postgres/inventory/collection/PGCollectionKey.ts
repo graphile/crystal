@@ -60,6 +60,18 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
   }
 
   /**
+   * Takes a key value and transforms it into a SQL condition which can be used
+   * in the `where` clause of `select`s, `update`s, and `delete`s.
+   *
+   * @private
+   */
+  private _getSQLKeyCondition (key: PGCollectionKeyValue): sql.SQL {
+    return sql.join(this._pgKeyAttributes.map((pgAttribute, i) =>
+      sql.query`${sql.identifier(pgAttribute.name)} = ${sql.value(key[i])}`
+    ), ' and ')
+  }
+
+  /**
    * Reads a value if a user can select from this class. Batches requests to
    * the same client in the background.
    */
@@ -111,13 +123,8 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
                 from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as x
 
                 -- For all of our key attributes we need to test equality with a
-                -- key value. Note though, if we don’t find a match no row will
-                -- be emit for this key. We loop through our keys below to
-                -- safeguard this from happening.
-                where
-                  ${sql.join(this._pgKeyAttributes.map((pgAttribute, i) =>
-                    sql.query`${sql.identifier(pgAttribute.name)} = ${sql.value(key[i])}`
-                  ), ' and ')}
+                -- key value.
+                where ${this._getSQLKeyCondition(key)}
 
                 -- Combine our selected row with a single null and a limit.
                 -- This way if our where clause misses, we’ll get the null. If
@@ -136,6 +143,50 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
       }
     )
   }
+
+  /**
+   * Updates a value in our Postgres database using a patch object. If no
+   * value could be updated we should throw an error to let the user know.
+   *
+   * This method, unlike many of the other asynchronous actions in Postgres
+   * collections, is not batched.
+   */
+  public update = (
+    !this._pgClass.isUpdatable
+      ? null
+      : async (context: mixed, key: PGCollectionKeyValue, patch: Map<string, mixed>): Promise<PGCollectionValue> => {
+        // First things first, we need to get our Postgres client from the
+        // context. This means first verifying our client exists on the
+        // context.
+        if (!isPGContext(context)) throw isPGContext.error()
+        const { client } = context
+
+        const query = sql.compile(sql.query`
+          -- Put our updated rows in a with statement so that we can select
+          -- our result as JSON rows before returning it.
+          with updated as (
+            update ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
+
+            -- Using our patch object we construct the fields we want to set and
+            -- the values we want to set them to.
+            set ${Array.from(patch.entries()).map(([fieldName, value]) =>
+              sql.query`x = ${value === null ? sql.raw('null') : sql.value(value)}`
+            )}
+
+            where ${this._getSQLKeyCondition(key)}
+            returning *
+          )
+          select row_to_json(x) as object from updated as x
+        `)()
+
+        const result = await client.query(query)
+
+        if (result.rowCount < 1)
+          throw new Error('No values were updated.')
+
+        return result.rows[0]['object']
+      }
+  )
 }
 
 export default PGCollectionKey
@@ -145,10 +196,8 @@ export default PGCollectionKey
  * representing objects as a JavaScript object, the key type will represent
  * object as an array.
  */
-class PGCollectionKeyType extends ObjectType<
-  PGCollectionKeyValue,
-  PGCollectionKeyField<mixed, Type<mixed>>,
-> {
+class PGCollectionKeyType
+extends ObjectType<PGCollectionKeyValue, PGCollectionKeyField<mixed, Type<mixed>>> {
   constructor (
     name: string,
     private _pgCatalog: PGCatalog,
@@ -169,14 +218,8 @@ class PGCollectionKeyType extends ObjectType<
   }
 }
 
-class PGCollectionKeyField<
-  TFieldValue,
-  TFieldType extends Type<TFieldValue>,
-> extends ObjectField<
-  PGCollectionKeyValue,
-  TFieldValue,
-  TFieldType,
-> {
+class PGCollectionKeyField<TFieldValue, TFieldType extends Type<TFieldValue>>
+extends ObjectField<PGCollectionKeyValue, TFieldValue, TFieldType> {
   constructor (
     pgCatalog: PGCatalog,
     pgAttribute: PGCatalogAttribute,

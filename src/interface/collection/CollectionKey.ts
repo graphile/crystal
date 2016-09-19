@@ -35,21 +35,26 @@ interface CollectionKey<TValue, TKey, TKeyType extends Type<TKey>> {
 
   /**
    * Reads a single value from the collection using that value’s key.
+   *
+   * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  read?: ((context: mixed, key: TKey) => Promise<TValue | undefined>) | null
+  read?: ((context: mixed, key: TKey) => Promise<TValue | null>) | null
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is
    * value after the updates have been applied.
+   *
+   * If nothing was updated, an error should be thrown.
    */
-  // TODO: Patch object.
   // TODO: Test this.
-  update?: ((context: mixed, key: TKey) => Promise<TValue>) | null
+  update?: ((context: mixed, key: TKey, patch: Map<string, mixed>) => Promise<TValue>) | null
 
   /**
    * Delete a value from the collection by using the value’s key. Returned is
    * the value before it was deleted.
+   *
+   * If nothing was deleted an error should be thrown.
    */
   // TODO: Test this.
   delete?: ((context: mixed, key: TKey) => Promise<TValue>) | null

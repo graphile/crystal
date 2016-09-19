@@ -36,6 +36,8 @@ export interface QueryConfig {
 }
 
 export interface QueryResult {
+  command: string
+  rowCount: number
   rows: ({ [key: string]: any })[]
 }
 
