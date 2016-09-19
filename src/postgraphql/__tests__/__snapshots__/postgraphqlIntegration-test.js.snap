@@ -3,6 +3,11 @@ exports[`test forum example 1`] = `
   query: Query
 }
 
+type CompoundKey {
+  personId_2: Int!
+  personId_1: Int!
+}
+
 scalar Email
 
 interface Node {

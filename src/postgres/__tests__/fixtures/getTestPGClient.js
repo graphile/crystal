@@ -1,10 +1,21 @@
+import { resolve as resolvePath } from 'path'
+import { readFile } from 'fs'
 import { Pool, Client } from 'pg'
+
+const minify = require('pg-minify')
 
 const pool = new Pool({
   database: 'postgraphql_test',
   port: 5432,
   max: 10,
   idleTimeoutMillis: 500,
+})
+
+const kitchenSinkSchema = new Promise((resolve, reject) => {
+  readFile(resolvePath(__dirname, 'kitchen-sink-schema.sql'), (error, data) => {
+    if (error) reject(error)
+    else resolve(minify(data.toString()))
+  })
 })
 
 let clients = []
@@ -15,15 +26,39 @@ let clients = []
  * so you don’t need to worry about releasing it yourself on a test-by-test
  * basis.
  *
+ * This function also will automatically add the kitchen sink schema which
+ * will be rolled back at the end of each test.
+ *
+ * This function also will automatically setup a transaction that will be
+ * rolled back upon test completion.
+ *
  * @returns {Promise<Client>}
  */
-export default async function getTestPGClient () {
+export default async function getTestPGClient ({ noKitchenSinkSchema } = {}) {
   const client = await pool.connect()
   clients.push(client)
+  await client.query('begin')
+
+  // If the user does not opt out of the kitchen sink schema, let’s apply it.
+  if (!noKitchenSinkSchema) {
+    try {
+      await client.query(await kitchenSinkSchema)
+    }
+    catch (error) {
+      // Make sure we log any errors we might run into. If we don’t do this
+      // log, the thrown error is pretty cryptic.
+      console.error('Failed to execute kitchen sink SQL:', error.stack)
+      throw error
+    }
+  }
+
   return client
 }
 
-afterEach(() => {
-  clients.forEach(client => client.release())
+afterEach(async () => {
+  await Promise.all(clients.map(async client => {
+    await client.query('rollback')
+    client.release()
+  }))
   clients = []
 })

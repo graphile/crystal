@@ -56,11 +56,11 @@ comment on column b.updatable_view.constant is 'This is constantly 2';
 
 create view a.no_update as select 2;
 
--- create table c.compound_key (
---   person_id_2 int references c.person(id),
---   person_id_1 int references c.person(id),
---   primary key (person_id_1, person_id_2)
--- );
+create table c.compound_key (
+  person_id_2 int references c.person(id),
+  person_id_1 int references c.person(id),
+  primary key (person_id_1, person_id_2)
+);
 
 -- create table a.foreign_key (
 --   person_id int references c.person(id),

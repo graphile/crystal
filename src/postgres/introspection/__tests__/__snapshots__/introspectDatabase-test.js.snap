@@ -2,6 +2,26 @@ exports[`test will get everything needed in an introspection 1`] = `
 Object {
   "attributes": Array [
     Object {
+      "classId": "compound_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "person_id_2",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "compound_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "person_id_1",
+      "num": 2,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "compound_type",
       "description": null,
       "hasDefault": false,
@@ -185,6 +205,18 @@ Object {
   "classes": Array [
     Object {
       "description": null,
+      "id": "compound_key",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "compound_key",
+      "namespaceId": "c",
+      "typeId": "compound_key"
+    },
+    Object {
+      "description": null,
       "id": "compound_type",
       "isDeletable": false,
       "isInsertable": false,
@@ -290,6 +322,44 @@ Object {
       "kind": "constraint",
       "name": "post_author_id_fkey",
       "type": "f"
+    },
+    Object {
+      "classId": "compound_key",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        2,
+        1
+      ],
+      "kind": "constraint",
+      "name": "compound_key_pkey",
+      "type": "p"
+    },
+    Object {
+      "classId": "compound_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "name": "compound_key_person_id_2_fkey",
+      "type": "f"
+    },
+    Object {
+      "classId": "compound_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        2
+      ],
+      "kind": "constraint",
+      "name": "compound_key_person_id_1_fkey",
+      "type": "f"
     }
   ],
   "namespaces": Array [
@@ -330,6 +400,20 @@ Object {
       "name": "color",
       "namespaceId": "b",
       "type": "e"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "compound_key",
+      "description": null,
+      "enumVariants": null,
+      "id": "compound_key",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "compound_key",
+      "namespaceId": "c",
+      "type": "c"
     },
     Object {
       "baseTypeId": null,

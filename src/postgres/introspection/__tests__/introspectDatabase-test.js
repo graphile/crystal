@@ -1,8 +1,6 @@
-import createKitchenSinkPGSchema from '../../__tests__/fixtures/createKitchenSinkPGSchema'
 import getTestPGClient from '../../__tests__/fixtures/getTestPGClient'
+import createKitchenSinkPGSchema from '../../__tests__/fixtures/createKitchenSinkPGSchema'
 import introspectDatabase from '../introspectDatabase'
-
-beforeAll(createKitchenSinkPGSchema)
 
 /**
  * Gets a local identifier that is independent of the object id assigned by
