@@ -1,6 +1,5 @@
 import React from 'react'
 import Relay from 'react-relay'
-import { withRouter } from 'react-router'
 import { RegisterPersonMutation } from '../mutations'
 import RegisterForm from './RegisterForm'
 
@@ -24,11 +23,11 @@ class RegisterPage extends React.Component {
   }
 
   onSuccess = (data) => (response) => {
-    console.log(data)
     this.context.auth.handleLogin({
       email: data.email,
       password: data.password,
-    }).then(() => this.props.router.push('/posts'))
+    })
+    //.then(() => this.props.router.push('/posts'))
   }
 
   render() {
@@ -36,7 +35,7 @@ class RegisterPage extends React.Component {
   }
 }
 
-export default Relay.createContainer(withRouter(RegisterPage), {
+export default Relay.createContainer(RegisterPage, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

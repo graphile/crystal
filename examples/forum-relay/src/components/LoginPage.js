@@ -1,6 +1,5 @@
 import React from 'react'
 import LoginForm from './LoginForm'
-import { withRouter } from 'react-router'
 
 class LoginPage extends React.Component {
   static contextTypes = {
@@ -9,7 +8,7 @@ class LoginPage extends React.Component {
 
   onSubmit = ({ email, password }) => {
     this.context.auth.handleLogin({ email, password })
-      .then(() => this.props.router.push('/posts'))
+    //.then(() => this.props.router.push('/posts'))
   }
 
   render() {
@@ -17,4 +16,4 @@ class LoginPage extends React.Component {
   }
 }
 
-export default withRouter(LoginPage)
+export default LoginPage

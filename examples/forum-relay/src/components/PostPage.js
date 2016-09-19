@@ -1,6 +1,6 @@
 import React from 'react'
 import Relay from 'react-relay'
-import { Link, withRouter } from 'react-router'
+import { Link } from 'react-router'
 import { StyleSheet, css } from 'aphrodite'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
@@ -65,7 +65,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export default Relay.createContainer(withRouter(PostPage), {
+export default Relay.createContainer(PostPage, {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

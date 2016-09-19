@@ -2,6 +2,17 @@ import React from 'react'
 import Relay from 'react-relay'
 import { Link } from 'react-router'
 
+class HomePageRoute extends Relay.Route {
+  static queries = {
+    viewer: () => Relay.QL`
+      query {
+        viewer
+      }
+    `,
+  }
+  static routeName = 'HomePageRoute';
+}
+
 class HomePage extends React.Component {
   render() {
     return (

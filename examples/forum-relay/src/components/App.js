@@ -1,8 +1,39 @@
 import React from 'react'
+import Relay from 'react-relay'
 import { StyleSheet, css } from 'aphrodite'
-import { Link } from 'react-router'
-import Logo from './Logo'
+import Match from 'react-router/Match'
+import Link from 'react-router/Link'
+import Miss from 'react-router/Miss'
 import authDecorator from '../utils/authDecorator'
+import Logo from './Logo'
+import HomePage from './HomePage'
+import PostIndexPage from './PostIndexPage'
+import PostPage from './PostPage'
+import RegisterPage from './RegisterPage'
+import LoginPage from './LoginPage'
+import {
+  HomeQueries,
+  PostIndexQueries,
+  PostQueries,
+  RegisterQueries
+} from '../queries'
+
+const MatchRelay = ({ component, queries, ...rest }) =>
+  <Match {...rest} render={(props) => {
+    const queryConfig = {
+      name: props.pathname,
+      params: props.params,
+      queries,
+    }
+    return (
+      <Relay.Renderer
+        {...props}
+        Container={component}
+        queryConfig={queryConfig}
+        environment={Relay.Store}
+      />
+    )
+  }}/>
 
 class App extends React.Component {
   // We use React Context to share state
@@ -19,8 +50,6 @@ class App extends React.Component {
     }
   }
 
-  // TODO: Implement Navigation component
-
   render() {
     return (
       <div className={css(styles.container)}>
@@ -29,7 +58,11 @@ class App extends React.Component {
           <Navigation auth={this.props.auth} user={this.props.user} />
         </header>
         <main>
-          {this.props.children}
+          <MatchRelay exactly pattern="/" component={HomePage} queries={HomeQueries} />
+          <MatchRelay exactly pattern="/posts" component={PostIndexPage} queries={PostIndexQueries} />
+          <MatchRelay pattern="/posts/:postId" component={PostPage} queries={PostQueries} />
+          <MatchRelay pattern="/register" component={RegisterPage} queries={RegisterQueries} />
+          <Match pattern="/login" component={LoginPage} />
         </main>
         <footer className={css(styles.footer)}>
           <p>An example application for PostGraphQL and Relay</p>
@@ -54,7 +87,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// TODO: Implement Navigation component
 function Navigation({ auth, user }) {
   return (
     <nav>
