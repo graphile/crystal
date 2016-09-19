@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import postgraphql from 'postgraphql'
-import webpackConfig from './build/webpack.config'
+import webpackConfig from '../config/webpack.config'
 import authentication from './auth'
 
 // Load the config from .env file.
