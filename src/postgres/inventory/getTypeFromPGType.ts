@@ -15,6 +15,7 @@ import {
 import { memoize2 } from '../utils'
 import PGCatalog from '../introspection/PGCatalog'
 import PGCatalogType from '../introspection/object/PGCatalogType'
+import getTypeFromPGAttribute from './getTypeFromPGAttribute'
 
 /**
  * The type for a JSON blob. It’s just a string…
@@ -93,19 +94,10 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
 
       // Add all our fields to the object.
       for (const pgAttribute of pgCatalog.getClassAttributes(pgClass.id)) {
-        const pgType = pgCatalog.assertGetType(pgAttribute.typeId)
-        let type = getTypeFromPGType(pgCatalog, pgType)
-
-        // If the attribute has the `NOT NULL` constraint, we need to strip away the
-        // `NullableType` wrapper that exists most of the time on PostgreSQL types.
-        if (pgAttribute.isNotNull && type instanceof NullableType)
-          type = type.getNonNullType()
-
-        const field = new BasicObjectField(pgAttribute.name, type)
-
-        field.setDescription(pgAttribute.description)
-
-        objectType.addField(field)
+        objectType.addField(
+          new BasicObjectField(pgAttribute.name, getTypeFromPGAttribute(pgCatalog, pgAttribute))
+            .setDescription(pgAttribute.description)
+        )
       }
 
       return new NullableType(objectType)
@@ -128,7 +120,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     }
     // If this type is an enum type…
     case 'e':
-      return new EnumType(pgType.name, pgType.enumVariants).setDescription(pgType.description)
+      return new NullableType(new EnumType(pgType.name, pgType.enumVariants).setDescription(pgType.description))
   }
 
   // If the type isn’t of a certain kind, let’s use the category which is used

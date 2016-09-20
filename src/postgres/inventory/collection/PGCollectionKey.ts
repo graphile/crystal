@@ -3,7 +3,7 @@ import { Client } from 'pg'
 import { CollectionKey, Type, ObjectType, ObjectField } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
-import getTypeFromPGType from '../getTypeFromPGType'
+import getTypeFromPGAttribute from '../getTypeFromPGAttribute'
 import isPGContext from '../isPGContext'
 
 type PGCollectionValue = { [key: string]: mixed }
@@ -42,7 +42,7 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
    * A type used to represent a key value. Consumers can then use this
    * information to construct intelligent inputs.
    */
-  public type = new PGCollectionKeyType(
+  public keyType = new PGCollectionKeyType(
     // We put an underscore in front of the name for this type to indicate the
     // type as private which allows us to change the type name at any time and
     // make it public.
@@ -56,7 +56,7 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
    * just extracting a subset of the value.
    */
   public getKeyFromValue (value: PGCollectionValue): PGCollectionKeyValue {
-    return this.type.getFields().map(field => value[field.getName()])
+    return this.keyType.getFields().map(field => value[field.getName()])
   }
 
   /**

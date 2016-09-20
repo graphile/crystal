@@ -9,16 +9,8 @@ abstract class ObjectField<TObjectValue, TFieldValue, TFieldType extends Type<TF
   private _description: string | undefined = undefined
 
   constructor (
-    private _name: string,
     private _type: TFieldType,
   ) {}
-
-  /**
-   * Gets the name of our field.
-   */
-  public getName (): string {
-    return this._name
-  }
 
   /**
    * Sets the description for our field.

@@ -15,7 +15,7 @@ abstract class ObjectType<
   /**
    * Gets all of the fields on our object type. Order matters.
    */
-  public abstract getFields (): Array<TField>
+  public abstract getFields (): Map<string, TField>
 
   /**
    * Creates a value with all of the fields in key/value pair format. If not

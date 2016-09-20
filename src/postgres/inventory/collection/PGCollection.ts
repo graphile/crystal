@@ -13,7 +13,7 @@ import { Client } from 'pg'
 import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import isPGContext from '../isPGContext'
-import getTypeFromPGType from '../getTypeFromPGType'
+import getTypeFromPGAttribute from '../getTypeFromPGAttribute'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
@@ -52,16 +52,7 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
     (type, pgAttribute) => type.addField(
       new BasicObjectField(
         pgAttribute.name,
-        (() => {
-          const type = getTypeFromPGType(this._pgCatalog, this._pgCatalog.assertGetType(pgAttribute.typeId))
-
-          // Make sure that if the attribute is non null, and the type we got
-          // is nullable to return the non null internal type.
-          if (pgAttribute.isNotNull && type instanceof NullableType)
-            return type.getNonNullType()
-
-          return type
-        })(),
+        getTypeFromPGAttribute(this._pgCatalog, pgAttribute),
       )
         .setDescription(pgAttribute.description)
     ),

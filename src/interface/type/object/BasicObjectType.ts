@@ -30,7 +30,7 @@ class BasicObjectType<TField extends BasicObjectField<mixed, Type<mixed>>> exten
    * The order in which fields get added is preserved.
    */
   public addField (field: TField): this {
-    const name = field.getName()
+    const name = field.name
 
     if (this._fields.has(name))
       throw new Error(`Field with name '${name}' already exists on this object.`)
@@ -44,8 +44,8 @@ class BasicObjectType<TField extends BasicObjectField<mixed, Type<mixed>>> exten
    * Gets all of the fields on our object type. Returned in the order the
    * fields were added in.
    */
-  public getFields (): Array<TField> {
-    return Array.from(this._fields.values())
+  public getFields (): Map<string, TField> {
+    return this._fields
   }
 
   /**
