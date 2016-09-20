@@ -1,3 +1,6 @@
+// TODO: Make this a Typescript file when we have types for the `Pool` type
+// in `pg`.
+
 import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { Pool, Client } from 'pg'
@@ -51,6 +54,10 @@ export default async function getTestPGClient ({ noKitchenSinkSchema } = {}) {
       throw error
     }
   }
+
+  // Wrap the query function in a Jest mock so that users in tests can inspect
+  // what’s happening.
+  client.query = jest.fn(client.query)
 
   return client
 }

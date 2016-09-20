@@ -7,29 +7,24 @@ import NamedType from './NamedType'
  * of a given type, there may be many items of a given type. A list may contain
  * any number of values and this type represents that construct.
  */
-class ListType<
-  TItemValue,
-  TValue extends Array<TItemValue>,
-  TItemType extends Type<TItemValue>,
-> extends Type<TValue> {
-  constructor (
-    private _itemType: TItemType
-  ) {
+class ListType<TValue extends Array<TItemValue>, TItemValue> extends Type<TValue> {
+  constructor (public readonly itemType: Type<TItemValue>) {
     super()
   }
 
   /**
-   * Get’s the item type for this list type.
+   * Checks if the value is an array and if it is an array checks if every item
+   * is one of the composite item type.
    */
-  public getItemType (): TItemType {
-    return this._itemType
+  public isTypeOf (values: mixed): values is TValue {
+    return Array.isArray(values) && values.every(value => this.itemType.isTypeOf(value))
   }
 
   /**
-   * Returns the item type.
+   * Returns the named type inside this list type’s item type.
    */
   public getNamedType (): NamedType<mixed> {
-    return this._itemType.getNamedType()
+    return this.itemType.getNamedType()
   }
 }
 

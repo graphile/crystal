@@ -5,20 +5,26 @@ import NamedType from './NamedType'
  * predetermined string values called variants.
  */
 class EnumType extends NamedType<string> {
-  constructor (
+  /**
+   * A ser of unique variations of this enum.
+   */
+  public readonly variants: Set<string>
+
+  constructor (config: {
     name: string,
-    private _variants: string[],
-  ) {
-    super(name)
+    description?: string | undefined,
+    variants: Set<string>,
+  }) {
+    super(config)
+    this.variants = config.variants
   }
 
   /**
-   * Gets all of the variants of our enum type.
+   * Checks if the value is a string and that string is one of this enum’s
+   * variants.
    */
-  public getVariants (): string[] {
-    // Do a shallow coppy of the variants array before returning so that the
-    // variants array cannot be changed.
-    return this._variants.slice()
+  public isTypeOf (value: mixed): value is string {
+    return typeof value === 'string' && this.variants.has(value)
   }
 }
 

@@ -7,43 +7,40 @@ import Type from './Type'
  * abstractions *over* named types. Like the `NullableType` or `ListType`.
  */
 abstract class NamedType<TValue> extends Type<TValue> {
-  private _description: string | undefined = undefined
+  /**
+   * The name of this type. For all intents and purposes, this name should
+   * probably be unique.
+   */
+  public readonly name: string
 
-  constructor (
-    private _name: string,
-  ) {
+  /**
+   * An optional description of the type. Used for the automatic generation of
+   * documentation. The description should be written in Markdown.
+   */
+  public readonly description?: string | undefined
+
+  constructor (config: {
+    name: string,
+    description?: string | undefined
+  }) {
     super()
+    this.name = config.name
+    this.description = config.description
   }
 
   /**
-   * Gets the name for our type. Every type must have a name.
+   * Returns itself, because this is a named type. We don’t need to keep
+   * searching.
    */
-  public getName (): string {
-    return this._name
-  }
-
-  /**
-   * Sets the description for our type.
-   */
-  public setDescription (description: string | undefined): this {
-    this._description = description
-    return this
-  }
-
-  /**
-   * Gets an optional description for our type.
-   */
-  public getDescription (): string | undefined {
-    return this._description
-  }
-
-  /**
-   * In this case this method just returns the `NamedType` instance straight
-   * up. Easy.
-   */
-  public getNamedType (): this {
+  public getNamedType (): NamedType<mixed> {
     return this
   }
 }
 
 export default NamedType
+
+/**
+ * Detects if a given type is a named type or not.
+ */
+export const isNamedType = <TValue>(type: Type<TValue>): type is NamedType<TValue> =>
+  typeof type['name'] === 'string'

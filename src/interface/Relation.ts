@@ -2,6 +2,7 @@ import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
 import Paginator from './collection/Paginator'
 import Condition from './collection/Condition'
+import ObjectType from './type/ObjectType'
 
 /**
  * A relation represents a directed edge between the keys of values in two
@@ -30,7 +31,7 @@ import Condition from './collection/Condition'
  *
  * @see https://en.wikipedia.org/wiki/Directed_graph#Basic_terminology
  */
-interface Relation<TTailValue, THeadValue, TKey> {
+interface Relation<TKey> {
   /**
    * The name of the relation.
    */
@@ -39,23 +40,23 @@ interface Relation<TTailValue, THeadValue, TKey> {
   /**
    * The tail collection in this relationship.
    */
-  readonly tailCollection: Collection<TTailValue>
+  readonly tailCollection: Collection
 
   /**
    * The head collection in this relationship.
    */
-  readonly headCollection: Collection<THeadValue>
+  readonly headCollection: Collection
 
   /**
    * The head collection key in this relationship.
    */
-  readonly headCollectionKey: CollectionKey<THeadValue, TKey>
+  readonly headCollectionKey: CollectionKey<TKey>
 
   /**
    * Gets the key for a value in the head collection from the tail collection
    * value. This allows us to see the “one” in a many-to-one mental model.
    */
-  getHeadKeyFromTailValue (value: TTailValue): TKey
+  getHeadKeyFromTailValue (value: ObjectType.Value): TKey
 
   // /**
   //  * Gets the paginator for values in the tail collection which we will use

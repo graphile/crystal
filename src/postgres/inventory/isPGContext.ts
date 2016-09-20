@@ -37,4 +37,6 @@ function isPGContext (value: mixed): value is PGContext {
 
 isPGContext['error'] = () => new Error('Must pass a correct context for Postgres.')
 
+// Export the function as a different type which includes extra properties
+// alongside the function.
 export default isPGContext as IsPGContextFn

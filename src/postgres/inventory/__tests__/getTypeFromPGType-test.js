@@ -75,17 +75,16 @@ test('will create a an object type from a composite type', () => {
 
   const type = getTypeFromPGType(catalog, compositeTypeObject)
   expect(type instanceof NullableType).toBe(true)
-  const nonNullType = type.getNonNullType()
+  const nonNullType = type.nonNullType
   expect(nonNullType instanceof ObjectType).toBe(true)
-  expect(nonNullType.getName()).toBe(compositeTypeObject.name)
-  expect(nonNullType.getDescription()).toBe(compositeTypeObject.description)
-  const [field1, field2] = nonNullType.getFields()
-  expect(field1.getName()).toBe(attributeA1Object.name)
-  expect(field1.getDescription()).toBe(attributeA1Object.description)
-  expect(field1.getType() instanceof NullableType).toBe(true)
-  expect(field2.getName()).toBe(attributeA2Object.name)
-  expect(field2.getDescription()).toBe(attributeA2Object.description)
-  expect(field2.getType() instanceof NullableType).toBe(false)
+  expect(nonNullType.name).toBe(compositeTypeObject.name)
+  expect(nonNullType.description).toBe(compositeTypeObject.description)
+  expect(nonNullType.fields.has(attributeA1Object.name)).toBe(true)
+  expect(nonNullType.fields.get(attributeA1Object.name).description).toBe(attributeA1Object.description)
+  expect(nonNullType.fields.get(attributeA1Object.name).type instanceof NullableType).toBe(true)
+  expect(nonNullType.fields.has(attributeA2Object.name)).toBe(true)
+  expect(nonNullType.fields.get(attributeA2Object.name).description).toBe(attributeA2Object.description)
+  expect(nonNullType.fields.get(attributeA2Object.name).type instanceof NullableType).toBe(false)
 })
 
 test('will create an alias type from a domain type', () => {
@@ -107,10 +106,10 @@ test('will create an alias type from a domain type', () => {
   const aliasType = getTypeFromPGType(catalog, domainTypeObject)
   expect(baseType instanceof NullableType).toBe(true)
   expect(aliasType instanceof AliasType).toBe(true)
-  expect(aliasType.getName()).toBe(domainTypeObject.name)
-  expect(aliasType.getDescription()).toBe(domainTypeObject.description)
-  expect(aliasType.getBaseType() instanceof NullableType).toBe(true)
-  expect(aliasType.getBaseType()).toBe(baseType)
+  expect(aliasType.name).toBe(domainTypeObject.name)
+  expect(aliasType.description).toBe(domainTypeObject.description)
+  expect(aliasType.baseType instanceof NullableType).toBe(true)
+  expect(aliasType.baseType).toBe(baseType)
 })
 
 test('will create an alias type with a non-null domain type', () => {
@@ -133,10 +132,10 @@ test('will create an alias type with a non-null domain type', () => {
   const aliasType = getTypeFromPGType(catalog, domainTypeObject)
   expect(baseType instanceof NullableType).toBe(true)
   expect(aliasType instanceof AliasType).toBe(true)
-  expect(aliasType.getName()).toBe(domainTypeObject.name)
-  expect(aliasType.getDescription()).toBe(domainTypeObject.description)
-  expect(aliasType.getBaseType() instanceof NullableType).toBe(false)
-  expect(aliasType.getBaseType()).toBe(baseType.getNonNullType())
+  expect(aliasType.name).toBe(domainTypeObject.name)
+  expect(aliasType.description).toBe(domainTypeObject.description)
+  expect(aliasType.baseType instanceof NullableType).toBe(false)
+  expect(aliasType.baseType).toBe(baseType.nonNullType)
 })
 
 test('will create an enum type from an enum type', () => {
@@ -150,11 +149,13 @@ test('will create an enum type from an enum type', () => {
   }
 
   const catalog = new PGCatalog([enumTypeObject])
-  const enumType = getTypeFromPGType(catalog, enumTypeObject)
+  const type = getTypeFromPGType(catalog, enumTypeObject)
+  expect(type instanceof NullableType).toBe(true)
+  const enumType = type.nonNullType
   expect(enumType instanceof EnumType).toBe(true)
-  expect(enumType.getName()).toBe(enumTypeObject.name)
-  expect(enumType.getDescription()).toBe(enumTypeObject.description)
-  expect(enumType.getVariants()).toEqual(enumTypeObject.enumVariants)
+  expect(enumType.name).toBe(enumTypeObject.name)
+  expect(enumType.description).toBe(enumTypeObject.description)
+  expect(Array.from(enumType.variants)).toEqual(enumTypeObject.enumVariants)
 })
 
 test('will create list types from arrays', () => {
@@ -175,9 +176,9 @@ test('will create list types from arrays', () => {
   const itemType = getTypeFromPGType(catalog, typeObject)
   const nullableType = getTypeFromPGType(catalog, arrayTypeObject)
   expect(nullableType instanceof NullableType).toBe(true)
-  const type = nullableType.getNonNullType()
+  const type = nullableType.nonNullType
   expect(type instanceof ListType).toBe(true)
-  expect(type.getItemType()).toBe(itemType)
+  expect(type.itemType).toBe(itemType)
 })
 
 test('will throw an error if list item type is not in catalog', () => {

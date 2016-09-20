@@ -1,6 +1,6 @@
 import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
-import ObjectType from './type/object/ObjectType'
+import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './Relation'
 
@@ -23,8 +23,8 @@ import Relation from './Relation'
  */
 class Inventory {
   private _types = new Map<string, NamedType<mixed>>()
-  private _collections = new Map<string, Collection<mixed>>()
-  private _relations = new Map<string, Relation<mixed, mixed, mixed>>()
+  private _collections = new Map<string, Collection>()
+  private _relations = new Map<string, Relation<mixed>>()
 
   /**
    * Add a type to our inventory. If the type is a composite named type (like an
@@ -40,7 +40,7 @@ class Inventory {
     if (this.hasType(type))
       return this
 
-    const name = type.getName()
+    const name = type.name
 
     if (this._types.has(name))
       throw new Error(`Type of name '${name}' already exists in the inventory.`)
@@ -49,11 +49,11 @@ class Inventory {
 
     // Add the base type if this is an alias type.
     if (type instanceof AliasType)
-      this.addType(type.getBaseType().getNamedType())
+      this.addType(type.baseType.getNamedType())
 
     // Add the type for all of the fields if this is an object type.
     if (type instanceof ObjectType)
-      type.getFields().forEach(field => this.addType(field.getType().getNamedType()))
+      Array.from(type.fields).forEach(([fieldName, { type }]) => this.addType(type.getNamedType()))
 
     return this
   }
@@ -70,7 +70,7 @@ class Inventory {
    * doesn’t.
    */
   public hasType (type: NamedType<mixed>): boolean {
-    return this._types.get(type.getName()) === type
+    return this._types.get(type.name) === type
   }
 
   /**
@@ -80,7 +80,7 @@ class Inventory {
    *
    * We will also add the type for this collection to the inventory.
    */
-  public addCollection (collection: Collection<mixed>): this {
+  public addCollection (collection: Collection): this {
     const { name } = collection
 
     if (this._collections.has(name))
@@ -103,14 +103,14 @@ class Inventory {
    */
   // TODO: Test that the collection object type is returned by `getTypes`.
   // TODO: Test that collections do not have the same name.
-  public getCollections (): Array<Collection<mixed>> {
+  public getCollections (): Array<Collection> {
     return Array.from(this._collections.values())
   }
 
   /**
    * Gets a single collection by name.
    */
-  public getCollection (name: string): Collection<mixed> | undefined {
+  public getCollection (name: string): Collection | undefined {
     return this._collections.get(name)
   }
 
@@ -119,7 +119,7 @@ class Inventory {
    * the exact reference to the collection argument exists in the inventory this
    * method returns true, otherwise it returns false.
    */
-  public hasCollection (collection: Collection<mixed>): boolean {
+  public hasCollection (collection: Collection): boolean {
     return this._collections.get(collection.name) === collection
   }
 
@@ -127,7 +127,7 @@ class Inventory {
    * Adds a single relation to our inventory. If the related collections are not
    * members of this inventory we fail with an error.
    */
-  public addRelation (relation: Relation<mixed, mixed, mixed>): this {
+  public addRelation (relation: Relation<mixed>): this {
     const { name, tailCollection, headCollection, headCollectionKey } = relation
 
     if (headCollectionKey && !headCollection.keys.has(headCollectionKey))
@@ -155,7 +155,7 @@ class Inventory {
    * In a graph representation of our inventory, collections would be nodes and
    * relations would be directed edges.
    */
-  public getRelations (): Array<Relation<mixed, mixed, mixed>> {
+  public getRelations (): Array<Relation<mixed>> {
     return Array.from(this._relations.values())
   }
 }

@@ -1,24 +1,24 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { CollectionKey, Type, ObjectType, ObjectField } from '../../../interface'
-import { sql, memoizeMethod } from '../../utils'
+import { CollectionKey, Type } from '../../../interface'
+import { sql, memoizeMethod, objectToMap } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
-import getTypeFromPGAttribute from '../getTypeFromPGAttribute'
 import isPGContext from '../isPGContext'
-
-type PGCollectionValue = { [key: string]: mixed }
-type PGCollectionKeyValue = Array<mixed>
+import PGObjectType from '../type/PGObjectType'
+import PGCollection from './PGCollection'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
  * constraints and unique constraints.
  */
-class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKeyValue, PGCollectionKeyType> {
+class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   constructor (
-    private _pgCatalog: PGCatalog,
+    private _collection: PGCollection,
     private _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
   ) {}
 
+  // Steal the catalog reference from our collection ;)
+  private _pgCatalog = this._collection._pgCatalog
   private _pgClass = this._pgCatalog.assertGetClass(this._pgConstraint.classId)
   private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
 
@@ -41,22 +41,37 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
   /**
    * A type used to represent a key value. Consumers can then use this
    * information to construct intelligent inputs.
+   *
+   * We can assume that the fields of `keyType` have the same number and order
+   * as our Postgres key attributes.
    */
-  public keyType = new PGCollectionKeyType(
-    // We put an underscore in front of the name for this type to indicate the
-    // type as private which allows us to change the type name at any time and
-    // make it public.
-    `_${this._pgConstraint.name}`,
-    this._pgCatalog,
-    this._pgKeyAttributes,
-  )
+  public keyType = new PGObjectType({
+    // We prefix the name with an underscore because we consider this type to
+    // be private. The name could change at any time.
+    name: `_${this._pgConstraint.name}`,
+    pgCatalog: this._pgCatalog,
+    pgAttributes: this._pgKeyAttributes,
+  })
+
+  /**
+   * Because `Array.from` may potentially be an extra operation we really don’t
+   * want to run in hot code paths, we cache its result here.
+   *
+   * @private
+   */
+  // TODO: Remove all references to `Array.from` from the codebase. Iterables
+  // forever!
+  private _keyTypeFields = Array.from(this.keyType.fields)
 
   /**
    * Extracts the key value from an object. In the case of this key, we are
    * just extracting a subset of the value.
    */
-  public getKeyFromValue (value: PGCollectionValue): PGCollectionKeyValue {
-    return this.keyType.getFields().map(field => value[field.getName()])
+  public getKeyFromValue (value: PGObjectType.Value): PGObjectType.Value {
+    return new Map<string, mixed>(
+      this._keyTypeFields
+        .map<[string, mixed]>(([fieldName]) => [fieldName, value.get(fieldName)])
+    )
   }
 
   /**
@@ -65,9 +80,9 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
    *
    * @private
    */
-  private _getSQLKeyCondition (key: PGCollectionKeyValue): sql.SQL {
-    return sql.join(this._pgKeyAttributes.map((pgAttribute, i) =>
-      sql.query`${sql.identifier(pgAttribute.name)} = ${sql.value(key[i])}`
+  private _getSQLKeyCondition (key: PGObjectType.Value): sql.SQL {
+    return sql.join(this._keyTypeFields.map(([fieldName, field]) =>
+      sql.query`${sql.identifier(field.pgAttribute.name)} = ${sql.value(key.get(fieldName))}`
     ), ' and ')
   }
 
@@ -78,7 +93,7 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
   public read = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PGCollectionKeyValue): Promise<PGCollectionValue | null> => {
+      : (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value | null> => {
         if (!isPGContext(context)) throw isPGContext.error()
         return this._getSelectLoader(context.client).load(key)
       }
@@ -91,9 +106,9 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
    * @private
    */
   @memoizeMethod
-  private _getSelectLoader (client: Client): DataLoader<PGCollectionKeyValue, PGCollectionValue | null> {
-    return new DataLoader<PGCollectionKeyValue, PGCollectionValue | null>(
-      async (keys: Array<PGCollectionKeyValue>): Promise<Array<PGCollectionValue | null>> => {
+  private _getSelectLoader (client: Client): DataLoader<PGObjectType.Value, PGObjectType.Value | null> {
+    return new DataLoader<PGObjectType.Value, PGObjectType.Value | null>(
+      async (keys: Array<PGObjectType.Value>): Promise<Array<PGObjectType.Value | null>> => {
         // For every key we have, generate a select statement then combine
         // those select statements with `union all`. This approach has a
         // number of advantages:
@@ -139,7 +154,7 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
         `)()
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => object)
+        return rows.map(({ object }) => object == null ? null : objectToMap(object))
       }
     )
   }
@@ -154,7 +169,7 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
   public update = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: mixed, key: PGCollectionKeyValue, patch: Map<string, mixed>): Promise<PGCollectionValue> => {
+      : async (context: mixed, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
         // First things first, we need to get our Postgres client from the
         // context. This means first verifying our client exists on the
         // context.
@@ -169,8 +184,13 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
 
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
-            set ${Array.from(patch.entries()).map(([fieldName, value]) =>
-              sql.query`x = ${value === null ? sql.raw('null') : sql.value(value)}`
+            set ${Array.from(patch).map(([fieldName, value]) =>
+              // Use the actual name of the Postgres attribute when
+              // comparing, not the field name which may be different.
+              sql.query`
+                ${sql.identifier(this._collection.type.fields.get(fieldName)!.pgAttribute.name)} =
+                ${value === null ? sql.raw('null') : sql.value(value)}
+              `
             )}
 
             where ${this._getSQLKeyCondition(key)}
@@ -184,54 +204,9 @@ class PGCollectionKey implements CollectionKey<PGCollectionValue, PGCollectionKe
         if (result.rowCount < 1)
           throw new Error('No values were updated.')
 
-        return result.rows[0]['object']
+        return objectToMap(result.rows[0]['object'])
       }
   )
 }
 
 export default PGCollectionKey
-
-/**
- * The collection key type is just a thin wrapper around an array. Instead of
- * representing objects as a JavaScript object, the key type will represent
- * object as an array.
- */
-class PGCollectionKeyType
-extends ObjectType<PGCollectionKeyValue, PGCollectionKeyField<mixed, Type<mixed>>> {
-  constructor (
-    name: string,
-    private _pgCatalog: PGCatalog,
-    private _pgKeyAttributes: Array<PGCatalogAttribute>,
-  ) {
-    super(name)
-  }
-
-  @memoizeMethod
-  public getFields (): Array<PGCollectionKeyField<mixed, Type<mixed>>> {
-    return this._pgKeyAttributes.map((pgAttribute, i) =>
-      new PGCollectionKeyField(this._pgCatalog, pgAttribute, i)
-    )
-  }
-
-  public createFromFieldValues (fieldValues: Map<string, mixed>): PGCollectionKeyValue {
-    return this.getFields().map(field => fieldValues.get(field.getName()))
-  }
-}
-
-class PGCollectionKeyField<TFieldValue, TFieldType extends Type<TFieldValue>>
-extends ObjectField<PGCollectionKeyValue, TFieldValue, TFieldType> {
-  constructor (
-    pgCatalog: PGCatalog,
-    pgAttribute: PGCatalogAttribute,
-    private _i: number,
-  ) {
-    super(
-      pgAttribute.name,
-      getTypeFromPGType(pgCatalog, pgCatalog.assertGetType(pgAttribute.typeId)) as any,
-    )
-  }
-
-  public getFieldValueFromObject (object: PGCollectionKeyValue): TFieldValue {
-    return object[this._i] as any
-  }
-}

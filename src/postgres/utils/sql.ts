@@ -18,7 +18,7 @@ namespace sql {
    * An object that represents a dynamicly generated SQL query. This query needs
    * to be compiled before being sent to PostgreSQL.
    */
-  export type SQL = SQLItem | Array<SQLItem>
+  export type SQL = Array<SQLItem>
 
   /**
    * A template string tag that creates a `SQL` query out of some strings and
@@ -153,7 +153,7 @@ namespace sql {
    * Join some SQL items together seperated by a string. Useful when dealing
    * with lists of SQL items that doesn’t make sense as a SQL query.
    */
-  export const join = (items: Array<SQLItem> | Array<Array<SQLItem>>, seperator?: string): Array<SQLItem> =>
+  export const join = (items: NestedArray<SQLItem>, seperator?: string): Array<SQLItem> =>
     (items as Array<SQLItem>).reduce<Array<SQLItem>>((currentItems, item, i) =>
       i === 0 || !seperator
         ? [...currentItems, ...flatten(item)]

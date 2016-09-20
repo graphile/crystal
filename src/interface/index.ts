@@ -7,17 +7,14 @@ import Condition from './collection/Condition'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
 import ListType from './type/ListType'
-import NamedType from './type/NamedType'
+import NamedType, { isNamedType } from './type/NamedType'
 import AliasType from './type/AliasType'
 import EnumType from './type/EnumType'
 import booleanType from './type/primitive/booleanType'
 import integerType from './type/primitive/integerType'
 import floatType from './type/primitive/floatType'
 import stringType from './type/primitive/stringType'
-import ObjectType from './type/object/ObjectType'
-import ObjectField from './type/object/ObjectField'
-import BasicObjectType from './type/object/BasicObjectType'
-import BasicObjectField from './type/object/BasicObjectField'
+import ObjectType from './type/ObjectType'
 
 export {
   Inventory,
@@ -30,6 +27,7 @@ export {
   NullableType,
   ListType,
   NamedType,
+  isNamedType,
   AliasType,
   EnumType,
   booleanType,
@@ -37,7 +35,4 @@ export {
   floatType,
   stringType,
   ObjectType,
-  ObjectField,
-  BasicObjectType,
-  BasicObjectField,
 }

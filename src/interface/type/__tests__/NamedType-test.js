@@ -1,15 +1,13 @@
 import NamedType from '../NamedType'
 
-test('getName will return the name', () => {
+test('name will return the name', () => {
   const name = Symbol('name')
-  const namedType = new NamedType(name)
-  expect(namedType.getName()).toBe(name)
+  const namedType = new NamedType({ name })
+  expect(namedType.name).toBe(name)
 })
 
-test('setDescription will set the description', () => {
+test('description will return the name', () => {
   const description = Symbol('description')
-  const namedType = new NamedType()
-  expect(namedType.getDescription()).toBe(undefined)
-  namedType.setDescription(description)
-  expect(namedType.getDescription()).toBe(description)
+  const namedType = new NamedType({ description })
+  expect(namedType.description).toBe(description)
 })

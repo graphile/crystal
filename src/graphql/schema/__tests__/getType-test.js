@@ -30,32 +30,18 @@ const mockBuildToken = () => ({
   },
 })
 
-const mockEnumType = () => new EnumType('enoom', ['a', 'b', 'c'])
+const mockEnumType = () =>
+  new EnumType({ name: 'enoom', variants: ['a', 'b', 'c'] })
 
-const mockObjectType = () => {
-  const objectType = {
-    getName: () => 'yo',
-    getDescription: () => 'yoyoyo',
-    getFields: () => [
-      {
-        getName: () => 'a',
-        getDescription: () => 'aaaa!',
-        getType: () => booleanType,
-        getFieldValueFromObject: source => 1,
-      },
-      {
-        getName: () => 'b',
-        getDescription: () => undefined,
-        getType: () => new NullableType(booleanType),
-        getFieldValueFromObject: source => 2,
-      },
-    ]
-  }
-
-  Object.setPrototypeOf(objectType, ObjectType.prototype)
-
-  return objectType
-}
+const mockObjectType = () =>
+  new ObjectType({
+    name: 'yo',
+    description: 'yoyoyo',
+    fields: new Map([
+      ['a', { type: booleanType, description: 'aaaa!' }],
+      ['b', { type: new NullableType(booleanType) }]
+    ]),
+  })
 
 test('will return the exact same thing for types that are both inputs and outputs', () => {
   const buildToken = mockBuildToken()
@@ -101,14 +87,14 @@ test('will remove many nullable wrappers', () => {
 
 test('will clone base types for aliases', () => {
   const buildToken = mockBuildToken()
-  const gqlType1 = getType(buildToken, new AliasType('yo', booleanType), false)
+  const gqlType1 = getType(buildToken, new AliasType({ name: 'yo', baseType: booleanType }), false)
   expect(gqlType1 instanceof GraphQLNonNull).toBe(true)
   expect(Object.getPrototypeOf(gqlType1.ofType)).toBe(GraphQLBoolean)
   expect(gqlType1.ofType.name).toBe('Yo')
-  const gqlType2 = getType(buildToken, new AliasType('yo', new NullableType(booleanType)), false)
+  const gqlType2 = getType(buildToken, new AliasType({ name: 'yo', baseType: new NullableType(booleanType) }), false)
   expect(Object.getPrototypeOf(gqlType2)).toBe(GraphQLBoolean)
   expect(gqlType2.name).toBe('Yo')
-  const gqlType3 = getType(buildToken, new NullableType(new AliasType('yo', booleanType)), false)
+  const gqlType3 = getType(buildToken, new NullableType(new AliasType({ name: 'yo', baseType: booleanType })), false)
   expect(Object.getPrototypeOf(gqlType3)).toBe(GraphQLBoolean)
   expect(gqlType3.name).toBe('Yo')
 })
@@ -151,11 +137,9 @@ test('will correctly make an object output type', () => {
   expect(gqlType.getFields().a.description).toBe('aaaa!')
   expect(gqlType.getFields().a.type instanceof GraphQLNonNull).toBe(true)
   expect(gqlType.getFields().a.type.ofType).toBe(GraphQLBoolean)
-  expect(gqlType.getFields().a.resolve()).toBe(1)
   expect(gqlType.getFields().b.name).toBe('b')
   expect(gqlType.getFields().b.description).toBe(undefined)
   expect(gqlType.getFields().b.type).toBe(GraphQLBoolean)
-  expect(gqlType.getFields().b.resolve()).toBe(2)
 })
 
 test('will correctly make an input object type', () => {

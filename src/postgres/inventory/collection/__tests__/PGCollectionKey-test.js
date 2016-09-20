@@ -1,5 +1,7 @@
 import getTestPGClient from '../../../__tests__/fixtures/getTestPGClient'
 import { introspectDatabase } from '../../../introspection'
+import { mapToObject } from '../../../utils'
+import PGCollection from '../PGCollection'
 import PGCollectionKey from '../PGCollectionKey'
 
 let client
@@ -19,29 +21,32 @@ beforeEach(async () => {
 
   const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
-  const constraint1 = {
-    kind: 'constraint',
-    name: 'compound_key_pkey',
-    type: 'p',
-    classId: pgCatalog.getClassByName('c', 'compound_key').id,
-    keyAttributeNums: [
-      pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1').num,
-      pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2').num,
-    ],
-  }
+  collectionKey1 = new PGCollectionKey(
+    new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'compound_key')),
+    {
+      kind: 'constraint',
+      name: 'compound_key_pkey',
+      type: 'p',
+      classId: pgCatalog.getClassByName('c', 'compound_key').id,
+      keyAttributeNums: [
+        pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1').num,
+        pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2').num,
+      ],
+    },
+  )
 
-  const constraint2 = {
-    kind: 'constraint',
-    name: 'person_unique_email',
-    type: 'u',
-    classId: pgCatalog.getClassByName('c', 'person').id,
-    keyAttributeNums: [
-      pgCatalog.getAttributeByName('c', 'person', 'email').num,
-    ],
-  }
-
-  collectionKey1 = new PGCollectionKey(pgCatalog, constraint1)
-  collectionKey2 = new PGCollectionKey(pgCatalog, constraint2)
+  collectionKey2 = new PGCollectionKey(
+    new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'person')),
+    {
+      kind: 'constraint',
+      name: 'person_unique_email',
+      type: 'u',
+      classId: pgCatalog.getClassByName('c', 'person').id,
+      keyAttributeNums: [
+        pgCatalog.getAttributeByName('c', 'person', 'email').num,
+      ],
+    },
+  )
 })
 
 test('name will be a concatenation of the attribute names with “and”', () => {
@@ -50,21 +55,8 @@ test('name will be a concatenation of the attribute names with “and”', () =>
 })
 
 test('type will have fields for all of the respective attributes', () => {
-  expect(collectionKey1.type.getFields().map(field => field.getName())).toEqual(['person_id_1', 'person_id_2'])
-  expect(collectionKey2.type.getFields().map(field => field.getName())).toEqual(['email'])
-})
-
-test('type createFromFieldValues will create a tuple key from a map', () => {
-  expect(collectionKey1.type.createFromFieldValues(new Map([['person_id_2', 4], ['person_id_1', 2]]))).toEqual([2, 4])
-  expect(collectionKey2.type.createFromFieldValues(new Map([['email', 'hello.world@example.com'], ['extra', 42]]))).toEqual(['hello.world@example.com'])
-})
-
-test('type fields getFieldValueFromObject will correctly extract values from a tuple', () => {
-  const a = Symbol('a')
-  const b = Symbol('b')
-  expect(collectionKey1.type.getFields()[0].getFieldValueFromObject([a, b])).toBe(a)
-  expect(collectionKey1.type.getFields()[1].getFieldValueFromObject([a, b])).toBe(b)
-  expect(collectionKey2.type.getFields()[0].getFieldValueFromObject([a])).toBe(a)
+  expect(Array.from(collectionKey1.keyType.fields.keys())).toEqual(['person_id_1', 'person_id_2'])
+  expect(Array.from(collectionKey2.keyType.fields.keys())).toEqual(['email'])
 })
 
 test('read will get single values from a table', async () => {
@@ -83,29 +75,35 @@ test('read will get single values from a table', async () => {
       (3, 1);
   `)
 
+  client.query.mockClear()
+
   const values = await Promise.all([
-    collectionKey1.read({ client }, [3, 2]),
-    collectionKey1.read({ client }, [2, 200]),
-    collectionKey1.read({ client }, [1, 2]),
-    collectionKey1.read({ client }, [3, 1]),
-    collectionKey1.read({ client }, [3, 3]),
-    collectionKey1.read({ client }, [2, 1]),
-    collectionKey2.read({ client }, ['sara.smith@email.com']),
-    collectionKey2.read({ client }, ['john.smith@email.com']),
-    collectionKey2.read({ client }, ['does.not.exist@email.com']),
-    collectionKey2.read({ client }, ['budd.deey@email.com']),
+    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 2]])),
+    collectionKey1.read({ client }, new Map([['person_id_1', 2], ['person_id_2', 200]])),
+    collectionKey1.read({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]])),
+    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 1]])),
+    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 3]])),
+    collectionKey1.read({ client }, new Map([['person_id_2', 1], ['person_id_1', 2]])),
+    collectionKey2.read({ client }, new Map([['email', 'sara.smith@email.com']])),
+    collectionKey2.read({ client }, new Map([['email', 'john.smith@email.com']])),
+    collectionKey2.read({ client }, new Map([['email', 'does.not.exist@email.com']])),
+    collectionKey2.read({ client }, new Map([['email', 'budd.deey@email.com']])),
   ])
 
-  expect(values).toEqual([
+  // Ensure that even though we did a lot of reads, we only actually queried
+  // the database twice. Thanks `dataloader`!
+  expect(client.query.mock.calls.length).toBe(2)
+
+  expect(values.map(value => value == null ? null : mapToObject(value))).toEqual([
     { 'person_id_1': 3, 'person_id_2': 2 },
     null,
     { 'person_id_1': 1, 'person_id_2': 2 },
     { 'person_id_1': 3, 'person_id_2': 1 },
     null,
     { 'person_id_1': 2, 'person_id_2': 1 },
-    { 'id': 2, 'name': 'Sara Smith', 'email': 'sara.smith@email.com', 'about': null, 'created_at': values[6]['created_at'] },
-    { 'id': 1, 'name': 'John Smith', 'email': 'john.smith@email.com', 'about': null, 'created_at': values[7]['created_at'] },
+    { 'id': 2, 'name': 'Sara Smith', 'email': 'sara.smith@email.com', 'about': null, 'created_at': values[6].get('created_at') },
+    { 'id': 1, 'name': 'John Smith', 'email': 'john.smith@email.com', 'about': null, 'created_at': values[7].get('created_at') },
     null,
-    { 'id': 3, 'name': 'Budd Deey', 'email': 'budd.deey@email.com', 'about': 'Just a friendly human', 'created_at': values[9]['created_at'] },
+    { 'id': 3, 'name': 'Budd Deey', 'email': 'budd.deey@email.com', 'about': 'Just a friendly human', 'created_at': values[9].get('created_at') },
   ])
 })

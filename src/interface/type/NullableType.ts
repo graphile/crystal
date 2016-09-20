@@ -30,29 +30,24 @@ import NamedType from './NamedType'
  * Also note that it is possible that a nullable type could wrap another
  * nullable type. This may lead to unexpected behavior.
  */
-class NullableType<
-  TNonNullValue,
-  TValue extends (TNonNullValue | null | undefined),
-  TNonNullType extends Type<TNonNullValue>,
-> extends Type<TValue> {
-  constructor (
-    private _nonNullType: Type<TNonNullType>,
-  ) {
+class NullableType<TValue extends TNonNullValue | null | undefined, TNonNullValue> extends Type<TValue> {
+  constructor (public readonly nonNullType: Type<TNonNullValue>) {
     super()
   }
 
   /**
-   * Gets the base type for this nullable type.
+   * Checks if the value is null, or it is a type of the nullable types non
+   * null composite type.
    */
-  public getNonNullType (): Type<TNonNullType> {
-    return this._nonNullType
+  public isTypeOf (value: mixed): value is TValue {
+    return value == null || this.nonNullType.isTypeOf(value)
   }
 
   /**
-   * Returns the base type.
+   * Returns the named type inside this nullable type’s non-null type.
    */
   public getNamedType (): NamedType<mixed> {
-    return this._nonNullType.getNamedType()
+    return this.nonNullType.getNamedType()
   }
 }
 

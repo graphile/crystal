@@ -26,10 +26,10 @@ import {
   NullableType,
   ListType,
   NamedType,
+  isNamedType,
   AliasType,
   EnumType,
   ObjectType,
-  ObjectField,
   booleanType,
   integerType,
   floatType,
@@ -88,15 +88,15 @@ function createType (buildToken: BuildToken, type: Type<mixed>, input: boolean):
   if (type instanceof AliasType) {
     return createGraphQLTypeAlias(
       // TODO: Remove the `input as any` when the Typescript bug is fixed.
-      getType(buildToken, type.getBaseType(), input as any),
-      formatName.type(type.getName()),
-      type.getDescription(),
+      getType(buildToken, type.baseType, input as any),
+      formatName.type(type.name),
+      type.description,
     )
   }
 
   if (type instanceof NullableType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-    return getNullableType(getType(buildToken, type.getNonNullType(), input as any))
+    return getNullableType(getType(buildToken, type.nonNullType, input as any))
 
   return new GraphQLNonNull(createNullableType(buildToken, type, input))
 }
@@ -111,9 +111,9 @@ function createType (buildToken: BuildToken, type: Type<mixed>, input: boolean):
 function createNullableType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLNullableType<mixed> {
   if (type instanceof ListType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-    return new GraphQLList(getType(buildToken, type.getItemType(), input as any))
+    return new GraphQLList(getType(buildToken, type.itemType, input as any))
 
-  if (!(type instanceof NamedType)) {
+  if (!isNamedType(type)) {
     throw new Error(
       `Cannot convert unnamed type of constructor '${type.constructor.name}' ` +
       'to a GraphQL type.'
@@ -131,10 +131,10 @@ function createNullableType (buildToken: BuildToken, type: Type<mixed>, input: b
 function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input: boolean): GraphQLNamedType<mixed> {
   if (type instanceof EnumType) {
     return new GraphQLEnumType({
-      name: formatName.type(type.getName()),
-      description: type.getDescription(),
+      name: formatName.type(type.name),
+      description: type.description,
       values: buildObject(
-        type.getVariants().map<[string, GraphQLEnumValueConfig<string>]>(variant =>
+        Array.from(type.variants).map<[string, GraphQLEnumValueConfig<string>]>(variant =>
           [formatName.enumValue(variant), {
             value: variant,
           }]
@@ -167,7 +167,7 @@ function createNamedType (buildToken: BuildToken, type: NamedType<mixed>, input:
  *
  * @private
  */
-function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed, ObjectField<mixed, mixed, Type<mixed>>>): GraphQLObjectType<mixed> {
+function createOutputObjectType (buildToken: BuildToken, type: ObjectType): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
   const collection = inventory.getCollections().find(collection => collection.type === type)
 
@@ -176,15 +176,15 @@ function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed,
   if (collection)
     return getCollectionType(buildToken, collection)
 
-  return new GraphQLObjectType<mixed>({
-    name: formatName.type(type.getName()),
-    description: type.getDescription(),
-    fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
-      type.getFields().map<[string, GraphQLFieldConfig<mixed, mixed>]>(field =>
-        [formatName.field(field.getName()), {
-          description: field.getDescription(),
-          type: getType(buildToken, field.getType(), false),
-          resolve: object => field.getFieldValueFromObject(object),
+  return new GraphQLObjectType<ObjectType.Value>({
+    name: formatName.type(type.name),
+    description: type.description,
+    fields: () => buildObject<GraphQLFieldConfig<ObjectType.Value, mixed>>(
+      Array.from(type.fields).map<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>(([fieldName, field]) =>
+        [formatName.field(fieldName), {
+          description: field.description,
+          type: getType(buildToken, field.type, false),
+          resolve: object => object.get(fieldName),
         }]
       ),
     ),
@@ -196,16 +196,16 @@ function createOutputObjectType (buildToken: BuildToken, type: ObjectType<mixed,
  *
  * @private
  */
-function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType<T, ObjectField<T, mixed, Type<mixed>>>): GraphQLInputObjectType<T> {
+function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType): GraphQLInputObjectType<T> {
   return new GraphQLInputObjectType<T>({
-    name: formatName.type(`${type.getName()}-input`),
-    description: type.getDescription(),
+    name: formatName.type(`${type.name}-input`),
+    description: type.description,
     fields: () => buildObject<GraphQLInputFieldConfig<mixed>>(
-      type.getFields().map<[string, GraphQLInputFieldConfig<mixed>]>(field =>
-        [formatName.field(field.getName()), {
-          description: field.getDescription(),
-          internalName: field.getName(),
-          type: getType(buildToken, field.getType(), true),
+      Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
+        [formatName.field(fieldName), {
+          description: field.description,
+          internalName: fieldName,
+          type: getType(buildToken, field.type, true),
         }]
       )
     ),

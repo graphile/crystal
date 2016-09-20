@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, ObjectField, Relation } from '../../../interface'
+import { Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getType from '../getType'
@@ -14,7 +14,7 @@ const _getCollectionType = memoize2(createCollectionType)
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection<TValue>): GraphQLObjectType<GraphQLCollectionValue<TValue>> {
+function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<GraphQLCollectionValue> {
   return _getCollectionType(buildToken, collection)
 }
 
@@ -23,9 +23,9 @@ export default getCollectionType
 /**
  * The type of the value used internally by our GraphQL schema.
  */
-export type GraphQLCollectionValue<TValue> = {
-  collection: Collection<TValue>,
-  value: TValue,
+export type GraphQLCollectionValue = {
+  collection: Collection,
+  value: ObjectType.Value,
 }
 
 /**
@@ -33,13 +33,13 @@ export type GraphQLCollectionValue<TValue> = {
  *
  * @private
  */
-function createCollectionType <TValue>(buildToken: BuildToken, collection: Collection<TValue>): GraphQLObjectType<GraphQLCollectionValue<TValue>> {
+function createCollectionType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<GraphQLCollectionValue> {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
 
-  return new GraphQLObjectType<GraphQLCollectionValue<TValue>>({
-    name: formatName.type(type.getName()),
-    description: type.getDescription(),
+  return new GraphQLObjectType<GraphQLCollectionValue>({
+    name: formatName.type(type.name),
+    description: collection.description,
 
     isTypeOf: value => value.collection === collection,
 
@@ -48,7 +48,7 @@ function createCollectionType <TValue>(buildToken: BuildToken, collection: Colle
 
     // We make `fields` here a thunk because we don’t want to eagerly create
     // types for collections used in this type.
-    fields: () => buildObject<GraphQLFieldConfig<GraphQLCollectionValue<TValue>, mixed>>(
+    fields: () => buildObject<GraphQLFieldConfig<GraphQLCollectionValue, mixed>>(
       // Our id field. It is powered by the collection’s primary key. If we
       // have no primary key, we have no id field.
       [
@@ -64,33 +64,43 @@ function createCollectionType <TValue>(buildToken: BuildToken, collection: Colle
       ],
 
       // Add all of the basic fields to our type.
-      type.getFields().map(<TFieldValue>(field: ObjectField<TValue, TFieldValue>): [string, GraphQLFieldConfig<GraphQLCollectionValue<TValue>, TFieldValue>] =>
-        [formatName.field(field.getName()), {
-          description: field.getDescription(),
-          type: getType(buildToken, field.getType(), false) as GraphQLOutputType<TFieldValue>,
-          resolve: ({ value }) => field.getFieldValueFromObject(value),
-        }]
-      ),
+      Array.from(type.fields.entries())
+        .map(<TFieldValue>([fieldName, field]: [string, ObjectType.Field<TFieldValue>]): [string, GraphQLFieldConfig<GraphQLCollectionValue, TFieldValue>] =>
+          [formatName.field(fieldName), {
+            description: field.description,
+            type: getType(buildToken, field.type, false) as GraphQLOutputType<TFieldValue>,
+            resolve: ({ value }) =>
+              // Since we get `mixed` back here from the map, we’re just going
+              // to assume the type is ok instead of running an `isTypeOf`
+              // check. Generally `isTypeOf` isn’t super efficient so we only
+              // use it on user input.
+              value.get(fieldName) as any,
+          }]
+        ),
 
       // TODO: Computed fields
 
       // Add all of our many-to-one relations (aka tail relations).
       inventory.getRelations()
         // We only want the relations for which this collection is the tail
-        // collection.
-        .filter(relation => relation.tailCollection === collection)
+        // collection and whose `headCollectionKey` have a `read`
+        // implementation.
+        .filter(relation =>
+          relation.tailCollection === collection &&
+          relation.headCollectionKey.read != null
+        )
         // Transform the relation into a field entry.
-        .map(<THeadValue, TKey>(relation: Relation<TValue, THeadValue, TKey>): [string, GraphQLFieldConfig<GraphQLCollectionValue<TValue>, GraphQLCollectionValue<THeadValue>>] => {
+        .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<GraphQLCollectionValue, GraphQLCollectionValue>] => {
           const headCollection = relation.headCollection
           const headCollectionKey = relation.headCollectionKey
 
-          return [formatName.field(`${headCollection.type.getName()}-by-${relation.name}`), {
+          return [formatName.field(`${headCollection.type.name}-by-${relation.name}`), {
             // TODO: description
             type: getCollectionType(buildToken, headCollection),
 
-            async resolve ({ value }): Promise<GraphQLCollectionValue<THeadValue> | undefined> {
+            async resolve ({ value }, args, context): Promise<GraphQLCollectionValue | undefined> {
               const key = relation.getHeadKeyFromTailValue(value)
-              const headValue = await headCollectionKey.read(key)
+              const headValue = await headCollectionKey.read!(context, key)
 
               if (!headValue)
                 return

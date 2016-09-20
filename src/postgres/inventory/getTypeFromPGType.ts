@@ -4,8 +4,6 @@ import {
   NullableType,
   ListType,
   EnumType,
-  BasicObjectType,
-  BasicObjectField,
   booleanType,
   integerType,
   floatType,
@@ -15,16 +13,18 @@ import {
 import { memoize2 } from '../utils'
 import PGCatalog from '../introspection/PGCatalog'
 import PGCatalogType from '../introspection/object/PGCatalogType'
-import getTypeFromPGAttribute from './getTypeFromPGAttribute'
+import PGObjectType from './type/PGObjectType'
 
 /**
  * The type for a JSON blob. It’s just a string…
  *
  * @private
  */
-const jsonType =
-  new AliasType('json', stringType)
-  .setDescription('An untyped serialized JSON string.')
+const jsonType = new AliasType({
+  name: 'json',
+  description: 'An untyped serialized JSON string.',
+  baseType: stringType,
+})
 
 /**
  * The type for a universal identifier as defined by [RFC 4122][1].
@@ -33,12 +33,13 @@ const jsonType =
  *
  * @private
  */
-const uuidType =
-  new AliasType('uuid', stringType)
-  .setDescription(
+const uuidType = new AliasType({
+  name: 'uuid',
+  description:
     'A universally unique identifier as defined by ' +
-    '[RFC 4122](https://tools.ietf.org/html/rfc4122).'
-  )
+    '[RFC 4122](https://tools.ietf.org/html/rfc4122).',
+  baseType: stringType,
+})
 
 /**
  * A hardcoded list of PostgreSQL type OIDs to interface types. Some types
@@ -88,17 +89,13 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // If this type is a composite type…
     case 'c': {
       const pgClass = pgCatalog.assertGetClass(pgType.classId)
-      const objectType = new BasicObjectType(pgType.name)
 
-      objectType.setDescription(pgType.description)
-
-      // Add all our fields to the object.
-      for (const pgAttribute of pgCatalog.getClassAttributes(pgClass.id)) {
-        objectType.addField(
-          new BasicObjectField(pgAttribute.name, getTypeFromPGAttribute(pgCatalog, pgAttribute))
-            .setDescription(pgAttribute.description)
-        )
-      }
+      const objectType = new PGObjectType({
+        name: pgType.name,
+        description: pgType.description,
+        pgCatalog,
+        pgAttributes: pgCatalog.getClassAttributes(pgClass.id),
+      })
 
       return new NullableType(objectType)
     }
@@ -110,17 +107,24 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
       // If the domain type has the `NOT NULL` contraint, we need to strip away the
       // `NullableType` wrapper that exists most of the time on PostgreSQL types.
       if (pgType.isNotNull && baseType instanceof NullableType)
-        baseType = baseType.getNonNullType()
+        baseType = baseType.nonNullType
 
-      const aliasType = new AliasType(pgType.name, baseType)
-
-      aliasType.setDescription(pgType.description)
+      const aliasType = new AliasType({
+        name: pgType.name,
+        description: pgType.description,
+        baseType,
+      })
 
       return aliasType
     }
     // If this type is an enum type…
-    case 'e':
-      return new NullableType(new EnumType(pgType.name, pgType.enumVariants).setDescription(pgType.description))
+    case 'e': {
+      return new NullableType(new EnumType({
+        name: pgType.name,
+        description: pgType.description,
+        variants: new Set(pgType.enumVariants),
+      }))
+    }
   }
 
   // If the type isn’t of a certain kind, let’s use the category which is used

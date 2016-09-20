@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
-import { Collection, ObjectType } from '../../../interface'
+import { Collection, CollectionKey, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
@@ -10,13 +10,13 @@ import getCollectionType from './getCollectionType'
  * Creates any number of query field entries for a collection. These fields
  * will be on the root query type.
  */
-export default function createCollectionQueryFieldEntries <T>(
+export default function createCollectionQueryFieldEntries (
   buildToken: BuildToken,
-  collection: Collection<T>,
+  collection: Collection,
 ): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
   const { options } = buildToken
   const type = collection.type
-  const entries: Array<[string, GraphQLFieldConfig<any, any>]> = []
+  const entries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = []
   const primaryKey = collection.primaryKey
   const paginator = collection.paginator
 
@@ -34,72 +34,120 @@ export default function createCollectionQueryFieldEntries <T>(
   // the primary key in this instance. Instead using a GraphQL native format,
   // the id format.
   if (primaryKey) {
-    entries.push([formatName.field(type.getName()), {
-      // TODO: description
-      type: getCollectionType(buildToken, collection),
+    const field = createCollectionPrimaryKeyField(buildToken, collection, primaryKey)
 
-      args: {
-        [options.nodeIdFieldName]: {
-          // TODO: description,
-          type: new GraphQLNonNull(GraphQLID),
-        },
-      },
-
-      resolve: (source, args) => {
-        const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
-
-        if (name !== collection.name)
-          throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.name}'.`)
-
-        return primaryKey.read(key)
-      },
-    }])
+    // If we got a field back, add it.
+    if (field) entries.push([formatName.field(type.name), field])
   }
 
   // Add a field to select any value in the collection by any key. So all
   // unique keys of an object will be usable to select a single value.
-  for (const key of collection.keys) {
-    const keyName = key.name
-    const keyType = key.type
-    const fieldName = formatName.field(`${type.getName()}-by-${keyName}`)
-    const collectionType = getCollectionType(buildToken, collection)
+  for (const collectionKey of collection.keys) {
+    const field = createCollectionKeyField(buildToken, collection, collectionKey)
 
-    // If the key type is an object type, we want to flatten the object fields
-    // into distinct arguments.
-    if (keyType instanceof ObjectType) {
-      const fields = keyType.getFields()
-      entries.push([fieldName, {
-        type: collectionType,
-        args: buildObject<GraphQLArgumentConfig<mixed>>(
-          fields.map<[string, GraphQLArgumentConfig<mixed>]>((field, i) =>
-            [formatName.arg(field.getName()), {
-              description: field.getDescription(),
-              internalName: field.getName(),
-              type: getType(buildToken, field.getType(), true),
-            }]
-          )
-        ),
-        resolve: (source, args) =>
-          key.read(args),
-      }])
-    }
-    // Otherwise if this is not an object type, we’ll just expose one argument
-    // with the key’s name.
-    else {
-      entries.push([fieldName, {
-        type: collectionType,
-        args: {
-          [formatName.arg(keyName)]: {
-            // TODO: description
-            internalName: 'input',
-            type: getType(buildToken, keyType, true),
-          },
-        },
-        resolve: (source, args) =>
-          key.read(args['input']),
-      }])
-    }
+    // If we got a field back, add it.
+    if (field) entries.push([formatName.field(`${type.name}-by-${collectionKey.name}`), field])
   }
 
   return entries
+}
+
+/**
+ * Creates the field used to select an object by its primary key using a
+ * GraphQL global id.
+ */
+function createCollectionPrimaryKeyField <TKey>(
+  buildToken: BuildToken,
+  collection: Collection,
+  collectionKey: CollectionKey<TKey>,
+): GraphQLFieldConfig<mixed, mixed> | undefined {
+  const { options } = buildToken
+  const { read: collectionKeyRead } = collectionKey
+
+  // If we can’t read from this collection key, stop.
+  if (collectionKeyRead == null) return
+
+  return {
+    // TODO: description
+    type: getCollectionType(buildToken, collection),
+
+    args: {
+      [options.nodeIdFieldName]: {
+        // TODO: description,
+        type: new GraphQLNonNull(GraphQLID),
+      },
+    },
+
+    resolve: (source, args, context) => {
+      const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
+
+      if (name !== collection.name)
+        throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.name}'.`)
+
+      if (!collectionKey.keyType.isTypeOf(key))
+        throw new Error('The provided key is of the incorrect type.')
+
+      return collectionKeyRead(context, key)
+    },
+  }
+}
+
+/**
+ * Creates a field using the value from any collection key.
+ */
+function createCollectionKeyField <TKey>(
+  buildToken: BuildToken,
+  collection: Collection,
+  collectionKey: CollectionKey<TKey>,
+): GraphQLFieldConfig<mixed, mixed> | undefined {
+  const { keyType, read: collectionKeyRead } = collectionKey
+  const collectionType = getCollectionType(buildToken, collection)
+
+  // If we can’t read from this collection key, stop.
+  if (collectionKeyRead == null) return
+
+  // If the key type is an object type, we want to flatten the object fields
+  // into distinct arguments.
+  if (keyType instanceof ObjectType) {
+    return {
+      type: collectionType,
+      args: buildObject<GraphQLArgumentConfig<mixed>>(
+        Array.from(keyType.fields.entries()).map<[string, GraphQLArgumentConfig<mixed>]>(([fieldName, field]) =>
+          [formatName.arg(fieldName), {
+            description: field.description,
+            internalName: fieldName,
+            type: getType(buildToken, field.type, true),
+          }]
+        )
+      ),
+      resolve: (source, args, context) => {
+        if (!keyType.isTypeOf(args))
+          throw new Error('The provided arguments are not the correct type.')
+
+        return collectionKeyRead(context, args)
+      },
+    }
+  }
+  // Otherwise if this is not an object type, we’ll just expose one argument
+  // with the key’s name.
+  else {
+    return {
+      type: collectionType,
+      args: {
+        [formatName.arg(collectionKey.name)]: {
+          // TODO: description
+          internalName: 'input',
+          type: getType(buildToken, keyType, true),
+        },
+      },
+      resolve: (source, args, context) => {
+        const key: mixed = args['input']
+
+        if (!keyType.isTypeOf(key))
+          throw new Error('The provided arguments are not the correct type.')
+
+        return collectionKeyRead(context, key)
+      },
+    }
+  }
 }

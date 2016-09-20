@@ -12,7 +12,7 @@ namespace idSerde {
    */
   export type ID = {
     name: string,
-    key: any,
+    key: mixed,
   }
 
   /**

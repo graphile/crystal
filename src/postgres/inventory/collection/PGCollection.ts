@@ -1,28 +1,20 @@
-import {
-  Collection,
-  Type,
-  NullableType,
-  ObjectType,
-  BasicObjectType,
-  BasicObjectField,
-} from '../../../interface'
-
 import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { memoize1, sql, memoizeMethod } from '../../utils'
+import { Collection, Type, NullableType } from '../../../interface'
+import { memoize1, sql, memoizeMethod, objectToMap } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
+import PGObjectType from '../type/PGObjectType'
 import isPGContext from '../isPGContext'
-import getTypeFromPGAttribute from '../getTypeFromPGAttribute'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
  * data. A collection aligns fairly well with a Postgres “class” that is
  * selectable. Non-selectable classes are generally compound types.
  */
-class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<BasicObjectField<mixed, Type<mixed>>>> {
+class PGCollection implements Collection {
   constructor (
-    private _pgCatalog: PGCatalog,
+    public _pgCatalog: PGCatalog,
     private _pgClass: PGCatalogClass,
   ) {}
 
@@ -47,17 +39,15 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
 
   /**
    * Gets the type for our collection using the composite type for this class.
+   * We can depend on this type having the exact same number of fields as there
+   * are Postgres attributes and in the exact same order.
    */
-  public type = this._pgAttributes.reduce(
-    (type, pgAttribute) => type.addField(
-      new BasicObjectField(
-        pgAttribute.name,
-        getTypeFromPGAttribute(this._pgCatalog, pgAttribute),
-      )
-        .setDescription(pgAttribute.description)
-    ),
-    new BasicObjectType(this._pgClass.name).setDescription(this._pgClass.description)
-  )
+  public type = new PGObjectType({
+    name: this._pgClass.name,
+    description: this._pgClass.description,
+    pgCatalog: this._pgCatalog,
+    pgAttributes: this._pgAttributes,
+  })
 
   public keys = new Set()
   public primaryKey = null
@@ -68,7 +58,7 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
   public create = (
     !this._pgClass.isInsertable
       ? null
-      : (context: mixed, value: BasicObjectType.Value): Promise<BasicObjectType.Value> => {
+      : (context: mixed, value: PGObjectType.Value): Promise<PGObjectType.Value> => {
         if (!isPGContext(context)) throw isPGContext.error()
         return this._getInsertLoader(context.client).load(value)
       }
@@ -82,9 +72,9 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
    * @private
    */
   @memoizeMethod
-  private _getInsertLoader (client: Client): DataLoader<BasicObjectType.Value, BasicObjectType.Value> {
-    return new DataLoader<BasicObjectType.Value, BasicObjectType.Value>(
-      async (values: Array<BasicObjectType.Value>): Promise<Array<BasicObjectType.Value>> => {
+  private _getInsertLoader (client: Client): DataLoader<PGObjectType.Value, PGObjectType.Value> {
+    return new DataLoader<PGObjectType.Value, PGObjectType.Value>(
+      async (values: Array<PGObjectType.Value>): Promise<Array<PGObjectType.Value>> => {
         // Create our insert query.
         const query = sql.compile(sql.query`
           with insertion as (
@@ -101,8 +91,8 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
               // Make sure we have one value for every attribute in the class,
               // if there was no such value defined, we should just use
               // `default` and use the user’s default value.
-              sql.query`(${sql.join(this.type.getFields().map(field =>
-                value.hasOwnProperty(field.getName()) ? sql.value(value[field.getName()]) : sql.raw('default')
+              sql.query`(${sql.join(Array.from(this.type.fields).map(([fieldName]) =>
+                value.has(fieldName) ? sql.value(value.get(fieldName)) : sql.raw('default')
               ), ', ')})`
             ), ', ')}
 
@@ -114,7 +104,7 @@ class PGCollection implements Collection<BasicObjectType.Value, BasicObjectType<
         `)()
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => object)
+        return rows.map(({ object }) => objectToMap(object))
       }
     )
   }
