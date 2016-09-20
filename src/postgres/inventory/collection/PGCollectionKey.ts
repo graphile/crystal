@@ -212,6 +212,42 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         return objectToMap(result.rows[0]['object'])
       }
   )
+
+  /**
+   * Deletes a value in our Postgres database using a given key. If no value
+   * could be deleted, an error will be thrown.
+   *
+   * This method, unlike many others in Postgres collections, is not batched.
+   */
+  public delete = (
+    !this._pgClass.isDeletable
+      ? null
+      : async (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
+        // First things first, we need to get our Postgres client from the
+        // context. This means first verifying our client exists on the
+        // context.
+        if (!isPGContext(context)) throw isPGContext.error()
+        const { client } = context
+
+        // This is a pretty simple query. Delete the row that matches our key
+        // and return the deleted row.
+        const query = sql.compile(sql.query`
+          with deleted as (
+            delete from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
+            where ${this._getSQLKeyCondition(key)}
+            returning *
+          )
+          select row_to_json(x) as object from deleted as x
+        `)()
+
+        const result = await client.query(query)
+
+        if (result.rowCount < 1)
+          throw new Error(`No values were deleted in collection '${this._collection.name}' using key '${this.name}'.`)
+
+        return objectToMap(result.rows[0]['object'])
+      }
+  )
 }
 
 export default PGCollectionKey

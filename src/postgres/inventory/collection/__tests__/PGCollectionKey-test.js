@@ -165,3 +165,44 @@ test('update fails when trying to update a value that does not exist', async () 
     expect(error.message).toBe('No values were updated in collection \'people\' using key \'email\'.')
   }
 })
+
+test('delete will delete things from the database', async () => {
+  await client.query(`
+    insert into c.person (id, name, email, about) values
+      (1, 'John Smith', 'john.smith@email.com', null),
+      (2, 'Sara Smith', 'sara.smith@email.com', null),
+      (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human');
+  `)
+
+  await client.query(`
+    insert into c.compound_key (person_id_1, person_id_2) values
+      (1, 2),
+      (2, 1),
+      (3, 2),
+      (3, 1);
+  `)
+
+  const selectQuery = `
+    select row_to_json(x) as object from c.compound_key as x
+    union all
+    select row_to_json(x) as object from c.person as x
+  `
+
+  const { rows: initialRows } = await client.query(selectQuery)
+
+  const values = await Promise.all([
+    collectionKey1.delete({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]])),
+    collectionKey1.delete({ client }, new Map([['person_id_1', 2], ['person_id_2', 1]])),
+    collectionKey1.delete({ client }, new Map([['person_id_1', 3], ['person_id_2', 1]])),
+    collectionKey2.delete({ client }, new Map([['email', 'john.smith@email.com']])),
+  ])
+
+  expect(values.map(mapToObject)).toEqual([
+    { 'person_id_1': 1, 'person_id_2': 2 },
+    { 'person_id_1': 2, 'person_id_2': 1 },
+    { 'person_id_1': 3, 'person_id_2': 1 },
+    { 'id': 1, 'name': 'John Smith', 'email': 'john.smith@email.com', 'about': null, 'created_at': values[3].get('created_at') },
+  ])
+
+  expect((await client.query(selectQuery)).rows).toEqual([initialRows[2], initialRows[5], initialRows[6]])
+})
