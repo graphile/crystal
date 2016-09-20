@@ -184,14 +184,19 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
 
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
-            set ${Array.from(patch).map(([fieldName, value]) =>
+            set ${sql.join(Array.from(patch).map(([fieldName, value]) => {
+              const collectionField = this._collection.type.fields.get(fieldName)
+
+              if (!collectionField)
+                throw new Error(`Cannot update field named '${fieldName}' because it does not exist in collection '${this._collection.name}'.`)
+
               // Use the actual name of the Postgres attribute when
               // comparing, not the field name which may be different.
-              sql.query`
-                ${sql.identifier(this._collection.type.fields.get(fieldName)!.pgAttribute.name)} =
+              return sql.query`
+                ${sql.identifier(collectionField.pgAttribute.name)} =
                 ${value === null ? sql.raw('null') : sql.value(value)}
               `
-            )}
+            }), ', ')}
 
             where ${this._getSQLKeyCondition(key)}
             returning *
@@ -202,7 +207,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error('No values were updated.')
+          throw new Error(`No values were updated in collection '${this._collection.name}' using key '${this.name}'.`)
 
         return objectToMap(result.rows[0]['object'])
       }

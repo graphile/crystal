@@ -107,3 +107,61 @@ test('read will get single values from a table', async () => {
     { 'id': 3, 'name': 'Budd Deey', 'email': 'budd.deey@email.com', 'about': 'Just a friendly human', 'created_at': values[9].get('created_at') },
   ])
 })
+
+test('update will change values from a table', async () => {
+  await client.query(`
+    insert into c.person (id, name, email, about) values
+      (1, 'John Smith', 'john.smith@email.com', null),
+      (2, 'Sara Smith', 'sara.smith@email.com', null),
+      (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human');
+  `)
+
+  await client.query(`
+    insert into c.compound_key (person_id_1, person_id_2) values
+      (3, 2);
+  `)
+
+  const values = await Promise.all([
+    collectionKey1.update({ client }, new Map([['person_id_1', 3], ['person_id_2', 2]]), new Map([['person_id_2', 3]])),
+    collectionKey2.update({ client }, new Map([['email', 'john.smith@email.com']]), new Map([['about', 'Yolo swag!']])),
+    collectionKey2.update({ client }, new Map([['email', 'sara.smith@email.com']]), new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com'], ['about', 'Yolo swag!']])),
+    collectionKey2.update({ client }, new Map([['email', 'budd.deey@email.com']]), new Map([['about', null]])),
+  ])
+
+  const expectedValues = [
+    { 'person_id_1': 3, 'person_id_2': 3 },
+    { 'id': 1, 'name': 'John Smith', email: 'john.smith@email.com', 'about': 'Yolo swag!', 'created_at': values[1].get('created_at') },
+    { 'id': 2, 'name': 'Sarah Smith', email: 'sarah.smith@email.com', 'about': 'Yolo swag!', 'created_at': values[2].get('created_at') },
+    { 'id': 3, 'name': 'Budd Deey', email: 'budd.deey@email.com', 'about': null, 'created_at': values[3].get('created_at') },
+  ]
+
+  expect(values.map(mapToObject)).toEqual(expectedValues)
+
+  const pgQueryResult = await client.query(`
+    select row_to_json(x) as object from c.compound_key as x
+    union all
+    select row_to_json(x) as object from c.person as x
+  `)
+
+  expect(pgQueryResult.rows.map(({ object }) => object)).toEqual(expectedValues)
+})
+
+test('update fails when trying to patch a field that does not exist', async () => {
+  try {
+    await collectionKey1.update({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]]), new Map([['a', 1]]))
+    expect(true).toBe(false)
+  }
+  catch (error) {
+    expect(error.message).toBe('Cannot update field named \'a\' because it does not exist in collection \'compound_keys\'.')
+  }
+})
+
+test('update fails when trying to update a value that does not exist', async () => {
+  try {
+    await collectionKey2.update({ client }, new Map([['email', 'does.not.exist@email.com']]), new Map([['about', 'xxxx']]))
+    expect(true).toBe(false)
+  }
+  catch (error) {
+    expect(error.message).toBe('No values were updated in collection \'people\' using key \'email\'.')
+  }
+})
