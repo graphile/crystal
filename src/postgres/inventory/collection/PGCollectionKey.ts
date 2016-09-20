@@ -207,7 +207,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error(`No values were updated in collection '${this._collection.name}' using key '${this.name}'.`)
+          throw new Error(`No values were updated in collection '${this._collection.name}' using key '${this.name}' because no values were found.`)
 
         return objectToMap(result.rows[0]['object'])
       }
@@ -243,7 +243,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error(`No values were deleted in collection '${this._collection.name}' using key '${this.name}'.`)
+          throw new Error(`No values were deleted in collection '${this._collection.name}' using key '${this.name}' because no values were found.`)
 
         return objectToMap(result.rows[0]['object'])
       }

@@ -162,7 +162,7 @@ test('update fails when trying to update a value that does not exist', async () 
     expect(true).toBe(false)
   }
   catch (error) {
-    expect(error.message).toBe('No values were updated in collection \'people\' using key \'email\'.')
+    expect(error.message).toBe('No values were updated in collection \'people\' using key \'email\' because no values were found.')
   }
 })
 
@@ -205,4 +205,14 @@ test('delete will delete things from the database', async () => {
   ])
 
   expect((await client.query(selectQuery)).rows).toEqual([initialRows[2], initialRows[5], initialRows[6]])
+})
+
+test('delete fails when trying to remove a value that does not exist', async () => {
+  try {
+    await collectionKey1.delete({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]]))
+    expect(true).toBe(false)
+  }
+  catch (error) {
+    expect(error.message).toBe('No values were deleted in collection \'compound_keys\' using key \'person_id_1_and_person_id_2\' because no values were found.')
+  }
 })
