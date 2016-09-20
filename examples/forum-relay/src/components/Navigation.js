@@ -6,7 +6,7 @@ function Navigation({ auth, user }) {
     <nav>
       <Link to="/">Home</Link>{' '}
       <Link to="/posts">Posts</Link>
-      {user.authenticated
+      {user.token
         ? <button onClick={auth.handleLogout}>Logout</button>
         : (
           <div>

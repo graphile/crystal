@@ -1,3 +1,5 @@
+import Relay from 'react-relay'
+
 const viewer = () => Relay.QL`query { viewer }`
 
 export const PostIndexQueries = {

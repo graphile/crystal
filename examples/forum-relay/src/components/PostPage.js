@@ -52,8 +52,8 @@ class PostPage extends React.Component {
   // react complains; I chose to ignore it
   render() {
     const { post } = this.props
-    const { authenticated, personId } = this.context.user
-    const authAndOwn = personId === post.authorId && authenticated
+    const { token, personId } = this.context.user
+    const authAndOwn = personId === post.authorId && !!token
 
     if (this.state.clickedDelete)
       return <Redirect to="/posts" />

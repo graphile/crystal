@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
 import jwt from 'jsonwebtoken'
-import { Unauthorized } from 'http-errors'
+import { Forbidden } from 'http-errors'
 import bcrypt from 'bcrypt'
 import pg, { Client } from 'pg'
 
@@ -28,7 +28,7 @@ app.post('/', wrap(async (req, res) => {
 
   const userRow = result.rows[0]
   if (!userRow || !bcrypt.compareSync(password, userRow.pass_hash))
-    throw new Unauthorized('Your email and password are incorrect.')
+    throw new Forbidden('Your email and password are incorrect.')
 
   const token = prepareToken(userRow)
   return res.json({ err: null, token })
@@ -36,8 +36,8 @@ app.post('/', wrap(async (req, res) => {
 
 // Here we get a hold of the errors that were thrown higher up the chain
 app.use((err, req, res, next) => {
-  if (err instanceof Unauthorized) {
-    res.status(401)
+  if (err instanceof Forbidden) {
+    res.status(403)
     return res.json({ err: err.message })
   } else {
     res.status(500)
@@ -55,7 +55,7 @@ function prepareToken(userRow) {
     role: 'user_role', // we need to set the role otherwise it will be the anon role
   }, SECRET, { // the secret we specified in the .env file
     audience: 'postgraphql', // PostGraphQL expects this to be set to `postgraphql`
-    expiresIn: '30 min',
+    expiresIn: '10 min',
   })
 }
 

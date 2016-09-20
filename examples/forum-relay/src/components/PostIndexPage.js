@@ -61,7 +61,7 @@ class PostIndex extends React.Component {
       <div>
         <h1>Posts</h1>
         <div>
-          {this.context.user.authenticated &&
+          {this.context.user.token &&
             <button onClick={this.setAddingPost}>
               {this.state.addingPost ? 'Cancel' : 'Write Post'}
             </button>

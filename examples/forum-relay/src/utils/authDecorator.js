@@ -1,55 +1,72 @@
 import React from 'react'
 import Relay from 'react-relay'
 import jwtDecode from 'jwt-decode'
-import { RelayNetworkLayer, authMiddleware, urlMiddleware } from 'react-relay-network-layer'
+import { RelayNetworkLayer } from 'react-relay-network-layer'
+import authMiddleware from './authMiddleware'
 
 const AUTH_URL = 'http://localhost:3000/token'
 
-// TODO: So much to do here :D
-// I feel like the my thinking how jwt works
-// is wrong. Will need to rethink this!
-
 const authDecorator = WrappedComponent => 
   class AuthDecorator extends React.Component {
-    state = { ...defaultState }
+    state = {
+      token: null,
+    }
 
     componentWillMount() {
-      const token = localStorage.getItem('token')
-      if (!token)
-        return
-      else if (isTokenExpired(token))
-        this.clearAuth()
-      else
-        this.setAuth(token)
+      const token = this.getTokenFromStorage()
+      this.setToken(token)
+      this.setupNetwork()
     }
 
-    setAuth(token) {
-      setupNetwork(token)
-      this.setState({
-        token,
-        authenticated: true,
-        ...jwtDecode(token),
-      })
+    setToken(token) {
+      let newState = { token }
+      if (token) {
+        newState = { ...jwtDecode(token), ...newState }
+        this.saveTokenToStorage(token)
+      } else {
+        this.clearTokenFromStorage()
+      }
+      this.setState({ ...newState })
     }
 
-    clearAuth() {
+    setupNetwork() {
+      Relay.injectNetworkLayer(new RelayNetworkLayer([
+        authMiddleware({
+          allowEmptyToken: true,
+          token: () => this.state.token,
+          onTokenInvalid: this.handleTokenInvalid,
+        }),
+      ], { disableBatchQuery: true }))
+    }
+
+    getTokenFromStorage() {
+      return localStorage.getItem('token')
+    }
+
+    saveTokenToStorage(token) {
+      localStorage.setItem('token', token)
+    }
+
+    clearTokenFromStorage() {
       localStorage.removeItem('token')
-      setupNetwork(null) // removes token from fetch headers
-      this.setState({
-        ...defaultState
+    }
+
+    handleTokenInvalid = () => {
+      return new Promise((resolve) => {
+        this.setToken(null, () => {
+          resolve()
+        })
       })
     }
 
-    // use async here (babel)
     handleLogin = (data) => {
       return fetchToken(data)
-        .then((token) => (this.setAuth(token), token))
-        .then((token) => localStorage.setItem('token', token))
+        .then((token) => this.setToken(token))
         .catch((err) => console.error(err))
     }
 
     handleLogout = () => {
-      this.clearAuth()
+      this.setToken(null)
     }
 
     render() {
@@ -65,27 +82,6 @@ const authDecorator = WrappedComponent =>
       )
     }
   }
-
-const defaultState = {
-  authenticated: false,
-  token: null,
-}
-
-const setupNetwork = (token) => {
-  Relay.injectNetworkLayer(new RelayNetworkLayer([
-    authMiddleware({
-      allowEmptyToken: true,
-      token,
-    }),
-  ], { disableBatchQuery: true }))
-}
-
-const isTokenExpired = (token) => {
-  const tokenPayload = jwtDecode(token)
-  const expiryDate = new Date(tokenPayload.exp * 1000)
-  const currentDate = new Date()
-  return expiryDate < currentDate
-}
 
 const fetchToken = (data) => {
   const options = {
