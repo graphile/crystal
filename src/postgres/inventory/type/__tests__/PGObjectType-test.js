@@ -53,3 +53,34 @@ test('it will call ObjectType with an appropriate config', () => {
     ]),
   }]])
 })
+
+test('it will rename `id` fields to `row_id` when instructed', () => {
+  ObjectType.mockClear()
+
+  const pgCatalog = new PGCatalog()
+  const pgAttribute = { name: 'id' }
+
+  new PGObjectType({
+    pgCatalog,
+    pgAttributes: [pgAttribute],
+  })
+
+  new PGObjectType({
+    pgCatalog,
+    pgAttributes: [pgAttribute],
+    renameIdToRowId: true,
+  })
+
+  expect(ObjectType.mock.calls).toEqual([
+    [{
+      fields: new Map([
+        ['id', { pgAttribute }],
+      ]),
+    }],
+    [{
+      fields: new Map([
+        ['row_id', { pgAttribute }],
+      ]),
+    }],
+  ])
+})
