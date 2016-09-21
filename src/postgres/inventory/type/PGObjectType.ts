@@ -25,14 +25,16 @@ class PGObjectType extends ObjectType {
     description?: string | undefined,
     pgCatalog: PGCatalog,
     pgAttributes: Array<PGCatalogAttribute>,
+    renameIdToRowId?: boolean,
   }) {
     super({
       name: config.name,
       description: config.description,
       fields: new Map<string, PGObjectType.Field<mixed>>(
         // Creates fields using the provided `pgAttributes` array.
-        config.pgAttributes.map<[string, PGObjectType.Field<mixed>]>(pgAttribute =>
-          [pgAttribute.name, {
+        config.pgAttributes.map<[string, PGObjectType.Field<mixed>]>(pgAttribute => {
+          const fieldName = config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name
+          return [fieldName, {
             description: pgAttribute.description,
 
             // Make sure that if our attribute specifies that it is non-null,
@@ -51,7 +53,7 @@ class PGObjectType extends ObjectType {
             // our custom field type.
             pgAttribute,
           }]
-        )
+        })
       ),
     })
   }

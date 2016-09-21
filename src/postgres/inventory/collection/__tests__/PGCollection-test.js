@@ -25,8 +25,12 @@ beforeEach(async () => {
 
   const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
-  collection1 = new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'person'))
-  collection2 = new PGCollection(pgCatalog, pgCatalog.getClassByName('b', 'updatable_view'))
+  const options = {
+    renameAttributes: new Map(),
+  }
+
+  collection1 = new PGCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'person'))
+  collection2 = new PGCollection(options, pgCatalog, pgCatalog.getClassByName('b', 'updatable_view'))
 })
 
 test('name will be the plural form of the class name', () => {

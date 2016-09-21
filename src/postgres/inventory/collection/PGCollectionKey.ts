@@ -17,7 +17,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
     public _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
   ) {}
 
-  // Steal the catalog reference from our collection ;)
+  // Steal the options and catalog reference from our collection ;)
+  private _options = this._collection._options
   private _pgCatalog = this._collection._pgCatalog
   private _pgClass = this._pgCatalog.assertGetClass(this._pgConstraint.classId)
   private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
@@ -26,17 +27,6 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
     this._pgConstraint.keyAttributeNums
       .map(num => this._pgCatalog.assertGetAttribute(this._pgConstraint.classId, num))
   )
-
-  /**
-   * Creates a name based on combining all of the key attribute names seperated
-   * by the word “and”.
-   */
-  public name = this._pgKeyAttributes.map(attribute => attribute.name).join('_and_')
-
-  /**
-   * We don’t have a great way to get the description for a key at the moment…
-   */
-  public description = undefined
 
   /**
    * A type used to represent a key value. Consumers can then use this
@@ -51,7 +41,22 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
     name: `_${this._pgConstraint.name}`,
     pgCatalog: this._pgCatalog,
     pgAttributes: this._pgKeyAttributes,
+    renameIdToRowId: this._options.renameIdToRowId,
   })
+
+  /**
+   * Creates a name based on combining all of the key attribute names seperated
+   * by the word “and”.
+   */
+  // Note that we define `name` under `keyType`. This is so that we can use the
+  // `keyType` field names when making our name instead of the plain Postgres
+  // attribute names.
+  public name = Array.from(this.keyType.fields.keys()).join('_and_')
+
+  /**
+   * We don’t have a great way to get the description for a key at the moment…
+   */
+  public description = undefined
 
   /**
    * Because `Array.from` may potentially be an extra operation we really don’t

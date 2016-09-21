@@ -5,6 +5,7 @@ import { Collection, Type, NullableType } from '../../../interface'
 import { memoize1, sql, memoizeMethod, objectToMap } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
+import Options from '../Options'
 import isPGContext from '../isPGContext'
 import PGCollectionKey from './PGCollectionKey'
 
@@ -15,6 +16,7 @@ import PGCollectionKey from './PGCollectionKey'
  */
 class PGCollection implements Collection {
   constructor (
+    public _options: Options,
     public _pgCatalog: PGCatalog,
     private _pgClass: PGCatalogClass,
   ) {}
@@ -48,6 +50,7 @@ class PGCollection implements Collection {
     description: this._pgClass.description,
     pgCatalog: this._pgCatalog,
     pgAttributes: this._pgAttributes,
+    renameIdToRowId: this._options.renameIdToRowId,
   })
 
   /**

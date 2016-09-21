@@ -41,7 +41,7 @@ export default function buildObject <T>(
     const [key, value] = entry
 
     if (object.hasOwnProperty(key))
-      throw new Error(`Naming conflict. Cannot have two definitions for key '${key}'.`)
+      throw new Error(`Naming conflict when building object. Cannot have two definitions for property '${key}'.`)
 
     object[key] = value
   }))

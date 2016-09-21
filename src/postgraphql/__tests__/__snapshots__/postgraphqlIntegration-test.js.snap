@@ -55,3 +55,61 @@ type UpdatableView {
 }
 "
 `;
+
+exports[`test forum example 2`] = `
+"schema {
+  query: Query
+}
+
+type CompoundKey implements Node {
+  id: ID!
+  personId2: Int!
+  personId1: Int!
+}
+
+scalar Email
+
+interface Node {
+  id: ID!
+}
+
+type NoUpdate {
+  column: Int
+}
+
+type Person implements Node {
+  id: ID!
+  rowId: Int!
+  name: String!
+  about: String
+  email: Email
+  createdAt: String
+}
+
+type Post implements Node {
+  id: ID!
+  rowId: Int!
+  headline: String!
+  body: String
+  authorId: Int
+}
+
+type Query {
+  node(id: ID!): Node
+  post(id: ID!): Post
+  postByRowId(rowId: Int!): Post
+  person(id: ID!): Person
+  personByRowId(rowId: Int!): Person
+  personByEmail(email: Email): Person
+  compoundKey(id: ID!): CompoundKey
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+}
+
+type UpdatableView {
+  __id: Int
+  name: String
+  description: String
+  constant: Int
+}
+"
+`;

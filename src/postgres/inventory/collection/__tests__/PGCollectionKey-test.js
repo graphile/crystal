@@ -21,8 +21,12 @@ beforeEach(async () => {
 
   const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
+  const options = {
+    renameAttributes: new Map(),
+  }
+
   collectionKey1 = new PGCollectionKey(
-    new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'compound_key')),
+    new PGCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key')),
     {
       kind: 'constraint',
       name: 'compound_key_pkey',
@@ -36,7 +40,7 @@ beforeEach(async () => {
   )
 
   collectionKey2 = new PGCollectionKey(
-    new PGCollection(pgCatalog, pgCatalog.getClassByName('c', 'person')),
+    new PGCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'person')),
     {
       kind: 'constraint',
       name: 'person_unique_email',
