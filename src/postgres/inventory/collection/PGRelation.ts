@@ -5,6 +5,7 @@ import PGCollection from './PGCollection'
 import PGCollectionKey from './PGCollectionKey'
 
 // TODO: This implementation is sketchy. Implement it better!
+// TODO: Tests
 class PGRelation implements Relation<PGObjectType.Value> {
   constructor (
     public tailCollection: PGCollection,
