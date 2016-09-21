@@ -129,9 +129,12 @@ export const IntervalType = createStringScalarType({
   description: 'Some time span',
 })
 
-export const JSONType = createStringScalarType({
+export const JSONType = new GraphQLScalarType({
   name: 'JSON',
   description: 'An object not queryable by GraphQL',
+  serialize: JSON.stringify,
+  parseValue: JSON.parse,
+  parseLiteral: ast => (ast.kind === Kind.STRING ? JSON.parse(ast.value) : null),
 })
 
 export const UUIDType = createStringScalarType({
