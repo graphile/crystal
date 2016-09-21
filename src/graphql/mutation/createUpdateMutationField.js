@@ -47,9 +47,10 @@ const createInputType = table =>
         table.getPrimaryKeys().map(column => [column.getFieldName(), {
           type: new GraphQLNonNull(getType(column.type)),
           description: `Matches the ${column.getMarkdownFieldName()} field of the node.`,
-        }])
+        }]),
       ),
-      // We include all the other columns to actually allow users to update a value.
+      // We include all the other columns to actually allow users to update a
+      // value.
       ...fromPairs(
         table.getColumns().map(column => [`new${upperFirst(column.getFieldName())}`, {
           type: getType(column.type),
@@ -111,7 +112,7 @@ const resolveUpdate = table => {
       .add(setClauses.join(', '), setValues)
       .add('where')
       .add(whereClauses.join(' and '), whereValues)
-      .add('returning *')
+      .add('returning *'),
     )
 
     const output = row ? (row[$$rowTable] = table, row) : null
