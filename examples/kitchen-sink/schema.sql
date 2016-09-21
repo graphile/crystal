@@ -29,7 +29,9 @@ create table another_thing (
 create table anything_goes (
   foo              int,
   bar              int,
-  interval         interval
+  interval         interval,
+  json             json,
+  jsonb            jsonb
 );
 
 create view non_mutation_view as
@@ -162,9 +164,9 @@ insert into another_thing (note, published, tags, thing_id) values
   ('world', true, '{"c", "d"}', null),
   ('foo', false, '{"a"}', 2);
 
-insert into anything_goes (foo, bar) values
-  (1, 2),
-  (2, 3),
-  (3, 4);
+insert into anything_goes (foo, bar, json, jsonb) values
+  (1, 2, '{"a":1,"b":2,"c":3}', '{"a":1,"b":2,"c":3}'),
+  (2, 3, null, null),
+  (3, 4, null, null);
 
 commit;
