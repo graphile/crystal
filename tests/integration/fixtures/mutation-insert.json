@@ -81,6 +81,12 @@
           }
         }
       }
+    },
+    "d": {
+      "anythingGoes": {
+        "foo": null,
+        "bar": null
+      }
     }
   }
 }
