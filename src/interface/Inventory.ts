@@ -2,7 +2,7 @@ import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
 import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
-import Relation from './Relation'
+import Relation from './collection/Relation'
 
 // TODO: Validate inventory functions. There are a lot of assumptions we make that
 // cannot be statically typed. We should have a test utility function to prove

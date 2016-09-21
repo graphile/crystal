@@ -1,9 +1,9 @@
 import Inventory from './Inventory'
-import Relation from './Relation'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
 import Paginator from './collection/Paginator'
 import Condition from './collection/Condition'
+import Relation from './collection/Relation'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
 import ListType from './type/ListType'
@@ -18,11 +18,11 @@ import ObjectType from './type/ObjectType'
 
 export {
   Inventory,
-  Relation,
   Collection,
   CollectionKey,
   Paginator,
   Condition,
+  Relation,
   Type,
   NullableType,
   ListType,

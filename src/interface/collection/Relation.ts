@@ -1,8 +1,8 @@
-import Collection from './collection/Collection'
-import CollectionKey from './collection/CollectionKey'
-import Paginator from './collection/Paginator'
-import Condition from './collection/Condition'
-import ObjectType from './type/ObjectType'
+import ObjectType from '../type/ObjectType'
+import Collection from './Collection'
+import CollectionKey from './CollectionKey'
+import Paginator from './Paginator'
+import Condition from './Condition'
 
 /**
  * A relation represents a directed edge between the keys of values in two
@@ -41,11 +41,6 @@ interface Relation<TKey> {
    * The tail collection in this relationship.
    */
   readonly tailCollection: Collection
-
-  /**
-   * The head collection in this relationship.
-   */
-  readonly headCollection: Collection
 
   /**
    * The head collection key in this relationship.

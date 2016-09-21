@@ -9,6 +9,11 @@ import Collection from './Collection'
  */
 interface CollectionKey<TKeyValue> {
   /**
+   * The collection this key is for.
+   */
+  readonly collection: Collection
+
+  /**
    * The name of our collection key.
    */
   readonly name: string

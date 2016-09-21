@@ -13,13 +13,13 @@ import PGCollection from './PGCollection'
  */
 class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   constructor (
-    private _collection: PGCollection,
+    public collection: PGCollection,
     public _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
   ) {}
 
   // Steal the options and catalog reference from our collection ;)
-  private _options = this._collection._options
-  private _pgCatalog = this._collection._pgCatalog
+  private _options = this.collection._options
+  private _pgCatalog = this.collection._pgCatalog
   private _pgClass = this._pgCatalog.assertGetClass(this._pgConstraint.classId)
   private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
 
@@ -190,10 +190,10 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
             set ${sql.join(Array.from(patch).map(([fieldName, value]) => {
-              const collectionField = this._collection.type.fields.get(fieldName)
+              const collectionField = this.collection.type.fields.get(fieldName)
 
               if (!collectionField)
-                throw new Error(`Cannot update field named '${fieldName}' because it does not exist in collection '${this._collection.name}'.`)
+                throw new Error(`Cannot update field named '${fieldName}' because it does not exist in collection '${this.collection.name}'.`)
 
               // Use the actual name of the Postgres attribute when
               // comparing, not the field name which may be different.
@@ -212,7 +212,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error(`No values were updated in collection '${this._collection.name}' using key '${this.name}' because no values were found.`)
+          throw new Error(`No values were updated in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
         return objectToMap(result.rows[0]['object'])
       }
@@ -248,7 +248,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error(`No values were deleted in collection '${this._collection.name}' using key '${this.name}' because no values were found.`)
+          throw new Error(`No values were deleted in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
         return objectToMap(result.rows[0]['object'])
       }
