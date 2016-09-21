@@ -2,6 +2,7 @@ mutation Insert {
   a: insertThing(input: { note: "a" }) { ...payloadThing }
   b: insertThing(input: { rowId: 9, note: "b", clientMutationId: "hello" }) { ...payloadThing }
   c: insertRelation(input: { aThingId: 8, bThingId: 9 }) { ...payloadRelation }
+  d: insertAnythingGoes(input: {}) { anythingGoes { foo bar } }
 }
 
 fragment payloadThing on InsertThingPayload {
