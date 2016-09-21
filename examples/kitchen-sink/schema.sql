@@ -7,7 +7,8 @@ set search_path = kitchen_sink;
 create table thing (
   id               serial not null primary key,
   note             text not null,
-  lucky_number     int unique
+  lucky_number     int unique,
+  some_boolean     boolean
 );
 
 create table relation (

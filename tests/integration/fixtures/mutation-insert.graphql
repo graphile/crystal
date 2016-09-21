@@ -3,6 +3,8 @@ mutation Insert {
   b: insertThing(input: { rowId: 9, note: "b", clientMutationId: "hello" }) { ...payloadThing }
   c: insertRelation(input: { aThingId: 8, bThingId: 9 }) { ...payloadRelation }
   d: insertAnythingGoes(input: {}) { anythingGoes { foo bar } }
+  e: insertThing(input: { rowId: 200, note: "true", someBoolean: true }) { ...payloadThing }
+  f: insertThing(input: { rowId: 201, note: "false", someBoolean: false }) { ...payloadThing }
 }
 
 fragment payloadThing on InsertThingPayload {
@@ -11,6 +13,7 @@ fragment payloadThing on InsertThingPayload {
     id
     rowId
     note
+    someBoolean
   }
   withArg: thingEdge(orderBy: ROW_ID) {
     cursor

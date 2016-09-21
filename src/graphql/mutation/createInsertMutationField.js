@@ -107,7 +107,7 @@ const resolveInsert = table => {
     const valueEntries = (
       columns
       .map(column => [column, input[column.getFieldName()]])
-      .filter(([, value]) => value)
+      .filter(([, value]) => value != null)
     )
 
     const query = (

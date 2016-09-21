@@ -5,7 +5,8 @@
       "thing": {
         "id": "dGhpbmc6OA==",
         "rowId": 8,
-        "note": "a"
+        "note": "a",
+        "someBoolean": null
       },
       "withArg": {
         "cursor": "W251bGwsbnVsbF0=",
@@ -29,7 +30,8 @@
       "thing": {
         "id": "dGhpbmc6OQ==",
         "rowId": 9,
-        "note": "b"
+        "note": "b",
+        "someBoolean": null
       },
       "withArg": {
         "cursor": "W251bGwsbnVsbF0=",
@@ -86,6 +88,56 @@
       "anythingGoes": {
         "foo": null,
         "bar": null
+      }
+    },
+    "e": {
+      "clientMutationId": null,
+      "thing": {
+        "id": "dGhpbmc6MjAw",
+        "rowId": 200,
+        "note": "true",
+        "someBoolean": true
+      },
+      "withArg": {
+        "cursor": "W251bGwsbnVsbF0=",
+        "node": {
+          "id": "dGhpbmc6MjAw",
+          "rowId": 200,
+          "note": "true"
+        }
+      },
+      "withoutArg": {
+        "cursor": "W251bGwsbnVsbF0=",
+        "node": {
+          "id": "dGhpbmc6MjAw",
+          "rowId": 200,
+          "note": "true"
+        }
+      }
+    },
+    "f": {
+      "clientMutationId": null,
+      "thing": {
+        "id": "dGhpbmc6MjAx",
+        "rowId": 201,
+        "note": "false",
+        "someBoolean": false
+      },
+      "withArg": {
+        "cursor": "W251bGwsbnVsbF0=",
+        "node": {
+          "id": "dGhpbmc6MjAx",
+          "rowId": 201,
+          "note": "false"
+        }
+      },
+      "withoutArg": {
+        "cursor": "W251bGwsbnVsbF0=",
+        "node": {
+          "id": "dGhpbmc6MjAx",
+          "rowId": 201,
+          "note": "false"
+        }
       }
     }
   }
