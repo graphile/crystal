@@ -22,11 +22,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   private _pgCatalog = this.collection._pgCatalog
   private _pgClass = this._pgCatalog.assertGetClass(this._pgConstraint.classId)
   private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
-
-  private _pgKeyAttributes = (
-    this._pgConstraint.keyAttributeNums
-      .map(num => this._pgCatalog.assertGetAttribute(this._pgConstraint.classId, num))
-  )
+  private _pgKeyAttributes = this._pgCatalog.getClassAttributes(this._pgConstraint.classId, this._pgConstraint.keyAttributeNums)
 
   /**
    * A type used to represent a key value. Consumers can then use this

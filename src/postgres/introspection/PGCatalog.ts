@@ -144,9 +144,18 @@ class PGCatalog {
 
   /**
    * Gets all of the attributes for a single class.
+   *
+   * If provided an array of `nums`, we will get only those attributes in the
+   * enumerated order. Otherwise we get all attributes in the order of their
+   * definition.
    */
-  public getClassAttributes (classId: string): Array<PGCatalogAttribute> {
-    return Array.from(this._attributes.values()).filter(attribute => attribute.classId === classId)
+  public getClassAttributes (classId: string, nums?: Array<number>): Array<PGCatalogAttribute> {
+    // Currently if we get a `nums` array we use a completely different
+    // implementation to preserve the `nums` order..
+    if (nums)
+      return nums.map(num => this.assertGetAttribute(classId, num))
+
+    return Array.from(this._attributes.values()).filter(pgAttribute => pgAttribute.classId === classId)
   }
 
   /**

@@ -10,6 +10,16 @@ import Collection from './Collection'
 interface CollectionKey<TKeyValue> {
   /**
    * The collection this key is for.
+   *
+   * An instance of `CollectionKey` will almost always need to have an instance
+   * of the collection it is for. This is so that it can correctly implement
+   * methods like `getKeyFromValue`, `update`, and so on which need information
+   * about the collection object type itself.
+   *
+   * Establishing this circular dependency is also helpful in that `Relation`
+   * instances can use this.
+   *
+   * Everyone wins, so we add it to the interface.
    */
   readonly collection: Collection
 

@@ -51,25 +51,12 @@ test('hasCollection will return if the exact collection exists in the inventory'
   expect(inventory.hasCollection(collection2)).toBe(false)
 })
 
-test('addRelation will fail if a key is not in the head collection keys', () => {
-  const inventory = new Inventory()
-  const collectionKey1 = { name: 'a' }
-  const collectionKey2 = { name: 'b' }
-  const collection1 = { name: 'a', keys: new Set([collectionKey1]) }
-  const collection2 = { name: 'b', keys: new Set([collectionKey2]) }
-  const relation1 = { name: 'a', tailCollection: collection1, headCollection: collection2, headCollectionKey: collectionKey1 }
-  const relation2 = { name: 'b', tailCollection: collection2, headCollection: collection1, headCollectionKey: collectionKey1 }
-  inventory.addCollection(collection1).addCollection(collection2)
-  expect(() => inventory.addRelation(relation1)).toThrow()
-  expect(() => inventory.addRelation(relation2)).not.toThrow()
-})
-
 test('addRelation will fail unless both the head and tail collections exist in the inventory', () => {
   const inventory = new Inventory()
   const collection1 = { name: 'a' }
   const collection2 = { name: 'b' }
-  const relation1 = { name: 'a', tailCollection: collection1, headCollection: collection2 }
-  const relation2 = { name: 'b', tailCollection: collection2, headCollection: collection1 }
+  const relation1 = { name: 'a', tailCollection: collection1, headCollectionKey: { collection: collection2 } }
+  const relation2 = { name: 'b', tailCollection: collection2, headCollectionKey: { collection: collection1 } }
   expect(() => inventory.addRelation(relation1)).toThrow()
   expect(() => inventory.addRelation(relation2)).toThrow()
   inventory.addCollection(collection1)
@@ -84,8 +71,8 @@ test('getRelations will get all of the relations that have been added to the inv
   const inventory = new Inventory()
   const collection1 = { name: 'a' }
   const collection2 = { name: 'b' }
-  const relation1 = { name: 'a', tailCollection: collection1, headCollection: collection2 }
-  const relation2 = { name: 'b', tailCollection: collection2, headCollection: collection1 }
+  const relation1 = { name: 'a', tailCollection: collection1, headCollectionKey: { collection: collection2 } }
+  const relation2 = { name: 'b', tailCollection: collection2, headCollectionKey: { collection: collection1 } }
   expect(inventory.getRelations()).toEqual([])
   expect(() => inventory.addRelation(relation1)).toThrow()
   expect(() => inventory.addRelation(relation2)).toThrow()

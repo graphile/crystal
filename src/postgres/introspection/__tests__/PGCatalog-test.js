@@ -12,12 +12,12 @@ const mockClasses = [
 ]
 
 const mockAttributes = [
-  { kind: 'attribute', classId: '2', num: '0', name: 'a' },
-  { kind: 'attribute', classId: '2', num: '1', name: 'b' },
-  { kind: 'attribute', classId: '2', num: '2', name: 'c' },
-  { kind: 'attribute', classId: '3', num: '0', name: 'a' },
-  { kind: 'attribute', classId: '4', num: '0', name: 'b' },
-  { kind: 'attribute', classId: '4', num: '1', name: 'c' },
+  { kind: 'attribute', classId: '2', num: 0, name: 'a' },
+  { kind: 'attribute', classId: '2', num: 1, name: 'b' },
+  { kind: 'attribute', classId: '2', num: 2, name: 'c' },
+  { kind: 'attribute', classId: '3', num: 0, name: 'a' },
+  { kind: 'attribute', classId: '4', num: 0, name: 'b' },
+  { kind: 'attribute', classId: '4', num: 1, name: 'c' },
 ]
 
 const mockTypes = [
@@ -123,6 +123,13 @@ test('getClassAttributes will get all the attributes for a class', () => {
   expect(catalog.getClassAttributes('2')).toEqual([mockAttributes[0], mockAttributes[1], mockAttributes[2]])
   expect(catalog.getClassAttributes('3')).toEqual([mockAttributes[3]])
   expect(catalog.getClassAttributes('4')).toEqual([mockAttributes[4], mockAttributes[5]])
+})
+
+test('getClassAttributes will only get class attributes of certain positions if passed an extra argument', () => {
+  expect(catalog.getClassAttributes('2', [])).toEqual([])
+  expect(catalog.getClassAttributes('2', [0, 2])).toEqual([mockAttributes[0], mockAttributes[2]])
+  expect(catalog.getClassAttributes('2', [2, 0])).toEqual([mockAttributes[2], mockAttributes[0]])
+  expect(catalog.getClassAttributes('2', [1])).toEqual([mockAttributes[1]])
 })
 
 test('getAttributeByName will get an attribute by its name', () => {

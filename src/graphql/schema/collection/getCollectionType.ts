@@ -91,8 +91,8 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         )
         // Transform the relation into a field entry.
         .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<GraphQLCollectionValue, GraphQLCollectionValue>] => {
-          const headCollection = relation.headCollection
           const headCollectionKey = relation.headCollectionKey
+          const headCollection = headCollectionKey.collection
 
           return [formatName.field(`${headCollection.type.name}-by-${relation.name}`), {
             // TODO: description

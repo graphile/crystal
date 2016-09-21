@@ -7,6 +7,8 @@ type CompoundKey implements Node {
   __id: ID!
   personId2: Int!
   personId1: Int!
+  personByPersonId2: Person
+  personByPersonId1: Person
 }
 
 scalar Email
@@ -34,6 +36,7 @@ type Post implements Node {
   headline: String!
   body: String
   authorId: Int
+  personByAuthorId: Person
 }
 
 type Query {
@@ -65,6 +68,8 @@ type CompoundKey implements Node {
   id: ID!
   personId2: Int!
   personId1: Int!
+  personByPersonId2: Person
+  personByPersonId1: Person
 }
 
 scalar Email
@@ -92,6 +97,7 @@ type Post implements Node {
   headline: String!
   body: String
   authorId: Int
+  personByAuthorId: Person
 }
 
 type Query {

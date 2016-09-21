@@ -128,16 +128,13 @@ class Inventory {
    * members of this inventory we fail with an error.
    */
   public addRelation (relation: Relation<mixed>): this {
-    const { name, tailCollection, headCollection, headCollectionKey } = relation
-
-    if (headCollectionKey && !headCollection.keys.has(headCollectionKey))
-      throw new Error(`Head collection key '${headCollectionKey.name}' is not valid for head collection '${headCollection.name}'.`)
+    const { name, tailCollection, headCollectionKey } = relation
 
     if (!this.hasCollection(tailCollection))
       throw new Error(`Tail collection named '${tailCollection.name}' is not in this inventory.`)
 
-    if (!this.hasCollection(headCollection))
-      throw new Error(`Head collection named '${headCollection.name}' is not in this inventory.`)
+    if (!this.hasCollection(headCollectionKey.collection))
+      throw new Error(`Head collection named '${headCollectionKey.collection.name}' is not in this inventory.`)
 
     if (this._relations.has(name))
       throw new Error(`Relation of name '${name}' already exists in the inventory.`)

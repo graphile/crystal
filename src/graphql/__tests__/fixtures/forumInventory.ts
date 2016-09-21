@@ -32,6 +32,7 @@ const personType = new ObjectType({
 })
 
 const personIdKey: CollectionKey<number> = {
+  collection: null as any,
   name: 'id',
   keyType: integerType,
   getKeyFromValue: unimplementedFn,
@@ -39,6 +40,7 @@ const personIdKey: CollectionKey<number> = {
 }
 
 const personNameKey: CollectionKey<string> = {
+  collection: null as any,
   name: 'name',
   keyType: stringType,
   getKeyFromValue: unimplementedFn,
@@ -46,6 +48,7 @@ const personNameKey: CollectionKey<string> = {
 }
 
 const personEmailKey: CollectionKey<string> = {
+  collection: null as any,
   name: 'email',
   keyType: stringType,
   getKeyFromValue: unimplementedFn,
@@ -71,10 +74,14 @@ const personPaginator: Paginator<ObjectType.Value, mixed> = {
 const personCollection: Collection = {
   name: 'people',
   type: personType,
-  keys: new Set([personIdKey, personNameKey, personEmailKey]),
+  keys: [personIdKey, personNameKey, personEmailKey],
   primaryKey: personIdKey,
   paginator: personPaginator,
 }
+
+Object.assign(personIdKey, { collection: personCollection })
+Object.assign(personNameKey, { collection: personCollection })
+Object.assign(personEmailKey, { collection: personCollection })
 
 const postStatusType = new EnumType({
   name: 'postStatus',
@@ -93,6 +100,7 @@ const postType = new ObjectType({
 })
 
 const postIdKey: CollectionKey<number> = {
+  collection: null as any,
   name: 'id',
   keyType: integerType,
   getKeyFromValue: unimplementedFn,
@@ -118,15 +126,16 @@ const postPaginator: Paginator<ObjectType.Value, mixed> = {
 const postCollection: Collection = {
   name: 'posts',
   type: postType,
-  keys: new Set([postIdKey]),
+  keys: [postIdKey],
   primaryKey: postIdKey,
   paginator: postPaginator,
 }
 
+Object.assign(postIdKey, { collection: postCollection })
+
 const authorRelation: Relation<number> = {
   name: 'author',
   tailCollection: postCollection,
-  headCollection: personCollection,
   headCollectionKey: personIdKey,
   getHeadKeyFromTailValue: unimplementedFn,
 }

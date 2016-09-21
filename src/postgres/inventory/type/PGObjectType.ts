@@ -57,6 +57,13 @@ class PGObjectType extends ObjectType {
       ),
     })
   }
+
+  // TODO: This was added for the sketchy `PGRelation` implementation.
+  // Implement it better!
+  public getPGAttributeFieldName (pgAttribute: PGCatalogAttribute): string | undefined {
+    const fieldEntry = Array.from(this.fields).find(([fieldName, field]) => field.pgAttribute === pgAttribute)
+    return fieldEntry && fieldEntry[0]
+  }
 }
 
 namespace PGObjectType {
