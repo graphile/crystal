@@ -5,8 +5,8 @@ const formatInsideUnderscores = (formatter: (string: string) => string) => (stri
   return `${start}${formatter(name)}${finish}`
 }
 
-const camelCaseInsideUnderscores = formatInsideUnderscores(camelCase)
-const pascalCaseInsideUnderscores = formatInsideUnderscores(pascalCase)
+const camelCaseInsideUnderscores = formatInsideUnderscores(name => camelCase(name, undefined, true))
+const pascalCaseInsideUnderscores = formatInsideUnderscores(name => pascalCase(name, undefined, true))
 const constantCaseInsideUnderscores = formatInsideUnderscores(constantCase)
 
 namespace formatName {

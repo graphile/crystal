@@ -14,7 +14,7 @@ import PGCollection from './PGCollection'
 class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   constructor (
     private _collection: PGCollection,
-    private _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
+    public _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
   ) {}
 
   // Steal the catalog reference from our collection ;)

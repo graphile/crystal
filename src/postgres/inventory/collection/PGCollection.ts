@@ -6,6 +6,7 @@ import { memoize1, sql, memoizeMethod, objectToMap } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import isPGContext from '../isPGContext'
+import PGCollectionKey from './PGCollectionKey'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
@@ -49,8 +50,35 @@ class PGCollection implements Collection {
     pgAttributes: this._pgAttributes,
   })
 
-  public keys = new Set()
-  public primaryKey = null
+  /**
+   * An array of all the keys which can be used to uniquely identify a value
+   * in our collection.
+   *
+   * The keys are a representation of the primary key constraints and unique
+   * constraints in Postgres on the table.
+   */
+  public keys = (
+    this._pgCatalog.getConstraints()
+      .filter(pgConstraint =>
+        // We only want the constraints that apply to this Postgres class.
+        pgConstraint.classId === this._pgClass.id &&
+        // …and the constraints that are either a primary key constraint or a
+        // unique constraint.
+        (pgConstraint.type === 'p' || pgConstraint.type === 'u')
+      )
+      // Tell TypeScript our constraint is ok (verified in the filter above)
+      // with `as any`.
+      .map(pgConstraint => new PGCollectionKey(this, pgConstraint as any))
+  )
+
+  /**
+   * The primary key for our collection is just an instance of `CollectionKey`
+   * representing the single primary key constraint in Postgres. We choose one
+   * key to be our primary key so that consumers have a clear choice in what id
+   * should be used.
+   */
+  public primaryKey = this.keys.find(key => key._pgConstraint.type === 'p')
+
   public paginator = null
 
   // If we can’t insert into this class, there should be no `create`

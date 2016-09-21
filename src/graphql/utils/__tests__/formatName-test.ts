@@ -9,6 +9,8 @@ test('type will format in pascal case', () => {
   expect(formatName.type('_helloWorld')).toBe('_HelloWorld')
   expect(formatName.type('__hello_world__')).toBe('__HelloWorld__')
   expect(formatName.type('HELLO_WORLD_')).toBe('HelloWorld_')
+  expect(formatName.type('person_id_1')).toBe('PersonId1')
+  expect(formatName.type('person_id_2')).toBe('PersonId2')
 })
 
 test('field will format in camel case', () => {
@@ -20,6 +22,8 @@ test('field will format in camel case', () => {
   expect(formatName.field('_HelloWorld')).toBe('_helloWorld')
   expect(formatName.field('__hello_world__')).toBe('__helloWorld__')
   expect(formatName.field('HELLO_WORLD_')).toBe('helloWorld_')
+  expect(formatName.field('person_id_1')).toBe('personId1')
+  expect(formatName.field('person_id_2')).toBe('personId2')
 })
 
 test('arg will format in camel case', () => {
@@ -31,6 +35,8 @@ test('arg will format in camel case', () => {
   expect(formatName.arg('_HelloWorld')).toBe('_helloWorld')
   expect(formatName.arg('__hello_world__')).toBe('__helloWorld__')
   expect(formatName.arg('HELLO_WORLD_')).toBe('helloWorld_')
+  expect(formatName.arg('person_id_1')).toBe('personId1')
+  expect(formatName.arg('person_id_2')).toBe('personId2')
 })
 
 test('enumValue will format in constant case', () => {
@@ -42,4 +48,6 @@ test('enumValue will format in constant case', () => {
   expect(formatName.enumValue('_HelloWorld')).toBe('_HELLO_WORLD')
   expect(formatName.enumValue('__hello_world__')).toBe('__HELLO_WORLD__')
   expect(formatName.enumValue('HELLO_WORLD_')).toBe('HELLO_WORLD_')
+  expect(formatName.enumValue('person_id_1')).toBe('PERSON_ID_1')
+  expect(formatName.enumValue('person_id_2')).toBe('PERSON_ID_2')
 })

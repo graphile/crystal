@@ -31,7 +31,7 @@ interface Collection {
    * by.
    */
   // TODO: Test that we don’t have any keys with the same name.
-  readonly keys: Set<CollectionKey<mixed>>
+  readonly keys: Array<CollectionKey<mixed>>
 
   /**
    * Gets the primary unique identifier for this collection. While a

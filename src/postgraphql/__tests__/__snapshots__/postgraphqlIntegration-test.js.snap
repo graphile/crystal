@@ -3,9 +3,10 @@ exports[`test forum example 1`] = `
   query: Query
 }
 
-type CompoundKey {
-  personId_2: Int!
-  personId_1: Int!
+type CompoundKey implements Node {
+  __id: ID!
+  personId2: Int!
+  personId1: Int!
 }
 
 scalar Email
@@ -18,7 +19,8 @@ type NoUpdate {
   column: Int
 }
 
-type Person {
+type Person implements Node {
+  __id: ID!
   id: Int!
   name: String!
   about: String
@@ -26,7 +28,8 @@ type Person {
   createdAt: String
 }
 
-type Post {
+type Post implements Node {
+  __id: ID!
   id: Int!
   headline: String!
   body: String
@@ -35,6 +38,13 @@ type Post {
 
 type Query {
   node(__id: ID!): Node
+  post(__id: ID!): Post
+  postById(id: Int!): Post
+  person(__id: ID!): Person
+  personById(id: Int!): Person
+  personByEmail(email: Email): Person
+  compoundKey(__id: ID!): CompoundKey
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 }
 
 type UpdatableView {
