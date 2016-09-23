@@ -42,7 +42,7 @@
     "typescript": "^2.1.0-dev.20160903"
   },
   "jest": {
-    "scriptPreprocessor": "<rootDir>/utils/jest-preprocessor.js",
+    "scriptPreprocessor": "<rootDir>/resources/jest-preprocessor.js",
     "moduleFileExtensions": [
       "ts",
       "js"
