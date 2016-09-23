@@ -62,7 +62,7 @@ Object {
       "typeId": "uuid"
     },
     Object {
-      "classId": "no_update",
+      "classId": "non_updatable_view",
       "description": null,
       "hasDefault": false,
       "isNotNull": false,
@@ -162,12 +162,82 @@ Object {
       "typeId": "int4"
     },
     Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "bigint",
+      "num": 1,
+      "typeId": "int8"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "boolean",
+      "num": 2,
+      "typeId": "bool"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "varchar",
+      "num": 3,
+      "typeId": "varchar"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "enum",
+      "num": 4,
+      "typeId": "color"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "domain",
+      "num": 5,
+      "typeId": "an_int"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "domain2",
+      "num": 6,
+      "typeId": "another_int"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "compound_type",
+      "num": 7,
+      "typeId": "compound_type"
+    },
+    Object {
       "classId": "updatable_view",
       "description": null,
       "hasDefault": false,
       "isNotNull": false,
       "kind": "attribute",
-      "name": "__id",
+      "name": "x",
       "num": 1,
       "typeId": "int4"
     },
@@ -229,15 +299,15 @@ Object {
     },
     Object {
       "description": null,
-      "id": "no_update",
+      "id": "non_updatable_view",
       "isDeletable": false,
       "isInsertable": false,
       "isSelectable": true,
       "isUpdatable": false,
       "kind": "class",
-      "name": "no_update",
+      "name": "non_updatable_view",
       "namespaceId": "a",
-      "typeId": "no_update"
+      "typeId": "non_updatable_view"
     },
     Object {
       "description": "Person test comment",
@@ -262,6 +332,18 @@ Object {
       "name": "post",
       "namespaceId": "a",
       "typeId": "post"
+    },
+    Object {
+      "description": null,
+      "id": "types",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "types",
+      "namespaceId": "b",
+      "typeId": "types"
     },
     Object {
       "description": "YOYOYO!!",
@@ -384,6 +466,60 @@ Object {
   ],
   "types": Array [
     Object {
+      "baseTypeId": Object {
+        "baseTypeId": null,
+        "category": "N",
+        "classId": null,
+        "description": "-2 billion to 2 billion integer, 4-byte storage",
+        "enumVariants": null,
+        "id": "23",
+        "isNotNull": false,
+        "itemId": null,
+        "kind": "type",
+        "name": "int4",
+        "namespaceId": "11",
+        "type": "b"
+      },
+      "category": "N",
+      "classId": null,
+      "description": null,
+      "enumVariants": null,
+      "id": "an_int",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "an_int",
+      "namespaceId": "a",
+      "type": "d"
+    },
+    Object {
+      "baseTypeId": Object {
+        "baseTypeId": "23",
+        "category": "N",
+        "classId": null,
+        "description": null,
+        "enumVariants": null,
+        "id": "1530543",
+        "isNotNull": false,
+        "itemId": null,
+        "kind": "type",
+        "name": "an_int",
+        "namespaceId": "1530465",
+        "type": "d"
+      },
+      "category": "N",
+      "classId": null,
+      "description": null,
+      "enumVariants": null,
+      "id": "another_int",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "another_int",
+      "namespaceId": "b",
+      "type": "d"
+    },
+    Object {
       "baseTypeId": null,
       "category": "E",
       "classId": null,
@@ -459,14 +595,14 @@ Object {
     Object {
       "baseTypeId": null,
       "category": "C",
-      "classId": "no_update",
+      "classId": "non_updatable_view",
       "description": null,
       "enumVariants": null,
-      "id": "no_update",
+      "id": "non_updatable_view",
       "isNotNull": false,
       "itemId": null,
       "kind": "type",
-      "name": "no_update",
+      "name": "non_updatable_view",
       "namespaceId": "a",
       "type": "c"
     },
@@ -501,6 +637,20 @@ Object {
     Object {
       "baseTypeId": null,
       "category": "C",
+      "classId": "types",
+      "description": null,
+      "enumVariants": null,
+      "id": "types",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "types",
+      "namespaceId": "b",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
       "classId": "updatable_view",
       "description": null,
       "enumVariants": null,
@@ -520,7 +670,7 @@ exports[`test will get everything needed in an introspection 2`] = `
 Object {
   "attributes": Array [
     Object {
-      "classId": "no_update",
+      "classId": "non_updatable_view",
       "description": null,
       "hasDefault": false,
       "isNotNull": false,
@@ -573,15 +723,15 @@ Object {
   "classes": Array [
     Object {
       "description": null,
-      "id": "no_update",
+      "id": "non_updatable_view",
       "isDeletable": false,
       "isInsertable": false,
       "isSelectable": true,
       "isUpdatable": false,
       "kind": "class",
-      "name": "no_update",
+      "name": "non_updatable_view",
       "namespaceId": "a",
-      "typeId": "no_update"
+      "typeId": "non_updatable_view"
     },
     Object {
       "description": null,
@@ -619,16 +769,43 @@ Object {
   ],
   "types": Array [
     Object {
-      "baseTypeId": null,
-      "category": "C",
-      "classId": "no_update",
+      "baseTypeId": Object {
+        "baseTypeId": null,
+        "category": "N",
+        "classId": null,
+        "description": "-2 billion to 2 billion integer, 4-byte storage",
+        "enumVariants": null,
+        "id": "23",
+        "isNotNull": false,
+        "itemId": null,
+        "kind": "type",
+        "name": "int4",
+        "namespaceId": "11",
+        "type": "b"
+      },
+      "category": "N",
+      "classId": null,
       "description": null,
       "enumVariants": null,
-      "id": "no_update",
+      "id": "an_int",
       "isNotNull": false,
       "itemId": null,
       "kind": "type",
-      "name": "no_update",
+      "name": "an_int",
+      "namespaceId": "a",
+      "type": "d"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "non_updatable_view",
+      "description": null,
+      "enumVariants": null,
+      "id": "non_updatable_view",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "non_updatable_view",
       "namespaceId": "a",
       "type": "c"
     },

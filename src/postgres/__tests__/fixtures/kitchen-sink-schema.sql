@@ -44,7 +44,7 @@ comment on type c.compound_type is 'Awesome feature!';
 
 create view b.updatable_view as
   select
-    id as __id,
+    id as x,
     name,
     about as description,
     2 as constant
@@ -54,7 +54,7 @@ create view b.updatable_view as
 comment on view b.updatable_view is 'YOYOYO!!';
 comment on column b.updatable_view.constant is 'This is constantly 2';
 
-create view a.no_update as select 2;
+create view a.non_updatable_view as select 2;
 
 create table c.compound_key (
   person_id_2 int references c.person(id),
@@ -69,42 +69,18 @@ create table c.compound_key (
 --   foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
 -- );
 
--- create table a.hello (
---   z_some int default 42,
---   world int,
---   moon int not null,
---   abc int default 2,
---   yoyo int
--- );
+create domain a.an_int as integer;
+create domain b.another_int as a.an_int;
 
--- comment on column a.hello.world is 'Hello, world!';
-
--- create view b.yo as
---   select
---     world,
---     moon,
---     2 as constant
---   from
---     a.hello;
-
--- create view c.no_update as
---   select
---     (1 + 1) as col1;
-
--- comment on view b.yo is 'YOYOYO!!';
--- comment on column b.yo.constant is 'This is constantly 2';
-
--- create domain a.an_int as integer;
--- create domain b.another_int as a.an_int;
-
--- create table a.types (
---   "bigint" bigint,
---   "boolean" boolean,
---   "varchar" varchar,
---   "enum" b.color,
---   "domain" a.an_int,
---   "domain2" b.another_int
--- );
+create table b.types (
+  "bigint" bigint,
+  "boolean" boolean,
+  "varchar" varchar,
+  "enum" b.color,
+  "domain" a.an_int,
+  "domain2" b.another_int,
+  "compound_type" c.compound_type
+);
 
 -- create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
 -- create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;

@@ -3,6 +3,16 @@ exports[`test forum example 1`] = `
   query: Query
 }
 
+scalar AnInt
+
+scalar AnotherInt
+
+enum Color {
+  RED
+  GREEN
+  BLUE
+}
+
 type CompoundKey implements Node {
   __id: ID!
   personId2: Int!
@@ -33,6 +43,13 @@ enum CompoundKeysOrderBy {
   PERSON_ID_1_DESC
 }
 
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+}
+
 scalar Cursor
 
 scalar Email
@@ -41,23 +58,23 @@ interface Node {
   __id: ID!
 }
 
-type NoUpdate {
+type NonUpdatableView {
   column: Int
 }
 
-type NoUpdatesConnection {
+type NonUpdatableViewsConnection {
   pageInfo: PageInfo!
   totalCount: Int
-  edges: [NoUpdatesEdge]
-  nodes: [NoUpdate!]
+  edges: [NonUpdatableViewsEdge]
+  nodes: [NonUpdatableView!]
 }
 
-type NoUpdatesEdge {
+type NonUpdatableViewsEdge {
   cursor: Cursor!
-  node: NoUpdate!
+  node: NonUpdatableView!
 }
 
-enum NoUpdatesOrderBy {
+enum NonUpdatableViewsOrderBy {
   NATURAL
   COLUMN_ASC
   COLUMN_DESC
@@ -148,7 +165,7 @@ type Query {
   post(__id: ID!): Post
   postById(id: Int!): Post
   allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
-  allNoUpdates(orderBy: NoUpdatesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NoUpdatesConnection
+  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
   allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
   person(__id: ID!): Person
   personById(id: Int!): Person
@@ -156,10 +173,51 @@ type Query {
   allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(__id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+  allTypes(orderBy: TypesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+}
+
+type Types {
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundType
+}
+
+type TypesConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [TypesEdge]
+  nodes: [Types!]
+}
+
+type TypesEdge {
+  cursor: Cursor!
+  node: Types!
+}
+
+enum TypesOrderBy {
+  NATURAL
+  BIGINT_ASC
+  BIGINT_DESC
+  BOOLEAN_ASC
+  BOOLEAN_DESC
+  VARCHAR_ASC
+  VARCHAR_DESC
+  ENUM_ASC
+  ENUM_DESC
+  DOMAIN_ASC
+  DOMAIN_DESC
+  DOMAIN2_ASC
+  DOMAIN2_DESC
+  COMPOUND_TYPE_ASC
+  COMPOUND_TYPE_DESC
 }
 
 type UpdatableView {
-  __id: Int
+  x: Int
   name: String
   description: String
   constant: Int
@@ -179,8 +237,8 @@ type UpdatableViewsEdge {
 
 enum UpdatableViewsOrderBy {
   NATURAL
-  __ID_ASC
-  __ID_DESC
+  X_ASC
+  X_DESC
   NAME_ASC
   NAME_DESC
   DESCRIPTION_ASC
@@ -188,12 +246,24 @@ enum UpdatableViewsOrderBy {
   CONSTANT_ASC
   CONSTANT_DESC
 }
+
+scalar Uuid
 "
 `;
 
 exports[`test forum example 2`] = `
 "schema {
   query: Query
+}
+
+scalar AnInt
+
+scalar AnotherInt
+
+enum Color {
+  RED
+  GREEN
+  BLUE
 }
 
 type CompoundKey implements Node {
@@ -226,6 +296,13 @@ enum CompoundKeysOrderBy {
   PERSON_ID_1_DESC
 }
 
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+}
+
 scalar Cursor
 
 scalar Email
@@ -234,23 +311,23 @@ interface Node {
   id: ID!
 }
 
-type NoUpdate {
+type NonUpdatableView {
   column: Int
 }
 
-type NoUpdatesConnection {
+type NonUpdatableViewsConnection {
   pageInfo: PageInfo!
   totalCount: Int
-  edges: [NoUpdatesEdge]
-  nodes: [NoUpdate!]
+  edges: [NonUpdatableViewsEdge]
+  nodes: [NonUpdatableView!]
 }
 
-type NoUpdatesEdge {
+type NonUpdatableViewsEdge {
   cursor: Cursor!
-  node: NoUpdate!
+  node: NonUpdatableView!
 }
 
-enum NoUpdatesOrderBy {
+enum NonUpdatableViewsOrderBy {
   NATURAL
   COLUMN_ASC
   COLUMN_DESC
@@ -341,7 +418,7 @@ type Query {
   post(id: ID!): Post
   postByRowId(rowId: Int!): Post
   allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
-  allNoUpdates(orderBy: NoUpdatesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NoUpdatesConnection
+  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
   allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
   person(id: ID!): Person
   personByRowId(rowId: Int!): Person
@@ -349,10 +426,51 @@ type Query {
   allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+  allTypes(orderBy: TypesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+}
+
+type Types {
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundType
+}
+
+type TypesConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [TypesEdge]
+  nodes: [Types!]
+}
+
+type TypesEdge {
+  cursor: Cursor!
+  node: Types!
+}
+
+enum TypesOrderBy {
+  NATURAL
+  BIGINT_ASC
+  BIGINT_DESC
+  BOOLEAN_ASC
+  BOOLEAN_DESC
+  VARCHAR_ASC
+  VARCHAR_DESC
+  ENUM_ASC
+  ENUM_DESC
+  DOMAIN_ASC
+  DOMAIN_DESC
+  DOMAIN2_ASC
+  DOMAIN2_DESC
+  COMPOUND_TYPE_ASC
+  COMPOUND_TYPE_DESC
 }
 
 type UpdatableView {
-  __id: Int
+  x: Int
   name: String
   description: String
   constant: Int
@@ -372,8 +490,8 @@ type UpdatableViewsEdge {
 
 enum UpdatableViewsOrderBy {
   NATURAL
-  __ID_ASC
-  __ID_DESC
+  X_ASC
+  X_DESC
   NAME_ASC
   NAME_DESC
   DESCRIPTION_ASC
@@ -381,5 +499,7 @@ enum UpdatableViewsOrderBy {
   CONSTANT_ASC
   CONSTANT_DESC
 }
+
+scalar Uuid
 "
 `;
