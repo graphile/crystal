@@ -13,7 +13,7 @@ export default function addPGToInventory (
   config: {
     renameIdToRowId?: boolean,
   } = {},
-) {
+): void {
   // Turn our config full of optional options, into an options object with the
   // appropriate defaults.
   const options: Options = {

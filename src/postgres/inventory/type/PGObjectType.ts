@@ -20,21 +20,32 @@ class PGObjectType extends ObjectType {
   // Overrides the `fields` type so that we recognize our custom field type.
   public readonly fields: Map<string, PGObjectType.Field<mixed>>
 
+  /**
+   * Private maps which act as indexes of the relationship between field names
+   * and Postgres attribute names.
+   *
+   * @private
+   */
+  private _fieldNameToPGAttributeName = new Map<string, string>()
+  private _pgAttributeNameToFieldName = new Map<string, string>()
+
   constructor (config: {
     name: string,
     description?: string | undefined,
     pgCatalog: PGCatalog,
-    pgAttributes: Array<PGCatalogAttribute>,
-    renameIdToRowId?: boolean,
+    pgAttributes: Array<PGCatalogAttribute> | Map<string, PGCatalogAttribute>,
   }) {
     super({
       name: config.name,
       description: config.description,
       fields: new Map<string, PGObjectType.Field<mixed>>(
         // Creates fields using the provided `pgAttributes` array.
-        config.pgAttributes.map<[string, PGObjectType.Field<mixed>]>(pgAttribute => {
-          const fieldName = config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name
-          return [fieldName, {
+        Array.from(
+          Array.isArray(config.pgAttributes)
+            ? new Map(config.pgAttributes.map<[string, PGCatalogAttribute]>(pgAttribute => [pgAttribute.name, pgAttribute]))
+            : config.pgAttributes
+        ).map<[string, PGObjectType.Field<mixed>]>(([fieldName, pgAttribute]) =>
+          [fieldName, {
             description: pgAttribute.description,
 
             // Make sure that if our attribute specifies that it is non-null,
@@ -53,16 +64,48 @@ class PGObjectType extends ObjectType {
             // our custom field type.
             pgAttribute,
           }]
-        })
+        )
       ),
     })
+
+    // Create our indexes of `fieldName` to `pgAttribute.name`. We can use
+    // these indexes to rename keys where appropriate.
+    for (const [fieldName, { pgAttribute }] of this.fields) {
+      if (this._pgAttributeNameToFieldName.has(pgAttribute.name))
+        throw new Error('Cannot use a Postgres attribute with the same name twice in a single object type.')
+
+      this._fieldNameToPGAttributeName.set(fieldName, pgAttribute.name)
+      this._pgAttributeNameToFieldName.set(pgAttribute.name, fieldName)
+    }
   }
 
-  // TODO: This was added for the sketchy `PGRelation` implementation.
-  // Implement it better!
-  public getPGAttributeFieldName (pgAttribute: PGCatalogAttribute): string | undefined {
-    const fieldEntry = Array.from(this.fields).find(([fieldName, field]) => field.pgAttribute === pgAttribute)
-    return fieldEntry && fieldEntry[0]
+  /**
+   * Converts a row returned by Postgres into the correct value object.
+   */
+  // TODO: test
+  public rowToValue (row: { [key: string]: mixed }): PGObjectType.Value {
+    const value = new Map<string, mixed>()
+
+    for (const [fieldName, { pgAttribute }] of this.fields)
+      value.set(fieldName, row[pgAttribute.name])
+
+    return value
+  }
+
+  /**
+   * Converts a field name into the appropriate Postgres attribute name.
+   */
+  // TODO: test
+  public getPGAttributeNameFromFieldName (fieldName: string): string | undefined {
+    return this._fieldNameToPGAttributeName.get(fieldName)
+  }
+
+  /**
+   * Converts a Postgres attribute name to the appropriate field name.
+   */
+  // TODO: test
+  public getFieldNameFromPGAttributeName (pgAttributeName: string): string | undefined {
+    return this._pgAttributeNameToFieldName.get(pgAttributeName)
   }
 }
 

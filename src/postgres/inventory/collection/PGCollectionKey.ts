@@ -1,7 +1,7 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { CollectionKey, Type } from '../../../interface'
-import { sql, memoizeMethod, objectToMap } from '../../utils'
+import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
 import isPGContext from '../isPGContext'
 import PGObjectType from '../type/PGObjectType'
@@ -36,8 +36,9 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
     // be private. The name could change at any time.
     name: `_${this._pgConstraint.name}`,
     pgCatalog: this._pgCatalog,
-    pgAttributes: this._pgKeyAttributes,
-    renameIdToRowId: this._options.renameIdToRowId,
+    pgAttributes: new Map(this._pgKeyAttributes.map<[string, PGCatalogAttribute]>(pgAttribute =>
+      [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
+    )),
   })
 
   /**
@@ -155,7 +156,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         `)()
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => object == null ? null : objectToMap(object))
+        return rows.map(({ object }) => object == null ? null : this.collection.type.rowToValue(object))
       }
     )
   }
@@ -186,17 +187,14 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
             set ${sql.join(Array.from(patch).map(([fieldName, value]) => {
-              const collectionField = this.collection.type.fields.get(fieldName)
+              const pgAttributeName = this.collection.type.getPGAttributeNameFromFieldName(fieldName)
 
-              if (!collectionField)
+              if (pgAttributeName == null)
                 throw new Error(`Cannot update field named '${fieldName}' because it does not exist in collection '${this.collection.name}'.`)
 
               // Use the actual name of the Postgres attribute when
               // comparing, not the field name which may be different.
-              return sql.query`
-                ${sql.identifier(collectionField.pgAttribute.name)} =
-                ${value === null ? sql.raw('null') : sql.value(value)}
-              `
+              return sql.query`${sql.identifier(pgAttributeName)} = ${value === null ? sql.raw('null') : sql.value(value)}`
             }), ', ')}
 
             where ${this._getSQLKeyCondition(key)}
@@ -210,7 +208,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were updated in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
-        return objectToMap(result.rows[0]['object'])
+        return this.collection.type.rowToValue(result.rows[0]['object'])
       }
   )
 
@@ -246,7 +244,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were deleted in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
-        return objectToMap(result.rows[0]['object'])
+        return this.collection.type.rowToValue(result.rows[0]['object'])
       }
   )
 }

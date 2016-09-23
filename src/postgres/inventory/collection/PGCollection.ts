@@ -2,12 +2,13 @@ import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { Collection, Type, NullableType } from '../../../interface'
-import { memoize1, sql, memoizeMethod, objectToMap } from '../../utils'
+import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import Options from '../Options'
 import isPGContext from '../isPGContext'
 import PGCollectionKey from './PGCollectionKey'
+import PGCollectionPaginator from './PGCollectionPaginator'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
@@ -18,7 +19,7 @@ class PGCollection implements Collection {
   constructor (
     public _options: Options,
     public _pgCatalog: PGCatalog,
-    private _pgClass: PGCatalogClass,
+    public _pgClass: PGCatalogClass,
   ) {}
 
   /**
@@ -49,8 +50,9 @@ class PGCollection implements Collection {
     name: this._pgClass.name,
     description: this._pgClass.description,
     pgCatalog: this._pgCatalog,
-    pgAttributes: this._pgAttributes,
-    renameIdToRowId: this._options.renameIdToRowId,
+    pgAttributes: new Map(this._pgAttributes.map<[string, PGCatalogAttribute]>(pgAttribute =>
+      [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
+    )),
   })
 
   /**
@@ -82,7 +84,7 @@ class PGCollection implements Collection {
    */
   public primaryKey = this.keys.find(key => key._pgConstraint.type === 'p')
 
-  public paginator = null
+  public paginator = new PGCollectionPaginator(this)
 
   // If we can’t insert into this class, there should be no `create`
   // function. Otherwise our `create` method is pretty basic.
@@ -135,7 +137,7 @@ class PGCollection implements Collection {
         `)()
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => objectToMap(object))
+        return rows.map(({ object }) => this.type.rowToValue(object))
       }
     )
   }

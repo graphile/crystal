@@ -48,12 +48,12 @@ test('_cursorType will correctly parse literals', () => {
 
 test('_pageInfoType will get hasNextPage correctly', () => {
   const hasNext = Symbol('hasNext')
-  expect(_pageInfoType.getFields().hasNextPage.resolve({ page: { hasNext } })).toBe(hasNext)
+  expect(_pageInfoType.getFields().hasNextPage.resolve({ page: { hasNextPage: () => hasNext } })).toBe(hasNext)
 })
 
 test('_pageInfoType will get hasPreviousPage correctly', () => {
   const hasPrevious = Symbol('hasPrevious')
-  expect(_pageInfoType.getFields().hasPreviousPage.resolve({ page: { hasPrevious } })).toBe(hasPrevious)
+  expect(_pageInfoType.getFields().hasPreviousPage.resolve({ page: { hasPreviousPage: () => hasPrevious } })).toBe(hasPrevious)
 })
 
 test('_pageInfoType will get the correct start cursor', () => {
@@ -128,7 +128,7 @@ test('_createEdgeType will just return the value for the node field', () => {
 test('_createOrderByEnumType will create an enum type with all the paginator orderings', () => {
   const a = Symbol('a')
   const b = Symbol('b')
-  const orderings = new Set([{ name: 'a', a }, { name: 'b', b }])
+  const orderings = [{ name: 'a', a }, { name: 'b', b }]
   const paginator = { name: 'bar', orderings }
   const enumType = _createOrderByEnumType({}, paginator)
 

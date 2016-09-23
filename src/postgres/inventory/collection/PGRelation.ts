@@ -15,7 +15,7 @@ class PGRelation implements Relation<PGObjectType.Value> {
 
   private _pgCatalog = this.tailCollection._pgCatalog
   private _pgTailAttributes = this._pgCatalog.getClassAttributes(this._pgConstraint.classId, this._pgConstraint.keyAttributeNums)
-  private _tailFieldNames = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getPGAttributeFieldName(pgAttribute)!)
+  private _tailFieldNames = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getFieldNameFromPGAttributeName(pgAttribute.name)!)
   private _headFieldNames = Array.from(this.headCollectionKey.keyType.fields.keys())
 
   /**

@@ -62,10 +62,10 @@ const personOrderings = [
   { name: 'lastName-asc' }, { name: 'lastName-desc' },
 ]
 
-const personPaginator: Paginator<ObjectType.Value, mixed> = {
+const personPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = {
   name: 'people',
   type: personType,
-  orderings: new Set(personOrderings),
+  orderings: personOrderings,
   defaultOrdering: personOrderings[0],
   count: unimplementedFn,
   readPage: unimplementedFn,
@@ -114,10 +114,10 @@ const postOrderings = [
   { name: 'headline-asc' }, { name: 'headline-desc' },
 ]
 
-const postPaginator: Paginator<ObjectType.Value, mixed> = {
+const postPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = {
   name: 'posts',
   type: postType,
-  orderings: new Set(postOrderings),
+  orderings: postOrderings,
   defaultOrdering: postOrderings[0],
   count: unimplementedFn,
   readPage: unimplementedFn,

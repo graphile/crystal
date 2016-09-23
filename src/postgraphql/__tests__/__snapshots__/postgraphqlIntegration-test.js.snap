@@ -11,6 +11,30 @@ type CompoundKey implements Node {
   personByPersonId1: Person
 }
 
+type CompoundKeysConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [CompoundKeysEdge]
+  nodes: [CompoundKey!]
+}
+
+type CompoundKeysEdge {
+  cursor: Cursor!
+  node: CompoundKey!
+}
+
+enum CompoundKeysOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
+  PERSON_ID_1_ASC
+  PERSON_ID_1_DESC
+}
+
+scalar Cursor
+
 scalar Email
 
 interface Node {
@@ -19,6 +43,59 @@ interface Node {
 
 type NoUpdate {
   column: Int
+}
+
+type NoUpdatesConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [NoUpdatesEdge]
+  nodes: [NoUpdate!]
+}
+
+type NoUpdatesEdge {
+  cursor: Cursor!
+  node: NoUpdate!
+}
+
+enum NoUpdatesOrderBy {
+  NATURAL
+  COLUMN_ASC
+  COLUMN_DESC
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+type PeopleConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PeopleEdge]
+  nodes: [Person!]
+}
+
+type PeopleEdge {
+  cursor: Cursor!
+  node: Person!
+}
+
+enum PeopleOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ABOUT_ASC
+  ABOUT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
 }
 
 type Person implements Node {
@@ -39,13 +116,44 @@ type Post implements Node {
   personByAuthorId: Person
 }
 
+type PostsConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PostsEdge]
+  nodes: [Post!]
+}
+
+type PostsEdge {
+  cursor: Cursor!
+  node: Post!
+}
+
+enum PostsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+  BODY_ASC
+  BODY_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+}
+
 type Query {
   node(__id: ID!): Node
+  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
+  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
+  allNoUpdates(orderBy: NoUpdatesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NoUpdatesConnection
+  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
   person(__id: ID!): Person
   personById(id: Int!): Person
   personByEmail(email: Email): Person
+  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(__id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 }
@@ -55,6 +163,30 @@ type UpdatableView {
   name: String
   description: String
   constant: Int
+}
+
+type UpdatableViewsConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [UpdatableViewsEdge]
+  nodes: [UpdatableView!]
+}
+
+type UpdatableViewsEdge {
+  cursor: Cursor!
+  node: UpdatableView!
+}
+
+enum UpdatableViewsOrderBy {
+  NATURAL
+  __ID_ASC
+  __ID_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  CONSTANT_ASC
+  CONSTANT_DESC
 }
 "
 `;
@@ -72,6 +204,30 @@ type CompoundKey implements Node {
   personByPersonId1: Person
 }
 
+type CompoundKeysConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [CompoundKeysEdge]
+  nodes: [CompoundKey!]
+}
+
+type CompoundKeysEdge {
+  cursor: Cursor!
+  node: CompoundKey!
+}
+
+enum CompoundKeysOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
+  PERSON_ID_1_ASC
+  PERSON_ID_1_DESC
+}
+
+scalar Cursor
+
 scalar Email
 
 interface Node {
@@ -80,6 +236,59 @@ interface Node {
 
 type NoUpdate {
   column: Int
+}
+
+type NoUpdatesConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [NoUpdatesEdge]
+  nodes: [NoUpdate!]
+}
+
+type NoUpdatesEdge {
+  cursor: Cursor!
+  node: NoUpdate!
+}
+
+enum NoUpdatesOrderBy {
+  NATURAL
+  COLUMN_ASC
+  COLUMN_DESC
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+type PeopleConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PeopleEdge]
+  nodes: [Person!]
+}
+
+type PeopleEdge {
+  cursor: Cursor!
+  node: Person!
+}
+
+enum PeopleOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ABOUT_ASC
+  ABOUT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
 }
 
 type Person implements Node {
@@ -100,13 +309,44 @@ type Post implements Node {
   personByAuthorId: Person
 }
 
+type PostsConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [PostsEdge]
+  nodes: [Post!]
+}
+
+type PostsEdge {
+  cursor: Cursor!
+  node: Post!
+}
+
+enum PostsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+  BODY_ASC
+  BODY_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+}
+
 type Query {
   node(id: ID!): Node
+  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(id: ID!): Post
   postByRowId(rowId: Int!): Post
+  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
+  allNoUpdates(orderBy: NoUpdatesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NoUpdatesConnection
+  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
   person(id: ID!): Person
   personByRowId(rowId: Int!): Person
   personByEmail(email: Email): Person
+  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 }
@@ -116,6 +356,30 @@ type UpdatableView {
   name: String
   description: String
   constant: Int
+}
+
+type UpdatableViewsConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [UpdatableViewsEdge]
+  nodes: [UpdatableView!]
+}
+
+type UpdatableViewsEdge {
+  cursor: Cursor!
+  node: UpdatableView!
+}
+
+enum UpdatableViewsOrderBy {
+  NATURAL
+  __ID_ASC
+  __ID_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  CONSTANT_ASC
+  CONSTANT_DESC
 }
 "
 `;

@@ -28,7 +28,7 @@ import Condition from './Condition'
  * that *all* of the cursors in the *entire* collection can change on seemingly
  * trivial writes which is non-ideal.
  */
-interface Paginator<TValue, TCursor> {
+interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
   /**
    * The name of the paginator. This name can be used to help
    * distinguish cursors when mixed with different paginators.
@@ -50,12 +50,12 @@ interface Paginator<TValue, TCursor> {
   // should probably be checked in this abstract level as to prevent logic
   // duplication. Instead this function is currently delegated to the
   // consumers of this abstraction.
-  readonly orderings: Set<Paginator.Ordering>
+  readonly orderings: Array<TOrdering>
 
   /**
    * The default ordering for our paginated values.
    */
-  readonly defaultOrdering: Paginator.Ordering | undefined
+  readonly defaultOrdering: TOrdering
 
   /**
    * Gets the total count of values in our collection. If a condition is
@@ -75,7 +75,7 @@ interface Paginator<TValue, TCursor> {
    */
   readPage (
     context: mixed,
-    config: Paginator.PageConfig<TCursor>,
+    config: Paginator.PageConfig<TOrdering, TCursor>,
   ): Promise<Paginator.Page<TValue, TCursor>>
 }
 
@@ -83,9 +83,9 @@ interface Paginator<TValue, TCursor> {
 // while at the same time being able to reference types that will be needed
 // with `CollectionPaginator.Page`, for example.
 namespace Paginator {
-  // TODO: doc this
-  export type Ordering = {
-    name: string,
+  // TODO: doc
+  export interface Ordering {
+    readonly name: string
   }
 
   /**
@@ -98,12 +98,12 @@ namespace Paginator {
    * however, we chose to read backwards using the same cursor and limit. Then
    * our set (page) would be `[2, 3]`. Note that the set would not be `[3, 2]`.
    */
-  export type PageConfig<TCursor> = {
+  export type PageConfig<TOrdering, TCursor> = {
+    ordering: TOrdering,
     beforeCursor?: TCursor,
     afterCursor?: TCursor,
     first?: number,
     last?: number,
-    ordering?: Paginator.Ordering,
     condition?: Condition,
   }
 
@@ -122,8 +122,8 @@ namespace Paginator {
   // constraint on a type level? Instead, instances must make these checks.
   export type Page<TValue, TCursor> = {
     values: Array<{ value: TValue, cursor: TCursor }>,
-    hasNext: boolean,
-    hasPrevious: boolean,
+    hasNextPage (): Promise<boolean>,
+    hasPreviousPage (): Promise<boolean>,
   }
 }
 
