@@ -10,7 +10,7 @@ import PGCatalog from './PGCatalog'
  * is SQL.
  */
 const introspectionQuery = new Promise<string>((resolve, reject) => {
-  readFile(path.resolve(__dirname, '../../../queries/introspection.sql'), (error, data) => {
+  readFile(path.resolve(__dirname, '../../../resources/introspection-query.sql'), (error, data) => {
     if (error) reject(error)
     else resolve(minify(data.toString()))
   })

@@ -1,3 +1,5 @@
+begin;
+
 drop schema if exists a cascade;
 drop schema if exists b cascade;
 drop schema if exists c cascade;
@@ -106,3 +108,5 @@ create table b.types (
 --   b text not null,
 --   unique (a, b)
 -- );
+
+commit;

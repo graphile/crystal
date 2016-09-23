@@ -1,0 +1,19 @@
+query {
+  allCompoundKeys {
+    nodes {
+      personId1
+      personId2
+      extra
+      personByPersonId1 {
+        name
+        email
+        createdAt
+      }
+      personByPersonId2 {
+        name
+        email
+        createdAt
+      }
+    }
+  }
+}

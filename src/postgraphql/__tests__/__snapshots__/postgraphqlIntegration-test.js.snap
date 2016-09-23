@@ -1,4 +1,105 @@
-exports[`test forum example 1`] = `
+exports[`test query relation-tail-head.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeys": Object {
+      "nodes": Array [
+        Object {
+          "extra": null,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "john.smith@email.com",
+            "name": "John Smith"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith"
+          },
+          "personId1": 1,
+          "personId2": 2
+        },
+        Object {
+          "extra": false,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "john.smith@email.com",
+            "name": "John Smith"
+          },
+          "personId1": 2,
+          "personId2": 1
+        },
+        Object {
+          "extra": null,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "budd.deey@email.com",
+            "name": "Budd Deey"
+          },
+          "personId1": 2,
+          "personId2": 3
+        },
+        Object {
+          "extra": true,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "johnny.tucker@email.com",
+            "name": "Johnny Tucker"
+          },
+          "personId1": 2,
+          "personId2": 5
+        },
+        Object {
+          "extra": true,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "budd.deey@email.com",
+            "name": "Budd Deey"
+          },
+          "personId1": 4,
+          "personId2": 3
+        },
+        Object {
+          "extra": false,
+          "personByPersonId1": Object {
+            "createdAt": null,
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez"
+          },
+          "personByPersonId2": Object {
+            "createdAt": null,
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez"
+          },
+          "personId1": 4,
+          "personId2": 4
+        }
+      ]
+    }
+  }
+}
+`;
+
+exports[`test schema 1`] = `
 "schema {
   query: Query
 }
@@ -254,7 +355,7 @@ scalar Uuid
 "
 `;
 
-exports[`test forum example 2`] = `
+exports[`test schema 2`] = `
 "schema {
   query: Query
 }

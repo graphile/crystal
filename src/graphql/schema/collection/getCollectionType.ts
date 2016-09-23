@@ -14,48 +14,40 @@ const _getCollectionType = memoize2(createCollectionType)
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<GraphQLCollectionValue> {
+function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
   return _getCollectionType(buildToken, collection)
 }
 
 export default getCollectionType
 
 /**
- * The type of the value used internally by our GraphQL schema.
- */
-export type GraphQLCollectionValue = {
-  collection: Collection,
-  value: ObjectType.Value,
-}
-
-/**
  * The private non-memoized implementation of `getCollectionType`.
  *
  * @private
  */
-function createCollectionType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<GraphQLCollectionValue> {
+function createCollectionType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
 
-  return new GraphQLObjectType<GraphQLCollectionValue>({
+  return new GraphQLObjectType<ObjectType.Value>({
     name: formatName.type(type.name),
     description: collection.description,
 
-    isTypeOf: value => value.collection === collection,
+    isTypeOf: value => type.isTypeOf(value),
 
     // If there is a primary key, this is a node.
     interfaces: primaryKey ? [getNodeInterfaceType(buildToken)] : [],
 
     // We make `fields` here a thunk because we don’t want to eagerly create
     // types for collections used in this type.
-    fields: () => buildObject<GraphQLFieldConfig<GraphQLCollectionValue, mixed>>(
+    fields: () => buildObject<GraphQLFieldConfig<ObjectType.Value, mixed>>(
       // Our id field. It is powered by the collection’s primary key. If we
       // have no primary key, we have no id field.
       [
         primaryKey && [options.nodeIdFieldName, {
           // TODO: description
           type: new GraphQLNonNull(GraphQLID),
-          resolve: ({ value }) =>
+          resolve: value =>
             idSerde.serialize({
               name: collection.name,
               key: primaryKey.getKeyFromValue(value),
@@ -65,11 +57,11 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
 
       // Add all of the basic fields to our type.
       Array.from(type.fields.entries())
-        .map(<TFieldValue>([fieldName, field]: [string, ObjectType.Field<TFieldValue>]): [string, GraphQLFieldConfig<GraphQLCollectionValue, TFieldValue>] =>
+        .map(<TFieldValue>([fieldName, field]: [string, ObjectType.Field<TFieldValue>]): [string, GraphQLFieldConfig<ObjectType.Value, TFieldValue>] =>
           [formatName.field(fieldName), {
             description: field.description,
             type: getType(buildToken, field.type, false) as GraphQLOutputType<TFieldValue>,
-            resolve: ({ value }) =>
+            resolve: value =>
               // Since we get `mixed` back here from the map, we’re just going
               // to assume the type is ok instead of running an `isTypeOf`
               // check. Generally `isTypeOf` isn’t super efficient so we only
@@ -90,7 +82,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
           relation.headCollectionKey.read != null
         )
         // Transform the relation into a field entry.
-        .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<GraphQLCollectionValue, GraphQLCollectionValue>] => {
+        .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
           const headCollectionKey = relation.headCollectionKey
           const headCollection = headCollectionKey.collection
 
@@ -98,17 +90,14 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
             // TODO: description
             type: getCollectionType(buildToken, headCollection),
 
-            async resolve ({ value }, args, context): Promise<GraphQLCollectionValue | undefined> {
+            async resolve (value, args, context): Promise<ObjectType.Value | undefined> {
               const key = relation.getHeadKeyFromTailValue(value)
               const headValue = await headCollectionKey.read!(context, key)
 
               if (!headValue)
                 return
 
-              return {
-                collection: headCollection,
-                value: headValue,
-              }
+              return headValue
             },
           }]
         }),

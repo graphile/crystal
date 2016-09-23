@@ -15,7 +15,7 @@ const pool = new Pool({
 })
 
 const kitchenSinkSchema = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, 'kitchen-sink-schema.sql'), (error, data) => {
+  readFile(resolvePath(__dirname, '../../../../resources/kitchen-sink-schema.sql'), (error, data) => {
     if (error) reject(error)
     else resolve(minify(data.toString()))
   })

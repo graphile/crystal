@@ -34,7 +34,7 @@ export default function createCollectionQueryFieldEntries (
   // the primary key in this instance. Instead using a GraphQL native format,
   // the id format.
   if (primaryKey) {
-    const field = createCollectionPrimaryKeyField(buildToken, collection, primaryKey)
+    const field = createCollectionPrimaryKeyField(buildToken, primaryKey)
 
     // If we got a field back, add it.
     if (field) entries.push([formatName.field(type.name), field])
@@ -43,7 +43,7 @@ export default function createCollectionQueryFieldEntries (
   // Add a field to select any value in the collection by any key. So all
   // unique keys of an object will be usable to select a single value.
   for (const collectionKey of collection.keys) {
-    const field = createCollectionKeyField(buildToken, collection, collectionKey)
+    const field = createCollectionKeyField(buildToken, collectionKey)
 
     // If we got a field back, add it.
     if (field) entries.push([formatName.field(`${type.name}-by-${collectionKey.name}`), field])
@@ -58,14 +58,13 @@ export default function createCollectionQueryFieldEntries (
  */
 function createCollectionPrimaryKeyField <TKey>(
   buildToken: BuildToken,
-  collection: Collection,
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
   const { options } = buildToken
-  const { read: collectionKeyRead } = collectionKey
+  const { collection } = collectionKey
 
   // If we can’t read from this collection key, stop.
-  if (collectionKeyRead == null) return
+  if (collectionKey.read == null) return
 
   return {
     // TODO: description
@@ -78,7 +77,7 @@ function createCollectionPrimaryKeyField <TKey>(
       },
     },
 
-    resolve: (source, args, context) => {
+    async resolve (source, args, context): Promise<ObjectType.Value | null> {
       const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
 
       if (name !== collection.name)
@@ -87,7 +86,7 @@ function createCollectionPrimaryKeyField <TKey>(
       if (!collectionKey.keyType.isTypeOf(key))
         throw new Error('The provided key is of the incorrect type.')
 
-      return collectionKeyRead(context, key)
+      return await collectionKey.read!(context, key)
     },
   }
 }
@@ -97,14 +96,13 @@ function createCollectionPrimaryKeyField <TKey>(
  */
 function createCollectionKeyField <TKey>(
   buildToken: BuildToken,
-  collection: Collection,
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
-  const { keyType, read: collectionKeyRead } = collectionKey
+  const { collection, keyType } = collectionKey
   const collectionType = getCollectionType(buildToken, collection)
 
   // If we can’t read from this collection key, stop.
-  if (collectionKeyRead == null) return
+  if (collectionKey.read == null) return
 
   // If the key type is an object type, we want to flatten the object fields
   // into distinct arguments.
@@ -120,11 +118,11 @@ function createCollectionKeyField <TKey>(
           }]
         )
       ),
-      resolve: (source, args, context) => {
+      async resolve (source, args, context): Promise<ObjectType.Value | null> {
         if (!keyType.isTypeOf(args))
           throw new Error('The provided arguments are not the correct type.')
 
-        return collectionKeyRead(context, args)
+        return await collectionKey.read!(context, args)
       },
     }
   }
@@ -140,13 +138,13 @@ function createCollectionKeyField <TKey>(
           type: getType(buildToken, keyType, true),
         },
       },
-      resolve: (source, args, context) => {
+      async resolve (source, args, context): Promise<ObjectType.Value | null> {
         const key: mixed = args['input']
 
         if (!keyType.isTypeOf(key))
           throw new Error('The provided arguments are not the correct type.')
 
-        return collectionKeyRead(context, key)
+        return await collectionKey.read!(context, key)
       },
     }
   }
