@@ -114,18 +114,20 @@ const resolveInsert = table => {
     const valueEntries = (
       columns
       .map(column => [column, input[column.getFieldName()]])
-      .filter(([, value]) => value)
+      .filter(([, value]) => value != null)
+    )
+
+    const query = (
+      new SQLBuilder()
+      .add(`insert into ${table.getIdentifier()}`)
+      .add(valueEntries.length === 0 ? '' : `(${valueEntries.map(([column]) => `"${column.name}"`).join(', ')})`)
+      .add(valueEntries.length === 0 ? 'default values' : 'values')
+      .add(valueEntries.length === 0 ? '' : `(${valueEntries.map(constant('$')).join(', ')})`, valueEntries.map(([, value]) => value))
+      .add('returning *')
     )
 
     // Insert the thing making sure we return the newly inserted row.
-    const { rows: [row] } = await client.queryAsync(
-      new SQLBuilder()
-      .add(`insert into ${table.getIdentifier()}`)
-      .add(`(${valueEntries.map(([column]) => `"${column.name}"`).join(', ')})`)
-      .add('values')
-      .add(`(${valueEntries.map(constant('$')).join(', ')})`, valueEntries.map(([, value]) => value))
-      .add('returning *')
-    )
+    const { rows: [row] } = await client.queryAsync(query)
 
     const output = row ? (row[$$rowTable] = table, row) : null
 

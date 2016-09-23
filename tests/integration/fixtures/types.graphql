@@ -1,0 +1,11 @@
+query Types {
+  anythingGoesNodes(orderBy: FOO) {
+    nodes {
+      foo
+      bar
+      interval
+      json
+      jsonb
+    }
+  }
+}
