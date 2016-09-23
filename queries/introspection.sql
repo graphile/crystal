@@ -16,6 +16,8 @@ with
       left join pg_catalog.pg_description as dsc on dsc.objoid = nsp.oid
     where
       nsp.nspname = any ($1)
+    order by
+      nsp.nspname
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-class.html
   class as (
@@ -49,6 +51,8 @@ with
       rel.relnamespace in (select "id" from namespace) and
       rel.relpersistence in ('p') and
       rel.relkind in ('r', 'v', 'm', 'c', 'f')
+    order by
+      rel.relnamespace, rel.relname
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-attribute.html
   attribute as (
@@ -116,6 +120,8 @@ with
       -- code to read. So we prefer code readability over selecting like 3 or
       -- 4 less type rows.
       typ.id in (select "baseTypeId" from type_all)
+    order by
+      "namespaceId", "name"
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-constraint.html
   "constraint" as (
@@ -143,6 +149,8 @@ with
       -- We only want foreign key, primary key, and unique constraints. We
       -- made add support for more constraints in the future.
       con.contype in ('f', 'p', 'u')
+    order by
+      con.conrelid, con.conname
   )
 select row_to_json(x) as object from namespace as x
 union all

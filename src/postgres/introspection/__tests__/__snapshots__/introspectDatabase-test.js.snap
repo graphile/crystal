@@ -22,6 +22,16 @@ Object {
       "typeId": "int4"
     },
     Object {
+      "classId": "compound_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "extra",
+      "num": 3,
+      "typeId": "bool"
+    },
+    Object {
       "classId": "compound_type",
       "description": null,
       "hasDefault": false,
@@ -364,17 +374,6 @@ Object {
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
-        1
-      ],
-      "kind": "constraint",
-      "name": "person_pkey",
-      "type": "p"
-    },
-    Object {
-      "classId": "person",
-      "foreignClassId": null,
-      "foreignKeyAttributeNums": null,
-      "keyAttributeNums": Array [
         4
       ],
       "kind": "constraint",
@@ -382,14 +381,14 @@ Object {
       "type": "u"
     },
     Object {
-      "classId": "post",
+      "classId": "person",
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
         1
       ],
       "kind": "constraint",
-      "name": "post_pkey",
+      "name": "person_pkey",
       "type": "p"
     },
     Object {
@@ -406,16 +405,28 @@ Object {
       "type": "f"
     },
     Object {
-      "classId": "compound_key",
+      "classId": "post",
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
-        2,
         1
       ],
       "kind": "constraint",
-      "name": "compound_key_pkey",
+      "name": "post_pkey",
       "type": "p"
+    },
+    Object {
+      "classId": "compound_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        2
+      ],
+      "kind": "constraint",
+      "name": "compound_key_person_id_1_fkey",
+      "type": "f"
     },
     Object {
       "classId": "compound_key",
@@ -432,16 +443,15 @@ Object {
     },
     Object {
       "classId": "compound_key",
-      "foreignClassId": "person",
-      "foreignKeyAttributeNums": Array [
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        2,
         1
       ],
-      "keyAttributeNums": Array [
-        2
-      ],
       "kind": "constraint",
-      "name": "compound_key_person_id_1_fkey",
-      "type": "f"
+      "name": "compound_key_pkey",
+      "type": "p"
     }
   ],
   "namespaces": Array [
@@ -466,20 +476,7 @@ Object {
   ],
   "types": Array [
     Object {
-      "baseTypeId": Object {
-        "baseTypeId": null,
-        "category": "N",
-        "classId": null,
-        "description": "-2 billion to 2 billion integer, 4-byte storage",
-        "enumVariants": null,
-        "id": "23",
-        "isNotNull": false,
-        "itemId": null,
-        "kind": "type",
-        "name": "int4",
-        "namespaceId": "11",
-        "type": "b"
-      },
+      "baseTypeId": "int4",
       "category": "N",
       "classId": null,
       "description": null,
@@ -493,20 +490,7 @@ Object {
       "type": "d"
     },
     Object {
-      "baseTypeId": Object {
-        "baseTypeId": "23",
-        "category": "N",
-        "classId": null,
-        "description": null,
-        "enumVariants": null,
-        "id": "1530543",
-        "isNotNull": false,
-        "itemId": null,
-        "kind": "type",
-        "name": "an_int",
-        "namespaceId": "1530465",
-        "type": "d"
-      },
+      "baseTypeId": "an_int",
       "category": "N",
       "classId": null,
       "description": null,
@@ -566,20 +550,7 @@ Object {
       "type": "c"
     },
     Object {
-      "baseTypeId": Object {
-        "baseTypeId": null,
-        "category": "S",
-        "classId": null,
-        "description": "variable-length string, no limit specified",
-        "enumVariants": null,
-        "id": "25",
-        "isNotNull": false,
-        "itemId": null,
-        "kind": "type",
-        "name": "text",
-        "namespaceId": "11",
-        "type": "b"
-      },
+      "baseTypeId": "text",
       "category": "S",
       "classId": null,
       "description": null,
@@ -769,20 +740,7 @@ Object {
   ],
   "types": Array [
     Object {
-      "baseTypeId": Object {
-        "baseTypeId": null,
-        "category": "N",
-        "classId": null,
-        "description": "-2 billion to 2 billion integer, 4-byte storage",
-        "enumVariants": null,
-        "id": "23",
-        "isNotNull": false,
-        "itemId": null,
-        "kind": "type",
-        "name": "int4",
-        "namespaceId": "11",
-        "type": "b"
-      },
+      "baseTypeId": "int4",
       "category": "N",
       "classId": null,
       "description": null,

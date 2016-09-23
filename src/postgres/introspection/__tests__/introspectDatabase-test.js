@@ -74,7 +74,7 @@ const format = catalog => ({
       id: type.name,
       namespaceId: catalog.getNamespace(type.namespaceId) ? catalog.getNamespace(type.namespaceId).name : null,
       classId: type.classId ? catalog.getClass(type.classId).name : null,
-      baseTypeId: type.baseTypeId ? catalog.getType(type.baseTypeId) : null,
+      baseTypeId: type.baseTypeId ? catalog.getType(type.baseTypeId).name : null,
     }))
     // Remove any types outside of our expected namespace. This may exclude
     // relevant types, but the tradeoff is worth it. This test gets flaky when

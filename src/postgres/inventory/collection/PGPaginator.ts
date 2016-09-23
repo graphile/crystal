@@ -27,9 +27,9 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   public async count (context: mixed, condition?: Condition): Promise<number> {
     if (!isPGContext(context)) throw isPGContext.error()
     const { client } = context
-    const conditionSQL = conditionToSQL(condition || true)
+    const conditionSQL = conditionToSQL(condition != null ? condition : true)
     const result = await client.query(sql.compile(sql.query`select count(x) as count from ${this.getFromEntrySQL()} as x where ${conditionSQL}`)())
-    return result.rows[0]['count']
+    return parseInt(result.rows[0]['count'], 10)
   }
 
   /**
@@ -41,7 +41,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   ): Promise<Paginator.Page<TValue, Array<mixed>>> {
     if (!isPGContext(context)) throw isPGContext.error()
     const { client } = context
-    const { ordering, beforeCursor, afterCursor, first, last, condition } = config
+    const { ordering = this.defaultOrdering, beforeCursor, afterCursor, first, last, condition } = config
 
     // const fromEntrySQL = sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
     const conditionSQL = conditionToSQL(condition || true)
@@ -56,6 +56,8 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
     // When we are provided exact information about the query we are ordering,
     // there are many things we can optimize.
     else if (ordering.type === 'ATTRIBUTES') {
+      const { pgAttributes, descending } = ordering
+
       const query = sql.compile(
         sql.query`
           -- The standard select/from clauses up top.
@@ -64,16 +66,20 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
 
           -- Combine our cursors with the condition used for this page to
           -- implement a where condition which will filter what we want it to.
+          --
+          -- We throw away nulls because there is a lot of wierdness when they
+          -- get included.
           where
-            ${beforeCursor ? this._getCursorCondition(ordering, beforeCursor, '<') : sql.raw('true')} and
-            ${afterCursor ? this._getCursorCondition(ordering, afterCursor, '>') : sql.raw('true')} and
+            ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
+            ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
+            ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
             ${conditionSQL}
 
           -- Order using the same attributes used to construct the cursors. If
           -- a last property was defined we need to reverse our ordering so the
           -- limit will work. We will fix the order in JavaScript.
-          order by ${sql.join(ordering.attributes.map(({ pgAttribute, descending }) =>
-            sql.query`${sql.identifier(pgAttribute.name)} ${sql.raw((last != null ? !descending : descending) ? 'desc' : 'asc')}`
+          order by ${sql.join(pgAttributes.map(pgAttribute =>
+            sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`
           ), ', ')}
 
           -- Finally, apply the appropriate limit.
@@ -96,7 +102,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
       const values: Array<{ value: TValue, cursor: Array<mixed> }> =
         rows.map(({ value }) => ({
           value: this.transformPGValue(value),
-          cursor: ordering.attributes.map(({ pgAttribute }) => value[pgAttribute.name])
+          cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name])
         }))
 
       return {
@@ -112,7 +118,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
           const { rowCount } = await client.query(sql.compile(sql.query`
             select null
             from ${this.getFromEntrySQL()}
-            where ${this._getCursorCondition(ordering, lastCursor, '>')} and ${conditionSQL}
+            where ${this._getCursorCondition(pgAttributes, lastCursor, '>')} and ${conditionSQL}
             limit 1
           `)())
 
@@ -129,7 +135,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
           const { rowCount } = await client.query(sql.compile(sql.query`
             select null
             from ${this.getFromEntrySQL()}
-            where ${this._getCursorCondition(ordering, firstCursor, '<')} and ${conditionSQL}
+            where ${this._getCursorCondition(pgAttributes, firstCursor, '<')} and ${conditionSQL}
             limit 1
           `)())
 
@@ -147,9 +153,9 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
    *
    * @private
    */
-  private _getCursorCondition ({ attributes }: PGPaginator.AttributesOrdering, cursor: Array<mixed>, operator: string): sql.SQL {
+  private _getCursorCondition (pgAttributes: Array<PGCatalogAttribute>, cursor: Array<mixed>, operator: string): sql.SQL {
     return sql.query`
-      (${sql.join(attributes.map(({ pgAttribute }) => sql.identifier(pgAttribute.name)), ', ')})
+      (${sql.join(pgAttributes.map(pgAttribute => sql.identifier(pgAttribute.name)), ', ')})
       ${sql.raw(operator)}
       (${sql.join(cursor.map(sql.value), ', ')})
     `
@@ -173,10 +179,8 @@ namespace PGPaginator {
   export type AttributesOrdering = {
     type: 'ATTRIBUTES',
     name: string,
-    attributes: Array<{
-      pgAttribute: PGCatalogAttribute,
-      descending: boolean,
-    }>,
+    descending: boolean,
+    pgAttributes: Array<PGCatalogAttribute>,
   }
 }
 

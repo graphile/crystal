@@ -59,6 +59,7 @@ create view a.non_updatable_view as select 2;
 create table c.compound_key (
   person_id_2 int references c.person(id),
   person_id_1 int references c.person(id),
+  extra boolean,
   primary key (person_id_1, person_id_2)
 );
 

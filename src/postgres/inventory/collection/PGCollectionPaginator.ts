@@ -46,8 +46,8 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
       // attributes.
       ...(pgPrimaryKeyAttributes
         ? [
-          { type: 'ATTRIBUTES', name: 'primary_key_asc', attributes: (pgPrimaryKeyAttributes || []).map(attributeOrderingHelper(false)) },
-          { type: 'ATTRIBUTES', name: 'primary_key_desc', attributes: (pgPrimaryKeyAttributes || []).map(attributeOrderingHelper(true)) },
+          { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: pgPrimaryKeyAttributes || [] },
+          { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: pgPrimaryKeyAttributes || [] },
         ] as Array<PGPaginator.Ordering>
         : []
       ),
@@ -72,8 +72,8 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
           .map<Array<PGPaginator.Ordering>>(pgAttribute => [
             // Note how we use `Array.from(new Set(…))` here, that will remove
             // duplicate attributes as the elements in a set must be unique.
-            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_asc`, attributes: Array.from(new Set([pgAttribute, pgPrimaryKeyAttributes || []])).map(attributeOrderingHelper(false)) },
-            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_desc`, attributes: Array.from(new Set([pgAttribute, pgPrimaryKeyAttributes || []])).map(attributeOrderingHelper(true)) },
+            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_asc`, descending: false, pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])) },
+            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_desc`, descending: true, pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])) },
           ])
           .reduce((a, b) => a.concat(b), [])
       ),

@@ -99,12 +99,12 @@ test('read will get single values from a table', async () => {
   expect(client.query.mock.calls.length).toBe(2)
 
   expect(values.map(value => value == null ? null : mapToObject(value))).toEqual([
-    { 'person_id_1': 3, 'person_id_2': 2 },
+    { 'person_id_1': 3, 'person_id_2': 2, 'extra': null },
     null,
-    { 'person_id_1': 1, 'person_id_2': 2 },
-    { 'person_id_1': 3, 'person_id_2': 1 },
+    { 'person_id_1': 1, 'person_id_2': 2, 'extra': null },
+    { 'person_id_1': 3, 'person_id_2': 1, 'extra': null },
     null,
-    { 'person_id_1': 2, 'person_id_2': 1 },
+    { 'person_id_1': 2, 'person_id_2': 1, 'extra': null },
     { 'id': 2, 'name': 'Sara Smith', 'email': 'sara.smith@email.com', 'about': null, 'created_at': values[6].get('created_at') },
     { 'id': 1, 'name': 'John Smith', 'email': 'john.smith@email.com', 'about': null, 'created_at': values[7].get('created_at') },
     null,
@@ -133,7 +133,7 @@ test('update will change values from a table', async () => {
   ])
 
   const expectedValues = [
-    { 'person_id_1': 3, 'person_id_2': 3 },
+    { 'person_id_1': 3, 'person_id_2': 3, 'extra': null },
     { 'id': 1, 'name': 'John Smith', email: 'john.smith@email.com', 'about': 'Yolo swag!', 'created_at': values[1].get('created_at') },
     { 'id': 2, 'name': 'Sarah Smith', email: 'sarah.smith@email.com', 'about': 'Yolo swag!', 'created_at': values[2].get('created_at') },
     { 'id': 3, 'name': 'Budd Deey', email: 'budd.deey@email.com', 'about': null, 'created_at': values[3].get('created_at') },
@@ -202,9 +202,9 @@ test('delete will delete things from the database', async () => {
   ])
 
   expect(values.map(mapToObject)).toEqual([
-    { 'person_id_1': 1, 'person_id_2': 2 },
-    { 'person_id_1': 2, 'person_id_2': 1 },
-    { 'person_id_1': 3, 'person_id_2': 1 },
+    { 'person_id_1': 1, 'person_id_2': 2, 'extra': null },
+    { 'person_id_1': 2, 'person_id_2': 1, 'extra': null },
+    { 'person_id_1': 3, 'person_id_2': 1, 'extra': null },
     { 'id': 1, 'name': 'John Smith', 'email': 'john.smith@email.com', 'about': null, 'created_at': values[3].get('created_at') },
   ])
 
