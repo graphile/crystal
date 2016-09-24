@@ -37,7 +37,7 @@ create domain forum_example.email as text
 
 create table forum_example.person_account (
   person_id        uuid not null primary key references forum_example.person(id),
-  email            email not null unique,
+  email            forum_example.email not null unique,
   pass_hash        char(60) not null
 );
 
