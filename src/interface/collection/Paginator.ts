@@ -1,3 +1,4 @@
+import Context from '../Context'
 import Type from '../type/Type'
 import Condition from './Condition'
 
@@ -62,7 +63,7 @@ interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  count (context: mixed, condition?: Condition): Promise<number>
+  count (context: Context, condition?: Condition): Promise<number>
 
   /**
    * Reads values in a collection relative to a cursor which is used as a
@@ -74,7 +75,7 @@ interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
    * @see Paginator.PageConfig
    */
   readPage (
-    context: mixed,
+    context: Context,
     config: Paginator.PageConfig<TOrdering, TCursor>,
   ): Promise<Paginator.Page<TValue, TCursor>>
 }

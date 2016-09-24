@@ -1,6 +1,7 @@
 import getTestPGClient from '../../../__tests__/fixtures/getTestPGClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'
+import { createPGContext } from '../../pgContext'
 import PGCollection from '../PGCollection'
 import PGCollectionKey from '../PGCollectionKey'
 
@@ -9,12 +10,7 @@ let client
 /**
  * @type {PGCollectionKey}
  */
-let collectionKey1
-
-/**
- * @type {PGCollectionKey}
- */
-let collectionKey2
+let collectionKey1, collectionKey2
 
 beforeEach(async () => {
   client = await getTestPGClient()
@@ -64,6 +60,8 @@ test('type will have fields for all of the respective attributes', () => {
 })
 
 test('read will get single values from a table', async () => {
+  const context = createPGContext(client)
+
   await client.query(`
     insert into c.person (id, name, email, about) values
       (1, 'John Smith', 'john.smith@email.com', null),
@@ -82,16 +80,16 @@ test('read will get single values from a table', async () => {
   client.query.mockClear()
 
   const values = await Promise.all([
-    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 2]])),
-    collectionKey1.read({ client }, new Map([['person_id_1', 2], ['person_id_2', 200]])),
-    collectionKey1.read({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]])),
-    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 1]])),
-    collectionKey1.read({ client }, new Map([['person_id_1', 3], ['person_id_2', 3]])),
-    collectionKey1.read({ client }, new Map([['person_id_2', 1], ['person_id_1', 2]])),
-    collectionKey2.read({ client }, new Map([['email', 'sara.smith@email.com']])),
-    collectionKey2.read({ client }, new Map([['email', 'john.smith@email.com']])),
-    collectionKey2.read({ client }, new Map([['email', 'does.not.exist@email.com']])),
-    collectionKey2.read({ client }, new Map([['email', 'budd.deey@email.com']])),
+    collectionKey1.read(context, new Map([['person_id_1', 3], ['person_id_2', 2]])),
+    collectionKey1.read(context, new Map([['person_id_1', 2], ['person_id_2', 200]])),
+    collectionKey1.read(context, new Map([['person_id_1', 1], ['person_id_2', 2]])),
+    collectionKey1.read(context, new Map([['person_id_1', 3], ['person_id_2', 1]])),
+    collectionKey1.read(context, new Map([['person_id_1', 3], ['person_id_2', 3]])),
+    collectionKey1.read(context, new Map([['person_id_2', 1], ['person_id_1', 2]])),
+    collectionKey2.read(context, new Map([['email', 'sara.smith@email.com']])),
+    collectionKey2.read(context, new Map([['email', 'john.smith@email.com']])),
+    collectionKey2.read(context, new Map([['email', 'does.not.exist@email.com']])),
+    collectionKey2.read(context, new Map([['email', 'budd.deey@email.com']])),
   ])
 
   // Ensure that even though we did a lot of reads, we only actually queried
@@ -113,6 +111,8 @@ test('read will get single values from a table', async () => {
 })
 
 test('update will change values from a table', async () => {
+  const context = createPGContext(client)
+
   await client.query(`
     insert into c.person (id, name, email, about) values
       (1, 'John Smith', 'john.smith@email.com', null),
@@ -126,10 +126,10 @@ test('update will change values from a table', async () => {
   `)
 
   const values = await Promise.all([
-    collectionKey1.update({ client }, new Map([['person_id_1', 3], ['person_id_2', 2]]), new Map([['person_id_2', 3]])),
-    collectionKey2.update({ client }, new Map([['email', 'john.smith@email.com']]), new Map([['about', 'Yolo swag!']])),
-    collectionKey2.update({ client }, new Map([['email', 'sara.smith@email.com']]), new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com'], ['about', 'Yolo swag!']])),
-    collectionKey2.update({ client }, new Map([['email', 'budd.deey@email.com']]), new Map([['about', null]])),
+    collectionKey1.update(context, new Map([['person_id_1', 3], ['person_id_2', 2]]), new Map([['person_id_2', 3]])),
+    collectionKey2.update(context, new Map([['email', 'john.smith@email.com']]), new Map([['about', 'Yolo swag!']])),
+    collectionKey2.update(context, new Map([['email', 'sara.smith@email.com']]), new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com'], ['about', 'Yolo swag!']])),
+    collectionKey2.update(context, new Map([['email', 'budd.deey@email.com']]), new Map([['about', null]])),
   ])
 
   const expectedValues = [
@@ -151,8 +151,10 @@ test('update will change values from a table', async () => {
 })
 
 test('update fails when trying to patch a field that does not exist', async () => {
+  const context = createPGContext(client)
+
   try {
-    await collectionKey1.update({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]]), new Map([['a', 1]]))
+    await collectionKey1.update(context, new Map([['person_id_1', 1], ['person_id_2', 2]]), new Map([['a', 1]]))
     expect(true).toBe(false)
   }
   catch (error) {
@@ -161,8 +163,10 @@ test('update fails when trying to patch a field that does not exist', async () =
 })
 
 test('update fails when trying to update a value that does not exist', async () => {
+  const context = createPGContext(client)
+
   try {
-    await collectionKey2.update({ client }, new Map([['email', 'does.not.exist@email.com']]), new Map([['about', 'xxxx']]))
+    await collectionKey2.update(context, new Map([['email', 'does.not.exist@email.com']]), new Map([['about', 'xxxx']]))
     expect(true).toBe(false)
   }
   catch (error) {
@@ -171,6 +175,8 @@ test('update fails when trying to update a value that does not exist', async () 
 })
 
 test('delete will delete things from the database', async () => {
+  const context = createPGContext(client)
+
   await client.query(`
     insert into c.person (id, name, email, about) values
       (1, 'John Smith', 'john.smith@email.com', null),
@@ -195,10 +201,10 @@ test('delete will delete things from the database', async () => {
   const { rows: initialRows } = await client.query(selectQuery)
 
   const values = await Promise.all([
-    collectionKey1.delete({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]])),
-    collectionKey1.delete({ client }, new Map([['person_id_1', 2], ['person_id_2', 1]])),
-    collectionKey1.delete({ client }, new Map([['person_id_1', 3], ['person_id_2', 1]])),
-    collectionKey2.delete({ client }, new Map([['email', 'john.smith@email.com']])),
+    collectionKey1.delete(context, new Map([['person_id_1', 1], ['person_id_2', 2]])),
+    collectionKey1.delete(context, new Map([['person_id_1', 2], ['person_id_2', 1]])),
+    collectionKey1.delete(context, new Map([['person_id_1', 3], ['person_id_2', 1]])),
+    collectionKey2.delete(context, new Map([['email', 'john.smith@email.com']])),
   ])
 
   expect(values.map(mapToObject)).toEqual([
@@ -212,8 +218,10 @@ test('delete will delete things from the database', async () => {
 })
 
 test('delete fails when trying to remove a value that does not exist', async () => {
+  const context = createPGContext(client)
+
   try {
-    await collectionKey1.delete({ client }, new Map([['person_id_1', 1], ['person_id_2', 2]]))
+    await collectionKey1.delete(context, new Map([['person_id_1', 1], ['person_id_2', 2]]))
     expect(true).toBe(false)
   }
   catch (error) {

@@ -1,12 +1,12 @@
 import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { Collection, Type, NullableType } from '../../../interface'
+import { Context, Collection, Type, NullableType } from '../../../interface'
 import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import Options from '../Options'
-import isPGContext from '../isPGContext'
+import { pgClientFromContext } from '../pgContext'
 import PGCollectionKey from './PGCollectionKey'
 import PGCollectionPaginator from './PGCollectionPaginator'
 
@@ -91,10 +91,8 @@ class PGCollection implements Collection {
   public create = (
     !this._pgClass.isInsertable
       ? null
-      : (context: mixed, value: PGObjectType.Value): Promise<PGObjectType.Value> => {
-        if (!isPGContext(context)) throw isPGContext.error()
-        return this._getInsertLoader(context.client).load(value)
-      }
+      : (context: Context, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
+        this._getInsertLoader(pgClientFromContext(context)).load(value)
   )
 
   /**
@@ -133,7 +131,7 @@ class PGCollection implements Collection {
             returning *
           )
           -- We use a subquery with our insert so we can turn the result into JSON.
-          select row_to_json(i) as object from insertion as i
+          select row_to_json(x) as object from insertion as x
         `)()
 
         const { rows } = await client.query(query)

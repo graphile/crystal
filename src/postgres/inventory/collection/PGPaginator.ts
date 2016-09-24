@@ -1,7 +1,7 @@
-import { Type, Paginator, Condition } from '../../../interface'
+import { Context, Type, Paginator, Condition } from '../../../interface'
 import { sql } from '../../utils'
 import { PGCatalogAttribute } from '../../introspection'
-import isPGContext from '../isPGContext'
+import { pgClientFromContext } from '../pgContext'
 import conditionToSQL from './conditionToSQL'
 
 abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Ordering, Array<mixed>> {
@@ -24,9 +24,8 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   /**
    * Counts how many values are in our `from` entry total.
    */
-  public async count (context: mixed, condition?: Condition): Promise<number> {
-    if (!isPGContext(context)) throw isPGContext.error()
-    const { client } = context
+  public async count (context: Context, condition?: Condition): Promise<number> {
+    const client = pgClientFromContext(context)
     const conditionSQL = conditionToSQL(condition != null ? condition : true)
     const result = await client.query(sql.compile(sql.query`select count(x) as count from ${this.getFromEntrySQL()} as x where ${conditionSQL}`)())
     return parseInt(result.rows[0]['count'], 10)
@@ -36,11 +35,10 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
    * Reads a page of data from our Postgres database. There are different methods this is actually executed which depends on
    */
   public async readPage (
-    context: mixed,
+    context: Context,
     config: Paginator.PageConfig<PGPaginator.Ordering, Array<mixed>>,
   ): Promise<Paginator.Page<TValue, Array<mixed>>> {
-    if (!isPGContext(context)) throw isPGContext.error()
-    const { client } = context
+    const client = pgClientFromContext(context)
     const { ordering = this.defaultOrdering, beforeCursor, afterCursor, first, last, condition } = config
 
     // const fromEntrySQL = sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`

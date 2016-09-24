@@ -21,7 +21,6 @@ export interface Defaults extends ConnectionConfig {
   reapIntervalMillis?: number
   binary?: boolean
   parseInt8?: boolean
-
 }
 
 export interface ClientConfig extends ConnectionConfig {
@@ -79,7 +78,7 @@ export class Client extends events.EventEmitter {
 }
 
 export class PoolClient extends Client {
-  public release (error: any): void
+  public release (error?: any): void
 }
 
 export class Query extends events.EventEmitter implements PromiseLike<ResultBuilder> {

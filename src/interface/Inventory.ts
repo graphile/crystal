@@ -1,8 +1,11 @@
+import Context from './Context'
 import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
 import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
+
+type ContextAssignmentFn = (context: Context) => void | Promise<void>
 
 // TODO: Validate inventory functions. There are a lot of assumptions we make that
 // cannot be statically typed. We should have a test utility function to prove
@@ -22,9 +25,29 @@ import Relation from './collection/Relation'
  * *mutable*. Scary, I know.
  */
 class Inventory {
+  private _contextAssignments: Array<ContextAssignmentFn> = []
   private _types = new Map<string, NamedType<mixed>>()
   private _collections = new Map<string, Collection>()
   private _relations = new Map<string, Relation<mixed>>()
+
+  /**
+   * Adds a function which will assign some values to a context object when it
+   * gets created.
+   */
+  public addContextAssignment (contextAssignment: ContextAssignmentFn): this {
+    this._contextAssignments.push(contextAssignment)
+    return this
+  }
+
+  /**
+   * Creates a context object by running all of the context assignments in
+   * parallel. A context will be valid for one single request “session.”
+   */
+  public async createContext (): Promise<Context> {
+    const context = new Context()
+    await Promise.all(this._contextAssignments.map(contextAssignment => contextAssignment(context)))
+    return context
+  }
 
   /**
    * Add a type to our inventory. If the type is a composite named type (like an

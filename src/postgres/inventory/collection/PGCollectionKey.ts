@@ -1,9 +1,9 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { CollectionKey, Type } from '../../../interface'
+import { Context, CollectionKey, Type } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
-import isPGContext from '../isPGContext'
+import { pgClientFromContext } from '../pgContext'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
 
@@ -95,10 +95,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public read = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value | null> => {
-        if (!isPGContext(context)) throw isPGContext.error()
-        return this._getSelectLoader(context.client).load(key)
-      }
+      : (context: Context, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
+        this._getSelectLoader(pgClientFromContext(context)).load(key)
   )
 
   /**
@@ -171,12 +169,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public update = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: mixed, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
-        // First things first, we need to get our Postgres client from the
-        // context. This means first verifying our client exists on the
-        // context.
-        if (!isPGContext(context)) throw isPGContext.error()
-        const { client } = context
+      : async (context: Context, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
+        const client = pgClientFromContext(context)
 
         const query = sql.compile(sql.query`
           -- Put our updated rows in a with statement so that we can select
@@ -221,12 +215,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public delete = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
-        // First things first, we need to get our Postgres client from the
-        // context. This means first verifying our client exists on the
-        // context.
-        if (!isPGContext(context)) throw isPGContext.error()
-        const { client } = context
+      : async (context: Context, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
+        const client = pgClientFromContext(context)
 
         // This is a pretty simple query. Delete the row that matches our key
         // and return the deleted row.

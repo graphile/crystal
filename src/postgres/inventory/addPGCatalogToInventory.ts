@@ -7,7 +7,7 @@ import Options from './Options'
 /**
  * Adds Postgres based objects created by introspection to an inventory.
  */
-export default function addPGToInventory (
+export default function addPGCatalogToInventory (
   inventory: Inventory,
   pgCatalog: PGCatalog,
   config: {

@@ -11,8 +11,8 @@ type Options = {
 }
 
 // TODO: doc
-export default function createSchema (inventory: Inventory, options: Options = {}): GraphQLSchema {
-  // We take our user-friendly arguments to `createSchema` and convert them
+export default function createGraphqlSchema (inventory: Inventory, options: Options = {}): GraphQLSchema {
+  // We take our user-friendly arguments to `createGraphqlSchema` and convert them
   // into a build token. One nice side effect of always creating our own
   // build token object is that we have the guarantee that every build token
   // will always maintain its own memoization map.
