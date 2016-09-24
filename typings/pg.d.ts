@@ -1,12 +1,10 @@
-// TODO: Write new `pg` types that actually support `pg` 6.1.0
-
 declare module 'pg' {
 
 import events = require("events")
 import stream = require("stream")
 
-export function connect (connection: string, callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<Client>
-export function connect (config: ClientConfig, callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<Client>
+export function connect (connection: string, callback?: (err: Error, client: PoolClient, done: (err?: any) => void) => void): Promise<PoolClient>
+export function connect (config: PoolConfig, callback?: (err: Error, client: PoolClient, done: (err?: any) => void) => void): Promise<PoolClient>
 export function end (): void
 
 export interface ConnectionConfig {
@@ -23,10 +21,16 @@ export interface Defaults extends ConnectionConfig {
   reapIntervalMillis?: number
   binary?: boolean
   parseInt8?: boolean
+
 }
 
 export interface ClientConfig extends ConnectionConfig {
   ssl?: boolean
+}
+
+export interface PoolConfig extends ClientConfig {
+  max?: number
+  min?: number
 }
 
 export interface QueryConfig {
@@ -38,7 +42,9 @@ export interface QueryConfig {
 export interface QueryResult {
   command: string
   rowCount: number
+  oid: number
   rows: ({ [key: string]: any })[]
+  fields: Array<any>
 }
 
 export interface ResultBuilder extends QueryResult {
@@ -54,9 +60,6 @@ export class Client extends events.EventEmitter {
 
   public connect (callback?: (err: Error) => void): void
   public end (): void
-
-  // TODO: This is only on clients acquired by the pool.
-  public release (): void
 
   public query (queryText: string, callback?: (err: Error, result: QueryResult) => void): Query
   public query (config: QueryConfig, callback?: (err: Error, result: QueryResult) => void): Query
@@ -75,6 +78,10 @@ export class Client extends events.EventEmitter {
   public on (event: string, listener: Function): this
 }
 
+export class PoolClient extends Client {
+  public release (error: any): void
+}
+
 export class Query extends events.EventEmitter implements PromiseLike<ResultBuilder> {
   public on (event: "row", listener: (row: any, result?: ResultBuilder) => void): this
   public on (event: "error", listener: (err: Error) => void): this
@@ -85,8 +92,10 @@ export class Query extends events.EventEmitter implements PromiseLike<ResultBuil
 }
 
 export class Pool {
-  public connect (callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<Client>
-  public take (callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<Client>
+  constructor (config: PoolConfig)
+
+  public connect (callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<PoolClient>
+  public take (callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<PoolClient>
 
   public query (queryText: string, callback?: (err: Error, result: QueryResult) => void): Query
   public query (config: QueryConfig, callback?: (err: Error, result: QueryResult) => void): Query
