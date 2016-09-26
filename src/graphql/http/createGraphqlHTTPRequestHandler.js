@@ -1,4 +1,5 @@
 import { resolve as resolvePath } from 'path'
+import { readFile } from 'fs'
 import { parse as parseQueryString } from 'querystring'
 import { IncomingMessage, ServerResponse } from 'http'
 const httpError = require('http-errors')
@@ -15,6 +16,13 @@ import {
 } from 'graphql'
 import { Inventory } from '../../interface'
 import createGraphqlSchema from '../schema/createGraphqlSchema'
+
+const favicon = new Promise((resolve, reject) => {
+  readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
+    if (error) reject(error)
+    else resolve(data)
+  })
+})
 
 // TODO: test `express`
 // TODO: test `connect`
@@ -53,6 +61,26 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
    * @param {ServerResponse} res
    */
   const requestHandler = async (req, res, next) => {
+    // If this is the favicon path and it has not yet been handled, let us
+    // serve our GraphQL favicon.
+    if (parseUrl(req).pathname === '/favicon.ico') {
+      // If this is the wrong method, we should let the client know.
+      if (!(req.method === 'GET' || req.method === 'HEAD')) {
+        res.statusCode = req.method === 'OPTIONS' ? 200 : 405
+        res.setHeader('Allow', 'GET, HEAD, OPTIONS')
+        res.end()
+        return
+      }
+
+      // Otherwise we are good and should pipe the favicon to the browser.
+      res.statusCode = 200
+      res.setHeader('Cache-Control', 'public, max-age=86400')
+      res.setHeader('Content-Type', 'image/x-icon')
+      res.end(await favicon)
+
+      return
+    }
+
     // Don’t handle any requests if this is not the correct route.
     if (parseUrl(req).pathname !== (options.route || '/'))
       return next()

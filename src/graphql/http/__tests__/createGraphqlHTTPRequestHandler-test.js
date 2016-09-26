@@ -336,5 +336,24 @@ for (const [name, createServer] of serverCreators) {
         .expect({ data: { greetings: 'Hello, Joe!' } })
       )
     })
+
+    test('will serve a favicon', async () => {
+      const server1 = createServer()
+      const server2 = createServer({ route: '/graphql' })
+      await (
+        request(server1)
+        .get('/favicon.ico')
+        .expect(200)
+        .expect('Cache-Control', 'public, max-age=86400')
+        .expect('Content-Type', 'image/x-icon')
+      )
+      await (
+        request(server2)
+        .get('/favicon.ico')
+        .expect(200)
+        .expect('Cache-Control', 'public, max-age=86400')
+        .expect('Content-Type', 'image/x-icon')
+      )
+    })
   })
 }
