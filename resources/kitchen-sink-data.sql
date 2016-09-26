@@ -1,4 +1,5 @@
-begin;
+-- We don’t have a `begin`/`commit` in here to let the users of this query
+-- control the data lifecycle.
 
 insert into c.person (id, name, email, about, created_at) values
   (1, 'John Smith', 'john.smith@email.com', null, null),
@@ -31,5 +32,3 @@ insert into c.compound_key (person_id_1, person_id_2, extra) values
   (2, 5, true),
   (2, 3, null),
   (4, 4, false);
-
-commit;

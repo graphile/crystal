@@ -1,20 +1,16 @@
-import getTestPGClient from '../../../__tests__/fixtures/getTestPGClient'
+import withPGClient from '../../../__tests__/fixtures/withPGClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'
 import { createPGContext } from '../../pgContext'
 import PGCollection from '../PGCollection'
 import PGCollectionKey from '../PGCollectionKey'
 
-let client
-
 /**
  * @type {PGCollectionKey}
  */
 let collectionKey1, collectionKey2
 
-beforeEach(async () => {
-  client = await getTestPGClient()
-
+beforeEach(withPGClient(async client => {
   const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
   const options = {
@@ -47,7 +43,7 @@ beforeEach(async () => {
       ],
     },
   )
-})
+}))
 
 test('name will be a concatenation of the attribute names with “and”', () => {
   expect(collectionKey1.name).toBe('person_id_1_and_person_id_2')
@@ -59,7 +55,7 @@ test('type will have fields for all of the respective attributes', () => {
   expect(Array.from(collectionKey2.keyType.fields.keys())).toEqual(['email'])
 })
 
-test('read will get single values from a table', async () => {
+test('read will get single values from a table', withPGClient(async client => {
   const context = createPGContext(client)
 
   await client.query(`
@@ -108,9 +104,9 @@ test('read will get single values from a table', async () => {
     null,
     { 'id': 3, 'name': 'Budd Deey', 'email': 'budd.deey@email.com', 'about': 'Just a friendly human', 'created_at': values[9].get('created_at') },
   ])
-})
+}))
 
-test('update will change values from a table', async () => {
+test('update will change values from a table', withPGClient(async client => {
   const context = createPGContext(client)
 
   await client.query(`
@@ -148,9 +144,9 @@ test('update will change values from a table', async () => {
   `)
 
   expect(pgQueryResult.rows.map(({ object }) => object)).toEqual(expectedValues)
-})
+}))
 
-test('update fails when trying to patch a field that does not exist', async () => {
+test('update fails when trying to patch a field that does not exist', withPGClient(async client => {
   const context = createPGContext(client)
 
   try {
@@ -160,9 +156,9 @@ test('update fails when trying to patch a field that does not exist', async () =
   catch (error) {
     expect(error.message).toBe('Cannot update field named \'a\' because it does not exist in collection \'compound_keys\'.')
   }
-})
+}))
 
-test('update fails when trying to update a value that does not exist', async () => {
+test('update fails when trying to update a value that does not exist', withPGClient(async client => {
   const context = createPGContext(client)
 
   try {
@@ -172,9 +168,9 @@ test('update fails when trying to update a value that does not exist', async () 
   catch (error) {
     expect(error.message).toBe('No values were updated in collection \'people\' using key \'email\' because no values were found.')
   }
-})
+}))
 
-test('delete will delete things from the database', async () => {
+test('delete will delete things from the database', withPGClient(async client => {
   const context = createPGContext(client)
 
   await client.query(`
@@ -215,9 +211,9 @@ test('delete will delete things from the database', async () => {
   ])
 
   expect((await client.query(selectQuery)).rows).toEqual([initialRows[2], initialRows[5], initialRows[6]])
-})
+}))
 
-test('delete fails when trying to remove a value that does not exist', async () => {
+test('delete fails when trying to remove a value that does not exist', withPGClient(async client => {
   const context = createPGContext(client)
 
   try {
@@ -227,4 +223,4 @@ test('delete fails when trying to remove a value that does not exist', async () 
   catch (error) {
     expect(error.message).toBe('No values were deleted in collection \'compound_keys\' using key \'person_id_1_and_person_id_2\' because no values were found.')
   }
-})
+}))

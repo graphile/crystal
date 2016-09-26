@@ -1,8 +1,7 @@
-begin;
+-- We don’t have a `begin`/`commit` in here to let the users of this query
+-- control the data lifecycle.
 
-drop schema if exists a cascade;
-drop schema if exists b cascade;
-drop schema if exists c cascade;
+drop schema if exists a, b, c cascade;
 
 create schema a;
 create schema b;
@@ -108,5 +107,3 @@ create table b.types (
 --   b text not null,
 --   unique (a, b)
 -- );
-
-commit;

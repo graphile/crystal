@@ -1,15 +1,10 @@
 import { Client } from 'pg'
 import { NullableType } from '../../../../interface'
-import getTestPGClient from '../../../__tests__/fixtures/getTestPGClient'
+import withPGClient from '../../../__tests__/fixtures/withPGClient'
 import { mapToObject } from '../../../utils'
 import { PGCatalog, introspectDatabase } from '../../../introspection'
 import { createPGContext } from '../../pgContext'
 import PGCollection from '../PGCollection'
-
-/**
- * @type {Client}
- */
-let client
 
 /**
  * @type {PGCatalog}
@@ -21,19 +16,15 @@ let pgCatalog
  */
 let collection1, collection2, collection3
 
-beforeEach(async () => {
-  client = await getTestPGClient()
-
+beforeAll(withPGClient(async client => {
   pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
-  const options = {
-    renameAttributes: new Map(),
-  }
+  const options = {}
 
   collection1 = new PGCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'person'))
   collection2 = new PGCollection(options, pgCatalog, pgCatalog.getClassByName('b', 'updatable_view'))
   collection3 = new PGCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key'))
-})
+}))
 
 test('name will be the plural form of the class name', () => {
   expect(collection1.name).toBe('people')
@@ -47,7 +38,7 @@ test('type will have the correct null and non null fields', () => {
     .toEqual([true, true, true, true])
 })
 
-test('create will insert new rows into the database', async () => {
+test('create will insert new rows into the database', withPGClient(async client => {
   const context = createPGContext(client)
 
   const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
@@ -80,7 +71,7 @@ test('create will insert new rows into the database', async () => {
 
   expect(pgQueryResult.rows.map(({ object }) => object))
     .toEqual(values.map(mapToObject))
-})
+}))
 
 test('paginator will have the same name and type', () => {
   expect(collection1.paginator.name).toBe(collection1.name)
@@ -137,7 +128,7 @@ test('paginator `defaultOrdering` will be the first ordering in `orderings`', ()
   expect(collection3.paginator.defaultOrdering).toBe(collection3.paginator.orderings[0])
 })
 
-async function addTestData () {
+async function addTestData (client) {
   await client.query(`
     insert into c.person (id, name, email, about, created_at) values
       (1, 'John Smith', 'john.smith@email.com', null, null),
@@ -154,14 +145,14 @@ async function addTestData () {
   `)
 }
 
-test('paginator `count` will count all of the values in a collection with a condition', async () => {
+test('paginator `count` will count all of the values in a collection with a condition', withPGClient(async client => {
   const context = createPGContext(client)
 
   expect(await collection1.paginator.count(context, true)).toBe(0)
   expect(await collection2.paginator.count(context, true)).toBe(0)
   expect(await collection3.paginator.count(context, true)).toBe(0)
 
-  await addTestData()
+  await addTestData(client)
 
   expect(await collection1.paginator.count(context, true)).toBe(3)
   expect(await collection2.paginator.count(context, true)).toBe(3)
@@ -170,15 +161,15 @@ test('paginator `count` will count all of the values in a collection with a cond
   expect(await collection3.paginator.count(context, false)).toBe(0)
   expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'EQUAL', value: 3 } })).toBe(2)
   expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'LESS_THAN', value: 2 } })).toBe(1)
-})
+}))
 
-test('paginator `readPage` will read all of the values', async () => {
+test('paginator `readPage` will read all of the values', withPGClient(async client => {
   const context = createPGContext(client)
 
   expect((await collection1.paginator.readPage(context, {})).values).toEqual([])
   expect((await collection3.paginator.readPage(context, {})).values).toEqual([])
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, {})).values).toEqual([
     {
@@ -247,7 +238,7 @@ test('paginator `readPage` will read all of the values', async () => {
       ]),
     },
   ])
-})
+}))
 
 const collection1PageValues = [
   {
@@ -317,86 +308,86 @@ const collection3PageValues = [
   },
 ]
 
-test('paginator `readPage` will read all of the values using different orderings', async () => {
+test('paginator `readPage` will read all of the values using different orderings', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10] })).values)
     .toEqual(collection1PageValues)
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7] })).values)
     .toEqual(collection3PageValues)
-})
+}))
 
-test('paginator `readPage` will use a `beforeCursor`', async () => {
+test('paginator `readPage` will use a `beforeCursor`', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['john.smith@email.com', 1] })).values)
     .toEqual([collection1PageValues[0]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], beforeCursor: [true, 2, 1] })).values)
     .toEqual([collection3PageValues[0], collection3PageValues[1]])
-})
+}))
 
-test('paginator `readPage` will use an `afterCursor`', async () => {
+test('paginator `readPage` will use an `afterCursor`', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], afterCursor: ['john.smith@email.com', 1] })).values)
     .toEqual([collection1PageValues[2]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], afterCursor: [true, 2, 1] })).values)
     .toEqual([collection3PageValues[3]])
-})
+}))
 
-test('paginator `readPage` will use a `beforeCursor` and `afterCursor`', async () => {
+test('paginator `readPage` will use a `beforeCursor` and `afterCursor`', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['budd.deey@email.com', 3], afterCursor: ['sara.smith@email.com', 2] })).values)
     .toEqual([collection1PageValues[1]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], beforeCursor: [true, 2, 1], afterCursor: [false, 3, 2] })).values)
     .toEqual([])
-})
+}))
 
-test('paginator `readPage` will read all of the values when there is a `first` parameter', async () => {
+test('paginator `readPage` will read all of the values when there is a `first` parameter', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], first: 2 })).values)
     .toEqual([collection1PageValues[0], collection1PageValues[1]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], first: 3 })).values)
     .toEqual([collection3PageValues[0], collection3PageValues[1], collection3PageValues[2]])
-})
+}))
 
-test('paginator `readPage` will read the correct values when there is a `last` parameter', async () => {
+test('paginator `readPage` will read the correct values when there is a `last` parameter', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], last: 2 })).values)
     .toEqual([collection1PageValues[1], collection1PageValues[2]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], last: 1 })).values)
     .toEqual([collection3PageValues[3]])
-})
+}))
 
-test('paginator `readPage` will read all of the values using various combinations of config options', async () => {
+test('paginator `readPage` will read all of the values using various combinations of config options', withPGClient(async client => {
   const context = createPGContext(client)
 
-  await addTestData()
+  await addTestData(client)
 
   expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['budd.deey@email.com', 3], last: 1 })).values)
     .toEqual([collection1PageValues[1]])
 
   expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], afterCursor: [false, 1, 2], first: 2 })).values)
     .toEqual([collection3PageValues[1], collection3PageValues[2]])
-})
+}))

@@ -30,6 +30,7 @@ export interface ClientConfig extends ConnectionConfig {
 export interface PoolConfig extends ClientConfig {
   max?: number
   min?: number
+  idleTimeoutMillis?: number
 }
 
 export interface QueryConfig {

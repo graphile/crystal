@@ -1,4 +1,4 @@
-import getTestPGClient from '../../__tests__/fixtures/getTestPGClient'
+import withPGClient from '../../__tests__/fixtures/withPGClient'
 import createKitchenSinkPGSchema from '../../__tests__/fixtures/createKitchenSinkPGSchema'
 import introspectDatabase from '../introspectDatabase'
 
@@ -89,8 +89,7 @@ const format = catalog => ({
     })),
 })
 
-test('will get everything needed in an introspection', async () => {
-  const client = await getTestPGClient()
+test('will get everything needed in an introspection', withPGClient(async client => {
   expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
   expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
-})
+}))
