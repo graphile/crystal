@@ -1,3 +1,5 @@
+// TODO: Refactor this module, it has code smell…
+
 import { PoolConfig, Pool, Client } from 'pg'
 import { Context } from '../../interface'
 
@@ -8,12 +10,9 @@ const $$pgClient = Symbol('postgres/client')
  * The config passed in will be used to create a pool which will connect
  * clients.
  */
-export function createPGContextAssignment (config: PoolConfig) {
-  const pool = new Pool(config)
-
+export function createPGContextAssignment (pool: Pool) {
   return async (context: Context) => {
     const client = await pool.connect()
-
     context.addCleanupFunction(() => client.release())
     context.addDependency($$pgClient, client)
   }

@@ -4,15 +4,17 @@ import PGCollection from './collection/PGCollection'
 import PGRelation from './collection/PGRelation'
 import Options from './Options'
 
+export type PGCatalogToInventoryConfig = {
+  renameIdToRowId?: boolean,
+}
+
 /**
  * Adds Postgres based objects created by introspection to an inventory.
  */
 export default function addPGCatalogToInventory (
   inventory: Inventory,
   pgCatalog: PGCatalog,
-  config: {
-    renameIdToRowId?: boolean,
-  } = {},
+  config: PGCatalogToInventoryConfig = {},
 ): void {
   // Turn our config full of optional options, into an options object with the
   // appropriate defaults.

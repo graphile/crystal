@@ -2,8 +2,13 @@
 node_modules
 npm-debug.log*
 TODO.md
+.editorconfig
+tsconfig.json
 .vscode
 src
+build/**/__tests__
+build/**/__mocks__
 typings
-**/__tests__
-**/__mocks__
+scripts
+examples
+resources/jest-preprocessor.js

@@ -45,9 +45,10 @@
     "express": "^4.14.0",
     "jest": "^15.1.1",
     "koa": "^2.0.0",
+    "nodemon": "^1.10.2",
     "source-map-support": "^0.4.2",
     "supertest-as-promised": "^4.0.0",
-    "typescript": "^2.1.0-dev.20160903"
+    "typescript": "^2.0.3"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/resources/jest-preprocessor.js",

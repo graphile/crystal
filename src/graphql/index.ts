@@ -1,5 +1,5 @@
 import createGraphqlSchema from './schema/createGraphqlSchema'
-import createGraphQLHTTPRequestHandler from './http/createGraphqlRequestHandler'
+import createGraphQLHTTPRequestHandler from './http/createGraphqlHTTPRequestHandler'
 
 export {
   createGraphqlSchema,

@@ -6,7 +6,7 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "pretty": true,
     "experimentalDecorators": true,
     "noImplicitAny": true,
@@ -19,6 +19,7 @@
     "node_modules",
     "build",
     "examples",
-    "utils"
+    "utils",
+    "resources"
   ]
 }
