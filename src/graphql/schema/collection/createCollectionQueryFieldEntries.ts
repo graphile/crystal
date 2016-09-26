@@ -3,6 +3,7 @@ import { Context, Collection, CollectionKey, ObjectType } from '../../../interfa
 import { formatName, idSerde, buildObject } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
+import transformInputValue from '../transformInputValue'
 import createConnectionField from '../createConnectionField'
 import getCollectionType from './getCollectionType'
 
@@ -77,6 +78,7 @@ function createCollectionPrimaryKeyField <TKey>(
       },
     },
 
+    // TODO: Test this resolver
     async resolve (source, args, context): Promise<ObjectType.Value | null> {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
@@ -110,48 +112,61 @@ function createCollectionKeyField <TKey>(
   // If the key type is an object type, we want to flatten the object fields
   // into distinct arguments.
   if (keyType instanceof ObjectType) {
+    // Create the definition of our arguments. We will use this definition
+    // object in our resolver to turn the `args` object into the correct key
+    // value.
+    const argsDefinition = buildObject<GraphQLArgumentConfig<mixed> & { internalName: string }>(
+      Array.from(keyType.fields).map<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
+        [formatName.arg(fieldName), {
+          description: field.description,
+          type: getType(buildToken, field.type, true),
+          internalName: fieldName,
+        }]
+      )
+    )
     return {
       type: collectionType,
-      args: buildObject<GraphQLArgumentConfig<mixed>>(
-        Array.from(keyType.fields.entries()).map<[string, GraphQLArgumentConfig<mixed>]>(([fieldName, field]) =>
-          [formatName.arg(fieldName), {
-            description: field.description,
-            internalName: fieldName,
-            type: getType(buildToken, field.type, true),
-          }]
-        )
-      ),
+      args: argsDefinition,
+      // TODO: Test this resolver
       async resolve (source, args, context): Promise<ObjectType.Value | null> {
+        // Transform our `args` into a proper value for this collection key.
+        const key = new Map(Object.keys(argsDefinition).map<[string, mixed]>(key => [
+          argsDefinition[key].internalName,
+          transformInputValue(argsDefinition[key].type, args[key] as mixed),
+        ]))
+
         if (!(context instanceof Context))
           throw new Error('GraphQL context must be an instance of `Context`.')
 
-        if (!keyType.isTypeOf(args))
-          throw new Error('The provided arguments are not the correct type.')
+        if (!keyType.isTypeOf(key))
+          throw new Error('The GraphQL arguments are not of the correct type.')
 
-        return await collectionKey.read!(context, args)
+        return await collectionKey.read!(context, key)
       },
     }
   }
   // Otherwise if this is not an object type, we’ll just expose one argument
   // with the key’s name.
   else {
+    const argFieldName = formatName.arg(collectionKey.name)
+    const argType = getType(buildToken, keyType, true)
     return {
       type: collectionType,
       args: {
-        [formatName.arg(collectionKey.name)]: {
+        [argFieldName]: {
           // TODO: description
-          internalName: 'input',
-          type: getType(buildToken, keyType, true),
+          type: argType,
         },
       },
+      // TODO: Test this resolver
       async resolve (source, args, context): Promise<ObjectType.Value | null> {
         if (!(context instanceof Context))
           throw new Error('GraphQL context must be an instance of `Context`.')
 
-        const key: mixed = args['input']
+        const key: mixed = transformInputValue(argType, args[argFieldName])
 
         if (!keyType.isTypeOf(key))
-          throw new Error('The provided arguments are not the correct type.')
+          throw new Error('The GraphQL arguments are not of the correct type.')
 
         return await collectionKey.read!(context, key)
       },

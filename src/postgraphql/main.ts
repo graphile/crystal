@@ -10,7 +10,7 @@ const pgConfig = {}
 async function main () {
   const inventory = new Inventory()
   await addPGToInventory(inventory, { schemas: ['a', 'b', 'c'] })
-  const requestHandler = createGraphQLHTTPRequestHandler(inventory, { graphiql: true })
+  const requestHandler = createGraphQLHTTPRequestHandler(inventory, { graphiql: true, showErrorStack: 'json' })
   const server = createServer(requestHandler)
 
   server.listen(3000, () => {

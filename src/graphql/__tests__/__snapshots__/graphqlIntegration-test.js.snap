@@ -1,9 +1,5 @@
 exports[`test will generate the correct forum schema 1`] = `
-"schema {
-  query: Query
-}
-
-scalar Cursor
+"scalar Cursor
 
 scalar Email
 

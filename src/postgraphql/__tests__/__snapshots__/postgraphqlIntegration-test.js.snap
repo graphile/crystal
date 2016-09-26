@@ -105,17 +105,22 @@ Object {
     "typesById": null
   },
   "errors": Array [
-    [Error: The provided arguments are not the correct type.]
+    GraphQLError {
+      "locations": Array [
+        Object {
+          "column": 3,
+          "line": 2
+        }
+      ],
+      "message": "Expected value of type \"Types\" but got: [object Map].",
+      "path": undefined
+    }
   ]
 }
 `;
 
 exports[`test schema 1`] = `
-"schema {
-  query: Query
-}
-
-scalar AnInt
+"scalar AnInt
 
 scalar AnotherInt
 
@@ -158,6 +163,7 @@ enum CompoundKeysOrderBy {
   EXTRA_DESC
 }
 
+# Awesome feature!
 type CompoundType {
   a: Int
   b: String
@@ -235,9 +241,12 @@ enum PeopleOrderBy {
   CREATED_AT_DESC
 }
 
+# Person test comment
 type Person implements Node {
   __id: ID!
   id: Int!
+
+  # The person’s name
   name: String!
   about: String
   email: Email
@@ -347,10 +356,13 @@ enum TypesOrderBy {
   NESTED_COMPOUND_TYPE_DESC
 }
 
+# YOYOYO!!
 type UpdatableView {
   x: Int
   name: String
   description: String
+
+  # This is constantly 2
   constant: Int
 }
 
@@ -378,16 +390,13 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
 scalar Uuid
 "
 `;
 
 exports[`test schema 2`] = `
-"schema {
-  query: Query
-}
-
-scalar AnInt
+"scalar AnInt
 
 scalar AnotherInt
 
@@ -430,6 +439,7 @@ enum CompoundKeysOrderBy {
   EXTRA_DESC
 }
 
+# Awesome feature!
 type CompoundType {
   a: Int
   b: String
@@ -507,9 +517,12 @@ enum PeopleOrderBy {
   CREATED_AT_DESC
 }
 
+# Person test comment
 type Person implements Node {
   id: ID!
   rowId: Int!
+
+  # The person’s name
   name: String!
   about: String
   email: Email
@@ -619,10 +632,13 @@ enum TypesOrderBy {
   NESTED_COMPOUND_TYPE_DESC
 }
 
+# YOYOYO!!
 type UpdatableView {
   x: Int
   name: String
   description: String
+
+  # This is constantly 2
   constant: Int
 }
 
@@ -650,6 +666,7 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
 scalar Uuid
 "
 `;

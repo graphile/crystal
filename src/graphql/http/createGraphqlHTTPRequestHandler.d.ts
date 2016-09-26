@@ -9,7 +9,13 @@ import { SchemaOptions } from '../schema/createGraphqlSchema'
 type HTTPRequestHandlerOptions = SchemaOptions & {
   // The exact (and only) route our request handler will respond to.
   route?: string,
+  // Whether or not we should show GraphiQL when the user asks for an HTML
+  // representation.
   graphiql?: boolean,
+  // Specifies whether or not we should show an error’s stack trace. If the
+  // value is `json` then the stack will be formatted in a way that is readble
+  // in JSON. Helpful for debugging.
+  showErrorStack?: boolean | 'json',
 }
 
 /**

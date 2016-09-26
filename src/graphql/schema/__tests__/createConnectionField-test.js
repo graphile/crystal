@@ -2,7 +2,7 @@ jest.mock('../getType')
 jest.mock('../../../interface')
 
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLList, GraphQLString } from 'graphql'
-import { Paginator } from '../../../interface'
+import { Context, Paginator } from '../../../interface'
 import getType from '../getType'
 import createConnectionField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionField'
 
@@ -161,7 +161,7 @@ test('_createConnectionType will resolve the source verbatim for pageInfo', () =
 test('_createConnectionType will use the paginators count method for totalCount', () => {
   const count = Symbol('count')
   const args = Symbol('args')
-  const context = Symbol('context')
+  const context = new Context()
   const condition = Symbol('condition')
 
   const paginator = { count: jest.fn(() => count) }
@@ -181,7 +181,7 @@ test('_createConnectionType will get the edges from the source page with some ex
   getType.mockReturnValueOnce(GraphQLString)
   const connectionType = _createConnectionType({}, {})
 
-  expect(connectionType.getFields().edges.resolve({ paginator, ordering, page: { values } }))
+  expect(connectionType.getFields().edges.resolve({ paginator, ordering, page: { values } }, {}, new Context()))
     .toEqual([{ value: 'a', cursor: 1, paginator, ordering }, { value: 'b', cursor: 2, paginator, ordering }])
 })
 
@@ -190,7 +190,7 @@ test('_createConnectionType will map the nodes field to page values', () => {
   const value2 = Symbol('value2')
   getType.mockReturnValueOnce(GraphQLString)
   const connectionType = _createConnectionType({}, {})
-  expect(connectionType.getFields().nodes.resolve({ page: { values: [{ value: value1 }, { value: value2 }] } }))
+  expect(connectionType.getFields().nodes.resolve({ page: { values: [{ value: value1 }, { value: value2 }] } }, {}, new Context()))
     .toEqual([value1, value2])
 })
 
@@ -203,23 +203,23 @@ test('createConnectionField will only include a condition argument if a conditio
 test('createConnectionField will throw when trying to resolve with cursors from different paginators', async () => {
   const paginator = { name: 'foo' }
   const field = createConnectionField({}, paginator)
-  await expectPromiseToReject(field.resolve(null, { before: { paginatorName: 'bar' } }), '`before` cursor can not be used with this connection.')
-  await expectPromiseToReject(field.resolve(null, { after: { paginatorName: 'bar' } }), '`after` cursor can not be used with this connection.')
+  await expectPromiseToReject(field.resolve(null, { before: { paginatorName: 'bar' } }, new Context()), '`before` cursor can not be used with this connection.')
+  await expectPromiseToReject(field.resolve(null, { after: { paginatorName: 'bar' } }, new Context()), '`after` cursor can not be used with this connection.')
 })
 
 test('createConnectionField will throw when trying to resolve with cursors from different orderings', async () => {
   const paginator = { name: 'foo' }
   const field = createConnectionField({}, paginator)
-  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: null } }), '`before` cursor can not be used for this `orderBy` value.')
-  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: null } }), '`after` cursor can not be used for this `orderBy` value.')
-  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: 'bar' } }), '`before` cursor can not be used for this `orderBy` value.')
-  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: 'bar' } }), '`after` cursor can not be used for this `orderBy` value.')
-  await expectPromiseToReject(field.resolve(null, { orderBy: null, before: { paginatorName: 'foo', orderingName: 'buz' } }), '`before` cursor can not be used for this `orderBy` value.')
-  await expectPromiseToReject(field.resolve(null, { orderBy: null, after: { paginatorName: 'foo', orderingName: 'buz' } }), '`after` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: null } }, new Context()), '`before` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: null } }, new Context()), '`after` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: 'bar' } }, new Context()), '`before` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: 'bar' } }, new Context()), '`after` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: null, before: { paginatorName: 'foo', orderingName: 'buz' } }, new Context()), '`before` cursor can not be used for this `orderBy` value.')
+  await expectPromiseToReject(field.resolve(null, { orderBy: null, after: { paginatorName: 'foo', orderingName: 'buz' } }, new Context()), '`after` cursor can not be used for this `orderBy` value.')
 })
 
 test('createConnectionField resolver will call Paginator#readPage and return the resulting page with some other values', async () => {
-  const context = Symbol('context')
+  const context = new Context()
   const page = Symbol('page')
 
   const paginator = { name: 'foo', readPage: jest.fn(() => page) }
@@ -237,6 +237,7 @@ test('createConnectionField resolver will call Paginator#readPage and return the
 })
 
 test('createConnectionField resolver will have a condition other than true if a config is provided', async () => {
+  const context = new Context()
   const source = Symbol('source')
   const conditionArg = Symbol('conditionArg')
   const condition = Symbol('condition')
@@ -250,12 +251,13 @@ test('createConnectionField resolver will have a condition other than true if a 
     getCondition,
   })
 
-  expect((await field.resolve(source, { condition: conditionArg })).condition).toBe(condition)
-  expect(paginator.readPage.mock.calls).toEqual([[undefined, { condition }]])
+  expect((await field.resolve(source, { condition: conditionArg }, context)).condition).toBe(condition)
+  expect(paginator.readPage.mock.calls).toEqual([[context, { condition }]])
   expect(getCondition.mock.calls).toEqual([[source, conditionArg]])
 })
 
 test('createConnectionField will pass down valid cursors without orderings', async () => {
+  const context = new Context()
   const cursor1 = Symbol('cursor1')
   const cursor2 = Symbol('cursor2')
 
@@ -264,26 +266,27 @@ test('createConnectionField will pass down valid cursors without orderings', asy
 
   const paginator = { name: 'foo', readPage: jest.fn() }
 
-  await createConnectionField({}, paginator).resolve(null, { before: beforeCursor })
-  await createConnectionField({}, paginator).resolve(null, { after: afterCursor })
+  await createConnectionField({}, paginator).resolve(null, { before: beforeCursor }, context)
+  await createConnectionField({}, paginator).resolve(null, { after: afterCursor }, context)
 
   expect(paginator.readPage.mock.calls).toEqual([
-    [undefined, { beforeCursor: cursor1, condition: true }],
-    [undefined, { afterCursor: cursor2, condition: true }],
+    [context, { beforeCursor: cursor1, condition: true }],
+    [context, { afterCursor: cursor2, condition: true }],
   ])
 })
 
 test('createConnectionField will pass down first/last integers', async () => {
+  const context = new Context()
   const first = Symbol('first')
   const last = Symbol('last')
 
   const paginator = { name: 'foo', readPage: jest.fn() }
 
-  await createConnectionField({}, paginator).resolve(null, { first })
-  await createConnectionField({}, paginator).resolve(null, { last })
+  await createConnectionField({}, paginator).resolve(null, { first }, context)
+  await createConnectionField({}, paginator).resolve(null, { last }, context)
 
   expect(paginator.readPage.mock.calls).toEqual([
-    [undefined, { first, condition: true }],
-    [undefined, { last, condition: true }],
+    [context, { first, condition: true }],
+    [context, { last, condition: true }],
   ])
 })

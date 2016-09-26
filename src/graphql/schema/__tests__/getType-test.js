@@ -22,6 +22,7 @@ import {
   ObjectType,
 } from '../../../interface'
 
+import { $$inputValueKeyName } from '../transformInputValue'
 import getType from '../getType'
 
 const mockBuildToken = () => ({
@@ -152,7 +153,9 @@ test('will correctly make an input object type', () => {
   expect(gqlType.getFields().a.description).toBe('aaaa!')
   expect(gqlType.getFields().a.type instanceof GraphQLNonNull).toBe(true)
   expect(gqlType.getFields().a.type.ofType).toBe(GraphQLBoolean)
+  expect(gqlType.getFields().a[$$inputValueKeyName]).toBe('a')
   expect(gqlType.getFields().b.name).toBe('b')
   expect(gqlType.getFields().b.description).toBe(undefined)
   expect(gqlType.getFields().b.type).toBe(GraphQLBoolean)
+  expect(gqlType.getFields().b[$$inputValueKeyName]).toBe('b')
 })

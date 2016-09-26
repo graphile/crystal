@@ -38,6 +38,7 @@ import {
 
 import { buildObject, formatName } from '../utils'
 import getCollectionType from './collection/getCollectionType'
+import { $$inputValueKeyName } from './transformInputValue'
 import BuildToken from './BuildToken'
 
 // TODO: doc
@@ -204,8 +205,8 @@ function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType): Gr
       Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
         [formatName.field(fieldName), {
           description: field.description,
-          internalName: fieldName,
           type: getType(buildToken, field.type, true),
+          [$$inputValueKeyName]: fieldName,
         }]
       )
     ),

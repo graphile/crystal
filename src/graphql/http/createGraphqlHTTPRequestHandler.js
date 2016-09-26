@@ -8,7 +8,7 @@ import {
   validate as validateGraphql,
   execute as executeGraphql,
   getOperationAST,
-  formatError,
+  formatError as defaultFormatError,
 } from 'graphql'
 import { Inventory } from '../../interface'
 import createGraphqlSchema from '../schema/createGraphqlSchema'
@@ -40,6 +40,20 @@ const favicon = new Promise((resolve, reject) => {
 export default function createGraphqlHTTPRequestHandler (inventory, options = {}) {
   // Creates our GraphQL schema…
   const graphqlSchema = createGraphqlSchema(inventory, options)
+
+  // Formats an error using the default GraphQL `formatError` function, and
+  // custom formatting using some other options.
+  const formatError = error => {
+    // Get the default formatted error object.
+    const formattedError = defaultFormatError(error)
+
+    // If the user wants to see the error’s stack, let’s add it to the
+    // formatted error.
+    if (options.showErrorStack)
+      formattedError.stack = options.showErrorStack === 'json' ? error.stack.split('\n') : error.stack
+
+    return formattedError
+  }
 
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
