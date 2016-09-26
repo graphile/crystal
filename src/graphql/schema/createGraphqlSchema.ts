@@ -10,7 +10,9 @@ export type SchemaOptions = {
   nodeIdFieldName?: string,
 }
 
-// TODO: doc
+/**
+ * Creates a GraphQL schema using an instance of `Inventory`.
+ */
 export default function createGraphqlSchema (inventory: Inventory, options: SchemaOptions = {}): GraphQLSchema {
   // We take our user-friendly arguments to `createGraphqlSchema` and convert them
   // into a build token. One nice side effect of always creating our own
