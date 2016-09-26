@@ -10,18 +10,22 @@ const minify = require('pg-minify')
 const pool = new Pool({
   database: 'postgraphql_test',
   port: 5432,
-  max: 10,
+  max: 20,
   idleTimeoutMillis: 500,
 })
 
-const kitchenSinkSchema = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../../resources/kitchen-sink-schema.sql'), (error, data) => {
-    if (error) reject(error)
-    else resolve(minify(data.toString()))
-  })
-})
-
 let clients = []
+
+beforeAll(async () => {
+  const kitchenSinkSchema = await new Promise((resolve, reject) => {
+    readFile(resolvePath(__dirname, '../../../../resources/kitchen-sink-schema.sql'), (error, data) => {
+      if (error) reject(error)
+      else resolve(minify(data.toString()))
+    })
+  })
+
+  await pool.query(kitchenSinkSchema)
+})
 
 /**
  * Acquires a client that connects to our test database from a connection pool.
@@ -37,27 +41,15 @@ let clients = []
  *
  * @returns {Promise<Client>}
  */
-export default async function getTestPGClient ({ noKitchenSinkSchema } = {}) {
+export default async function getTestPGClient () {
   const client = await pool.connect()
-  clients.push(client)
   await client.query('begin')
-
-  // If the user does not opt out of the kitchen sink schema, let’s apply it.
-  if (!noKitchenSinkSchema) {
-    try {
-      await client.query(await kitchenSinkSchema)
-    }
-    catch (error) {
-      // Make sure we log any errors we might run into. If we don’t do this
-      // log, the thrown error is pretty cryptic.
-      console.error('Failed to execute kitchen sink SQL:', error.stack)
-      throw error
-    }
-  }
 
   // Wrap the query function in a Jest mock so that users in tests can inspect
   // what’s happening.
   client.query = jest.fn(client.query)
+
+  clients.push(client)
 
   return client
 }
@@ -68,4 +60,8 @@ afterEach(async () => {
     client.release()
   }))
   clients = []
+})
+
+afterAll(async () => {
+  await pool.end()
 })

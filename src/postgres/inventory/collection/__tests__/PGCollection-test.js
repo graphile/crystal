@@ -79,7 +79,7 @@ test('create will insert new rows into the database', async () => {
   const pgQueryResult = await client.query('select row_to_json(p) as object from c.person as p')
 
   expect(pgQueryResult.rows.map(({ object }) => object))
-  .toEqual(values.map(mapToObject))
+    .toEqual(values.map(mapToObject))
 })
 
 test('paginator will have the same name and type', () => {
