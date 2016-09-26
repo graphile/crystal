@@ -94,13 +94,6 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
   public getFromEntrySQL (): sql.SQL {
     return sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
   }
-
-  /**
-   * Runs the `rowToValue` method of its type on the value it got back.
-   */
-  public transformPGValue (value: { [key: string]: mixed }): PGObjectType.Value {
-    return this.type.rowToValue(value)
-  }
 }
 
 export default PGCollectionPaginator

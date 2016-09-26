@@ -1,5 +1,6 @@
 import { ObjectType, NullableType } from '../../../interface'
 import { PGCatalog, PGCatalogAttribute } from '../../introspection'
+import transformPGValue, { $$transformPGValue } from '../transformPGValue'
 import getTypeFromPGType from '../getTypeFromPGType'
 
 /**
@@ -83,11 +84,21 @@ class PGObjectType extends ObjectType {
    * Converts a row returned by Postgres into the correct value object.
    */
   // TODO: test
-  public rowToValue (row: { [key: string]: mixed }): PGObjectType.Value {
+  public [$$transformPGValue] (row: { [key: string]: mixed }): PGObjectType.Value {
     const value = new Map<string, mixed>()
 
-    for (const [fieldName, { pgAttribute }] of this.fields)
-      value.set(fieldName, row[pgAttribute.name])
+    for (const [fieldName, { type: fieldType, pgAttribute }] of this.fields) {
+      let fieldValue = row[pgAttribute.name]
+
+      // If the field value is an object, we run `objectToMap`. Note though
+      // that it doesn’t use type information. For now since our only field
+      // attribute rename is in the collection type this is safe to do.
+      // TODO: Use type information to turn nested objects into maps.
+      if (fieldValue != null && typeof fieldValue === 'object')
+        fieldValue = transformPGValue(fieldType, fieldValue)
+
+      value.set(fieldName, fieldValue)
+    }
 
     return value
   }

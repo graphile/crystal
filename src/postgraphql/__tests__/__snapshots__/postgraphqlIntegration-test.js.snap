@@ -103,21 +103,41 @@ exports[`test query types.graphql 1`] = `
 Object {
   "data": Object {
     "allTypes": Object {
-      "nodes": null
-    }
-  },
-  "errors": Array [
-    GraphQLError {
-      "locations": Array [
+      "nodes": Array [
         Object {
-          "column": 5,
-          "line": 3
+          "bigint": 200,
+          "boolean": true,
+          "compoundType": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+            "d": "4be8a712-3ff7-432e-aa34-fdb43fbd838d",
+            "fooBar": 8
+          },
+          "domain": 5,
+          "domain2": 6,
+          "enum": "GREEN",
+          "nestedCompoundType": Object {
+            "a": Object {
+              "a": 3,
+              "b": "456",
+              "c": "RED",
+              "d": "aed18400-2a92-46df-8204-b70c728b3520",
+              "fooBar": 93
+            },
+            "b": Object {
+              "a": 42,
+              "b": "Hello, world!",
+              "c": "BLUE",
+              "d": "d34df5e0-83f1-11e6-8dd0-abee917ffd1e",
+              "fooBar": -5
+            },
+            "bazBuz": 7
+          }
         }
-      ],
-      "message": "Expected value of type \"Types\" but got: [object Map].",
-      "path": undefined
+      ]
     }
-  ]
+  }
 }
 `;
 

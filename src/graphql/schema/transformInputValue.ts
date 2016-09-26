@@ -77,5 +77,5 @@ export default function transformInputValue (type: GraphQLInputType<mixed>, valu
   }
 
   // Throw an error here. Just in case.
-  throw new Error(`Type of constructor named '${type.constructor.name}' is not a valid GraphQL input type.`)
+  throw new Error(`Type '${type.toString()}' is not a valid GraphQL input type.`)
 }

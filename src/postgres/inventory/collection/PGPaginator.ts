@@ -2,6 +2,7 @@ import { Context, Type, Paginator, Condition } from '../../../interface'
 import { sql } from '../../utils'
 import { PGCatalogAttribute } from '../../introspection'
 import { pgClientFromContext } from '../pgContext'
+import transformPGValue from '../transformPGValue'
 import conditionToSQL from './conditionToSQL'
 
 abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Ordering, Array<mixed>> {
@@ -15,11 +16,6 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
    * for the `from` entry we will use in our `select` queries.
    */
   public abstract getFromEntrySQL (): sql.SQL
-
-  /**
-   * Transforms the value from Postgres into an actual value.
-   */
-  public abstract transformPGValue (value: { [key: string]: mixed }): TValue
 
   /**
    * Counts how many values are in our `from` entry total.
@@ -99,7 +95,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
       // Convert our rows into usable values.
       const values: Array<{ value: TValue, cursor: Array<mixed> }> =
         rows.map(({ value }) => ({
-          value: this.transformPGValue(value),
+          value: transformPGValue(this.type, value),
           cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name])
         }))
 
