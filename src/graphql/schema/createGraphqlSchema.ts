@@ -6,12 +6,12 @@ import getCollectionType from './collection/getCollectionType'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
 import BuildToken from './BuildToken'
 
-type Options = {
+export type SchemaOptions = {
   nodeIdFieldName?: string,
 }
 
 // TODO: doc
-export default function createGraphqlSchema (inventory: Inventory, options: Options = {}): GraphQLSchema {
+export default function createGraphqlSchema (inventory: Inventory, options: SchemaOptions = {}): GraphQLSchema {
   // We take our user-friendly arguments to `createGraphqlSchema` and convert them
   // into a build token. One nice side effect of always creating our own
   // build token object is that we have the guarantee that every build token
