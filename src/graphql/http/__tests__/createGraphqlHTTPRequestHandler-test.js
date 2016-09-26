@@ -355,5 +355,26 @@ for (const [name, createServer] of serverCreators) {
         .expect('Content-Type', 'image/x-icon')
       )
     })
+
+    test('will render GraphiQL if enabled', async () => {
+      const server1 = createServer()
+      const server2 = createServer({ graphiql: true })
+      await (
+        request(server1)
+        .get('/')
+        .set('Accept', 'text/html')
+        .query({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+      )
+      await (
+        request(server2)
+        .get('/')
+        .set('Accept', 'text/html')
+        .query({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', 'text/html; charset=utf-8')
+      )
+    })
   })
 }

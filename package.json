@@ -24,11 +24,11 @@
   "main": "index.js",
   "scripts": {},
   "dependencies": {
+    "accepts": "^1.3.3",
     "body-parser": "^1.15.2",
     "change-case": "^3.0.0",
     "dataloader": "^1.2.0",
     "finalhandler": "^0.5.0",
-    "graphql": ">=0.6.0 <1.0.0",
     "graphql": "calebmer/graphql#163f491f24563101ca525e39152f55bf74529961",
     "http-errors": "^1.5.0",
     "parseurl": "^1.3.1",

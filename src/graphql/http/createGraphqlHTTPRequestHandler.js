@@ -2,10 +2,6 @@ import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { parse as parseQueryString } from 'querystring'
 import { IncomingMessage, ServerResponse } from 'http'
-const httpError = require('http-errors')
-const parseUrl = require('parseurl')
-const finalHandler = require('finalhandler')
-const bodyParser = require('body-parser')
 import {
   Source,
   parse as parseGraphql,
@@ -16,6 +12,13 @@ import {
 } from 'graphql'
 import { Inventory } from '../../interface'
 import createGraphqlSchema from '../schema/createGraphqlSchema'
+import renderGraphiQL from './renderGraphiQL'
+
+const httpError = require('http-errors')
+const parseUrl = require('parseurl')
+const finalHandler = require('finalhandler')
+const bodyParser = require('body-parser')
+const accepts = require('accepts')
 
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
@@ -101,7 +104,8 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
 
     // The `result` will be used at the very end in our `finally` block.
     // Statements inside the `try` will assign to `result` when they get
-    // a result.
+    // a result. We also keep track of `params`.
+    let params
     let result
 
     // This big `try`/`catch`/`finally` block represents the execution of our
@@ -141,7 +145,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      const params =
+      params =
         req.method === 'GET'
           ? parseQueryString(parseUrl(req).query)
           : typeof req.body === 'string' ? { query: req.body } : req.body
@@ -233,9 +237,25 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       if (result && result.errors)
         result.errors = result.errors.map(formatError)
 
-      // Send our result to the client as JSON.
-      res.setHeader('Content-Type', 'application/json; charser=utf-8')
-      res.end(JSON.stringify(result))
+      // If the `Accepts` header is looking for `html` (probably a
+      // browser), we want to show GraphiQL.
+      const showGraphiQL = options.graphiql && accepts(req).types(['json', 'html']) === 'html'
+
+      // Render the HTML involved for GraphiQL.
+      if (showGraphiQL) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.end(renderGraphiQL({
+          query: params.query,
+          variables: params.variables,
+          operationName: params.operationName,
+          result,
+        }))
+      }
+      // Otherwise send our result to the client as JSON.
+      else {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8')
+        res.end(JSON.stringify(result))
+      }
     }
   }
 

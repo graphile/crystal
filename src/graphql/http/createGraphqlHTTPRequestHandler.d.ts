@@ -9,6 +9,7 @@ import { SchemaOptions } from '../schema/createGraphqlSchema'
 type HTTPRequestHandlerOptions = SchemaOptions & {
   // The exact (and only) route our request handler will respond to.
   route?: string,
+  graphiql?: boolean,
 }
 
 /**
