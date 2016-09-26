@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, ObjectType, Relation } from '../../../interface'
+import { Context, Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getType from '../getType'
@@ -91,6 +91,9 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
             type: getCollectionType(buildToken, headCollection),
 
             async resolve (value, args, context): Promise<ObjectType.Value | undefined> {
+              if (!(context instanceof Context))
+                throw new Error('GraphQL context must be an instance of `Context`.')
+
               const key = relation.getHeadKeyFromTailValue(value)
               const headValue = await headCollectionKey.read!(context, key)
 

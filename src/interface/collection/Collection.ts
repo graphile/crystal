@@ -54,7 +54,7 @@ interface Collection {
    * the same `Type` as the `Collection`. This isn’t a hard requirement and
    * things might work fine if they’re different, but it may not work forever.
    */
-  readonly paginator?: Paginator<ObjectType.Value, mixed> | null
+  readonly paginator?: Paginator<ObjectType.Value, Paginator.Ordering, mixed> | null
 
   /**
    * Creates a value in our collection. Returns the newly created value.

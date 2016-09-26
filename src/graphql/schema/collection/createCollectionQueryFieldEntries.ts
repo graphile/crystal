@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
-import { Collection, CollectionKey, ObjectType } from '../../../interface'
+import { Context, Collection, CollectionKey, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
@@ -78,6 +78,9 @@ function createCollectionPrimaryKeyField <TKey>(
     },
 
     async resolve (source, args, context): Promise<ObjectType.Value | null> {
+      if (!(context instanceof Context))
+        throw new Error('GraphQL context must be an instance of `Context`.')
+
       const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
 
       if (name !== collection.name)
@@ -119,6 +122,9 @@ function createCollectionKeyField <TKey>(
         )
       ),
       async resolve (source, args, context): Promise<ObjectType.Value | null> {
+        if (!(context instanceof Context))
+          throw new Error('GraphQL context must be an instance of `Context`.')
+
         if (!keyType.isTypeOf(args))
           throw new Error('The provided arguments are not the correct type.')
 
@@ -139,6 +145,9 @@ function createCollectionKeyField <TKey>(
         },
       },
       async resolve (source, args, context): Promise<ObjectType.Value | null> {
+        if (!(context instanceof Context))
+          throw new Error('GraphQL context must be an instance of `Context`.')
+
         const key: mixed = args['input']
 
         if (!keyType.isTypeOf(key))

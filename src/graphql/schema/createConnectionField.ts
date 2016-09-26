@@ -17,7 +17,7 @@ import {
   Kind,
 } from 'graphql'
 
-import { Paginator, Condition, Type } from '../../interface'
+import { Context, Paginator, Condition, Type } from '../../interface'
 import { buildObject, formatName, memoize2 } from '../utils'
 import getType from './getType'
 import BuildToken from './BuildToken'
@@ -83,6 +83,9 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       context: mixed,
       info: GraphQLResolveInfo<mixed, mixed>,
     ): Promise<Connection<TValue, TOrdering, TCursor>> {
+      if (!(context instanceof Context))
+        throw new Error('GraphQL context must be an instance of `Context`.')
+
       const {
         orderBy: ordering = paginator.defaultOrdering,
         before: beforeCursor,
@@ -163,7 +166,12 @@ export function _createConnectionType <TValue, TOrdering extends Paginator.Order
       },
       totalCount: {
         type: GraphQLInt,
-        resolve: ({ paginator, condition }, args, context) => paginator.count(context, condition),
+        resolve: ({ paginator, condition }, args, context) => {
+          if (!(context instanceof Context))
+            throw new Error('GraphQL context must be an instance of `Context`.')
+
+          return paginator.count(context, condition)
+        },
         // TODO: description
       },
       edges: {

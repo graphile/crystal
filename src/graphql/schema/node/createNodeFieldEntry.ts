@@ -1,4 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
+import { Context } from '../../../interface'
 import idSerde from '../../utils/idSerde'
 import BuildToken from '../BuildToken'
 import getNodeInterfaceType from './getNodeInterfaceType'
@@ -15,7 +16,10 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    resolve (source, args) {
+    resolve (source, args, context) {
+      if (!(context instanceof Context))
+        throw new Error('GraphQL context must be an instance of `Context`.')
+
       const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName])
       const collection = inventory.getCollection(name)
 
@@ -24,10 +28,10 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
 
       const primaryKey = collection.primaryKey
 
-      if (!primaryKey)
-        throw new Error(`Invalid id, no primary key on collection named '${name}'.`)
+      if (!primaryKey || !primaryKey.read)
+        throw new Error(`Invalid id, no readable primary key on collection named '${name}'.`)
 
-      return primaryKey.read(key)
+      return primaryKey.read(context, key)
     },
   }]
 }
