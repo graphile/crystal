@@ -2,16 +2,17 @@ jest.mock('../../../interface/Inventory')
 jest.mock('../../../interface/Context')
 jest.mock('../../schema/createGraphqlSchema')
 
-const http = require('http')
-const request = require('supertest-as-promised')
-const connect = require('connect')
-const express = require('express')
-const Koa = require('koa')
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import Inventory from '../../../interface/Inventory'
 import Context from '../../../interface/Context'
 import createGraphqlSchema from '../../schema/createGraphqlSchema'
 import createGraphqlHTTPRequestHandler from '../createGraphqlHTTPRequestHandler'
+
+const http = require('http')
+const request = require('supertest-as-promised')
+const connect = require('connect')
+const express = require('express')
+const Koa = require('koa')
 
 createGraphqlSchema.mockReturnValue(new GraphQLSchema({
   query: new GraphQLObjectType({
