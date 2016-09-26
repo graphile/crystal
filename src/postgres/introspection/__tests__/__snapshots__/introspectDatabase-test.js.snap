@@ -72,6 +72,26 @@ Object {
       "typeId": "uuid"
     },
     Object {
+      "classId": "nested_compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "a",
+      "num": 1,
+      "typeId": "compound_type"
+    },
+    Object {
+      "classId": "nested_compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "b",
+      "num": 2,
+      "typeId": "compound_type"
+    },
+    Object {
       "classId": "non_updatable_view",
       "description": null,
       "hasDefault": false,
@@ -174,11 +194,21 @@ Object {
     Object {
       "classId": "types",
       "description": null,
+      "hasDefault": true,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
       "hasDefault": false,
       "isNotNull": false,
       "kind": "attribute",
       "name": "bigint",
-      "num": 1,
+      "num": 2,
       "typeId": "int8"
     },
     Object {
@@ -188,7 +218,7 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "boolean",
-      "num": 2,
+      "num": 3,
       "typeId": "bool"
     },
     Object {
@@ -198,7 +228,7 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "varchar",
-      "num": 3,
+      "num": 4,
       "typeId": "varchar"
     },
     Object {
@@ -208,7 +238,7 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "enum",
-      "num": 4,
+      "num": 5,
       "typeId": "color"
     },
     Object {
@@ -218,7 +248,7 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "domain",
-      "num": 5,
+      "num": 6,
       "typeId": "an_int"
     },
     Object {
@@ -228,7 +258,7 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "domain2",
-      "num": 6,
+      "num": 7,
       "typeId": "another_int"
     },
     Object {
@@ -238,8 +268,18 @@ Object {
       "isNotNull": false,
       "kind": "attribute",
       "name": "compound_type",
-      "num": 7,
+      "num": 8,
       "typeId": "compound_type"
+    },
+    Object {
+      "classId": "types",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "nested_compound_type",
+      "num": 9,
+      "typeId": "nested_compound_type"
     },
     Object {
       "classId": "updatable_view",
@@ -306,6 +346,18 @@ Object {
       "name": "compound_type",
       "namespaceId": "c",
       "typeId": "compound_type"
+    },
+    Object {
+      "description": null,
+      "id": "nested_compound_type",
+      "isDeletable": false,
+      "isInsertable": false,
+      "isSelectable": false,
+      "isUpdatable": false,
+      "kind": "class",
+      "name": "nested_compound_type",
+      "namespaceId": "b",
+      "typeId": "nested_compound_type"
     },
     Object {
       "description": null,
@@ -452,6 +504,17 @@ Object {
       "kind": "constraint",
       "name": "compound_key_pkey",
       "type": "p"
+    },
+    Object {
+      "classId": "types",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "name": "types_pkey",
+      "type": "p"
     }
   ],
   "namespaces": Array [
@@ -562,6 +625,20 @@ Object {
       "name": "email",
       "namespaceId": "b",
       "type": "d"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "nested_compound_type",
+      "description": null,
+      "enumVariants": null,
+      "id": "nested_compound_type",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "nested_compound_type",
+      "namespaceId": "b",
+      "type": "c"
     },
     Object {
       "baseTypeId": null,

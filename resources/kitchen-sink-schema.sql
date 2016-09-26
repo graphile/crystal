@@ -41,6 +41,11 @@ create type c.compound_type as (
   d uuid
 );
 
+create type b.nested_compound_type as (
+  a c.compound_type,
+  b c.compound_type
+);
+
 comment on type c.compound_type is 'Awesome feature!';
 
 create view b.updatable_view as
@@ -75,13 +80,15 @@ create domain a.an_int as integer;
 create domain b.another_int as a.an_int;
 
 create table b.types (
+  id serial primary key,
   "bigint" bigint,
   "boolean" boolean,
   "varchar" varchar,
   "enum" b.color,
   "domain" a.an_int,
   "domain2" b.another_int,
-  "compound_type" c.compound_type
+  "compound_type" c.compound_type,
+  "nested_compound_type" b.nested_compound_type
 );
 
 -- create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;

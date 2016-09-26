@@ -49,10 +49,14 @@ for (const file of readdirSync(queriesDir)) {
     })
 
     await client.query(await kitchenSinkData)
-
     const context = createPGContext(client)
 
     const result = await graphql(schema1, query, null, context)
+
+    // Log the errors in our result.
+    if (result.errors)
+      for (const e of result.errors)
+        console.error(e.stack || e)
 
     expect(result).toMatchSnapshot()
   }))

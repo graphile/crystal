@@ -99,6 +99,17 @@ Object {
 }
 `;
 
+exports[`test query types.graphql 1`] = `
+Object {
+  "data": Object {
+    "typesById": null
+  },
+  "errors": Array [
+    [Error: The provided arguments are not the correct type.]
+  ]
+}
+`;
+
 exports[`test schema 1`] = `
 "schema {
   query: Query
@@ -157,6 +168,11 @@ type CompoundType {
 scalar Cursor
 
 scalar Email
+
+type NestedCompoundType {
+  a: CompoundType
+  b: CompoundType
+}
 
 interface Node {
   __id: ID!
@@ -269,7 +285,9 @@ type Query {
   allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
-  allTypes(orderBy: TypesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  types(__id: ID!): Types
+  typesById(id: Int!): Types
   allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
   allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(__id: ID!): CompoundKey
@@ -280,7 +298,9 @@ type Query {
   personById(id: Int!): Person
 }
 
-type Types {
+type Types implements Node {
+  __id: ID!
+  id: Int!
   bigint: Int
   boolean: Boolean
   varchar: String
@@ -288,6 +308,7 @@ type Types {
   domain: AnInt
   domain2: AnotherInt
   compoundType: CompoundType
+  nestedCompoundType: NestedCompoundType
 }
 
 type TypesConnection {
@@ -303,7 +324,11 @@ type TypesEdge {
 }
 
 enum TypesOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   NATURAL
+  ID_ASC
+  ID_DESC
   BIGINT_ASC
   BIGINT_DESC
   BOOLEAN_ASC
@@ -318,6 +343,8 @@ enum TypesOrderBy {
   DOMAIN2_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
+  NESTED_COMPOUND_TYPE_ASC
+  NESTED_COMPOUND_TYPE_DESC
 }
 
 type UpdatableView {
@@ -413,6 +440,11 @@ type CompoundType {
 scalar Cursor
 
 scalar Email
+
+type NestedCompoundType {
+  a: CompoundType
+  b: CompoundType
+}
 
 interface Node {
   id: ID!
@@ -525,7 +557,9 @@ type Query {
   allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(id: ID!): Post
   postByRowId(rowId: Int!): Post
-  allTypes(orderBy: TypesOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  types(id: ID!): Types
+  typesByRowId(rowId: Int!): Types
   allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
   allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
   compoundKey(id: ID!): CompoundKey
@@ -536,7 +570,9 @@ type Query {
   personByRowId(rowId: Int!): Person
 }
 
-type Types {
+type Types implements Node {
+  id: ID!
+  rowId: Int!
   bigint: Int
   boolean: Boolean
   varchar: String
@@ -544,6 +580,7 @@ type Types {
   domain: AnInt
   domain2: AnotherInt
   compoundType: CompoundType
+  nestedCompoundType: NestedCompoundType
 }
 
 type TypesConnection {
@@ -559,7 +596,11 @@ type TypesEdge {
 }
 
 enum TypesOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   NATURAL
+  ID_ASC
+  ID_DESC
   BIGINT_ASC
   BIGINT_DESC
   BOOLEAN_ASC
@@ -574,6 +615,8 @@ enum TypesOrderBy {
   DOMAIN2_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
+  NESTED_COMPOUND_TYPE_ASC
+  NESTED_COMPOUND_TYPE_DESC
 }
 
 type UpdatableView {
