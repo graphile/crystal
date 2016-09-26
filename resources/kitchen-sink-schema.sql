@@ -38,12 +38,14 @@ create type c.compound_type as (
   a int,
   b text,
   c b.color,
-  d uuid
+  d uuid,
+  foo_bar int
 );
 
 create type b.nested_compound_type as (
   a c.compound_type,
-  b c.compound_type
+  b c.compound_type,
+  baz_buz int
 );
 
 comment on type c.compound_type is 'Awesome feature!';

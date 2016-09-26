@@ -1,14 +1,17 @@
 query {
-  typesById(id: 50) {
-    bigint
-    boolean
-    enum
-    domain
-    domain2
-    compoundType { ...compoundType }
-    nestedCompoundType {
-      a { ...compoundType }
-      b { ...compoundType }
+  allTypes {
+    nodes {
+      bigint
+      boolean
+      enum
+      domain
+      domain2
+      compoundType { ...compoundType }
+      nestedCompoundType {
+        a { ...compoundType }
+        b { ...compoundType }
+        bazBuz
+      }
     }
   }
 }
@@ -18,4 +21,5 @@ fragment compoundType on CompoundType {
   b
   c
   d
+  fooBar
 }

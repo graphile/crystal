@@ -72,6 +72,16 @@ Object {
       "typeId": "uuid"
     },
     Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "foo_bar",
+      "num": 5,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "nested_compound_type",
       "description": null,
       "hasDefault": false,
@@ -90,6 +100,16 @@ Object {
       "name": "b",
       "num": 2,
       "typeId": "compound_type"
+    },
+    Object {
+      "classId": "nested_compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "baz_buz",
+      "num": 3,
+      "typeId": "int4"
     },
     Object {
       "classId": "non_updatable_view",

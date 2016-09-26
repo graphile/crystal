@@ -102,14 +102,16 @@ Object {
 exports[`test query types.graphql 1`] = `
 Object {
   "data": Object {
-    "typesById": null
+    "allTypes": Object {
+      "nodes": null
+    }
   },
   "errors": Array [
     GraphQLError {
       "locations": Array [
         Object {
-          "column": 3,
-          "line": 2
+          "column": 5,
+          "line": 3
         }
       ],
       "message": "Expected value of type \"Types\" but got: [object Map].",
@@ -169,6 +171,7 @@ type CompoundType {
   b: String
   c: Color
   d: Uuid
+  fooBar: Int
 }
 
 scalar Cursor
@@ -178,6 +181,7 @@ scalar Email
 type NestedCompoundType {
   a: CompoundType
   b: CompoundType
+  bazBuz: Int
 }
 
 interface Node {
@@ -445,6 +449,7 @@ type CompoundType {
   b: String
   c: Color
   d: Uuid
+  fooBar: Int
 }
 
 scalar Cursor
@@ -454,6 +459,7 @@ scalar Email
 type NestedCompoundType {
   a: CompoundType
   b: CompoundType
+  bazBuz: Int
 }
 
 interface Node {
