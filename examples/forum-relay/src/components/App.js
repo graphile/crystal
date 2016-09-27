@@ -13,14 +13,11 @@ import RegisterPage from './RegisterPage'
 import LoginPage from './LoginPage'
 
 import {
-  HomeQueries,
-  PostIndexQueries,
-  PostQueries,
-  RegisterQueries
+  homeQueries,
+  postIndexQueries,
+  postQueries,
+  registerQueries
 } from '../queries'
-
-// We use React Context to share state
-// Redux might make sense though …
 
 class App extends React.Component {
   static childContextTypes = {
@@ -43,11 +40,38 @@ class App extends React.Component {
           <Navigation auth={this.props.auth} user={this.props.user} />
         </header>
         <main>
-          <MatchRelay exactly pattern="/" component={HomePage} queries={HomeQueries} />
-          <MatchRelay exactly pattern="/posts" component={PostIndexPage} queries={PostIndexQueries} />
-          <MatchRelay pattern="/posts/:postId" component={PostPage} queries={PostQueries} />
-          <MatchRelay pattern="/register" component={RegisterPage} queries={RegisterQueries} />
-          <Match pattern="/login" component={LoginPage} />
+          <MatchRelay
+            exactly
+            pattern="/"
+            component={HomePage}
+            queries={homeQueries}
+          />
+          <MatchRelay
+            exactly
+            pattern="/posts"
+            component={PostIndexPage}
+            queries={postIndexQueries}
+            prepareParams={(params) => { 
+              const { offset } = params
+              params = { ...params, offset: parseInt(offset) || 0 }
+              return params
+            }}
+          />
+          <MatchRelay
+            exactly
+            pattern="/posts/:postId"
+            component={PostPage}
+            queries={postQueries}
+          />
+          <MatchRelay
+            pattern="/register"
+            component={RegisterPage}
+            queries={registerQueries}
+          />
+          <Match
+            pattern="/login"
+            component={LoginPage}
+          />
         </main>
         <footer className={css(styles.footer)}>
           <p>An example application for PostGraphQL and Relay</p>
@@ -65,7 +89,6 @@ const styles = StyleSheet.create({
     padding: '1.5em 0',
   },
   footer: {
-    borderTop: '2px solid #0095ff',
     paddingTop: '1.5em',
     marginTop: '1.5em',
     color: '#0095ff',

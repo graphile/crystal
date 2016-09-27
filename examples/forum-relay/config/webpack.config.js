@@ -8,7 +8,6 @@ export default {
       test: /\.css$/,
       exclude: /node_modules/,
       loader: 'style-loader!css-loader?modules',
-      options: 'modules'
     }, {
       test: /\.css$/,
       include: /node_modules/,

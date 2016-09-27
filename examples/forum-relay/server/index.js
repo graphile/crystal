@@ -27,10 +27,10 @@ const app = new WebpackDevServer(compiler, {
   stats: { colors: true },
 })
 
+// The webpack dev server exposes the `.use` of the express app instance.
 // We mount the authentication service
 app.use('/token', authentication)
 
-// The webpack dev server exposes the `.use` of the express app instance.
 // Mount the postgraphql as middleware at `/graphql`.
 app.use('/graphql', postgraphql(DB_STRING, DB_SCHEMA, {
   anonymousRole: 'anon_role',

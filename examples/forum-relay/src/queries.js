@@ -2,19 +2,19 @@ import Relay from 'react-relay'
 
 const viewer = () => Relay.QL`query { viewer }`
 
-export const PostIndexQueries = {
+export const postIndexQueries = {
   viewer,
 }
 
-export const PostQueries = {
+export const postQueries = {
   post: () => Relay.QL`query { post(id: $postId) }`,
   viewer,
 }
 
-export const RegisterQueries = {
+export const registerQueries = {
   viewer,
 }
 
-export const HomeQueries = {
+export const homeQueries = {
   viewer,
 }

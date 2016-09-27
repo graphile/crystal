@@ -1,17 +1,15 @@
 import React from 'react'
 import Relay from 'react-relay'
 import { StyleSheet, css } from 'aphrodite'
+import Redirect from 'react-router/Redirect'
+import Link from 'react-router/Link'
 import PostItem from './PostItem'
 import PostForm from './PostForm'
+import RegisterPage from './RegisterPage'
+import { registerQueries } from '../queries'
+import MatchRelay from '../utils/MatchRelay'
+import ScrollBottomNotifier from '../utils/ScrollBottomNotifier'
 import { InsertPostMutation } from '../mutations'
-
-// TODO:
-// # Pagination
-//   * Scrolling
-//   * how does it handle mutations?
-//   * Update url
-//   * hide buttons if no prev/next page
-//   * Button Component
 
 class PostIndex extends React.Component {
   static contextTypes = {
@@ -20,6 +18,7 @@ class PostIndex extends React.Component {
 
   state = {
     addingPost: false,
+    loading: false,
   }
 
   insertPost = (data) => {
@@ -37,54 +36,41 @@ class PostIndex extends React.Component {
     this.setState({ addingPost: value || !addingPost })
   }
 
-  handleNextPage = () => {
-    const { totalCount } = this.props.viewer.posts
-    const { offset, first } = this.props.relay.variables
-    if (totalCount > offset + first) {
-      this.props.relay.setVariables({
-        offset: offset + first,
+  handleScrollBottom = () => {
+    const { relay, viewer } = this.props
+    //if (!viewer.posts.pageInfo.hasNextPage) return
+    relay.setVariables({
+      count: relay.variables.count + 3,
+    }, ({ready, done, error, aborted}) => {
+      this.setState({
+        loading: !ready && !(done || error || aborted)
       })
-    }
-  }
-
-  handlePrevPage = () => {
-    const { offset, first } = this.props.relay.variables
-    if (offset >= first) {
-      this.props.relay.setVariables({
-        offset: offset - first,
-      })
-    }
+    })
   }
 
   render() {
+    const { posts } = this.props.viewer
+
     return (
       <div>
-        <h1>Posts</h1>
-        <div>
-          {this.context.user.token &&
-            <button onClick={this.setAddingPost}>
-              {this.state.addingPost ? 'Cancel' : 'Write Post'}
-            </button>
-          }
+        <h1>Topics</h1>
+        {this.context.user.token &&
+          <div>
+          <button onClick={this.setAddingPost}>
+            {this.state.addingPost ? 'Cancel' : 'Add Topic'}
+          </button>
           {this.state.addingPost &&
             <PostForm user={this.context.user} onSubmit={this.insertPost}/>
           }
-        </div>
-        <div>
-          <button onClick={this.handlePrevPage}>Previous Page</button>
-          <button onClick={this.handleNextPage}>Next Page</button>
-        </div>
-        <ul>
-          {this.props.viewer.posts.edges.map(({ node: post }) =>
-            <li key={post.id}>
+          </div>
+        }
+        <ScrollBottomNotifier onScrollBottom={this.handleScrollBottom}>
+          {posts.edges && posts.edges.map(({ node: post }) =>
+            <div key={post.id}>
               <PostItem {...post}/>
-            </li>
+            </div>
           )}
-        </ul>
-        <div>
-          <button onClick={this.handlePrevPage}>Previous Page</button>
-          <button onClick={this.handleNextPage}>Next Page</button>
-        </div>
+        </ScrollBottomNotifier>
       </div>
     )
   }
@@ -92,19 +78,21 @@ class PostIndex extends React.Component {
 
 export default Relay.createContainer(PostIndex, {
   initialVariables: {
-    offset: 0,
-    first: 5,
+    count: 3,
   },
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {
         ${InsertPostMutation.getFragment('viewer')}
         posts: postNodes(
-          descending: true
-          first: $first,
-          offset: $offset,
-          orderBy: CREATED_AT,
+          first: $count,
+          descending: true,
+          orderBy: ROW_ID,
         ) {
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
           totalCount
           edges {
             node {

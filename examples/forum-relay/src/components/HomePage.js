@@ -6,7 +6,7 @@ class HomePage extends React.Component {
   render() {
     return (
       <div>
-        <h1>Newest Posts</h1>
+        <h1>Newest Topics</h1>
         <ul>
           {this.props.viewer.newestPosts.edges.map(({ node }) => {
             return <li key={node.id}>
