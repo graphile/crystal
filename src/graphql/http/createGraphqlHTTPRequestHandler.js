@@ -14,11 +14,14 @@ import { Inventory } from '../../interface'
 import createGraphqlSchema from '../schema/createGraphqlSchema'
 import renderGraphiQL from './renderGraphiQL'
 
+const Debugger = require('debug')
 const httpError = require('http-errors')
 const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 const accepts = require('accepts')
+
+const debug = new Debugger('postgraphql:graphql:http')
 
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
@@ -216,6 +219,10 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
           throw httpError(405, `Can only perform a '${operationAST.operation}' operation from a POST request.`)
         }
       }
+
+      // Lazily log the query. If this debugger isn’t enabled, don’t run it.
+      if (debug.enabled)
+        debug(params.query.replace(/\s+/g, ' ').trim())
 
       // Create a new context
       const context = await inventory.createContext()

@@ -4,6 +4,8 @@ npm_bin=$(npm bin)
 
 rm -rf build/*
 
+export DEBUG=postgraphql*
+
 $npm_bin/tsc --watch & \
 (sleep 6 && $npm_bin/nodemon --watch build --exec "node -r source-map-support/register build/postgraphql/main.js")
 
