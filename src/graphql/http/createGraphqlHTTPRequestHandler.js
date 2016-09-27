@@ -30,10 +30,6 @@ const favicon = new Promise((resolve, reject) => {
   })
 })
 
-// TODO: test `express`
-// TODO: test `connect`
-// TODO: test `koa`
-// TODO: test `http`
 /**
  * Creates a GraphQL request handler, this is untyped besides some JSDoc types
  * for intellisense.
