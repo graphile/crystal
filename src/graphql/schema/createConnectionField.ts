@@ -96,13 +96,6 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       } = args
 
       // Throw an error if the user is trying to use a cursor from another
-      // paginator.
-      if (beforeCursor && beforeCursor.paginatorName !== paginatorName)
-        throw new Error('`before` cursor can not be used with this connection.')
-      if (afterCursor && afterCursor.paginatorName !== paginatorName)
-        throw new Error('`after` cursor can not be used with this connection.')
-
-      // Throw an error if the user is trying to use a cursor from another
       // ordering. Note that if no ordering is defined we expect the
       // `orderingName` to be `null`. This is because when we deserialize the
       // base64 encoded JSON any undefineds will become nulls.
@@ -207,8 +200,7 @@ export function _createEdgeType <TValue, TOrdering extends Paginator.Ordering, T
     fields: () => ({
       cursor: {
         type: new GraphQLNonNull(_cursorType),
-        resolve: ({ paginator, ordering, cursor }): NamespacedCursor<TCursor> => ({
-          paginatorName: paginator.name,
+        resolve: ({ ordering, cursor }): NamespacedCursor<TCursor> => ({
           orderingName: ordering ? ordering.name : null,
           cursor,
         }),
@@ -265,8 +257,8 @@ export const _cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
  *
  * @private
  */
-function serializeCursor ({ paginatorName, orderingName, cursor }: NamespacedCursor<any>): string {
-  return new Buffer(JSON.stringify([paginatorName, orderingName, cursor])).toString('base64')
+function serializeCursor ({ orderingName, cursor }: NamespacedCursor<any>): string {
+  return new Buffer(JSON.stringify([orderingName, cursor])).toString('base64')
 }
 
 /**
@@ -275,8 +267,8 @@ function serializeCursor ({ paginatorName, orderingName, cursor }: NamespacedCur
  * @private
  */
 function deserializeCursor (serializedCursor: string): NamespacedCursor<any> {
-  const [paginatorName, orderingName, cursor] = JSON.parse(new Buffer(serializedCursor, 'base64').toString())
-  return { paginatorName, orderingName, cursor }
+  const [orderingName, cursor] = JSON.parse(new Buffer(serializedCursor, 'base64').toString())
+  return { orderingName, cursor }
 }
 
 /**
@@ -302,8 +294,7 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, Paginator.Orderi
       },
       startCursor: {
         type: _cursorType,
-        resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
-          paginatorName: paginator.name,
+        resolve: ({ ordering, page }): NamespacedCursor<any> => ({
           orderingName: ordering ? ordering.name : null,
           cursor: page.values[0].cursor,
         }),
@@ -311,8 +302,7 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, Paginator.Orderi
       },
       endCursor: {
         type: _cursorType,
-        resolve: ({ paginator, ordering, page }): NamespacedCursor<any> => ({
-          paginatorName: paginator.name,
+        resolve: ({ ordering, page }): NamespacedCursor<any> => ({
           orderingName: ordering ? ordering.name : null,
           cursor: page.values[page.values.length - 1].cursor,
         }),
@@ -359,7 +349,8 @@ interface Edge<TValue, TOrdering extends Paginator.Ordering, TCursor> {
  * @private
  */
 type NamespacedCursor<TCursor> = {
-  paginatorName: string,
+  // TODO: Evaluate if we really want to enforce paginator name checks.
+  // paginatorName: string,
   orderingName: string | null,
   cursor: TCursor,
 }

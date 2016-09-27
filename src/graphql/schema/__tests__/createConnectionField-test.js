@@ -17,15 +17,13 @@ const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject
 
 test('_cursorType will correctly serialize namespaced cursors', () => {
   expect(_cursorType.serialize({
-    paginatorName: 'hello',
     orderingName: 'world',
     cursor: 'foobar',
-  })).toBe('WyJoZWxsbyIsIndvcmxkIiwiZm9vYmFyIl0=')
+  })).toBe('WyJ3b3JsZCIsImZvb2JhciJd')
 })
 
 test('_cursorType will correctly parse values', () => {
-  expect(_cursorType.parseValue('WyJoZWxsbyIsIndvcmxkIiwiZm9vYmFyIl0=')).toEqual({
-    paginatorName: 'hello',
+  expect(_cursorType.parseValue('WyJ3b3JsZCIsImZvb2JhciJd')).toEqual({
     orderingName: 'world',
     cursor: 'foobar',
   })
@@ -34,9 +32,8 @@ test('_cursorType will correctly parse values', () => {
 test('_cursorType will correctly parse literals', () => {
   expect(_cursorType.parseLiteral({
     kind: Kind.STRING,
-    value: 'WyJoZWxsbyIsIndvcmxkIiwiZm9vYmFyIl0=',
+    value: 'WyJ3b3JsZCIsImZvb2JhciJd',
   })).toEqual({
-    paginatorName: 'hello',
     orderingName: 'world',
     cursor: 'foobar',
   })
@@ -67,7 +64,6 @@ test('_pageInfoType will get the correct start cursor', () => {
     ordering: { name: orderingName },
     page: { values: [{ cursor: startCursor }, { cursor: endCursor }] },
   })).toEqual({
-    paginatorName,
     orderingName,
     cursor: startCursor,
   })
@@ -84,7 +80,6 @@ test('_pageInfoType will get the correct end cursor', () => {
     ordering: { name: orderingName },
     page: { values: [{ cursor: startCursor }, { cursor: endCursor }] },
   })).toEqual({
-    paginatorName,
     orderingName,
     cursor: endCursor,
   })
@@ -106,13 +101,11 @@ test('_createEdgeType will correctly return a namespaced cursor', () => {
   const edgeType = _createEdgeType({}, paginator)
   expect(edgeType.getFields().cursor.resolve({ paginator, cursor: 'foobar' }))
     .toEqual({
-      paginatorName: 'foo',
       orderingName: null,
       cursor: 'foobar',
     })
   expect(edgeType.getFields().cursor.resolve({ paginator, cursor: 'xyz', ordering: { name: 'bar' } }))
     .toEqual({
-      paginatorName: 'foo',
       orderingName: 'bar',
       cursor: 'xyz',
     })
@@ -198,13 +191,6 @@ test('createConnectionField will only include a condition argument if a conditio
   const paginator = {}
   expect(createConnectionField({}, paginator).args.condition).toBeFalsy()
   expect(createConnectionField({}, paginator, { conditionType: GraphQLString }).args.condition).toBeTruthy()
-})
-
-test('createConnectionField will throw when trying to resolve with cursors from different paginators', async () => {
-  const paginator = { name: 'foo' }
-  const field = createConnectionField({}, paginator)
-  await expectPromiseToReject(field.resolve(null, { before: { paginatorName: 'bar' } }, new Context()), '`before` cursor can not be used with this connection.')
-  await expectPromiseToReject(field.resolve(null, { after: { paginatorName: 'bar' } }, new Context()), '`after` cursor can not be used with this connection.')
 })
 
 test('createConnectionField will throw when trying to resolve with cursors from different orderings', async () => {
