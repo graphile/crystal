@@ -1,3 +1,136 @@
+exports[`test query node.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "nodes": Array [
+        Object {
+          "__id": "WyJwZW9wbGUiLDFd",
+          "__typename": "Person",
+          "id": 1,
+          "name": "John Smith"
+        },
+        Object {
+          "__id": "WyJwZW9wbGUiLDJd",
+          "__typename": "Person",
+          "id": 2,
+          "name": "Sara Smith"
+        },
+        Object {
+          "__id": "WyJwZW9wbGUiLDNd",
+          "__typename": "Person",
+          "id": 3,
+          "name": "Budd Deey"
+        },
+        Object {
+          "__id": "WyJwZW9wbGUiLDRd",
+          "__typename": "Person",
+          "id": 4,
+          "name": "Kathryn Ramirez"
+        },
+        Object {
+          "__id": "WyJwZW9wbGUiLDVd",
+          "__typename": "Person",
+          "id": 5,
+          "name": "Johnny Tucker"
+        }
+      ]
+    },
+    "b": Object {
+      "nodes": Array [
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+          "__typename": "CompoundKey",
+          "personId1": 1,
+          "personId2": 2
+        },
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
+          "__typename": "CompoundKey",
+          "personId1": 2,
+          "personId2": 1
+        },
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+          "__typename": "CompoundKey",
+          "personId1": 2,
+          "personId2": 3
+        },
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
+          "__typename": "CompoundKey",
+          "personId1": 2,
+          "personId2": 5
+        },
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+          "__typename": "CompoundKey",
+          "personId1": 4,
+          "personId2": 3
+        },
+        Object {
+          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
+          "__typename": "CompoundKey",
+          "personId1": 4,
+          "personId2": 4
+        }
+      ]
+    },
+    "c": Object {
+      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "__typename": "CompoundKey",
+      "personId1": 2,
+      "personId2": 3
+    },
+    "d": Object {
+      "__id": "WyJwZW9wbGUiLDJd",
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith"
+    },
+    "e": Object {
+      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "__typename": "CompoundKey",
+      "personId1": 1,
+      "personId2": 2
+    },
+    "f": Object {
+      "__id": "WyJwZW9wbGUiLDVd",
+      "__typename": "Person",
+      "id": 5,
+      "name": "Johnny Tucker"
+    },
+    "g": null,
+    "h": null,
+    "i": Object {
+      "__id": "WyJwZW9wbGUiLDJd",
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith"
+    },
+    "j": Object {
+      "__id": "WyJwZW9wbGUiLDVd",
+      "__typename": "Person",
+      "id": 5,
+      "name": "Johnny Tucker"
+    },
+    "k": null,
+    "l": Object {
+      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "__typename": "CompoundKey",
+      "personId1": 2,
+      "personId2": 3
+    },
+    "m": Object {
+      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "__typename": "CompoundKey",
+      "personId1": 1,
+      "personId2": 2
+    },
+    "n": null
+  }
+}
+`;
+
 exports[`test query relation-tail-head.graphql 1`] = `
 Object {
   "data": Object {

@@ -16,22 +16,16 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    resolve (source, args, context) {
+    resolve <T>(source: mixed, args: any, context: mixed) {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName])
-      const collection = inventory.getCollection(name)
+      const { collectionKey, keyValue } = idSerde.deserialize(inventory, args[options.nodeIdFieldName])
 
-      if (!collection)
-        throw new Error(`Invalid id, no collection exists named '${name}'.`)
-
-      const primaryKey = collection.primaryKey
-
-      if (!primaryKey || !primaryKey.read)
+      if (!collectionKey || !collectionKey.read)
         throw new Error(`Invalid id, no readable primary key on collection named '${name}'.`)
 
-      return primaryKey.read(context, key)
+      return collectionKey.read(context, keyValue)
     },
   }]
 }

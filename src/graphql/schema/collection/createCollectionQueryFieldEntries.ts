@@ -61,7 +61,7 @@ function createCollectionPrimaryKeyField <TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
-  const { options } = buildToken
+  const { options, inventory } = buildToken
   const { collection } = collectionKey
 
   // If we can’t read from this collection key, stop.
@@ -83,15 +83,12 @@ function createCollectionPrimaryKeyField <TKey>(
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const { name, key } = idSerde.deserialize(args[options.nodeIdFieldName] as string)
+      const { collectionKey, keyValue } = idSerde.deserialize<TKey>(inventory, args[options.nodeIdFieldName] as string)
 
-      if (name !== collection.name)
-        throw new Error(`The provided id is for collection '${name}', not the expected collection '${collection.name}'.`)
+      if (collectionKey.collection !== collection)
+        throw new Error(`The provided id is for collection '${collectionKey.collection.name}', not the expected collection '${collection.name}'.`)
 
-      if (!collectionKey.keyType.isTypeOf(key))
-        throw new Error('The provided key is of the incorrect type.')
-
-      return await collectionKey.read!(context, key)
+      return await collectionKey.read!(context, keyValue)
     },
   }
 }

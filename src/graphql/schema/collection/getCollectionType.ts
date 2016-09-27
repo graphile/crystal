@@ -47,11 +47,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         primaryKey && [options.nodeIdFieldName, {
           // TODO: description
           type: new GraphQLNonNull(GraphQLID),
-          resolve: value =>
-            idSerde.serialize({
-              name: collection.name,
-              key: primaryKey.getKeyFromValue(value),
-            }),
+          resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value)),
         }],
       ],
 
