@@ -95,6 +95,10 @@ type Query {
   allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  relay: Query!
 }
 "
 `;

@@ -1,0 +1,19 @@
+query {
+  ...query
+  relay {
+    ...query
+    relay {
+      ...query
+      relay {
+        ...query
+      }
+    }
+  }
+}
+
+fragment query on Query {
+  node(__id: "hello") {
+    __typename
+    __id
+  }
+}

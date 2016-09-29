@@ -567,6 +567,23 @@ Object {
 }
 `;
 
+exports[`test query relay.graphql 1`] = `
+Object {
+  "data": Object {
+    "node": null,
+    "relay": Object {
+      "node": null,
+      "relay": Object {
+        "node": null,
+        "relay": Object {
+          "node": null
+        }
+      }
+    }
+  }
+}
+`;
+
 exports[`test query types.graphql 1`] = `
 Object {
   "data": Object {
@@ -849,6 +866,10 @@ type Query {
   person(__id: ID!): Person
   personByEmail(email: Email): Person
   personById(id: Int!): Person
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  relay: Query!
 }
 
 type Types implements Node {
@@ -1158,6 +1179,10 @@ type Query {
   person(id: ID!): Person
   personByEmail(email: Email): Person
   personByRowId(rowId: Int!): Person
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  relay: Query!
 }
 
 type Types implements Node {

@@ -1,4 +1,4 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
+import { GraphQLSchema, GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
 import { Inventory } from '../../interface'
 import buildObject from '../utils/buildObject'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
@@ -41,12 +41,14 @@ export default function createGraphqlSchema (inventory: Inventory, options: Sche
 }
 
 // TODO: doc
-function createQueryType <T>(buildToken: BuildToken): GraphQLObjectType<T> {
+function createQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
-  return new GraphQLObjectType({
+  let queryType: GraphQLObjectType<mixed>
+
+  queryType = new GraphQLObjectType({
     name: 'Query',
     // TODO: description
-    fields: buildObject<GraphQLFieldConfig<T, mixed>>(
+    fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
       [
         createNodeFieldEntry(buildToken),
       ],
@@ -54,6 +56,15 @@ function createQueryType <T>(buildToken: BuildToken): GraphQLObjectType<T> {
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
         .reduce((a, b) => a.concat(b), []),
+      [
+        ['relay', {
+          description: 'Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.',
+          type: new GraphQLNonNull(queryType),
+          resolve: source => source || {},
+        }],
+      ],
     ),
   })
+
+  return queryType
 }
