@@ -68,7 +68,7 @@
     "babel-plugin-module-alias": "^1.6.0",
     "babel-preset-modern-node": "^3.2.0",
     "babel-preset-stage-1": "^6.16.0",
-    "babel-register": "^6.14.0",
+    "babel-register": "^6.16.0",
     "babel-watch": "^2.0.2",
     "eslint": "^3.6.1",
     "eslint-config-calebmer": "^8.2.1",
