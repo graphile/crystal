@@ -71,12 +71,12 @@ create table c.compound_key (
   primary key (person_id_1, person_id_2)
 );
 
--- create table a.foreign_key (
---   person_id int references c.person(id),
---   compound_key_1 int,
---   compound_key_2 int,
---   foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
--- );
+create table a.foreign_key (
+  person_id int references c.person(id),
+  compound_key_1 int,
+  compound_key_2 int,
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
+);
 
 create domain a.an_int as integer;
 create domain b.another_int as a.an_int;

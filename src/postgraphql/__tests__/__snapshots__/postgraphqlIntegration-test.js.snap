@@ -446,12 +446,10 @@ Object {
         Object {
           "extra": null,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "john.smith@email.com",
             "name": "John Smith"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "sara.smith@email.com",
             "name": "Sara Smith"
           },
@@ -461,12 +459,10 @@ Object {
         Object {
           "extra": false,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "sara.smith@email.com",
             "name": "Sara Smith"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "john.smith@email.com",
             "name": "John Smith"
           },
@@ -476,12 +472,10 @@ Object {
         Object {
           "extra": null,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "sara.smith@email.com",
             "name": "Sara Smith"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "budd.deey@email.com",
             "name": "Budd Deey"
           },
@@ -491,12 +485,10 @@ Object {
         Object {
           "extra": true,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "sara.smith@email.com",
             "name": "Sara Smith"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "johnny.tucker@email.com",
             "name": "Johnny Tucker"
           },
@@ -506,12 +498,10 @@ Object {
         Object {
           "extra": true,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "kathryn.ramirez@email.com",
             "name": "Kathryn Ramirez"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "budd.deey@email.com",
             "name": "Budd Deey"
           },
@@ -521,17 +511,55 @@ Object {
         Object {
           "extra": false,
           "personByPersonId1": Object {
-            "createdAt": null,
             "email": "kathryn.ramirez@email.com",
             "name": "Kathryn Ramirez"
           },
           "personByPersonId2": Object {
-            "createdAt": null,
             "email": "kathryn.ramirez@email.com",
             "name": "Kathryn Ramirez"
           },
           "personId1": 4,
           "personId2": 4
+        }
+      ]
+    },
+    "allForeignKeys": Object {
+      "nodes": Array [
+        Object {
+          "compoundKey1": 2,
+          "compoundKey2": 1,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 2,
+            "personId2": 1
+          },
+          "personByPersonId": Object {
+            "email": "johnny.tucker@email.com",
+            "name": "Johnny Tucker"
+          },
+          "personId": 5
+        },
+        Object {
+          "compoundKey1": 4,
+          "compoundKey2": 4,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 4,
+            "personId2": 4
+          },
+          "personByPersonId": null,
+          "personId": null
+        },
+        Object {
+          "compoundKey1": 2,
+          "compoundKey2": 1,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 2,
+            "personId2": 1
+          },
+          "personByPersonId": null,
+          "personId": null
         }
       ]
     }
@@ -577,6 +605,27 @@ Object {
         }
       ]
     }
+  }
+}
+`;
+
+exports[`test query unique-constraints.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "email": "sara.smith@email.com",
+      "name": "Sara Smith"
+    },
+    "b": null,
+    "c": Object {
+      "personId1": 1,
+      "personId2": 2
+    },
+    "d": Object {
+      "personId1": 4,
+      "personId2": 4
+    },
+    "e": null
   }
 }
 `;
@@ -637,6 +686,36 @@ type CompoundType {
 scalar Cursor
 
 scalar Email
+
+type ForeignKey {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+  personByPersonId: Person
+}
+
+type ForeignKeysConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [ForeignKeysEdge]
+  nodes: [ForeignKey!]
+}
+
+type ForeignKeysEdge {
+  cursor: Cursor!
+  node: ForeignKey!
+}
+
+enum ForeignKeysOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  COMPOUND_KEY_1_ASC
+  COMPOUND_KEY_1_DESC
+  COMPOUND_KEY_2_ASC
+  COMPOUND_KEY_2_DESC
+}
 
 type NestedCompoundType {
   a: CompoundType
@@ -754,6 +833,7 @@ enum PostsOrderBy {
 
 type Query {
   node(__id: ID!): Node
+  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): ForeignKeysConnection
   allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
   allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(__id: ID!): Post
@@ -916,6 +996,36 @@ scalar Cursor
 
 scalar Email
 
+type ForeignKey {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+  personByPersonId: Person
+}
+
+type ForeignKeysConnection {
+  pageInfo: PageInfo!
+  totalCount: Int
+  edges: [ForeignKeysEdge]
+  nodes: [ForeignKey!]
+}
+
+type ForeignKeysEdge {
+  cursor: Cursor!
+  node: ForeignKey!
+}
+
+enum ForeignKeysOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  COMPOUND_KEY_1_ASC
+  COMPOUND_KEY_1_DESC
+  COMPOUND_KEY_2_ASC
+  COMPOUND_KEY_2_DESC
+}
+
 type NestedCompoundType {
   a: CompoundType
   b: CompoundType
@@ -1032,6 +1142,7 @@ enum PostsOrderBy {
 
 type Query {
   node(id: ID!): Node
+  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): ForeignKeysConnection
   allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
   allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
   post(id: ID!): Post

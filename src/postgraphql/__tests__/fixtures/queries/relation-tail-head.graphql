@@ -7,12 +7,26 @@ query {
       personByPersonId1 {
         name
         email
-        createdAt
       }
       personByPersonId2 {
         name
         email
-        createdAt
+      }
+    }
+  }
+  allForeignKeys {
+    nodes {
+      personId
+      compoundKey1
+      compoundKey2
+      personByPersonId {
+        name
+        email
+      }
+      compoundKeyByCompoundKey1AndCompoundKey2 {
+        personId1
+        personId2
+        extra
       }
     }
   }

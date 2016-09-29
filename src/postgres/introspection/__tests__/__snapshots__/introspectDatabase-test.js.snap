@@ -82,6 +82,36 @@ Object {
       "typeId": "int4"
     },
     Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "person_id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "compound_key_1",
+      "num": 2,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "compound_key_2",
+      "num": 3,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "nested_compound_type",
       "description": null,
       "hasDefault": false,
@@ -369,6 +399,18 @@ Object {
     },
     Object {
       "description": null,
+      "id": "foreign_key",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "foreign_key",
+      "namespaceId": "a",
+      "typeId": "foreign_key"
+    },
+    Object {
+      "description": null,
       "id": "nested_compound_type",
       "isDeletable": false,
       "isInsertable": false,
@@ -526,6 +568,34 @@ Object {
       "type": "p"
     },
     Object {
+      "classId": "foreign_key",
+      "foreignClassId": "compound_key",
+      "foreignKeyAttributeNums": Array [
+        2,
+        1
+      ],
+      "keyAttributeNums": Array [
+        2,
+        3
+      ],
+      "kind": "constraint",
+      "name": "foreign_key_compound_key_1_fkey",
+      "type": "f"
+    },
+    Object {
+      "classId": "foreign_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "name": "foreign_key_person_id_fkey",
+      "type": "f"
+    },
+    Object {
       "classId": "types",
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
@@ -649,6 +719,20 @@ Object {
     Object {
       "baseTypeId": null,
       "category": "C",
+      "classId": "foreign_key",
+      "description": null,
+      "enumVariants": null,
+      "id": "foreign_key",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "foreign_key",
+      "namespaceId": "a",
+      "type": "c"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
       "classId": "nested_compound_type",
       "description": null,
       "enumVariants": null,
@@ -738,6 +822,36 @@ exports[`test will get everything needed in an introspection 2`] = `
 Object {
   "attributes": Array [
     Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "person_id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "compound_key_1",
+      "num": 2,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "foreign_key",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "compound_key_2",
+      "num": 3,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "non_updatable_view",
       "description": null,
       "hasDefault": false,
@@ -789,6 +903,18 @@ Object {
     }
   ],
   "classes": Array [
+    Object {
+      "description": null,
+      "id": "foreign_key",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "foreign_key",
+      "namespaceId": "a",
+      "typeId": "foreign_key"
+    },
     Object {
       "description": null,
       "id": "non_updatable_view",
@@ -849,6 +975,20 @@ Object {
       "name": "an_int",
       "namespaceId": "a",
       "type": "d"
+    },
+    Object {
+      "baseTypeId": null,
+      "category": "C",
+      "classId": "foreign_key",
+      "description": null,
+      "enumVariants": null,
+      "id": "foreign_key",
+      "isNotNull": false,
+      "itemId": null,
+      "kind": "type",
+      "name": "foreign_key",
+      "namespaceId": "a",
+      "type": "c"
     },
     Object {
       "baseTypeId": null,
