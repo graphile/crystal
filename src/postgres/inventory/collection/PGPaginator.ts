@@ -27,7 +27,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   public async count (context: Context, condition?: Condition): Promise<number> {
     const client = pgClientFromContext(context)
     const conditionSQL = conditionToSQL(condition != null ? condition : true)
-    const result = await client.query(sql.compile(sql.query`select count(x) as count from ${this.getFromEntrySQL()} as x where ${conditionSQL}`)())
+    const result = await client.query(sql.compile(sql.query`select count(alias_x) as count from ${this.getFromEntrySQL()} as alias_x where ${conditionSQL}`)())
     return parseInt(result.rows[0]['count'], 10)
   }
 
@@ -130,8 +130,8 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
 
       // Construct our SQL query that will actually do the selecting.
       const query = sql.compile(sql.query`
-        select to_json(x) as value
-        from ${fromSQL} as x
+        select to_json(alias_x) as value
+        from ${fromSQL} as alias_x
         where ${conditionSQL}
         offset ${sql.value(offset)}
         limit ${limit != null ? sql.value(limit) : sql.raw('all')}
@@ -176,8 +176,8 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
       const query = sql.compile(
         sql.query`
           -- The standard select/from clauses up top.
-          select to_json(x) as value
-          from ${fromSQL} as x
+          select to_json(alias_x) as value
+          from ${fromSQL} as alias_x
 
           -- Combine our cursors with the condition used for this page to
           -- implement a where condition which will filter what we want it to.

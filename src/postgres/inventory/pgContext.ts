@@ -1,7 +1,10 @@
 // TODO: Refactor this module, it has code smell…
 
+import createDebugger = require('debug')
 import { PoolConfig, Pool, Client } from 'pg'
 import { Context } from '../../interface'
+
+const debugQuery = createDebugger('postgraphql:postgres:query')
 
 const $$pgClient = Symbol('postgres/client')
 
@@ -13,6 +16,21 @@ const $$pgClient = Symbol('postgres/client')
 export function createPGContextAssignment (pool: Pool) {
   return async (context: Context) => {
     const client = await pool.connect()
+
+    // If the client query debugger is enabled, log all of our Postgres
+    // queries.
+    if (debugQuery.enabled) {
+      const originalQuery = client.query
+      client.query = function debuggingQuery (...args: Array<any>) {
+        // If possible we never want to log the variables. Only the query text.
+        // If we logged variables we may log a password in plaintext.
+        if (typeof args[0] === 'string') debugQuery(args[0])
+        else if (typeof args[0] === 'object') debugQuery(args[0].text)
+
+        return originalQuery.apply(this, args)
+      }
+    }
+
     context.addCleanupFunction(() => client.release())
     context.addDependency($$pgClient, client)
   }

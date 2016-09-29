@@ -8,6 +8,7 @@ import {
   execute as executeGraphql,
   getOperationAST,
   formatError as defaultFormatError,
+  print as printGraphql,
 } from 'graphql'
 import { Inventory } from '../../interface'
 import createGraphqlSchema from '../schema/createGraphqlSchema'
@@ -255,7 +256,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
       if (debug.enabled)
-        debug(params.query.replace(/\s+/g, ' ').trim())
+        debug(printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim())
 
       // Create a new context
       const context = await inventory.createContext()

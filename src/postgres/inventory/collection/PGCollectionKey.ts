@@ -135,8 +135,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             sql.query`
               select (
                 -- Select our rows as JSON objects.
-                select row_to_json(x) as object
-                from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as x
+                select row_to_json(alias_x) as object
+                from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as alias_x
 
                 -- For all of our key attributes we need to test equality with a
                 -- key value.
@@ -195,7 +195,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             where ${this._getSQLKeyCondition(key)}
             returning *
           )
-          select row_to_json(x) as object from updated as x
+          select row_to_json(alias_x) as object from updated as alias_x
         `)()
 
         const result = await client.query(query)
@@ -227,7 +227,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             where ${this._getSQLKeyCondition(key)}
             returning *
           )
-          select row_to_json(x) as object from deleted as x
+          select row_to_json(alias_x) as object from deleted as alias_x
         `)()
 
         const result = await client.query(query)

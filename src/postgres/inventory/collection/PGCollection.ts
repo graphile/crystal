@@ -132,7 +132,7 @@ class PGCollection implements Collection {
             returning *
           )
           -- We use a subquery with our insert so we can turn the result into JSON.
-          select row_to_json(x) as object from insertion as x
+          select row_to_json(alias_x) as object from insertion as alias_x
         `)()
 
         const { rows } = await client.query(query)

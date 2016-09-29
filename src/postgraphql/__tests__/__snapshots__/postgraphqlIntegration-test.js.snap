@@ -218,41 +218,41 @@ Object {
         Object {
           "cursor": "WyJuYXR1cmFsIiwxXQ==",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1
           }
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiwyXQ==",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2
           }
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiwzXQ==",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3
           }
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiw0XQ==",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4
           }
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiw1XQ==",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Johnny Tucker",
+            "x": 5
           }
         }
       ]
@@ -260,43 +260,43 @@ Object {
     "i": Object {
       "edges": Array [
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1
           }
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2
           }
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3
           }
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4
           }
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
-            "constant": null,
-            "name": null,
-            "x": null
+            "constant": 2,
+            "name": "Johnny Tucker",
+            "x": 5
           }
         }
       ]
