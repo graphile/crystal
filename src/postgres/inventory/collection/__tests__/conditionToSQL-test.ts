@@ -88,7 +88,7 @@ test('integration test 1', () => {
       },
     ],
   }
-  expect(sql.compile(conditionToSQL(condition))()).toEqual({
+  expect(sql.compile(conditionToSQL(condition))).toEqual({
     name: undefined,
     text: '(true and not(false) and ("a" = $1) and ("a"."b" < $2) and not((("c" > $3) or ("c" = $4))))',
     values: [42, 45, 5, 5],

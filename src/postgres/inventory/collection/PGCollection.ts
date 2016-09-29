@@ -107,9 +107,11 @@ class PGCollection implements Collection {
   private _getInsertLoader (client: Client): DataLoader<PGObjectType.Value, PGObjectType.Value> {
     return new DataLoader<PGObjectType.Value, PGObjectType.Value>(
       async (values: Array<PGObjectType.Value>): Promise<Array<PGObjectType.Value>> => {
+        const insertionIdentifier = Symbol()
+
         // Create our insert query.
         const query = sql.compile(sql.query`
-          with insertion as (
+          with ${sql.identifier(insertionIdentifier)} as (
             -- Start by defining our header which will be the class we are
             -- inserting into (prefixed by namespace of course).
             insert into ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
@@ -132,8 +134,8 @@ class PGCollection implements Collection {
             returning *
           )
           -- We use a subquery with our insert so we can turn the result into JSON.
-          select row_to_json(alias_x) as object from insertion as alias_x
-        `)()
+          select row_to_json(${sql.identifier(insertionIdentifier)}) as object from ${sql.identifier(insertionIdentifier)}
+        `)
 
         const { rows } = await client.query(query)
         return rows.map(({ object }) => transformPGValue(this.type, object))

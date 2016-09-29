@@ -27,7 +27,8 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   public async count (context: Context, condition?: Condition): Promise<number> {
     const client = pgClientFromContext(context)
     const conditionSQL = conditionToSQL(condition != null ? condition : true)
-    const result = await client.query(sql.compile(sql.query`select count(alias_x) as count from ${this.getFromEntrySQL()} as alias_x where ${conditionSQL}`)())
+    const aliasIdentifier = Symbol()
+    const result = await client.query(sql.compile(sql.query`select count(${sql.identifier(aliasIdentifier)}) as count from ${this.getFromEntrySQL()} as ${sql.identifier(aliasIdentifier)} where ${conditionSQL}`))
     return parseInt(result.rows[0]['count'], 10)
   }
 
@@ -128,14 +129,16 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
         limit = last
       }
 
+      const aliasIdentifier = Symbol()
+
       // Construct our SQL query that will actually do the selecting.
       const query = sql.compile(sql.query`
-        select to_json(alias_x) as value
-        from ${fromSQL} as alias_x
+        select to_json(${sql.identifier(aliasIdentifier)}) as value
+        from ${fromSQL} as ${sql.identifier(aliasIdentifier)}
         where ${conditionSQL}
         offset ${sql.value(offset)}
-        limit ${limit != null ? sql.value(limit) : sql.raw('all')}
-      `)()
+        limit ${limit != null ? sql.value(limit) : sql.query`all`}
+      `)
 
       // Send our query to Postgres.
       const { rows } = await client.query(query)
@@ -173,11 +176,13 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
       if (beforeCursor != null && (!Array.isArray(beforeCursor) || beforeCursor.length !== pgAttributes.length))
         throw new Error('Before cursor must be a value tuple of the correct length.')
 
+      const aliasIdentifier = Symbol()
+
       const query = sql.compile(
         sql.query`
           -- The standard select/from clauses up top.
-          select to_json(alias_x) as value
-          from ${fromSQL} as alias_x
+          select to_json(${sql.identifier(aliasIdentifier)}) as value
+          from ${fromSQL} as ${sql.identifier(aliasIdentifier)}
 
           -- Combine our cursors with the condition used for this page to
           -- implement a where condition which will filter what we want it to.
@@ -200,7 +205,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
           -- Finally, apply the appropriate limit.
           limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
         `
-      )()
+      )
 
       let { rows } = await client.query(query)
 
@@ -235,7 +240,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
             from ${fromSQL}
             where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSQL}
             limit 1
-          `)())
+          `))
 
           return rowCount !== 0
         },
@@ -252,7 +257,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
             from ${fromSQL}
             where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSQL}
             limit 1
-          `)())
+          `))
 
           return rowCount !== 0
         },

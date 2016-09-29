@@ -110,6 +110,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   private _getSelectLoader (client: Client): DataLoader<PGObjectType.Value, PGObjectType.Value | null> {
     return new DataLoader<PGObjectType.Value, PGObjectType.Value | null>(
       async (keys: Array<PGObjectType.Value>): Promise<Array<PGObjectType.Value | null>> => {
+        const aliasIdentifier = Symbol()
+
         // For every key we have, generate a select statement then combine
         // those select statements with `union all`. This approach has a
         // number of advantages:
@@ -135,8 +137,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             sql.query`
               select (
                 -- Select our rows as JSON objects.
-                select row_to_json(alias_x) as object
-                from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as alias_x
+                select row_to_json(${sql.identifier(aliasIdentifier)}) as object
+                from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
 
                 -- For all of our key attributes we need to test equality with a
                 -- key value.
@@ -152,7 +154,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
               )
             `
           ), ' union all ')}
-        `)()
+        `)
 
         const { rows } = await client.query(query)
         return rows.map(({ object }) => object == null ? null : transformPGValue(this.collection.type, object))
@@ -173,10 +175,12 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
       : async (context: Context, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
+        const updatedIdentifier = Symbol()
+
         const query = sql.compile(sql.query`
           -- Put our updated rows in a with statement so that we can select
           -- our result as JSON rows before returning it.
-          with updated as (
+          with ${sql.identifier(updatedIdentifier)} as (
             update ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
 
             -- Using our patch object we construct the fields we want to set and
@@ -195,8 +199,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             where ${this._getSQLKeyCondition(key)}
             returning *
           )
-          select row_to_json(alias_x) as object from updated as alias_x
-        `)()
+          select row_to_json(${sql.identifier(updatedIdentifier)}) as object from ${sql.identifier(updatedIdentifier)}
+        `)
 
         const result = await client.query(query)
 
@@ -219,16 +223,18 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
       : async (context: Context, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
+        const deletedIdentifier = Symbol()
+
         // This is a pretty simple query. Delete the row that matches our key
         // and return the deleted row.
         const query = sql.compile(sql.query`
-          with deleted as (
+          with ${sql.identifier(deletedIdentifier)} as (
             delete from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
             where ${this._getSQLKeyCondition(key)}
             returning *
           )
-          select row_to_json(alias_x) as object from deleted as alias_x
-        `)()
+          select row_to_json(${sql.identifier(deletedIdentifier)}) as object from ${sql.identifier(deletedIdentifier)}
+        `)
 
         const result = await client.query(query)
 
