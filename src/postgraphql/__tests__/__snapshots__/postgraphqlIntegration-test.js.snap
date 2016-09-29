@@ -1,3 +1,310 @@
+exports[`test query connections.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "johnny.tucker@email.com",
+            "id": 5,
+            "name": "Johnny Tucker"
+          }
+        }
+      ]
+    },
+    "b": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith"
+          }
+        }
+      ]
+    },
+    "c": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "johnny.tucker@email.com",
+            "id": 5,
+            "name": "Johnny Tucker"
+          }
+        }
+      ]
+    },
+    "d": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2hubnkgVHVja2VyIiw1XV0=",
+          "node": Object {
+            "email": "johnny.tucker@email.com",
+            "id": 5,
+            "name": "Johnny Tucker"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith"
+          }
+        }
+      ]
+    },
+    "e": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obm55IFR1Y2tlciIsNV1d",
+          "node": Object {
+            "email": "johnny.tucker@email.com",
+            "id": 5,
+            "name": "Johnny Tucker"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith"
+          }
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey"
+          }
+        }
+      ]
+    },
+    "f": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith"
+          }
+        }
+      ]
+    },
+    "g": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez"
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "johnny.tucker@email.com",
+            "id": 5,
+            "name": "Johnny Tucker"
+          }
+        }
+      ]
+    },
+    "h": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        }
+      ]
+    },
+    "i": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFtudWxsXV0=",
+          "node": Object {
+            "constant": null,
+            "name": null,
+            "x": null
+          }
+        }
+      ]
+    }
+  }
+}
+`;
+
 exports[`test query node.graphql 1`] = `
 Object {
   "data": Object {

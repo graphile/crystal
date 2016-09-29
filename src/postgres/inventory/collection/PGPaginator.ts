@@ -5,7 +5,11 @@ import { pgClientFromContext } from '../pgContext'
 import transformPGValue from '../transformPGValue'
 import conditionToSQL from './conditionToSQL'
 
-abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Ordering, Array<mixed>> {
+type PGPaginatorCursor = Array<mixed> | number
+
+// TODO: If we split up `Paginator`, we can move the cursor computation from
+// `readPage` into a class method.
+abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Ordering, PGPaginatorCursor> {
   public abstract name: string
   public abstract type: Type<TValue>
   public abstract orderings: Array<PGPaginator.Ordering>
@@ -28,35 +32,152 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
   }
 
   /**
-   * Reads a page of data from our Postgres database. There are different methods this is actually executed which depends on
+   * Reads a page of data from our Postgres database. There are different
+   * methods this is actually executed which depends on the ordering.
    */
+  // TODO: Refactor this into two methods…
+  // TODO: Perhaps refactor the paginator into two different classes. This
+  // would allow type seperation between cursors and orderings.
   public async readPage (
     context: Context,
-    config: Paginator.PageConfig<PGPaginator.Ordering, Array<mixed>>,
-  ): Promise<Paginator.Page<TValue, Array<mixed>>> {
+    config: Paginator.PageConfig<PGPaginator.Ordering, PGPaginatorCursor>,
+  ): Promise<Paginator.Page<TValue, PGPaginatorCursor>> {
     const client = pgClientFromContext(context)
     const { ordering = this.defaultOrdering, beforeCursor, afterCursor, first, last, condition } = config
 
-    // const fromEntrySQL = sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
+    const fromSQL = this.getFromEntrySQL()
     const conditionSQL = conditionToSQL(condition || true)
 
+    // Do not allow `first` and `last` to be defined at the same time. THERE
+    // MAY ONLY BE 1!!
     if (first != null && last != null)
       throw new Error('`first` and `last` may not be defined at the same time.')
 
-    // TODO: Implement offset ordering.
+    // ========================================================================
+    // Offset Ordering
+    // ========================================================================
+    //
+    // IMPORTANT NOTE: There are two implementations of cursor based pagination
+    // in this paginator. One is this offset implementation, and the other is
+    // an implementation which uses Postgres columns. Offset based cursor
+    // pagination is definetly the easier of the two to implement, but it is
+    // much flakier and it negates some of the benefits of cursor based
+    // pagination. This does not mean you shouldn’t offset based pagination, it
+    // is definetly useful for SQL systems. However, if you are using this as a
+    // reference cursor implementation to implement cursor based pagination in
+    // your own app prefer ordering with attributes.
     if (ordering.type === 'OFFSET') {
-      throw new Error('Unimplemented')
+      // Check that the types of our cursors is exactly what we would expect.
+      if (afterCursor != null && (typeof afterCursor !== 'number' || !Number.isInteger(afterCursor)))
+        throw new Error('The after cursor must be an integer.')
+      if (beforeCursor != null && (typeof beforeCursor !== 'number' || !Number.isInteger(beforeCursor)))
+        throw new Error('The before cursor must be an integer.')
+
+      // Rename our variables to make it clear they are offsets.
+      const afterOffset: number | undefined = afterCursor
+      const beforeOffset: number | undefined = beforeCursor
+
+      // A private variable where we store the value returned by `getCount`.
+      let _count: number | undefined
+
+      // A local memoized implementation that gets the count of *all* values in
+      // the set we are paginating.
+      const getCount = async () => {
+        if (_count == null)
+          _count = await this.count(context, condition)
+
+        return _count
+      }
+
+      let offset: number
+      let limit: number | null
+
+      // If `last` is not defined (which means `first` might be defined), *or*
+      // the `last` variable is unnesecary (this happens when
+      // `beforeOffset - afterOffset <= last`). Execute the first method of
+      // calculating `offset` and `limit`.
+      //
+      // If `beforeOffset - afterOffset <= last` is true then we can safely
+      // ignore `last` as the range between `afterOffset` and `beforeOffset`
+      // is *less* then the range defined in `last`.
+      //
+      // In this first block we can consider ourselves paginating *forwards*.
+      if (last == null || (last != null && beforeOffset != null && beforeOffset - (afterOffset != null ? afterOffset : 0) <= last)) {
+        // Start selecting at the offset specified by `after`. If there is no
+        // after, we start selecting at the beginning (0).
+        offset = afterOffset != null ? afterOffset : 0
+
+        // Next create our limit (what we will be selecting to relative to our
+        // `offset`).
+        limit =
+          beforeOffset != null ? Math.min((beforeOffset - 1) - offset, first != null ? first : Infinity) :
+          first != null ? first :
+          null
+      }
+      // Otherwise in this block, we will be paginating *backwards*.
+      else {
+        // Calculate the `offset` by doing some maths. We may need to get the
+        // count from the database on this one.
+        offset =
+          beforeOffset != null
+            ? beforeOffset - last - 1
+            : Math.max(await getCount() - last, afterOffset != null ? afterOffset : -Infinity)
+
+        // The limit should always simply be `last`. Except in one case, but
+        // that case is handled above.
+        limit = last
+      }
+
+      // Construct our SQL query that will actually do the selecting.
+      const query = sql.compile(sql.query`
+        select to_json(x) as value
+        from ${fromSQL} as x
+        where ${conditionSQL}
+        offset ${sql.value(offset)}
+        limit ${limit != null ? sql.value(limit) : sql.raw('all')}
+      `)()
+
+      // Send our query to Postgres.
+      const { rows } = await client.query(query)
+
+      // Transform our rows into the values our page expects.
+      const values: Array<{ value: TValue, cursor: number }> =
+        rows.map(({ value }, i) => ({
+          value: transformPGValue(this.type, value),
+          cursor: offset + 1 + i,
+        }))
+
+      // TODO: We get the count in this function (see `getCount`) to paginate
+      // correctly. We should create an optimization that allows us to share
+      // what the count is instead of calling for the count again.
+      return {
+        values,
+        // We have super simple implementations for `hasNextPage` and
+        // `hasPreviousPage` thanks to the algebraic nature of ordering by
+        // offset.
+        hasNextPage: async () => offset + (limit != null ? limit : Infinity) < await getCount(),
+        hasPreviousPage: () => Promise.resolve(offset > 0),
+      }
     }
-    // When we are provided exact information about the query we are ordering,
-    // there are many things we can optimize.
+
+    // ========================================================================
+    // Attributes Ordering
+    // ========================================================================
     else if (ordering.type === 'ATTRIBUTES') {
       const { pgAttributes, descending } = ordering
+
+      // Perform some validations on our cursors. If they do not pass these
+      // conditions, we should not proceed.
+      if (afterCursor != null && (!Array.isArray(afterCursor) || afterCursor.length !== pgAttributes.length))
+        throw new Error('After cursor must be a value tuple of the correct length.')
+      if (beforeCursor != null && (!Array.isArray(beforeCursor) || beforeCursor.length !== pgAttributes.length))
+        throw new Error('Before cursor must be a value tuple of the correct length.')
 
       const query = sql.compile(
         sql.query`
           -- The standard select/from clauses up top.
           select to_json(x) as value
-          from ${this.getFromEntrySQL()} as x
+          from ${fromSQL} as x
 
           -- Combine our cursors with the condition used for this page to
           -- implement a where condition which will filter what we want it to.
@@ -96,7 +217,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
       const values: Array<{ value: TValue, cursor: Array<mixed> }> =
         rows.map(({ value }) => ({
           value: transformPGValue(this.type, value),
-          cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name])
+          cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name]),
         }))
 
       return {
@@ -104,15 +225,15 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
 
         // Gets whether or not we have more values to paginate through by
         // running a simple, efficient SQL query to test.
-        async hasNextPage (): Promise<boolean> {
+        hasNextPage: async (): Promise<boolean> => {
           const lastValue = values[values.length - 1]
-          const lastCursor = lastValue ? lastValue.cursor : null
-          if (!lastCursor) return false
+          const lastCursor = lastValue ? lastValue.cursor : beforeCursor
+          if (lastCursor == null) return false
 
           const { rowCount } = await client.query(sql.compile(sql.query`
             select null
-            from ${this.getFromEntrySQL()}
-            where ${this._getCursorCondition(pgAttributes, lastCursor, '>')} and ${conditionSQL}
+            from ${fromSQL}
+            where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSQL}
             limit 1
           `)())
 
@@ -121,15 +242,15 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
 
         // Gets whether or not we have more values to paginate through by
         // running a simple, efficient SQL query to test.
-        async hasPreviousPage (): Promise<boolean> {
+        hasPreviousPage: async (): Promise<boolean> => {
           const firstValue = values[0]
-          const firstCursor = firstValue ? firstValue.cursor : null
-          if (!firstCursor) return false
+          const firstCursor = firstValue ? firstValue.cursor : afterCursor
+          if (firstCursor == null) return false
 
           const { rowCount } = await client.query(sql.compile(sql.query`
             select null
-            from ${this.getFromEntrySQL()}
-            where ${this._getCursorCondition(pgAttributes, firstCursor, '<')} and ${conditionSQL}
+            from ${fromSQL}
+            where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSQL}
             limit 1
           `)())
 

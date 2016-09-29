@@ -128,7 +128,13 @@ test('paginator `defaultOrdering` will be the first ordering in `orderings`', ()
   expect(collection3.paginator.defaultOrdering).toBe(collection3.paginator.orderings[0])
 })
 
-async function addTestData (client) {
+test('paginator `count` will count all of the values in a collection with a condition', withPGClient(async client => {
+  const context = createPGContext(client)
+
+  expect(await collection1.paginator.count(context, true)).toBe(0)
+  expect(await collection2.paginator.count(context, true)).toBe(0)
+  expect(await collection3.paginator.count(context, true)).toBe(0)
+
   await client.query(`
     insert into c.person (id, name, email, about, created_at) values
       (1, 'John Smith', 'john.smith@email.com', null, null),
@@ -143,16 +149,6 @@ async function addTestData (client) {
       (3, 2, false),
       (3, 1, true);
   `)
-}
-
-test('paginator `count` will count all of the values in a collection with a condition', withPGClient(async client => {
-  const context = createPGContext(client)
-
-  expect(await collection1.paginator.count(context, true)).toBe(0)
-  expect(await collection2.paginator.count(context, true)).toBe(0)
-  expect(await collection3.paginator.count(context, true)).toBe(0)
-
-  await addTestData(client)
 
   expect(await collection1.paginator.count(context, true)).toBe(3)
   expect(await collection2.paginator.count(context, true)).toBe(3)
@@ -163,231 +159,373 @@ test('paginator `count` will count all of the values in a collection with a cond
   expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'LESS_THAN', value: 2 } })).toBe(1)
 }))
 
-test('paginator `readPage` will read all of the values', withPGClient(async client => {
-  const context = createPGContext(client)
-
-  expect((await collection1.paginator.readPage(context, {})).values).toEqual([])
-  expect((await collection3.paginator.readPage(context, {})).values).toEqual([])
-
-  await addTestData(client)
-
-  expect((await collection1.paginator.readPage(context, {})).values).toEqual([
-    {
-      cursor: [1],
-      value: new Map([
-        ['id', 1],
-        ['name', 'John Smith'],
-        ['about', null],
-        ['email', 'john.smith@email.com'],
-        ['created_at', null],
-      ]),
-    },
-    {
-      cursor: [2],
-      value: new Map([
-        ['id', 2],
-        ['name', 'Sara Smith'],
-        ['about', null],
-        ['email', 'sara.smith@email.com'],
-        ['created_at', null],
-      ]),
-    },
-    {
-      cursor: [3],
-      value: new Map([
-        ['id', 3],
-        ['name', 'Budd Deey'],
-        ['about', 'Just a friendly human'],
-        ['email', 'budd.deey@email.com'],
-        ['created_at', null],
-      ]),
-    },
-  ])
-
-  expect((await collection3.paginator.readPage(context, {})).values).toEqual([
-    {
-      cursor: [1, 2],
-      value: new Map([
-        ['person_id_2', 2],
-        ['person_id_1', 1],
-        ['extra', false],
-      ]),
-    },
-    {
-      cursor: [2, 1],
-      value: new Map([
-        ['person_id_2', 1],
-        ['person_id_1', 2],
-        ['extra', true],
-      ]),
-    },
-    {
-      cursor: [3, 1],
-      value: new Map([
-        ['person_id_2', 1],
-        ['person_id_1', 3],
-        ['extra', true],
-      ]),
-    },
-    {
-      cursor: [3, 2],
-      value: new Map([
-        ['person_id_2', 2],
-        ['person_id_1', 3],
-        ['extra', false],
-      ]),
-    },
-  ])
-}))
-
-const collection1PageValues = [
+const paginatorFixtures = [
   {
-    cursor: ['sara.smith@email.com', 2],
-    value: new Map([
-      ['id', 2],
-      ['name', 'Sara Smith'],
-      ['about', null],
-      ['email', 'sara.smith@email.com'],
-      ['created_at', null],
-    ]),
+    name: 'people',
+    getPaginator: () => collection1.paginator,
+    addValuesToClient: async client => {
+      await client.query(`
+        insert into c.person (id, name, email, about, created_at) values
+          (1, 'John Smith', 'john.smith@email.com', null, null),
+          (2, 'Sara Smith', 'sara.smith@email.com', null, null),
+          (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null),
+          (4, 'Hello World', 'hello.world@email.com', null, null);
+      `)
+    },
+    allValues: [
+      new Map([['id', 1], ['name', 'John Smith'], ['about', null], ['email', 'john.smith@email.com'], ['created_at', null]]),
+      new Map([['id', 2], ['name', 'Sara Smith'], ['about', null], ['email', 'sara.smith@email.com'], ['created_at', null]]),
+      new Map([['id', 3], ['name', 'Budd Deey'], ['about', 'Just a friendly human'], ['email', 'budd.deey@email.com'], ['created_at', null]]),
+      new Map([['id', 4], ['name', 'Hello World'], ['about', null], ['email', 'hello.world@email.com'], ['created_at', null]]),
+    ],
+    orderingFixtures: [
+      {
+        name: 'ascending primary key',
+        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'primary_key_asc'),
+        getValueCursor: value => [value.get('id')],
+        compareValues: (a, b) => {
+          const aId = a.get('id')
+          const bId = b.get('id')
+          return aId === bId ? 0 : aId > bId ? 1 : -1
+        },
+      },
+      {
+        name: 'descending primary key',
+        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'primary_key_desc'),
+        getValueCursor: value => [value.get('id')],
+        compareValues: (a, b) => {
+          const aId = a.get('id')
+          const bId = b.get('id')
+          return aId === bId ? 0 : aId < bId ? 1 : -1
+        },
+      },
+      {
+        name: 'ascending emails',
+        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'email_asc'),
+        getValueCursor: value => [value.get('email'), value.get('id')],
+        compareValues: (a, b) => {
+          const aEmail = a.get('email')
+          const bEmail = b.get('email')
+          return aEmail === bEmail ? 0 : aEmail > bEmail ? 1 : -1
+        },
+      },
+      {
+        name: 'descending emails',
+        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'email_desc'),
+        getValueCursor: value => [value.get('email'), value.get('id')],
+        compareValues: (a, b) => {
+          const aEmail = a.get('email')
+          const bEmail = b.get('email')
+          return aEmail === bEmail ? 0 : aEmail < bEmail ? 1 : -1
+        },
+      },
+      {
+        name: 'natural',
+        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'natural'),
+        getValueCursor: (value, i) => i + 1,
+        compareValues: null,
+      },
+    ],
   },
   {
-    cursor: ['john.smith@email.com', 1],
-    value: new Map([
-      ['id', 1],
-      ['name', 'John Smith'],
-      ['about', null],
-      ['email', 'john.smith@email.com'],
-      ['created_at', null],
-    ]),
-  },
-  {
-    cursor: ['budd.deey@email.com', 3],
-    value: new Map([
-      ['id', 3],
-      ['name', 'Budd Deey'],
-      ['about', 'Just a friendly human'],
-      ['email', 'budd.deey@email.com'],
-      ['created_at', null],
-    ]),
+    name: 'compound_keys',
+    getPaginator: () => collection3.paginator,
+    addValuesToClient: async client => {
+      await client.query(`
+        insert into c.person (id, name, email, about, created_at) values
+          (1, 'John Smith', 'john.smith@email.com', null, null),
+          (2, 'Sara Smith', 'sara.smith@email.com', null, null),
+          (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null);
+      `)
+
+      await client.query(`
+        insert into c.compound_key (person_id_1, person_id_2, extra) values
+          (1, 2, false),
+          (2, 1, true),
+          (3, 2, false),
+          (3, 1, true);
+      `)
+    },
+    allValues: [
+      new Map([['person_id_2', 2], ['person_id_1', 1], ['extra', false]]),
+      new Map([['person_id_2', 1], ['person_id_1', 2], ['extra', true]]),
+      new Map([['person_id_2', 2], ['person_id_1', 3], ['extra', false]]),
+      new Map([['person_id_2', 1], ['person_id_1', 3], ['extra', true]]),
+    ],
+    orderingFixtures: [
+      {
+        name: 'ascending primary key',
+        getOrdering: () => collection3.paginator.orderings.find(({ name }) => name === 'primary_key_asc'),
+        getValueCursor: value => [value.get('person_id_1'), value.get('person_id_2')],
+        compareValues: (a, b) => {
+          const aId1 = a.get('person_id_1')
+          const aId2 = a.get('person_id_2')
+          const bId1 = b.get('person_id_1')
+          const bId2 = b.get('person_id_2')
+          return aId1 === bId1 ? aId2 === bId2 ? 0 : aId2 > bId2 ? 1 : -1 : aId1 > bId1 ? 1 : -1
+        },
+      },
+      {
+        name: 'descending primary key',
+        getOrdering: () => collection3.paginator.orderings.find(({ name }) => name === 'primary_key_desc'),
+        getValueCursor: value => [value.get('person_id_1'), value.get('person_id_2')],
+        compareValues: (a, b) => {
+          const aId1 = a.get('person_id_1')
+          const aId2 = a.get('person_id_2')
+          const bId1 = b.get('person_id_1')
+          const bId2 = b.get('person_id_2')
+          return aId1 === bId1 ? aId2 === bId2 ? 0 : aId2 < bId2 ? 1 : -1 : aId1 < bId1 ? 1 : -1
+        },
+      },
+      {
+        name: 'ascending extra',
+        getOrdering: () => collection3.paginator.orderings.find(({ name }) => name === 'extra_asc'),
+        getValueCursor: value => [value.get('extra'), value.get('person_id_1'), value.get('person_id_2')],
+        compareValues: (a, b) => {
+          const aExtra = a.get('extra')
+          const aId1 = a.get('person_id_1')
+          const aId2 = a.get('person_id_2')
+          const bExtra = b.get('extra')
+          const bId1 = b.get('person_id_1')
+          const bId2 = b.get('person_id_2')
+          return aExtra === bExtra ? aId1 === bId1 ? aId2 === bId2 ? 0 : aId2 > bId2 ? 1 : -1 : aId1 > bId1 ? 1 : -1 : aExtra > bExtra ? 1 : -1
+        },
+      },
+      {
+        name: 'descending extra',
+        getOrdering: () => collection3.paginator.orderings.find(({ name }) => name === 'extra_desc'),
+        getValueCursor: value => [value.get('extra'), value.get('person_id_1'), value.get('person_id_2')],
+        compareValues: (a, b) => {
+          const aExtra = a.get('extra')
+          const aId1 = a.get('person_id_1')
+          const aId2 = a.get('person_id_2')
+          const bExtra = b.get('extra')
+          const bId1 = b.get('person_id_1')
+          const bId2 = b.get('person_id_2')
+          return aExtra === bExtra ? aId1 === bId1 ? aId2 === bId2 ? 0 : aId2 < bId2 ? 1 : -1 : aId1 < bId1 ? 1 : -1 : aExtra < bExtra ? 1 : -1
+        },
+      },
+      {
+        name: 'natural',
+        getOrdering: () => collection3.paginator.orderings.find(({ name }) => name === 'natural'),
+        getValueCursor: (value, i) => i + 1,
+        compareValues: null,
+      },
+    ],
   },
 ]
 
-const collection3PageValues = [
-  {
-    cursor: [false, 1, 2],
-    value: new Map([
-      ['person_id_2', 2],
-      ['person_id_1', 1],
-      ['extra', false],
-    ]),
-  },
-  {
-    cursor: [false, 3, 2],
-    value: new Map([
-      ['person_id_2', 2],
-      ['person_id_1', 3],
-      ['extra', false],
-    ]),
-  },
-  {
-    cursor: [true, 2, 1],
-    value: new Map([
-      ['person_id_2', 1],
-      ['person_id_1', 2],
-      ['extra', true],
-    ]),
-  },
-  {
-    cursor: [true, 3, 1],
-    value: new Map([
-      ['person_id_2', 1],
-      ['person_id_1', 3],
-      ['extra', true],
-    ]),
-  },
-]
+paginatorFixtures.forEach(paginatorFixture => {
+  describe(`paginator '${paginatorFixture.name}'`, () => {
+    const { allValues } = paginatorFixture
 
-test('paginator `readPage` will read all of the values using different orderings', withPGClient(async client => {
-  const context = createPGContext(client)
+    let paginator
+    beforeAll(() => paginator = paginatorFixture.getPaginator())
 
-  await addTestData(client)
+    test('will count all of the values in the collection', withPGClient(async client => {
+      await paginatorFixture.addValuesToClient(client)
+      const context = createPGContext(client)
+      expect(await paginator.count(context)).toBe(allValues.length)
+    }))
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10] })).values)
-    .toEqual(collection1PageValues)
+    paginatorFixture.orderingFixtures.forEach(orderingFixture => {
+      describe(`ordering '${orderingFixture.name}'`, () => {
+        const sortedValues = orderingFixture.compareValues ? [...allValues].sort(orderingFixture.compareValues) : [...allValues]
+        const sortedValuesWithCursors = sortedValues.map((value, i) => ({ value, cursor: orderingFixture.getValueCursor(value, i) }))
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7] })).values)
-    .toEqual(collection3PageValues)
-}))
+        let ordering
+        beforeAll(() => ordering = orderingFixture.getOrdering())
 
-test('paginator `readPage` will use a `beforeCursor`', withPGClient(async client => {
-  const context = createPGContext(client)
+        test('will read all of the values in the correct order', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+          const page = await paginator.readPage(context, { ordering })
+          expect(page.values).toEqual(sortedValuesWithCursors)
+          expect(await Promise.all([page.hasNextPage(), page.hasPreviousPage()])).toEqual([false, false])
+        }))
 
-  await addTestData(client)
+        test('will read all values after an `afterCursor`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['john.smith@email.com', 1] })).values)
-    .toEqual([collection1PageValues[0]])
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, afterCursor: sortedValuesWithCursors[0].cursor }),
+            paginator.readPage(context, { ordering, afterCursor: sortedValuesWithCursors[2].cursor }),
+          ])
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], beforeCursor: [true, 2, 1] })).values)
-    .toEqual([collection3PageValues[0], collection3PageValues[1]])
-}))
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(3))
 
-test('paginator `readPage` will use an `afterCursor`', withPGClient(async client => {
-  const context = createPGContext(client)
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([false, true, false, true])
+        }))
 
-  await addTestData(client)
+        test('will read all values before a `beforeCursor`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], afterCursor: ['john.smith@email.com', 1] })).values)
-    .toEqual([collection1PageValues[2]])
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, beforeCursor: sortedValuesWithCursors[1].cursor }),
+            paginator.readPage(context, { ordering, beforeCursor: sortedValuesWithCursors[3].cursor }),
+          ])
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], afterCursor: [true, 2, 1] })).values)
-    .toEqual([collection3PageValues[3]])
-}))
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(0, 1))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(0, 3))
 
-test('paginator `readPage` will use a `beforeCursor` and `afterCursor`', withPGClient(async client => {
-  const context = createPGContext(client)
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, false, true, false])
+        }))
 
-  await addTestData(client)
+        test('will read all values between a `beforeCursor` and an `afterCursor`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['budd.deey@email.com', 3], afterCursor: ['sara.smith@email.com', 2] })).values)
-    .toEqual([collection1PageValues[1]])
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
+            paginator.readPage(context, { ordering, afterCursor: sortedValuesWithCursors[1].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
+          ])
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], beforeCursor: [true, 2, 1], afterCursor: [false, 3, 2] })).values)
-    .toEqual([])
-}))
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1, 3))
+          expect(page2.values).toEqual([])
 
-test('paginator `readPage` will read all of the values when there is a `first` parameter', withPGClient(async client => {
-  const context = createPGContext(client)
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, true, true])
+        }))
 
-  await addTestData(client)
+        test('will read only the first few values when provided `first`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], first: 2 })).values)
-    .toEqual([collection1PageValues[0], collection1PageValues[1]])
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, first: 1 }),
+            paginator.readPage(context, { ordering, first: 3 }),
+          ])
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], first: 3 })).values)
-    .toEqual([collection3PageValues[0], collection3PageValues[1], collection3PageValues[2]])
-}))
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(0, 1))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(0, 3))
 
-test('paginator `readPage` will read the correct values when there is a `last` parameter', withPGClient(async client => {
-  const context = createPGContext(client)
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, false, true, false])
+        }))
 
-  await addTestData(client)
+        test('will read only the last few values when provided `last`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], last: 2 })).values)
-    .toEqual([collection1PageValues[1], collection1PageValues[2]])
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, last: 1 }),
+            paginator.readPage(context, { ordering, last: 3 }),
+          ])
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], last: 1 })).values)
-    .toEqual([collection3PageValues[3]])
-}))
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(-1))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(-3))
 
-test('paginator `readPage` will read all of the values using various combinations of config options', withPGClient(async client => {
-  const context = createPGContext(client)
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([false, true, false, true])
+        }))
 
-  await addTestData(client)
+        test('will fail when trying to use `first` and `last` together', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+          expect((await paginator.readPage(context, { ordering, first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
+        }))
 
-  expect((await collection1.paginator.readPage(context, { ordering: collection1.paginator.orderings[10], beforeCursor: ['budd.deey@email.com', 3], last: 1 })).values)
-    .toEqual([collection1PageValues[1]])
+        test('can use `beforeCursor` and `first` together', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
 
-  expect((await collection3.paginator.readPage(context, { ordering: collection3.paginator.orderings[7], afterCursor: [false, 1, 2], first: 2 })).values)
-    .toEqual([collection3PageValues[1], collection3PageValues[2]])
-}))
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, first: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
+            paginator.readPage(context, { ordering, first: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(0, 2))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(0, 1))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, false, true, false])
+        }))
+
+        test('can use `afterCursor` and `first` together', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, first: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
+            paginator.readPage(context, { ordering, first: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1, 3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(2, 3))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, true, true])
+        }))
+
+        test('can use `first` with both `beforeCursor` and `afterCursor`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, first: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
+            paginator.readPage(context, { ordering, first: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1, 2))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(1, 2))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, true, true])
+        }))
+
+        test('can use `beforeCursor` and `last` together', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, last: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
+            paginator.readPage(context, { ordering, last: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1, 3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(0, 1))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, true, false])
+        }))
+
+        test('can use `afterCursor` and `last` together', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, last: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
+            paginator.readPage(context, { ordering, last: 2, afterCursor: sortedValuesWithCursors[sortedValuesWithCursors.length - 2].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(-2))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(-1))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([false, true, false, true])
+        }))
+
+        test('can use `last` with both `beforeCursor` and `afterCursor`', withPGClient(async client => {
+          await paginatorFixture.addValuesToClient(client)
+          const context = createPGContext(client)
+
+          const [page1, page2] = await Promise.all([
+            paginator.readPage(context, { ordering, last: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
+            paginator.readPage(context, { ordering, last: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(2, 3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(1, 2))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, true, true])
+        }))
+      })
+    })
+  })
+})

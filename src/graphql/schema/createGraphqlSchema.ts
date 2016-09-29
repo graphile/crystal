@@ -7,6 +7,9 @@ import createCollectionQueryFieldEntries from './collection/createCollectionQuer
 import BuildToken from './BuildToken'
 
 export type SchemaOptions = {
+  // The exact name for the node id field. In the past Relay wanted this to
+  // be `id`, but there are some movements in the GraphQL standard to
+  // standardize an `__id` field.
   nodeIdFieldName?: string,
 }
 
