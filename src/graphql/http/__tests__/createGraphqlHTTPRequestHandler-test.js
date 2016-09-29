@@ -83,87 +83,74 @@ for (const [name, createServer] of serverCreators) {
 
     test('will 404 for route other than that specified', async () => {
       const server1 = createServer()
-      const server2 = createServer({ route: '/graphql' })
+      const server2 = createServer({ graphqlRoute: '/x' })
       await (
         request(server1)
-        .get('/graphql')
+        .post('/x')
         .expect(404)
       )
       await (
         request(server2)
-        .get('/')
+        .post('/graphql')
         .expect(404)
       )
     })
 
-    test('will run a query on a GET request', async () => {
-      const server = createServer()
-      await (
-        request(server)
-        .get('/')
-        .query({ query: '{hello}' })
-        .expect(200)
-        .expect('Content-Type', /json/)
-        .expect({ data: { hello: 'world' } })
-      )
-    })
-
     test('will respond to queries on a different route', async () => {
-      const server = createServer({ route: '/graphql' })
+      const server = createServer({ graphqlRoute: '/x' })
       await (
         request(server)
-        .get('/graphql')
-        .query({ query: '{hello}' })
+        .post('/x')
+        .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } })
       )
     })
 
-    test('will always respond with CORS to an OPTIONS request', async () => {
-      const server = createServer()
+    test('will always respond with CORS to an OPTIONS request when enabled', async () => {
+      const server = createServer({ enableCORS: true })
       await (
         request(server)
-        .options('/')
+        .options('/graphql')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'GET, POST')
+        .expect('Access-Control-Request-Method', 'POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
         .expect('')
       )
     })
 
-    test('will always respond to any request with CORS headers', async () => {
-      const server = createServer()
+    test('will always respond to any request with CORS headers when enabled', async () => {
+      const server = createServer({ enableCORS: true })
       await (
         request(server)
-        .get('/')
+        .post('/graphql')
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'GET, POST')
-        .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
-      )
-      await (
-        request(server)
-        .post('/')
-        .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'GET, POST')
+        .expect('Access-Control-Request-Method', 'POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
       )
     })
 
-    test('will not allow requests other than GET and POST', async () => {
+    test('will not allow requests other than POST', async () => {
       const server = createServer()
       await (
         request(server)
-        .delete('/')
+        .get('/graphql')
         .expect(405)
-        .expect('Allow', 'GET, POST')
+        .expect('Allow', 'POST, OPTIONS')
       )
       await (
         request(server)
-        .put('/')
+        .delete('/graphql')
         .expect(405)
-        .expect('Allow', 'GET, POST')
+        .expect('Allow', 'POST, OPTIONS')
+      )
+      await (
+        request(server)
+        .put('/graphql')
+        .expect(405)
+        .expect('Allow', 'POST, OPTIONS')
       )
     })
 
@@ -171,7 +158,7 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .set('Content-Type', 'application/json')
         .send(JSON.stringify({ query: '{hello}' }))
         .expect(200)
@@ -184,7 +171,7 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(`query=${encodeURIComponent('{hello}')}`)
         .expect(200)
@@ -197,7 +184,7 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .set('Content-Type', 'application/graphql')
         .send('{hello}')
         .expect(200)
@@ -210,8 +197,8 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .get('/')
-        .query({ query: '{' })
+        .post('/graphql')
+        .send({ query: '{' })
         .expect(400)
         .expect('Content-Type', /json/)
         .expect({ errors: [{ message: 'Syntax Error GraphQL HTTP Request (1:2) Expected Name, found <EOF>\n\n1: {\n    ^\n', locations: [{ line: 1, column: 2 }] }] })
@@ -222,41 +209,11 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .get('/')
-        .query({ query: '{notFound}' })
+        .post('/graphql')
+        .send({ query: '{notFound}' })
         .expect(400)
         .expect('Content-Type', /json/)
         .expect({ errors: [{ message: 'Cannot query field "notFound" on type "Query".', locations: [{ line: 1, column: 2 }] }] })
-      )
-    })
-
-    test('will not run mutations in GET', async () => {
-      const server = createServer()
-      await (
-        request(server)
-        .get('/')
-        .query({ query: 'mutation {hello}' })
-        .expect(405)
-        .expect('Content-Type', /json/)
-        .expect('Allow', 'Post')
-        .expect({ errors: [{ message: 'Can only perform a \'mutation\' operation from a POST request.' }] })
-      )
-      await (
-        request(server)
-        .get('/')
-        .query({ query: 'query A { hello } mutation B { hello }', operationName: 'B' })
-        .expect(405)
-        .expect('Content-Type', /json/)
-        .expect('Allow', 'Post')
-        .expect({ errors: [{ message: 'Can only perform a \'mutation\' operation from a POST request.' }] })
-      )
-      await (
-        request(server)
-        .get('/')
-        .query({ query: 'query A { hello } mutation B { hello }', operationName: 'A' })
-        .expect(200)
-        .expect('Content-Type', /json/)
-        .expect({ data: { hello: 'world' } })
       )
     })
 
@@ -264,7 +221,7 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .send({ query: 'mutation {hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -279,7 +236,7 @@ for (const [name, createServer] of serverCreators) {
       inventory.createContext.mockReturnValueOnce(Promise.resolve(context))
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -293,7 +250,7 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .send({ query: 'query A { a: hello } query B { b: hello }', operationName: 'A' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -301,7 +258,7 @@ for (const [name, createServer] of serverCreators) {
       )
       await (
         request(server)
-        .post('/')
+        .post('/graphql')
         .send({ query: 'query A { a: hello } query B { b: hello }', operationName: 'B' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -313,28 +270,53 @@ for (const [name, createServer] of serverCreators) {
       const server = createServer()
       await (
         request(server)
-        .get('/')
-        .query({ query: 'query A($name: String!) { greetings(name: $name) }', variables: JSON.stringify({ name: 'Joe' }), operationName: 'A' })
+        .post('/graphql')
+        .send({ query: 'query A($name: String!) { greetings(name: $name) }', variables: JSON.stringify({ name: 'Joe' }), operationName: 'A' })
         .expect(200)
         .expect('Content-Type', /json/)
         .expect({ data: { greetings: 'Hello, Joe!' } })
       )
       await (
         request(server)
-        .post('/')
-        .send({ query: 'query A($name: String!) { greetings(name: $name) }', variables: { name: 'Joe' }, operationName: 'A' })
-        .expect(200)
-        .expect('Content-Type', /json/)
-        .expect({ data: { greetings: 'Hello, Joe!' } })
-      )
-      await (
-        request(server)
-        .post('/')
+        .post('/graphql')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(`operationName=A&query=${encodeURIComponent('query A($name: String!) { greetings(name: $name) }')}&variables=${encodeURIComponent(JSON.stringify({ name: 'Joe' }))}`)
         .expect(200)
         .expect('Content-Type', /json/)
         .expect({ data: { greetings: 'Hello, Joe!' } })
+      )
+    })
+
+    test('will ignore empty string variables', async () => {
+      const server = createServer()
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}', variables: '' })
+        .expect(200)
+        .expect({ data: { hello: 'world' } })
+      )
+    })
+
+    test('will error with variables of the incorrect type', async () => {
+      const server = createServer()
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}', variables: 2 })
+        .expect(400)
+        .expect({ errors: [{ message: 'Variables must be an object, not \'number\'.' }] })
+      )
+    })
+
+    test('will error with an operation name of the incorrect type', async () => {
+      const server = createServer()
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}', operationName: 2 })
+        .expect(400)
+        .expect({ errors: [{ message: 'Operation name must be a string, not \'number\'.' }] })
       )
     })
 
@@ -362,17 +344,28 @@ for (const [name, createServer] of serverCreators) {
       const server2 = createServer({ graphiql: true })
       await (
         request(server1)
-        .get('/')
-        .set('Accept', 'text/html')
-        .query({ query: '{hello}' })
-        .expect(200)
-        .expect('Content-Type', 'application/json; charset=utf-8')
+        .get('/graphiql')
+        .expect(404)
       )
       await (
         request(server2)
-        .get('/')
-        .set('Accept', 'text/html')
-        .query({ query: '{hello}' })
+        .get('/graphiql')
+        .expect(200)
+        .expect('Content-Type', 'text/html; charset=utf-8')
+      )
+    })
+
+    test('will render GraphiQL on another route if desired', async () => {
+      const server1 = createServer({ graphiqlRoute: '/x' })
+      const server2 = createServer({ graphiql: true, graphiqlRoute: '/x' })
+      await (
+        request(server1)
+        .get('/x')
+        .expect(404)
+      )
+      await (
+        request(server2)
+        .get('/x')
         .expect(200)
         .expect('Content-Type', 'text/html; charset=utf-8')
       )

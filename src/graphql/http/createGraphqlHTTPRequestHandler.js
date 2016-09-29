@@ -1,6 +1,5 @@
 import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
-import { parse as parseQueryString } from 'querystring'
 import { IncomingMessage, ServerResponse } from 'http'
 import {
   Source,
@@ -19,7 +18,6 @@ const httpError = require('http-errors')
 const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
-const accepts = require('accepts')
 
 const debug = new Debugger('postgraphql:graphql:http')
 
@@ -37,6 +35,14 @@ const favicon = new Promise((resolve, reject) => {
  * @param {Inventory} inventory
  */
 export default function createGraphqlHTTPRequestHandler (inventory, options = {}) {
+  // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
+  const graphqlRoute = options.graphqlRoute || '/graphql'
+  const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null
+
+  // Throw an error of the GraphQL and GraphiQL routes are the same.
+  if (graphqlRoute === graphiqlRoute)
+    throw new Error(`Cannot use the same route '${graphqlRoute}' for both GraphQL and GraphiQL.`)
+
   // Creates our GraphQL schema…
   const graphqlSchema = createGraphqlSchema(inventory, options)
 
@@ -59,7 +65,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
   // not call `next`). Middlewares that handle a request like favicon
   // middleware will result in a promise that never resolves, and we don’t
   // want that.
-  const middlewares = [
+  const bodyParserMiddlewares = [
     // Parse JSON bodies.
     bodyParser.json(),
     // Parse URL encoded bodies (forms).
@@ -92,13 +98,42 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       res.statusCode = 200
       res.setHeader('Cache-Control', 'public, max-age=86400')
       res.setHeader('Content-Type', 'image/x-icon')
-      res.end(await favicon)
 
+      // End early if the method is `HEAD`.
+      if (req.method === 'HEAD') {
+        res.end()
+        return
+      }
+
+      res.end(await favicon)
+      return
+    }
+
+    // If this is the GraphiQL route, show GraphiQL and stop execution.
+    if (parseUrl(req).pathname === graphiqlRoute) {
+      if (!(req.method === 'GET' || req.method === 'HEAD')) {
+        res.statusCode = req.method === 'OPTIONS' ? 200 : 405
+        res.setHeader('Allow', 'GET, HEAD, OPTIONS')
+        res.end()
+        return
+      }
+
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+
+      // End early if the method is `HEAD`.
+      if (req.method === 'HEAD') {
+        res.end()
+        return
+      }
+
+      // Actually renders GraphiQL.
+      res.end(renderGraphiQL(graphqlRoute))
       return
     }
 
     // Don’t handle any requests if this is not the correct route.
-    if (parseUrl(req).pathname !== (options.route || '/'))
+    if (parseUrl(req).pathname !== graphqlRoute)
       return next()
 
     // If we didn’t call `next` above, all requests will return 200 by default!
@@ -106,7 +141,8 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
 
     // Add our CORS headers to be good web citizens (there are perf
     // implications though so be careful!)
-    addCORSHeaders(res)
+    if (options.enableCORS)
+      addCORSHeaders(res)
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
     if (req.method === 'OPTIONS') {
@@ -136,7 +172,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       //
       // We also run our middleware inside the `try` so that we get the GraphQL
       // error reporting style for syntax errors.
-      await middlewares.reduce((promise, middleware) => (
+      await bodyParserMiddlewares.reduce((promise, middleware) => (
         promise.then(() => new Promise((resolve, reject) => {
           middleware(req, res, error => {
             if (error) reject(error)
@@ -146,9 +182,9 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       ), Promise.resolve())
 
       // If this is not one of the correct methods, throw an error.
-      if (!(req.method === 'GET' || req.method === 'POST')) {
-        res.setHeader('Allow', 'GET, POST')
-        throw httpError(405, 'Only `GET` and `POST` requests are allowed.')
+      if (req.method !== 'POST') {
+        res.setHeader('Allow', 'POST, OPTIONS')
+        throw httpError(405, 'Only `POST` requests are allowed.')
       }
 
       // Get the parameters we will use to run a GraphQL request. `params` may
@@ -158,10 +194,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      params =
-        req.method === 'GET'
-          ? parseQueryString(parseUrl(req).query)
-          : typeof req.body === 'string' ? { query: req.body } : req.body
+      params = typeof req.body === 'string' ? { query: req.body } : req.body
 
       // Throw an error if no query string was defined.
       if (!params.query)
@@ -170,14 +203,30 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       // If variables is a string, we assume it is a JSON string and that it
       // needs to be parsed.
       if (typeof params.variables === 'string') {
-        try {
-          params.variables = JSON.parse(params.variables)
+        // If variables is just an empty string, we should set it to null and
+        // ignore it.
+        if (params.variables === '') {
+          params.variables = null
         }
-        catch (error) {
-          error.statusCode = 400
-          throw error
+        // Otherwise, let us try to parse it as JSON.
+        else {
+          try {
+            params.variables = JSON.parse(params.variables)
+          }
+          catch (error) {
+            error.statusCode = 400
+            throw error
+          }
         }
       }
+
+      // Throw an error if `variables` is not an object.
+      if (params.variables != null && typeof params.variables !== 'object')
+        throw httpError(400, `Variables must be an object, not '${typeof params.variables}'.`)
+
+      // Throw an error if `operationName` is not a string.
+      if (params.operationName != null && typeof params.operationName !== 'string')
+        throw httpError(400, `Operation name must be a string, not '${typeof params.operationName}'.`)
 
       const source = new Source(params.query, 'GraphQL HTTP Request')
       let queryDocumentAST
@@ -202,18 +251,6 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
         res.statusCode = 400
         result = { errors: validationErrors }
         return
-      }
-
-      // If this is a `GET` request, we need to make sure that we are not
-      // allowing mutations. Only standard GraphQL queries can be performed
-      // in a `GET` request.
-      if (req.method === 'GET') {
-        const operationAST = getOperationAST(queryDocumentAST, params.operationName)
-
-        if (operationAST.operation !== 'query') {
-          res.setHeader('Allow', 'Post')
-          throw httpError(405, `Can only perform a '${operationAST.operation}' operation from a POST request.`)
-        }
       }
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
@@ -254,25 +291,8 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
       if (result && result.errors)
         result.errors = result.errors.map(formatError)
 
-      // If the `Accepts` header is looking for `html` (probably a
-      // browser), we want to show GraphiQL.
-      const showGraphiQL = options.graphiql && accepts(req).types(['json', 'html']) === 'html'
-
-      // Render the HTML involved for GraphiQL.
-      if (showGraphiQL) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        res.end(renderGraphiQL({
-          query: params.query,
-          variables: params.variables,
-          operationName: params.operationName,
-          result,
-        }))
-      }
-      // Otherwise send our result to the client as JSON.
-      else {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8')
-        res.end(JSON.stringify(result))
-      }
+      res.setHeader('Content-Type', 'application/json; charset=utf-8')
+      res.end(JSON.stringify(result))
     }
   }
 
@@ -333,7 +353,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
  */
 function addCORSHeaders (res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Request-Method', 'GET, POST')
+  res.setHeader('Access-Control-Request-Method', 'POST')
   res.setHeader('Access-Control-Allow-Headers', [
     'Origin',
     'X-Requested-With',

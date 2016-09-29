@@ -8,14 +8,28 @@ import { SchemaOptions } from '../schema/createGraphqlSchema'
  */
 type HTTPRequestHandlerOptions = SchemaOptions & {
   // The exact (and only) route our request handler will respond to.
-  route?: string,
+  graphqlRoute?: string,
+
   // Whether or not we should show GraphiQL when the user asks for an HTML
-  // representation.
+  // representation. Note that his overrides `graphiqlRoute`. If not
+  // `graphiqlRoute` is defined, the default route is `/graphiql`.
   graphiql?: boolean,
+
+  // Allows the user to customize what route GraphiQL is served on.
+  //
+  // We seperate GraphiQL and our main GraphQL route so that we can evolve
+  // GraphiQL as an app seperately and do not have to depend on its HTTP
+  // functionality.
+  graphiqlRoute?: string,
+
   // Specifies whether or not we should show an error’s stack trace. If the
   // value is `json` then the stack will be formatted in a way that is readble
   // in JSON. Helpful for debugging.
   showErrorStack?: boolean | 'json',
+
+  // Enables some CORS rules. When enabled there may be some pre-flight
+  // requests with negative performance impacts.
+  enableCORS?: boolean,
 }
 
 /**
