@@ -21,15 +21,21 @@ const kitchenSinkData = new Promise((resolve, reject) => {
 let schema1, schema2
 
 beforeAll(withPGClient(async client => {
-  const catalog = await introspectDatabase(client, ['a', 'b', 'c'])
+  try {
+    const catalog = await introspectDatabase(client, ['a', 'b', 'c'])
 
-  const inventory1 = new Inventory()
-  addPGCatalogToInventory(inventory1, catalog)
-  schema1 = createGraphqlSchema(inventory1)
+    const inventory1 = new Inventory()
+    addPGCatalogToInventory(inventory1, catalog)
+    schema1 = createGraphqlSchema(inventory1)
 
-  const inventory2 = new Inventory()
-  addPGCatalogToInventory(inventory2, catalog, { renameIdToRowId: true })
-  schema2 = createGraphqlSchema(inventory2, { nodeIdFieldName: 'id' })
+    const inventory2 = new Inventory()
+    addPGCatalogToInventory(inventory2, catalog, { renameIdToRowId: true })
+    schema2 = createGraphqlSchema(inventory2, { nodeIdFieldName: 'id' })
+  }
+  catch (error) {
+    console.error(error.stack)
+    throw error
+  }
 }))
 
 test('schema', async () => {

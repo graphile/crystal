@@ -34,20 +34,7 @@ export default function createDeleteCollectionMutationFieldEntry (
         type: new GraphQLNonNull(GraphQLID),
       }],
     ],
-    outputFields: [
-      // Add the deleted value as an output field so the user can see the
-      // object they just deleted.
-      [formatName.field(collection.type.name), {
-        type: getCollectionType(buildToken, collection),
-        resolve: value => value,
-      }],
-      // Add the deleted values globally unique id as well. This one is
-      // especially useful for removing old nodes from the cache.
-      [formatName.field(`deleted-${collection.type.name}-id`), {
-        type: GraphQLID,
-        resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value))
-      }],
-    ],
+    outputFields: createDeleteCollectionOutputFieldEntries(buildToken, collection),
     // Execute by deserializing the id into its component parts and delete a
     // value in the collection using that key.
     execute: (context, input) => {
@@ -59,4 +46,29 @@ export default function createDeleteCollectionMutationFieldEntry (
       return primaryKey.delete!(context, keyValue)
     },
   })]
+}
+
+/**
+ * Creates the output fields returned by the collection delete mutation.
+ */
+export function createDeleteCollectionOutputFieldEntries (
+  buildToken: BuildToken,
+  collection: Collection,
+): Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>] | null> {
+  const { primaryKey } = collection
+
+  return [
+    // Add the deleted value as an output field so the user can see the
+    // object they just deleted.
+    [formatName.field(collection.type.name), {
+      type: getCollectionType(buildToken, collection),
+      resolve: value => value,
+    }],
+    // Add the deleted values globally unique id as well. This one is
+    // especially useful for removing old nodes from the cache.
+    primaryKey ? [formatName.field(`deleted-${collection.type.name}-id`), {
+      type: GraphQLID,
+      resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value)),
+    }] : null,
+  ]
 }

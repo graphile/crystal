@@ -2,6 +2,7 @@ import { GraphQLFieldConfig } from 'graphql'
 import { Collection } from '../../../interface'
 import BuildToken from '../BuildToken'
 import createCreateCollectionMutationFieldEntry from './mutations/createCreateCollectionMutationFieldEntry'
+import createUpdateCollectionMutationFieldEntry from './mutations/createUpdateCollectionMutationFieldEntry'
 import createDeleteCollectionMutationFieldEntry from './mutations/createDeleteCollectionMutationFieldEntry'
 import createDeleteCollectionKeyMutationFieldEntry from './mutations/createDeleteCollectionKeyMutationFieldEntry'
 
@@ -19,6 +20,8 @@ export default function createCollectionMutationFieldEntries (
   const optionalEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>] | undefined> = [
     // Add the create collection mutation.
     createCreateCollectionMutationFieldEntry(buildToken, collection),
+    // Add the update collection mutation. Uses the collection’s primary key.
+    createUpdateCollectionMutationFieldEntry(buildToken, collection),
     // Add the delete collection mutation. Uses the collection’s primary key.
     createDeleteCollectionMutationFieldEntry(buildToken, collection),
     // Add the delete mutation for all of the collection keys.

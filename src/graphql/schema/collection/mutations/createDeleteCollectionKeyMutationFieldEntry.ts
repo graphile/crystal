@@ -5,6 +5,7 @@ import BuildToken from '../../BuildToken'
 import createMutationField from '../../createMutationField'
 import getCollectionType from '../getCollectionType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
+import { createDeleteCollectionOutputFieldEntries } from './createDeleteCollectionMutationFieldEntry'
 
 /**
  * Creates a delete mutation which will delete a single value from a collection
@@ -25,24 +26,8 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TKey>(
 
   return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
     name,
-    // Add the input fields from our input helpers.
     inputFields: inputHelpers.fieldEntries,
-    outputFields: [
-      // Add the deleted value as an output field so the user can see the
-      // object they just deleted.
-      [formatName.field(collection.type.name), {
-        type: getCollectionType(buildToken, collection),
-        resolve: value => value,
-      }],
-      // Add the deleted values globally unique id as well. This one is
-      // especially useful for removing old nodes from the cache.
-      collection.primaryKey && [formatName.field(`deleted-${collection.type.name}-id`), {
-        type: GraphQLID,
-        resolve: value => idSerde.serialize(collection.primaryKey!, collection.primaryKey!.getKeyFromValue(value))
-      }],
-    ],
-    // Actually delete the value getting the key from our input with our
-    // helpers.
+    outputFields: createDeleteCollectionOutputFieldEntries(buildToken, collection),
     execute: (context, input) =>
       collectionKey.delete!(context, inputHelpers.getKey(input)),
   })]

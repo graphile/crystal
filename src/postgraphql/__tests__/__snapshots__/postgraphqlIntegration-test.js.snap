@@ -782,6 +782,12 @@ input CompoundKeyInput {
   extra: Boolean
 }
 
+input CompoundKeyPatch {
+  personId2: Int
+  personId1: Int
+  extra: Boolean
+}
+
 # A connection to a list of \`CompoundKey\` values.
 type CompoundKeysConnection {
   # Information to aid in pagination.
@@ -1098,16 +1104,20 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
   deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
@@ -1246,6 +1256,14 @@ input PersonInput {
   createdAt: String
 }
 
+input PersonPatch {
+  id: Int
+  name: String
+  about: String
+  email: Email
+  createdAt: String
+}
+
 type Post implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
@@ -1261,6 +1279,13 @@ type Post implements Node {
 input PostInput {
   id: Int
   headline: String!
+  body: String
+  authorId: Int
+}
+
+input PostPatch {
+  id: Int
+  headline: String
   body: String
   authorId: Int
 }
@@ -1576,6 +1601,18 @@ enum TypesOrderBy {
   NESTED_COMPOUND_TYPE_DESC
 }
 
+input TypesPatch {
+  id: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
 # YOYOYO!!
 type UpdatableView {
   x: Int
@@ -1633,6 +1670,54 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+input UpdateCompoundKeyInput {
+  clientMutationId: String
+  __id: ID!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
+input UpdatePersonInput {
+  clientMutationId: String
+  __id: ID!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePostInput {
+  clientMutationId: String
+  __id: ID!
+  postPatch: PostPatch!
+}
+
+type UpdatePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input UpdateTypesInput {
+  clientMutationId: String
+  __id: ID!
+  typesPatch: TypesPatch!
+}
+
+type UpdateTypesPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
 # A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
 scalar Uuid
 "
@@ -1666,6 +1751,12 @@ type CompoundKey implements Node {
 input CompoundKeyInput {
   personId2: Int!
   personId1: Int!
+  extra: Boolean
+}
+
+input CompoundKeyPatch {
+  personId2: Int
+  personId1: Int
   extra: Boolean
 }
 
@@ -1985,16 +2076,20 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
   deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesByRowId(input: DeleteTypesByRowIdInput!): DeleteTypesByRowIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonByRowIdPayload
@@ -2133,6 +2228,14 @@ input PersonInput {
   createdAt: String
 }
 
+input PersonPatch {
+  rowId: Int
+  name: String
+  about: String
+  email: Email
+  createdAt: String
+}
+
 type Post implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
@@ -2148,6 +2251,13 @@ type Post implements Node {
 input PostInput {
   rowId: Int
   headline: String!
+  body: String
+  authorId: Int
+}
+
+input PostPatch {
+  rowId: Int
+  headline: String
   body: String
   authorId: Int
 }
@@ -2463,6 +2573,18 @@ enum TypesOrderBy {
   NESTED_COMPOUND_TYPE_DESC
 }
 
+input TypesPatch {
+  rowId: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
 # YOYOYO!!
 type UpdatableView {
   x: Int
@@ -2518,6 +2640,54 @@ enum UpdatableViewsOrderBy {
   DESCRIPTION_DESC
   CONSTANT_ASC
   CONSTANT_DESC
+}
+
+input UpdateCompoundKeyInput {
+  clientMutationId: String
+  id: ID!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
+input UpdatePersonInput {
+  clientMutationId: String
+  id: ID!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePostInput {
+  clientMutationId: String
+  id: ID!
+  postPatch: PostPatch!
+}
+
+type UpdatePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input UpdateTypesInput {
+  clientMutationId: String
+  id: ID!
+  typesPatch: TypesPatch!
+}
+
+type UpdateTypesPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
 }
 
 # A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
