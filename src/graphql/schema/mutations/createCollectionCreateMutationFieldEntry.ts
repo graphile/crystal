@@ -1,11 +1,11 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection, ObjectType } from '../../../../interface'
-import { formatName } from '../../../utils'
-import BuildToken from '../../BuildToken'
-import getType from '../../getType'
-import transformInputValue from '../../transformInputValue'
-import getCollectionType from '../../collection/getCollectionType'
-import { getEdgeType, createOrderByArg } from '../../connection/createConnectionField'
+import { Collection, ObjectType } from '../../../interface'
+import { formatName } from '../../utils'
+import BuildToken from '../BuildToken'
+import getType from '../getType'
+import transformInputValue from '../transformInputValue'
+import getCollectionType from '../collection/getCollectionType'
+import { getEdgeType, createOrderByArg } from '../connection/createConnectionField'
 import createMutationField from './createMutationField'
 
 /**

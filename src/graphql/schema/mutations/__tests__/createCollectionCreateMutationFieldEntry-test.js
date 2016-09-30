@@ -1,9 +1,9 @@
-jest.mock('../../../getType')
-jest.mock('../../getCollectionType')
+jest.mock('../../getType')
+jest.mock('../../collection/getCollectionType')
 jest.mock('../createMutationField')
 
-import getType from '../../../getType'
-import getCollectionType from '../../getCollectionType'
+import getType from '../../getType'
+import getCollectionType from '../../collection/getCollectionType'
 import createMutationField from '../createMutationField'
 import createCollectionCreateMutationFieldEntry from '../createCollectionCreateMutationFieldEntry'
 
