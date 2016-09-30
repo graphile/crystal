@@ -81,6 +81,19 @@ namespace ObjectType {
      * The type of the field.
      */
     readonly type: Type<TFieldValue>
+
+    /**
+     * Some meta information which indicates whether or not the field has a
+     * default value that can be fallen back on.
+     *
+     * We use this in inputs to mark non-null fields as nullable to let the
+     * implementation use its own default instead of requiring the user to
+     * provide a value.
+     */
+    // TODO: Is this exposing to much information? This comes out of supporting
+    // Postgres, we want serial primary key ids to be nullable in their inputs
+    // even if they are nullable in the database.
+    readonly hasDefault?: boolean
   }
 }
 

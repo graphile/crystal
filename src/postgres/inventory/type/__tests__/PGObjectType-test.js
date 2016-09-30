@@ -1,11 +1,11 @@
 jest.mock('../../../../interface/type/ObjectType')
 jest.mock('../../../introspection/PGCatalog')
-jest.mock('../../getTypeFromPGType')
+jest.mock('../getTypeFromPGType')
 
 import { NullableType } from '../../../../interface'
 import ObjectType from '../../../../interface/type/ObjectType'
 import PGCatalog from '../../../introspection/PGCatalog'
-import getTypeFromPGType from '../../getTypeFromPGType'
+import getTypeFromPGType from '../getTypeFromPGType'
 import PGObjectType from '../PGObjectType'
 
 ObjectType.mockImplementation(function (config) {

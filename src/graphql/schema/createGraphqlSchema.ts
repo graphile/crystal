@@ -1,10 +1,9 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
+import { GraphQLSchema } from 'graphql'
 import { Inventory } from '../../interface'
-import buildObject from '../utils/buildObject'
-import createNodeFieldEntry from './node/createNodeFieldEntry'
 import getCollectionType from './collection/getCollectionType'
-import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
 import BuildToken from './BuildToken'
+import getQueryType from './getQueryType'
+import getMutationType from './getMutationType'
 
 export type SchemaOptions = {
   // The exact name for the node id field. In the past Relay wanted this to
@@ -31,40 +30,12 @@ export default function createGraphqlSchema (inventory: Inventory, options: Sche
   }
 
   return new GraphQLSchema({
-    query: createQueryType(buildToken),
+    query: getQueryType(buildToken),
+    mutation: getMutationType(buildToken),
     types: [
       // Make sure to always include the types for our collections, even if
       // they have no other output.
       ...inventory.getCollections().map(collection => getCollectionType(buildToken, collection)),
     ],
   })
-}
-
-// TODO: doc
-function createQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
-  const { inventory } = buildToken
-  let queryType: GraphQLObjectType<mixed>
-
-  queryType = new GraphQLObjectType({
-    name: 'Query',
-    // TODO: description
-    fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
-      [
-        createNodeFieldEntry(buildToken),
-      ],
-      inventory
-        .getCollections()
-        .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
-        .reduce((a, b) => a.concat(b), []),
-      [
-        ['relay', {
-          description: 'Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.',
-          type: new GraphQLNonNull(queryType),
-          resolve: source => source || {},
-        }],
-      ],
-    ),
-  })
-
-  return queryType
 }

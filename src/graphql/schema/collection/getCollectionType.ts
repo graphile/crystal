@@ -3,7 +3,7 @@ import { Context, Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getType from '../getType'
-import createConnectionField from '../createConnectionField'
+import createConnectionField from '../connection/createConnectionField'
 import BuildToken from '../BuildToken'
 
 // Private implementation of `getCollectionType`, types aren’t that great.

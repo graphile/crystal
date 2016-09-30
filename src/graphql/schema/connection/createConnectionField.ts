@@ -17,10 +17,10 @@ import {
   Kind,
 } from 'graphql'
 
-import { Context, Paginator, Condition, Type } from '../../interface'
-import { buildObject, formatName, memoize2 } from '../utils'
-import getType from './getType'
-import BuildToken from './BuildToken'
+import { Context, Paginator, Condition, Type } from '../../../interface'
+import { buildObject, formatName, memoize2 } from '../../utils'
+import getType from '../getType'
+import BuildToken from '../BuildToken'
 
 // TODO: doc
 export default function createConnectionField <TValue, TOrdering extends Paginator.Ordering, TCursor, TCondition>(
@@ -49,11 +49,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
-      paginator.orderings && paginator.orderings.length > 0 && ['orderBy', {
-        type: getOrderByEnumType(buildToken, paginator),
-        defaultValue: paginator.defaultOrdering,
-        // TODO: description
-      }],
+      paginator.orderings && paginator.orderings.length > 0 && ['orderBy', createOrderByArg(buildToken, paginator)],
       ['before', {
         type: _cursorType,
         // TODO: description
@@ -183,7 +179,7 @@ export function _createConnectionType <TValue, TOrdering extends Paginator.Order
   })
 }
 
-const getEdgeType = memoize2(_createEdgeType)
+export const getEdgeType = memoize2(_createEdgeType)
 
 /**
  * Creates a concrete GraphQL edge object type.
@@ -213,6 +209,21 @@ export function _createEdgeType <TValue, TOrdering extends Paginator.Ordering, T
       },
     }),
   })
+}
+
+/**
+ * Creates an argument for the `orderBy` field. The argument will be a correct
+ * ordering value for the paginator.
+ */
+export function createOrderByArg <TValue, TOrdering extends Paginator.Ordering, TCursor>(
+  buildToken: BuildToken,
+  paginator: Paginator<TValue, TOrdering, TCursor>,
+) {
+  return {
+    // TODO: description
+    type: getOrderByEnumType(buildToken, paginator),
+    defaultValue: paginator.defaultOrdering,
+  }
 }
 
 const getOrderByEnumType = memoize2(_createOrderByEnumType)

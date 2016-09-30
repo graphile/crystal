@@ -1,7 +1,7 @@
 import { ObjectType, NullableType } from '../../../interface'
 import { PGCatalog, PGCatalogAttribute } from '../../introspection'
 import transformPGValue, { $$transformPGValue } from '../transformPGValue'
-import getTypeFromPGType from '../getTypeFromPGType'
+import getTypeFromPGType from './getTypeFromPGType'
 
 /**
  * `PGObjectType` is very much like `ObjectType` except it does a few extra
@@ -55,11 +55,16 @@ class PGObjectType extends ObjectType {
               const pgType = config.pgCatalog.assertGetType(pgAttribute.typeId)
               const type = getTypeFromPGType(config.pgCatalog, pgType)
 
+              // If the attribute is not null, but the type we got was
+              // nullable, extract the non null variant and return that.
               if (pgAttribute.isNotNull && type instanceof NullableType)
                 return type.nonNullType
 
               return type
             })(),
+
+            // Pass along the `hasDefault` information.
+            hasDefault: pgAttribute.hasDefault,
 
             // Notice how we add an extra `pgAttribute` property here as per
             // our custom field type.

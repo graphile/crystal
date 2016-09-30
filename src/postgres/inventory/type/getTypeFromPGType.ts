@@ -8,12 +8,11 @@ import {
   integerType,
   floatType,
   stringType,
-} from '../../interface'
-
-import { memoize2 } from '../utils'
-import PGCatalog from '../introspection/PGCatalog'
-import PGCatalogType from '../introspection/object/PGCatalogType'
-import PGObjectType from './type/PGObjectType'
+} from '../../../interface'
+import { memoize2 } from '../../utils'
+import PGCatalog from '../../introspection/PGCatalog'
+import PGCatalogType from '../../introspection/object/PGCatalogType'
+import PGObjectType from './PGObjectType'
 
 /**
  * The type for a JSON blob. It’s just a string…

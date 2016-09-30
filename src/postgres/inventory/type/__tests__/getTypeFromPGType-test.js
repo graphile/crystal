@@ -1,5 +1,5 @@
-import { ObjectType, NullableType, AliasType, EnumType, ListType } from '../../../interface'
-import PGCatalog from '../../introspection/PGCatalog'
+import { ObjectType, NullableType, AliasType, EnumType, ListType } from '../../../../interface'
+import PGCatalog from '../../../introspection/PGCatalog'
 import getTypeFromPGType from '../getTypeFromPGType'
 
 test('will fail if creating a type that is not in the catalog', () => {

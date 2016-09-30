@@ -1,9 +1,9 @@
-jest.mock('../getType')
-jest.mock('../../../interface')
+jest.mock('../../getType')
+jest.mock('../../../../interface')
 
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLList, GraphQLString } from 'graphql'
-import { Context, Paginator } from '../../../interface'
-import getType from '../getType'
+import { Context, Paginator } from '../../../../interface'
+import getType from '../../getType'
 import createConnectionField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionField'
 
 const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject) =>

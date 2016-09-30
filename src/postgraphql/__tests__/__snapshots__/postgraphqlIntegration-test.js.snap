@@ -667,6 +667,12 @@ type CompoundKey implements Node {
   personByPersonId2: Person
 }
 
+input CompoundKeyInput {
+  personId2: Int!
+  personId1: Int!
+  extra: Boolean
+}
+
 type CompoundKeysConnection {
   pageInfo: PageInfo!
   totalCount: Int
@@ -700,6 +706,87 @@ type CompoundType {
   fooBar: Int
 }
 
+# Awesome feature!
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+input CreateCompoundKeyInput {
+  clientMutationId: String
+  compoundKey: CompoundKeyInput!
+}
+
+type CreateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  compoundKeyEdge(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC): CompoundKeysEdge
+  query: Query
+}
+
+input CreateForeignKeyInput {
+  clientMutationId: String
+  foreignKey: ForeignKeyInput!
+}
+
+type CreateForeignKeyPayload {
+  clientMutationId: String
+  foreignKey: ForeignKey
+  foreignKeyEdge(orderBy: ForeignKeysOrderBy = NATURAL): ForeignKeysEdge
+  query: Query
+}
+
+input CreatePersonInput {
+  clientMutationId: String
+  person: PersonInput!
+}
+
+type CreatePersonPayload {
+  clientMutationId: String
+  person: Person
+  personEdge(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC): PeopleEdge
+  query: Query
+}
+
+input CreatePostInput {
+  clientMutationId: String
+  post: PostInput!
+}
+
+type CreatePostPayload {
+  clientMutationId: String
+  post: Post
+  postEdge(orderBy: PostsOrderBy = PRIMARY_KEY_ASC): PostsEdge
+  query: Query
+}
+
+input CreateTypesInput {
+  clientMutationId: String
+  types: TypesInput!
+}
+
+type CreateTypesPayload {
+  clientMutationId: String
+  types: Types
+  typesEdge(orderBy: TypesOrderBy = PRIMARY_KEY_ASC): TypesEdge
+  query: Query
+}
+
+input CreateUpdatableViewInput {
+  clientMutationId: String
+  updatableView: UpdatableViewInput!
+}
+
+type CreateUpdatableViewPayload {
+  clientMutationId: String
+  updatableView: UpdatableView
+  updatableViewEdge(orderBy: UpdatableViewsOrderBy = NATURAL): UpdatableViewsEdge
+  query: Query
+}
+
 scalar Cursor
 
 scalar Email
@@ -710,6 +797,12 @@ type ForeignKey {
   compoundKey2: Int
   compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
   personByPersonId: Person
+}
+
+input ForeignKeyInput {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
 }
 
 type ForeignKeysConnection {
@@ -734,9 +827,24 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+type Mutation {
+  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  createTypes(input: CreateTypesInput!): CreateTypesPayload
+  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
+  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  createPerson(input: CreatePersonInput!): CreatePersonPayload
+}
+
 type NestedCompoundType {
   a: CompoundType
   b: CompoundType
+  bazBuz: Int
+}
+
+input NestedCompoundTypeInput {
+  a: CompoundTypeInput
+  b: CompoundTypeInput
   bazBuz: Int
 }
 
@@ -813,6 +921,17 @@ type Person implements Node {
   createdAt: String
 }
 
+# Person test comment
+input PersonInput {
+  id: Int
+
+  # The person’s name
+  name: String!
+  about: String
+  email: Email
+  createdAt: String
+}
+
 type Post implements Node {
   __id: ID!
   id: Int!
@@ -820,6 +939,13 @@ type Post implements Node {
   body: String
   authorId: Int
   personByAuthorId: Person
+}
+
+input PostInput {
+  id: Int
+  headline: String!
+  body: String
+  authorId: Int
 }
 
 type PostsConnection {
@@ -897,6 +1023,18 @@ type TypesEdge {
   node: Types!
 }
 
+input TypesInput {
+  id: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
 enum TypesOrderBy {
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -923,6 +1061,16 @@ enum TypesOrderBy {
 
 # YOYOYO!!
 type UpdatableView {
+  x: Int
+  name: String
+  description: String
+
+  # This is constantly 2
+  constant: Int
+}
+
+# YOYOYO!!
+input UpdatableViewInput {
   x: Int
   name: String
   description: String
@@ -980,6 +1128,12 @@ type CompoundKey implements Node {
   personByPersonId2: Person
 }
 
+input CompoundKeyInput {
+  personId2: Int!
+  personId1: Int!
+  extra: Boolean
+}
+
 type CompoundKeysConnection {
   pageInfo: PageInfo!
   totalCount: Int
@@ -1013,6 +1167,87 @@ type CompoundType {
   fooBar: Int
 }
 
+# Awesome feature!
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+input CreateCompoundKeyInput {
+  clientMutationId: String
+  compoundKey: CompoundKeyInput!
+}
+
+type CreateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  compoundKeyEdge(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC): CompoundKeysEdge
+  query: Query
+}
+
+input CreateForeignKeyInput {
+  clientMutationId: String
+  foreignKey: ForeignKeyInput!
+}
+
+type CreateForeignKeyPayload {
+  clientMutationId: String
+  foreignKey: ForeignKey
+  foreignKeyEdge(orderBy: ForeignKeysOrderBy = NATURAL): ForeignKeysEdge
+  query: Query
+}
+
+input CreatePersonInput {
+  clientMutationId: String
+  person: PersonInput!
+}
+
+type CreatePersonPayload {
+  clientMutationId: String
+  person: Person
+  personEdge(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC): PeopleEdge
+  query: Query
+}
+
+input CreatePostInput {
+  clientMutationId: String
+  post: PostInput!
+}
+
+type CreatePostPayload {
+  clientMutationId: String
+  post: Post
+  postEdge(orderBy: PostsOrderBy = PRIMARY_KEY_ASC): PostsEdge
+  query: Query
+}
+
+input CreateTypesInput {
+  clientMutationId: String
+  types: TypesInput!
+}
+
+type CreateTypesPayload {
+  clientMutationId: String
+  types: Types
+  typesEdge(orderBy: TypesOrderBy = PRIMARY_KEY_ASC): TypesEdge
+  query: Query
+}
+
+input CreateUpdatableViewInput {
+  clientMutationId: String
+  updatableView: UpdatableViewInput!
+}
+
+type CreateUpdatableViewPayload {
+  clientMutationId: String
+  updatableView: UpdatableView
+  updatableViewEdge(orderBy: UpdatableViewsOrderBy = NATURAL): UpdatableViewsEdge
+  query: Query
+}
+
 scalar Cursor
 
 scalar Email
@@ -1023,6 +1258,12 @@ type ForeignKey {
   compoundKey2: Int
   compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
   personByPersonId: Person
+}
+
+input ForeignKeyInput {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
 }
 
 type ForeignKeysConnection {
@@ -1047,9 +1288,24 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+type Mutation {
+  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  createTypes(input: CreateTypesInput!): CreateTypesPayload
+  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
+  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  createPerson(input: CreatePersonInput!): CreatePersonPayload
+}
+
 type NestedCompoundType {
   a: CompoundType
   b: CompoundType
+  bazBuz: Int
+}
+
+input NestedCompoundTypeInput {
+  a: CompoundTypeInput
+  b: CompoundTypeInput
   bazBuz: Int
 }
 
@@ -1126,6 +1382,17 @@ type Person implements Node {
   createdAt: String
 }
 
+# Person test comment
+input PersonInput {
+  rowId: Int
+
+  # The person’s name
+  name: String!
+  about: String
+  email: Email
+  createdAt: String
+}
+
 type Post implements Node {
   id: ID!
   rowId: Int!
@@ -1133,6 +1400,13 @@ type Post implements Node {
   body: String
   authorId: Int
   personByAuthorId: Person
+}
+
+input PostInput {
+  rowId: Int
+  headline: String!
+  body: String
+  authorId: Int
 }
 
 type PostsConnection {
@@ -1210,6 +1484,18 @@ type TypesEdge {
   node: Types!
 }
 
+input TypesInput {
+  rowId: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
 enum TypesOrderBy {
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -1236,6 +1522,16 @@ enum TypesOrderBy {
 
 # YOYOYO!!
 type UpdatableView {
+  x: Int
+  name: String
+  description: String
+
+  # This is constantly 2
+  constant: Int
+}
+
+# YOYOYO!!
+input UpdatableViewInput {
   x: Int
   name: String
   description: String

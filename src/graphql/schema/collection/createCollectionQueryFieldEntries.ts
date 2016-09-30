@@ -4,7 +4,7 @@ import { formatName, idSerde, buildObject } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
 import transformInputValue from '../transformInputValue'
-import createConnectionField from '../createConnectionField'
+import createConnectionField from '../connection/createConnectionField'
 import getCollectionType from './getCollectionType'
 
 /**

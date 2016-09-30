@@ -48,6 +48,7 @@ const cache = new WeakMap<BuildToken, {
 }>()
 
 // TODO: doc
+// TODO: Maybe this should have a different name?
 // Instead of using our utility memoization function, we implement our own
 // memoization logic here because in some scenarios we want to return the same
 // result regardless of whether the `input` is true or false.
@@ -202,13 +203,20 @@ function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType): Gr
     name: formatName.type(`${type.name}-input`),
     description: type.description,
     fields: () => buildObject<GraphQLInputFieldConfig<mixed>>(
-      Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
-        [formatName.field(fieldName), {
+      Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) => {
+        let type = getType(buildToken, field.type, true)
+
+        // If the field has a default and the type we got was non-null, let’s
+        // get the nullable version.
+        if (field.hasDefault && type instanceof GraphQLNonNull)
+          type = type.ofType
+
+        return [formatName.field(fieldName), {
           description: field.description,
-          type: getType(buildToken, field.type, true),
+          type,
           [$$inputValueKeyName]: fieldName,
         }]
-      )
+      })
     ),
   })
 }
