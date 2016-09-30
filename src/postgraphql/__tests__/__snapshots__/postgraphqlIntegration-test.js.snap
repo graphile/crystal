@@ -44,6 +44,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": false
+      },
       "totalCount": 5
     },
     "b": Object {
@@ -65,6 +69,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
       "totalCount": 5
     },
     "c": Object {
@@ -86,6 +94,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": true
+      },
       "totalCount": 5
     },
     "d": Object {
@@ -131,6 +143,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": false
+      },
       "totalCount": 5
     },
     "e": Object {
@@ -176,6 +192,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": false
+      },
       "totalCount": 5
     },
     "f": Object {
@@ -189,6 +209,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
       "totalCount": 5
     },
     "g": Object {
@@ -218,6 +242,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": true
+      },
       "totalCount": 5
     },
     "h": Object {
@@ -332,6 +360,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": false
+      },
       "totalCount": 3
     },
     "k": Object {
@@ -351,6 +383,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      },
       "totalCount": 3
     },
     "l": Object {
@@ -363,6 +399,10 @@ Object {
           }
         }
       ],
+      "pageInfo": Object {
+        "hasNextPage": false,
+        "hasPreviousPage": true
+      },
       "totalCount": 4
     }
   }

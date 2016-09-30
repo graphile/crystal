@@ -14,6 +14,10 @@ query {
 }
 
 fragment personConnection on PeopleConnection {
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+  }
   totalCount
   edges {
     cursor
@@ -26,6 +30,10 @@ fragment personConnection on PeopleConnection {
 }
 
 fragment postConnection on PostsConnection {
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+  }
   totalCount
   edges {
     cursor
