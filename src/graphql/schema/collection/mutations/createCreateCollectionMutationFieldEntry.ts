@@ -1,18 +1,18 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection, ObjectType } from '../../../interface'
-import { formatName } from '../../utils'
-import BuildToken from '../BuildToken'
-import getType from '../getType'
-import transformInputValue from '../transformInputValue'
-import getCollectionType from '../collection/getCollectionType'
-import { getEdgeType, createOrderByArg } from '../connection/createConnectionField'
-import createMutationField from './createMutationField'
+import { Collection, ObjectType } from '../../../../interface'
+import { formatName } from '../../../utils'
+import BuildToken from '../../BuildToken'
+import getType from '../../getType'
+import transformInputValue from '../../transformInputValue'
+import createMutationField from '../../createMutationField'
+import { getEdgeType, createOrderByArg } from '../../connection/createConnectionField'
+import getCollectionType from '../getCollectionType'
 
 /**
  * Creates the mutation field entry for creating values in a collection.
  * Returns undefined if you can’t create values in a given collection.
  */
-export default function createCollectionCreateMutationFieldEntry (
+export default function createCreateCollectionMutationFieldEntry (
   buildToken: BuildToken,
   collection: Collection,
 ): [string, GraphQLFieldConfig<mixed, mixed>] | undefined {

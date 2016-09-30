@@ -6,10 +6,10 @@ import {
   GraphQLInputObjectType,
   GraphQLInputFieldConfig,
 } from 'graphql'
-import { Context } from '../../../interface'
-import { formatName, buildObject } from '../../utils'
-import BuildToken from '../BuildToken'
-import getQueryType from '../getQueryType'
+import { Context } from '../../interface'
+import { formatName, buildObject } from '../utils'
+import BuildToken from './BuildToken'
+import getQueryType from './getQueryType'
 
 /**
  * The configuration for creating a mutation field.

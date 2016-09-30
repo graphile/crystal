@@ -1,8 +1,8 @@
-jest.mock('../../getQueryType')
+jest.mock('../getQueryType')
 
 import { GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInputObjectType } from 'graphql'
-import { Context } from '../../../../interface'
-import getQueryType from '../../getQueryType'
+import { Context } from '../../../interface'
+import getQueryType from '../getQueryType'
 import createMutationField from '../createMutationField'
 
 // Create a new object where `GraphQLString` is the prototype. This means it

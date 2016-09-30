@@ -1,7 +1,7 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Collection } from '../../../interface'
 import BuildToken from '../BuildToken'
-import createCollectionCreateMutationFieldEntry from '../mutations/createCollectionCreateMutationFieldEntry'
+import createCollectionCreateMutationFieldEntry from './mutations/createCreateCollectionMutationFieldEntry'
 
 /**
  * Creates all of the mutation fields available for a given collection. This

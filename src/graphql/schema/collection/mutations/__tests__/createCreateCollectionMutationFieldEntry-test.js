@@ -1,23 +1,23 @@
-jest.mock('../../getType')
-jest.mock('../../collection/getCollectionType')
-jest.mock('../createMutationField')
+jest.mock('../../../getType')
+jest.mock('../../../createMutationField')
+jest.mock('../../getCollectionType')
 
-import getType from '../../getType'
-import getCollectionType from '../../collection/getCollectionType'
-import createMutationField from '../createMutationField'
-import createCollectionCreateMutationFieldEntry from '../createCollectionCreateMutationFieldEntry'
+import getType from '../../../getType'
+import createMutationField from '../../../createMutationField'
+import getCollectionType from '../../getCollectionType'
+import createCreateCollectionMutationFieldEntry from '../createCreateCollectionMutationFieldEntry'
 
 createMutationField.mockImplementation((buildToken, config) => Object.assign(config, { buildToken }))
 
 test('will return undefined if create is not defined', () => {
-  expect(createCollectionCreateMutationFieldEntry({}, {})).toBe(undefined)
+  expect(createCreateCollectionMutationFieldEntry({}, {})).toBe(undefined)
 })
 
 test('will create a field entry with the correct name', () => {
   const buildToken = Symbol('buildToken')
   const type = { name: 'person' }
   const collection = { name: 'people', type, create: true }
-  const fieldEntry = createCollectionCreateMutationFieldEntry(buildToken, collection)
+  const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[0]).toBe('createPerson')
   expect(fieldEntry[1].buildToken).toBe(buildToken)
   expect(fieldEntry[1].name).toBe('create-person')
@@ -30,7 +30,7 @@ test('will create a field entry with the correct input fields', () => {
   const buildToken = Symbol('buildToken')
   const type = { name: 'person' }
   const collection = { name: 'people', type, create: true }
-  const fieldEntry = createCollectionCreateMutationFieldEntry(buildToken, collection)
+  const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[1].inputFields).toEqual([['person', { type: gqlType }]])
   expect(getType.mock.calls).toEqual([[buildToken, type, true]])
 })
@@ -43,7 +43,7 @@ test('will create a field entry with output fields and no paginator', () => {
   const buildToken = Symbol('buildToken')
   const type = { name: 'person' }
   const collection = { name: 'people', type, create: true }
-  const fieldEntry = createCollectionCreateMutationFieldEntry(buildToken, collection)
+  const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[1].outputFields[0][0]).toBe('person')
   expect(fieldEntry[1].outputFields[0][1].type).toBe(gqlCollectionType)
   expect(fieldEntry[1].outputFields[0][1].resolve(value)).toBe(value)
