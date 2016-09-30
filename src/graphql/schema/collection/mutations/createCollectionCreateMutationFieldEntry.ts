@@ -46,6 +46,7 @@ export default function createCollectionCreateMutationFieldEntry (
         type: getCollectionType(buildToken, collection),
         resolve: value => value,
       }],
+
       // An edge variant of the created value. Because we use cursor
       // based pagination, it is also helpful to get the cursor for the
       // value we just created (thus why this is in the form of an edge).
@@ -65,6 +66,7 @@ export default function createCollectionCreateMutationFieldEntry (
 
     // When we execute we just create a value in the collection after
     // transforming the correct input field.
+    // TODO: test
     execute: (context, input) =>
       collection.create!(context, transformInputValue(inputFieldType, input[inputFieldName]) as any),
   })]

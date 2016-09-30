@@ -127,7 +127,7 @@ export default function createMutationField <T>(
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const { clientMutationId } = args
+      const { clientMutationId } = args['input']
       const value = await config.execute(context, args['input'])
 
       return {

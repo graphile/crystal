@@ -77,6 +77,7 @@ const personCollection: Collection = {
   keys: [personIdKey, personNameKey, personEmailKey],
   primaryKey: personIdKey,
   paginator: personPaginator,
+  create: unimplementedFn,
 }
 
 Object.assign(personIdKey, { collection: personCollection })
@@ -129,6 +130,7 @@ const postCollection: Collection = {
   keys: [postIdKey],
   primaryKey: postIdKey,
   paginator: postPaginator,
+  create: unimplementedFn,
 }
 
 Object.assign(postIdKey, { collection: postCollection })

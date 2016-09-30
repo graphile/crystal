@@ -1,7 +1,36 @@
 exports[`test will generate the correct forum schema 1`] = `
-"scalar Cursor
+"input CreatePersonInput {
+  clientMutationId: String
+  person: PersonInput!
+}
+
+type CreatePersonPayload {
+  clientMutationId: String
+  person: Person
+  personEdge(orderBy: PeopleOrderBy = ID_ASC): PeopleEdge
+  query: Query
+}
+
+input CreatePostInput {
+  clientMutationId: String
+  post: PostInput!
+}
+
+type CreatePostPayload {
+  clientMutationId: String
+  post: Post
+  postEdge(orderBy: PostsOrderBy = ID_ASC): PostsEdge
+  query: Query
+}
+
+scalar Cursor
 
 scalar Email
+
+type Mutation {
+  createPerson(input: CreatePersonInput!): CreatePersonPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+}
 
 interface Node {
   __id: ID!
@@ -47,6 +76,15 @@ type Person implements Node {
   about: String
 }
 
+input PersonInput {
+  id: Int!
+  name: String!
+  email: Email!
+  firstName: String
+  lastName: String
+  about: String
+}
+
 type Post implements Node {
   __id: ID!
   id: Int!
@@ -55,6 +93,14 @@ type Post implements Node {
   headline: String!
   body: String
   personByAuthor: Person
+}
+
+input PostInput {
+  id: Int!
+  authorId: Int!
+  status: PostStatus!
+  headline: String!
+  body: String
 }
 
 type PostsConnection {
