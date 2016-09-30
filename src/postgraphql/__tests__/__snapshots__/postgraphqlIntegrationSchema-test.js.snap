@@ -352,19 +352,24 @@ type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
+  updatePostByRowId(input: UpdatePostByRowIdInput!): UpdatePostByRowIdPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
   updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
+  updateTypesByRowId(input: UpdateTypesByRowIdInput!): UpdateTypesByRowIdPayload
   deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesByRowId(input: DeleteTypesByRowIdInput!): DeleteTypesByRowIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
+  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyByPersonId1AndPersonId2Payload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
+  updatePersonByRowId(input: UpdatePersonByRowIdInput!): UpdatePersonByRowIdPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonByRowIdPayload
@@ -917,6 +922,19 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyByPersonId1AndPersonId2Payload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
 input UpdateCompoundKeyInput {
   clientMutationId: String
   id: ID!
@@ -926,6 +944,30 @@ input UpdateCompoundKeyInput {
 type UpdateCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+  query: Query
+}
+
+input UpdatePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePersonByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByRowIdPayload {
+  clientMutationId: String
+  person: Person
   query: Query
 }
 
@@ -941,6 +983,18 @@ type UpdatePersonPayload {
   query: Query
 }
 
+input UpdatePostByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+  postPatch: PostPatch!
+}
+
+type UpdatePostByRowIdPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
 input UpdatePostInput {
   clientMutationId: String
   id: ID!
@@ -950,6 +1004,18 @@ input UpdatePostInput {
 type UpdatePostPayload {
   clientMutationId: String
   post: Post
+  query: Query
+}
+
+input UpdateTypesByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+  typesPatch: TypesPatch!
+}
+
+type UpdateTypesByRowIdPayload {
+  clientMutationId: String
+  types: Types
   query: Query
 }
 
@@ -1324,19 +1390,24 @@ type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
+  updatePostById(input: UpdatePostByIdInput!): UpdatePostByIdPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
   updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
+  updateTypesById(input: UpdateTypesByIdInput!): UpdateTypesByIdPayload
   deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
+  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyByPersonId1AndPersonId2Payload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
+  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
@@ -1889,6 +1960,19 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyByPersonId1AndPersonId2Payload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
 input UpdateCompoundKeyInput {
   clientMutationId: String
   __id: ID!
@@ -1898,6 +1982,30 @@ input UpdateCompoundKeyInput {
 type UpdateCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+  query: Query
+}
+
+input UpdatePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePersonByIdInput {
+  clientMutationId: String
+  id: Int!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByIdPayload {
+  clientMutationId: String
+  person: Person
   query: Query
 }
 
@@ -1913,6 +2021,18 @@ type UpdatePersonPayload {
   query: Query
 }
 
+input UpdatePostByIdInput {
+  clientMutationId: String
+  id: Int!
+  postPatch: PostPatch!
+}
+
+type UpdatePostByIdPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
 input UpdatePostInput {
   clientMutationId: String
   __id: ID!
@@ -1922,6 +2042,18 @@ input UpdatePostInput {
 type UpdatePostPayload {
   clientMutationId: String
   post: Post
+  query: Query
+}
+
+input UpdateTypesByIdInput {
+  clientMutationId: String
+  id: Int!
+  typesPatch: TypesPatch!
+}
+
+type UpdateTypesByIdPayload {
+  clientMutationId: String
+  types: Types
   query: Query
 }
 
