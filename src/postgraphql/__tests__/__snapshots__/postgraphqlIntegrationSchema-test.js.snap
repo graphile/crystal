@@ -1,1729 +1,4 @@
-exports[`test query connections.graphql 1`] = `
-Object {
-  "data": Object {
-    "a": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-          "node": Object {
-            "email": "john.smith@email.com",
-            "id": 1,
-            "name": "John Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
-          "node": Object {
-            "email": "sara.smith@email.com",
-            "id": 2,
-            "name": "Sara Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
-          "node": Object {
-            "email": "budd.deey@email.com",
-            "id": 3,
-            "name": "Budd Deey"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": false
-      },
-      "totalCount": 5
-    },
-    "b": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-          "node": Object {
-            "email": "john.smith@email.com",
-            "id": 1,
-            "name": "John Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
-          "node": Object {
-            "email": "sara.smith@email.com",
-            "id": 2,
-            "name": "Sara Smith"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": true,
-        "hasPreviousPage": false
-      },
-      "totalCount": 5
-    },
-    "c": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": true
-      },
-      "totalCount": 5
-    },
-    "d": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
-          "node": Object {
-            "email": "budd.deey@email.com",
-            "id": 3,
-            "name": "Budd Deey"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
-          "node": Object {
-            "email": "john.smith@email.com",
-            "id": 1,
-            "name": "John Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJKb2hubnkgVHVja2VyIiw1XV0=",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
-          "node": Object {
-            "email": "sara.smith@email.com",
-            "id": 2,
-            "name": "Sara Smith"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": false
-      },
-      "totalCount": 5
-    },
-    "e": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
-          "node": Object {
-            "email": "sara.smith@email.com",
-            "id": 2,
-            "name": "Sara Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obm55IFR1Y2tlciIsNV1d",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
-          "node": Object {
-            "email": "john.smith@email.com",
-            "id": 1,
-            "name": "John Smith"
-          }
-        },
-        Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
-          "node": Object {
-            "email": "budd.deey@email.com",
-            "id": 3,
-            "name": "Budd Deey"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": false
-      },
-      "totalCount": 5
-    },
-    "f": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-          "node": Object {
-            "email": "john.smith@email.com",
-            "id": 1,
-            "name": "John Smith"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": true,
-        "hasPreviousPage": false
-      },
-      "totalCount": 5
-    },
-    "g": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
-          "node": Object {
-            "email": "budd.deey@email.com",
-            "id": 3,
-            "name": "Budd Deey"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez"
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": true
-      },
-      "totalCount": 5
-    },
-    "h": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJuYXR1cmFsIiwxXQ==",
-          "node": Object {
-            "constant": 2,
-            "name": "John Smith",
-            "x": 1
-          }
-        },
-        Object {
-          "cursor": "WyJuYXR1cmFsIiwyXQ==",
-          "node": Object {
-            "constant": 2,
-            "name": "Sara Smith",
-            "x": 2
-          }
-        },
-        Object {
-          "cursor": "WyJuYXR1cmFsIiwzXQ==",
-          "node": Object {
-            "constant": 2,
-            "name": "Budd Deey",
-            "x": 3
-          }
-        },
-        Object {
-          "cursor": "WyJuYXR1cmFsIiw0XQ==",
-          "node": Object {
-            "constant": 2,
-            "name": "Kathryn Ramirez",
-            "x": 4
-          }
-        },
-        Object {
-          "cursor": "WyJuYXR1cmFsIiw1XQ==",
-          "node": Object {
-            "constant": 2,
-            "name": "Johnny Tucker",
-            "x": 5
-          }
-        }
-      ]
-    },
-    "i": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
-          "node": Object {
-            "constant": 2,
-            "name": "John Smith",
-            "x": 1
-          }
-        },
-        Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
-          "node": Object {
-            "constant": 2,
-            "name": "Sara Smith",
-            "x": 2
-          }
-        },
-        Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
-          "node": Object {
-            "constant": 2,
-            "name": "Budd Deey",
-            "x": 3
-          }
-        },
-        Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
-          "node": Object {
-            "constant": 2,
-            "name": "Kathryn Ramirez",
-            "x": 4
-          }
-        },
-        Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
-          "node": Object {
-            "constant": 2,
-            "name": "Johnny Tucker",
-            "x": 5
-          }
-        }
-      ]
-    },
-    "j": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-          "node": Object {
-            "authorId": 2,
-            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
-          "node": Object {
-            "authorId": 2,
-            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
-          "node": Object {
-            "authorId": 2,
-            "headline": "What’s with you kids? Every other day it’s food, food, food."
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": false
-      },
-      "totalCount": 3
-    },
-    "k": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
-          "node": Object {
-            "authorId": 2,
-            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
-          }
-        },
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
-          "node": Object {
-            "authorId": 2,
-            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": true,
-        "hasPreviousPage": false
-      },
-      "totalCount": 3
-    },
-    "l": Object {
-      "edges": Array [
-        Object {
-          "cursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
-          "node": Object {
-            "authorId": 1,
-            "headline": "You hit me with a cricket bat."
-          }
-        }
-      ],
-      "pageInfo": Object {
-        "hasNextPage": false,
-        "hasPreviousPage": true
-      },
-      "totalCount": 4
-    }
-  }
-}
-`;
-
-exports[`test query node.graphql 1`] = `
-Object {
-  "data": Object {
-    "a": Object {
-      "nodes": Array [
-        Object {
-          "__id": "WyJwZW9wbGUiLDFd",
-          "__typename": "Person",
-          "id": 1,
-          "name": "John Smith"
-        },
-        Object {
-          "__id": "WyJwZW9wbGUiLDJd",
-          "__typename": "Person",
-          "id": 2,
-          "name": "Sara Smith"
-        },
-        Object {
-          "__id": "WyJwZW9wbGUiLDNd",
-          "__typename": "Person",
-          "id": 3,
-          "name": "Budd Deey"
-        },
-        Object {
-          "__id": "WyJwZW9wbGUiLDRd",
-          "__typename": "Person",
-          "id": 4,
-          "name": "Kathryn Ramirez"
-        },
-        Object {
-          "__id": "WyJwZW9wbGUiLDVd",
-          "__typename": "Person",
-          "id": 5,
-          "name": "Johnny Tucker"
-        }
-      ]
-    },
-    "b": Object {
-      "nodes": Array [
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
-          "__typename": "CompoundKey",
-          "personId1": 1,
-          "personId2": 2
-        },
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
-          "__typename": "CompoundKey",
-          "personId1": 2,
-          "personId2": 1
-        },
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
-          "__typename": "CompoundKey",
-          "personId1": 2,
-          "personId2": 3
-        },
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
-          "__typename": "CompoundKey",
-          "personId1": 2,
-          "personId2": 5
-        },
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
-          "__typename": "CompoundKey",
-          "personId1": 4,
-          "personId2": 3
-        },
-        Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
-          "__typename": "CompoundKey",
-          "personId1": 4,
-          "personId2": 4
-        }
-      ]
-    },
-    "c": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
-      "__typename": "CompoundKey",
-      "personId1": 2,
-      "personId2": 3
-    },
-    "d": Object {
-      "__id": "WyJwZW9wbGUiLDJd",
-      "__typename": "Person",
-      "id": 2,
-      "name": "Sara Smith"
-    },
-    "e": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
-      "__typename": "CompoundKey",
-      "personId1": 1,
-      "personId2": 2
-    },
-    "f": Object {
-      "__id": "WyJwZW9wbGUiLDVd",
-      "__typename": "Person",
-      "id": 5,
-      "name": "Johnny Tucker"
-    },
-    "g": null,
-    "h": null,
-    "i": Object {
-      "__id": "WyJwZW9wbGUiLDJd",
-      "__typename": "Person",
-      "id": 2,
-      "name": "Sara Smith"
-    },
-    "j": Object {
-      "__id": "WyJwZW9wbGUiLDVd",
-      "__typename": "Person",
-      "id": 5,
-      "name": "Johnny Tucker"
-    },
-    "k": null,
-    "l": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
-      "__typename": "CompoundKey",
-      "personId1": 2,
-      "personId2": 3
-    },
-    "m": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
-      "__typename": "CompoundKey",
-      "personId1": 1,
-      "personId2": 2
-    },
-    "n": null
-  }
-}
-`;
-
-exports[`test query relation-tail-head.graphql 1`] = `
-Object {
-  "data": Object {
-    "allCompoundKeys": Object {
-      "nodes": Array [
-        Object {
-          "extra": null,
-          "personByPersonId1": Object {
-            "email": "john.smith@email.com",
-            "name": "John Smith"
-          },
-          "personByPersonId2": Object {
-            "email": "sara.smith@email.com",
-            "name": "Sara Smith"
-          },
-          "personId1": 1,
-          "personId2": 2
-        },
-        Object {
-          "extra": false,
-          "personByPersonId1": Object {
-            "email": "sara.smith@email.com",
-            "name": "Sara Smith"
-          },
-          "personByPersonId2": Object {
-            "email": "john.smith@email.com",
-            "name": "John Smith"
-          },
-          "personId1": 2,
-          "personId2": 1
-        },
-        Object {
-          "extra": null,
-          "personByPersonId1": Object {
-            "email": "sara.smith@email.com",
-            "name": "Sara Smith"
-          },
-          "personByPersonId2": Object {
-            "email": "budd.deey@email.com",
-            "name": "Budd Deey"
-          },
-          "personId1": 2,
-          "personId2": 3
-        },
-        Object {
-          "extra": true,
-          "personByPersonId1": Object {
-            "email": "sara.smith@email.com",
-            "name": "Sara Smith"
-          },
-          "personByPersonId2": Object {
-            "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker"
-          },
-          "personId1": 2,
-          "personId2": 5
-        },
-        Object {
-          "extra": true,
-          "personByPersonId1": Object {
-            "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
-          },
-          "personByPersonId2": Object {
-            "email": "budd.deey@email.com",
-            "name": "Budd Deey"
-          },
-          "personId1": 4,
-          "personId2": 3
-        },
-        Object {
-          "extra": false,
-          "personByPersonId1": Object {
-            "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
-          },
-          "personByPersonId2": Object {
-            "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
-          },
-          "personId1": 4,
-          "personId2": 4
-        }
-      ]
-    },
-    "allForeignKeys": Object {
-      "nodes": Array [
-        Object {
-          "compoundKey1": 2,
-          "compoundKey2": 1,
-          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
-            "extra": false,
-            "personId1": 2,
-            "personId2": 1
-          },
-          "personByPersonId": Object {
-            "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker"
-          },
-          "personId": 5
-        },
-        Object {
-          "compoundKey1": 4,
-          "compoundKey2": 4,
-          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
-            "extra": false,
-            "personId1": 4,
-            "personId2": 4
-          },
-          "personByPersonId": null,
-          "personId": null
-        },
-        Object {
-          "compoundKey1": 2,
-          "compoundKey2": 1,
-          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
-            "extra": false,
-            "personId1": 2,
-            "personId2": 1
-          },
-          "personByPersonId": null,
-          "personId": null
-        }
-      ]
-    }
-  }
-}
-`;
-
-exports[`test query relay.graphql 1`] = `
-Object {
-  "data": Object {
-    "node": null,
-    "relay": Object {
-      "node": null,
-      "relay": Object {
-        "node": null,
-        "relay": Object {
-          "node": null
-        }
-      }
-    }
-  }
-}
-`;
-
-exports[`test query types.graphql 1`] = `
-Object {
-  "data": Object {
-    "allTypes": Object {
-      "nodes": Array [
-        Object {
-          "bigint": 200,
-          "boolean": true,
-          "compoundType": Object {
-            "a": 1,
-            "b": "2",
-            "c": "BLUE",
-            "d": "4be8a712-3ff7-432e-aa34-fdb43fbd838d",
-            "fooBar": 8
-          },
-          "domain": 5,
-          "domain2": 6,
-          "enum": "GREEN",
-          "nestedCompoundType": Object {
-            "a": Object {
-              "a": 3,
-              "b": "456",
-              "c": "RED",
-              "d": "aed18400-2a92-46df-8204-b70c728b3520",
-              "fooBar": 93
-            },
-            "b": Object {
-              "a": 42,
-              "b": "Hello, world!",
-              "c": "BLUE",
-              "d": "d34df5e0-83f1-11e6-8dd0-abee917ffd1e",
-              "fooBar": -5
-            },
-            "bazBuz": 7
-          }
-        }
-      ]
-    }
-  }
-}
-`;
-
-exports[`test query unique-constraints.graphql 1`] = `
-Object {
-  "data": Object {
-    "a": Object {
-      "email": "sara.smith@email.com",
-      "name": "Sara Smith"
-    },
-    "b": null,
-    "c": Object {
-      "personId1": 1,
-      "personId2": 2
-    },
-    "d": Object {
-      "personId1": 4,
-      "personId2": 4
-    },
-    "e": null
-  }
-}
-`;
-
-exports[`test schema 1`] = `
-"scalar AnInt
-
-scalar AnotherInt
-
-enum Color {
-  RED
-  GREEN
-  BLUE
-}
-
-type CompoundKey implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
-  personId2: Int!
-  personId1: Int!
-  extra: Boolean
-
-  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
-
-  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
-}
-
-input CompoundKeyInput {
-  personId2: Int!
-  personId1: Int!
-  extra: Boolean
-}
-
-input CompoundKeyPatch {
-  personId2: Int
-  personId1: Int
-  extra: Boolean
-}
-
-# A connection to a list of \`CompoundKey\` values.
-type CompoundKeysConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`CompoundKey\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`CompoundKey\` and cursor to aid in pagination.
-  edges: [CompoundKeysEdge]
-
-  # A list of \`CompoundKey\` objects.
-  nodes: [CompoundKey!]
-}
-
-# A \`CompoundKey\` edge in the connection.
-type CompoundKeysEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`CompoundKey\` at the end of the edge.
-  node: CompoundKey!
-}
-
-# Methods to use when ordering \`CompoundKey\`.
-enum CompoundKeysOrderBy {
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  NATURAL
-  PERSON_ID_2_ASC
-  PERSON_ID_2_DESC
-  PERSON_ID_1_ASC
-  PERSON_ID_1_DESC
-  EXTRA_ASC
-  EXTRA_DESC
-}
-
-# Awesome feature!
-type CompoundType {
-  a: Int
-  b: String
-  c: Color
-  d: Uuid
-  fooBar: Int
-}
-
-# Awesome feature!
-input CompoundTypeInput {
-  a: Int
-  b: String
-  c: Color
-  d: Uuid
-  fooBar: Int
-}
-
-input CreateCompoundKeyInput {
-  clientMutationId: String
-  compoundKey: CompoundKeyInput!
-}
-
-type CreateCompoundKeyPayload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  compoundKeyEdge(
-    # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
-  ): CompoundKeysEdge
-  query: Query
-}
-
-input CreateForeignKeyInput {
-  clientMutationId: String
-  foreignKey: ForeignKeyInput!
-}
-
-type CreateForeignKeyPayload {
-  clientMutationId: String
-  foreignKey: ForeignKey
-  foreignKeyEdge(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-  ): ForeignKeysEdge
-  query: Query
-}
-
-input CreatePersonInput {
-  clientMutationId: String
-  person: PersonInput!
-}
-
-type CreatePersonPayload {
-  clientMutationId: String
-  person: Person
-  personEdge(
-    # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
-  ): PeopleEdge
-  query: Query
-}
-
-input CreatePostInput {
-  clientMutationId: String
-  post: PostInput!
-}
-
-type CreatePostPayload {
-  clientMutationId: String
-  post: Post
-  postEdge(
-    # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
-  ): PostsEdge
-  query: Query
-}
-
-input CreateTypesInput {
-  clientMutationId: String
-  types: TypesInput!
-}
-
-type CreateTypesPayload {
-  clientMutationId: String
-  types: Types
-  typesEdge(
-    # The method to use when ordering \`Types\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
-  ): TypesEdge
-  query: Query
-}
-
-input CreateUpdatableViewInput {
-  clientMutationId: String
-  updatableView: UpdatableViewInput!
-}
-
-type CreateUpdatableViewPayload {
-  clientMutationId: String
-  updatableView: UpdatableView
-  updatableViewEdge(
-    # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
-  ): UpdatableViewsEdge
-  query: Query
-}
-
-# A location in a connection that can be used for resuming pagination.
-scalar Cursor
-
-input DeleteCompoundKeyByPersonId1AndPersonId2Input {
-  clientMutationId: String
-  personId1: Int!
-  personId2: Int!
-}
-
-type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  deletedCompoundKeyId: ID
-  query: Query
-}
-
-input DeleteCompoundKeyInput {
-  clientMutationId: String
-  __id: ID!
-}
-
-type DeleteCompoundKeyPayload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  deletedCompoundKeyId: ID
-  query: Query
-}
-
-input DeletePersonByEmailInput {
-  clientMutationId: String
-  email: Email!
-}
-
-type DeletePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
-input DeletePersonByIdInput {
-  clientMutationId: String
-  id: Int!
-}
-
-type DeletePersonByIdPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
-input DeletePersonInput {
-  clientMutationId: String
-  __id: ID!
-}
-
-type DeletePersonPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
-input DeletePostByIdInput {
-  clientMutationId: String
-  id: Int!
-}
-
-type DeletePostByIdPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-  query: Query
-}
-
-input DeletePostInput {
-  clientMutationId: String
-  __id: ID!
-}
-
-type DeletePostPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-  query: Query
-}
-
-input DeleteTypesByIdInput {
-  clientMutationId: String
-  id: Int!
-}
-
-type DeleteTypesByIdPayload {
-  clientMutationId: String
-  types: Types
-  deletedTypesId: ID
-  query: Query
-}
-
-input DeleteTypesInput {
-  clientMutationId: String
-  __id: ID!
-}
-
-type DeleteTypesPayload {
-  clientMutationId: String
-  types: Types
-  deletedTypesId: ID
-  query: Query
-}
-
-scalar Email
-
-type ForeignKey {
-  personId: Int
-  compoundKey1: Int
-  compoundKey2: Int
-
-  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
-  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
-  personByPersonId: Person
-}
-
-input ForeignKeyInput {
-  personId: Int
-  compoundKey1: Int
-  compoundKey2: Int
-}
-
-# A connection to a list of \`ForeignKey\` values.
-type ForeignKeysConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`ForeignKey\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`ForeignKey\` and cursor to aid in pagination.
-  edges: [ForeignKeysEdge]
-
-  # A list of \`ForeignKey\` objects.
-  nodes: [ForeignKey!]
-}
-
-# A \`ForeignKey\` edge in the connection.
-type ForeignKeysEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`ForeignKey\` at the end of the edge.
-  node: ForeignKey!
-}
-
-# Methods to use when ordering \`ForeignKey\`.
-enum ForeignKeysOrderBy {
-  NATURAL
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  COMPOUND_KEY_1_ASC
-  COMPOUND_KEY_1_DESC
-  COMPOUND_KEY_2_ASC
-  COMPOUND_KEY_2_DESC
-}
-
-# The root mutation type which contains root level fields which mutate data.
-type Mutation {
-  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
-  createPost(input: CreatePostInput!): CreatePostPayload
-  updatePost(input: UpdatePostInput!): UpdatePostPayload
-  deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
-  createTypes(input: CreateTypesInput!): CreateTypesPayload
-  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
-  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
-  deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
-  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
-  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
-  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
-  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
-  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
-  createPerson(input: CreatePersonInput!): CreatePersonPayload
-  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
-  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
-}
-
-type NestedCompoundType {
-  a: CompoundType
-  b: CompoundType
-  bazBuz: Int
-}
-
-input NestedCompoundTypeInput {
-  a: CompoundTypeInput
-  b: CompoundTypeInput
-  bazBuz: Int
-}
-
-# An object with a globally unique \`ID\`.
-interface Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
-}
-
-type NonUpdatableView {
-  column: Int
-}
-
-# A connection to a list of \`NonUpdatableView\` values.
-type NonUpdatableViewsConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`NonUpdatableView\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`NonUpdatableView\` and cursor to aid in pagination.
-  edges: [NonUpdatableViewsEdge]
-
-  # A list of \`NonUpdatableView\` objects.
-  nodes: [NonUpdatableView!]
-}
-
-# A \`NonUpdatableView\` edge in the connection.
-type NonUpdatableViewsEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`NonUpdatableView\` at the end of the edge.
-  node: NonUpdatableView!
-}
-
-# Methods to use when ordering \`NonUpdatableView\`.
-enum NonUpdatableViewsOrderBy {
-  NATURAL
-  COLUMN_ASC
-  COLUMN_DESC
-}
-
-# Information about pagination in a connection.
-type PageInfo {
-  # When paginating forwards, are there more items?
-  hasNextPage: Boolean!
-
-  # When paginating backwards, are there more items?
-  hasPreviousPage: Boolean!
-
-  # When paginating backwards, the cursor to continue.
-  startCursor: Cursor
-
-  # When paginating forwards, the cursor to continue.
-  endCursor: Cursor
-}
-
-# A connection to a list of \`Person\` values.
-type PeopleConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Person\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
-  edges: [PeopleEdge]
-
-  # A list of \`Person\` objects.
-  nodes: [Person!]
-}
-
-# A \`Person\` edge in the connection.
-type PeopleEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Person\` at the end of the edge.
-  node: Person!
-}
-
-# Methods to use when ordering \`Person\`.
-enum PeopleOrderBy {
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  NATURAL
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ABOUT_ASC
-  ABOUT_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-}
-
-# Person test comment
-type Person implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
-  id: Int!
-
-  # The person’s name
-  name: String!
-  about: String
-  email: Email
-  createdAt: String
-}
-
-# Person test comment
-input PersonInput {
-  id: Int
-
-  # The person’s name
-  name: String!
-  about: String
-  email: Email
-  createdAt: String
-}
-
-input PersonPatch {
-  id: Int
-  name: String
-  about: String
-  email: Email
-  createdAt: String
-}
-
-type Post implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
-  id: Int!
-  headline: String!
-  body: String
-  authorId: Int
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
-}
-
-input PostInput {
-  id: Int
-  headline: String!
-  body: String
-  authorId: Int
-}
-
-input PostPatch {
-  id: Int
-  headline: String
-  body: String
-  authorId: Int
-}
-
-# A connection to a list of \`Post\` values.
-type PostsConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Post\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Post\` and cursor to aid in pagination.
-  edges: [PostsEdge]
-
-  # A list of \`Post\` objects.
-  nodes: [Post!]
-}
-
-# A \`Post\` edge in the connection.
-type PostsEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Post\` at the end of the edge.
-  node: Post!
-}
-
-# Methods to use when ordering \`Post\`.
-enum PostsOrderBy {
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  NATURAL
-  ID_ASC
-  ID_DESC
-  HEADLINE_ASC
-  HEADLINE_DESC
-  BODY_ASC
-  BODY_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-}
-
-# The root query type which gives access points into the data universe.
-type Query {
-  # Fetches an object given its globally unique \`ID\`.
-  node(
-    # The globally unique \`ID\`.
-    __id: ID!
-  ): Node
-
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
-  allForeignKeys(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    personId: Int
-    compoundKey1: Int
-    compoundKey2: Int
-  ): ForeignKeysConnection
-
-  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
-  allNonUpdatableViews(
-    # The method to use when ordering \`NonUpdatableView\`.
-    orderBy: NonUpdatableViewsOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    column: Int
-  ): NonUpdatableViewsConnection
-
-  # Reads and enables paginatation through a set of \`Post\`.
-  allPosts(
-    # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    id: Int
-    headline: String
-    body: String
-    authorId: Int
-  ): PostsConnection
-
-  # Reads a single \`Post\` using its globally unique \`ID\`.
-  post(
-    # The globally unique \`ID\` to be used in selecting a single \`Post\`.
-    __id: ID!
-  ): Post
-  postById(id: Int!): Post
-
-  # Reads and enables paginatation through a set of \`Types\`.
-  allTypes(
-    # The method to use when ordering \`Types\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    id: Int
-    bigint: Int
-    boolean: Boolean
-    varchar: String
-    enum: Color
-    domain: AnInt
-    domain2: AnotherInt
-    compoundType: CompoundTypeInput
-    nestedCompoundType: NestedCompoundTypeInput
-  ): TypesConnection
-
-  # Reads a single \`Types\` using its globally unique \`ID\`.
-  types(
-    # The globally unique \`ID\` to be used in selecting a single \`Types\`.
-    __id: ID!
-  ): Types
-  typesById(id: Int!): Types
-
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
-  allUpdatableViews(
-    # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    x: Int
-    name: String
-    description: String
-    constant: Int
-  ): UpdatableViewsConnection
-
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
-  allCompoundKeys(
-    # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    personId2: Int
-    personId1: Int
-    extra: Boolean
-  ): CompoundKeysConnection
-
-  # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
-  compoundKey(
-    # The globally unique \`ID\` to be used in selecting a single \`CompoundKey\`.
-    __id: ID!
-  ): CompoundKey
-  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-
-  # Reads and enables paginatation through a set of \`Person\`.
-  allPeople(
-    # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    id: Int
-    name: String
-    about: String
-    email: Email
-    createdAt: String
-  ): PeopleConnection
-
-  # Reads a single \`Person\` using its globally unique \`ID\`.
-  person(
-    # The globally unique \`ID\` to be used in selecting a single \`Person\`.
-    __id: ID!
-  ): Person
-  personByEmail(email: Email!): Person
-  personById(id: Int!): Person
-
-  # Exposes the root query type nested one level down. This is helpful for Relay 1
-  # which can only query top level fields if they are in a particular form.
-  relay: Query!
-}
-
-type Types implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
-  id: Int!
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
-  domain: AnInt
-  domain2: AnotherInt
-  compoundType: CompoundType
-  nestedCompoundType: NestedCompoundType
-}
-
-# A connection to a list of \`Types\` values.
-type TypesConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Types\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Types\` and cursor to aid in pagination.
-  edges: [TypesEdge]
-
-  # A list of \`Types\` objects.
-  nodes: [Types!]
-}
-
-# A \`Types\` edge in the connection.
-type TypesEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Types\` at the end of the edge.
-  node: Types!
-}
-
-input TypesInput {
-  id: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
-  domain: AnInt
-  domain2: AnotherInt
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
-}
-
-# Methods to use when ordering \`Types\`.
-enum TypesOrderBy {
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  NATURAL
-  ID_ASC
-  ID_DESC
-  BIGINT_ASC
-  BIGINT_DESC
-  BOOLEAN_ASC
-  BOOLEAN_DESC
-  VARCHAR_ASC
-  VARCHAR_DESC
-  ENUM_ASC
-  ENUM_DESC
-  DOMAIN_ASC
-  DOMAIN_DESC
-  DOMAIN2_ASC
-  DOMAIN2_DESC
-  COMPOUND_TYPE_ASC
-  COMPOUND_TYPE_DESC
-  NESTED_COMPOUND_TYPE_ASC
-  NESTED_COMPOUND_TYPE_DESC
-}
-
-input TypesPatch {
-  id: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
-  domain: AnInt
-  domain2: AnotherInt
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
-}
-
-# YOYOYO!!
-type UpdatableView {
-  x: Int
-  name: String
-  description: String
-
-  # This is constantly 2
-  constant: Int
-}
-
-# YOYOYO!!
-input UpdatableViewInput {
-  x: Int
-  name: String
-  description: String
-
-  # This is constantly 2
-  constant: Int
-}
-
-# A connection to a list of \`UpdatableView\` values.
-type UpdatableViewsConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`UpdatableView\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`UpdatableView\` and cursor to aid in pagination.
-  edges: [UpdatableViewsEdge]
-
-  # A list of \`UpdatableView\` objects.
-  nodes: [UpdatableView!]
-}
-
-# A \`UpdatableView\` edge in the connection.
-type UpdatableViewsEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`UpdatableView\` at the end of the edge.
-  node: UpdatableView!
-}
-
-# Methods to use when ordering \`UpdatableView\`.
-enum UpdatableViewsOrderBy {
-  NATURAL
-  X_ASC
-  X_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  CONSTANT_ASC
-  CONSTANT_DESC
-}
-
-input UpdateCompoundKeyInput {
-  clientMutationId: String
-  __id: ID!
-  compoundKeyPatch: CompoundKeyPatch!
-}
-
-type UpdateCompoundKeyPayload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  query: Query
-}
-
-input UpdatePersonInput {
-  clientMutationId: String
-  __id: ID!
-  personPatch: PersonPatch!
-}
-
-type UpdatePersonPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
-}
-
-input UpdatePostInput {
-  clientMutationId: String
-  __id: ID!
-  postPatch: PostPatch!
-}
-
-type UpdatePostPayload {
-  clientMutationId: String
-  post: Post
-  query: Query
-}
-
-input UpdateTypesInput {
-  clientMutationId: String
-  __id: ID!
-  typesPatch: TypesPatch!
-}
-
-type UpdateTypesPayload {
-  clientMutationId: String
-  types: Types
-  query: Query
-}
-
-# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-scalar Uuid
-"
-`;
-
-exports[`test schema 2`] = `
+exports[`test prints a schema with Relay 1 style ids 1`] = `
 "scalar AnInt
 
 scalar AnotherInt
@@ -2681,6 +956,978 @@ type UpdatePostPayload {
 input UpdateTypesInput {
   clientMutationId: String
   id: ID!
+  typesPatch: TypesPatch!
+}
+
+type UpdateTypesPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+scalar Uuid
+"
+`;
+
+exports[`test prints a schema with the default options 1`] = `
+"scalar AnInt
+
+scalar AnotherInt
+
+enum Color {
+  RED
+  GREEN
+  BLUE
+}
+
+type CompoundKey implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  personId2: Int!
+  personId1: Int!
+  extra: Boolean
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+}
+
+input CompoundKeyInput {
+  personId2: Int!
+  personId1: Int!
+  extra: Boolean
+}
+
+input CompoundKeyPatch {
+  personId2: Int
+  personId1: Int
+  extra: Boolean
+}
+
+# A connection to a list of \`CompoundKey\` values.
+type CompoundKeysConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundKey\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`CompoundKey\` and cursor to aid in pagination.
+  edges: [CompoundKeysEdge]
+
+  # A list of \`CompoundKey\` objects.
+  nodes: [CompoundKey!]
+}
+
+# A \`CompoundKey\` edge in the connection.
+type CompoundKeysEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`CompoundKey\` at the end of the edge.
+  node: CompoundKey!
+}
+
+# Methods to use when ordering \`CompoundKey\`.
+enum CompoundKeysOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
+  PERSON_ID_1_ASC
+  PERSON_ID_1_DESC
+  EXTRA_ASC
+  EXTRA_DESC
+}
+
+# Awesome feature!
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+# Awesome feature!
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+input CreateCompoundKeyInput {
+  clientMutationId: String
+  compoundKey: CompoundKeyInput!
+}
+
+type CreateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  compoundKeyEdge(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysEdge
+  query: Query
+}
+
+input CreateForeignKeyInput {
+  clientMutationId: String
+  foreignKey: ForeignKeyInput!
+}
+
+type CreateForeignKeyPayload {
+  clientMutationId: String
+  foreignKey: ForeignKey
+  foreignKeyEdge(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+  ): ForeignKeysEdge
+  query: Query
+}
+
+input CreatePersonInput {
+  clientMutationId: String
+  person: PersonInput!
+}
+
+type CreatePersonPayload {
+  clientMutationId: String
+  person: Person
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleEdge
+  query: Query
+}
+
+input CreatePostInput {
+  clientMutationId: String
+  post: PostInput!
+}
+
+type CreatePostPayload {
+  clientMutationId: String
+  post: Post
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsEdge
+  query: Query
+}
+
+input CreateTypesInput {
+  clientMutationId: String
+  types: TypesInput!
+}
+
+type CreateTypesPayload {
+  clientMutationId: String
+  types: Types
+  typesEdge(
+    # The method to use when ordering \`Types\`.
+    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+  ): TypesEdge
+  query: Query
+}
+
+input CreateUpdatableViewInput {
+  clientMutationId: String
+  updatableView: UpdatableViewInput!
+}
+
+type CreateUpdatableViewPayload {
+  clientMutationId: String
+  updatableView: UpdatableView
+  updatableViewEdge(
+    # The method to use when ordering \`UpdatableView\`.
+    orderBy: UpdatableViewsOrderBy = NATURAL
+  ): UpdatableViewsEdge
+  query: Query
+}
+
+# A location in a connection that can be used for resuming pagination.
+scalar Cursor
+
+input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+}
+
+type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
+  query: Query
+}
+
+input DeleteCompoundKeyInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeleteCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
+  query: Query
+}
+
+input DeletePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+}
+
+type DeletePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  deletedPersonId: ID
+  query: Query
+}
+
+input DeletePersonByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePersonByIdPayload {
+  clientMutationId: String
+  person: Person
+  deletedPersonId: ID
+  query: Query
+}
+
+input DeletePersonInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePersonPayload {
+  clientMutationId: String
+  person: Person
+  deletedPersonId: ID
+  query: Query
+}
+
+input DeletePostByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePostByIdPayload {
+  clientMutationId: String
+  post: Post
+  deletedPostId: ID
+  query: Query
+}
+
+input DeletePostInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePostPayload {
+  clientMutationId: String
+  post: Post
+  deletedPostId: ID
+  query: Query
+}
+
+input DeleteTypesByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeleteTypesByIdPayload {
+  clientMutationId: String
+  types: Types
+  deletedTypesId: ID
+  query: Query
+}
+
+input DeleteTypesInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeleteTypesPayload {
+  clientMutationId: String
+  types: Types
+  deletedTypesId: ID
+  query: Query
+}
+
+scalar Email
+
+type ForeignKey {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
+
+  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
+  personByPersonId: Person
+}
+
+input ForeignKeyInput {
+  personId: Int
+  compoundKey1: Int
+  compoundKey2: Int
+}
+
+# A connection to a list of \`ForeignKey\` values.
+type ForeignKeysConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`ForeignKey\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`ForeignKey\` and cursor to aid in pagination.
+  edges: [ForeignKeysEdge]
+
+  # A list of \`ForeignKey\` objects.
+  nodes: [ForeignKey!]
+}
+
+# A \`ForeignKey\` edge in the connection.
+type ForeignKeysEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`ForeignKey\` at the end of the edge.
+  node: ForeignKey!
+}
+
+# Methods to use when ordering \`ForeignKey\`.
+enum ForeignKeysOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  COMPOUND_KEY_1_ASC
+  COMPOUND_KEY_1_DESC
+  COMPOUND_KEY_2_ASC
+  COMPOUND_KEY_2_DESC
+}
+
+# The root mutation type which contains root level fields which mutate data.
+type Mutation {
+  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
+  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
+  createTypes(input: CreateTypesInput!): CreateTypesPayload
+  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
+  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
+  deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
+  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
+  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
+  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
+  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
+  createPerson(input: CreatePersonInput!): CreatePersonPayload
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload
+  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
+  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
+}
+
+type NestedCompoundType {
+  a: CompoundType
+  b: CompoundType
+  bazBuz: Int
+}
+
+input NestedCompoundTypeInput {
+  a: CompoundTypeInput
+  b: CompoundTypeInput
+  bazBuz: Int
+}
+
+# An object with a globally unique \`ID\`.
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+}
+
+type NonUpdatableView {
+  column: Int
+}
+
+# A connection to a list of \`NonUpdatableView\` values.
+type NonUpdatableViewsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`NonUpdatableView\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`NonUpdatableView\` and cursor to aid in pagination.
+  edges: [NonUpdatableViewsEdge]
+
+  # A list of \`NonUpdatableView\` objects.
+  nodes: [NonUpdatableView!]
+}
+
+# A \`NonUpdatableView\` edge in the connection.
+type NonUpdatableViewsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`NonUpdatableView\` at the end of the edge.
+  node: NonUpdatableView!
+}
+
+# Methods to use when ordering \`NonUpdatableView\`.
+enum NonUpdatableViewsOrderBy {
+  NATURAL
+  COLUMN_ASC
+  COLUMN_DESC
+}
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: Cursor
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: Cursor
+}
+
+# A connection to a list of \`Person\` values.
+type PeopleConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [PeopleEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person!]
+}
+
+# A \`Person\` edge in the connection.
+type PeopleEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
+  node: Person!
+}
+
+# Methods to use when ordering \`Person\`.
+enum PeopleOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ABOUT_ASC
+  ABOUT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+# Person test comment
+type Person implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  id: Int!
+
+  # The person’s name
+  name: String!
+  about: String
+  email: Email
+  createdAt: String
+}
+
+# Person test comment
+input PersonInput {
+  id: Int
+
+  # The person’s name
+  name: String!
+  about: String
+  email: Email
+  createdAt: String
+}
+
+input PersonPatch {
+  id: Int
+  name: String
+  about: String
+  email: Email
+  createdAt: String
+}
+
+type Post implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  id: Int!
+  headline: String!
+  body: String
+  authorId: Int
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
+}
+
+input PostInput {
+  id: Int
+  headline: String!
+  body: String
+  authorId: Int
+}
+
+input PostPatch {
+  id: Int
+  headline: String
+  body: String
+  authorId: Int
+}
+
+# A connection to a list of \`Post\` values.
+type PostsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Post\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Post\` and cursor to aid in pagination.
+  edges: [PostsEdge]
+
+  # A list of \`Post\` objects.
+  nodes: [Post!]
+}
+
+# A \`Post\` edge in the connection.
+type PostsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Post\` at the end of the edge.
+  node: Post!
+}
+
+# Methods to use when ordering \`Post\`.
+enum PostsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  HEADLINE_ASC
+  HEADLINE_DESC
+  BODY_ASC
+  BODY_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+}
+
+# The root query type which gives access points into the data universe.
+type Query {
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    __id: ID!
+  ): Node
+
+  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  allForeignKeys(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    personId: Int
+    compoundKey1: Int
+    compoundKey2: Int
+  ): ForeignKeysConnection
+
+  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
+  allNonUpdatableViews(
+    # The method to use when ordering \`NonUpdatableView\`.
+    orderBy: NonUpdatableViewsOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    column: Int
+  ): NonUpdatableViewsConnection
+
+  # Reads and enables paginatation through a set of \`Post\`.
+  allPosts(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    headline: String
+    body: String
+    authorId: Int
+  ): PostsConnection
+
+  # Reads a single \`Post\` using its globally unique \`ID\`.
+  post(
+    # The globally unique \`ID\` to be used in selecting a single \`Post\`.
+    __id: ID!
+  ): Post
+  postById(id: Int!): Post
+
+  # Reads and enables paginatation through a set of \`Types\`.
+  allTypes(
+    # The method to use when ordering \`Types\`.
+    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    bigint: Int
+    boolean: Boolean
+    varchar: String
+    enum: Color
+    domain: AnInt
+    domain2: AnotherInt
+    compoundType: CompoundTypeInput
+    nestedCompoundType: NestedCompoundTypeInput
+  ): TypesConnection
+
+  # Reads a single \`Types\` using its globally unique \`ID\`.
+  types(
+    # The globally unique \`ID\` to be used in selecting a single \`Types\`.
+    __id: ID!
+  ): Types
+  typesById(id: Int!): Types
+
+  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  allUpdatableViews(
+    # The method to use when ordering \`UpdatableView\`.
+    orderBy: UpdatableViewsOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    x: Int
+    name: String
+    description: String
+    constant: Int
+  ): UpdatableViewsConnection
+
+  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  allCompoundKeys(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    personId2: Int
+    personId1: Int
+    extra: Boolean
+  ): CompoundKeysConnection
+
+  # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
+  compoundKey(
+    # The globally unique \`ID\` to be used in selecting a single \`CompoundKey\`.
+    __id: ID!
+  ): CompoundKey
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  allPeople(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    name: String
+    about: String
+    email: Email
+    createdAt: String
+  ): PeopleConnection
+
+  # Reads a single \`Person\` using its globally unique \`ID\`.
+  person(
+    # The globally unique \`ID\` to be used in selecting a single \`Person\`.
+    __id: ID!
+  ): Person
+  personByEmail(email: Email!): Person
+  personById(id: Int!): Person
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  relay: Query!
+}
+
+type Types implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  id: Int!
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundType
+  nestedCompoundType: NestedCompoundType
+}
+
+# A connection to a list of \`Types\` values.
+type TypesConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Types\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Types\` and cursor to aid in pagination.
+  edges: [TypesEdge]
+
+  # A list of \`Types\` objects.
+  nodes: [Types!]
+}
+
+# A \`Types\` edge in the connection.
+type TypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Types\` at the end of the edge.
+  node: Types!
+}
+
+input TypesInput {
+  id: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
+# Methods to use when ordering \`Types\`.
+enum TypesOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  ID_ASC
+  ID_DESC
+  BIGINT_ASC
+  BIGINT_DESC
+  BOOLEAN_ASC
+  BOOLEAN_DESC
+  VARCHAR_ASC
+  VARCHAR_DESC
+  ENUM_ASC
+  ENUM_DESC
+  DOMAIN_ASC
+  DOMAIN_DESC
+  DOMAIN2_ASC
+  DOMAIN2_DESC
+  COMPOUND_TYPE_ASC
+  COMPOUND_TYPE_DESC
+  NESTED_COMPOUND_TYPE_ASC
+  NESTED_COMPOUND_TYPE_DESC
+}
+
+input TypesPatch {
+  id: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
+# YOYOYO!!
+type UpdatableView {
+  x: Int
+  name: String
+  description: String
+
+  # This is constantly 2
+  constant: Int
+}
+
+# YOYOYO!!
+input UpdatableViewInput {
+  x: Int
+  name: String
+  description: String
+
+  # This is constantly 2
+  constant: Int
+}
+
+# A connection to a list of \`UpdatableView\` values.
+type UpdatableViewsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`UpdatableView\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`UpdatableView\` and cursor to aid in pagination.
+  edges: [UpdatableViewsEdge]
+
+  # A list of \`UpdatableView\` objects.
+  nodes: [UpdatableView!]
+}
+
+# A \`UpdatableView\` edge in the connection.
+type UpdatableViewsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`UpdatableView\` at the end of the edge.
+  node: UpdatableView!
+}
+
+# Methods to use when ordering \`UpdatableView\`.
+enum UpdatableViewsOrderBy {
+  NATURAL
+  X_ASC
+  X_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  CONSTANT_ASC
+  CONSTANT_DESC
+}
+
+input UpdateCompoundKeyInput {
+  clientMutationId: String
+  __id: ID!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
+input UpdatePersonInput {
+  clientMutationId: String
+  __id: ID!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePostInput {
+  clientMutationId: String
+  __id: ID!
+  postPatch: PostPatch!
+}
+
+type UpdatePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input UpdateTypesInput {
+  clientMutationId: String
+  __id: ID!
   typesPatch: TypesPatch!
 }
 
