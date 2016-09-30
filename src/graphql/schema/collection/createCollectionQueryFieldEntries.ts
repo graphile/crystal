@@ -6,6 +6,7 @@ import getType from '../getType'
 import transformInputValue from '../transformInputValue'
 import createConnectionField from '../connection/createConnectionField'
 import getCollectionType from './getCollectionType'
+import createCollectionKeyInput from './createCollectionKeyInput'
 
 /**
  * Creates any number of query field entries for a collection. These fields
@@ -102,74 +103,23 @@ function createCollectionKeyField <TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
-  const { collection, keyType } = collectionKey
-  const collectionType = getCollectionType(buildToken, collection)
-
   // If we can’t read from this collection key, stop.
   if (collectionKey.read == null) return
 
-  // If the key type is an object type, we want to flatten the object fields
-  // into distinct arguments.
-  if (keyType instanceof ObjectType) {
-    // Create the definition of our arguments. We will use this definition
-    // object in our resolver to turn the `args` object into the correct key
-    // value.
-    const argsDefinition = buildObject<GraphQLArgumentConfig<mixed> & { internalName: string }>(
-      Array.from(keyType.fields).map<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
-        [formatName.arg(fieldName), {
-          description: field.description,
-          type: getType(buildToken, field.type, true),
-          internalName: fieldName,
-        }]
-      )
-    )
-    return {
-      type: collectionType,
-      args: argsDefinition,
-      // TODO: Test this resolver
-      async resolve (source, args, context): Promise<ObjectType.Value | null> {
-        // Transform our `args` into a proper value for this collection key.
-        const key = new Map(Object.keys(argsDefinition).map<[string, mixed]>(key => [
-          argsDefinition[key].internalName,
-          transformInputValue(argsDefinition[key].type, args[key] as mixed),
-        ]))
+  const { collection, keyType } = collectionKey
+  const collectionType = getCollectionType(buildToken, collection)
+  const collectionKeyInput = createCollectionKeyInput<TKey>(buildToken, collectionKey)
 
-        if (!(context instanceof Context))
-          throw new Error('GraphQL context must be an instance of `Context`.')
+  return {
+    type: collectionType,
+    args: buildObject(collectionKeyInput.fieldEntries),
+    // TODO: test
+    async resolve (source, args, context): Promise<ObjectType.Value | null> {
+      if (!(context instanceof Context))
+        throw new Error('GraphQL context must be an instance of `Context`.')
 
-        if (!keyType.isTypeOf(key))
-          throw new Error('The GraphQL arguments are not of the correct type.')
-
-        return await collectionKey.read!(context, key)
-      },
-    }
-  }
-  // Otherwise if this is not an object type, we’ll just expose one argument
-  // with the key’s name.
-  else {
-    const argFieldName = formatName.arg(collectionKey.name)
-    const argType = getType(buildToken, keyType, true)
-    return {
-      description: `Reads a single ${scrib.type(collectionType)} using its unique ${scrib.type(argType)}.`,
-      type: collectionType,
-      args: {
-        [argFieldName]: {
-          description: `The unique ${scrib.type(argType)} to be used in selectin a single ${scrib.type(collectionType)}.`,
-          type: argType,
-        },
-      },
-      // TODO: Test this resolver
-      async resolve (source, args, context): Promise<ObjectType.Value | null> {
-        if (!(context instanceof Context))
-          throw new Error('GraphQL context must be an instance of `Context`.')
-
-        const key: mixed = transformInputValue(argType, args[argFieldName])
-
-        if (!keyType.isTypeOf(key))
-          throw new Error('The GraphQL arguments are not of the correct type.')
-
-        return await collectionKey.read!(context, key)
-      },
-    }
+      const key = collectionKeyInput.getValue(args)
+      return await collectionKey.read!(context, key)
+    },
   }
 }
