@@ -133,12 +133,12 @@ enum PostStatus {
 
 type Query {
   node(__id: ID!): Node
-  allPeople(orderBy: PeopleOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
+  allPeople(orderBy: PeopleOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, name: String, email: Email, firstName: String, lastName: String, about: String): PeopleConnection
   person(__id: ID!): Person
   personById(id: Int!): Person
   personByName(name: String!): Person
   personByEmail(email: String!): Person
-  allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
+  allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, authorId: Int, status: PostStatus, headline: String, body: String): PostsConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
 

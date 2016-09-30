@@ -43,7 +43,8 @@ Object {
             "name": "Johnny Tucker"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "b": Object {
       "edges": Array [
@@ -63,7 +64,8 @@ Object {
             "name": "Sara Smith"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "c": Object {
       "edges": Array [
@@ -83,7 +85,8 @@ Object {
             "name": "Johnny Tucker"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "d": Object {
       "edges": Array [
@@ -127,7 +130,8 @@ Object {
             "name": "Sara Smith"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "e": Object {
       "edges": Array [
@@ -171,7 +175,8 @@ Object {
             "name": "Budd Deey"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "f": Object {
       "edges": Array [
@@ -183,7 +188,8 @@ Object {
             "name": "John Smith"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "g": Object {
       "edges": Array [
@@ -211,7 +217,8 @@ Object {
             "name": "Johnny Tucker"
           }
         }
-      ]
+      ],
+      "totalCount": 5
     },
     "h": Object {
       "edges": Array [
@@ -300,6 +307,63 @@ Object {
           }
         }
       ]
+    },
+    "j": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+          "node": Object {
+            "authorId": 2,
+            "headline": "What’s with you kids? Every other day it’s food, food, food."
+          }
+        }
+      ],
+      "totalCount": 3
+    },
+    "k": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
+          }
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
+          }
+        }
+      ],
+      "totalCount": 3
+    },
+    "l": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+          "node": Object {
+            "authorId": 1,
+            "headline": "You hit me with a cricket bat."
+          }
+        }
+      ],
+      "totalCount": 4
     }
   }
 }
@@ -976,19 +1040,19 @@ enum PostsOrderBy {
 
 type Query {
   node(__id: ID!): Node
-  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): ForeignKeysConnection
-  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
-  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
+  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, personId: Int, compoundKey1: Int, compoundKey2: Int): ForeignKeysConnection
+  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, column: Int): NonUpdatableViewsConnection
+  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, headline: String, body: String, authorId: Int): PostsConnection
   post(__id: ID!): Post
   postById(id: Int!): Post
-  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, bigint: Int, boolean: Boolean, varchar: String, enum: Color, domain: AnInt, domain2: AnotherInt, compoundType: CompoundTypeInput, nestedCompoundType: NestedCompoundTypeInput): TypesConnection
   types(__id: ID!): Types
   typesById(id: Int!): Types
-  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
-  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
+  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, x: Int, name: String, description: String, constant: Int): UpdatableViewsConnection
+  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, personId2: Int, personId1: Int, extra: Boolean): CompoundKeysConnection
   compoundKey(__id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
+  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, name: String, about: String, email: Email, createdAt: String): PeopleConnection
   person(__id: ID!): Person
   personByEmail(email: Email): Person
   personById(id: Int!): Person
@@ -1437,19 +1501,19 @@ enum PostsOrderBy {
 
 type Query {
   node(id: ID!): Node
-  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): ForeignKeysConnection
-  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): NonUpdatableViewsConnection
-  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PostsConnection
+  allForeignKeys(orderBy: ForeignKeysOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, personId: Int, compoundKey1: Int, compoundKey2: Int): ForeignKeysConnection
+  allNonUpdatableViews(orderBy: NonUpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, column: Int): NonUpdatableViewsConnection
+  allPosts(orderBy: PostsOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, rowId: Int, headline: String, body: String, authorId: Int): PostsConnection
   post(id: ID!): Post
   postByRowId(rowId: Int!): Post
-  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): TypesConnection
+  allTypes(orderBy: TypesOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, rowId: Int, bigint: Int, boolean: Boolean, varchar: String, enum: Color, domain: AnInt, domain2: AnotherInt, compoundType: CompoundTypeInput, nestedCompoundType: NestedCompoundTypeInput): TypesConnection
   types(id: ID!): Types
   typesByRowId(rowId: Int!): Types
-  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int): UpdatableViewsConnection
-  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): CompoundKeysConnection
+  allUpdatableViews(orderBy: UpdatableViewsOrderBy = NATURAL, before: Cursor, after: Cursor, first: Int, last: Int, x: Int, name: String, description: String, constant: Int): UpdatableViewsConnection
+  allCompoundKeys(orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, personId2: Int, personId1: Int, extra: Boolean): CompoundKeysConnection
   compoundKey(id: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int): PeopleConnection
+  allPeople(orderBy: PeopleOrderBy = PRIMARY_KEY_ASC, before: Cursor, after: Cursor, first: Int, last: Int, rowId: Int, name: String, about: String, email: Email, createdAt: String): PeopleConnection
   person(id: ID!): Person
   personByEmail(email: Email): Person
   personByRowId(rowId: Int!): Person

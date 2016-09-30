@@ -26,7 +26,7 @@ export default function createCollectionQueryFieldEntries (
   if (paginator) {
     entries.push([
       formatName.field(`all-${collection.name}`),
-      createConnectionField(buildToken, paginator),
+      createConnectionField(buildToken, paginator, { withFieldsCondition: true }),
     ])
   }
 

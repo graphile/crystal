@@ -16,22 +16,44 @@ import {
   GraphQLString,
   Kind,
 } from 'graphql'
-
-import { Context, Paginator, Condition, Type } from '../../../interface'
+import { Context, Paginator, Condition, conditionHelpers, Type, NullableType, ObjectType } from '../../../interface'
 import { buildObject, formatName, memoize2 } from '../../utils'
 import getType from '../getType'
 import BuildToken from '../BuildToken'
+import transformInputValue from '../transformInputValue'
 
 // TODO: doc
 export default function createConnectionField <TValue, TOrdering extends Paginator.Ordering, TCursor, TCondition>(
   buildToken: BuildToken,
   paginator: Paginator<TValue, TOrdering, TCursor>,
   config: {
-    conditionType?: GraphQLInputType<TCondition>,
-    getCondition?: (source: mixed, conditionValue: TCondition | undefined) => Condition,
+    withFieldsCondition?: boolean,
+    getCondition?: (source: mixed) => Condition,
   } = {},
 ): GraphQLFieldConfig<mixed, Connection<TValue, TOrdering, TCursor>> {
   const paginatorName = paginator.name
+
+  // If the user wants field conditions, but that paginator type is not an
+  // object type, we need to throw an error.
+  if (config.withFieldsCondition && !(paginator.type instanceof ObjectType))
+    throw new Error('Can only create a connection which has field argument conditions if the paginator type is an object type.')
+
+  // Create our field condition entries. If we are not configured to have such
+  // entries, this variable will just be null.
+  const fieldConditionEntries: Array<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]> | null =
+    config.withFieldsCondition && paginator.type instanceof ObjectType ?
+      Array.from(paginator.type.fields).map<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
+        [formatName.arg(fieldName), {
+          // TODO: description
+          // Get the type for this field, but always make sure that it is
+          // nullable. We don’t want to require conditions.
+          type: getType(buildToken, new NullableType(field.type), true),
+          // We include this internal name so that we can resolve the arguments
+          // back into actual values.
+          internalName: fieldName,
+        }]
+      )
+    : null
 
   // This is the type of all the connection arguments.
   type ConnectionArgs = {
@@ -51,25 +73,24 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       // order.
       paginator.orderings && paginator.orderings.length > 0 && ['orderBy', createOrderByArg(buildToken, paginator)],
       ['before', {
-        type: _cursorType,
         // TODO: description
+        type: _cursorType,
       }],
       ['after', {
-        type: _cursorType,
         // TODO: description
+        type: _cursorType,
       }],
       ['first', {
-        type: GraphQLInt,
         // TODO: description
+        type: GraphQLInt,
       }],
       ['last', {
+        // TODO: description
         type: GraphQLInt,
-        // TODO: description
       }],
-      config.conditionType && ['condition', {
-        type: config.conditionType,
-        // TODO: description
-      }],
+      // Add all of the field entries that will eventually make up our
+      // condition.
+      ...(fieldConditionEntries ? fieldConditionEntries : []),
     ]),
     // Note that this resolver is an arrow function. This is so that we can
     // keep the correct `this` reference.
@@ -88,7 +109,6 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
         after: afterCursor,
         first,
         last,
-        condition: argCondition,
       } = args
 
       // Throw an error if the user is trying to use a cursor from another
@@ -100,12 +120,23 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       if (afterCursor && afterCursor.orderingName !== (ordering ? ordering.name : null))
         throw new Error('`after` cursor can not be used for this `orderBy` value.')
 
-      // Get our condition from the condition input type. If we had no
-      // condition or we had no condition config, the condition will just be
-      // `true`. Everything passes! 🎉
-      const condition: Condition = config.getCondition
-        ? config.getCondition(source, argCondition)
-        : true
+      const condition: Condition = conditionHelpers.and(
+        // Get an arbitrary condition from our config. If no `getCondition`
+        // was provided, the condition is `true`.
+        config.getCondition ? config.getCondition(source) : true,
+        // For all of our field condition entries, let us add an actual
+        // condition to test equality with a given field.
+        ...(fieldConditionEntries ? (
+          fieldConditionEntries.map(([fieldName, field]) =>
+            args[fieldName] !== undefined
+              // If the argument exists, create a condition and transform the
+              // input value.
+              ? conditionHelpers.fieldEquals(field.internalName, transformInputValue(field.type, args[fieldName]))
+              // If the argument does not exist, this condition should just be
+              // true (which will get filtered out by `conditionHelpers.and`).
+              : true
+        )) : []),
+      )
 
       // Construct the page config.
       const pageConfig: Paginator.PageConfig<TOrdering, TCursor> = {

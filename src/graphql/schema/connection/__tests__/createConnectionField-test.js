@@ -1,8 +1,9 @@
 jest.mock('../../getType')
-jest.mock('../../../../interface')
+jest.mock('../../../../interface/Context')
+jest.mock('../../../../interface/collection/Paginator')
 
-import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLList, GraphQLString } from 'graphql'
-import { Context, Paginator } from '../../../../interface'
+import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLString } from 'graphql'
+import { Context, Paginator, ObjectType, stringType } from '../../../../interface'
 import getType from '../../getType'
 import createConnectionField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionField'
 
@@ -187,12 +188,6 @@ test('_createConnectionType will map the nodes field to page values', () => {
     .toEqual([value1, value2])
 })
 
-test('createConnectionField will only include a condition argument if a condition config was included', () => {
-  const paginator = {}
-  expect(createConnectionField({}, paginator).args.condition).toBeFalsy()
-  expect(createConnectionField({}, paginator, { conditionType: GraphQLString }).args.condition).toBeTruthy()
-})
-
 test('createConnectionField will throw when trying to resolve with cursors from different orderings', async () => {
   const paginator = { name: 'foo' }
   const field = createConnectionField({}, paginator)
@@ -225,7 +220,6 @@ test('createConnectionField resolver will call Paginator#readPage and return the
 test('createConnectionField resolver will have a condition other than true if a config is provided', async () => {
   const context = new Context()
   const source = Symbol('source')
-  const conditionArg = Symbol('conditionArg')
   const condition = Symbol('condition')
 
   const paginator = { name: 'foo', readPage: jest.fn() }
@@ -237,9 +231,9 @@ test('createConnectionField resolver will have a condition other than true if a 
     getCondition,
   })
 
-  expect((await field.resolve(source, { condition: conditionArg }, context)).condition).toBe(condition)
+  expect((await field.resolve(source, {}, context)).condition).toBe(condition)
   expect(paginator.readPage.mock.calls).toEqual([[context, { condition }]])
-  expect(getCondition.mock.calls).toEqual([[source, conditionArg]])
+  expect(getCondition.mock.calls).toEqual([[source]])
 })
 
 test('createConnectionField will pass down valid cursors without orderings', async () => {
@@ -272,7 +266,73 @@ test('createConnectionField will pass down first/last integers', async () => {
   await createConnectionField({}, paginator).resolve(null, { last }, context)
 
   expect(paginator.readPage.mock.calls).toEqual([
-    [context, { first, condition: true }],
-    [context, { last, condition: true }],
+    [context, { first, condition: true, beforeCursor: undefined, afterCursor: undefined, last: undefined, ordering: undefined }],
+    [context, { last, condition: true, beforeCursor: undefined, afterCursor: undefined, first: undefined, ordering: undefined }],
+  ])
+})
+
+test('createConnectionField will throw an error when `withFieldsCondition` is true but the paginator type is not an object type', () => {
+  expect(() => createConnectionField({}, {}, { withFieldsCondition: true }))
+    .toThrow('Can only create a connection which has field argument conditions if the paginator type is an object type.')
+})
+
+test('createConnectionField will add extra arguments when `withFieldsCondition` is true', () => {
+  const objectType = new ObjectType({
+    name: 'item',
+    fields: new Map([
+      ['a', { type: stringType }],
+      ['b', { type: stringType }],
+      ['c', { type: stringType }],
+    ])
+  })
+
+  const paginator = { name: 'foo', type: objectType }
+  const field1 = createConnectionField({}, paginator, { withFieldsCondition: false })
+  const field2 = createConnectionField({}, paginator, { withFieldsCondition: true })
+
+  expect(field1.args.a).toBeFalsy()
+  expect(field1.args.b).toBeFalsy()
+  expect(field1.args.c).toBeFalsy()
+  expect(field2.args.a).toBeTruthy()
+  expect(field2.args.b).toBeTruthy()
+  expect(field2.args.c).toBeTruthy()
+  expect(field2.args.a.type instanceof GraphQLNonNull).toBe(false)
+  expect(field2.args.b.type instanceof GraphQLNonNull).toBe(false)
+  expect(field2.args.c.type instanceof GraphQLNonNull).toBe(false)
+})
+
+test('createConnectionField will use extra arguments from `withFieldsCondition` and pass down a condition with them', async () => {
+  getType.mockReturnValue(GraphQLString)
+
+  const objectType = new ObjectType({
+    name: 'item',
+    fields: new Map([
+      ['x_a', { type: stringType }],
+      ['x_b', { type: stringType }],
+      ['x_c', { type: stringType }],
+    ])
+  })
+
+  const extraCondition = Symbol('extraCondition')
+  const context = new Context()
+  const paginator = { name: 'foo', type: objectType, readPage: jest.fn() }
+  const field1 = createConnectionField({}, paginator, { withFieldsCondition: true })
+  const field2 = createConnectionField({}, paginator, { withFieldsCondition: true, getCondition: () => extraCondition })
+
+  const condition0 = { type: 'AND', conditions: [{ type: 'FIELD', name: 'x_a', condition: { type: 'EQUAL', value: 'x' } }, { type: 'FIELD', name: 'x_b', condition: { type: 'EQUAL', value: 'y' } }, { type: 'FIELD', name: 'x_c', condition: { type: 'EQUAL', value: 'z' } }] }
+  const condition1 = { type: 'FIELD', name: 'x_b', condition: { type: 'EQUAL', value: 'y' } }
+  const condition2 = { type: 'AND', conditions: [{ type: 'FIELD', name: 'x_a', condition: { type: 'EQUAL', value: 'x' } }, { type: 'FIELD', name: 'x_c', condition: { type: 'EQUAL', value: 'z' } }] }
+  const condition3 = { type: 'AND', conditions: [extraCondition, { type: 'FIELD', name: 'x_a', condition: { type: 'EQUAL', value: 'x' } }, { type: 'FIELD', name: 'x_c', condition: { type: 'EQUAL', value: 'z' } }] }
+
+  await field1.resolve(null, { xA: 'x', xB: 'y', xC: 'z' }, context)
+  await field1.resolve(null, { xB: 'y' }, context)
+  await field1.resolve(null, { xA: 'x', xC: 'z' }, context)
+  await field2.resolve(null, { xA: 'x', xC: 'z' }, context)
+
+  expect(paginator.readPage.mock.calls).toEqual([
+    [context, { condition: condition0 }],
+    [context, { condition: condition1 }],
+    [context, { condition: condition2 }],
+    [context, { condition: condition3 }],
   ])
 })

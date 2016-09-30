@@ -28,6 +28,47 @@ type Condition =
 
 export default Condition
 
+// TODO: rename
+// TODO: seperate into own file?
+export namespace conditionHelpers {
+  /**
+   * Does some logic and creates an `AndCondition`. Simplifies constants and
+   * more.
+   */
+  export function and (...conditions: Array<Condition>): Condition {
+    // If there are no conditions, throw an error.
+    if (conditions.length === 0)
+      throw new Error('Cannot have 0 conditions, must have at least 1.')
+
+    const andConditions: Array<Condition> = []
+
+    // For each condition, do some stuff…
+    for (const condition of conditions) {
+      // If one condition is false, the entire thing is false.
+      if (condition === false) return false
+      // If a condition is not true, add it to our `andConditions` list. In
+      // this way we filter out all of the `true`s.
+      else if (condition !== true) andConditions.push(condition)
+    }
+
+    // If there are no conditions in `andConditions` (because we filtered out
+    // all the trues), just return true. If there is just one condition in
+    // `andConditions` return that one condition. Otherwise, return an “and”
+    // condition.
+    return andConditions.length === 0 ? true : andConditions.length === 1 ? andConditions[0] : { type: 'AND', conditions: andConditions }
+  }
+
+  /**
+   * Creates a condition that tests for the equality of a field with any given
+   * value. A shortcut for creating a `FieldCondition` condition with an
+   * `EqualCondition`.
+   */
+  // TODO: test
+  export function fieldEquals (name: string, value: mixed): Condition {
+    return { type: 'FIELD', name, condition: { type: 'EQUAL', value } }
+  }
+}
+
 /**
  * A constant condition will always pass or fail. As the constant condition is
  * just a boolean internally, for “true” the condition will always pass, and

@@ -3,7 +3,7 @@ import Inventory from './Inventory'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
 import Paginator from './collection/Paginator'
-import Condition from './collection/Condition'
+import Condition, { conditionHelpers } from './collection/Condition'
 import Relation from './collection/Relation'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
@@ -24,6 +24,7 @@ export {
   CollectionKey,
   Paginator,
   Condition,
+  conditionHelpers,
   Relation,
   Type,
   NullableType,

@@ -159,6 +159,7 @@ test('paginator `count` will count all of the values in a collection with a cond
   expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'LESS_THAN', value: 2 } })).toBe(1)
 }))
 
+// TODO: Test conditions.
 const paginatorFixtures = [
   {
     name: 'people',
