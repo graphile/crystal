@@ -939,6 +939,7 @@ input DeleteCompoundKeyByPersonId1AndPersonId2Input {
 type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
   clientMutationId: String
   compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
   query: Query
 }
 
@@ -950,6 +951,7 @@ input DeleteCompoundKeyInput {
 type DeleteCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
   query: Query
 }
 
@@ -961,6 +963,7 @@ input DeletePersonByEmailInput {
 type DeletePersonByEmailPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -972,6 +975,7 @@ input DeletePersonByIdInput {
 type DeletePersonByIdPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -983,6 +987,7 @@ input DeletePersonInput {
 type DeletePersonPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -994,6 +999,7 @@ input DeletePostByIdInput {
 type DeletePostByIdPayload {
   clientMutationId: String
   post: Post
+  deletedPostId: ID
   query: Query
 }
 
@@ -1005,6 +1011,7 @@ input DeletePostInput {
 type DeletePostPayload {
   clientMutationId: String
   post: Post
+  deletedPostId: ID
   query: Query
 }
 
@@ -1016,6 +1023,7 @@ input DeleteTypesByIdInput {
 type DeleteTypesByIdPayload {
   clientMutationId: String
   types: Types
+  deletedTypesId: ID
   query: Query
 }
 
@@ -1027,6 +1035,7 @@ input DeleteTypesInput {
 type DeleteTypesPayload {
   clientMutationId: String
   types: Types
+  deletedTypesId: ID
   query: Query
 }
 
@@ -1817,6 +1826,7 @@ input DeleteCompoundKeyByPersonId1AndPersonId2Input {
 type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
   clientMutationId: String
   compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
   query: Query
 }
 
@@ -1828,6 +1838,7 @@ input DeleteCompoundKeyInput {
 type DeleteCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+  deletedCompoundKeyId: ID
   query: Query
 }
 
@@ -1839,6 +1850,7 @@ input DeletePersonByEmailInput {
 type DeletePersonByEmailPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -1850,6 +1862,7 @@ input DeletePersonByRowIdInput {
 type DeletePersonByRowIdPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -1861,6 +1874,7 @@ input DeletePersonInput {
 type DeletePersonPayload {
   clientMutationId: String
   person: Person
+  deletedPersonId: ID
   query: Query
 }
 
@@ -1872,6 +1886,7 @@ input DeletePostByRowIdInput {
 type DeletePostByRowIdPayload {
   clientMutationId: String
   post: Post
+  deletedPostId: ID
   query: Query
 }
 
@@ -1883,6 +1898,7 @@ input DeletePostInput {
 type DeletePostPayload {
   clientMutationId: String
   post: Post
+  deletedPostId: ID
   query: Query
 }
 
@@ -1894,6 +1910,7 @@ input DeleteTypesByRowIdInput {
 type DeleteTypesByRowIdPayload {
   clientMutationId: String
   types: Types
+  deletedTypesId: ID
   query: Query
 }
 
@@ -1905,6 +1922,7 @@ input DeleteTypesInput {
 type DeleteTypesPayload {
   clientMutationId: String
   types: Types
+  deletedTypesId: ID
   query: Query
 }
 

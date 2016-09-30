@@ -1,6 +1,6 @@
-import { GraphQLFieldConfig } from 'graphql'
+import { GraphQLFieldConfig, GraphQLID } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../../interface'
-import { formatName } from '../../../utils'
+import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationField from '../../createMutationField'
 import getCollectionType from '../getCollectionType'
@@ -33,6 +33,12 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TKey>(
       [formatName.field(collection.type.name), {
         type: getCollectionType(buildToken, collection),
         resolve: value => value,
+      }],
+      // Add the deleted values globally unique id as well. This one is
+      // especially useful for removing old nodes from the cache.
+      collection.primaryKey && [formatName.field(`deleted-${collection.type.name}-id`), {
+        type: GraphQLID,
+        resolve: value => idSerde.serialize(collection.primaryKey!, collection.primaryKey!.getKeyFromValue(value))
       }],
     ],
     // Actually delete the value getting the key from our input with our

@@ -41,6 +41,12 @@ export default function createDeleteCollectionMutationFieldEntry (
         type: getCollectionType(buildToken, collection),
         resolve: value => value,
       }],
+      // Add the deleted values globally unique id as well. This one is
+      // especially useful for removing old nodes from the cache.
+      [formatName.field(`deleted-${collection.type.name}-id`), {
+        type: GraphQLID,
+        resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value))
+      }],
     ],
     // Execute by deserializing the id into its component parts and delete a
     // value in the collection using that key.
