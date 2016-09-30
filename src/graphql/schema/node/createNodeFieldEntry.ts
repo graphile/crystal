@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Context, CollectionKey } from '../../../interface'
-import idSerde from '../../utils/idSerde'
+import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
@@ -8,11 +8,11 @@ import getNodeInterfaceType from './getNodeInterfaceType'
 export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<mixed, mixed>] {
   const { inventory, options } = buildToken
   return ['node', {
-    // TODO: description
+    description: `Fetches an object given its globally unique ${scrib.type(GraphQLID)}.`,
     type: getNodeInterfaceType(buildToken),
     args: {
       [options.nodeIdFieldName]: {
-        // TODO: description,
+        description: `The globally unique ${scrib.type(GraphQLID)}.`,
         type: new GraphQLNonNull(GraphQLID),
       },
     },

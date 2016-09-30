@@ -38,7 +38,7 @@ function createMutationType (buildToken: BuildToken): GraphQLObjectType<mixed> |
 
   return new GraphQLObjectType({
     name: 'Mutation',
-    // TODO: description
+    description: 'The root mutation type which contains root level fields which mutate data.',
     fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(mutationFieldEntries),
   })
 }

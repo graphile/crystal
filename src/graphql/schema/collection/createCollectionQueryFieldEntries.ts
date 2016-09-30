@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
 import { Context, Collection, CollectionKey, ObjectType } from '../../../interface'
-import { formatName, idSerde, buildObject } from '../../utils'
+import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
 import transformInputValue from '../transformInputValue'
@@ -67,13 +67,15 @@ function createCollectionPrimaryKeyField <TKey>(
   // If we can’t read from this collection key, stop.
   if (collectionKey.read == null) return
 
+  const collectionType = getCollectionType(buildToken, collection)
+
   return {
-    // TODO: description
-    type: getCollectionType(buildToken, collection),
+    description: `Reads a single ${scrib.type(collectionType)} using its globally unique ${scrib.type(GraphQLID)}.`,
+    type: collectionType,
 
     args: {
       [options.nodeIdFieldName]: {
-        // TODO: description,
+        description: `The globally unique ${scrib.type(GraphQLID)} to be used in selecting a single ${scrib.type(collectionType)}.`,
         type: new GraphQLNonNull(GraphQLID),
       },
     },
@@ -148,10 +150,11 @@ function createCollectionKeyField <TKey>(
     const argFieldName = formatName.arg(collectionKey.name)
     const argType = getType(buildToken, keyType, true)
     return {
+      description: `Reads a single ${scrib.type(collectionType)} using its unique ${scrib.type(argType)}.`,
       type: collectionType,
       args: {
         [argFieldName]: {
-          // TODO: description
+          description: `The unique ${scrib.type(argType)} to be used in selectin a single ${scrib.type(collectionType)}.`,
           type: argType,
         },
       },

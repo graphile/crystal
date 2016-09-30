@@ -18,7 +18,7 @@ function createQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
 
   queryType = new GraphQLObjectType({
     name: 'Query',
-    // TODO: description
+    description: 'The root query type which gives access points into the data universe.',
     fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
       [
         createNodeFieldEntry(buildToken),

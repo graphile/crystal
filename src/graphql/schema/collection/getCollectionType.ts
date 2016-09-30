@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
 import { Context, Collection, ObjectType, Relation } from '../../../interface'
-import { memoize2, formatName, buildObject, idSerde } from '../../utils'
+import { memoize2, formatName, buildObject, idSerde, scrib } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getType from '../getType'
 import createConnectionField from '../connection/createConnectionField'
@@ -28,9 +28,10 @@ export default getCollectionType
 function createCollectionType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
+  const collectionTypeName = formatName.type(type.name)
 
   return new GraphQLObjectType<ObjectType.Value>({
-    name: formatName.type(type.name),
+    name: collectionTypeName,
     description: collection.description,
 
     isTypeOf: value => type.isTypeOf(value),
@@ -45,7 +46,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
       // have no primary key, we have no id field.
       [
         primaryKey && [options.nodeIdFieldName, {
-          // TODO: description
+          description: 'A globally unique identifier. Can be used in various places throughout the system to identify this single value.',
           type: new GraphQLNonNull(GraphQLID),
           resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value)),
         }],
@@ -81,10 +82,12 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
           const headCollectionKey = relation.headCollectionKey
           const headCollection = headCollectionKey.collection
+          const headCollectionType = getCollectionType(buildToken, headCollection)
 
           return [formatName.field(`${headCollection.type.name}-by-${relation.name}`), {
-            // TODO: description
-            type: getCollectionType(buildToken, headCollection),
+            description: `Reads a single ${scrib.type(headCollectionType)} that is related to this \`${collectionTypeName}\`.`,
+
+            type: headCollectionType,
 
             async resolve (value, args, context): Promise<ObjectType.Value | undefined> {
               if (!(context instanceof Context))

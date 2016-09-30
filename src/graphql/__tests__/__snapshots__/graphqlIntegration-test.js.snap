@@ -7,7 +7,10 @@ exports[`test will generate the correct forum schema 1`] = `
 type CreatePersonPayload {
   clientMutationId: String
   person: Person
-  personEdge(orderBy: PeopleOrderBy = ID_ASC): PeopleEdge
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = ID_ASC
+  ): PeopleEdge
   query: Query
 }
 
@@ -19,42 +22,70 @@ input CreatePostInput {
 type CreatePostPayload {
   clientMutationId: String
   post: Post
-  postEdge(orderBy: PostsOrderBy = ID_ASC): PostsEdge
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = ID_ASC
+  ): PostsEdge
   query: Query
 }
 
+# A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
 scalar Email
 
+# The root mutation type which contains root level fields which mutate data.
 type Mutation {
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   createPost(input: CreatePostInput!): CreatePostPayload
 }
 
+# An object with a globally unique \`ID\`.
 interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
 }
 
+# Information about pagination in a connection.
 type PageInfo {
+  # When paginating forwards, are there more items?
   hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
   hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
   startCursor: Cursor
+
+  # When paginating forwards, the cursor to continue.
   endCursor: Cursor
 }
 
+# A connection to a list of \`Person\` values.
 type PeopleConnection {
+  # Information to aid in pagination.
   pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
   totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
   edges: [PeopleEdge]
+
+  # A list of \`Person\` objects.
   nodes: [Person!]
 }
 
+# A \`Person\` edge in the connection.
 type PeopleEdge {
+  # A cursor for use in pagination.
   cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
   node: Person!
 }
 
+# Methods to use when ordering \`Person\`.
 enum PeopleOrderBy {
   ID_ASC
   ID_DESC
@@ -67,6 +98,7 @@ enum PeopleOrderBy {
 }
 
 type Person implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
   id: Int!
   name: String!
@@ -86,12 +118,15 @@ input PersonInput {
 }
 
 type Post implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
   id: Int!
   authorId: Int!
   status: PostStatus!
   headline: String!
   body: String
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthor: Person
 }
 
@@ -103,18 +138,31 @@ input PostInput {
   body: String
 }
 
+# A connection to a list of \`Post\` values.
 type PostsConnection {
+  # Information to aid in pagination.
   pageInfo: PageInfo!
+
+  # The count of *all* \`Post\` you could get from the connection.
   totalCount: Int
+
+  # A list of edges which contains the \`Post\` and cursor to aid in pagination.
   edges: [PostsEdge]
+
+  # A list of \`Post\` objects.
   nodes: [Post!]
 }
 
+# A \`Post\` edge in the connection.
 type PostsEdge {
+  # A cursor for use in pagination.
   cursor: Cursor!
+
+  # The \`Post\` at the end of the edge.
   node: Post!
 }
 
+# Methods to use when ordering \`Post\`.
 enum PostsOrderBy {
   ID_ASC
   ID_DESC
@@ -131,16 +179,96 @@ enum PostStatus {
   PUBLISHED
 }
 
+# The root query type which gives access points into the data universe.
 type Query {
-  node(__id: ID!): Node
-  allPeople(orderBy: PeopleOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, name: String, email: Email, firstName: String, lastName: String, about: String): PeopleConnection
-  person(__id: ID!): Person
-  personById(id: Int!): Person
-  personByName(name: String!): Person
-  personByEmail(email: String!): Person
-  allPosts(orderBy: PostsOrderBy = ID_ASC, before: Cursor, after: Cursor, first: Int, last: Int, id: Int, authorId: Int, status: PostStatus, headline: String, body: String): PostsConnection
-  post(__id: ID!): Post
-  postById(id: Int!): Post
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    __id: ID!
+  ): Node
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  allPeople(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = ID_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    name: String
+    email: Email
+    firstName: String
+    lastName: String
+    about: String
+  ): PeopleConnection
+
+  # Reads a single \`Person\` using its globally unique \`ID\`.
+  person(
+    # The globally unique \`ID\` to be used in selecting a single \`Person\`.
+    __id: ID!
+  ): Person
+
+  # Reads a single \`Person\` using its unique \`Int\`.
+  personById(
+    # The unique \`Int\` to be used in selectin a single \`Person\`.
+    id: Int!
+  ): Person
+
+  # Reads a single \`Person\` using its unique \`String\`.
+  personByName(
+    # The unique \`String\` to be used in selectin a single \`Person\`.
+    name: String!
+  ): Person
+
+  # Reads a single \`Person\` using its unique \`String\`.
+  personByEmail(
+    # The unique \`String\` to be used in selectin a single \`Person\`.
+    email: String!
+  ): Person
+
+  # Reads and enables paginatation through a set of \`Post\`.
+  allPosts(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = ID_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    authorId: Int
+    status: PostStatus
+    headline: String
+    body: String
+  ): PostsConnection
+
+  # Reads a single \`Post\` using its globally unique \`ID\`.
+  post(
+    # The globally unique \`ID\` to be used in selecting a single \`Post\`.
+    __id: ID!
+  ): Post
+
+  # Reads a single \`Post\` using its unique \`Int\`.
+  postById(
+    # The unique \`Int\` to be used in selectin a single \`Post\`.
+    id: Int!
+  ): Post
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
