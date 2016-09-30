@@ -176,7 +176,6 @@ type GraphQLFieldConfigArgumentMap = {
 
 type GraphQLArgumentConfig<TArg> = {
   type: GraphQLInputType<TArg>,
-  internalName?: string,
   defaultValue?: TArg,
   description?: string | undefined,
 }
@@ -203,7 +202,6 @@ type GraphQLFieldDefinition<TSource, TResolve> = {
 
 type GraphQLArgument<TArg> = {
   name: string,
-  internalName: string,
   type: GraphQLInputType<TArg>,
   defaultValue?: TArg,
   description?: string | undefined,
@@ -318,7 +316,6 @@ type GraphQLInputFieldConfigMap<TSource> = {
 
 type GraphQLInputFieldConfig<TValue> = {
   type: GraphQLInputType<TValue>,
-  internalName?: string,
   defaultValue?: TValue,
   description?: string | undefined,
 }
@@ -329,7 +326,6 @@ type GraphQLInputObjectFieldMap<TSource> = {
 
 type GraphQLInputObjectField<TSource> = {
   name: string,
-  internalName: string,
   type: GraphQLInputType<TSource>,
   defaultValue?: TSource,
   description?: string | undefined,
