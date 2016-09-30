@@ -16,7 +16,7 @@ import transformInputValue from '../transformInputValue'
  * For everything else we just have a single field.
  */
 // TODO: test
-export default function createCollectionKeyInput <T>(
+export default function createCollectionKeyInputHelpers <T>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<T>,
 ): {

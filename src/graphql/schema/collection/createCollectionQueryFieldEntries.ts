@@ -6,7 +6,7 @@ import getType from '../getType'
 import transformInputValue from '../transformInputValue'
 import createConnectionField from '../connection/createConnectionField'
 import getCollectionType from './getCollectionType'
-import createCollectionKeyInput from './createCollectionKeyInput'
+import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 
 /**
  * Creates any number of query field entries for a collection. These fields
@@ -108,17 +108,17 @@ function createCollectionKeyField <TKey>(
 
   const { collection, keyType } = collectionKey
   const collectionType = getCollectionType(buildToken, collection)
-  const collectionKeyInput = createCollectionKeyInput<TKey>(buildToken, collectionKey)
+  const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
 
   return {
     type: collectionType,
-    args: buildObject(collectionKeyInput.fieldEntries),
+    args: buildObject(inputHelpers.fieldEntries),
     // TODO: test
     async resolve (source, args, context): Promise<ObjectType.Value | null> {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const key = collectionKeyInput.getValue(args)
+      const key = inputHelpers.getValue(args)
       return await collectionKey.read!(context, key)
     },
   }
