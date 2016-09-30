@@ -15,7 +15,7 @@ import createMutationField from './createMutationField'
 export default function createCollectionCreateMutationFieldEntry (
   buildToken: BuildToken,
   collection: Collection,
-): [string, GraphQLFieldConfig<ObjectType.Value, mixed>] | undefined {
+): [string, GraphQLFieldConfig<mixed, mixed>] | undefined {
   // Return undefined if you can’t create values.
   if (!collection.create)
     return
