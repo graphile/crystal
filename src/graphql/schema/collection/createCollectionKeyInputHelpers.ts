@@ -1,4 +1,4 @@
-import { GraphQLInputFieldConfig } from 'graphql'
+import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../interface'
 import { buildObject, formatName } from '../../utils'
 import BuildToken from '../BuildToken'
@@ -35,7 +35,7 @@ export default function createCollectionKeyInputHelpers <T>(
       Array.from(keyType.fields).map<[string, GraphQLInputFieldConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
         [formatName.arg(fieldName), {
           description: field.description,
-          type: getType(buildToken, field.type, true),
+          type: new GraphQLNonNull(getNullableType(getType(buildToken, field.type, true))),
           // We add an `internalName` so that we can use that name to
           // reconstruct the correct object value.
           internalName: fieldName,
@@ -66,7 +66,7 @@ export default function createCollectionKeyInputHelpers <T>(
       fieldEntries: [
         [fieldName, {
           // TODO: description
-          type: fieldType,
+          type: new GraphQLNonNull(getNullableType(fieldType)),
         }],
       ],
       getValue: input => {

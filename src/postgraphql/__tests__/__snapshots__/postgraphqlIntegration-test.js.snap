@@ -930,6 +930,62 @@ type CreateUpdatableViewPayload {
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+}
+
+type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
+input DeletePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+}
+
+type DeletePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input DeletePersonByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePersonByIdPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input DeletePostByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePostByIdPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input DeleteTypesByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeleteTypesByIdPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
 scalar Email
 
 type ForeignKey {
@@ -989,10 +1045,15 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
+  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
 }
 
 type NestedCompoundType {
@@ -1375,7 +1436,7 @@ type Query {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     __id: ID!
   ): Person
-  personByEmail(email: Email): Person
+  personByEmail(email: Email!): Person
   personById(id: Int!): Person
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -1699,6 +1760,62 @@ type CreateUpdatableViewPayload {
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+}
+
+type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
+input DeletePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+}
+
+type DeletePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input DeletePersonByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+}
+
+type DeletePersonByRowIdPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input DeletePostByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+}
+
+type DeletePostByRowIdPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input DeleteTypesByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+}
+
+type DeleteTypesByRowIdPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
 scalar Email
 
 type ForeignKey {
@@ -1758,10 +1875,15 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  deleteTypesByRowId(input: DeleteTypesByRowIdInput!): DeleteTypesByRowIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
+  deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonByRowIdPayload
 }
 
 type NestedCompoundType {
@@ -2144,7 +2266,7 @@ type Query {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     id: ID!
   ): Person
-  personByEmail(email: Email): Person
+  personByEmail(email: Email!): Person
   personByRowId(rowId: Int!): Person
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1

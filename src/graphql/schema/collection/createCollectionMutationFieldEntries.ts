@@ -1,7 +1,8 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Collection } from '../../../interface'
 import BuildToken from '../BuildToken'
-import createCollectionCreateMutationFieldEntry from './mutations/createCreateCollectionMutationFieldEntry'
+import createCreateCollectionMutationFieldEntry from './mutations/createCreateCollectionMutationFieldEntry'
+import createDeleteCollectionKeyMutationFieldEntry from './mutations/createDeleteCollectionKeyMutationFieldEntry'
 
 /**
  * Creates all of the mutation fields available for a given collection. This
@@ -15,7 +16,10 @@ export default function createCollectionMutationFieldEntries (
   // Create an array of entries that may be undefined. We will filter out the
   // undefined ones at the end.
   const optionalEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>] | undefined> = [
-    createCollectionCreateMutationFieldEntry(buildToken, collection)
+    // Add the create mutation.
+    createCreateCollectionMutationFieldEntry(buildToken, collection),
+    // Add the delete mutation for all of the collection keys.
+    ...collection.keys.map(collectionKey => createDeleteCollectionKeyMutationFieldEntry(buildToken, collectionKey)),
   ]
 
   return optionalEntries.filter(Boolean) as Array<[string, GraphQLFieldConfig<mixed, mixed>]>
