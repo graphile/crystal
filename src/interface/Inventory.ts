@@ -34,6 +34,7 @@ class Inventory {
    * Adds a function which will assign some values to a context object when it
    * gets created.
    */
+  // TODO: Clean this API up! The current context API is terrible.
   public addContextAssignment (contextAssignment: ContextAssignmentFn): this {
     this._contextAssignments.push(contextAssignment)
     return this
