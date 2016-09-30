@@ -21,7 +21,7 @@ export default function createCollectionKeyInputHelpers <T>(
   collectionKey: CollectionKey<T>,
 ): {
   fieldEntries: Array<[string, GraphQLInputFieldConfig<mixed>]>
-  getValue: (input: { [key: string]: mixed }) => T
+  getKey: (input: { [key: string]: mixed }) => T
 } {
   const { keyType } = collectionKey
 
@@ -44,7 +44,7 @@ export default function createCollectionKeyInputHelpers <T>(
 
     return {
       fieldEntries,
-      getValue: input => {
+      getKey: input => {
         const key = new Map(fieldEntries.map<[string, mixed]>(([fieldName, field]) => [
           field.internalName,
           transformInputValue(field.type, input[fieldName] as mixed),
@@ -69,7 +69,7 @@ export default function createCollectionKeyInputHelpers <T>(
           type: new GraphQLNonNull(getNullableType(fieldType)),
         }],
       ],
-      getValue: input => {
+      getKey: input => {
         const key = transformInputValue(fieldType, input[fieldName]) as any
 
         if (!keyType.isTypeOf(key))

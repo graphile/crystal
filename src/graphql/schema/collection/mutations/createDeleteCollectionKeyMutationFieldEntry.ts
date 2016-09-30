@@ -35,7 +35,9 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TKey>(
         resolve: value => value,
       }],
     ],
+    // Actually delete the value getting the key from our input with our
+    // helpers.
     execute: (context, input) =>
-      collectionKey.delete!(context, inputHelpers.getValue(input)),
+      collectionKey.delete!(context, inputHelpers.getKey(input)),
   })]
 }

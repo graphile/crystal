@@ -942,6 +942,17 @@ type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
   query: Query
 }
 
+input DeleteCompoundKeyInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeleteCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
 input DeletePersonByEmailInput {
   clientMutationId: String
   email: Email!
@@ -964,6 +975,17 @@ type DeletePersonByIdPayload {
   query: Query
 }
 
+input DeletePersonInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
 input DeletePostByIdInput {
   clientMutationId: String
   id: Int!
@@ -975,12 +997,34 @@ type DeletePostByIdPayload {
   query: Query
 }
 
+input DeletePostInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
 input DeleteTypesByIdInput {
   clientMutationId: String
   id: Int!
 }
 
 type DeleteTypesByIdPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
+input DeleteTypesInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeleteTypesPayload {
   clientMutationId: String
   types: Types
   query: Query
@@ -1045,13 +1089,17 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
 }
@@ -1772,6 +1820,17 @@ type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
   query: Query
 }
 
+input DeleteCompoundKeyInput {
+  clientMutationId: String
+  id: ID!
+}
+
+type DeleteCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+  query: Query
+}
+
 input DeletePersonByEmailInput {
   clientMutationId: String
   email: Email!
@@ -1794,6 +1853,17 @@ type DeletePersonByRowIdPayload {
   query: Query
 }
 
+input DeletePersonInput {
+  clientMutationId: String
+  id: ID!
+}
+
+type DeletePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
 input DeletePostByRowIdInput {
   clientMutationId: String
   rowId: Int!
@@ -1805,12 +1875,34 @@ type DeletePostByRowIdPayload {
   query: Query
 }
 
+input DeletePostInput {
+  clientMutationId: String
+  id: ID!
+}
+
+type DeletePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
 input DeleteTypesByRowIdInput {
   clientMutationId: String
   rowId: Int!
 }
 
 type DeleteTypesByRowIdPayload {
+  clientMutationId: String
+  types: Types
+  query: Query
+}
+
+input DeleteTypesInput {
+  clientMutationId: String
+  id: ID!
+}
+
+type DeleteTypesPayload {
   clientMutationId: String
   types: Types
   query: Query
@@ -1875,13 +1967,17 @@ enum ForeignKeysOrderBy {
 type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
   createTypes(input: CreateTypesInput!): CreateTypesPayload
+  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
   deleteTypesByRowId(input: DeleteTypesByRowIdInput!): DeleteTypesByRowIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
+  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
   deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonByRowIdPayload
 }

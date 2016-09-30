@@ -118,7 +118,7 @@ function createCollectionKeyField <TKey>(
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const key = inputHelpers.getValue(args)
+      const key = inputHelpers.getKey(args)
       return await collectionKey.read!(context, key)
     },
   }
