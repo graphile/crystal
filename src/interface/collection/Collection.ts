@@ -1,8 +1,8 @@
 import Context from '../Context'
 import Type from '../type/Type'
 import ObjectType from '../type/ObjectType'
+import Paginator from '../Paginator'
 import CollectionKey from './CollectionKey'
-import Paginator from './Paginator'
 import Condition from './Condition'
 
 /**

@@ -4,6 +4,7 @@ import AliasType from './type/AliasType'
 import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
+import Procedure from './Procedure'
 
 type ContextAssignmentFn = (context: Context) => void | Promise<void>
 
@@ -23,6 +24,7 @@ class Inventory {
   private _types = new Map<string, NamedType<mixed>>()
   private _collections = new Map<string, Collection>()
   private _relations = new Map<string, Relation<mixed>>()
+  private _procedures = new Map<string, Procedure>()
 
   /**
    * Adds a function which will assign some values to a context object when it
@@ -45,53 +47,6 @@ class Inventory {
   }
 
   /**
-   * Add a type to our inventory. If the type is a composite named type (like an
-   * alias type or an object type), we will also add the types it is composed
-   * of to the inventory.
-   *
-   * Type names must be unique. So if you had already added a type with the
-   * same name to the inventory, an error will be thrown.
-   */
-  // TODO: add tests!
-  public addType (type: NamedType<mixed>): this {
-    // If the type has already been added, we good!
-    if (this.hasType(type))
-      return this
-
-    const name = type.name
-
-    if (this._types.has(name))
-      throw new Error(`Type of name '${name}' already exists in the inventory.`)
-
-    this._types.set(name, type)
-
-    // Add the base type if this is an alias type.
-    if (type instanceof AliasType)
-      this.addType(type.baseType.getNamedType())
-
-    // Add the type for all of the fields if this is an object type.
-    if (type instanceof ObjectType)
-      Array.from(type.fields).forEach(([fieldName, { type }]) => this.addType(type.getNamedType()))
-
-    return this
-  }
-
-  /**
-   * Get all of the types in our inventory.
-   */
-  public getTypes (): Array<NamedType<mixed>> {
-    return Array.from(this._types.values())
-  }
-
-  /**
-   * Returns true if the exact same type exists in this inventory, false if it
-   * doesn’t.
-   */
-  public hasType (type: NamedType<mixed>): boolean {
-    return this._types.get(type.name) === type
-  }
-
-  /**
    * Adds a single collection to our inventory. If a collection with the same
    * name already exists, an error is thrown. If the collection has a
    * different inventory, an error is thrown.
@@ -105,10 +60,6 @@ class Inventory {
       throw new Error(`Collection of name '${name}' already exists in the inventory.`)
 
     this._collections.set(name, collection)
-
-    // Add the type for this collection if it exists.
-    if (collection.type)
-      this.addType(collection.type)
 
     return this
   }
@@ -170,6 +121,28 @@ class Inventory {
    */
   public getRelations (): Array<Relation<mixed>> {
     return Array.from(this._relations.values())
+  }
+
+  /**
+   * Adds a single `Procedure` to our inventory. If a procedure of the same
+   * name already exists, an error will be thrown.
+   */
+  public addProcedure (procedure: Procedure): this {
+    const { name } = procedure
+
+    if (this._procedures.has(name))
+      throw new Error(`Procedure of name '${name}' already exists in the inventory.'`)
+
+    this._procedures.set(name, procedure)
+
+    return this
+  }
+
+  /**
+   * Returns all of the procedures in our inventory.
+   */
+  public getProcedures (): Array<Procedure> {
+    return Array.from(this._procedures.values())
   }
 }
 

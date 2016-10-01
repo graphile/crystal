@@ -1,7 +1,7 @@
 import ObjectType from '../type/ObjectType'
+import Paginator from '../Paginator'
 import Collection from './Collection'
 import CollectionKey from './CollectionKey'
-import Paginator from './Paginator'
 import Condition from './Condition'
 
 /**
