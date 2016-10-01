@@ -2,6 +2,7 @@ import {
   Type,
   NullableType,
   ListType,
+  AliasType,
   EnumType,
   booleanType,
   integerType,
@@ -21,7 +22,6 @@ export const $$transformPGValue = Symbol('transformPGValue')
  * we can use in our interface. If the type has an implementation for the
  * symbol `$$transformPGValue` then that implementation will be used.
  */
-// TODO: test
 export default function transformPGValue (type: Type<mixed>, value: mixed): any {
   // If the type has defined a custom implementation for this function, use it.
   if (type[$$transformPGValue])
@@ -41,6 +41,11 @@ export default function transformPGValue (type: Type<mixed>, value: mixed): any 
     return value.map(item => transformPGValue(type.itemType, item))
   }
 
+  // If this is an alias type, just run the transform function with its base
+  // type.
+  if (type instanceof AliasType)
+    return transformPGValue(type.baseType, value)
+
   // If the is an enum type, or one of a select few primitive types, trust
   // Postgres did the right thing and return the value.
   if (
@@ -58,7 +63,7 @@ export default function transformPGValue (type: Type<mixed>, value: mixed): any 
     if (value == null)
       throw new Error('Postgres value of object type may not be nullish.')
 
-    if (typeof value === 'object')
+    if (typeof value !== 'object')
       throw new Error(`Postgres value of object type must be an object, not '${typeof value}'.`)
 
     return new Map(Array.from(type.fields).map<[string, mixed]>(([fieldName, { type }]) => [fieldName, transformPGValue(type, value[fieldName])]))

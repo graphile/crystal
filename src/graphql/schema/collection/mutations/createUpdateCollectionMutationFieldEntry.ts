@@ -12,7 +12,7 @@ import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getType from '../../getType'
 import createMutationField from '../../createMutationField'
-import transformInputValue, { $$inputValueKeyName } from '../../transformInputValue'
+import transformGqlInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGqlInputValue'
 import getCollectionType from '../getCollectionType'
 
 /**
@@ -64,7 +64,7 @@ export default function createDeleteCollectionMutationFieldEntry (
         throw new Error(`The provided id is for collection '${collectionKey.collection.name}', not the expected collection '${collection.name}'.`)
 
       // Get the patch from our input.
-      const patch = transformInputValue(patchType, input[patchFieldName])
+      const patch = transformGqlInputValue(patchType, input[patchFieldName])
 
       return primaryKey.update!(context, keyValue, patch as any)
     },
@@ -93,7 +93,7 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
         [formatName.field(fieldName), {
           // TODO: description
           type: getNullableType(getType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
-          [$$inputValueKeyName]: fieldName,
+          [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
       )
     ),

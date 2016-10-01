@@ -3,7 +3,7 @@ import { Collection, ObjectType } from '../../../../interface'
 import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getType from '../../getType'
-import transformInputValue from '../../transformInputValue'
+import transformGqlInputValue from '../../transformGqlInputValue'
 import createMutationField from '../../createMutationField'
 import { getEdgeType, createOrderByArg } from '../../connection/createConnectionField'
 import getCollectionType from '../getCollectionType'
@@ -68,6 +68,6 @@ export default function createCreateCollectionMutationFieldEntry (
     // transforming the correct input field.
     // TODO: test
     execute: (context, input) =>
-      collection.create!(context, transformInputValue(inputFieldType, input[inputFieldName]) as any),
+      collection.create!(context, transformGqlInputValue(inputFieldType, input[inputFieldName]) as any),
   })]
 }

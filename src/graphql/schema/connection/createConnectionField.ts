@@ -20,7 +20,7 @@ import { Context, Paginator, Condition, conditionHelpers, Type, NullableType, Ob
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getType from '../getType'
 import BuildToken from '../BuildToken'
-import transformInputValue from '../transformInputValue'
+import transformGqlInputValue from '../transformGqlInputValue'
 
 // TODO: doc
 export default function createConnectionField <TValue, TOrdering extends Paginator.Ordering, TCursor, TCondition>(
@@ -131,7 +131,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
             args[fieldName] !== undefined
               // If the argument exists, create a condition and transform the
               // input value.
-              ? conditionHelpers.fieldEquals(field.internalName, transformInputValue(field.type, args[fieldName]))
+              ? conditionHelpers.fieldEquals(field.internalName, transformGqlInputValue(field.type, args[fieldName]))
               // If the argument does not exist, this condition should just be
               // true (which will get filtered out by `conditionHelpers.and`).
               : true

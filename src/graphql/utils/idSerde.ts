@@ -5,6 +5,7 @@ namespace idSerde {
    * This function will take an id object and turn it into an opaque string
    * that can be deserialized. Type information is lost in serialization.
    */
+  // TODO: `idSerde` should take collections, not collection keys.
   export function serialize <TKeyValue>(
     // A `primaryKey` is required whereas in a normal collection it is not
     // required.

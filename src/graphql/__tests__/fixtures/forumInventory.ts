@@ -71,7 +71,7 @@ const personPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = 
   readPage: unimplementedFn,
 }
 
-const personCollection: Collection = {
+export const personCollection: Collection = {
   name: 'people',
   type: personType,
   keys: [personIdKey, personNameKey, personEmailKey],
@@ -124,7 +124,7 @@ const postPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = {
   readPage: unimplementedFn,
 }
 
-const postCollection: Collection = {
+export const postCollection: Collection = {
   name: 'posts',
   type: postType,
   keys: [postIdKey],

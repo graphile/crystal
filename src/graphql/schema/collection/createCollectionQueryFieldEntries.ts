@@ -3,7 +3,7 @@ import { Context, Collection, CollectionKey, ObjectType } from '../../../interfa
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
-import transformInputValue from '../transformInputValue'
+import transformGqlInputValue from '../transformGqlInputValue'
 import createConnectionField from '../connection/createConnectionField'
 import getCollectionType from './getCollectionType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
@@ -39,12 +39,13 @@ export default function createCollectionQueryFieldEntries (
     const field = createCollectionPrimaryKeyField(buildToken, primaryKey)
 
     // If we got a field back, add it.
-    if (field) entries.push([formatName.field(type.name), field])
+    if (field)
+      entries.push([formatName.field(type.name), field])
   }
 
   // Add a field to select any value in the collection by any key. So all
   // unique keys of an object will be usable to select a single value.
-  for (const collectionKey of collection.keys) {
+  for (const collectionKey of (collection.keys || [])) {
     const field = createCollectionKeyField(buildToken, collectionKey)
 
     // If we got a field back, add it.
@@ -66,7 +67,8 @@ function createCollectionPrimaryKeyField <TKey>(
   const { collection } = collectionKey
 
   // If we can’t read from this collection key, stop.
-  if (collectionKey.read == null) return
+  if (collectionKey.read == null)
+    return
 
   const collectionType = getCollectionType(buildToken, collection)
 
@@ -81,7 +83,6 @@ function createCollectionPrimaryKeyField <TKey>(
       },
     },
 
-    // TODO: Test this resolver
     async resolve (source, args, context): Promise<ObjectType.Value | null> {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
@@ -99,12 +100,14 @@ function createCollectionPrimaryKeyField <TKey>(
 /**
  * Creates a field using the value from any collection key.
  */
+// TODO: test
 function createCollectionKeyField <TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
   // If we can’t read from this collection key, stop.
-  if (collectionKey.read == null) return
+  if (collectionKey.read == null)
+    return
 
   const { collection, keyType } = collectionKey
   const collectionType = getCollectionType(buildToken, collection)
@@ -113,7 +116,6 @@ function createCollectionKeyField <TKey>(
   return {
     type: collectionType,
     args: buildObject(inputHelpers.fieldEntries),
-    // TODO: test
     async resolve (source, args, context): Promise<ObjectType.Value | null> {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')

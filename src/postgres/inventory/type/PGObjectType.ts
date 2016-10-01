@@ -16,7 +16,6 @@ import getTypeFromPGType from './getTypeFromPGType'
  * Users of this type are still expected to provide their own name and
  * description.
  */
-// TODO: test
 class PGObjectType extends ObjectType {
   // Overrides the `fields` type so that we recognize our custom field type.
   public readonly fields: Map<string, PGObjectType.Field<mixed>>
@@ -88,22 +87,11 @@ class PGObjectType extends ObjectType {
   /**
    * Converts a row returned by Postgres into the correct value object.
    */
-  // TODO: test
   public [$$transformPGValue] (row: { [key: string]: mixed }): PGObjectType.Value {
     const value = new Map<string, mixed>()
 
-    for (const [fieldName, { type: fieldType, pgAttribute }] of this.fields) {
-      let fieldValue = row[pgAttribute.name]
-
-      // If the field value is an object, we run `objectToMap`. Note though
-      // that it doesn’t use type information. For now since our only field
-      // attribute rename is in the collection type this is safe to do.
-      // TODO: Use type information to turn nested objects into maps.
-      if (fieldValue != null && typeof fieldValue === 'object')
-        fieldValue = transformPGValue(fieldType, fieldValue)
-
-      value.set(fieldName, fieldValue)
-    }
+    for (const [fieldName, { type: fieldType, pgAttribute }] of this.fields)
+      value.set(fieldName, transformPGValue(fieldType, row[pgAttribute.name]))
 
     return value
   }
@@ -111,7 +99,6 @@ class PGObjectType extends ObjectType {
   /**
    * Converts a field name into the appropriate Postgres attribute name.
    */
-  // TODO: test
   public getPGAttributeNameFromFieldName (fieldName: string): string | undefined {
     return this._fieldNameToPGAttributeName.get(fieldName)
   }
@@ -119,7 +106,6 @@ class PGObjectType extends ObjectType {
   /**
    * Converts a Postgres attribute name to the appropriate field name.
    */
-  // TODO: test
   public getFieldNameFromPGAttributeName (pgAttributeName: string): string | undefined {
     return this._pgAttributeNameToFieldName.get(pgAttributeName)
   }

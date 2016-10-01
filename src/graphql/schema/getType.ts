@@ -38,7 +38,7 @@ import {
 
 import { buildObject, formatName } from '../utils'
 import getCollectionType from './collection/getCollectionType'
-import { $$inputValueKeyName } from './transformInputValue'
+import { $$gqlInputObjectTypeValueKeyName } from './transformGqlInputValue'
 import BuildToken from './BuildToken'
 
 // TODO: doc
@@ -214,7 +214,7 @@ function createInputObjectType <T>(buildToken: BuildToken, type: ObjectType): Gr
         return [formatName.field(fieldName), {
           description: field.description,
           type,
-          [$$inputValueKeyName]: fieldName,
+          [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
       })
     ),

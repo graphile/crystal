@@ -7,12 +7,6 @@ import Relation from './collection/Relation'
 
 type ContextAssignmentFn = (context: Context) => void | Promise<void>
 
-// TODO: Validate inventory functions. There are a lot of assumptions we make that
-// cannot be statically typed. We should have a test utility function to prove
-// those assumptions are correct. We will mostly test things not defined in
-// the type system.
-// TODO: Is this the right way to do it?
-// TODO: Test this!
 /**
  * In order to build awesome tools from any database we need an abstract
  * static data definition language. Inventory is the root level interface
@@ -125,8 +119,6 @@ class Inventory {
    *
    * Two collections in this set should not have the same name.
    */
-  // TODO: Test that the collection object type is returned by `getTypes`.
-  // TODO: Test that collections do not have the same name.
   public getCollections (): Array<Collection> {
     return Array.from(this._collections.values())
   }

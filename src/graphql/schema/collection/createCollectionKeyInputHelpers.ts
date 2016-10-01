@@ -3,7 +3,7 @@ import { CollectionKey, ObjectType } from '../../../interface'
 import { buildObject, formatName } from '../../utils'
 import BuildToken from '../BuildToken'
 import getType from '../getType'
-import transformInputValue from '../transformInputValue'
+import transformGqlInputValue from '../transformGqlInputValue'
 
 /**
  * There are different ways to create the input for a collection key given the
@@ -47,7 +47,7 @@ export default function createCollectionKeyInputHelpers <T>(
       getKey: input => {
         const key = new Map(fieldEntries.map<[string, mixed]>(([fieldName, field]) => [
           field.internalName,
-          transformInputValue(field.type, input[fieldName] as mixed),
+          transformGqlInputValue(field.type, input[fieldName] as mixed),
         ])) as any
 
         if (!keyType.isTypeOf(key))
@@ -70,7 +70,7 @@ export default function createCollectionKeyInputHelpers <T>(
         }],
       ],
       getKey: input => {
-        const key = transformInputValue(fieldType, input[fieldName]) as any
+        const key = transformGqlInputValue(fieldType, input[fieldName]) as any
 
         if (!keyType.isTypeOf(key))
           throw new Error('The key input is not of the correct type.')
