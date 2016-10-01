@@ -1,6 +1,8 @@
 import { Client } from 'pg'
 import { NullableType } from '../../../../interface'
 import withPGClient from '../../../__tests__/fixtures/withPGClient'
+import pgPool from '../../../__tests__/fixtures/pgPool'
+import kitchenSinkSchemaSQL from '../../../__tests__/fixtures/kitchenSinkSchemaSQL'
 import { mapToObject } from '../../../utils'
 import { PGCatalog, introspectDatabase } from '../../../introspection'
 import { createPGContext } from '../../pgContext'
@@ -221,8 +223,8 @@ const paginatorFixtures = [
         },
       },
       {
-        name: 'natural',
-        getOrdering: () => collection1.paginator.orderings.find(({ name }) => name === 'natural'),
+        name: 'offset',
+        getOrdering: () => ({ type: 'OFFSET', name: 'offset', orderBy: { type: 'RAW', text: 'id asc' } }),
         getValueCursor: (value, i) => i + 1,
         compareValues: null,
       },
@@ -318,16 +320,29 @@ const paginatorFixtures = [
 
 paginatorFixtures.forEach(paginatorFixture => {
   describe(`paginator '${paginatorFixture.name}'`, () => {
+    let client
+
+    beforeAll(async () => {
+      client = await pgPool.connect()
+      await client.query('begin')
+      await client.query(await kitchenSinkSchemaSQL)
+      await paginatorFixture.addValuesToClient(client)
+    })
+
+    afterAll(async () => {
+      await client.query('rollback')
+      client.release()
+    })
+
     const { allValues } = paginatorFixture
 
     let paginator
     beforeAll(() => paginator = paginatorFixture.getPaginator())
 
-    test('will count all of the values in the collection', withPGClient(async client => {
-      await paginatorFixture.addValuesToClient(client)
+    test('will count all of the values in the collection', async () => {
       const context = createPGContext(client)
       expect(await paginator.count(context)).toBe(allValues.length)
-    }))
+    })
 
     paginatorFixture.orderingFixtures.forEach(orderingFixture => {
       describe(`ordering '${orderingFixture.name}'`, () => {
@@ -337,16 +352,14 @@ paginatorFixtures.forEach(paginatorFixture => {
         let ordering
         beforeAll(() => ordering = orderingFixture.getOrdering())
 
-        test('will read all of the values in the correct order', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read all of the values in the correct order', async () => {
           const context = createPGContext(client)
           const page = await paginator.readPage(context, { ordering })
           expect(page.values).toEqual(sortedValuesWithCursors)
           expect(await Promise.all([page.hasNextPage(), page.hasPreviousPage()])).toEqual([false, false])
-        }))
+        })
 
-        test('will read all values after an `afterCursor`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read all values after an `afterCursor`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -359,10 +372,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([false, true, false, true])
-        }))
+        })
 
-        test('will read all values before a `beforeCursor`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read all values before a `beforeCursor`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -375,10 +387,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, false, true, false])
-        }))
+        })
 
-        test('will read all values between a `beforeCursor` and an `afterCursor`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -391,10 +402,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, true])
-        }))
+        })
 
-        test('will read only the first few values when provided `first`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read only the first few values when provided `first`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -407,10 +417,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, false, true, false])
-        }))
+        })
 
-        test('will read only the last few values when provided `last`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will read only the last few values when provided `last`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -423,16 +432,14 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([false, true, false, true])
-        }))
+        })
 
-        test('will fail when trying to use `first` and `last` together', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('will fail when trying to use `first` and `last` together', async () => {
           const context = createPGContext(client)
           expect((await paginator.readPage(context, { ordering, first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
-        }))
+        })
 
-        test('can use `beforeCursor` and `first` together', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `beforeCursor` and `first` together', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -445,10 +452,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, false, true, false])
-        }))
+        })
 
-        test('can use `afterCursor` and `first` together', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `afterCursor` and `first` together', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -461,10 +467,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, true])
-        }))
+        })
 
-        test('can use `first` with both `beforeCursor` and `afterCursor`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -477,10 +482,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, true])
-        }))
+        })
 
-        test('can use `beforeCursor` and `last` together', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `beforeCursor` and `last` together', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -493,10 +497,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, false])
-        }))
+        })
 
-        test('can use `afterCursor` and `last` together', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `afterCursor` and `last` together', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -509,10 +512,9 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([false, true, false, true])
-        }))
+        })
 
-        test('can use `last` with both `beforeCursor` and `afterCursor`', withPGClient(async client => {
-          await paginatorFixture.addValuesToClient(client)
+        test('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
           const context = createPGContext(client)
 
           const [page1, page2] = await Promise.all([
@@ -525,7 +527,7 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, true])
-        }))
+        })
       })
     })
   })

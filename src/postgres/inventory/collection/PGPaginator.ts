@@ -136,6 +136,7 @@ abstract class PGPaginator<TValue> implements Paginator<TValue, PGPaginator.Orde
         select to_json(${sql.identifier(aliasIdentifier)}) as value
         from ${fromSQL} as ${sql.identifier(aliasIdentifier)}
         where ${conditionSQL}
+        ${ordering.orderBy ? sql.query`order by ${ordering.orderBy}` : sql.query``}
         offset ${sql.value(offset)}
         limit ${limit != null ? sql.value(limit) : sql.query`all`}
       `)
@@ -294,6 +295,7 @@ namespace PGPaginator {
   export type OffsetOrdering = {
     type: 'OFFSET',
     name: string,
+    orderBy?: sql.SQL,
   }
 
   export type AttributesOrdering = {
