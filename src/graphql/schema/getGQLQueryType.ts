@@ -7,12 +7,12 @@ import createCollectionQueryFieldEntries from './collection/createCollectionQuer
 import BuildToken from './BuildToken'
 
 // TODO: doc
-const getQueryType = memoize1(createQueryType)
+const getGQLQueryType = memoize1(createGQLQueryType)
 
-export default getQueryType
+export default getGQLQueryType
 
 // TODO: doc
-function createQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
+function createGQLQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
   let queryType: GraphQLObjectType<mixed>
 

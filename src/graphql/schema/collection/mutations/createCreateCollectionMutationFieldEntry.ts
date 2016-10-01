@@ -2,8 +2,8 @@ import { GraphQLFieldConfig } from 'graphql'
 import { Collection, ObjectType } from '../../../../interface'
 import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import getType from '../../getType'
-import transformGqlInputValue from '../../transformGqlInputValue'
+import getGQLType from '../../getGQLType'
+import transformGQLInputValue from '../../transformGQLInputValue'
 import createMutationField from '../../createMutationField'
 import { getEdgeType, createOrderByArg } from '../../connection/createConnectionField'
 import getCollectionType from '../getCollectionType'
@@ -22,7 +22,7 @@ export default function createCreateCollectionMutationFieldEntry (
 
   const name = `create-${collection.type.name}`
   const inputFieldName = formatName.field(collection.type.name)
-  const inputFieldType = getType(buildToken, collection.type, true)
+  const inputFieldType = getGQLType(buildToken, collection.type, true)
 
   return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
     name,
@@ -68,6 +68,6 @@ export default function createCreateCollectionMutationFieldEntry (
     // transforming the correct input field.
     // TODO: test
     execute: (context, input) =>
-      collection.create!(context, transformGqlInputValue(inputFieldType, input[inputFieldName]) as any),
+      collection.create!(context, transformGQLInputValue(inputFieldType, input[inputFieldName]) as any),
   })]
 }

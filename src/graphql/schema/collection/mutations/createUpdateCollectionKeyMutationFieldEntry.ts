@@ -3,7 +3,7 @@ import { CollectionKey, ObjectType } from '../../../../interface'
 import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationField from '../../createMutationField'
-import transformGqlInputValue from '../../transformGqlInputValue'
+import transformGQLInputValue from '../../transformGQLInputValue'
 import getCollectionType from '../getCollectionType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, createUpdateCollectionOutputFieldEntries } from './createUpdateCollectionMutationFieldEntry'
@@ -45,7 +45,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
     outputFields: createUpdateCollectionOutputFieldEntries(buildToken, collection),
     execute: (context, input) => {
       // Get the patch from our input.
-      const patch = transformGqlInputValue(patchType, input[patchFieldName])
+      const patch = transformGQLInputValue(patchType, input[patchFieldName])
       return collectionKey.update!(context, inputHelpers.getKey(input), patch as any)
     },
   })]

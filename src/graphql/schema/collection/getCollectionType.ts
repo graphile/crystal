@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, Graph
 import { Context, Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde, scrib } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
-import getType from '../getType'
+import getGQLType from '../getGQLType'
 import createConnectionField from '../connection/createConnectionField'
 import BuildToken from '../BuildToken'
 
@@ -57,7 +57,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         .map(<TFieldValue>([fieldName, field]: [string, ObjectType.Field<TFieldValue>]): [string, GraphQLFieldConfig<ObjectType.Value, TFieldValue>] =>
           [formatName.field(fieldName), {
             description: field.description,
-            type: getType(buildToken, field.type, false) as GraphQLOutputType<TFieldValue>,
+            type: getGQLType(buildToken, field.type, false) as GraphQLOutputType<TFieldValue>,
             resolve: value =>
               // Since we get `mixed` back here from the map, we’re just going
               // to assume the type is ok instead of running an `isTypeOf`

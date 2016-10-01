@@ -9,16 +9,16 @@ import BuildToken from './BuildToken'
  * schema. If there are no mutations, instead of throwing an error we will just
  * return `undefined`.
  */
-const getMutationType = memoize1(createMutationType)
+const getGQLMutationType = memoize1(createGQLMutationType)
 
-export default getMutationType
+export default getGQLMutationType
 
 /**
  * Internal create implementation for `getMutationType`.
  *
  * @private
  */
-function createMutationType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
+function createGQLMutationType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
   const { inventory } = buildToken
 
   // A list of all the mutations we are able to run.

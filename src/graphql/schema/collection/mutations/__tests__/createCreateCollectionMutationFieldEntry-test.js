@@ -1,8 +1,8 @@
-jest.mock('../../../getType')
+jest.mock('../../../getGQLType')
 jest.mock('../../../createMutationField')
 jest.mock('../../getCollectionType')
 
-import getType from '../../../getType'
+import getGQLType from '../../../getGQLType'
 import createMutationField from '../../../createMutationField'
 import getCollectionType from '../../getCollectionType'
 import createCreateCollectionMutationFieldEntry from '../createCreateCollectionMutationFieldEntry'
@@ -24,15 +24,15 @@ test('will create a field entry with the correct name', () => {
 })
 
 test('will create a field entry with the correct input fields', () => {
-  getType.mockClear()
+  getGQLType.mockClear()
   const gqlType = Symbol('gqlType')
-  getType.mockReturnValueOnce(gqlType)
+  getGQLType.mockReturnValueOnce(gqlType)
   const buildToken = Symbol('buildToken')
   const type = { name: 'person' }
   const collection = { name: 'people', type, create: true }
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[1].inputFields).toEqual([['person', { type: gqlType }]])
-  expect(getType.mock.calls).toEqual([[buildToken, type, true]])
+  expect(getGQLType.mock.calls).toEqual([[buildToken, type, true]])
 })
 
 test('will create a field entry with output fields and no paginator', () => {

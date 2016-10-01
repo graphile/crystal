@@ -18,9 +18,9 @@ import {
 } from 'graphql'
 import { Context, Paginator, Condition, conditionHelpers, Type, NullableType, ObjectType } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
-import getType from '../getType'
+import getGQLType from '../getGQLType'
 import BuildToken from '../BuildToken'
-import transformGqlInputValue from '../transformGqlInputValue'
+import transformGQLInputValue from '../transformGQLInputValue'
 
 // TODO: doc
 export default function createConnectionField <TValue, TOrdering extends Paginator.Ordering, TCursor, TCondition>(
@@ -32,7 +32,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
   } = {},
 ): GraphQLFieldConfig<mixed, Connection<TValue, TOrdering, TCursor>> {
   const paginatorName = paginator.name
-  const gqlType = getType(buildToken, paginator.type, false)
+  const gqlType = getGQLType(buildToken, paginator.type, false)
 
   // If the user wants field conditions, but that paginator type is not an
   // object type, we need to throw an error.
@@ -47,7 +47,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
         [formatName.arg(fieldName), {
           // Get the type for this field, but always make sure that it is
           // nullable. We don’t want to require conditions.
-          type: getType(buildToken, new NullableType(field.type), true),
+          type: getGQLType(buildToken, new NullableType(field.type), true),
           // We include this internal name so that we can resolve the arguments
           // back into actual values.
           internalName: fieldName,
@@ -131,7 +131,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
             args[fieldName] !== undefined
               // If the argument exists, create a condition and transform the
               // input value.
-              ? conditionHelpers.fieldEquals(field.internalName, transformGqlInputValue(field.type, args[fieldName]))
+              ? conditionHelpers.fieldEquals(field.internalName, transformGQLInputValue(field.type, args[fieldName]))
               // If the argument does not exist, this condition should just be
               // true (which will get filtered out by `conditionHelpers.and`).
               : true
@@ -172,7 +172,7 @@ export function _createConnectionType <TValue, TOrdering extends Paginator.Order
   buildToken: BuildToken,
   paginator: Paginator<TValue, TOrdering, TCursor>,
 ): GraphQLObjectType<Connection<TValue, TOrdering, TCursor>> {
-  const gqlType = getType(buildToken, paginator.type, false)
+  const gqlType = getGQLType(buildToken, paginator.type, false)
   const gqlEdgeType = getEdgeType(buildToken, paginator)
 
   return new GraphQLObjectType<Connection<TValue, TOrdering, TCursor>>({
@@ -219,7 +219,7 @@ export function _createEdgeType <TValue, TOrdering extends Paginator.Ordering, T
   buildToken: BuildToken,
   paginator: Paginator<TValue, TOrdering, TCursor>,
 ): GraphQLObjectType<Edge<TValue, TOrdering, TCursor>> {
-  const gqlType = getType(buildToken, paginator.type, false)
+  const gqlType = getGQLType(buildToken, paginator.type, false)
 
   return new GraphQLObjectType<Edge<TValue, TOrdering, TCursor>>({
     name: formatName.type(`${paginator.name}-edge`),
@@ -250,7 +250,7 @@ export function createOrderByArg <TValue, TOrdering extends Paginator.Ordering, 
   buildToken: BuildToken,
   paginator: Paginator<TValue, TOrdering, TCursor>,
 ) {
-  const gqlType = getType(buildToken, paginator.type, false)
+  const gqlType = getGQLType(buildToken, paginator.type, false)
   return {
     description: `The method to use when ordering ${scrib.type(gqlType)}.`,
     type: getOrderByEnumType(buildToken, paginator),
@@ -268,7 +268,7 @@ export function _createOrderByEnumType <TValue, TOrdering extends Paginator.Orde
   buildToken: BuildToken,
   paginator: Paginator<TValue, TOrdering, TCursor>,
 ): GraphQLEnumType<Paginator.Ordering> {
-  const gqlType = getType(buildToken, paginator.type, false)
+  const gqlType = getGQLType(buildToken, paginator.type, false)
 
   return new GraphQLEnumType<Paginator.Ordering>({
     name: formatName.type(`${paginator.name}-order-by`),

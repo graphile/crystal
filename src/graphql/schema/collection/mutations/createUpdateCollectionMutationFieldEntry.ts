@@ -10,9 +10,9 @@ import {
 import { Collection, ObjectType } from '../../../../interface'
 import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import getType from '../../getType'
+import getGQLType from '../../getGQLType'
 import createMutationField from '../../createMutationField'
-import transformGqlInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGqlInputValue'
+import transformGQLInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGQLInputValue'
 import getCollectionType from '../getCollectionType'
 
 /**
@@ -64,7 +64,7 @@ export default function createDeleteCollectionMutationFieldEntry (
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
       // Get the patch from our input.
-      const patch = transformGqlInputValue(patchType, input[patchFieldName])
+      const patch = transformGQLInputValue(patchType, input[patchFieldName])
 
       return primaryKey.update!(context, result.keyValue, patch as any)
     },
@@ -92,7 +92,7 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
       Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
         [formatName.field(fieldName), {
           // TODO: description
-          type: getNullableType(getType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
+          type: getNullableType(getGQLType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
       )

@@ -22,8 +22,8 @@ import {
   ObjectType,
 } from '../../../interface'
 
-import { $$gqlInputObjectTypeValueKeyName } from '../transformGqlInputValue'
-import getType from '../getType'
+import { $$gqlInputObjectTypeValueKeyName } from '../transformGQLInputValue'
+import getGQLType from '../getGQLType'
 
 const mockBuildToken = () => ({
   inventory: {
@@ -48,8 +48,8 @@ test('will return the exact same thing for types that are both inputs and output
   const buildToken = mockBuildToken()
   const enumType = mockEnumType()
   const objectType = mockObjectType()
-  expect(getType(buildToken, enumType, false)).toBe(getType(buildToken, enumType, true))
-  expect(getType(buildToken, objectType, false)).not.toBe(getType(buildToken, objectType, true))
+  expect(getGQLType(buildToken, enumType, false)).toBe(getGQLType(buildToken, enumType, true))
+  expect(getGQLType(buildToken, objectType, false)).not.toBe(getGQLType(buildToken, objectType, true))
 })
 
 test('is memoized', () => {
@@ -57,64 +57,64 @@ test('is memoized', () => {
   const buildToken2 = mockBuildToken()
   const enumType = mockEnumType()
   const objectType = mockObjectType()
-  expect(getType(buildToken1, enumType, false)).toBe(getType(buildToken1, enumType, false))
-  expect(getType(buildToken1, enumType, true)).toBe(getType(buildToken1, enumType, true))
-  expect(getType(buildToken1, objectType, false)).toBe(getType(buildToken1, objectType, false))
-  expect(getType(buildToken1, objectType, true)).toBe(getType(buildToken1, objectType, true))
-  expect(getType(buildToken2, enumType, false)).toBe(getType(buildToken2, enumType, false))
-  expect(getType(buildToken2, enumType, true)).toBe(getType(buildToken2, enumType, true))
-  expect(getType(buildToken2, objectType, false)).toBe(getType(buildToken2, objectType, false))
-  expect(getType(buildToken2, objectType, true)).toBe(getType(buildToken2, objectType, true))
-  expect(getType(buildToken1, enumType, false)).not.toBe(getType(buildToken2, enumType, false))
-  expect(getType(buildToken1, enumType, true)).not.toBe(getType(buildToken2, enumType, true))
-  expect(getType(buildToken1, objectType, false)).not.toBe(getType(buildToken2, objectType, false))
-  expect(getType(buildToken1, objectType, true)).not.toBe(getType(buildToken2, objectType, true))
+  expect(getGQLType(buildToken1, enumType, false)).toBe(getGQLType(buildToken1, enumType, false))
+  expect(getGQLType(buildToken1, enumType, true)).toBe(getGQLType(buildToken1, enumType, true))
+  expect(getGQLType(buildToken1, objectType, false)).toBe(getGQLType(buildToken1, objectType, false))
+  expect(getGQLType(buildToken1, objectType, true)).toBe(getGQLType(buildToken1, objectType, true))
+  expect(getGQLType(buildToken2, enumType, false)).toBe(getGQLType(buildToken2, enumType, false))
+  expect(getGQLType(buildToken2, enumType, true)).toBe(getGQLType(buildToken2, enumType, true))
+  expect(getGQLType(buildToken2, objectType, false)).toBe(getGQLType(buildToken2, objectType, false))
+  expect(getGQLType(buildToken2, objectType, true)).toBe(getGQLType(buildToken2, objectType, true))
+  expect(getGQLType(buildToken1, enumType, false)).not.toBe(getGQLType(buildToken2, enumType, false))
+  expect(getGQLType(buildToken1, enumType, true)).not.toBe(getGQLType(buildToken2, enumType, true))
+  expect(getGQLType(buildToken1, objectType, false)).not.toBe(getGQLType(buildToken2, objectType, false))
+  expect(getGQLType(buildToken1, objectType, true)).not.toBe(getGQLType(buildToken2, objectType, true))
 })
 
 test('will invert nullable types', () => {
   const buildToken = mockBuildToken()
-  const gqlType1 = getType(buildToken, booleanType, false)
+  const gqlType1 = getGQLType(buildToken, booleanType, false)
   expect(gqlType1 instanceof GraphQLNonNull).toBe(true)
   expect(gqlType1.ofType).toBe(GraphQLBoolean)
-  const gqlType2 = getType(buildToken, new NullableType(booleanType), false)
+  const gqlType2 = getGQLType(buildToken, new NullableType(booleanType), false)
   expect(gqlType2).toBe(GraphQLBoolean)
 })
 
 test('will remove many nullable wrappers', () => {
   const buildToken = mockBuildToken()
-  const gqlType = getType(buildToken, new NullableType(new NullableType(new NullableType(booleanType))), false)
+  const gqlType = getGQLType(buildToken, new NullableType(new NullableType(new NullableType(booleanType))), false)
   expect(gqlType).toBe(GraphQLBoolean)
 })
 
 test('will clone base types for aliases', () => {
   const buildToken = mockBuildToken()
-  const gqlType1 = getType(buildToken, new AliasType({ name: 'yo', baseType: booleanType }), false)
+  const gqlType1 = getGQLType(buildToken, new AliasType({ name: 'yo', baseType: booleanType }), false)
   expect(gqlType1 instanceof GraphQLNonNull).toBe(true)
   expect(Object.getPrototypeOf(gqlType1.ofType)).toBe(GraphQLBoolean)
   expect(gqlType1.ofType.name).toBe('Yo')
-  const gqlType2 = getType(buildToken, new AliasType({ name: 'yo', baseType: new NullableType(booleanType) }), false)
+  const gqlType2 = getGQLType(buildToken, new AliasType({ name: 'yo', baseType: new NullableType(booleanType) }), false)
   expect(Object.getPrototypeOf(gqlType2)).toBe(GraphQLBoolean)
   expect(gqlType2.name).toBe('Yo')
-  const gqlType3 = getType(buildToken, new NullableType(new AliasType({ name: 'yo', baseType: booleanType })), false)
+  const gqlType3 = getGQLType(buildToken, new NullableType(new AliasType({ name: 'yo', baseType: booleanType })), false)
   expect(Object.getPrototypeOf(gqlType3)).toBe(GraphQLBoolean)
   expect(gqlType3.name).toBe('Yo')
 })
 
 test('will create lists correctly', () => {
   const buildToken = mockBuildToken()
-  const gqlType1 = getType(buildToken, new ListType(booleanType), false)
+  const gqlType1 = getGQLType(buildToken, new ListType(booleanType), false)
   expect(gqlType1 instanceof GraphQLNonNull).toBe(true)
   expect(gqlType1.ofType instanceof GraphQLList).toBe(true)
   expect(gqlType1.ofType.ofType instanceof GraphQLNonNull).toBe(true)
   expect(gqlType1.ofType.ofType.ofType).toBe(GraphQLBoolean)
-  const gqlType2 = getType(buildToken, new NullableType(new ListType(new NullableType(booleanType))), false)
+  const gqlType2 = getGQLType(buildToken, new NullableType(new ListType(new NullableType(booleanType))), false)
   expect(gqlType2 instanceof GraphQLList).toBe(true)
   expect(gqlType2.ofType).toBe(GraphQLBoolean)
 })
 
 test('will correctly create enums', () => {
   const buildToken = mockBuildToken()
-  const gqlType = getType(buildToken, new NullableType(mockEnumType()), false)
+  const gqlType = getGQLType(buildToken, new NullableType(mockEnumType()), false)
   expect(gqlType instanceof GraphQLEnumType).toBe(true)
   expect(gqlType.name).toBe('Enoom')
   expect(gqlType.getValues().map(({ name }) => name)).toEqual(['A', 'B', 'C'])
@@ -122,15 +122,15 @@ test('will correctly create enums', () => {
 
 test('will correctly return primitive types', () => {
   const buildToken = mockBuildToken()
-  expect(getType(buildToken, new NullableType(booleanType), false)).toBe(GraphQLBoolean)
-  expect(getType(buildToken, new NullableType(integerType), false)).toBe(GraphQLInt)
-  expect(getType(buildToken, new NullableType(floatType), false)).toBe(GraphQLFloat)
-  expect(getType(buildToken, new NullableType(stringType), false)).toBe(GraphQLString)
+  expect(getGQLType(buildToken, new NullableType(booleanType), false)).toBe(GraphQLBoolean)
+  expect(getGQLType(buildToken, new NullableType(integerType), false)).toBe(GraphQLInt)
+  expect(getGQLType(buildToken, new NullableType(floatType), false)).toBe(GraphQLFloat)
+  expect(getGQLType(buildToken, new NullableType(stringType), false)).toBe(GraphQLString)
 })
 
 test('will correctly make an object output type', () => {
   const buildToken = mockBuildToken()
-  const gqlType = getType(buildToken, new NullableType(mockObjectType()), false)
+  const gqlType = getGQLType(buildToken, new NullableType(mockObjectType()), false)
   expect(gqlType instanceof GraphQLObjectType).toBe(true)
   expect(gqlType.name).toBe('Yo')
   expect(gqlType.description).toBe('yoyoyo')
@@ -145,7 +145,7 @@ test('will correctly make an object output type', () => {
 
 test('will correctly make an input object type', () => {
   const buildToken = mockBuildToken()
-  const gqlType = getType(buildToken, new NullableType(mockObjectType()), true)
+  const gqlType = getGQLType(buildToken, new NullableType(mockObjectType()), true)
   expect(gqlType instanceof GraphQLInputObjectType).toBe(true)
   expect(gqlType.name).toBe('YoInput')
   expect(gqlType.description).toBe('yoyoyo')

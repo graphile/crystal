@@ -2,8 +2,8 @@ import { GraphQLSchema } from 'graphql'
 import { Inventory } from '../../interface'
 import getCollectionType from './collection/getCollectionType'
 import BuildToken from './BuildToken'
-import getQueryType from './getQueryType'
-import getMutationType from './getMutationType'
+import getGQLQueryType from './getGQLQueryType'
+import getGQLMutationType from './getGQLMutationType'
 
 export type SchemaOptions = {
   // The exact name for the node id field. In the past Relay wanted this to
@@ -30,8 +30,8 @@ export default function createGraphqlSchema (inventory: Inventory, options: Sche
   }
 
   return new GraphQLSchema({
-    query: getQueryType(buildToken),
-    mutation: getMutationType(buildToken),
+    query: getGQLQueryType(buildToken),
+    mutation: getGQLMutationType(buildToken),
     types: [
       // Make sure to always include the types for our collections, even if
       // they have no other output.
