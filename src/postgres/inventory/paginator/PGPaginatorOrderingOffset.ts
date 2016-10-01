@@ -1,7 +1,7 @@
-import { Type, Context, Paginator } from '../../../../interface'
-import { sql } from '../../../utils'
-import { pgClientFromContext } from '../../pgContext'
-import transformPGValue from '../../transformPGValue'
+import { Type, Context, Paginator } from '../../../interface'
+import { sql } from '../../utils'
+import { pgClientFromContext } from '../pgContext'
+import transformPGValue from '../transformPGValue'
 import PGPaginator from './PGPaginator'
 
 /**

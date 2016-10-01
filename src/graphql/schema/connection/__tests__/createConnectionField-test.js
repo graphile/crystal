@@ -1,9 +1,8 @@
 jest.mock('../../getGQLType')
 jest.mock('../../../../interface/Context')
-jest.mock('../../../../interface/collection/Paginator')
 
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLString } from 'graphql'
-import { Context, Paginator, ObjectType, stringType } from '../../../../interface'
+import { Context, ObjectType, stringType } from '../../../../interface'
 import getGQLType from '../../getGQLType'
 import createConnectionField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionField'
 

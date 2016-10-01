@@ -1,6 +1,5 @@
-import Context from '../Context'
-import Type from '../type/Type'
-import Condition from './Condition'
+import Context from './Context'
+import Type from './type/Type'
 
 /**
  * A collection paginator is an object that implements cursor based pagination

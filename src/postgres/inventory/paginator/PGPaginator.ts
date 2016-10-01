@@ -1,6 +1,6 @@
-import { Context, Type, Paginator } from '../../../../interface'
-import { sql } from '../../../utils'
-import { pgClientFromContext } from '../../pgContext'
+import { Context, Type, Paginator } from '../../../interface'
+import { sql } from '../../utils'
+import { pgClientFromContext } from '../pgContext'
 
 /**
  * An abstract base paginator class for Postgres. This class also exposes a

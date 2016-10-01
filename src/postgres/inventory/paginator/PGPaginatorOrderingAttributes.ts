@@ -1,9 +1,9 @@
-import { Context, Paginator } from '../../../../interface'
-import { PGCatalogAttribute } from '../../../introspection'
-import { sql } from '../../../utils'
-import { pgClientFromContext } from '../../pgContext'
-import transformPGValue from '../../transformPGValue'
-import PGObjectType from '../../type/PGObjectType'
+import { Context, Paginator } from '../../../interface'
+import { PGCatalogAttribute } from '../../introspection'
+import { sql } from '../../utils'
+import { pgClientFromContext } from '../pgContext'
+import transformPGValue from '../transformPGValue'
+import PGObjectType from '../type/PGObjectType'
 import PGPaginator from './PGPaginator'
 
 /**

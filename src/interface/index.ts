@@ -1,8 +1,8 @@
 import Context from './Context'
 import Inventory from './Inventory'
+import Paginator from './Paginator'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
-import Paginator from './collection/Paginator'
 import Condition, { conditionHelpers } from './collection/Condition'
 import Relation from './collection/Relation'
 import Type from './type/Type'
@@ -20,9 +20,9 @@ import stringType from './type/primitive/stringType'
 export {
   Context,
   Inventory,
+  Paginator,
   Collection,
   CollectionKey,
-  Paginator,
   Condition,
   conditionHelpers,
   Relation,
