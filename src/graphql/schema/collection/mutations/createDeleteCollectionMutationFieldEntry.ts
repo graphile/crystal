@@ -38,12 +38,12 @@ export default function createDeleteCollectionMutationFieldEntry (
     // Execute by deserializing the id into its component parts and delete a
     // value in the collection using that key.
     execute: (context, input) => {
-      const { collectionKey, keyValue } = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
+      const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
 
-      if (collectionKey !== primaryKey)
-        throw new Error(`The provided id is for collection '${collectionKey.collection.name}', not the expected collection '${collection.name}'.`)
+      if (result.collection !== collection)
+        throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.delete!(context, keyValue)
+      return primaryKey.delete!(context, result.keyValue)
     },
   })]
 }
@@ -68,7 +68,7 @@ export function createDeleteCollectionOutputFieldEntries (
     // especially useful for removing old nodes from the cache.
     primaryKey ? [formatName.field(`deleted-${collection.type.name}-id`), {
       type: GraphQLID,
-      resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value)),
+      resolve: value => idSerde.serialize(collection, value),
     }] : null,
   ]
 }

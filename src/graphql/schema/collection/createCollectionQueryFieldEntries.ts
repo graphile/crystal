@@ -87,12 +87,12 @@ function createCollectionPrimaryKeyField <TKey>(
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      const { collectionKey, keyValue } = idSerde.deserialize<TKey>(inventory, args[options.nodeIdFieldName] as string)
+      const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
 
-      if (collectionKey.collection !== collection)
-        throw new Error(`The provided id is for collection '${collectionKey.collection.name}', not the expected collection '${collection.name}'.`)
+      if (result.collection !== collection)
+        throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return await collectionKey.read!(context, keyValue)
+      return await collectionKey.read!(context, result.keyValue as any)
     },
   }
 }

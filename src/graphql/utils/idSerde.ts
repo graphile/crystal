@@ -1,29 +1,34 @@
-import { Inventory, CollectionKey, ObjectType } from '../../interface'
+import { Inventory, Collection, ObjectType } from '../../interface'
 
 namespace idSerde {
   /**
    * This function will take an id object and turn it into an opaque string
    * that can be deserialized. Type information is lost in serialization.
    */
-  // TODO: `idSerde` should take collections, not collection keys.
   export function serialize <TKeyValue>(
     // A `primaryKey` is required whereas in a normal collection it is not
     // required.
-    collectionKey: CollectionKey<TKeyValue>,
-    keyValue: TKeyValue,
+    collection: Collection,
+    value: ObjectType.Value,
   ): string {
-    const collectionName = collectionKey.collection.name
-    const keyType = collectionKey.keyType
+    const primaryKey = collection.primaryKey
+
+    // If there is no primary key, error.
+    if (!primaryKey)
+      throw new Error(`A primary key is required for collection '${collection.name}' to create an id.`)
+
+    const keyType = primaryKey.keyType
+    const keyValue = primaryKey.getKeyFromValue(value)
 
     // If the type is an object type, we convert the key into a tuple array
     // and spread it inside our array to save space.
     if (keyType instanceof ObjectType) {
       const keyTuple = Array.from(keyType.fields.keys()).map(fieldName => (keyValue as any).get(fieldName))
-      return new Buffer(JSON.stringify([collectionName, ...keyTuple])).toString('base64')
+      return new Buffer(JSON.stringify([collection.name, ...keyTuple])).toString('base64')
     }
     // Otherwise, let’s just use the single key value.
     else {
-      return new Buffer(JSON.stringify([collectionName, keyValue])).toString('base64')
+      return new Buffer(JSON.stringify([collection.name, keyValue])).toString('base64')
     }
   }
 
@@ -32,7 +37,7 @@ namespace idSerde {
    * back into an ID object. Type information is lost in serialization and it
    * doesn’t come back in deserialization.
    */
-  export function deserialize <T>(inventory: Inventory, idString: string): { collectionKey: CollectionKey<T>, keyValue: T } {
+  export function deserialize (inventory: Inventory, idString: string): { collection: Collection, keyValue: mixed } {
     const [collectionName, ...keyTuple] = JSON.parse(new Buffer(idString, 'base64').toString())
 
     const collection = inventory.getCollection(collectionName)
@@ -61,7 +66,7 @@ namespace idSerde {
     if (!collectionKey.keyType.isTypeOf(keyValue))
       throw new Error('Key provided in id is not of the correct type.')
 
-    return { collectionKey, keyValue } as any
+    return { collection, keyValue }
   }
 }
 

@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Context, CollectionKey } from '../../../interface'
+import { Context, Collection } from '../../../interface'
 import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getNodeInterfaceType from './getNodeInterfaceType'
@@ -16,28 +16,28 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    resolve <T>(source: mixed, args: any, context: mixed) {
+    async resolve (source: mixed, args: any, context: mixed) {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
-      let deserializationResult: { collectionKey: CollectionKey<T>, keyValue: T }
+      let deserializationResult: { collection: Collection, keyValue: mixed }
 
       // Try to deserialize the id we got from our argument. If we fail to
       // deserialize the id, we should just return null and ignore the error.
       try {
-        deserializationResult = idSerde.deserialize<T>(inventory, args[options.nodeIdFieldName])
+        deserializationResult = idSerde.deserialize(inventory, args[options.nodeIdFieldName])
       }
       catch (error) {
         return null
       }
 
-      const { collectionKey, keyValue } = deserializationResult
+      const { collection, keyValue } = deserializationResult
+      const primaryKey = collection.primaryKey
 
-      if (!collectionKey || !collectionKey.read)
+      if (!primaryKey || !primaryKey.read)
         throw new Error(`Invalid id, no readable primary key on collection named '${name}'.`)
 
-      return collectionKey.read(context, keyValue)
+      return primaryKey.read(context, keyValue)
     },
   }]
 }
-

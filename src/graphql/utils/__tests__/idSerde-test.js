@@ -15,15 +15,19 @@ const mockObjectType = () =>
   })
 
 test('serialize will create a base64 encoded key value for a collection key', () => {
-  expect(idSerde.serialize({ collection: { name: 'hello' }, keyType: null }, 'world')).toEqual('WyJoZWxsbyIsIndvcmxkIl0=')
+  const collection = { name: 'hello', primaryKey: { keyType: null, getKeyFromValue: jest.fn(x => x) } }
+  expect(idSerde.serialize(collection, 'world')).toEqual('WyJoZWxsbyIsIndvcmxkIl0=')
+  expect(collection.primaryKey.getKeyFromValue.mock.calls).toEqual([['world']])
 })
 
 test('serialize will give object types a special treatment create a base64 encoded key value for a collection key', () => {
-  expect(idSerde.serialize({
-    collection: { name: 'hello' },
-    keyType: mockObjectType(),
-  }, new Map([['a', 1], ['b', 2], ['c', 3]])))
-    .toEqual('WyJoZWxsbyIsMiwxLDNd')
+  const value = Symbol()
+  const collection = {
+    name: 'hello',
+    primaryKey: { keyType: mockObjectType(), getKeyFromValue: jest.fn(() => new Map([['a', 1], ['b', 2], ['c', 3]])) },
+  }
+  expect(idSerde.serialize(collection, value)).toEqual('WyJoZWxsbyIsMiwxLDNd')
+  expect(collection.primaryKey.getKeyFromValue.mock.calls).toEqual([[value]])
 })
 
 test('deserialize will turn an id into a collection key and key value', () => {
@@ -34,7 +38,7 @@ test('deserialize will turn an id into a collection key and key value', () => {
 
   inventory.getCollection.mockReturnValue(collection)
 
-  expect(idSerde.deserialize(inventory, 'WyJoZWxsbyIsIndvcmxkIl0=')).toEqual({ collectionKey, keyValue: 'world' })
+  expect(idSerde.deserialize(inventory, 'WyJoZWxsbyIsIndvcmxkIl0=')).toEqual({ collection, keyValue: 'world' })
   expect(inventory.getCollection.mock.calls).toEqual([['hello']])
   expect(collectionKey.keyType.isTypeOf.mock.calls).toEqual([['world']])
 })
@@ -48,7 +52,7 @@ test('deserialize will turn an id into a collection key and key value even if th
   inventory.getCollection.mockReturnValue(collection)
   collectionKey.keyType.isTypeOf = jest.fn(collectionKey.keyType.isTypeOf)
 
-  expect(idSerde.deserialize(inventory, 'WyJoZWxsbyIsMiwxLDNd')).toEqual({ collectionKey, keyValue: new Map([['b', 2], ['a', 1], ['c', 3]]) })
+  expect(idSerde.deserialize(inventory, 'WyJoZWxsbyIsMiwxLDNd')).toEqual({ collection, keyValue: new Map([['b', 2], ['a', 1], ['c', 3]]) })
   expect(inventory.getCollection.mock.calls).toEqual([['hello']])
   expect(collectionKey.keyType.isTypeOf.mock.calls).toEqual([[new Map([['b', 2], ['a', 1], ['c', 3]])]])
 })

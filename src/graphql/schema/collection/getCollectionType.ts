@@ -48,7 +48,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         primaryKey && [options.nodeIdFieldName, {
           description: 'A globally unique identifier. Can be used in various places throughout the system to identify this single value.',
           type: new GraphQLNonNull(GraphQLID),
-          resolve: value => idSerde.serialize(primaryKey, primaryKey.getKeyFromValue(value)),
+          resolve: value => idSerde.serialize(collection, value),
         }],
       ],
 
