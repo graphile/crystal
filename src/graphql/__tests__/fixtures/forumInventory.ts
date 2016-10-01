@@ -1,5 +1,6 @@
 import {
   Inventory,
+  Condition,
   Collection,
   CollectionKey,
   Paginator,
@@ -55,20 +56,25 @@ const personEmailKey: CollectionKey<string> = {
   read: unimplementedFn,
 }
 
-const personOrderings = [
-  { name: 'id-asc' }, { name: 'id-desc' },
-  { name: 'name-asc' }, { name: 'name-desc' },
-  { name: 'firstName-asc' }, { name: 'firstName-desc' },
-  { name: 'lastName-asc' }, { name: 'lastName-desc' },
-]
+const personOrderings = new Map(
+  <Array<[string, Paginator.Ordering<Condition, ObjectType.Value, mixed>]>> [
+    ['id-asc', { readPage: unimplementedFn }],
+    ['id-desc', { readPage: unimplementedFn }],
+    ['name-asc', { readPage: unimplementedFn }],
+    ['name-desc', { readPage: unimplementedFn }],
+    ['firstName-asc', { readPage: unimplementedFn }],
+    ['firstName-desc', { readPage: unimplementedFn }],
+    ['lastName-asc', { readPage: unimplementedFn }],
+    ['lastName-desc', { readPage: unimplementedFn }],
+  ]
+)
 
-const personPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = {
+const personPaginator: Paginator<Condition, ObjectType.Value> = {
   name: 'people',
-  type: personType,
+  itemType: personType,
   orderings: personOrderings,
-  defaultOrdering: personOrderings[0],
+  defaultOrdering: personOrderings.get('name-asc')!,
   count: unimplementedFn,
-  readPage: unimplementedFn,
 }
 
 export const personCollection: Collection = {
@@ -108,20 +114,25 @@ const postIdKey: CollectionKey<number> = {
   read: unimplementedFn,
 }
 
-const postOrderings = [
-  { name: 'id-asc' }, { name: 'id-desc' },
-  { name: 'authorId-asc' }, { name: 'authorId-desc' },
-  { name: 'status-asc' }, { name: 'status-desc' },
-  { name: 'headline-asc' }, { name: 'headline-desc' },
-]
+const postOrderings = new Map(
+  <Array<[string, Paginator.Ordering<Condition, ObjectType.Value, mixed>]>> [
+    ['id-asc', { readPage: unimplementedFn }],
+    ['id-desc', { readPage: unimplementedFn }],
+    ['authorId-asc', { readPage: unimplementedFn }],
+    ['authorId-desc', { readPage: unimplementedFn }],
+    ['status-asc', { readPage: unimplementedFn }],
+    ['status-desc', { readPage: unimplementedFn }],
+    ['headline-asc', { readPage: unimplementedFn }],
+    ['headline-desc', { readPage: unimplementedFn }],
+  ]
+)
 
-const postPaginator: Paginator<ObjectType.Value, Paginator.Ordering, mixed> = {
+const postPaginator: Paginator<Condition, ObjectType.Value> = {
   name: 'posts',
-  type: postType,
+  itemType: postType,
   orderings: postOrderings,
-  defaultOrdering: postOrderings[0],
+  defaultOrdering: postOrderings.get('headline-asc')!,
   count: unimplementedFn,
-  readPage: unimplementedFn,
 }
 
 export const postCollection: Collection = {

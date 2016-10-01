@@ -9,7 +9,7 @@ type CreatePersonPayload {
   person: Person
   personEdge(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = ID_ASC
+    orderBy: PeopleOrderBy = NAME_ASC
   ): PeopleEdge
   query: Query
 }
@@ -24,7 +24,7 @@ type CreatePostPayload {
   post: Post
   postEdge(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = ID_ASC
+    orderBy: PostsOrderBy = HEADLINE_ASC
   ): PostsEdge
   query: Query
 }
@@ -190,7 +190,7 @@ type Query {
   # Reads and enables paginatation through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = ID_ASC
+    orderBy: PeopleOrderBy = NAME_ASC
 
     # Read all values in the set before (above) this cursor.
     before: Cursor
@@ -223,7 +223,7 @@ type Query {
   # Reads and enables paginatation through a set of \`Post\`.
   allPosts(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = ID_ASC
+    orderBy: PostsOrderBy = HEADLINE_ASC
 
     # Read all values in the set before (above) this cursor.
     before: Cursor

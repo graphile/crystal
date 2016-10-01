@@ -18,10 +18,13 @@ test('will create no entries for a collection with no keys and no paginator', ()
 test('will create a connection when there is a paginator', () => {
   const buildToken = Symbol('buildToken')
   const paginator = Symbol('paginator')
-  const fieldEntries = createCollectionQueryFieldEntries(buildToken, { name: 'foo', paginator })
+  const fieldEntries = createCollectionQueryFieldEntries(buildToken, { name: 'foo', type: { fields: new Map() }, paginator })
   expect(fieldEntries.length).toEqual(1)
   expect(fieldEntries[0][0]).toEqual('allFoo')
-  expect(createConnectionField.mock.calls).toEqual([[buildToken, paginator, { withFieldsCondition: true }]])
+  expect(createConnectionField.mock.calls.length).toEqual(1)
+  expect(createConnectionField.mock.calls[0].length).toEqual(3)
+  expect(createConnectionField.mock.calls[0][0]).toBe(buildToken)
+  expect(createConnectionField.mock.calls[0][1]).toBe(paginator)
 })
 
 test('will create no entries if there is a primary key with no read method', () => {

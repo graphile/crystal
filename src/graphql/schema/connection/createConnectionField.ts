@@ -16,53 +16,32 @@ import {
   GraphQLString,
   Kind,
 } from 'graphql'
-import { Context, Paginator, Condition, conditionHelpers, Type, NullableType, ObjectType } from '../../../interface'
+import { Context, Paginator, Type, NullableType, ObjectType } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGQLType from '../getGQLType'
 import BuildToken from '../BuildToken'
 import transformGQLInputValue from '../transformGQLInputValue'
 
 // TODO: doc
-export default function createConnectionField <TValue, TOrdering extends Paginator.Ordering, TCursor, TCondition>(
+export default function createConnectionField <TInput, TItemValue>(
   buildToken: BuildToken,
-  paginator: Paginator<TValue, TOrdering, TCursor>,
+  paginator: Paginator<TInput, TItemValue>,
   config: {
-    withFieldsCondition?: boolean,
-    getCondition?: (source: mixed) => Condition,
-  } = {},
-): GraphQLFieldConfig<mixed, Connection<TValue, TOrdering, TCursor>> {
+    inputArgEntries?: Array<[string, GraphQLArgumentConfig<mixed>]>,
+    getPaginatorInput: (args: { [key: string]: mixed }) => TInput,
+  },
+): GraphQLFieldConfig<mixed, Connection<TInput, TItemValue, mixed>> {
   const paginatorName = paginator.name
-  const gqlType = getGQLType(buildToken, paginator.type, false)
-
-  // If the user wants field conditions, but that paginator type is not an
-  // object type, we need to throw an error.
-  if (config.withFieldsCondition && !(paginator.type instanceof ObjectType))
-    throw new Error('Can only create a connection which has field argument conditions if the paginator type is an object type.')
-
-  // Create our field condition entries. If we are not configured to have such
-  // entries, this variable will just be null.
-  const fieldConditionEntries: Array<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]> | null =
-    config.withFieldsCondition && paginator.type instanceof ObjectType ?
-      Array.from(paginator.type.fields).map<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
-        [formatName.arg(fieldName), {
-          // Get the type for this field, but always make sure that it is
-          // nullable. We don’t want to require conditions.
-          type: getGQLType(buildToken, new NullableType(field.type), true),
-          // We include this internal name so that we can resolve the arguments
-          // back into actual values.
-          internalName: fieldName,
-        }]
-      )
-    : null
+  const gqlType = getGQLType(buildToken, paginator.itemType, false)
 
   // This is the type of all the connection arguments.
-  type ConnectionArgs = {
-    orderBy: TOrdering,
+  type ConnectionArgs<TCursor> = {
+    orderBy: string,
     before?: NamespacedCursor<TCursor>,
     after?: NamespacedCursor<TCursor>,
     first?: number,
     last?: number,
-    condition?: TCondition,
+    input: TInput,
   }
 
   return {
@@ -71,7 +50,7 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
-      paginator.orderings && paginator.orderings.length > 0 && ['orderBy', createOrderByArg(buildToken, paginator)],
+      paginator.orderings && paginator.orderings.size > 0 && ['orderBy', createOrderByArg(buildToken, paginator)],
       ['before', {
         description: 'Read all values in the set before (above) this cursor.',
         type: _cursorType,
@@ -90,21 +69,20 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       }],
       // Add all of the field entries that will eventually make up our
       // condition.
-      ...(fieldConditionEntries ? fieldConditionEntries : []),
+      ...(config.inputArgEntries ? config.inputArgEntries : []),
     ]),
     // Note that this resolver is an arrow function. This is so that we can
     // keep the correct `this` reference.
-    async resolve (
+    async resolve <TCursor>(
       source: mixed,
-      args: ConnectionArgs,
+      args: ConnectionArgs<TCursor>,
       context: mixed,
-      info: GraphQLResolveInfo<mixed, mixed>,
-    ): Promise<Connection<TValue, TOrdering, TCursor>> {
+    ): Promise<Connection<TInput, TItemValue, TCursor>> {
       if (!(context instanceof Context))
         throw new Error('GraphQL context must be an instance of `Context`.')
 
       const {
-        orderBy: ordering = paginator.defaultOrdering,
+        orderBy: orderingName,
         before: beforeCursor,
         after: afterCursor,
         first,
@@ -115,48 +93,32 @@ export default function createConnectionField <TValue, TOrdering extends Paginat
       // ordering. Note that if no ordering is defined we expect the
       // `orderingName` to be `null`. This is because when we deserialize the
       // base64 encoded JSON any undefineds will become nulls.
-      if (beforeCursor && beforeCursor.orderingName !== (ordering ? ordering.name : null))
+      if (beforeCursor && beforeCursor.orderingName !== orderingName)
         throw new Error('`before` cursor can not be used for this `orderBy` value.')
-      if (afterCursor && afterCursor.orderingName !== (ordering ? ordering.name : null))
+      if (afterCursor && afterCursor.orderingName !== orderingName)
         throw new Error('`after` cursor can not be used for this `orderBy` value.')
 
-      const condition: Condition = conditionHelpers.and(
-        // Get an arbitrary condition from our config. If no `getCondition`
-        // was provided, the condition is `true`.
-        config.getCondition ? config.getCondition(source) : true,
-        // For all of our field condition entries, let us add an actual
-        // condition to test equality with a given field.
-        ...(fieldConditionEntries ? (
-          fieldConditionEntries.map(([fieldName, field]) =>
-            args[fieldName] !== undefined
-              // If the argument exists, create a condition and transform the
-              // input value.
-              ? conditionHelpers.fieldEquals(field.internalName, transformGQLInputValue(field.type, args[fieldName]))
-              // If the argument does not exist, this condition should just be
-              // true (which will get filtered out by `conditionHelpers.and`).
-              : true
-        )) : []),
-      )
+      // Get our input.
+      const input = config.getPaginatorInput(args)
 
       // Construct the page config.
-      const pageConfig: Paginator.PageConfig<TOrdering, TCursor> = {
+      const pageConfig: Paginator.PageConfig<TCursor> = {
         beforeCursor: beforeCursor && beforeCursor.cursor,
         afterCursor: afterCursor && afterCursor.cursor,
         first,
         last,
-        ordering,
-        condition,
       }
 
+      // Get our ordering.
+      const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
+
       // Finally, actually get the page data.
-      const page = await paginator.readPage(context, pageConfig)
+      const page = await ordering.readPage(context, input, pageConfig)
 
       return {
         paginator,
-        ordering,
-        // We pass on the condition as it is used by the `Paginator#count`
-        // method.
-        condition,
+        orderingName,
+        input,
         page,
       }
     },
@@ -168,14 +130,14 @@ const getConnectionType = memoize2(_createConnectionType)
 /**
  * Creates a concrete GraphQL connection object type.
  */
-export function _createConnectionType <TValue, TOrdering extends Paginator.Ordering, TCursor>(
+export function _createConnectionType <TInput, TItemValue>(
   buildToken: BuildToken,
-  paginator: Paginator<TValue, TOrdering, TCursor>,
-): GraphQLObjectType<Connection<TValue, TOrdering, TCursor>> {
-  const gqlType = getGQLType(buildToken, paginator.type, false)
+  paginator: Paginator<TInput, TItemValue>,
+): GraphQLObjectType<Connection<TInput, TItemValue, mixed>> {
+  const gqlType = getGQLType(buildToken, paginator.itemType, false)
   const gqlEdgeType = getEdgeType(buildToken, paginator)
 
-  return new GraphQLObjectType<Connection<TValue, TOrdering, TCursor>>({
+  return new GraphQLObjectType<Connection<TInput, TItemValue, mixed>>({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
     fields: () => ({
@@ -187,23 +149,23 @@ export function _createConnectionType <TValue, TOrdering extends Paginator.Order
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ paginator, condition }, args, context) => {
+        resolve: ({ paginator, input }, args, context) => {
           if (!(context instanceof Context))
             throw new Error('GraphQL context must be an instance of `Context`.')
 
-          return paginator.count(context, condition)
+          return paginator.count(context, input)
         },
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
         type: new GraphQLList(gqlEdgeType),
-        resolve: ({ paginator, ordering, page }): Array<Edge<TValue, TOrdering, TCursor>> =>
-          page.values.map(({ cursor, value }) => ({ paginator, ordering, cursor, value })),
+        resolve: <TCursor>({ paginator, orderingName, page }: Connection<TInput, TItemValue, TCursor>): Array<Edge<TInput, TItemValue, TCursor>> =>
+          page.values.map(({ cursor, value }) => ({ paginator, orderingName, cursor, value })),
       },
       nodes: {
         description: `A list of ${scrib.type(gqlType)} objects.`,
         type: new GraphQLList(gqlType),
-        resolve: ({ page }): Array<TValue> =>
+        resolve: ({ page }): Array<TItemValue> =>
           page.values.map(({ value }) => value),
       },
     }),
@@ -215,21 +177,21 @@ export const getEdgeType = memoize2(_createEdgeType)
 /**
  * Creates a concrete GraphQL edge object type.
  */
-export function _createEdgeType <TValue, TOrdering extends Paginator.Ordering, TCursor>(
+export function _createEdgeType <TInput, TItemValue>(
   buildToken: BuildToken,
-  paginator: Paginator<TValue, TOrdering, TCursor>,
-): GraphQLObjectType<Edge<TValue, TOrdering, TCursor>> {
-  const gqlType = getGQLType(buildToken, paginator.type, false)
+  paginator: Paginator<TInput, TItemValue>,
+): GraphQLObjectType<Edge<TInput, TItemValue, mixed>> {
+  const gqlType = getGQLType(buildToken, paginator.itemType, false)
 
-  return new GraphQLObjectType<Edge<TValue, TOrdering, TCursor>>({
+  return new GraphQLObjectType<Edge<TInput, TItemValue, mixed>>({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
     fields: () => ({
       cursor: {
         description: 'A cursor for use in pagination.',
         type: new GraphQLNonNull(_cursorType),
-        resolve: ({ ordering, cursor }): NamespacedCursor<TCursor> => ({
-          orderingName: ordering ? ordering.name : null,
+        resolve: <TCursor>({ orderingName, cursor }: Edge<TInput, TItemValue, TCursor>): NamespacedCursor<TCursor> => ({
+          orderingName,
           cursor,
         }),
       },
@@ -246,37 +208,48 @@ export function _createEdgeType <TValue, TOrdering extends Paginator.Ordering, T
  * Creates an argument for the `orderBy` field. The argument will be a correct
  * ordering value for the paginator.
  */
-export function createOrderByArg <TValue, TOrdering extends Paginator.Ordering, TCursor>(
+export function createOrderByArg <TInput, TItemValue>(
   buildToken: BuildToken,
-  paginator: Paginator<TValue, TOrdering, TCursor>,
-) {
-  const gqlType = getGQLType(buildToken, paginator.type, false)
+  paginator: Paginator<TInput, TItemValue>,
+): GraphQLArgumentConfig<string> {
+  const gqlType = getGQLType(buildToken, paginator.itemType, false)
+  const enumType = getOrderByEnumType(buildToken, paginator)
   return {
     description: `The method to use when ordering ${scrib.type(gqlType)}.`,
-    type: getOrderByEnumType(buildToken, paginator),
-    defaultValue: paginator.defaultOrdering,
+    type: enumType,
+    defaultValue: Array.from(paginator.orderings).find(([name, ordering]) => ordering === paginator.defaultOrdering)![0],
   }
 }
 
-const getOrderByEnumType = memoize2(_createOrderByEnumType)
+const _getOrderByEnumType = memoize2(_createOrderByEnumType)
+
+// We use a second `getOrderByEnumType` so we can maintain the function
+// prototype which gets mangled in memoization.
+function getOrderByEnumType <TInput, TItemValue>(
+  buildToken: BuildToken,
+  paginator: Paginator<TInput, TItemValue>,
+): GraphQLEnumType<string> {
+  return _getOrderByEnumType(buildToken, paginator)
+}
 
 /**
  * Creates a GraphQL type which can be used by the user to select an ordering
  * strategy.
  */
-export function _createOrderByEnumType <TValue, TOrdering extends Paginator.Ordering, TCursor>(
+export function _createOrderByEnumType <TInput, TItemValue>(
   buildToken: BuildToken,
-  paginator: Paginator<TValue, TOrdering, TCursor>,
-): GraphQLEnumType<Paginator.Ordering> {
-  const gqlType = getGQLType(buildToken, paginator.type, false)
+  paginator: Paginator<TInput, TItemValue>,
+): GraphQLEnumType<string> {
+  const gqlType = getGQLType(buildToken, paginator.itemType, false)
 
-  return new GraphQLEnumType<Paginator.Ordering>({
+  return new GraphQLEnumType({
     name: formatName.type(`${paginator.name}-order-by`),
     description: `Methods to use when ordering ${scrib.type(gqlType)}.`,
-    values: buildObject<GraphQLEnumValueConfig<Paginator.Ordering>>(
-      paginator.orderings.map<[string, GraphQLEnumValueConfig<Paginator.Ordering>]>(ordering =>
-        [formatName.enumValue(ordering.name), { value: ordering }]
-      )
+    values: buildObject(
+      Array.from(paginator.orderings)
+        .map<[string, GraphQLEnumValueConfig<string>]>(
+          ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }]
+        )
     ),
   })
 }
@@ -322,8 +295,8 @@ function deserializeCursor (serializedCursor: string): NamespacedCursor<any> {
  *
  * @private
  */
-export const _pageInfoType: GraphQLObjectType<Connection<mixed, Paginator.Ordering, mixed>> =
-  new GraphQLObjectType<Connection<mixed, Paginator.Ordering, mixed>>({
+export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed, mixed>> =
+  new GraphQLObjectType<Connection<mixed, mixed, mixed>>({
     name: 'PageInfo',
     description: 'Information about pagination in a connection.',
     fields: {
@@ -340,16 +313,16 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, Paginator.Orderi
       startCursor: {
         description: 'When paginating backwards, the cursor to continue.',
         type: _cursorType,
-        resolve: ({ ordering, page }): NamespacedCursor<any> => ({
-          orderingName: ordering ? ordering.name : null,
+        resolve: ({ orderingName, page }): NamespacedCursor<mixed> => ({
+          orderingName: orderingName,
           cursor: page.values[0].cursor,
         }),
       },
       endCursor: {
         description: 'When paginating forwards, the cursor to continue.',
         type: _cursorType,
-        resolve: ({ ordering, page }): NamespacedCursor<any> => ({
-          orderingName: ordering ? ordering.name : null,
+        resolve: ({ orderingName, page }): NamespacedCursor<any> => ({
+          orderingName: orderingName,
           cursor: page.values[page.values.length - 1].cursor,
         }),
       },
@@ -363,11 +336,11 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, Paginator.Orderi
  *
  * @private
  */
-interface Connection<TValue, TOrdering extends Paginator.Ordering, TCursor> {
-  paginator: Paginator<TValue, TOrdering, TCursor>
-  ordering: Paginator.Ordering | undefined
-  condition: Condition
-  page: Paginator.Page<TValue, TCursor>
+interface Connection<TInput, TItemValue, TCursor> {
+  paginator: Paginator<TInput, TItemValue>
+  orderingName: string
+  input: TInput
+  page: Paginator.Page<TItemValue, TCursor>
 }
 
 /**
@@ -377,11 +350,11 @@ interface Connection<TValue, TOrdering extends Paginator.Ordering, TCursor> {
  *
  * @private
  */
-interface Edge<TValue, TOrdering extends Paginator.Ordering, TCursor> {
-  paginator: Paginator<TValue, TOrdering, TCursor>
-  ordering: Paginator.Ordering | undefined
+interface Edge<TInput, TItemValue, TCursor> {
+  paginator: Paginator<TInput, TItemValue>
+  orderingName: string
   cursor: TCursor
-  value: TValue
+  value: TItemValue
 }
 
 /**

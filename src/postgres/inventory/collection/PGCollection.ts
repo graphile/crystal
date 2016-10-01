@@ -9,7 +9,7 @@ import Options from '../Options'
 import { pgClientFromContext } from '../pgContext'
 import transformPGValue from '../transformPGValue'
 import PGCollectionKey from './PGCollectionKey'
-import PGCollectionPaginator from './PGCollectionPaginator'
+import PGCollectionPaginator from './paginator/PGCollectionPaginator'
 
 /**
  * Creates a collection object for Postgres that can be used to access the

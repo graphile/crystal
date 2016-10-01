@@ -29,7 +29,7 @@ import Condition from './Condition'
  * that *all* of the cursors in the *entire* collection can change on seemingly
  * trivial writes which is non-ideal.
  */
-interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
+interface Paginator<TInput, TItemValue> {
   /**
    * The name of the paginator. This name can be used to help
    * distinguish cursors when mixed with different paginators.
@@ -39,7 +39,7 @@ interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
   /**
    * The type of the values returned by this paginator.
    */
-  readonly type: Type<TValue>
+  readonly itemType: Type<TItemValue>
 
   /**
    * A unique array of ordering objects which represent the different ways
@@ -47,46 +47,56 @@ interface Paginator<TValue, TOrdering extends Paginator.Ordering, TCursor> {
    *
    * The name of each ordering object is unique.
    */
-  // TODO: Is there a better API for orderings? Cursor-ordering compliance
-  // should probably be checked in this abstract level as to prevent logic
-  // duplication. Instead this function is currently delegated to the
-  // consumers of this abstraction.
-  readonly orderings: Array<TOrdering>
+  readonly orderings: Map<string, Paginator.Ordering<TInput, TItemValue, mixed>>
 
   /**
-   * The default ordering for our paginated values.
+   * The default ordering for our paginated values. A default ordering is
+   * required.
    */
-  readonly defaultOrdering: TOrdering
+  readonly defaultOrdering: Paginator.Ordering<TInput, TItemValue, mixed>
 
   /**
    * Gets the total count of values in our collection. If a condition is
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  count (context: Context, condition?: Condition): Promise<number>
-
-  /**
-   * Reads values in a collection relative to a cursor which is used as a
-   * “bookmark” for a specific value in the paginator’s ordered collection.
-   *
-   * When implementing this function, paginators can safely make the
-   * assumption that cursors are valid for the specified ordering.
-   *
-   * @see Paginator.PageConfig
-   */
-  readPage (
-    context: Context,
-    config: Paginator.PageConfig<TOrdering, TCursor>,
-  ): Promise<Paginator.Page<TValue, TCursor>>
+  count (context: Context, input: TInput): Promise<number>
 }
 
 // We use a namespace so we only have to export one thing from this module
 // while at the same time being able to reference types that will be needed
-// with `CollectionPaginator.Page`, for example.
+// with `Paginator.Page`, for example.
 namespace Paginator {
-  // TODO: doc
-  export interface Ordering {
-    readonly name: string
+  /**
+   * A `Paginator.Ordering` instance will be the thing which actually queries
+   * the set for values. The reason we created a new object is to allow to
+   * ensure that cursors are associated with their ordering.
+   */
+  export interface Ordering<TInput, TItemValue, TCursor> {
+    /**
+     * Gets the cursor for a single value in the set. There are two ways to get
+     * the cursor for a value, the first is to get the cursor returned by
+     * `readPage`, the other is to use this method. Calling this function will
+     * be generally less performant then just using the cursor returned by
+     * `readPage`. Use this method only when you can’t call `readPage`.
+     *
+     * May return synchronously or asynchronously.
+     */
+    getCursorForValue? (value: TItemValue): TCursor | Promise<TCursor>
+
+    /**
+     * Reads values in a collection relative to a cursor which is used as a
+     * “bookmark” for a specific value in the paginator’s ordered collection.
+     *
+     * All values returned by this method will be in a consistent order.
+     *
+     * @see Paginator.PageConfig
+     */
+    readPage (
+      context: Context,
+      input: TInput,
+      config: Paginator.PageConfig<TCursor>,
+    ): Promise<Paginator.Page<TItemValue, TCursor>>
   }
 
   /**
@@ -98,14 +108,14 @@ namespace Paginator {
    * read forward. Well then our resulting set (page) would be `[5, 6]`. Say,
    * however, we chose to read backwards using the same cursor and limit. Then
    * our set (page) would be `[2, 3]`. Note that the set would not be `[3, 2]`.
+   *
+   * Cannot use `first` and `last` at the same time.
    */
-  export type PageConfig<TOrdering, TCursor> = {
-    ordering: TOrdering,
-    beforeCursor?: TCursor,
-    afterCursor?: TCursor,
+  export type PageConfig<TCursor> = {
     first?: number,
     last?: number,
-    condition?: Condition,
+    beforeCursor?: TCursor,
+    afterCursor?: TCursor,
   }
 
   /**

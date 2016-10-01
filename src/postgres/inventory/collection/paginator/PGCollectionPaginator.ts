@@ -1,10 +1,21 @@
-import { PGCatalogAttribute } from '../../introspection'
-import { sql } from '../../utils'
-import PGObjectType from '../type/PGObjectType'
-import PGCollection from './PGCollection'
+import { Context, Paginator, Condition } from '../../../../interface'
+import { PGCatalogAttribute } from '../../../introspection'
+import { sql } from '../../../utils'
+import PGObjectType from '../../type/PGObjectType'
+import { pgClientFromContext } from '../../pgContext'
+import conditionToSQL from '../conditionToSQL'
+import PGCollection from '../PGCollection'
 import PGPaginator from './PGPaginator'
+import PGPaginatorOrderingAttributes from './PGPaginatorOrderingAttributes'
+import PGPaginatorOrderingOffset from './PGPaginatorOrderingOffset'
 
-class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
+/**
+ * The Postgres collection paginator is a paginator explicitly for collections.
+ * Collections have a `Condition` as there input and objects as their item
+ * values. This implementation leverages that knowledge to create an effective
+ * paginator.
+ */
+class PGCollectionPaginator extends PGPaginator<Condition, PGObjectType.Value> {
   constructor (
     public collection: PGCollection,
   ) {
@@ -18,13 +29,29 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
 
   // Define some of the property stuffs that are easy property copies.
   public name = this.collection.name
-  public type = this.collection.type
+  public itemType = this.collection.type
+
+  /**
+   * The `from` entry for a collection paginator is simply the namespaced
+   * table name of its collection.
+   */
+  public getFromEntrySQL (): sql.SQL {
+    return sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
+  }
+
+  /**
+   * The condition for this paginator will simply be whatever condition was
+   * the input value.
+   */
+  public getConditionSQL (condition: Condition): sql.SQL {
+    return conditionToSQL(condition)
+  }
 
   /**
    * An array of the orderings a user may choose from to be used with this
    * paginator. Each ordering must have a unique name.
    */
-  public orderings = ((): Array<PGPaginator.Ordering> => {
+  public orderings = ((): Map<string, Paginator.Ordering<Condition, PGObjectType.Value, mixed>> => {
     // Fetch some useful things from our Postgres catalog.
     const pgClassAttributes = this._pgCatalog.getClassAttributes(this._pgClass.id)
     const pgPrimaryKeyConstraint = this._pgCatalog.getConstraints().find(pgConstraint => pgConstraint.type === 'p' && pgConstraint.classId === this._pgClass.id)
@@ -36,7 +63,7 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
     const attributeOrderingHelper = (descending: boolean) => (pgAttribute: PGCatalogAttribute) =>
       ({ pgAttribute, descending })
 
-    return [
+    return new Map(<Array<[string, Paginator.Ordering<Condition, PGObjectType.Value, mixed>]>> [
       // If this collection has a primary key, we are going to add two
       // orderings. One where all primary key attributes are arranged in
       // ascending order, and the other where all primary key attributes are
@@ -46,15 +73,23 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
       // attributes.
       ...(pgPrimaryKeyAttributes
         ? [
-          { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: pgPrimaryKeyAttributes || [] },
-          { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: pgPrimaryKeyAttributes || [] },
-        ] as Array<PGPaginator.Ordering>
+          ['primary_key_asc', new PGPaginatorOrderingAttributes({
+            pgPaginator: this,
+            descending: false,
+            pgAttributes: pgPrimaryKeyAttributes || [],
+          })],
+          ['primary_key_desc', new PGPaginatorOrderingAttributes({
+            pgPaginator: this,
+            descending: true,
+            pgAttributes: pgPrimaryKeyAttributes || [],
+          })],
+        ]
         : []
       ),
 
       // We include one basic natural ordering which will get whatever order
       // the database gives it.
-      { type: 'OFFSET', name: 'natural' },
+      ['natural', new PGPaginatorOrderingOffset({ pgPaginator: this })],
 
       ...(
         // For all of the Postgres class attributes, create two orderings. One
@@ -69,15 +104,23 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
         // @see https://github.com/calebmer/postgraphql/issues/93
         // @see https://github.com/calebmer/postgraphql/pull/95
         pgClassAttributes
-          .map<Array<PGPaginator.Ordering>>(pgAttribute => [
+          .map<Array<[string, Paginator.Ordering<Condition, PGObjectType.Value, mixed>]>>(pgAttribute => [
             // Note how we use `Array.from(new Set(…))` here, that will remove
             // duplicate attributes as the elements in a set must be unique.
-            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_asc`, descending: false, pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])) },
-            { type: 'ATTRIBUTES', name: `${pgAttribute.name}_desc`, descending: true, pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])) },
+            [`${pgAttribute.name}_asc`, new PGPaginatorOrderingAttributes({
+              pgPaginator: this,
+              descending: false,
+              pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])),
+            })],
+            [`${pgAttribute.name}_desc`, new PGPaginatorOrderingAttributes({
+              pgPaginator: this,
+              descending: true,
+              pgAttributes: Array.from(new Set([pgAttribute, ...(pgPrimaryKeyAttributes || [])])),
+            })],
           ])
           .reduce((a, b) => a.concat(b), [])
       ),
-    ]
+    ])
   })()
 
   /**
@@ -85,15 +128,7 @@ class PGCollectionPaginator extends PGPaginator<PGObjectType.Value> {
    * ordering. The first ordering will always be the ascending primary key, or
    * else it will be the natural ordering.
    */
-  public defaultOrdering = this.orderings[0]
-
-  /**
-   * The `from` entry for a collection paginator is simply the namespaced
-   * table name of its collection.
-   */
-  public getFromEntrySQL (): sql.SQL {
-    return sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
-  }
+  public defaultOrdering = Array.from(this.orderings.values())[0]
 }
 
 export default PGCollectionPaginator

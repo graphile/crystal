@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLArgumentConfig } from 'graphql'
-import { Context, Collection, CollectionKey, ObjectType } from '../../../interface'
+import { Context, Condition, conditionHelpers, Collection, CollectionKey, NullableType, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
@@ -25,9 +25,41 @@ export default function createCollectionQueryFieldEntries (
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
+    // Create our field condition entries. If we are not configured to have such
+    // entries, this variable will just be null.
+    const inputArgEntries: Array<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]> =
+      Array.from(collection.type.fields).map<[string, GraphQLArgumentConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
+        [formatName.arg(fieldName), {
+          // Get the type for this field, but always make sure that it is
+          // nullable. We don’t want to require conditions.
+          type: getGQLType(buildToken, new NullableType(field.type), true),
+          // We include this internal name so that we can resolve the arguments
+          // back into actual values.
+          internalName: fieldName,
+        }]
+      )
+
+    // Gets the condition input for our paginator by looking through the
+    // arguments object and adding a field condition for all the values we
+    // find.
+    const getPaginatorInput = (args: { [key: string]: mixed }): Condition =>
+      conditionHelpers.and(
+        // For all of our field condition entries, let us add an actual
+        // condition to test equality with a given field.
+        ...inputArgEntries.map(([fieldName, field]) =>
+          args[fieldName] !== undefined
+            // If the argument exists, create a condition and transform the
+            // input value.
+            ? conditionHelpers.fieldEquals(field.internalName, transformGQLInputValue(field.type, args[fieldName]))
+            // If the argument does not exist, this condition should just be
+            // true (which will get filtered out by `conditionHelpers.and`).
+            : true
+        )
+      )
+
     entries.push([
       formatName.field(`all-${collection.name}`),
-      createConnectionField(buildToken, paginator, { withFieldsCondition: true }),
+      createConnectionField(buildToken, paginator, { inputArgEntries, getPaginatorInput }),
     ])
   }
 
