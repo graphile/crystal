@@ -74,6 +74,39 @@ with
     order by
       att.attrelid, att.attnum
   ),
+  -- -- @see https://www.postgresql.org/docs/9.6/static/catalog-pg-proc.html
+  -- procedure as (
+  --   select
+  --     'procedure' as "kind",
+  --     pro.proname as "name",
+  --     pro.proisstrict as "isStrict",
+  --     pro.proretset as "returnsSet",
+  --     case
+  --       when pro.provolatile = 'i' then true
+  --       when pro.provolatile = 's' then true
+  --       else false
+  --     end as "isStable",
+  --     pro.prorettype as "returnTypeId",
+  --     pro.proallargtypes as "argTypeIds",
+  --     pro.proargnames as "argNames"
+  --   from
+  --     pg_catalog.pg_proc as pro
+  --   where
+  --     pro.pronamespace in (select "id" from namespace) and
+  --     -- Currently we don’t support functions with variadic arguments. In the
+  --     -- future we may, but for now let’s just ignore functions with variadic
+  --     -- arguments.
+  --     -- TODO: Variadic arguments.
+  --     pro.provariadic = 0 and
+  --     -- Filter our aggregate functions and window functions.
+  --     pro.proisagg = false and
+  --     pro.proiswindow = false and
+  --     -- We want to make sure the argument mode for all of our arguments is
+  --     -- `IN` which means `proargmodes` will be null.
+  --     pro.proargmodes is null
+  --   order by
+  --     pro.pronamespace, pro.proname
+  -- ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html
   type as (
     -- Use another `WITH` statement here, because our `WHERE` clause will need
@@ -114,6 +147,8 @@ with
     where
       typ.id in (select "typeId" from class) or
       typ.id in (select "typeId" from attribute) or
+      -- typ.id in (select "returnTypeId" from procedure) or
+      -- typ.id in (select unnest("argTypeIds") from procedure) or
       -- If this type is a base type for *any* domain type, we will include it
       -- in our selection. This may mean we fetch more types than we need, but
       -- the alternative is to do some funky SQL recursion which would be hard
@@ -161,4 +196,6 @@ union all
 select row_to_json(x) as object from type as x
 union all
 select row_to_json(x) as object from "constraint" as x
+-- union all
+-- select row_to_json(x) as object from procedure as x
 ;
