@@ -1,12 +1,12 @@
 jest.mock('../../../utils/idSerde')
-jest.mock('../../connection/createConnectionField')
+jest.mock('../../connection/createConnectionGQLField')
 jest.mock('../getCollectionType')
 
 import { GraphQLNonNull, GraphQLID } from 'graphql'
 import { Context } from '../../../../interface'
 import { personCollection, postCollection } from '../../../__tests__/fixtures/forumInventory'
 import idSerde from '../../../utils/idSerde'
-import createConnectionField from '../../connection/createConnectionField'
+import createConnectionGQLField from '../../connection/createConnectionGQLField'
 import getCollectionType from '../getCollectionType'
 import createCollectionQueryFieldEntries from '../createCollectionQueryFieldEntries'
 
@@ -21,10 +21,10 @@ test('will create a connection when there is a paginator', () => {
   const fieldEntries = createCollectionQueryFieldEntries(buildToken, { name: 'foo', type: { fields: new Map() }, paginator })
   expect(fieldEntries.length).toEqual(1)
   expect(fieldEntries[0][0]).toEqual('allFoo')
-  expect(createConnectionField.mock.calls.length).toEqual(1)
-  expect(createConnectionField.mock.calls[0].length).toEqual(3)
-  expect(createConnectionField.mock.calls[0][0]).toBe(buildToken)
-  expect(createConnectionField.mock.calls[0][1]).toBe(paginator)
+  expect(createConnectionGQLField.mock.calls.length).toEqual(1)
+  expect(createConnectionGQLField.mock.calls[0].length).toEqual(3)
+  expect(createConnectionGQLField.mock.calls[0][0]).toBe(buildToken)
+  expect(createConnectionGQLField.mock.calls[0][1]).toBe(paginator)
 })
 
 test('will create no entries if there is a primary key with no read method', () => {

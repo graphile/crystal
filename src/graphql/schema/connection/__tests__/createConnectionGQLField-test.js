@@ -4,7 +4,7 @@ jest.mock('../../../../interface/Context')
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLString } from 'graphql'
 import { Context, ObjectType, stringType } from '../../../../interface'
 import getGQLType from '../../getGQLType'
-import createConnectionField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionField'
+import createConnectionGQLField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionGQLField'
 
 const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject) =>
   promise
@@ -187,9 +187,9 @@ test('_createConnectionType will map the nodes field to page values', () => {
     .toEqual([value1, value2])
 })
 
-test('createConnectionField will throw when trying to resolve with cursors from different orderings', async () => {
+test('createConnectionGQLField will throw when trying to resolve with cursors from different orderings', async () => {
   const paginator = { name: 'foo' }
-  const field = createConnectionField({}, paginator, {})
+  const field = createConnectionGQLField({}, paginator, {})
   await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: null } }, new Context()), '`before` cursor can not be used for this `orderBy` value.')
   await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, after: { paginatorName: 'foo', orderingName: null } }, new Context()), '`after` cursor can not be used for this `orderBy` value.')
   await expectPromiseToReject(field.resolve(null, { orderBy: { name: 'buz' }, before: { paginatorName: 'foo', orderingName: 'bar' } }, new Context()), '`before` cursor can not be used for this `orderBy` value.')
@@ -198,7 +198,7 @@ test('createConnectionField will throw when trying to resolve with cursors from 
   await expectPromiseToReject(field.resolve(null, { orderBy: null, after: { paginatorName: 'foo', orderingName: 'buz' } }, new Context()), '`after` cursor can not be used for this `orderBy` value.')
 })
 
-test('createConnectionField resolver will call Paginator#readPage and return the resulting page with some other values', async () => {
+test('createConnectionGQLField resolver will call Paginator#readPage and return the resulting page with some other values', async () => {
   const context = new Context()
   const a = Symbol('a')
   const input = Symbol('input')
@@ -208,7 +208,7 @@ test('createConnectionField resolver will call Paginator#readPage and return the
   const ordering = { readPage: jest.fn(() => page) }
   const paginator = { name: 'foo', orderings: new Map([['foo', ordering]]), defaultOrdering: ordering }
 
-  const field = createConnectionField({}, paginator, { getPaginatorInput })
+  const field = createConnectionGQLField({}, paginator, { getPaginatorInput })
 
   expect(await field.resolve(null, { orderBy: 'foo', a }, context)).toEqual({
     paginator,
@@ -218,10 +218,10 @@ test('createConnectionField resolver will call Paginator#readPage and return the
   })
 
   expect(ordering.readPage.mock.calls).toEqual([[context, input, {}]])
-  expect(getPaginatorInput.mock.calls).toEqual([[{ orderBy: 'foo', a }]])
+  expect(getPaginatorInput.mock.calls).toEqual([[null, { orderBy: 'foo', a }]])
 })
 
-test('createConnectionField will pass down valid cursors without orderings', async () => {
+test('createConnectionGQLField will pass down valid cursors without orderings', async () => {
   const context = new Context()
   const cursor1 = Symbol('cursor1')
   const cursor2 = Symbol('cursor2')
@@ -234,20 +234,20 @@ test('createConnectionField will pass down valid cursors without orderings', asy
   const ordering = { readPage: jest.fn() }
   const paginator = { name: 'bar', orderings: new Map([['foo', ordering]]), defaultOrdering: ordering }
 
-  await createConnectionField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', before: beforeCursor }, context)
-  await createConnectionField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', after: afterCursor }, context)
+  await createConnectionGQLField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', before: beforeCursor }, context)
+  await createConnectionGQLField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', after: afterCursor }, context)
 
   expect(ordering.readPage.mock.calls).toEqual([
     [context, input, { beforeCursor: cursor1 }],
     [context, input, { afterCursor: cursor2 }],
   ])
   expect(getPaginatorInput.mock.calls).toEqual([
-    [{ orderBy: 'foo', before: beforeCursor }],
-    [{ orderBy: 'foo', after: afterCursor }],
+    [null, { orderBy: 'foo', before: beforeCursor }],
+    [null, { orderBy: 'foo', after: afterCursor }],
   ])
 })
 
-test('createConnectionField will pass down first/last integers', async () => {
+test('createConnectionGQLField will pass down first/last integers', async () => {
   const context = new Context()
   const first = Symbol('first')
   const last = Symbol('last')
@@ -257,27 +257,27 @@ test('createConnectionField will pass down first/last integers', async () => {
   const ordering = { readPage: jest.fn() }
   const paginator = { name: 'bar', orderings: new Map([['foo', ordering]]), defaultOrdering: ordering }
 
-  await createConnectionField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', first }, context)
-  await createConnectionField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', last }, context)
+  await createConnectionGQLField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', first }, context)
+  await createConnectionGQLField({}, paginator, { getPaginatorInput }).resolve(null, { orderBy: 'foo', last }, context)
 
   expect(ordering.readPage.mock.calls).toEqual([
     [context, input, { first }],
     [context, input, { last }],
   ])
   expect(getPaginatorInput.mock.calls).toEqual([
-    [{ orderBy: 'foo', first }],
-    [{ orderBy: 'foo', last }],
+    [null, { orderBy: 'foo', first }],
+    [null, { orderBy: 'foo', last }],
   ])
 })
 
 // TODO: Refactor for `inputArgEntries`
 
-// test('createConnectionField will throw an error when `withFieldsCondition` is true but the paginator type is not an object type', () => {
-//   expect(() => createConnectionField({}, {}, { withFieldsCondition: true }))
+// test('createConnectionGQLField will throw an error when `withFieldsCondition` is true but the paginator type is not an object type', () => {
+//   expect(() => createConnectionGQLField({}, {}, { withFieldsCondition: true }))
 //     .toThrow('Can only create a connection which has field argument conditions if the paginator type is an object type.')
 // })
 
-// test('createConnectionField will add extra arguments when `withFieldsCondition` is true', () => {
+// test('createConnectionGQLField will add extra arguments when `withFieldsCondition` is true', () => {
 //   const objectType = new ObjectType({
 //     name: 'item',
 //     fields: new Map([
@@ -288,8 +288,8 @@ test('createConnectionField will pass down first/last integers', async () => {
 //   })
 
 //   const paginator = { name: 'foo', type: objectType }
-//   const field1 = createConnectionField({}, paginator, { withFieldsCondition: false })
-//   const field2 = createConnectionField({}, paginator, { withFieldsCondition: true })
+//   const field1 = createConnectionGQLField({}, paginator, { withFieldsCondition: false })
+//   const field2 = createConnectionGQLField({}, paginator, { withFieldsCondition: true })
 
 //   expect(field1.args.a).toBeFalsy()
 //   expect(field1.args.b).toBeFalsy()
@@ -302,7 +302,7 @@ test('createConnectionField will pass down first/last integers', async () => {
 //   expect(field2.args.c.type instanceof GraphQLNonNull).toBe(false)
 // })
 
-// test('createConnectionField will use extra arguments from `withFieldsCondition` and pass down a condition with them', async () => {
+// test('createConnectionGQLField will use extra arguments from `withFieldsCondition` and pass down a condition with them', async () => {
 //   getGQLType.mockReturnValue(GraphQLString)
 
 //   const objectType = new ObjectType({
@@ -317,8 +317,8 @@ test('createConnectionField will pass down first/last integers', async () => {
 //   const extraCondition = Symbol('extraCondition')
 //   const context = new Context()
 //   const paginator = { name: 'foo', type: objectType, readPage: jest.fn() }
-//   const field1 = createConnectionField({}, paginator, { withFieldsCondition: true })
-//   const field2 = createConnectionField({}, paginator, { withFieldsCondition: true, getCondition: () => extraCondition })
+//   const field1 = createConnectionGQLField({}, paginator, { withFieldsCondition: true })
+//   const field2 = createConnectionGQLField({}, paginator, { withFieldsCondition: true, getCondition: () => extraCondition })
 
 //   const condition0 = { type: 'AND', conditions: [{ type: 'FIELD', name: 'x_a', condition: { type: 'EQUAL', value: 'x' } }, { type: 'FIELD', name: 'x_b', condition: { type: 'EQUAL', value: 'y' } }, { type: 'FIELD', name: 'x_c', condition: { type: 'EQUAL', value: 'z' } }] }
 //   const condition1 = { type: 'FIELD', name: 'x_b', condition: { type: 'EQUAL', value: 'y' } }

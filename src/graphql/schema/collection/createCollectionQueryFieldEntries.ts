@@ -4,7 +4,7 @@ import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
 import transformGQLInputValue from '../transformGQLInputValue'
-import createConnectionField from '../connection/createConnectionField'
+import createConnectionGQLField from '../connection/createConnectionGQLField'
 import getCollectionType from './getCollectionType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 
@@ -42,7 +42,7 @@ export default function createCollectionQueryFieldEntries (
     // Gets the condition input for our paginator by looking through the
     // arguments object and adding a field condition for all the values we
     // find.
-    const getPaginatorInput = (args: { [key: string]: mixed }): Condition =>
+    const getPaginatorInput = (source: mixed, args: { [key: string]: mixed }): Condition =>
       conditionHelpers.and(
         // For all of our field condition entries, let us add an actual
         // condition to test equality with a given field.
@@ -59,7 +59,7 @@ export default function createCollectionQueryFieldEntries (
 
     entries.push([
       formatName.field(`all-${collection.name}`),
-      createConnectionField(buildToken, paginator, { inputArgEntries, getPaginatorInput }),
+      createConnectionGQLField(buildToken, paginator, { inputArgEntries, getPaginatorInput }),
     ])
   }
 

@@ -28,6 +28,13 @@ import Type from './type/Type'
  * that *all* of the cursors in the *entire* collection can change on seemingly
  * trivial writes which is non-ideal.
  */
+// TODO: Paginators should not exist statically. We may only want paginators to
+// exist at runtime. This means `orderings` and `defaultOrdering` should be
+// stored somewhere else. This would allow us to dynamically create paginators
+// based on arbitrary inputs (no `TInput`). The only problem is giving cursors
+// meaning accross paginators. Perhaps we create long lived paginators? What
+// then does that mean for procedure paginators where one is created on every
+// call. Ponder these problems…
 interface Paginator<TInput, TItemValue> {
   /**
    * The name of the paginator. This name can be used to help

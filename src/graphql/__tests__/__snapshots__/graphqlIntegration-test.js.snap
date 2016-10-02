@@ -56,6 +56,17 @@ type DeletePersonPayload {
   query: Query
 }
 
+input DeletePersonPostsInput {
+  clientMutationId: String
+  personId: Int!
+}
+
+type DeletePersonPostsPayload {
+  clientMutationId: String
+  posts: [Post!]
+  query: Query
+}
+
 input DeletePostByIdInput {
   clientMutationId: String
   id: Int!
@@ -85,6 +96,7 @@ scalar Email
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
   registerPerson(input: RegisterPersonInput!): RegisterPersonPayload
+  deletePersonPosts(input: DeletePersonPostsInput!): DeletePersonPostsPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload

@@ -2,7 +2,7 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, ObjectType } from '../../../../interface'
 import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import createMutationField from '../../createMutationField'
+import createMutationGQLField from '../../createMutationGQLField'
 import getCollectionType from '../getCollectionType'
 
 /**
@@ -24,7 +24,7 @@ export default function createDeleteCollectionMutationFieldEntry (
   const { options, inventory } = buildToken
   const name = `delete-${collection.type.name}`
 
-  return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
     inputFields: [
       // The only input field we want is the globally unique id which

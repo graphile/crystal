@@ -11,7 +11,7 @@ import { Collection, ObjectType } from '../../../../interface'
 import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
-import createMutationField from '../../createMutationField'
+import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGQLInputValue'
 import getCollectionType from '../getCollectionType'
 
@@ -36,7 +36,7 @@ export default function createDeleteCollectionMutationFieldEntry (
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const patchType = getCollectionPatchType(buildToken, collection)
 
-  return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
     inputFields: [
       // The only input field we want is the globally unique id which

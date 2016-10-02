@@ -1,15 +1,15 @@
 jest.mock('../../getGQLType')
 jest.mock('../../transformGQLInputValue')
-jest.mock('../../createMutationField')
+jest.mock('../../createMutationGQLField')
 
 import { ObjectType, stringType } from '../../../../interface'
 import getGQLType from '../../getGQLType'
 import transformGQLInputValue from '../../transformGQLInputValue'
-import createMutationField from '../../createMutationField'
+import createMutationGQLField from '../../createMutationGQLField'
 import createProcedureMutationGQLFieldEntry from '../createProcedureMutationGQLFieldEntry'
 
 getGQLType.mockImplementation((buildToken, type) => type)
-createMutationField.mockImplementation((buildToken, config) => config)
+createMutationGQLField.mockImplementation((buildToken, config) => config)
 
 const mockInputType = ({} = {}) => new ObjectType({
   name: 'bar',

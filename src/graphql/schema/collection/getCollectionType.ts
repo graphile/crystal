@@ -3,7 +3,7 @@ import { Context, Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde, scrib } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getGQLType from '../getGQLType'
-import createConnectionField from '../connection/createConnectionField'
+import createConnectionGQLField from '../connection/createConnectionGQLField'
 import BuildToken from '../BuildToken'
 
 // Private implementation of `getCollectionType`, types aren’t that great.
@@ -119,7 +119,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
 
       //     return [
       //       formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
-      //       createConnectionField(buildToken, tailPaginator, {
+      //       createConnectionGQLField(buildToken, tailPaginator, {
       //         // We use the config when creating a connection field to inject
       //         // a condition that limits what we select from the paginator.
       //         getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),

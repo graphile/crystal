@@ -43,7 +43,7 @@ type MutationValue<T> = {
  *
  * [1]: https://www.npmjs.com/package/graphql-relay
  */
-export default function createMutationField <T>(
+export default function createMutationGQLField <T>(
   buildToken: BuildToken,
   config: MutationFieldConfig<T>,
 ): GraphQLFieldConfig<mixed, MutationValue<T>> {

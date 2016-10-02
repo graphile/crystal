@@ -2,7 +2,7 @@ import { GraphQLNonNull, GraphQLFieldConfig } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../../interface'
 import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import createMutationField from '../../createMutationField'
+import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue from '../../transformGQLInputValue'
 import getCollectionType from '../getCollectionType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
@@ -27,7 +27,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const patchType = getCollectionPatchType(buildToken, collection)
 
-  return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
     inputFields: [
       // Include all of the fields we need to construct the key value we will

@@ -6,6 +6,11 @@ import ObjectType from './type/ObjectType'
  * A procedure is any remote function which our interface knows about.
  * Procedures allow users to execute arbitrary code from their APIs.
  */
+// TODO: Rethink the procedure interface from a non-Postgres perspective.
+// Having paginator output for mutations can be wierd. Maybe paginators
+// should be instance based?
+// TODO: Consider splitting up a `Procedure` into multiple types. One for
+// mutations, one for queries/views.
 interface Procedure {
   /**
    * The required name of our procedure.
@@ -37,6 +42,8 @@ interface Procedure {
    * The output `Procedure` strategy. A procedure could output one of two
    * things. A single value, or a set of values. Expressed by a paginator.
    */
+  // TODO: Does an unstable procedure with a paginator output make sense?
+  // Perhaps only stable procedures should have paginators.
   readonly output: Procedure.SingleOutput<mixed> | Procedure.PaginatorOutput<mixed>
 }
 

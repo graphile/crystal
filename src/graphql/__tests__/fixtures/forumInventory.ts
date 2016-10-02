@@ -160,10 +160,10 @@ const authorRelation: Relation<number> = {
 }
 
 const registerPersonProcedure: Procedure = {
-  name: 'register-person',
+  name: 'registerPerson',
   isStable: false,
   inputType: new ObjectType({
-    name: 'register-person-input',
+    name: 'registerPersonInput',
     fields: new Map<string, ObjectType.Field<mixed>>([
       ['name', { type: stringType }],
       ['firstName', { type: new NullableType(stringType) }],
@@ -179,10 +179,27 @@ const registerPersonProcedure: Procedure = {
   },
 }
 
+const deletePersonPostsProcedure: Procedure = {
+  name: 'deletePersonPosts',
+  isStable: false,
+  inputType: new ObjectType({
+    name: 'deletePersonPostsInput',
+    fields: new Map<string, ObjectType.Field<mixed>>([
+      ['personId', { type: integerType }],
+    ]),
+  }),
+  output: {
+    kind: 'PAGINATOR',
+    // TODO: Probably needs a custom paginator…
+    paginator: postPaginator as any,
+  },
+}
+
 export default (
   new Inventory()
     .addCollection(personCollection)
     .addCollection(postCollection)
     .addRelation(authorRelation)
     .addProcedure(registerPersonProcedure)
+    .addProcedure(deletePersonPostsProcedure)
 )

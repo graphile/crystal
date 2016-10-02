@@ -1,13 +1,13 @@
 jest.mock('../../../getGQLType')
-jest.mock('../../../createMutationField')
+jest.mock('../../../createMutationGQLField')
 jest.mock('../../getCollectionType')
 
 import getGQLType from '../../../getGQLType'
-import createMutationField from '../../../createMutationField'
+import createMutationGQLField from '../../../createMutationGQLField'
 import getCollectionType from '../../getCollectionType'
 import createCreateCollectionMutationFieldEntry from '../createCreateCollectionMutationFieldEntry'
 
-createMutationField.mockImplementation((buildToken, config) => Object.assign(config, { buildToken }))
+createMutationGQLField.mockImplementation((buildToken, config) => Object.assign(config, { buildToken }))
 
 test('will return undefined if create is not defined', () => {
   expect(createCreateCollectionMutationFieldEntry({}, {})).toBe(undefined)

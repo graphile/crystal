@@ -23,14 +23,14 @@ import BuildToken from '../BuildToken'
 import transformGQLInputValue from '../transformGQLInputValue'
 
 // TODO: doc
-export default function createConnectionField <TInput, TItemValue>(
+export default function createConnectionGQLField <TSource, TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
   config: {
     inputArgEntries?: Array<[string, GraphQLArgumentConfig<mixed>]>,
-    getPaginatorInput: (args: { [key: string]: mixed }) => TInput,
+    getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
-): GraphQLFieldConfig<mixed, Connection<TInput, TItemValue, mixed>> {
+): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
   const paginatorName = paginator.name
   const gqlType = getGQLType(buildToken, paginator.itemType, false)
 
@@ -74,7 +74,7 @@ export default function createConnectionField <TInput, TItemValue>(
     // Note that this resolver is an arrow function. This is so that we can
     // keep the correct `this` reference.
     async resolve <TCursor>(
-      source: mixed,
+      source: TSource,
       args: ConnectionArgs<TCursor>,
       context: mixed,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
@@ -99,7 +99,7 @@ export default function createConnectionField <TInput, TItemValue>(
         throw new Error('`after` cursor can not be used for this `orderBy` value.')
 
       // Get our input.
-      const input = config.getPaginatorInput(args)
+      const input = config.getPaginatorInput(source, args)
 
       // Construct the page config.
       const pageConfig: Paginator.PageConfig<TCursor> = {

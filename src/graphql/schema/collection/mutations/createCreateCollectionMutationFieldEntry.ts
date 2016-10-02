@@ -4,8 +4,8 @@ import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
 import transformGQLInputValue from '../../transformGQLInputValue'
-import createMutationField from '../../createMutationField'
-import { getEdgeType, createOrderByArg } from '../../connection/createConnectionField'
+import createMutationGQLField from '../../createMutationGQLField'
+import { getEdgeType, createOrderByArg } from '../../connection/createConnectionGQLField'
 import getCollectionType from '../getCollectionType'
 
 /**
@@ -24,7 +24,7 @@ export default function createCreateCollectionMutationFieldEntry (
   const inputFieldName = formatName.field(collection.type.name)
   const inputFieldType = getGQLType(buildToken, collection.type, true)
 
-  return [formatName.field(name), createMutationField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
 
     inputFields: [
