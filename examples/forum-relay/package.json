@@ -24,6 +24,7 @@
     "body-parser": "^1.15.2",
     "css-loader": "^0.25.0",
     "dotenv": "^2.0.0",
+    "escape-html": "1.0.3",
     "fs-promise": "^0.5.0",
     "http-errors": "^1.5.0",
     "isomorphic-fetch": "^2.2.1",
