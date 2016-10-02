@@ -120,7 +120,9 @@ namespace Paginator {
   export type PageConfig<TCursor> = {
     first?: number,
     last?: number,
+    // TODO: rename to start cursor
     afterCursor?: TCursor,
+    // TODO: rename to end cursor
     beforeCursor?: TCursor,
   }
 
