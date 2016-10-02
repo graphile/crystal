@@ -1,23 +1,9 @@
 import React from 'react'
 import { StyleSheet, css } from 'aphrodite'
-import Match from 'react-router/Match'
-import Miss from 'react-router/Miss'
-import MatchRelay from '../utils/MatchRelay'
-import authDecorator from '../utils/authDecorator'
+import { Link } from 'react-router'
 import Logo from './Logo'
 import Navigation from './Navigation'
-import HomePage from './HomePage'
-import PostIndexPage from './PostIndexPage'
-import PostPage from './PostPage'
-import RegisterPage from './RegisterPage'
-import LoginPage from './LoginPage'
-
-import {
-  homeQueries,
-  postIndexQueries,
-  postQueries,
-  registerQueries
-} from '../queries'
+import authDecorator from '../utils/authDecorator'
 
 class App extends React.Component {
   static childContextTypes = {
@@ -40,38 +26,7 @@ class App extends React.Component {
           <Navigation auth={this.props.auth} user={this.props.user} />
         </header>
         <main>
-          <MatchRelay
-            exactly
-            pattern="/"
-            component={HomePage}
-            queries={homeQueries}
-          />
-          <MatchRelay
-            exactly
-            pattern="/posts"
-            component={PostIndexPage}
-            queries={postIndexQueries}
-            prepareParams={(params) => { 
-              const { offset } = params
-              params = { ...params, offset: parseInt(offset) || 0 }
-              return params
-            }}
-          />
-          <MatchRelay
-            exactly
-            pattern="/posts/:postId"
-            component={PostPage}
-            queries={postQueries}
-          />
-          <MatchRelay
-            pattern="/register"
-            component={RegisterPage}
-            queries={registerQueries}
-          />
-          <Match
-            pattern="/login"
-            component={LoginPage}
-          />
+          {this.props.children}
         </main>
         <footer className={css(styles.footer)}>
           <p>An example application for PostGraphQL and Relay</p>

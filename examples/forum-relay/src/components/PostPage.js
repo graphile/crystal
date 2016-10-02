@@ -1,17 +1,12 @@
 import React from 'react'
 import Relay from 'react-relay'
-import Redirect from 'react-router/Redirect'
-import Link from 'react-router/Link'
+import { Link, withRouter } from 'react-router'
 import { StyleSheet, css } from 'aphrodite'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
 class PostPage extends React.Component {
   static contextTypes = {
     user: React.PropTypes.object,
-  }
-
-  state = {
-    clickedDelete: null,
   }
 
   handleUpdate = (event) => {
@@ -36,7 +31,7 @@ class PostPage extends React.Component {
   }
 
   handleDelete = (event) => {
-    this.setState({ clickedDelete: true })
+    this.props.router.push('/posts')
 
     // TODO: Use applyUpdate and commit once navigated?
     this.props.relay.commitUpdate(
@@ -54,9 +49,6 @@ class PostPage extends React.Component {
     const { post } = this.props
     const { token, personId } = this.context.user
     const authAndOwn = personId === post.authorId && !!token
-
-    if (this.state.clickedDelete)
-      return <Redirect to="/posts" />
 
     return (
       <div>
@@ -80,7 +72,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export default Relay.createContainer(PostPage, {
+export default Relay.createContainer(withRouter(PostPage), {
   fragments: {
     viewer: () => Relay.QL`
       fragment on Viewer {

@@ -1,13 +1,9 @@
 import React from 'react'
 import Relay from 'react-relay'
 import { StyleSheet, css } from 'aphrodite'
-import Redirect from 'react-router/Redirect'
-import Link from 'react-router/Link'
 import PostItem from './PostItem'
 import PostForm from './PostForm'
 import RegisterPage from './RegisterPage'
-import { registerQueries } from '../queries'
-import MatchRelay from '../utils/MatchRelay'
 import ScrollBottomNotifier from '../utils/ScrollBottomNotifier'
 import { InsertPostMutation } from '../mutations'
 
@@ -86,7 +82,6 @@ export default Relay.createContainer(PostIndex, {
         ${InsertPostMutation.getFragment('viewer')}
         posts: postNodes(
           first: $count,
-          descending: true,
           orderBy: ROW_ID,
         ) {
           pageInfo {
