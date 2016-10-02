@@ -48,7 +48,7 @@ class PGCollection implements Collection {
    * are Postgres attributes and in the exact same order.
    */
   public type = new PGObjectType({
-    name: this._pgClass.name,
+    name: pluralize(this._pgClass.name, 1),
     description: this._pgClass.description,
     pgCatalog: this._pgCatalog,
     pgAttributes: new Map(this._pgAttributes.map<[string, PGCatalogAttribute]>(pgAttribute =>
