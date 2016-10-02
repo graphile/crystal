@@ -24,7 +24,7 @@ class ScrollBottomNotifier extends React.Component {
   }
 
   getScrollInfo() {
-    const offsetAndHeight = topPosition(this._el) + this._el.clientHeight
+    const offsetAndHeight = topPosition(this.container) + this.container.clientHeight
     const viewportHeight = window.innerHeight
     const currentScrollPosition = document.body.scrollTop || document.documentElement.scrollTop
     const noBottom = offsetAndHeight <= viewportHeight
@@ -43,11 +43,16 @@ class ScrollBottomNotifier extends React.Component {
       this.props.onScrollBottom()
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+
   render() {
     const style = { ...this.props.style, overflow: 'auto' }
+    console.log('render')
 
     return <div
-      ref={(ref) => this._el = ref}
+      ref={(ref) => this.container = ref}
       style={style}
       onScroll={this.handleScroll}
     >
