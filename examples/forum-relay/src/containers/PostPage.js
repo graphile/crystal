@@ -2,6 +2,7 @@ import React from 'react'
 import Relay from 'react-relay'
 import { Link, withRouter } from 'react-router'
 import { StyleSheet, css } from 'aphrodite'
+import UncontrolledContentEditable from './UncontrolledContentEditable'
 import { UpdatePostMutation, DeletePostMutation } from '../mutations'
 
 class PostPage extends React.Component {

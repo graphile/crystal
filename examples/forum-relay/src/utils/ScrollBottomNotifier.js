@@ -49,7 +49,6 @@ class ScrollBottomNotifier extends React.Component {
 
   render() {
     const style = { ...this.props.style, overflow: 'auto' }
-    console.log('render')
 
     return <div
       ref={(ref) => this.container = ref}

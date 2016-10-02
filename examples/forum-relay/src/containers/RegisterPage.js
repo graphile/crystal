@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 import { withRouter } from 'react-router'
-import RegisterForm from './RegisterForm'
+import RegisterForm from '../components/RegisterForm'
 import { RegisterPersonMutation } from '../mutations'
 
 class RegisterPage extends React.Component {

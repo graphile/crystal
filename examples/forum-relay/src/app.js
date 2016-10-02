@@ -5,11 +5,11 @@ import { render } from 'react-dom'
 import { Router, Route, Redirect, IndexRoute, browserHistory, applyRouterMiddleware } from 'react-router'
 import useRelay from 'react-router-relay'
 import App from './components/App'
-import HomePage from './components/HomePage'
-import PostIndexPage from './components/PostIndexPage'
-import PostPage from './components/PostPage'
-import RegisterPage from './components/RegisterPage'
-import LoginPage from './components/LoginPage'
+import HomePage from './containers/HomePage'
+import PostIndexPage from './containers/PostIndexPage'
+import PostPage from './containers/PostPage'
+import RegisterPage from './containers/RegisterPage'
+import LoginPage from './containers/LoginPage'
 
 import {
   homeQueries,

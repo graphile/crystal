@@ -1,9 +1,8 @@
 import React from 'react'
 import Relay from 'react-relay'
 import { StyleSheet, css } from 'aphrodite'
-import PostItem from './PostItem'
-import PostForm from './PostForm'
-import RegisterPage from './RegisterPage'
+import PostItem from '../components/PostItem'
+import PostForm from '../components/PostForm'
 import ScrollBottomNotifier from '../utils/ScrollBottomNotifier'
 import { InsertPostMutation } from '../mutations'
 
