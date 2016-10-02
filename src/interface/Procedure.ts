@@ -37,14 +37,19 @@ interface Procedure {
    * The output `Procedure` strategy. A procedure could output one of two
    * things. A single value, or a set of values. Expressed by a paginator.
    */
-  readonly output: Procedure.OutputSingle<mixed> | Procedure.OutputPaginator<mixed>
+  readonly output: Procedure.SingleOutput<mixed> | Procedure.PaginatorOutput<mixed>
 }
 
 namespace Procedure {
   /**
    * The output object for a procedure that returns a single value.
    */
-  export interface OutputSingle<TOutputValue> {
+  export interface SingleOutput<TOutputValue> {
+    /**
+     * A constant tag to identify this output type from other output types.
+     */
+    readonly kind: 'SINGLE'
+
     /**
      * The type of the value the paginator will output.
      */
@@ -59,7 +64,13 @@ namespace Procedure {
   /**
    * The output object for a procedure that returns a set of values.
    */
-  export interface OutputPaginator<TOutputItemValue> {
+  export interface PaginatorOutput<TOutputItemValue> {
+    /**
+     * The tag necessary for distinguishing this output type from other output
+     * types.
+     */
+    readonly kind: 'PAGINATOR'
+
     /**
      * The paginator to be used in executing our procedure. Takes the value
      * specified by `Procedure#inputType` as the input.

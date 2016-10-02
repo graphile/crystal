@@ -1,8 +1,9 @@
 import { GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
 import { Inventory } from '../../interface'
 import { buildObject, memoize1 } from '../utils'
-import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'
 import BuildToken from './BuildToken'
+import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'
+import createProcedureMutationGQLFieldEntry from './procedure/createProcedureMutationGQLFieldEntry'
 
 /**
  * Gets the mutation type which includes all available mutations for our
@@ -24,7 +25,17 @@ function createGQLMutationType (buildToken: BuildToken): GraphQLObjectType<mixed
   // A list of all the mutations we are able to run.
   const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [
     ...(
-      // Get the mutations for all of our collections.
+      // Gets all the unstable procedures in our inventory and creates
+      // appropriate mutations for them all. If a procedure has `isStable` set
+      // to true, it will not have a mutation.
+      inventory
+        .getProcedures()
+        .filter(procedure => !procedure.isStable)
+        .map(procedure => createProcedureMutationGQLFieldEntry(buildToken, procedure))
+    ),
+    ...(
+      // Get the mutations for all of our collections and creates mutations
+      // for them.
       inventory
         .getCollections()
         .map(collection => createCollectionMutationFieldEntries(buildToken, collection))

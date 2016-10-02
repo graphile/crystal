@@ -1,5 +1,6 @@
 import {
   Inventory,
+  Procedure,
   Condition,
   Collection,
   CollectionKey,
@@ -38,6 +39,8 @@ const personIdKey: CollectionKey<number> = {
   keyType: integerType,
   getKeyFromValue: unimplementedFn,
   read: unimplementedFn,
+  update: unimplementedFn,
+  delete: unimplementedFn,
 }
 
 const personNameKey: CollectionKey<string> = {
@@ -54,6 +57,7 @@ const personEmailKey: CollectionKey<string> = {
   keyType: stringType,
   getKeyFromValue: unimplementedFn,
   read: unimplementedFn,
+  update: unimplementedFn,
 }
 
 const personOrderings = new Map(
@@ -112,6 +116,8 @@ const postIdKey: CollectionKey<number> = {
   keyType: integerType,
   getKeyFromValue: unimplementedFn,
   read: unimplementedFn,
+  update: unimplementedFn,
+  delete: unimplementedFn,
 }
 
 const postOrderings = new Map(
@@ -153,9 +159,30 @@ const authorRelation: Relation<number> = {
   getHeadKeyFromTailValue: unimplementedFn,
 }
 
+const registerPersonProcedure: Procedure = {
+  name: 'register-person',
+  isStable: false,
+  inputType: new ObjectType({
+    name: 'register-person-input',
+    fields: new Map<string, ObjectType.Field<mixed>>([
+      ['name', { type: stringType }],
+      ['firstName', { type: new NullableType(stringType) }],
+      ['lastName', { type: new NullableType(stringType) }],
+      ['email', { type: stringType }],
+      ['password', { type: stringType }],
+    ]),
+  }),
+  output: {
+    kind: 'SINGLE',
+    outputType: personType,
+    execute: unimplementedFn,
+  },
+}
+
 export default (
   new Inventory()
     .addCollection(personCollection)
     .addCollection(postCollection)
     .addRelation(authorRelation)
+    .addProcedure(registerPersonProcedure)
 )

@@ -32,12 +32,70 @@ type CreatePostPayload {
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+input DeletePersonByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePersonByIdPayload {
+  clientMutationId: String
+  person: Person
+  deletedPersonId: ID
+  query: Query
+}
+
+input DeletePersonInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePersonPayload {
+  clientMutationId: String
+  person: Person
+  deletedPersonId: ID
+  query: Query
+}
+
+input DeletePostByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+type DeletePostByIdPayload {
+  clientMutationId: String
+  post: Post
+  deletedPostId: ID
+  query: Query
+}
+
+input DeletePostInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeletePostPayload {
+  clientMutationId: String
+  post: Post
+  deletedPostId: ID
+  query: Query
+}
+
 scalar Email
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
+  registerPerson(input: RegisterPersonInput!): RegisterPersonPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
+  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
+  deletePerson(input: DeletePersonInput!): DeletePersonPayload
+  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
   createPost(input: CreatePostInput!): CreatePostPayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+  updatePostById(input: UpdatePostByIdInput!): UpdatePostByIdPayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
+  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
 }
 
 # An object with a globally unique \`ID\`.
@@ -117,6 +175,15 @@ input PersonInput {
   about: String
 }
 
+input PersonPatch {
+  id: Int
+  name: String
+  email: Email
+  firstName: String
+  lastName: String
+  about: String
+}
+
 type Post implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
@@ -135,6 +202,14 @@ input PostInput {
   authorId: Int!
   status: PostStatus!
   headline: String!
+  body: String
+}
+
+input PostPatch {
+  id: Int
+  authorId: Int
+  status: PostStatus
+  headline: String
   body: String
 }
 
@@ -253,6 +328,81 @@ type Query {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   relay: Query!
+}
+
+input RegisterPersonInput {
+  clientMutationId: String
+  name: String!
+  firstName: String
+  lastName: String
+  email: String!
+  password: String!
+}
+
+type RegisterPersonPayload {
+  clientMutationId: String
+  person: Person!
+  query: Query
+}
+
+input UpdatePersonByEmailInput {
+  clientMutationId: String
+  email: String!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByEmailPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePersonByIdInput {
+  clientMutationId: String
+  id: Int!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonByIdPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePersonInput {
+  clientMutationId: String
+  __id: ID!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+
+input UpdatePostByIdInput {
+  clientMutationId: String
+  id: Int!
+  postPatch: PostPatch!
+}
+
+type UpdatePostByIdPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
+}
+
+input UpdatePostInput {
+  clientMutationId: String
+  __id: ID!
+  postPatch: PostPatch!
+}
+
+type UpdatePostPayload {
+  clientMutationId: String
+  post: Post
+  query: Query
 }
 "
 `;

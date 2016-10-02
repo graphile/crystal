@@ -150,16 +150,16 @@ type CreatePostPayload {
   query: Query
 }
 
-input CreateTypesInput {
+input CreateTypeInput {
   clientMutationId: String
-  types: TypesInput!
+  type: TypeInput!
 }
 
-type CreateTypesPayload {
+type CreateTypePayload {
   clientMutationId: String
-  types: Types
-  typesEdge(
-    # The method to use when ordering \`Types\`.
+  type: Type
+  typeEdge(
+    # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesEdge
   query: Query
@@ -268,27 +268,27 @@ type DeletePostPayload {
   query: Query
 }
 
-input DeleteTypesByRowIdInput {
+input DeleteTypeByRowIdInput {
   clientMutationId: String
   rowId: Int!
 }
 
-type DeleteTypesByRowIdPayload {
+type DeleteTypeByRowIdPayload {
   clientMutationId: String
-  types: Types
-  deletedTypesId: ID
+  type: Type
+  deletedTypeId: ID
   query: Query
 }
 
-input DeleteTypesInput {
+input DeleteTypeInput {
   clientMutationId: String
   id: ID!
 }
 
-type DeleteTypesPayload {
+type DeleteTypePayload {
   clientMutationId: String
-  types: Types
-  deletedTypesId: ID
+  type: Type
+  deletedTypeId: ID
   query: Query
 }
 
@@ -355,11 +355,11 @@ type Mutation {
   updatePostByRowId(input: UpdatePostByRowIdInput!): UpdatePostByRowIdPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
-  createTypes(input: CreateTypesInput!): CreateTypesPayload
-  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
-  updateTypesByRowId(input: UpdateTypesByRowIdInput!): UpdateTypesByRowIdPayload
-  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
-  deleteTypesByRowId(input: DeleteTypesByRowIdInput!): DeleteTypesByRowIdPayload
+  createType(input: CreateTypeInput!): CreateTypePayload
+  updateType(input: UpdateTypeInput!): UpdateTypePayload
+  updateTypeByRowId(input: UpdateTypeByRowIdInput!): UpdateTypeByRowIdPayload
+  deleteType(input: DeleteTypeInput!): DeleteTypePayload
+  deleteTypeByRowId(input: DeleteTypeByRowIdInput!): DeleteTypeByRowIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
@@ -658,9 +658,9 @@ type Query {
   ): Post
   postByRowId(rowId: Int!): Post
 
-  # Reads and enables paginatation through a set of \`Types\`.
+  # Reads and enables paginatation through a set of \`Type\`.
   allTypes(
-    # The method to use when ordering \`Types\`.
+    # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
 
     # Read all values in the set before (above) this cursor.
@@ -685,12 +685,12 @@ type Query {
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
 
-  # Reads a single \`Types\` using its globally unique \`ID\`.
-  types(
-    # The globally unique \`ID\` to be used in selecting a single \`Types\`.
+  # Reads a single \`Type\` using its globally unique \`ID\`.
+  type(
+    # The globally unique \`ID\` to be used in selecting a single \`Type\`.
     id: ID!
-  ): Types
-  typesByRowId(rowId: Int!): Types
+  ): Type
+  typeByRowId(rowId: Int!): Type
 
   # Reads and enables paginatation through a set of \`UpdatableView\`.
   allUpdatableViews(
@@ -778,7 +778,7 @@ type Query {
   relay: Query!
 }
 
-type Types implements Node {
+type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
   rowId: Int!
@@ -792,31 +792,7 @@ type Types implements Node {
   nestedCompoundType: NestedCompoundType
 }
 
-# A connection to a list of \`Types\` values.
-type TypesConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Types\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Types\` and cursor to aid in pagination.
-  edges: [TypesEdge]
-
-  # A list of \`Types\` objects.
-  nodes: [Types!]
-}
-
-# A \`Types\` edge in the connection.
-type TypesEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Types\` at the end of the edge.
-  node: Types!
-}
-
-input TypesInput {
+input TypeInput {
   rowId: Int
   bigint: Int
   boolean: Boolean
@@ -828,7 +804,43 @@ input TypesInput {
   nestedCompoundType: NestedCompoundTypeInput
 }
 
-# Methods to use when ordering \`Types\`.
+input TypePatch {
+  rowId: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
+# A connection to a list of \`Type\` values.
+type TypesConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Type\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Type\` and cursor to aid in pagination.
+  edges: [TypesEdge]
+
+  # A list of \`Type\` objects.
+  nodes: [Type!]
+}
+
+# A \`Type\` edge in the connection.
+type TypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Type\` at the end of the edge.
+  node: Type!
+}
+
+# Methods to use when ordering \`Type\`.
 enum TypesOrderBy {
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -851,18 +863,6 @@ enum TypesOrderBy {
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
   NESTED_COMPOUND_TYPE_DESC
-}
-
-input TypesPatch {
-  rowId: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
-  domain: AnInt
-  domain2: AnotherInt
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
 }
 
 # YOYOYO!!
@@ -1007,27 +1007,27 @@ type UpdatePostPayload {
   query: Query
 }
 
-input UpdateTypesByRowIdInput {
+input UpdateTypeByRowIdInput {
   clientMutationId: String
   rowId: Int!
-  typesPatch: TypesPatch!
+  typePatch: TypePatch!
 }
 
-type UpdateTypesByRowIdPayload {
+type UpdateTypeByRowIdPayload {
   clientMutationId: String
-  types: Types
+  type: Type
   query: Query
 }
 
-input UpdateTypesInput {
+input UpdateTypeInput {
   clientMutationId: String
   id: ID!
-  typesPatch: TypesPatch!
+  typePatch: TypePatch!
 }
 
-type UpdateTypesPayload {
+type UpdateTypePayload {
   clientMutationId: String
-  types: Types
+  type: Type
   query: Query
 }
 
@@ -1188,16 +1188,16 @@ type CreatePostPayload {
   query: Query
 }
 
-input CreateTypesInput {
+input CreateTypeInput {
   clientMutationId: String
-  types: TypesInput!
+  type: TypeInput!
 }
 
-type CreateTypesPayload {
+type CreateTypePayload {
   clientMutationId: String
-  types: Types
-  typesEdge(
-    # The method to use when ordering \`Types\`.
+  type: Type
+  typeEdge(
+    # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesEdge
   query: Query
@@ -1306,27 +1306,27 @@ type DeletePostPayload {
   query: Query
 }
 
-input DeleteTypesByIdInput {
+input DeleteTypeByIdInput {
   clientMutationId: String
   id: Int!
 }
 
-type DeleteTypesByIdPayload {
+type DeleteTypeByIdPayload {
   clientMutationId: String
-  types: Types
-  deletedTypesId: ID
+  type: Type
+  deletedTypeId: ID
   query: Query
 }
 
-input DeleteTypesInput {
+input DeleteTypeInput {
   clientMutationId: String
   __id: ID!
 }
 
-type DeleteTypesPayload {
+type DeleteTypePayload {
   clientMutationId: String
-  types: Types
-  deletedTypesId: ID
+  type: Type
+  deletedTypeId: ID
   query: Query
 }
 
@@ -1393,11 +1393,11 @@ type Mutation {
   updatePostById(input: UpdatePostByIdInput!): UpdatePostByIdPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
-  createTypes(input: CreateTypesInput!): CreateTypesPayload
-  updateTypes(input: UpdateTypesInput!): UpdateTypesPayload
-  updateTypesById(input: UpdateTypesByIdInput!): UpdateTypesByIdPayload
-  deleteTypes(input: DeleteTypesInput!): DeleteTypesPayload
-  deleteTypesById(input: DeleteTypesByIdInput!): DeleteTypesByIdPayload
+  createType(input: CreateTypeInput!): CreateTypePayload
+  updateType(input: UpdateTypeInput!): UpdateTypePayload
+  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypeByIdPayload
+  deleteType(input: DeleteTypeInput!): DeleteTypePayload
+  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypeByIdPayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
@@ -1696,9 +1696,9 @@ type Query {
   ): Post
   postById(id: Int!): Post
 
-  # Reads and enables paginatation through a set of \`Types\`.
+  # Reads and enables paginatation through a set of \`Type\`.
   allTypes(
-    # The method to use when ordering \`Types\`.
+    # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
 
     # Read all values in the set before (above) this cursor.
@@ -1723,12 +1723,12 @@ type Query {
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
 
-  # Reads a single \`Types\` using its globally unique \`ID\`.
-  types(
-    # The globally unique \`ID\` to be used in selecting a single \`Types\`.
+  # Reads a single \`Type\` using its globally unique \`ID\`.
+  type(
+    # The globally unique \`ID\` to be used in selecting a single \`Type\`.
     __id: ID!
-  ): Types
-  typesById(id: Int!): Types
+  ): Type
+  typeById(id: Int!): Type
 
   # Reads and enables paginatation through a set of \`UpdatableView\`.
   allUpdatableViews(
@@ -1816,7 +1816,7 @@ type Query {
   relay: Query!
 }
 
-type Types implements Node {
+type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
   id: Int!
@@ -1830,31 +1830,7 @@ type Types implements Node {
   nestedCompoundType: NestedCompoundType
 }
 
-# A connection to a list of \`Types\` values.
-type TypesConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Types\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Types\` and cursor to aid in pagination.
-  edges: [TypesEdge]
-
-  # A list of \`Types\` objects.
-  nodes: [Types!]
-}
-
-# A \`Types\` edge in the connection.
-type TypesEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Types\` at the end of the edge.
-  node: Types!
-}
-
-input TypesInput {
+input TypeInput {
   id: Int
   bigint: Int
   boolean: Boolean
@@ -1866,7 +1842,43 @@ input TypesInput {
   nestedCompoundType: NestedCompoundTypeInput
 }
 
-# Methods to use when ordering \`Types\`.
+input TypePatch {
+  id: Int
+  bigint: Int
+  boolean: Boolean
+  varchar: String
+  enum: Color
+  domain: AnInt
+  domain2: AnotherInt
+  compoundType: CompoundTypeInput
+  nestedCompoundType: NestedCompoundTypeInput
+}
+
+# A connection to a list of \`Type\` values.
+type TypesConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Type\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Type\` and cursor to aid in pagination.
+  edges: [TypesEdge]
+
+  # A list of \`Type\` objects.
+  nodes: [Type!]
+}
+
+# A \`Type\` edge in the connection.
+type TypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Type\` at the end of the edge.
+  node: Type!
+}
+
+# Methods to use when ordering \`Type\`.
 enum TypesOrderBy {
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -1889,18 +1901,6 @@ enum TypesOrderBy {
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
   NESTED_COMPOUND_TYPE_DESC
-}
-
-input TypesPatch {
-  id: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
-  domain: AnInt
-  domain2: AnotherInt
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
 }
 
 # YOYOYO!!
@@ -2045,27 +2045,27 @@ type UpdatePostPayload {
   query: Query
 }
 
-input UpdateTypesByIdInput {
+input UpdateTypeByIdInput {
   clientMutationId: String
   id: Int!
-  typesPatch: TypesPatch!
+  typePatch: TypePatch!
 }
 
-type UpdateTypesByIdPayload {
+type UpdateTypeByIdPayload {
   clientMutationId: String
-  types: Types
+  type: Type
   query: Query
 }
 
-input UpdateTypesInput {
+input UpdateTypeInput {
   clientMutationId: String
   __id: ID!
-  typesPatch: TypesPatch!
+  typePatch: TypePatch!
 }
 
-type UpdateTypesPayload {
+type UpdateTypePayload {
   clientMutationId: String
-  types: Types
+  type: Type
   query: Query
 }
 
