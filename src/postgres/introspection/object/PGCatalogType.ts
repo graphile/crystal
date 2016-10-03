@@ -12,7 +12,7 @@ type PGCatalogType =
   PGCatalogDomainType |
   PGCatalogEnumType |
   (PGCatalogBaseType & {
-    type: 'b' | 'p' | 'r',
+    readonly type: 'b' | 'p' | 'r',
   })
 
 export default PGCatalogType
@@ -21,28 +21,28 @@ export default PGCatalogType
  * A composite type is a type with an associated class. So any type which may
  * have attributes (or fields).
  */
-export type PGCatalogCompositeType = PGCatalogBaseType & {
-  type: 'c',
-  classId: string,
+export interface PGCatalogCompositeType extends PGCatalogBaseType {
+  readonly type: 'c'
+  readonly classId: string
 }
 
 /**
  * A domain type is a named alias of another type with some extra constraints
  * added on top. One such constraint is the `is_not_null` constraint.
  */
-export type PGCatalogDomainType = PGCatalogBaseType & {
-  type: 'd',
-  baseTypeId: string,
-  isNotNull: boolean,
+export interface PGCatalogDomainType extends PGCatalogBaseType {
+  readonly type: 'd'
+  readonly baseTypeId: string
+  readonly isNotNull: boolean
 }
 
 /**
  * An enum type is a type with a set of predefined string values. A value of
  * an enum type may only be one of those values.
  */
-export type PGCatalogEnumType = PGCatalogBaseType & {
-  type: 'e',
-  enumVariants: Array<string>,
+export interface PGCatalogEnumType extends PGCatalogBaseType {
+  readonly type: 'e'
+  readonly enumVariants: Array<string>
 }
 
 /**
@@ -52,18 +52,18 @@ export type PGCatalogEnumType = PGCatalogBaseType & {
  *
  * @private
  */
-type PGCatalogBaseType = {
-  kind: 'type',
-  id: string,
-  name: string,
-  description: string | undefined,
-  namespaceId: string,
-  itemId: string | null,
+interface PGCatalogBaseType {
+  readonly kind: 'type'
+  readonly id: string
+  readonly name: string
+  readonly description: string | undefined
+  readonly namespaceId: string
+  readonly itemId: string | null
   // The category property is used by the parser to do implicit type casting.
   // This is helpful for us as we don’t need to create catalog types for every
   // PostgreSQL type. Rather we can group types into “buckets” using this
   // property.
   //
   // @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html#CATALOG-TYPCATEGORY-TABLE
-  category: 'A' | 'B' | 'C' | 'D' | 'E' | 'G' | 'I' | 'N' | 'P' | 'S' | 'T' | 'U' | 'V' | 'X',
+  readonly category: 'A' | 'B' | 'C' | 'D' | 'E' | 'G' | 'I' | 'N' | 'P' | 'S' | 'T' | 'U' | 'V' | 'X'
 }

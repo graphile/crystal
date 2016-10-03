@@ -5,17 +5,17 @@
  *
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-class.html
  */
-type PGCatalogClass = {
-  kind: 'class',
-  id: string,
-  name: string,
-  description: string,
-  namespaceId: string,
-  typeId: string,
-  isSelectable: boolean,
-  isInsertable: boolean,
-  isUpdatable: boolean,
-  isDeletable: boolean,
+interface PGCatalogClass {
+  readonly kind: 'class'
+  readonly id: string
+  readonly name: string
+  readonly description: string
+  readonly namespaceId: string
+  readonly typeId: string
+  readonly isSelectable: boolean
+  readonly isInsertable: boolean
+  readonly isUpdatable: boolean
+  readonly isDeletable: boolean
 }
 
 export default PGCatalogClass

@@ -5,16 +5,17 @@
  *
  * @see https://www.postgresql.org/docs/9.6/static/catalog-pg-proc.html
  */
-type PGCatalogProcedure = {
-  kind: 'procedure',
-  name: string,
-  description: string | undefined,
-  isStrict: boolean,
-  returnsSet: boolean,
-  isStable: boolean,
-  returnTypeId: string,
-  argTypeIds: Array<string>,
-  argNames: Array<string>,
+interface PGCatalogProcedure {
+  readonly kind: 'procedure'
+  readonly name: string
+  readonly description: string | undefined
+  readonly namespaceId: string
+  readonly isStrict: boolean
+  readonly returnsSet: boolean
+  readonly isStable: boolean
+  readonly returnTypeId: string
+  readonly argTypeIds: Array<string>
+  readonly argNames: Array<string>
 }
 
 export default PGCatalogProcedure

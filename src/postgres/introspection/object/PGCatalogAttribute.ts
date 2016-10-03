@@ -4,15 +4,15 @@
  *
  * @see https://www.postgresql.org/docs/9.5/static/catalog-pg-attribute.html
  */
-type PGCatalogAttribute = {
-  kind: 'attribute',
-  classId: string,
-  num: number,
-  name: string,
-  description: string,
-  typeId: string,
-  isNotNull: boolean,
-  hasDefault: boolean,
+interface PGCatalogAttribute {
+  readonly kind: 'attribute'
+  readonly classId: string
+  readonly num: number
+  readonly name: string
+  readonly description: string
+  readonly typeId: string
+  readonly isNotNull: boolean
+  readonly hasDefault: boolean
 }
 
 export default PGCatalogAttribute
