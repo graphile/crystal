@@ -1,5 +1,29 @@
 exports[`test prints a schema with Relay 1 style ids 1`] = `
-"scalar AnInt
+"input Add3Input {
+  clientMutationId: String
+  a: Int
+  arg1: Int
+}
+
+type Add3Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add4Input {
+  clientMutationId: String
+  arg0: Int
+  b: Int
+}
+
+type Add4Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+scalar AnInt
 
 scalar AnotherInt
 
@@ -88,6 +112,17 @@ input CompoundTypeInput {
   c: Color
   d: Uuid
   fooBar: Int
+}
+
+input CompoundTypeMutationInput {
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+type CompoundTypeMutationPayload {
+  clientMutationId: String
+  compoundType: CompoundType
+  query: Query
 }
 
 input CreateCompoundKeyInput {
@@ -347,8 +382,69 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+input Mult1Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult1Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult2Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult2Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult3Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult3Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult4Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult4Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
+  # lol, add some stuff 3
+  add3(input: Add3Input!): Add3Payload
+
+  # lol, add some stuff 4
+  add4(input: Add4Input!): Add4Payload
+  mult1(input: Mult1Input!): Mult1Payload
+  mult2(input: Mult2Input!): Mult2Payload
+  mult3(input: Mult3Input!): Mult3Payload
+  mult4(input: Mult4Input!): Mult4Payload
+  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
+  noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
+  tableMutation(input: TableMutationInput!): TableMutationPayload
+  typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
@@ -385,6 +481,16 @@ input NestedCompoundTypeInput {
   a: CompoundTypeInput
   b: CompoundTypeInput
   bazBuz: Int
+}
+
+input NoArgsMutationInput {
+  clientMutationId: String
+}
+
+type NoArgsMutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
 }
 
 # An object with a globally unique \`ID\`.
@@ -778,6 +884,17 @@ type Query {
   relay: Query!
 }
 
+input TableMutationInput {
+  clientMutationId: String
+  id: Int
+}
+
+type TableMutationPayload {
+  clientMutationId: String
+  post: Post!
+  query: Query
+}
+
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
@@ -838,6 +955,19 @@ type TypesEdge {
 
   # The \`Type\` at the end of the edge.
   node: Type!
+}
+
+input TypesMutationInput {
+  clientMutationId: String
+  a: Int
+  b: Boolean
+  c: String
+}
+
+type TypesMutationPayload {
+  clientMutationId: String
+  boolean: Boolean
+  query: Query
 }
 
 # Methods to use when ordering \`Type\`.
@@ -1037,7 +1167,31 @@ scalar Uuid
 `;
 
 exports[`test prints a schema with the default options 1`] = `
-"scalar AnInt
+"input Add3Input {
+  clientMutationId: String
+  a: Int
+  arg1: Int
+}
+
+type Add3Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add4Input {
+  clientMutationId: String
+  arg0: Int
+  b: Int
+}
+
+type Add4Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+scalar AnInt
 
 scalar AnotherInt
 
@@ -1126,6 +1280,17 @@ input CompoundTypeInput {
   c: Color
   d: Uuid
   fooBar: Int
+}
+
+input CompoundTypeMutationInput {
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+type CompoundTypeMutationPayload {
+  clientMutationId: String
+  compoundType: CompoundType
+  query: Query
 }
 
 input CreateCompoundKeyInput {
@@ -1385,8 +1550,69 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+input Mult1Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult1Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult2Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult2Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult3Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult3Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult4Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult4Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
+  # lol, add some stuff 3
+  add3(input: Add3Input!): Add3Payload
+
+  # lol, add some stuff 4
+  add4(input: Add4Input!): Add4Payload
+  mult1(input: Mult1Input!): Mult1Payload
+  mult2(input: Mult2Input!): Mult2Payload
+  mult3(input: Mult3Input!): Mult3Payload
+  mult4(input: Mult4Input!): Mult4Payload
+  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
+  noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
+  tableMutation(input: TableMutationInput!): TableMutationPayload
+  typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
@@ -1423,6 +1649,16 @@ input NestedCompoundTypeInput {
   a: CompoundTypeInput
   b: CompoundTypeInput
   bazBuz: Int
+}
+
+input NoArgsMutationInput {
+  clientMutationId: String
+}
+
+type NoArgsMutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
 }
 
 # An object with a globally unique \`ID\`.
@@ -1816,6 +2052,17 @@ type Query {
   relay: Query!
 }
 
+input TableMutationInput {
+  clientMutationId: String
+  id: Int
+}
+
+type TableMutationPayload {
+  clientMutationId: String
+  post: Post!
+  query: Query
+}
+
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
@@ -1876,6 +2123,19 @@ type TypesEdge {
 
   # The \`Type\` at the end of the edge.
   node: Type!
+}
+
+input TypesMutationInput {
+  clientMutationId: String
+  a: Int
+  b: Boolean
+  c: String
+}
+
+type TypesMutationPayload {
+  clientMutationId: String
+  boolean: Boolean
+  query: Query
 }
 
 # Methods to use when ordering \`Type\`.

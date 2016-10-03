@@ -9,11 +9,15 @@ type BuildToken = {
   options: {
     nodeIdFieldName: string,
   },
-  _hooks: {
-    queryFieldEntries: () => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
-    mutationFieldEntries: () => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
-    objectTypeFieldEntries: (type: ObjectType) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
-  },
+  // TODO: doc
+  _hooks: _BuildTokenHooks,
+}
+
+// TODO: doc
+type _BuildTokenHooks = {
+  queryFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
+  mutationFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
+  objectTypeFieldEntries?: (type: ObjectType, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
 }
 
 export default BuildToken

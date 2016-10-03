@@ -17,6 +17,7 @@ import getQueryGQLType from './getQueryGQLType'
  */
 type MutationFieldConfig<T> = {
   name: string,
+  description?: string | undefined,
   inputFields?: Array<[string, GraphQLInputFieldConfig<mixed>] | false | null | undefined>,
   outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
   execute: (context: mixed, input: { [name: string]: mixed }) => Promise<T | null | undefined>,
@@ -47,6 +48,8 @@ export default function createMutationGQLField <T>(
   config: MutationFieldConfig<T>,
 ): GraphQLFieldConfig<mixed, MutationValue<T>> {
   return {
+    description: config.description,
+
     // First up we need to define our input arguments. Our input arguments is
     // really just one required object argument. The reason we use one object
     // is so that clients can use a single GraphQL variable when performing the

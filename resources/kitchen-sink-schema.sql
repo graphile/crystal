@@ -93,19 +93,28 @@ create table b.types (
   "nested_compound_type" b.nested_compound_type
 );
 
-create function b.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
-create function b.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
-create function b.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
-create function b.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
+create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
+create function a.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function a.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
 
-comment on function b.add_1(int, int) is 'lol, add some stuff';
+comment on function a.add_1(int, int) is 'lol, add some stuff 1';
+comment on function a.add_2(int, int) is 'lol, add some stuff 2';
+comment on function a.add_3(int, int) is 'lol, add some stuff 3';
+comment on function a.add_4(int, int) is 'lol, add some stuff 4';
 
-create function c.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
-create function c.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
-create function c.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
-create function c.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
+create function b.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
+create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
+create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
+create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
-create function a.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
-create function a.compound_type(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
-create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
-create function a.no_args() returns int as $$ select 2 $$ language sql;
+create function c.types_query(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql stable;
+create function c.types_mutation(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
+create function c.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql stable;
+create function c.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
+create function c.table_query(id int) returns a.post as $$ select * from a.post where id = id $$ language sql stable;
+create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = id $$ language sql;
+create function c.set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
+create function c.set_mutation() returns setof c.person as $$ select * from c.person $$ language sql stable;
+create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
+create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;

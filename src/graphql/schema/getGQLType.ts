@@ -189,8 +189,8 @@ function createGQLOutputObjectType (buildToken: BuildToken, type: ObjectType): G
         }]
       ),
       // Add extra fields that may exist in our hooks.
-      buildToken._hooks
-        ? buildToken._hooks.objectTypeFieldEntries(type)
+      buildToken._hooks.objectTypeFieldEntries
+        ? buildToken._hooks.objectTypeFieldEntries(type, buildToken)
         : [],
     ),
   })

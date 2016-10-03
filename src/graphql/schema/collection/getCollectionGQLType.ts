@@ -68,7 +68,9 @@ function createCollectionGQLType (buildToken: BuildToken, collection: Collection
         ),
 
       // Add extra fields that may exist in our hooks.
-      buildToken._hooks.objectTypeFieldEntries(type),
+      buildToken._hooks.objectTypeFieldEntries
+        ? buildToken._hooks.objectTypeFieldEntries(type, buildToken)
+        : [],
 
       // Add all of our many-to-one relations (aka tail relations).
       inventory.getRelations()

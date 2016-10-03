@@ -225,6 +225,13 @@ class PGCatalog {
   public getConstraints (): Array<PGCatalogConstraint> {
     return Array.from(this._constraints)
   }
+
+  /**
+   * Returns all of the procedures in our catalog.
+   */
+  public getProcedures (): Array<PGCatalogProcedure> {
+    return Array.from(this._procedures)
+  }
 }
 
 export default PGCatalog

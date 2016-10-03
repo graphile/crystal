@@ -1,7 +1,7 @@
 import { GraphQLSchema, GraphQLFieldConfig } from 'graphql'
 import { Inventory, ObjectType } from '../../interface'
 import getCollectionGQLType from './collection/getCollectionGQLType'
-import BuildToken from './BuildToken'
+import BuildToken, { _BuildTokenHooks } from './BuildToken'
 import getQueryGQLType from './getQueryGQLType'
 import getMutationGQLType from './getMutationGQLType'
 
@@ -11,9 +11,7 @@ export type SchemaOptions = {
   // standardize an `__id` field.
   nodeIdFieldName?: string,
   // TODO: doc
-  _queryFieldEntries?: () => Array<[string, GraphQLFieldConfig<mixed, mixed>]>,
-  _mutationFieldEntries?: () => Array<[string, GraphQLFieldConfig<mixed, mixed>]>,
-  _objectTypeFieldEntries?: (type: ObjectType) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
+  _hooks?: _BuildTokenHooks,
 }
 
 /**
@@ -31,13 +29,7 @@ export default function createGQLSchema (inventory: Inventory, options: SchemaOp
       // standard.
       nodeIdFieldName: options.nodeIdFieldName || '__id',
     },
-    _hooks: {
-      // Add the hooks to the build token and add default implementations if
-      // they do not exist.
-      queryFieldEntries: options._queryFieldEntries || (() => []),
-      mutationFieldEntries: options._mutationFieldEntries || (() => []),
-      objectTypeFieldEntries: options._objectTypeFieldEntries || (() => []),
-    },
+    _hooks: options._hooks || {},
   }
 
   return new GraphQLSchema({

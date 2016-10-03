@@ -24,7 +24,9 @@ function createGQLQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
         createNodeFieldEntry(buildToken),
       ],
       // Add the query field entires from our build token hooks.
-      buildToken._hooks.queryFieldEntries(),
+      buildToken._hooks.queryFieldEntries
+        ? buildToken._hooks.queryFieldEntries(buildToken)
+        : [],
       inventory
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))

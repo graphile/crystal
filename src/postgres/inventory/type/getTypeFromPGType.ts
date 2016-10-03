@@ -1,4 +1,5 @@
 import {
+  Inventory,
   Type,
   AliasType,
   NullableType,
@@ -12,6 +13,7 @@ import {
 import { memoize2 } from '../../utils'
 import PGCatalog from '../../introspection/PGCatalog'
 import PGCatalogType from '../../introspection/object/PGCatalogType'
+import PGCollection from '../collection/PGCollection'
 import PGObjectType from './PGObjectType'
 
 /**
@@ -63,19 +65,36 @@ const pgTypeIdToType = new Map<string, Type<any>>([
   ['2950', uuidType], // uuid
 ])
 
+const _getTypeFromPGType = memoize2(createTypeFromPGType)
+
 /**
  * Converts a PostgreSQL type into a type object that our interface expects.
  * This function is memoized, so for the same `pgCatalog` and `pgType` pair,
  * returned will be the *exact* same type. This way we can maintain refrential
  * equality.
  */
-const getTypeFromPGType = memoize2(createTypeFromPGType)
+// TODO: The third `Inventory` argument is hacky and should be refactored.
+function getTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType, _inventory?: Inventory): Type<mixed> {
+  // If this is a composite type, then it may be the type for a row. Search our
+  // collections (if an `Inventory` was provided) to see if this type
+  // truly is a row type. If we find a collection, just return the collection’s
+  // type instead of deferring to our own selection mechanisms.
+  //
+  // Note that this check is not memoized.
+  if (_inventory && pgType.type === 'c') {
+    const collection = _inventory.getCollections().find(collection => collection instanceof PGCollection && collection._pgClass.typeId === pgType.id)
+    if (collection)
+      return collection.type
+  }
+
+  return _getTypeFromPGType(pgCatalog, pgType)
+}
 
 export default getTypeFromPGType
 
 function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Type<mixed> {
   if (!pgCatalog.hasType(pgType))
-    throw new Error(`PostgreSQL type of name '${pgType.name}' and id '${pgType.id}' does not exist.`)
+    throw new Error(`Postgres type of name '${pgType.name}' and id '${pgType.id}' does not exist.`)
 
   // If our type id was hardcoded to have a certain type, use it.
   if (pgTypeIdToType.has(pgType.id))

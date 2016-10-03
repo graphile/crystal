@@ -24,7 +24,11 @@ function createMutationGQLType (buildToken: BuildToken): GraphQLObjectType<mixed
   // A list of all the mutations we are able to run.
   const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [
     // Add the mutation field entires from our build token hooks.
-    ...buildToken._hooks.mutationFieldEntries(),
+    ...(
+      buildToken._hooks.mutationFieldEntries
+        ? buildToken._hooks.mutationFieldEntries(buildToken)
+        : []
+    ),
     ...(
       // Get the mutations for all of our collections and creates mutations
       // for them.
