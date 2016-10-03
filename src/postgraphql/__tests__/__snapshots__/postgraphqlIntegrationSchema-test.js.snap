@@ -443,6 +443,7 @@ type Mutation {
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
+  setMutation(input: SetMutationInput!): SetMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
@@ -882,6 +883,16 @@ type Query {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   relay: Query!
+}
+
+input SetMutationInput {
+  clientMutationId: String
+}
+
+type SetMutationPayload {
+  clientMutationId: String
+  people: [Person!]
+  query: Query
 }
 
 input TableMutationInput {
@@ -1611,6 +1622,7 @@ type Mutation {
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
+  setMutation(input: SetMutationInput!): SetMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
@@ -2050,6 +2062,16 @@ type Query {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   relay: Query!
+}
+
+input SetMutationInput {
+  clientMutationId: String
+}
+
+type SetMutationPayload {
+  clientMutationId: String
+  people: [Person!]
+  query: Query
 }
 
 input TableMutationInput {

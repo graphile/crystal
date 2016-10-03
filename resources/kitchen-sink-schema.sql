@@ -115,6 +115,6 @@ create function c.compound_type_mutation(object c.compound_type) returns c.compo
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = id $$ language sql stable;
 create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = id $$ language sql;
 create function c.set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
-create function c.set_mutation() returns setof c.person as $$ select * from c.person $$ language sql stable;
+create function c.set_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
 create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
 create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;
