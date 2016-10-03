@@ -6,26 +6,26 @@ import getGQLType from '../getGQLType'
 import createConnectionGQLField from '../connection/createConnectionGQLField'
 import BuildToken from '../BuildToken'
 
-// Private implementation of `getCollectionType`, types aren’t that great.
-const _getCollectionType = memoize2(createCollectionType)
+// Private implementation of `getCollectionGQLType`, types aren’t that great.
+const _getCollectionGQLType = memoize2(createCollectionGQLType)
 
 /**
  * Creates the output object type for a collection. This type will include all
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
-  return _getCollectionType(buildToken, collection)
+function getCollectionGQLType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
+  return _getCollectionGQLType(buildToken, collection)
 }
 
-export default getCollectionType
+export default getCollectionGQLType
 
 /**
- * The private non-memoized implementation of `getCollectionType`.
+ * The private non-memoized implementation of `getCollectionGQLType`.
  *
  * @private
  */
-function createCollectionType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
+function createCollectionGQLType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
   const collectionTypeName = formatName.type(type.name)
@@ -67,7 +67,8 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
           }]
         ),
 
-      // TODO: Computed fields
+      // Add extra fields that may exist in our hooks.
+      buildToken._hooks.objectTypeFieldEntries(type),
 
       // Add all of our many-to-one relations (aka tail relations).
       inventory.getRelations()
@@ -82,7 +83,7 @@ function createCollectionType (buildToken: BuildToken, collection: Collection): 
         .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
           const headCollectionKey = relation.headCollectionKey
           const headCollection = headCollectionKey.collection
-          const headCollectionType = getCollectionType(buildToken, headCollection)
+          const headCollectionType = getCollectionGQLType(buildToken, headCollection)
 
           return [formatName.field(`${headCollection.type.name}-by-${relation.name}`), {
             description: `Reads a single ${scrib.type(headCollectionType)} that is related to this \`${collectionTypeName}\`.`,

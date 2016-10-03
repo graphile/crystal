@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
 import { Inventory } from '../../interface'
 import { buildObject, memoize1 } from '../utils'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
-import getCollectionType from './collection/getCollectionType'
+import getCollectionGQLType from './collection/getCollectionGQLType'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
 import BuildToken from './BuildToken'
 
@@ -23,6 +23,8 @@ function createGQLQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
       [
         createNodeFieldEntry(buildToken),
       ],
+      // Add the query field entires from our build token hooks.
+      buildToken._hooks.queryFieldEntries(),
       inventory
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))

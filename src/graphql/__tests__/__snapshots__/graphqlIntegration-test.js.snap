@@ -56,17 +56,6 @@ type DeletePersonPayload {
   query: Query
 }
 
-input DeletePersonPostsInput {
-  clientMutationId: String
-  personId: Int!
-}
-
-type DeletePersonPostsPayload {
-  clientMutationId: String
-  posts: [Post!]
-  query: Query
-}
-
 input DeletePostByIdInput {
   clientMutationId: String
   id: Int!
@@ -95,8 +84,6 @@ scalar Email
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  registerPerson(input: RegisterPersonInput!): RegisterPersonPayload
-  deletePersonPosts(input: DeletePersonPostsInput!): DeletePersonPostsPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload
@@ -340,21 +327,6 @@ type Query {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   relay: Query!
-}
-
-input RegisterPersonInput {
-  clientMutationId: String
-  name: String!
-  firstName: String
-  lastName: String
-  email: String!
-  password: String!
-}
-
-type RegisterPersonPayload {
-  clientMutationId: String
-  person: Person!
-  query: Query
 }
 
 input UpdatePersonByEmailInput {

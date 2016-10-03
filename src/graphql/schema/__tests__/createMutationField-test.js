@@ -1,8 +1,8 @@
-jest.mock('../getGQLQueryType')
+jest.mock('../getQueryGQLType')
 
 import { GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInputObjectType } from 'graphql'
 import { Context } from '../../../interface'
-import getGQLQueryType from '../getGQLQueryType'
+import getQueryGQLType from '../getQueryGQLType'
 import createMutationGQLField from '../createMutationGQLField'
 
 // Create a new object where `GraphQLString` is the prototype. This means it
@@ -10,7 +10,7 @@ import createMutationGQLField from '../createMutationGQLField'
 // `queryType !== GraphQLString` which is nice for tests.
 const queryType = Object.create(GraphQLString)
 
-getGQLQueryType.mockReturnValue(queryType)
+getQueryGQLType.mockReturnValue(queryType)
 
 test('will only create a single input argument', () => {
   const field = createMutationGQLField({}, { name: 'foo' })
@@ -51,7 +51,7 @@ test('will return an object payload type', () => {
 })
 
 test('will always include `clientMutationId` and `query` fields', () => {
-  getGQLQueryType.mockClear()
+  getQueryGQLType.mockClear()
   const buildToken = Symbol('buildToken')
   const clientMutationId = Symbol('clientMutationId')
   const field = createMutationGQLField(buildToken, { name: 'foo' })
@@ -60,7 +60,7 @@ test('will always include `clientMutationId` and `query` fields', () => {
   expect(field.type.getFields().clientMutationId.resolve({ clientMutationId })).toBe(clientMutationId)
   expect(field.type.getFields().query.type).toBe(queryType)
   expect(field.type.getFields().query.resolve()).toBe(null)
-  expect(getGQLQueryType.mock.calls).toEqual([[buildToken]])
+  expect(getQueryGQLType.mock.calls).toEqual([[buildToken]])
 })
 
 test('will add `outputFields` in payload type and skip falsies', () => {

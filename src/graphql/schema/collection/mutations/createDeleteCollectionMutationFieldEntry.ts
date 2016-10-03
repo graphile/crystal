@@ -3,7 +3,7 @@ import { Collection, ObjectType } from '../../../../interface'
 import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGQLField from '../../createMutationGQLField'
-import getCollectionType from '../getCollectionType'
+import getCollectionGQLType from '../getCollectionGQLType'
 
 /**
  * Creates a delete mutation that uses the primary key of a collection and an
@@ -61,7 +61,7 @@ export function createDeleteCollectionOutputFieldEntries (
     // Add the deleted value as an output field so the user can see the
     // object they just deleted.
     [formatName.field(collection.type.name), {
-      type: getCollectionType(buildToken, collection),
+      type: getCollectionGQLType(buildToken, collection),
       resolve: value => value,
     }],
     // Add the deleted values globally unique id as well. This one is

@@ -5,7 +5,7 @@ import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
 import transformGQLInputValue from '../transformGQLInputValue'
 import createConnectionGQLField from '../connection/createConnectionGQLField'
-import getCollectionType from './getCollectionType'
+import getCollectionGQLType from './getCollectionGQLType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 
 /**
@@ -102,7 +102,7 @@ function createCollectionPrimaryKeyField <TKey>(
   if (collectionKey.read == null)
     return
 
-  const collectionType = getCollectionType(buildToken, collection)
+  const collectionType = getCollectionGQLType(buildToken, collection)
 
   return {
     description: `Reads a single ${scrib.type(collectionType)} using its globally unique ${scrib.type(GraphQLID)}.`,
@@ -142,7 +142,7 @@ function createCollectionKeyField <TKey>(
     return
 
   const { collection, keyType } = collectionKey
-  const collectionType = getCollectionType(buildToken, collection)
+  const collectionType = getCollectionGQLType(buildToken, collection)
   const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
 
   return {

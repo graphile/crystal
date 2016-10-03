@@ -9,7 +9,7 @@ import {
 import { Context } from '../../interface'
 import { formatName, buildObject } from '../utils'
 import BuildToken from './BuildToken'
-import getGQLQueryType from './getGQLQueryType'
+import getQueryGQLType from './getQueryGQLType'
 
 /**
  * The configuration for creating a mutation field.
@@ -112,7 +112,7 @@ export default function createMutationGQLField <T>(
           // data in your mutations.
           ['query', {
             // TODO: description
-            type: getGQLQueryType(buildToken),
+            type: getQueryGQLType(buildToken),
             resolve: () => null,
           }],
         ],

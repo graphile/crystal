@@ -6,7 +6,7 @@ import getGQLType from '../../getGQLType'
 import transformGQLInputValue from '../../transformGQLInputValue'
 import createMutationGQLField from '../../createMutationGQLField'
 import { getEdgeType, createOrderByArg } from '../../connection/createConnectionGQLField'
-import getCollectionType from '../getCollectionType'
+import getCollectionGQLType from '../getCollectionGQLType'
 
 /**
  * Creates the mutation field entry for creating values in a collection.
@@ -43,7 +43,7 @@ export default function createCreateCollectionMutationFieldEntry (
       // with this object.
       [formatName.field(collection.type.name), {
         // TODO: description
-        type: getCollectionType(buildToken, collection),
+        type: getCollectionGQLType(buildToken, collection),
         resolve: value => value,
       }],
 

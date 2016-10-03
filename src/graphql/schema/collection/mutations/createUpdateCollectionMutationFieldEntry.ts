@@ -13,7 +13,7 @@ import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
 import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGQLInputValue'
-import getCollectionType from '../getCollectionType'
+import getCollectionGQLType from '../getCollectionGQLType'
 
 /**
  * Creates a delete mutation that uses the primary key of a collection and an
@@ -111,7 +111,7 @@ export function createUpdateCollectionOutputFieldEntries (
     // Add the updated value as an output field so the user can see the
     // object they just updated.
     [formatName.field(collection.type.name), {
-      type: getCollectionType(buildToken, collection),
+      type: getCollectionGQLType(buildToken, collection),
       resolve: value => value,
     }],
   ]

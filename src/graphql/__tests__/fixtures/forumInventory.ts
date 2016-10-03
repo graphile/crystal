@@ -1,6 +1,5 @@
 import {
   Inventory,
-  Procedure,
   Condition,
   Collection,
   CollectionKey,
@@ -159,47 +158,9 @@ const authorRelation: Relation<number> = {
   getHeadKeyFromTailValue: unimplementedFn,
 }
 
-const registerPersonProcedure: Procedure = {
-  name: 'registerPerson',
-  isStable: false,
-  inputType: new ObjectType({
-    name: 'registerPersonInput',
-    fields: new Map<string, ObjectType.Field<mixed>>([
-      ['name', { type: stringType }],
-      ['firstName', { type: new NullableType(stringType) }],
-      ['lastName', { type: new NullableType(stringType) }],
-      ['email', { type: stringType }],
-      ['password', { type: stringType }],
-    ]),
-  }),
-  output: {
-    kind: 'SINGLE',
-    outputType: personType,
-    execute: unimplementedFn,
-  },
-}
-
-const deletePersonPostsProcedure: Procedure = {
-  name: 'deletePersonPosts',
-  isStable: false,
-  inputType: new ObjectType({
-    name: 'deletePersonPostsInput',
-    fields: new Map<string, ObjectType.Field<mixed>>([
-      ['personId', { type: integerType }],
-    ]),
-  }),
-  output: {
-    kind: 'PAGINATOR',
-    // TODO: Probably needs a custom paginator…
-    paginator: postPaginator as any,
-  },
-}
-
 export default (
   new Inventory()
     .addCollection(personCollection)
     .addCollection(postCollection)
     .addRelation(authorRelation)
-    .addProcedure(registerPersonProcedure)
-    .addProcedure(deletePersonPostsProcedure)
 )

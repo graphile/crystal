@@ -70,7 +70,7 @@ namespace ObjectType {
    * and a value of any type.
    */
   // This is accessed as `ObjectType.Field`.
-  export interface Field<TFieldValue> {
+  export interface Field<TValue> {
     /**
      * The optional description of a field. It may be used to generate
      * documentation.
@@ -80,7 +80,7 @@ namespace ObjectType {
     /**
      * The type of the field.
      */
-    readonly type: Type<TFieldValue>
+    readonly type: Type<TValue>
 
     /**
      * Some meta information which indicates whether or not the field has a

@@ -4,7 +4,6 @@ import AliasType from './type/AliasType'
 import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
-import Procedure from './Procedure'
 
 type ContextAssignmentFn = (context: Context) => void | Promise<void>
 
@@ -24,7 +23,6 @@ class Inventory {
   private _types = new Map<string, NamedType<mixed>>()
   private _collections = new Map<string, Collection>()
   private _relations = new Map<string, Relation<mixed>>()
-  private _procedures = new Map<string, Procedure>()
 
   /**
    * Adds a function which will assign some values to a context object when it
@@ -121,28 +119,6 @@ class Inventory {
    */
   public getRelations (): Array<Relation<mixed>> {
     return Array.from(this._relations.values())
-  }
-
-  /**
-   * Adds a single `Procedure` to our inventory. If a procedure of the same
-   * name already exists, an error will be thrown.
-   */
-  public addProcedure (procedure: Procedure): this {
-    const { name } = procedure
-
-    if (this._procedures.has(name))
-      throw new Error(`Procedure of name '${name}' already exists in the inventory.'`)
-
-    this._procedures.set(name, procedure)
-
-    return this
-  }
-
-  /**
-   * Returns all of the procedures in our inventory.
-   */
-  public getProcedures (): Array<Procedure> {
-    return Array.from(this._procedures.values())
   }
 }
 

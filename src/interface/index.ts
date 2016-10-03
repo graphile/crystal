@@ -1,7 +1,6 @@
 import Context from './Context'
 import Inventory from './Inventory'
 import Paginator from './Paginator'
-import Procedure from './Procedure'
 import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
 import Condition, { conditionHelpers } from './collection/Condition'
@@ -22,7 +21,6 @@ export {
   Context,
   Inventory,
   Paginator,
-  Procedure,
   Collection,
   CollectionKey,
   Condition,

@@ -84,20 +84,3 @@ test('getRelations will get all of the relations that have been added to the inv
   inventory.addRelation(relation2)
   expect(inventory.getRelations()).toEqual([relation1, relation2])
 })
-
-test('addProcedure will not add procedures with the same name', () => {
-  const inventory = new Inventory().addProcedure({ name: 'a' })
-  expect(() => inventory.addProcedure({ name: 'a' })).toThrow()
-})
-
-test('getProcedures will get all of the procedures added to the inventory', () => {
-  const inventory = new Inventory()
-  const procedure1 = { name: 'a' }
-  const procedure2 = { name: 'b' }
-  const procedure3 = { name: 'c' }
-  expect(inventory.getProcedures()).toEqual([])
-  inventory.addProcedure(procedure1)
-  expect(inventory.getProcedures()).toEqual([procedure1])
-  inventory.addProcedure(procedure2).addProcedure(procedure3)
-  expect(inventory.getProcedures()).toEqual([procedure1, procedure2, procedure3])
-})

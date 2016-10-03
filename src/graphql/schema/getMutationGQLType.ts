@@ -10,29 +10,22 @@ import createProcedureMutationGQLFieldEntry from './procedure/createProcedureMut
  * schema. If there are no mutations, instead of throwing an error we will just
  * return `undefined`.
  */
-const getGQLMutationType = memoize1(createGQLMutationType)
+const getMutationGQLType = memoize1(createMutationGQLType)
 
-export default getGQLMutationType
+export default getMutationGQLType
 
 /**
  * Internal create implementation for `getMutationType`.
  *
  * @private
  */
-function createGQLMutationType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
+function createMutationGQLType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
   const { inventory } = buildToken
 
   // A list of all the mutations we are able to run.
   const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [
-    ...(
-      // Gets all the unstable procedures in our inventory and creates
-      // appropriate mutations for them all. If a procedure has `isStable` set
-      // to true, it will not have a mutation.
-      inventory
-        .getProcedures()
-        .filter(procedure => !procedure.isStable)
-        .map(procedure => createProcedureMutationGQLFieldEntry(buildToken, procedure))
-    ),
+    // Add the mutation field entires from our build token hooks.
+    ...buildToken._hooks.mutationFieldEntries(),
     ...(
       // Get the mutations for all of our collections and creates mutations
       // for them.

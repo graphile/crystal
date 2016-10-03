@@ -4,7 +4,7 @@ import { formatName, idSerde } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue from '../../transformGQLInputValue'
-import getCollectionType from '../getCollectionType'
+import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, createUpdateCollectionOutputFieldEntries } from './createUpdateCollectionMutationFieldEntry'
 

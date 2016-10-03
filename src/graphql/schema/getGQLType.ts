@@ -37,7 +37,7 @@ import {
 } from '../../interface'
 
 import { buildObject, formatName } from '../utils'
-import getCollectionType from './collection/getCollectionType'
+import getCollectionGQLType from './collection/getCollectionGQLType'
 import { $$gqlInputObjectTypeValueKeyName } from './transformGQLInputValue'
 import BuildToken from './BuildToken'
 
@@ -48,7 +48,6 @@ const cache = new WeakMap<BuildToken, {
 }>()
 
 // TODO: doc
-// TODO: Maybe this should have a different name?
 // Instead of using our utility memoization function, we implement our own
 // memoization logic here because in some scenarios we want to return the same
 // result regardless of whether the `input` is true or false.
@@ -88,7 +87,7 @@ function createGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolea
   // are aliasing is nullable or non null then `AliasType` will automatically
   // pick that up.
   if (type instanceof AliasType) {
-    return createGraphQLTypeAlias(
+    return createGQLTypeAlias(
       // TODO: Remove the `input as any` when the Typescript bug is fixed.
       getGQLType(buildToken, type.baseType, input as any),
       formatName.type(type.name),
@@ -176,7 +175,7 @@ function createGQLOutputObjectType (buildToken: BuildToken, type: ObjectType): G
   // If there is a collection which uses this type, we should use the
   // collection’s type and not create our own.
   if (collection)
-    return getCollectionType(buildToken, collection)
+    return getCollectionGQLType(buildToken, collection)
 
   return new GraphQLObjectType<ObjectType.Value>({
     name: formatName.type(type.name),
@@ -189,6 +188,10 @@ function createGQLOutputObjectType (buildToken: BuildToken, type: ObjectType): G
           resolve: object => object.get(fieldName),
         }]
       ),
+      // Add extra fields that may exist in our hooks.
+      buildToken._hooks
+        ? buildToken._hooks.objectTypeFieldEntries(type)
+        : [],
     ),
   })
 }
@@ -229,12 +232,12 @@ function createGQLInputObjectType <T>(buildToken: BuildToken, type: ObjectType):
  *
  * @private
  */
-function createGraphQLTypeAlias (gqlType: GraphQLType<any>, name: string, description: string | undefined): GraphQLType<any> {
+function createGQLTypeAlias (gqlType: GraphQLType<any>, name: string, description: string | undefined): GraphQLType<any> {
   if (gqlType instanceof GraphQLNonNull)
-    return new GraphQLNonNull(createGraphQLTypeAlias(gqlType.ofType, name, description))
+    return new GraphQLNonNull(createGQLTypeAlias(gqlType.ofType, name, description))
 
   if (gqlType instanceof GraphQLList)
-    return new GraphQLList(createGraphQLTypeAlias(gqlType.ofType, name, description))
+    return new GraphQLList(createGQLTypeAlias(gqlType.ofType, name, description))
 
   // Use prototypes to inherit all of the methods from the type we are
   // aliasing, then set the `name` and `description` properties to the aliased
