@@ -3,6 +3,7 @@ import PGCatalogClass from './PGCatalogClass'
 import PGCatalogAttribute from './PGCatalogAttribute'
 import PGCatalogType from './PGCatalogType'
 import PGCatalogConstraint from './PGCatalogConstraint'
+import PGCatalogProcedure from './PGCatalogProcedure'
 
 /**
  * `PGCatalogObject` is a type that represents all of the different shapes of objects
@@ -15,6 +16,7 @@ type PGCatalogObject =
   PGCatalogClass |
   PGCatalogAttribute |
   PGCatalogType |
-  PGCatalogConstraint
+  PGCatalogConstraint |
+  PGCatalogProcedure
 
 export default PGCatalogObject

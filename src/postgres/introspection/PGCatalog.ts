@@ -4,6 +4,7 @@ import PGCatalogClass from './object/PGCatalogClass'
 import PGCatalogAttribute from './object/PGCatalogAttribute'
 import PGCatalogType from './object/PGCatalogType'
 import PGCatalogConstraint from './object/PGCatalogConstraint'
+import PGCatalogProcedure from './object/PGCatalogProcedure'
 
 /**
  * A utility class for interacting with the `PGCatalogObject`s returned from the
@@ -15,6 +16,7 @@ class PGCatalog {
   private _attributes = new Map<string, PGCatalogAttribute>()
   private _types = new Map<string, PGCatalogType>()
   private _constraints = new Set<PGCatalogConstraint>()
+  private _procedures = new Set<PGCatalogProcedure>()
 
   constructor (objects: Array<PGCatalogObject>) {
     // Build an in-memory index of all our objects for ease of use:
@@ -34,6 +36,9 @@ class PGCatalog {
           break
         case 'constraint':
           this._constraints.add(object)
+          break
+        case 'procedure':
+          this._procedures.add(object)
           break
         default:
           throw new Error(`Object of kind '${object['kind']}' is not allowed.`)

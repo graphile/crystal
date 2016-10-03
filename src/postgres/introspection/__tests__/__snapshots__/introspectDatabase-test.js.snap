@@ -627,6 +627,185 @@ Object {
       "name": "c"
     }
   ],
+  "procedure": Array [
+    Object {
+      "argNames": Array [
+        "object"
+      ],
+      "argTypeIds": Array [
+        "compound_type"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "compound_type",
+      "returnTypeId": "compound_type",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "no_args",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "set",
+      "returnTypeId": "person",
+      "returnsSet": true
+    },
+    Object {
+      "argNames": Array [
+        "a",
+        "b",
+        "c"
+      ],
+      "argTypeIds": Array [
+        "int8",
+        "bool",
+        "varchar"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "types",
+      "returnTypeId": "bool",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": "lol, add some stuff",
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "add_1",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [
+        "a",
+        "b"
+      ],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "add_2",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [
+        "a",
+        ""
+      ],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "add_3",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [
+        "",
+        "b"
+      ],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "add_4",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "mult_1",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "mult_2",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": true,
+      "kind": "procedure",
+      "name": "mult_3",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [
+        "int4",
+        "int4"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": true,
+      "kind": "procedure",
+      "name": "mult_4",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    }
+  ],
   "types": Array [
     Object {
       "baseTypeId": "int4",
@@ -822,6 +1001,56 @@ exports[`test will get everything needed in an introspection 2`] = `
 Object {
   "attributes": Array [
     Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "a",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "b",
+      "num": 2,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "c",
+      "num": 3,
+      "typeId": "color"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "d",
+      "num": 4,
+      "typeId": "uuid"
+    },
+    Object {
+      "classId": "compound_type",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "foo_bar",
+      "num": 5,
+      "typeId": "int4"
+    },
+    Object {
       "classId": "foreign_key",
       "description": null,
       "hasDefault": false,
@@ -860,6 +1089,56 @@ Object {
       "name": "?column?",
       "num": 1,
       "typeId": "int4"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "id",
+      "num": 1,
+      "typeId": "int4"
+    },
+    Object {
+      "classId": "person",
+      "description": "The person’s name",
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "name",
+      "num": 2,
+      "typeId": "varchar"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "about",
+      "num": 3,
+      "typeId": "text"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": true,
+      "kind": "attribute",
+      "name": "email",
+      "num": 4,
+      "typeId": "email"
+    },
+    Object {
+      "classId": "person",
+      "description": null,
+      "hasDefault": true,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "created_at",
+      "num": 5,
+      "typeId": "timestamp"
     },
     Object {
       "classId": "post",
@@ -905,6 +1184,18 @@ Object {
   "classes": Array [
     Object {
       "description": null,
+      "id": "compound_type",
+      "isDeletable": false,
+      "isInsertable": false,
+      "isSelectable": false,
+      "isUpdatable": false,
+      "kind": "class",
+      "name": "compound_type",
+      "namespaceId": "__external__",
+      "typeId": "compound_type"
+    },
+    Object {
+      "description": null,
       "id": "foreign_key",
       "isDeletable": true,
       "isInsertable": true,
@@ -928,6 +1219,18 @@ Object {
       "typeId": "non_updatable_view"
     },
     Object {
+      "description": "Person test comment",
+      "id": "person",
+      "isDeletable": true,
+      "isInsertable": true,
+      "isSelectable": true,
+      "isUpdatable": true,
+      "kind": "class",
+      "name": "person",
+      "namespaceId": "__external__",
+      "typeId": "person"
+    },
+    Object {
       "description": null,
       "id": "post",
       "isDeletable": true,
@@ -942,6 +1245,41 @@ Object {
   ],
   "constraints": Array [
     Object {
+      "classId": "person",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        4
+      ],
+      "kind": "constraint",
+      "name": "person_email_key",
+      "type": "u"
+    },
+    Object {
+      "classId": "person",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "name": "person_pkey",
+      "type": "p"
+    },
+    Object {
+      "classId": "post",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        4
+      ],
+      "kind": "constraint",
+      "name": "post_author_id_fkey",
+      "type": "f"
+    },
+    Object {
       "classId": "post",
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
@@ -951,6 +1289,19 @@ Object {
       "kind": "constraint",
       "name": "post_pkey",
       "type": "p"
+    },
+    Object {
+      "classId": "foreign_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1
+      ],
+      "keyAttributeNums": Array [
+        1
+      ],
+      "kind": "constraint",
+      "name": "foreign_key_person_id_fkey",
+      "type": "f"
     }
   ],
   "namespaces": Array [
@@ -959,6 +1310,64 @@ Object {
       "id": "a",
       "kind": "namespace",
       "name": "a"
+    }
+  ],
+  "procedure": Array [
+    Object {
+      "argNames": Array [
+        "object"
+      ],
+      "argTypeIds": Array [
+        "compound_type"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "compound_type",
+      "returnTypeId": "compound_type",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "no_args",
+      "returnTypeId": "int4",
+      "returnsSet": false
+    },
+    Object {
+      "argNames": Array [],
+      "argTypeIds": Array [],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "set",
+      "returnTypeId": "person",
+      "returnsSet": true
+    },
+    Object {
+      "argNames": Array [
+        "a",
+        "b",
+        "c"
+      ],
+      "argTypeIds": Array [
+        "int8",
+        "bool",
+        "varchar"
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "types",
+      "returnTypeId": "bool",
+      "returnsSet": false
     }
   ],
   "types": Array [

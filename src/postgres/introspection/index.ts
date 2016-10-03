@@ -6,6 +6,7 @@ import PGCatalogClass from './object/PGCatalogClass'
 import PGCatalogAttribute from './object/PGCatalogAttribute'
 import PGCatalogType from './object/PGCatalogType'
 import PGCatalogConstraint from './object/PGCatalogConstraint'
+import PGCatalogProcedure from './object/PGCatalogProcedure'
 
 export {
   introspectDatabase,
@@ -16,6 +17,7 @@ export {
   PGCatalogAttribute,
   PGCatalogType,
   PGCatalogConstraint,
+  PGCatalogProcedure,
 }
 
 export * from './object/PGCatalogType'

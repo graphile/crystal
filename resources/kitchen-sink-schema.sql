@@ -93,26 +93,19 @@ create table b.types (
   "nested_compound_type" b.nested_compound_type
 );
 
--- create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
--- create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
--- create function a.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
--- create function a.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
+create function b.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function b.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
+create function b.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function b.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
 
--- comment on function a.add_1(int, int) is 'lol, add some stuff';
+comment on function b.add_1(int, int) is 'lol, add some stuff';
 
--- create function b.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
--- create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
--- create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
--- create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
+create function c.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
+create function c.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
+create function c.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
+create function c.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
--- create function c.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
-
--- create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
-
--- create table b.so_unique (
---   id uuid primary key,
---   lucky_number int unique,
---   a text not null,
---   b text not null,
---   unique (a, b)
--- );
+create function a.types(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
+create function a.compound_type(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
+create function a.set() returns setof c.person as $$ select * from c.person $$ language sql;
+create function a.no_args() returns int as $$ select 2 $$ language sql;

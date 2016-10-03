@@ -20,7 +20,15 @@ export default function withPGClient (fn: (client: Client) => void | Promise<voi
       throw client
 
     await client.query('begin')
-    await client.query(await kitchenSinkSchemaSQL)
+
+    // Run our kichen sink schema SQL, if there is an error we should report it
+    try {
+      await client.query(await kitchenSinkSchemaSQL)
+    }
+    catch (error) {
+      console.error(error.stack || error)
+      throw error
+    }
 
     // Mock the query function.
     client.query = jest.fn(client.query)

@@ -57,7 +57,7 @@ const format = catalog => ({
   classes: Array.from(catalog._classes.values())
     .map(klass => Object.assign({}, klass, {
       id: klass.name,
-      namespaceId: catalog.getNamespace(klass.namespaceId).name,
+      namespaceId: catalog.getNamespace(klass.namespaceId) ? catalog.getNamespace(klass.namespaceId).name : '__external__',
       typeId: catalog.getType(klass.typeId).name,
     }))
     .sort(sortBy(({ id }) => id)),
@@ -86,6 +86,12 @@ const format = catalog => ({
     .map(constraint => Object.assign({}, constraint, {
       classId: catalog.getClass(constraint.classId).name,
       foreignClassId: constraint.foreignClassId ? catalog.getClass(constraint.foreignClassId).name : null,
+    })),
+
+  procedure: Array.from(catalog._procedures)
+    .map(procedure => Object.assign({}, procedure, {
+      returnTypeId: catalog.getType(procedure.returnTypeId).name,
+      argTypeIds: procedure.argTypeIds.map(typeId => catalog.getType(typeId).name),
     })),
 })
 
