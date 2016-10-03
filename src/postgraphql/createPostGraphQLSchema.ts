@@ -4,6 +4,9 @@ import { Inventory } from '../interface'
 import { introspectPGDatabase, addPGCatalogToInventory } from '../postgres'
 import { createGraphQLSchema } from '../graphql'
 
+/**
+ * Creates a PostGraphQL schema by looking at a Postgres client.
+ */
 export default async function createPostGraphQLSchema (
   config: {
     // TODO: Accept connection strings, configs, clients, and `PGCatalog`s.
