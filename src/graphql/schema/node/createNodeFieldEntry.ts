@@ -2,7 +2,6 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection } from '../../../interface'
 import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
-import getContextFromGQLContext from '../getContextFromGQLContext'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
 // TODO: doc
@@ -17,8 +16,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    async resolve (source: mixed, args: any, gqlContext: mixed) {
-      const context = getContextFromGQLContext(gqlContext)
+    async resolve (source: mixed, args: any, context: mixed) {
       let deserializationResult: { collection: Collection, keyValue: mixed }
 
       // Try to deserialize the id we got from our argument. If we fail to

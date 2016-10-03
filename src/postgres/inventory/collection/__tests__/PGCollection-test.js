@@ -41,7 +41,7 @@ test('type will have the correct null and non null fields', () => {
 })
 
 test('create will insert new rows into the database', withPGClient(async client => {
-  const context = new Map([[$$pgClient, client]])
+  const context = { [$$pgClient]: client }
 
   const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
   const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
@@ -132,7 +132,7 @@ test('create will insert new rows into the database', withPGClient(async client 
 // })
 
 test('paginator `count` will count all of the values in a collection with a condition', withPGClient(async client => {
-  const context = new Map([[$$pgClient, client]])
+  const context = { [$$pgClient]: client }
 
   expect(await collection1.paginator.count(context, true)).toBe(0)
   expect(await collection2.paginator.count(context, true)).toBe(0)
@@ -326,7 +326,7 @@ paginatorFixtures.forEach(paginatorFixture => {
 
     beforeAll(async () => {
       client = await pgPool.connect()
-      context = new Map([[$$pgClient, client]])
+      context = { [$$pgClient]: client }
       await client.query('begin')
       await client.query(await kitchenSinkSchemaSQL)
       await paginatorFixture.addValuesToClient(client)

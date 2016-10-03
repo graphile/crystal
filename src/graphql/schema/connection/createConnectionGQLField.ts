@@ -21,7 +21,6 @@ import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGQLType from '../getGQLType'
 import BuildToken from '../BuildToken'
 import transformGQLInputValue from '../transformGQLInputValue'
-import getContextFromGQLContext from '../getContextFromGQLContext'
 
 // TODO: doc
 export default function createConnectionGQLField <TSource, TInput, TItemValue>(
@@ -77,10 +76,8 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
     async resolve <TCursor>(
       source: TSource,
       args: ConnectionArgs<TCursor>,
-      gqlContext: mixed,
+      context: mixed,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
-      const context = getContextFromGQLContext(gqlContext)
-
       const {
         orderBy: orderingName,
         before: beforeCursor,
@@ -149,8 +146,8 @@ export function _createConnectionType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ paginator, input }, args, gqlContext) =>
-          paginator.count(getContextFromGQLContext(gqlContext), input),
+        resolve: ({ paginator, input }, args, context) =>
+          paginator.count(context, input),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,

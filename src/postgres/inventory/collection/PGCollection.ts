@@ -92,7 +92,7 @@ class PGCollection implements Collection {
   public create = (
     !this._pgClass.isInsertable
       ? null
-      : (context: Map<Symbol, mixed>, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
+      : (context: mixed, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
         this._getInsertLoader(pgClientFromContext(context)).load(value)
   )
 

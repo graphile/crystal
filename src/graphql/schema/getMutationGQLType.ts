@@ -3,7 +3,6 @@ import { Inventory } from '../../interface'
 import { buildObject, memoize1 } from '../utils'
 import BuildToken from './BuildToken'
 import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'
-import createProcedureMutationGQLFieldEntry from './procedure/createProcedureMutationGQLFieldEntry'
 
 /**
  * Gets the mutation type which includes all available mutations for our

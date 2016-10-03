@@ -53,7 +53,7 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
    * Reads a single page for this ordering.
    */
   public async readPage (
-    context: Map<Symbol, mixed>,
+    context: mixed,
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
   ): Promise<Paginator.Page<PGObjectType.Value, AttributesCursor>> {

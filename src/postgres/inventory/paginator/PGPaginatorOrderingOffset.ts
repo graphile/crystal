@@ -44,7 +44,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
    * Reads a single page using the offset ordering strategy.
    */
   public async readPage (
-    context: Map<Symbol, mixed>,
+    context: mixed,
     input: TInput,
     config: Paginator.PageConfig<OffsetCursor>,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {

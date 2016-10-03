@@ -9,39 +9,31 @@ import kitchenSinkSchemaSQL from './kitchenSinkSchemaSQL'
  */
 export default function withPGClient (fn: (client: Client) => void | Promise<void>) {
   return async () => {
+    // Connect a client from our pool and begin a transaction.
+    const client = await pgPool.connect()
+
+    // There’s some wierd behavior with the `pg` module here where an error
+    // is resolved correctly.
+    //
+    // @see https://github.com/brianc/node-postgres/issues/1142
+    if (client['errno'])
+      throw client
+
+    await client.query('begin')
+    await client.query(await kitchenSinkSchemaSQL)
+
+    // Mock the query function.
+    client.query = jest.fn(client.query)
+
+    // Try to run our test, if it fails we still want to cleanup the client.
     try {
-      // Connect a client from our pool and begin a transaction.
-      const client = await pgPool.connect()
-
-      // There’s some wierd behavior with the `pg` module here where an error
-      // is resolved correctly.
-      //
-      // @see https://github.com/brianc/node-postgres/issues/1142
-      if (client['errno'])
-        throw client
-
-      await client.query('begin')
-      await client.query(await kitchenSinkSchemaSQL)
-
-      // Mock the query function.
-      client.query = jest.fn(client.query)
-
-      // Try to run our test, if it fails we still want to cleanup the client.
-      try {
-        await fn(client)
-      }
-      // Always rollback our changes and release the client, even if the test
-      // fails.
-      finally {
-        await client.query('rollback')
-        client.release()
-      }
+      await fn(client)
     }
-    // We want to log the error to the console if one was thrown in case Jest
-    // doesn’t do it.
-    catch (error) {
-      console.error(error.stack || error)
-      throw error
+    // Always rollback our changes and release the client, even if the test
+    // fails.
+    finally {
+      await client.query('rollback')
+      client.release()
     }
   }
 }

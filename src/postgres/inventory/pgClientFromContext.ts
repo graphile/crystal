@@ -8,11 +8,17 @@ export const $$pgClient = Symbol('postgres/client')
  * Retrieves a Postgres client from a context, throwing an error if such a
  * client does not exist.
  */
-export default function getPGClientFromContext (context: Map<Symbol, mixed>): Client {
-  const client = context.get($$pgClient)
+export default function getPGClientFromContext (context: mixed): Client {
+  if (context == null || typeof context !== 'object')
+    throw new Error('Context must be an object.')
 
-  if (client == null || !(client instanceof Client))
-    throw new Error('Postgres client not found in the context.')
+  const client = context[$$pgClient]
+
+  if (client == null)
+    throw new Error('Postgres client does not exist on the context.')
+
+  if (!(client instanceof Client))
+    throw new Error('Postgres client on context is of the incorrect type.')
 
   return client
 }

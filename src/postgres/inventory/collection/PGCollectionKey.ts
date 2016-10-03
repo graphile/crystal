@@ -96,7 +96,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public read = (
     !this._pgClass.isSelectable
       ? null
-      : (context: Map<Symbol, string>, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
+      : (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
         this._getSelectLoader(pgClientFromContext(context)).load(key)
   )
 
@@ -172,7 +172,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public update = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: Map<Symbol, string>, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
+      : async (context: mixed, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
         const updatedIdentifier = Symbol()
@@ -220,7 +220,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public delete = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: Map<Symbol, string>, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
+      : async (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
         const deletedIdentifier = Symbol()

@@ -4,7 +4,6 @@ import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
 import transformGQLInputValue from '../transformGQLInputValue'
-import getContextFromGQLContext from '../getContextFromGQLContext'
 import createConnectionGQLField from '../connection/createConnectionGQLField'
 import getCollectionGQLType from './getCollectionGQLType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
@@ -116,9 +115,7 @@ function createCollectionPrimaryKeyField <TKey>(
       },
     },
 
-    async resolve (source, args, gqlContext): Promise<ObjectType.Value | null> {
-      const context = getContextFromGQLContext(gqlContext)
-
+    async resolve (source, args, context): Promise<ObjectType.Value | null> {
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
 
       if (result.collection !== collection)
@@ -148,9 +145,7 @@ function createCollectionKeyField <TKey>(
   return {
     type: collectionType,
     args: buildObject(inputHelpers.fieldEntries),
-    async resolve (source, args, gqlContext): Promise<ObjectType.Value | null> {
-      const context = getContextFromGQLContext(gqlContext)
-
+    async resolve (source, args, context): Promise<ObjectType.Value | null> {
       const key = inputHelpers.getKey(args)
       return await collectionKey.read!(context, key)
     },

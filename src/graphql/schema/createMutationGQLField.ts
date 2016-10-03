@@ -9,7 +9,6 @@ import {
 import { formatName, buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import getQueryGQLType from './getQueryGQLType'
-import getContextFromGQLContext from './getContextFromGQLContext'
 
 /**
  * The configuration for creating a mutation field.
@@ -20,7 +19,7 @@ type MutationFieldConfig<T> = {
   name: string,
   inputFields?: Array<[string, GraphQLInputFieldConfig<mixed>] | false | null | undefined>,
   outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
-  execute: (context: Map<Symbol, mixed>, input: { [name: string]: mixed }) => Promise<T | null | undefined>,
+  execute: (context: mixed, input: { [name: string]: mixed }) => Promise<T | null | undefined>,
 }
 
 /**
@@ -122,9 +121,9 @@ export default function createMutationGQLField <T>(
     // Finally we define the resolver for this field which will actually
     // execute the mutation. Basically it will just include the
     // `clientMutationId` in the payload, and calls `config.execute`.
-    async resolve (source, args, gqlContext) {
+    async resolve (source, args, context) {
       const { clientMutationId } = args['input']
-      const value = await config.execute(getContextFromGQLContext(gqlContext), args['input'])
+      const value = await config.execute(context, args['input'])
 
       return {
         clientMutationId,

@@ -28,7 +28,7 @@ abstract class PGPaginator<TInput, TItemValue> implements Paginator<TInput, TIte
   /**
    * Counts how many values are in our `from` entry total.
    */
-  public async count (context: Map<Symbol, mixed>, input: TInput): Promise<number> {
+  public async count (context: mixed, input: TInput): Promise<number> {
     const client = pgClientFromContext(context)
     const fromSQL = this.getFromEntrySQL(input)
     const conditionSQL = this.getConditionSQL(input)
