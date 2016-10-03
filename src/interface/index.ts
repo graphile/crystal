@@ -1,4 +1,3 @@
-import Context from './Context'
 import Inventory from './Inventory'
 import Paginator from './Paginator'
 import Collection from './collection/Collection'
@@ -18,7 +17,6 @@ import floatType from './type/primitive/floatType'
 import stringType from './type/primitive/stringType'
 
 export {
-  Context,
   Inventory,
   Paginator,
   Collection,

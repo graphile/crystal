@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { Inventory } from '../../interface'
-import { SchemaOptions } from '../schema/createGraphqlSchema'
+import { SchemaOptions } from '../schema/createGQLSchema'
 
 /**
  * Options used to create our request handler. Includes all of the options
@@ -48,7 +48,7 @@ interface HTTPRequestHandler {
  * - `express`.
  * - `koa` (2.0).
  */
-export default function createGraphqlHTTPRequestHandler (
+export default function createGraphQLHTTPRequestHandler (
   inventory: Inventory,
   options?: HTTPRequestHandlerOptions,
 ): HTTPRequestHandler

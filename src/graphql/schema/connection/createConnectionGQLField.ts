@@ -16,11 +16,12 @@ import {
   GraphQLString,
   Kind,
 } from 'graphql'
-import { Context, Paginator, Type, NullableType, ObjectType } from '../../../interface'
+import { Paginator, Type, NullableType, ObjectType } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGQLType from '../getGQLType'
 import BuildToken from '../BuildToken'
 import transformGQLInputValue from '../transformGQLInputValue'
+import getContextFromGQLContext from '../getContextFromGQLContext'
 
 // TODO: doc
 export default function createConnectionGQLField <TSource, TInput, TItemValue>(
@@ -76,10 +77,9 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
     async resolve <TCursor>(
       source: TSource,
       args: ConnectionArgs<TCursor>,
-      context: mixed,
+      gqlContext: mixed,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
-      if (!(context instanceof Context))
-        throw new Error('GraphQL context must be an instance of `Context`.')
+      const context = getContextFromGQLContext(gqlContext)
 
       const {
         orderBy: orderingName,
@@ -149,12 +149,8 @@ export function _createConnectionType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ paginator, input }, args, context) => {
-          if (!(context instanceof Context))
-            throw new Error('GraphQL context must be an instance of `Context`.')
-
-          return paginator.count(context, input)
-        },
+        resolve: ({ paginator, input }, args, gqlContext) =>
+          paginator.count(getContextFromGQLContext(gqlContext), input),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,

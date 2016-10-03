@@ -5,7 +5,7 @@ import pgPool from '../../../__tests__/fixtures/pgPool'
 import kitchenSinkSchemaSQL from '../../../__tests__/fixtures/kitchenSinkSchemaSQL'
 import { mapToObject } from '../../../utils'
 import { PGCatalog, introspectDatabase } from '../../../introspection'
-import { createPGContext } from '../../pgContext'
+import { $$pgClient } from '../../pgClientFromContext'
 import PGCollection from '../PGCollection'
 
 /**
@@ -41,7 +41,7 @@ test('type will have the correct null and non null fields', () => {
 })
 
 test('create will insert new rows into the database', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
   const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
@@ -132,7 +132,7 @@ test('create will insert new rows into the database', withPGClient(async client 
 // })
 
 test('paginator `count` will count all of the values in a collection with a condition', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   expect(await collection1.paginator.count(context, true)).toBe(0)
   expect(await collection2.paginator.count(context, true)).toBe(0)
@@ -322,9 +322,11 @@ const paginatorFixtures = [
 paginatorFixtures.forEach(paginatorFixture => {
   describe(`paginator '${paginatorFixture.name}'`, () => {
     let client
+    let context
 
     beforeAll(async () => {
       client = await pgPool.connect()
+      context = new Map([[$$pgClient, client]])
       await client.query('begin')
       await client.query(await kitchenSinkSchemaSQL)
       await paginatorFixture.addValuesToClient(client)
@@ -341,7 +343,6 @@ paginatorFixtures.forEach(paginatorFixture => {
     beforeAll(() => paginator = paginatorFixture.getPaginator())
 
     test('will count all of the values in the collection', async () => {
-      const context = createPGContext(client)
       expect(await paginator.count(context, true)).toBe(allValues.length)
     })
 
@@ -354,15 +355,12 @@ paginatorFixtures.forEach(paginatorFixture => {
         beforeAll(() => ordering = orderingFixture.getOrdering())
 
         test('will read all of the values in the correct order', async () => {
-          const context = createPGContext(client)
           const page = await ordering.readPage(context, true, {})
           expect(page.values).toEqual(sortedValuesWithCursors)
           expect(await Promise.all([page.hasNextPage(), page.hasPreviousPage()])).toEqual([false, false])
         })
 
         test('will read all values after an `afterCursor`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[2].cursor }),
@@ -376,8 +374,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('will read all values before a `beforeCursor`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[1].cursor }),
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[3].cursor }),
@@ -391,8 +387,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[1].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -406,8 +400,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('will read only the first few values when provided `first`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1 }),
             ordering.readPage(context, true, { first: 3 }),
@@ -421,8 +413,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('will read only the last few values when provided `last`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1 }),
             ordering.readPage(context, true, { last: 3 }),
@@ -436,13 +426,10 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('will fail when trying to use `first` and `last` together', async () => {
-          const context = createPGContext(client)
           expect((await ordering.readPage(context, true, { first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
         })
 
         test('can use `beforeCursor` and `first` together', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -456,8 +443,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('can use `afterCursor` and `first` together', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
@@ -471,8 +456,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -486,8 +469,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('can use `beforeCursor` and `last` together', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -501,8 +482,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('can use `afterCursor` and `last` together', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[sortedValuesWithCursors.length - 2].cursor }),
@@ -516,8 +495,6 @@ paginatorFixtures.forEach(paginatorFixture => {
         })
 
         test('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
-          const context = createPGContext(client)
-
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),

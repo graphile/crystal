@@ -1,7 +1,7 @@
-import { Context, Paginator } from '../../../interface'
+import { Paginator } from '../../../interface'
 import { PGCatalogAttribute } from '../../introspection'
 import { sql } from '../../utils'
-import { pgClientFromContext } from '../pgContext'
+import pgClientFromContext from '../pgClientFromContext'
 import transformPGValue from '../transformPGValue'
 import PGObjectType from '../type/PGObjectType'
 import PGPaginator from './PGPaginator'
@@ -53,7 +53,7 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
    * Reads a single page for this ordering.
    */
   public async readPage (
-    context: Context,
+    context: Map<Symbol, mixed>,
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
   ): Promise<Paginator.Page<PGObjectType.Value, AttributesCursor>> {

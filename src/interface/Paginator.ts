@@ -1,4 +1,3 @@
-import Context from './Context'
 import Type from './type/Type'
 
 /**
@@ -66,7 +65,7 @@ interface Paginator<TInput, TItemValue> {
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  count (context: Context, input: TInput): Promise<number>
+  count (context: Map<Symbol, mixed>, input: TInput): Promise<number>
 }
 
 // We use a namespace so we only have to export one thing from this module
@@ -99,7 +98,7 @@ namespace Paginator {
      * @see Paginator.PageConfig
      */
     readPage (
-      context: Context,
+      context: Map<Symbol, mixed>,
       input: TInput,
       config: Paginator.PageConfig<TCursor>,
     ): Promise<Paginator.Page<TItemValue, TCursor>>

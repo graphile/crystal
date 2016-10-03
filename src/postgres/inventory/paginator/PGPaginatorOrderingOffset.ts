@@ -1,6 +1,6 @@
-import { Type, Context, Paginator } from '../../../interface'
+import { Type, Paginator } from '../../../interface'
 import { sql } from '../../utils'
-import { pgClientFromContext } from '../pgContext'
+import pgClientFromContext from '../pgClientFromContext'
 import transformPGValue from '../transformPGValue'
 import PGPaginator from './PGPaginator'
 
@@ -44,7 +44,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
    * Reads a single page using the offset ordering strategy.
    */
   public async readPage (
-    context: Context,
+    context: Map<Symbol, mixed>,
     input: TInput,
     config: Paginator.PageConfig<OffsetCursor>,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {

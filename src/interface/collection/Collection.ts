@@ -1,4 +1,3 @@
-import Context from '../Context'
 import Type from '../type/Type'
 import ObjectType from '../type/ObjectType'
 import Paginator from '../Paginator'
@@ -65,7 +64,7 @@ interface Collection {
   // TODO: Test that we can use this method on an empty collection and then
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
-  create?: ((context: Context, value: ObjectType.Value) => Promise<ObjectType.Value>) | null
+  create?: ((context: Map<Symbol, mixed>, value: ObjectType.Value) => Promise<ObjectType.Value>) | null
 }
 
 export default Collection

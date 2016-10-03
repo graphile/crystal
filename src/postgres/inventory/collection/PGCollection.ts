@@ -1,12 +1,12 @@
 import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { Context, Collection, Type, NullableType } from '../../../interface'
+import { Collection, Type, NullableType } from '../../../interface'
 import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import Options from '../Options'
-import { pgClientFromContext } from '../pgContext'
+import pgClientFromContext from '../pgClientFromContext'
 import transformPGValue from '../transformPGValue'
 import PGCollectionPaginator from '../paginator/PGCollectionPaginator'
 import PGCollectionKey from './PGCollectionKey'
@@ -92,7 +92,7 @@ class PGCollection implements Collection {
   public create = (
     !this._pgClass.isInsertable
       ? null
-      : (context: Context, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
+      : (context: Map<Symbol, mixed>, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
         this._getInsertLoader(pgClientFromContext(context)).load(value)
   )
 

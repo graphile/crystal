@@ -1,9 +1,9 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { Context, CollectionKey, Type } from '../../../interface'
+import { CollectionKey, Type } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
-import { pgClientFromContext } from '../pgContext'
+import pgClientFromContext from '../pgClientFromContext'
 import transformPGValue from '../transformPGValue'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
@@ -96,7 +96,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public read = (
     !this._pgClass.isSelectable
       ? null
-      : (context: Context, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
+      : (context: Map<Symbol, string>, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
         this._getSelectLoader(pgClientFromContext(context)).load(key)
   )
 
@@ -172,7 +172,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public update = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: Context, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
+      : async (context: Map<Symbol, string>, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
         const updatedIdentifier = Symbol()
@@ -220,7 +220,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   public delete = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: Context, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
+      : async (context: Map<Symbol, string>, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
         const client = pgClientFromContext(context)
 
         const deletedIdentifier = Symbol()

@@ -1,7 +1,7 @@
 import withPGClient from '../../../__tests__/fixtures/withPGClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'
-import { createPGContext } from '../../pgContext'
+import { $$pgClient } from '../../pgClientFromContext.ts'
 import PGCollection from '../PGCollection'
 import PGCollectionKey from '../PGCollectionKey'
 
@@ -56,7 +56,7 @@ test('type will have fields for all of the respective attributes', () => {
 })
 
 test('read will get single values from a table', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   await client.query(`
     insert into c.person (id, name, email, about) values
@@ -107,7 +107,7 @@ test('read will get single values from a table', withPGClient(async client => {
 }))
 
 test('update will change values from a table', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   await client.query(`
     insert into c.person (id, name, email, about) values
@@ -147,7 +147,7 @@ test('update will change values from a table', withPGClient(async client => {
 }))
 
 test('update fails when trying to patch a field that does not exist', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   try {
     await collectionKey1.update(context, new Map([['person_id_1', 1], ['person_id_2', 2]]), new Map([['a', 1]]))
@@ -159,7 +159,7 @@ test('update fails when trying to patch a field that does not exist', withPGClie
 }))
 
 test('update fails when trying to update a value that does not exist', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   try {
     await collectionKey2.update(context, new Map([['email', 'does.not.exist@email.com']]), new Map([['about', 'xxxx']]))
@@ -171,7 +171,7 @@ test('update fails when trying to update a value that does not exist', withPGCli
 }))
 
 test('delete will delete things from the database', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   await client.query(`
     insert into c.person (id, name, email, about) values
@@ -214,7 +214,7 @@ test('delete will delete things from the database', withPGClient(async client =>
 }))
 
 test('delete fails when trying to remove a value that does not exist', withPGClient(async client => {
-  const context = createPGContext(client)
+  const context = new Map([[$$pgClient, client]])
 
   try {
     await collectionKey1.delete(context, new Map([['person_id_1', 1], ['person_id_2', 2]]))

@@ -1,4 +1,3 @@
-import Context from '../Context'
 import Type from '../type/Type'
 import ObjectType from '../type/ObjectType'
 import Collection from './Collection'
@@ -56,7 +55,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  read?: ((context: Context, key: TKeyValue) => Promise<ObjectType.Value | null>) | null
+  read?: ((context: Map<Symbol, mixed>, key: TKeyValue) => Promise<ObjectType.Value | null>) | null
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is
@@ -69,7 +68,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was updated, an error should be thrown.
    */
   // TODO: Test this.
-  update?: ((context: Context, key: TKeyValue, patch: Map<string, mixed>) => Promise<ObjectType.Value>) | null
+  update?: ((context: Map<Symbol, mixed>, key: TKeyValue, patch: Map<string, mixed>) => Promise<ObjectType.Value>) | null
 
   /**
    * Delete a value from the collection by using the value’s key. Returned is
@@ -78,7 +77,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was deleted an error should be thrown.
    */
   // TODO: Test this.
-  delete?: ((context: Context, key: TKeyValue) => Promise<ObjectType.Value>) | null
+  delete?: ((context: Map<Symbol, mixed>, key: TKeyValue) => Promise<ObjectType.Value>) | null
 }
 
 export default CollectionKey

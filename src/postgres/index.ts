@@ -1,3 +1,7 @@
-import addPGToInventory from './addPGToInventory'
+import introspectPGDatabase from './introspection/introspectDatabase'
+import addPGCatalogToInventory from './inventory/addPGCatalogToInventory'
 
-export { addPGToInventory }
+export {
+  introspectPGDatabase,
+  addPGCatalogToInventory,
+}

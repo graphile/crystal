@@ -1,12 +1,10 @@
 import { resolve as resolvePath } from 'path'
 import { readFile, readdirSync } from 'fs'
 import { graphql } from 'graphql'
-import { Inventory } from '../../interface'
 import withPGClient from '../../postgres/__tests__/fixtures/withPGClient'
-import { introspectDatabase } from '../../postgres/introspection'
-import addPGCatalogToInventory from '../../postgres/inventory/addPGCatalogToInventory'
-import { createPGContext } from '../../postgres/inventory/pgContext'
-import createGraphqlSchema from '../../graphql/schema/createGraphqlSchema'
+import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
+import { $$interfaceContext } from '../../graphql/schema/getContextFromGQLContext'
+import createPostGraphQLSchema from '../createPostGraphQLSchema'
 
 const kitchenSinkData = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/kitchen-sink-data.sql'), (error, data) => {
@@ -18,11 +16,12 @@ const kitchenSinkData = new Promise((resolve, reject) => {
 const queriesDir = resolvePath(__dirname, 'fixtures/queries')
 
 for (const file of readdirSync(queriesDir)) {
-  test(`operation ${file}`, withPGClient(async client => {
-    const catalog = await introspectDatabase(client, ['a', 'b', 'c'])
-    const inventory = new Inventory()
-    addPGCatalogToInventory(inventory, catalog)
-    const schema = createGraphqlSchema(inventory)
+  test(`operation ${file}`, withPGClient(async pgClient => {
+    const gqlSchema = await createPostGraphQLSchema({
+      pgClient,
+      pgSchemas: ['a', 'b', 'c'],
+      relay1Ids: false,
+    })
 
     const query = await new Promise((resolve, reject) => {
       readFile(resolvePath(queriesDir, file), (error, data) => {
@@ -31,10 +30,10 @@ for (const file of readdirSync(queriesDir)) {
       })
     })
 
-    await client.query(await kitchenSinkData)
-    const context = createPGContext(client)
+    await pgClient.query(await kitchenSinkData)
+    const context = new Map([[$$pgClient, pgClient]])
 
-    const result = await graphql(schema, query, null, context)
+    const result = await graphql(gqlSchema, query, null, { [$$interfaceContext]: context })
 
     // Log the errors in our result.
     if (result.errors)

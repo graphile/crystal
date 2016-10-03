@@ -11,7 +11,7 @@ import {
   print as printGraphql,
 } from 'graphql'
 import { Inventory } from '../../interface'
-import createGraphqlSchema from '../schema/createGraphqlSchema'
+import createGQLSchema from '../schema/createGQLSchema'
 import renderGraphiQL from './renderGraphiQL'
 
 const Debugger = require('debug')
@@ -35,7 +35,7 @@ const favicon = new Promise((resolve, reject) => {
  *
  * @param {Inventory} inventory
  */
-export default function createGraphqlHTTPRequestHandler (inventory, options = {}) {
+export default function createGraphQLHTTPRequestHandler (inventory, options = {}) {
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
   const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null
@@ -45,7 +45,7 @@ export default function createGraphqlHTTPRequestHandler (inventory, options = {}
     throw new Error(`Cannot use the same route '${graphqlRoute}' for both GraphQL and GraphiQL.`)
 
   // Creates our GraphQL schema…
-  const graphqlSchema = createGraphqlSchema(inventory, options)
+  const graphqlSchema = createGQLSchema(inventory, options)
 
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.

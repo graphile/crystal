@@ -1,11 +1,8 @@
-import Context from './Context'
 import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
 import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
-
-type ContextAssignmentFn = (context: Context) => void | Promise<void>
 
 /**
  * In order to build awesome tools from any database we need an abstract
@@ -19,30 +16,9 @@ type ContextAssignmentFn = (context: Context) => void | Promise<void>
  * *mutable*. Scary, I know.
  */
 class Inventory {
-  private _contextAssignments: Array<ContextAssignmentFn> = []
   private _types = new Map<string, NamedType<mixed>>()
   private _collections = new Map<string, Collection>()
   private _relations = new Map<string, Relation<mixed>>()
-
-  /**
-   * Adds a function which will assign some values to a context object when it
-   * gets created.
-   */
-  // TODO: Clean this API up! The current context API is terrible.
-  public addContextAssignment (contextAssignment: ContextAssignmentFn): this {
-    this._contextAssignments.push(contextAssignment)
-    return this
-  }
-
-  /**
-   * Creates a context object by running all of the context assignments in
-   * parallel. A context will be valid for one single request “session.”
-   */
-  public async createContext (): Promise<Context> {
-    const context = new Context()
-    await Promise.all(this._contextAssignments.map(contextAssignment => contextAssignment(context)))
-    return context
-  }
 
   /**
    * Adds a single collection to our inventory. If a collection with the same
