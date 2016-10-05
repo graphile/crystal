@@ -1,9 +1,4 @@
-import {
-  GraphQLNonNull,
-  GraphQLFieldConfig,
-  GraphQLArgumentConfig,
-  getNullableType,
-} from 'graphql'
+import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableType } from 'graphql'
 import { Type } from '../../interface'
 import { formatName, buildObject } from '../../graphql/utils'
 import BuildToken from '../../graphql/schema/BuildToken'
