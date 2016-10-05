@@ -48,7 +48,7 @@
     "@types/pluralize": "0.0.26",
     "connect": "^3.5.0",
     "express": "^4.14.0",
-    "jest": "^15.1.1",
+    "jest": "^16.0.1",
     "koa": "^2.0.0",
     "nodemon": "^1.10.2",
     "source-map-support": "^0.4.2",
