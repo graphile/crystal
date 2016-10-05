@@ -90,6 +90,7 @@ const format = catalog => ({
 
   procedure: Array.from(catalog._procedures)
     .map(procedure => Object.assign({}, procedure, {
+      namespaceId: catalog.getNamespace(procedure.namespaceId).name,
       returnTypeId: catalog.getType(procedure.returnTypeId).name,
       argTypeIds: procedure.argTypeIds.map(typeId => catalog.getType(typeId).name),
     })),

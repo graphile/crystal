@@ -29,6 +29,7 @@ with
       'procedure' as "kind",
       pro.proname as "name",
       dsc.description as "description",
+      pro.pronamespace as "namespaceId",
       pro.proisstrict as "isStrict",
       pro.proretset as "returnsSet",
       case

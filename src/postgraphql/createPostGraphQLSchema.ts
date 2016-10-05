@@ -4,7 +4,8 @@ import { Inventory } from '../interface'
 import { introspectPGDatabase, addPGCatalogToInventory } from '../postgres'
 import { createGraphQLSchema } from '../graphql'
 import BuildToken from '../graphql/schema/BuildToken'
-import createProcedureMutationGQLFieldEntries from './procedures/createProcedureMutationGQLFieldEntries'
+import createPGProcedureMutationGQLFieldEntries from './procedures/createPGProcedureMutationGQLFieldEntries'
+import createPGProcedureQueryGQLFieldEntries from './procedures/createPGProcedureQueryGQLFieldEntries'
 
 /**
  * Creates a PostGraphQL schema by looking at a Postgres client.
@@ -35,7 +36,8 @@ export default async function createPostGraphQLSchema (
   const gqlSchema = createGraphQLSchema(inventory, {
     nodeIdFieldName: config.relay1Ids ? 'id' : '__id',
     _hooks: {
-      mutationFieldEntries: (_buildToken: BuildToken) => createProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
+      mutationFieldEntries: (_buildToken: BuildToken) => createPGProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
+      queryFieldEntries: (_buildToken: BuildToken) => createPGProcedureQueryGQLFieldEntries(_buildToken, pgCatalog),
     },
   })
 

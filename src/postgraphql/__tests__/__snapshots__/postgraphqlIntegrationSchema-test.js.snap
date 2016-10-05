@@ -1,23 +1,47 @@
 exports[`test prints a schema with Relay 1 style ids 1`] = `
-"input Add3Input {
+"input Add1MutationInput {
   clientMutationId: String
-  a: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 }
 
-type Add3Payload {
+type Add1MutationPayload {
   clientMutationId: String
   integer: Int
   query: Query
 }
 
-input Add4Input {
+input Add2MutationInput {
+  clientMutationId: String
+  a: Int!
+  b: Int!
+}
+
+type Add2MutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add3MutationInput {
+  clientMutationId: String
+  a: Int
+  arg1: Int
+}
+
+type Add3MutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add4MutationInput {
   clientMutationId: String
   arg0: Int
   b: Int
 }
 
-type Add4Payload {
+type Add4MutationPayload {
   clientMutationId: String
   integer: Int
   query: Query
@@ -432,18 +456,25 @@ type Mult4Payload {
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  # lol, add some stuff 3
-  add3(input: Add3Input!): Add3Payload
+  # lol, add some stuff 1 mutation
+  add1Mutation(input: Add1MutationInput!): Add1MutationPayload
 
-  # lol, add some stuff 4
-  add4(input: Add4Input!): Add4Payload
+  # lol, add some stuff 2 mutation
+  add2Mutation(input: Add2MutationInput!): Add2MutationPayload
+
+  # lol, add some stuff 3 mutation
+  add3Mutation(input: Add3MutationInput!): Add3MutationPayload
+
+  # lol, add some stuff 4 mutation
+  add4Mutation(input: Add4MutationInput!): Add4MutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  setMutation(input: SetMutationInput!): SetMutationPayload
+  setIntMutation(input: SetIntMutationInput!): SetIntMutationPayload
+  setTableMutation(input: SetTableMutationInput!): SetTableMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
@@ -696,6 +727,61 @@ type Query {
     id: ID!
   ): Node
 
+  # lol, add some stuff 1 query
+  add1Query(arg0: Int!, arg1: Int!): Int
+
+  # lol, add some stuff 2 query
+  add2Query(a: Int!, b: Int!): Int
+
+  # lol, add some stuff 3 query
+  add3Query(a: Int, arg1: Int): Int
+
+  # lol, add some stuff 4 query
+  add4Query(arg0: Int, b: Int): Int
+  compoundTypeQuery(object: CompoundTypeInput): CompoundType
+  noArgsQuery: Int
+
+  # Reads and enables paginatation through a set of \`Int\`.
+  setIntQuery(
+    # The method to use when ordering \`Int\`.
+    orderBy: SetIntQueryOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    x: Int
+    y: Int
+    z: Int
+  ): SetIntQueryConnection
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  setTableQuery(
+    # The method to use when ordering \`Person\`.
+    orderBy: SetTableQueryOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): SetTableQueryConnection
+  tableQuery(id: Int): Post
+  typesQuery(a: Int, b: Boolean, c: String): Boolean
+
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
     # The method to use when ordering \`ForeignKey\`.
@@ -885,14 +971,85 @@ type Query {
   relay: Query!
 }
 
-input SetMutationInput {
+input SetIntMutationInput {
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+type SetIntMutationPayload {
+  clientMutationId: String
+  integers: [Int]
+  query: Query
+}
+
+# A connection to a list of \`Int\` values.
+type SetIntQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Int\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  edges: [SetIntQueryEdge]
+
+  # A list of \`Int\` objects.
+  nodes: [Int]
+}
+
+# A \`Int\` edge in the connection.
+type SetIntQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Int\` at the end of the edge.
+  node: Int
+}
+
+# Methods to use when ordering \`Int\`.
+enum SetIntQueryOrderBy {
+  NATURAL
+}
+
+input SetTableMutationInput {
   clientMutationId: String
 }
 
-type SetMutationPayload {
+type SetTableMutationPayload {
   clientMutationId: String
-  people: [Person!]
+  people: [Person]
   query: Query
+}
+
+# A connection to a list of \`Person\` values.
+type SetTableQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [SetTableQueryEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type SetTableQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum SetTableQueryOrderBy {
+  NATURAL
 }
 
 input TableMutationInput {
@@ -902,7 +1059,7 @@ input TableMutationInput {
 
 type TableMutationPayload {
   clientMutationId: String
-  post: Post!
+  post: Post
   query: Query
 }
 
@@ -1178,25 +1335,49 @@ scalar Uuid
 `;
 
 exports[`test prints a schema with the default options 1`] = `
-"input Add3Input {
+"input Add1MutationInput {
   clientMutationId: String
-  a: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 }
 
-type Add3Payload {
+type Add1MutationPayload {
   clientMutationId: String
   integer: Int
   query: Query
 }
 
-input Add4Input {
+input Add2MutationInput {
+  clientMutationId: String
+  a: Int!
+  b: Int!
+}
+
+type Add2MutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add3MutationInput {
+  clientMutationId: String
+  a: Int
+  arg1: Int
+}
+
+type Add3MutationPayload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Add4MutationInput {
   clientMutationId: String
   arg0: Int
   b: Int
 }
 
-type Add4Payload {
+type Add4MutationPayload {
   clientMutationId: String
   integer: Int
   query: Query
@@ -1611,18 +1792,25 @@ type Mult4Payload {
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  # lol, add some stuff 3
-  add3(input: Add3Input!): Add3Payload
+  # lol, add some stuff 1 mutation
+  add1Mutation(input: Add1MutationInput!): Add1MutationPayload
 
-  # lol, add some stuff 4
-  add4(input: Add4Input!): Add4Payload
+  # lol, add some stuff 2 mutation
+  add2Mutation(input: Add2MutationInput!): Add2MutationPayload
+
+  # lol, add some stuff 3 mutation
+  add3Mutation(input: Add3MutationInput!): Add3MutationPayload
+
+  # lol, add some stuff 4 mutation
+  add4Mutation(input: Add4MutationInput!): Add4MutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  setMutation(input: SetMutationInput!): SetMutationPayload
+  setIntMutation(input: SetIntMutationInput!): SetIntMutationPayload
+  setTableMutation(input: SetTableMutationInput!): SetTableMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
@@ -1875,6 +2063,61 @@ type Query {
     __id: ID!
   ): Node
 
+  # lol, add some stuff 1 query
+  add1Query(arg0: Int!, arg1: Int!): Int
+
+  # lol, add some stuff 2 query
+  add2Query(a: Int!, b: Int!): Int
+
+  # lol, add some stuff 3 query
+  add3Query(a: Int, arg1: Int): Int
+
+  # lol, add some stuff 4 query
+  add4Query(arg0: Int, b: Int): Int
+  compoundTypeQuery(object: CompoundTypeInput): CompoundType
+  noArgsQuery: Int
+
+  # Reads and enables paginatation through a set of \`Int\`.
+  setIntQuery(
+    # The method to use when ordering \`Int\`.
+    orderBy: SetIntQueryOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    x: Int
+    y: Int
+    z: Int
+  ): SetIntQueryConnection
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  setTableQuery(
+    # The method to use when ordering \`Person\`.
+    orderBy: SetTableQueryOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): SetTableQueryConnection
+  tableQuery(id: Int): Post
+  typesQuery(a: Int, b: Boolean, c: String): Boolean
+
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
     # The method to use when ordering \`ForeignKey\`.
@@ -2064,14 +2307,85 @@ type Query {
   relay: Query!
 }
 
-input SetMutationInput {
+input SetIntMutationInput {
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+type SetIntMutationPayload {
+  clientMutationId: String
+  integers: [Int]
+  query: Query
+}
+
+# A connection to a list of \`Int\` values.
+type SetIntQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Int\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  edges: [SetIntQueryEdge]
+
+  # A list of \`Int\` objects.
+  nodes: [Int]
+}
+
+# A \`Int\` edge in the connection.
+type SetIntQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Int\` at the end of the edge.
+  node: Int
+}
+
+# Methods to use when ordering \`Int\`.
+enum SetIntQueryOrderBy {
+  NATURAL
+}
+
+input SetTableMutationInput {
   clientMutationId: String
 }
 
-type SetMutationPayload {
+type SetTableMutationPayload {
   clientMutationId: String
-  people: [Person!]
+  people: [Person]
   query: Query
+}
+
+# A connection to a list of \`Person\` values.
+type SetTableQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [SetTableQueryEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type SetTableQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum SetTableQueryOrderBy {
+  NATURAL
 }
 
 input TableMutationInput {
@@ -2081,7 +2395,7 @@ input TableMutationInput {
 
 type TableMutationPayload {
   clientMutationId: String
-  post: Post!
+  post: Post
   query: Query
 }
 

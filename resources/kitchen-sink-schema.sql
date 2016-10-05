@@ -93,15 +93,23 @@ create table b.types (
   "nested_compound_type" b.nested_compound_type
 );
 
-create function a.add_1(int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
-create function a.add_2(a int, b int) returns int as $$ select $1 + $2 $$ language sql stable;
-create function a.add_3(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
-create function a.add_4(int, b int) returns int as $$ select $1 + $2 $$ language sql;
+create function a.add_1_mutation(int, int) returns int as $$ select $1 + $2 $$ language sql volatile strict;
+create function a.add_2_mutation(a int, b int default 2) returns int as $$ select $1 + $2 $$ language sql strict;
+create function a.add_3_mutation(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function a.add_4_mutation(int, b int default 2) returns int as $$ select $1 + $2 $$ language sql;
+create function a.add_1_query(int, int) returns int as $$ select $1 + $2 $$ language sql immutable strict;
+create function a.add_2_query(a int, b int default 2) returns int as $$ select $1 + $2 $$ language sql stable strict;
+create function a.add_3_query(a int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function a.add_4_query(int, b int default 2) returns int as $$ select $1 + $2 $$ language sql stable;
 
-comment on function a.add_1(int, int) is 'lol, add some stuff 1';
-comment on function a.add_2(int, int) is 'lol, add some stuff 2';
-comment on function a.add_3(int, int) is 'lol, add some stuff 3';
-comment on function a.add_4(int, int) is 'lol, add some stuff 4';
+comment on function a.add_1_mutation(int, int) is 'lol, add some stuff 1 mutation';
+comment on function a.add_2_mutation(int, int) is 'lol, add some stuff 2 mutation';
+comment on function a.add_3_mutation(int, int) is 'lol, add some stuff 3 mutation';
+comment on function a.add_4_mutation(int, int) is 'lol, add some stuff 4 mutation';
+comment on function a.add_1_query(int, int) is 'lol, add some stuff 1 query';
+comment on function a.add_2_query(int, int) is 'lol, add some stuff 2 query';
+comment on function a.add_3_query(int, int) is 'lol, add some stuff 3 query';
+comment on function a.add_4_query(int, int) is 'lol, add some stuff 4 query';
 
 create function b.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
 create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
@@ -114,7 +122,9 @@ create function c.compound_type_query(object c.compound_type) returns c.compound
 create function c.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = id $$ language sql stable;
 create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = id $$ language sql;
-create function c.set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
-create function c.set_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
+create function c.set_table_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
+create function c.set_table_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
+create function c.set_int_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;
+create function c.set_int_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
 create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
 create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;

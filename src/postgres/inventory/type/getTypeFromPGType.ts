@@ -84,7 +84,7 @@ function getTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType, _invent
   if (_inventory && pgType.type === 'c') {
     const collection = _inventory.getCollections().find(collection => collection instanceof PGCollection && collection._pgClass.typeId === pgType.id)
     if (collection)
-      return collection.type
+      return new NullableType(collection.type)
   }
 
   return _getTypeFromPGType(pgCatalog, pgType)
