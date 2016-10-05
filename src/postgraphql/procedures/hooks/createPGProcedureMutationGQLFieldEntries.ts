@@ -6,12 +6,12 @@ import {
   GraphQLInputFieldConfig,
   getNullableType,
 } from 'graphql'
-import { Type, NullableType, ListType } from '../../interface'
-import { formatName } from '../../graphql/utils'
-import BuildToken from '../../graphql/schema/BuildToken'
-import createMutationGQLField from '../../graphql/schema/createMutationGQLField'
-import { PGCatalog, PGCatalogProcedure } from '../../postgres/introspection'
-import createPGProcedureSignatureFixtures from './createPGProcedureSignatureFixtures'
+import { Type, NullableType, ListType } from '../../../interface'
+import { formatName } from '../../../graphql/utils'
+import BuildToken from '../../../graphql/schema/BuildToken'
+import createMutationGQLField from '../../../graphql/schema/createMutationGQLField'
+import { PGCatalog, PGCatalogProcedure } from '../../../postgres/introspection'
+import createPGProcedureSignatureFixtures from '../createPGProcedureSignatureFixtures'
 
 /**
  * Creates mutation field entries for all of our volatile Postgres procedures.

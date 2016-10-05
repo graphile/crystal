@@ -14,7 +14,7 @@ type BuildToken = {
 }
 
 // TODO: doc
-type _BuildTokenHooks = {
+export type _BuildTokenHooks = {
   queryFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
   mutationFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
   objectTypeFieldEntries?: (type: ObjectType, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,

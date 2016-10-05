@@ -1,11 +1,11 @@
 import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableType } from 'graphql'
-import { Type } from '../../interface'
-import { formatName, buildObject } from '../../graphql/utils'
-import BuildToken from '../../graphql/schema/BuildToken'
-import createConnectionGQLField from '../../graphql/schema/connection/createConnectionGQLField'
-import { PGCatalog, PGCatalogProcedure } from '../../postgres/introspection'
-import createPGProcedureSignatureFixtures from './createPGProcedureSignatureFixtures'
-import PGProcedurePaginator from './PGProcedurePaginator'
+import { Type } from '../../../interface'
+import { formatName, buildObject } from '../../../graphql/utils'
+import BuildToken from '../../../graphql/schema/BuildToken'
+import createConnectionGQLField from '../../../graphql/schema/connection/createConnectionGQLField'
+import { PGCatalog, PGCatalogProcedure } from '../../../postgres/introspection'
+import createPGProcedureSignatureFixtures from '../createPGProcedureSignatureFixtures'
+import PGProcedurePaginator from '../PGProcedurePaginator'
 
 /**
  * Creates all of the fields for query procedures. Query procedures that return
