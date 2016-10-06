@@ -787,7 +787,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int, b: Boolean, c: String): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -1096,9 +1096,10 @@ type TypesEdge {
 
 input TypesMutationInput {
   clientMutationId: String
-  a: Int
-  b: Boolean
-  c: String
+  a: Int!
+  b: Boolean!
+  c: String!
+  d: [Int]!
 }
 
 type TypesMutationPayload {
@@ -2064,7 +2065,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int, b: Boolean, c: String): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -2373,9 +2374,10 @@ type TypesEdge {
 
 input TypesMutationInput {
   clientMutationId: String
-  a: Int
-  b: Boolean
-  c: String
+  a: Int!
+  b: Boolean!
+  c: String!
+  d: [Int]!
 }
 
 type TypesMutationPayload {

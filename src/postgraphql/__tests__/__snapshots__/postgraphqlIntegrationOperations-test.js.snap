@@ -1045,6 +1045,32 @@ Object {
 }
 `;
 
+exports[`test operation procedure-query.graphql 1`] = `
+Object {
+  "data": Object {
+    "add1Query": 3,
+    "add2Query": 4,
+    "add3Query": null,
+    "add4Query": 4,
+    "compoundTypeQuery": Object {
+      "a": 420,
+      "b": "easy cheesy baked potatoes",
+      "c": "RED",
+      "d": null,
+      "fooBar": 8,
+    },
+    "noArgsQuery": 2,
+    "tableQuery": Object {
+      "__id": "WyJwb3N0cyIsNV0=",
+      "authorId": 5,
+      "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      "id": 5,
+    },
+    "typesQuery": false,
+  },
+}
+`;
+
 exports[`test operation query.graphql 1`] = `
 Object {
   "data": Object {
