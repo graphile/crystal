@@ -1,3 +1,4 @@
+```ts
 /**
  * This is for a world when paginators are simple instances and are not used
  * statically. Currently paginators have a `name`, `itemType`, and `ordering`
@@ -37,3 +38,4 @@ interface PaginatorRange<TPosition> {
 // Original Set:   0,1,2,3,4,5,6,7,8,9
 // Range:              ( *---*   )
 // Final Set:            3,4,5
+```

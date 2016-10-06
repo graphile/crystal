@@ -3,7 +3,7 @@ import { readFile, readdirSync } from 'fs'
 import { graphql } from 'graphql'
 import withPGClient from '../../postgres/__tests__/fixtures/withPGClient'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
-import createPostGraphQLSchema from '../createPostGraphQLSchema'
+import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 const kitchenSinkData = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/kitchen-sink-data.sql'), (error, data) => {
@@ -32,11 +32,6 @@ for (const file of readdirSync(queriesDir)) {
     await pgClient.query(await kitchenSinkData)
 
     const result = await graphql(gqlSchema, query, null, { [$$pgClient]: pgClient })
-
-    // Log the errors in our result.
-    if (result.errors)
-      for (const e of result.errors)
-        console.error(e.stack || e)
 
     expect(result).toMatchSnapshot()
   }))

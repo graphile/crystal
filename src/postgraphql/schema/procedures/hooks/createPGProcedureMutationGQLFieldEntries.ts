@@ -6,11 +6,11 @@ import {
   GraphQLInputFieldConfig,
   getNullableType,
 } from 'graphql'
-import { Type, NullableType, ListType } from '../../../interface'
-import { formatName } from '../../../graphql/utils'
-import BuildToken from '../../../graphql/schema/BuildToken'
-import createMutationGQLField from '../../../graphql/schema/createMutationGQLField'
-import { PGCatalog, PGCatalogProcedure } from '../../../postgres/introspection'
+import { Type, NullableType, ListType } from '../../../../interface'
+import { formatName } from '../../../../graphql/utils'
+import BuildToken from '../../../../graphql/schema/BuildToken'
+import createMutationGQLField from '../../../../graphql/schema/createMutationGQLField'
+import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
 import createPGProcedureSignatureFixtures from '../createPGProcedureSignatureFixtures'
 
 /**

@@ -6,7 +6,7 @@ import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue from '../../transformGQLInputValue'
 import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
-import { getCollectionPatchType, createUpdateCollectionOutputFieldEntries } from './createUpdateCollectionMutationFieldEntry'
+import { getCollectionPatchType, getUpdateCollectionPayloadGQLType } from './createUpdateCollectionMutationFieldEntry'
 
 /**
  * Creates a delete mutation which will delete a single value from a collection
@@ -42,7 +42,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
         type: new GraphQLNonNull(patchType),
       }],
     ],
-    outputFields: createUpdateCollectionOutputFieldEntries(buildToken, collection),
+    payloadType: getUpdateCollectionPayloadGQLType(buildToken, collection),
     execute: (context, input) => {
       // Get the patch from our input.
       const patch = transformGQLInputValue(patchType, input[patchFieldName])

@@ -1,12 +1,30 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { Inventory } from '../../interface'
-import { SchemaOptions } from '../schema/createGQLSchema'
+import { GraphQLSchema } from 'graphql'
+import { Pool } from 'pg'
 
 /**
- * Options used to create our request handler. Includes all of the options
- * necessary to create our schema.
+ * A request handler for one of many different `http` frameworks.
  */
-type HTTPRequestHandlerOptions = SchemaOptions & {
+interface HTTPRequestHandler {
+  (req: IncomingMessage, res: ServerResponse, next?: (error?: any) => void): void
+  (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
+}
+
+/**
+ * Creates a GraphQL request handler that can support many different `http` frameworks, including:
+ *
+ * - Native Node.js `http`.
+ * - `connect`.
+ * - `express`.
+ * - `koa` (2.0).
+ */
+export default function createPostGraphQLHTTPRequestHandler (config: {
+  // The actual GraphQL schema we will use.
+  graphqlSchema: GraphQLSchema,
+
+  // A Postgres client pool we use to connect Postgres clients.
+  pgPool: Pool,
+
   // The exact (and only) route our request handler will respond to.
   graphqlRoute?: string,
 
@@ -30,25 +48,4 @@ type HTTPRequestHandlerOptions = SchemaOptions & {
   // Enables some CORS rules. When enabled there may be some pre-flight
   // requests with negative performance impacts.
   enableCORS?: boolean,
-}
-
-/**
- * A request handler for one of many different `http` frameworks.
- */
-interface HTTPRequestHandler {
-  (req: IncomingMessage, res: ServerResponse, next?: (error?: any) => void): void
-  (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
-}
-
-/**
- * Creates a GraphQL request handler that can support many different `http` frameworks, including:
- *
- * - Native Node.js `http`.
- * - `connect`.
- * - `express`.
- * - `koa` (2.0).
- */
-export default function createGraphQLHTTPRequestHandler (
-  inventory: Inventory,
-  options?: HTTPRequestHandlerOptions,
-): HTTPRequestHandler
+}): HTTPRequestHandler

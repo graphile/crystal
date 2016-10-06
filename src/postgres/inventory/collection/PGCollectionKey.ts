@@ -239,7 +239,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const result = await client.query(query)
 
         if (result.rowCount < 1)
-          throw new Error(`No values were deleted in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
+          throw new Error(`No values were deleted in collection '${this.collection.name}' because no values were found.`)
 
         return transformPGValue(this.collection.type, result.rows[0]['object'])
       }

@@ -1,16 +1,33 @@
 // TODO: This is a temporary main file for testing.
 
 import { createServer } from 'http'
-import { Inventory } from '../interface'
-import { addPGToInventory } from '../postgres'
-import { createGraphQLHTTPRequestHandler } from '../graphql'
+import { Pool, PoolConfig } from 'pg'
+import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
+import createPostGraphQLHTTPRequestHandler from './http/createPostGraphQLHTTPRequestHandler'
 
-const pgConfig = {}
+// The default Postgres config.
+const pgConfig: PoolConfig = {
+  max: 10,
+}
 
 async function main () {
-  const inventory = new Inventory()
-  await addPGToInventory(inventory, { schemas: ['a', 'b', 'c'] })
-  const requestHandler = createGraphQLHTTPRequestHandler(inventory, { graphiql: true, showErrorStack: 'json' })
+  const pgPool = new Pool(pgConfig)
+  const pgClient = await pgPool.connect()
+
+  const graphqlSchema = await createPostGraphQLSchema({
+    pgClient,
+    pgSchemas: ['a', 'b', 'c'],
+  })
+
+  pgClient.release()
+
+  const requestHandler = createPostGraphQLHTTPRequestHandler({
+    graphqlSchema,
+    pgPool,
+    graphiql: true,
+    showErrorStack: 'json',
+  })
+
   const server = createServer(requestHandler)
 
   server.listen(3000, () => {

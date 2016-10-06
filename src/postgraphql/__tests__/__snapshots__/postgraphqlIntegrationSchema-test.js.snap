@@ -248,13 +248,6 @@ input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   personId2: Int!
 }
 
-type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  deletedCompoundKeyId: ID
-  query: Query
-}
-
 input DeleteCompoundKeyInput {
   clientMutationId: String
   id: ID!
@@ -272,23 +265,9 @@ input DeletePersonByEmailInput {
   email: Email!
 }
 
-type DeletePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
 input DeletePersonByRowIdInput {
   clientMutationId: String
   rowId: Int!
-}
-
-type DeletePersonByRowIdPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
 }
 
 input DeletePersonInput {
@@ -308,13 +287,6 @@ input DeletePostByRowIdInput {
   rowId: Int!
 }
 
-type DeletePostByRowIdPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-  query: Query
-}
-
 input DeletePostInput {
   clientMutationId: String
   id: ID!
@@ -330,13 +302,6 @@ type DeletePostPayload {
 input DeleteTypeByRowIdInput {
   clientMutationId: String
   rowId: Int!
-}
-
-type DeleteTypeByRowIdPayload {
-  clientMutationId: String
-  type: Type
-  deletedTypeId: ID
-  query: Query
 }
 
 input DeleteTypeInput {
@@ -522,27 +487,27 @@ type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostByRowId(input: UpdatePostByRowIdInput!): UpdatePostByRowIdPayload
+  updatePostByRowId(input: UpdatePostByRowIdInput!): UpdatePostPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostByRowIdPayload
+  deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostPayload
   createType(input: CreateTypeInput!): CreateTypePayload
   updateType(input: UpdateTypeInput!): UpdateTypePayload
-  updateTypeByRowId(input: UpdateTypeByRowIdInput!): UpdateTypeByRowIdPayload
+  updateTypeByRowId(input: UpdateTypeByRowIdInput!): UpdateTypePayload
   deleteType(input: DeleteTypeInput!): DeleteTypePayload
-  deleteTypeByRowId(input: DeleteTypeByRowIdInput!): DeleteTypeByRowIdPayload
+  deleteTypeByRowId(input: DeleteTypeByRowIdInput!): DeleteTypePayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
-  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyByPersonId1AndPersonId2Payload
+  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
-  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
+  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
-  updatePersonByRowId(input: UpdatePersonByRowIdInput!): UpdatePersonByRowIdPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
+  updatePersonByRowId(input: UpdatePersonByRowIdInput!): UpdatePersonPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
-  deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonByRowIdPayload
+  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
+  deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonPayload
 }
 
 type NestedCompoundType {
@@ -1227,12 +1192,6 @@ input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   compoundKeyPatch: CompoundKeyPatch!
 }
 
-type UpdateCompoundKeyByPersonId1AndPersonId2Payload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  query: Query
-}
-
 input UpdateCompoundKeyInput {
   clientMutationId: String
   id: ID!
@@ -1251,22 +1210,10 @@ input UpdatePersonByEmailInput {
   personPatch: PersonPatch!
 }
 
-type UpdatePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
-}
-
 input UpdatePersonByRowIdInput {
   clientMutationId: String
   rowId: Int!
   personPatch: PersonPatch!
-}
-
-type UpdatePersonByRowIdPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
 }
 
 input UpdatePersonInput {
@@ -1287,12 +1234,6 @@ input UpdatePostByRowIdInput {
   postPatch: PostPatch!
 }
 
-type UpdatePostByRowIdPayload {
-  clientMutationId: String
-  post: Post
-  query: Query
-}
-
 input UpdatePostInput {
   clientMutationId: String
   id: ID!
@@ -1309,12 +1250,6 @@ input UpdateTypeByRowIdInput {
   clientMutationId: String
   rowId: Int!
   typePatch: TypePatch!
-}
-
-type UpdateTypeByRowIdPayload {
-  clientMutationId: String
-  type: Type
-  query: Query
 }
 
 input UpdateTypeInput {
@@ -1584,13 +1519,6 @@ input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   personId2: Int!
 }
 
-type DeleteCompoundKeyByPersonId1AndPersonId2Payload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  deletedCompoundKeyId: ID
-  query: Query
-}
-
 input DeleteCompoundKeyInput {
   clientMutationId: String
   __id: ID!
@@ -1608,23 +1536,9 @@ input DeletePersonByEmailInput {
   email: Email!
 }
 
-type DeletePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
 input DeletePersonByIdInput {
   clientMutationId: String
   id: Int!
-}
-
-type DeletePersonByIdPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
 }
 
 input DeletePersonInput {
@@ -1644,13 +1558,6 @@ input DeletePostByIdInput {
   id: Int!
 }
 
-type DeletePostByIdPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-  query: Query
-}
-
 input DeletePostInput {
   clientMutationId: String
   __id: ID!
@@ -1666,13 +1573,6 @@ type DeletePostPayload {
 input DeleteTypeByIdInput {
   clientMutationId: String
   id: Int!
-}
-
-type DeleteTypeByIdPayload {
-  clientMutationId: String
-  type: Type
-  deletedTypeId: ID
-  query: Query
 }
 
 input DeleteTypeInput {
@@ -1858,27 +1758,27 @@ type Mutation {
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostById(input: UpdatePostByIdInput!): UpdatePostByIdPayload
+  updatePostById(input: UpdatePostByIdInput!): UpdatePostPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
+  deletePostById(input: DeletePostByIdInput!): DeletePostPayload
   createType(input: CreateTypeInput!): CreateTypePayload
   updateType(input: UpdateTypeInput!): UpdateTypePayload
-  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypeByIdPayload
+  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypePayload
   deleteType(input: DeleteTypeInput!): DeleteTypePayload
-  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypeByIdPayload
+  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypePayload
   createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
-  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyByPersonId1AndPersonId2Payload
+  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
-  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyByPersonId1AndPersonId2Payload
+  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
-  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
+  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonByEmailPayload
-  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
+  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
+  deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
 }
 
 type NestedCompoundType {
@@ -2563,12 +2463,6 @@ input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   compoundKeyPatch: CompoundKeyPatch!
 }
 
-type UpdateCompoundKeyByPersonId1AndPersonId2Payload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-  query: Query
-}
-
 input UpdateCompoundKeyInput {
   clientMutationId: String
   __id: ID!
@@ -2587,22 +2481,10 @@ input UpdatePersonByEmailInput {
   personPatch: PersonPatch!
 }
 
-type UpdatePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
-}
-
 input UpdatePersonByIdInput {
   clientMutationId: String
   id: Int!
   personPatch: PersonPatch!
-}
-
-type UpdatePersonByIdPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
 }
 
 input UpdatePersonInput {
@@ -2623,12 +2505,6 @@ input UpdatePostByIdInput {
   postPatch: PostPatch!
 }
 
-type UpdatePostByIdPayload {
-  clientMutationId: String
-  post: Post
-  query: Query
-}
-
 input UpdatePostInput {
   clientMutationId: String
   __id: ID!
@@ -2645,12 +2521,6 @@ input UpdateTypeByIdInput {
   clientMutationId: String
   id: Int!
   typePatch: TypePatch!
-}
-
-type UpdateTypeByIdPayload {
-  clientMutationId: String
-  type: Type
-  query: Query
 }
 
 input UpdateTypeInput {

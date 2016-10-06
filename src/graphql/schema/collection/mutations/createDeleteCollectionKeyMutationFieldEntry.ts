@@ -5,7 +5,7 @@ import BuildToken from '../../BuildToken'
 import createMutationGQLField from '../../createMutationGQLField'
 import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
-import { createDeleteCollectionOutputFieldEntries } from './createDeleteCollectionMutationFieldEntry'
+import { getDeleteCollectionPayloadGQLType } from './createDeleteCollectionMutationFieldEntry'
 
 /**
  * Creates a delete mutation which will delete a single value from a collection
@@ -27,7 +27,7 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TKey>(
   return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
     inputFields: inputHelpers.fieldEntries,
-    outputFields: createDeleteCollectionOutputFieldEntries(buildToken, collection),
+    payloadType: getDeleteCollectionPayloadGQLType(buildToken, collection),
     execute: (context, input) =>
       collectionKey.delete!(context, inputHelpers.getKey(input)),
   })]

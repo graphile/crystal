@@ -1,9 +1,9 @@
 import { GraphQLOutputType, GraphQLInputType } from 'graphql'
-import { Inventory, Type } from '../../interface'
-import { PGCatalog, PGCatalogType, PGCatalogProcedure } from '../../postgres/introspection'
-import BuildToken from '../../graphql/schema/BuildToken'
-import getGQLType from '../../graphql/schema/getGQLType'
-import getTypeFromPGType from '../../postgres/inventory/type/getTypeFromPGType'
+import { Inventory, Type } from '../../../interface'
+import { PGCatalog, PGCatalogType, PGCatalogProcedure } from '../../../postgres/introspection'
+import BuildToken from '../../../graphql/schema/BuildToken'
+import getGQLType from '../../../graphql/schema/getGQLType'
+import getTypeFromPGType from '../../../postgres/inventory/type/getTypeFromPGType'
 
 /**
  * Creates some signature fixtures for a Postgres procedure. Contains the

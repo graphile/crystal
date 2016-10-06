@@ -1,8 +1,8 @@
-import { Type, ObjectType, Paginator } from '../../interface'
-import { sql } from '../../postgres/utils'
-import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogProcedure } from '../../postgres/introspection'
-import PGPaginator from '../../postgres/inventory/paginator/PGPaginator'
-import PGPaginatorOrderingOffset from '../../postgres/inventory/paginator/PGPaginatorOrderingOffset'
+import { Type, ObjectType, Paginator } from '../../../interface'
+import { sql } from '../../../postgres/utils'
+import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogProcedure } from '../../../postgres/introspection'
+import PGPaginator from '../../../postgres/inventory/paginator/PGPaginator'
+import PGPaginatorOrderingOffset from '../../../postgres/inventory/paginator/PGPaginatorOrderingOffset'
 
 /**
  * The input to our procedure is simply a tuple of values that represent the

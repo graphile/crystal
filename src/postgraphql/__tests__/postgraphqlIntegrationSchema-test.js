@@ -1,6 +1,6 @@
 import { printSchema } from 'graphql'
 import withPGClient from '../../postgres/__tests__/fixtures/withPGClient'
-import createPostGraphQLSchema from '../createPostGraphQLSchema'
+import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 test('prints a schema with the default options', withPGClient(async pgClient => {
   const gqlSchema = await createPostGraphQLSchema({

@@ -1,9 +1,8 @@
 import { Client, connect } from 'pg'
 import { GraphQLSchema } from 'graphql'
-import { Inventory } from '../interface'
-import { introspectPGDatabase, addPGCatalogToInventory } from '../postgres'
-import { createGraphQLSchema } from '../graphql'
-import BuildToken from '../graphql/schema/BuildToken'
+import { Inventory } from '../../interface'
+import { introspectPGDatabase, addPGCatalogToInventory } from '../../postgres'
+import { createGraphQLSchema } from '../../graphql'
 import createPGProcedureMutationGQLFieldEntries from './procedures/hooks/createPGProcedureMutationGQLFieldEntries'
 import createPGProcedureQueryGQLFieldEntries from './procedures/hooks/createPGProcedureQueryGQLFieldEntries'
 
@@ -36,8 +35,8 @@ export default async function createPostGraphQLSchema (
   const gqlSchema = createGraphQLSchema(inventory, {
     nodeIdFieldName: config.relay1Ids ? 'id' : '__id',
     _hooks: {
-      mutationFieldEntries: (_buildToken: BuildToken) => createPGProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
-      queryFieldEntries: (_buildToken: BuildToken) => createPGProcedureQueryGQLFieldEntries(_buildToken, pgCatalog),
+      mutationFieldEntries: _buildToken => createPGProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
+      queryFieldEntries: _buildToken => createPGProcedureQueryGQLFieldEntries(_buildToken, pgCatalog),
       objectTypeFieldEntries: () => [],
     },
   })

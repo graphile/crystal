@@ -10,8 +10,7 @@ import {
   formatError as defaultFormatError,
   print as printGraphql,
 } from 'graphql'
-import { Inventory } from '../../interface'
-import createGQLSchema from '../schema/createGQLSchema'
+import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 
 const Debugger = require('debug')
@@ -20,7 +19,10 @@ const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 
-const debug = new Debugger('postgraphql:graphql:http')
+const $$pgClientOrigQuery = Symbol()
+
+const debugGraphql = new Debugger('postgraphql:graphql')
+const debugPG = new Debugger('postgraphql:postgres')
 
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
@@ -33,9 +35,11 @@ const favicon = new Promise((resolve, reject) => {
  * Creates a GraphQL request handler, this is untyped besides some JSDoc types
  * for intellisense.
  *
- * @param {Inventory} inventory
+ * @param {GraphQLSchema} graphqlSchema
  */
-export default function createGraphQLHTTPRequestHandler (inventory, options = {}) {
+export default function createPostGraphQLHTTPRequestHandler (options) {
+  const { graphqlSchema, pgPool } = options
+
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
   const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null
@@ -43,9 +47,6 @@ export default function createGraphQLHTTPRequestHandler (inventory, options = {}
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
     throw new Error(`Cannot use the same route '${graphqlRoute}' for both GraphQL and GraphiQL.`)
-
-  // Creates our GraphQL schema…
-  const graphqlSchema = createGQLSchema(inventory, options)
 
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
@@ -255,26 +256,45 @@ export default function createGraphQLHTTPRequestHandler (inventory, options = {}
       }
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
-      if (debug.enabled)
-        debug(printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim())
+      if (debugGraphql.enabled)
+        debugGraphql(printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim())
 
-      // Create a new context
-      const context = await inventory.createContext()
+      // Connect a new Postgres client and start a transaction.
+      const pgClient = await pgPool.connect()
+
+      // If the user has enabled the debugging of Postgres queries, enhance the
+      // query function to log SQL queries.
+      if (debugPG.enabled) {
+        // Set the original query method to a key on our client. If that key is
+        // already set, use that.
+        pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
+
+        pgClient.query = function (...args) {
+          // Debug just the query text.
+          debugPG(args[0].text || args[0])
+          console.log(args[0].values)
+          // Call the original query method.
+          return pgClient[$$pgClientOrigQuery].apply(this, args)
+        }
+      }
+
+      await pgClient.query('begin')
 
       try {
         result = await executeGraphql(
           graphqlSchema,
           queryDocumentAST,
           null,
-          context,
+          { [$$pgClient]: pgClient },
           params.variables,
           params.operationName,
         )
       }
-      // Cleanup our context. Even if we fail to execute the request it is
-      // very important that we cleanup after ourselves!
+      // Cleanup our Postgres client by ending the transaction and releasing
+      // the client back to the pool. Always do this even if the query fails.
       finally {
-        await context.cleanup()
+        await pgClient.query('commit')
+        pgClient.release()
       }
     }
     catch (error) {

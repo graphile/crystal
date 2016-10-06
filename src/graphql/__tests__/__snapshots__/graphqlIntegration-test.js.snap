@@ -37,13 +37,6 @@ input DeletePersonByIdInput {
   id: Int!
 }
 
-type DeletePersonByIdPayload {
-  clientMutationId: String
-  person: Person
-  deletedPersonId: ID
-  query: Query
-}
-
 input DeletePersonInput {
   clientMutationId: String
   __id: ID!
@@ -59,13 +52,6 @@ type DeletePersonPayload {
 input DeletePostByIdInput {
   clientMutationId: String
   id: Int!
-}
-
-type DeletePostByIdPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-  query: Query
 }
 
 input DeletePostInput {
@@ -86,15 +72,15 @@ scalar Email
 type Mutation {
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonByIdPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonByEmailPayload
+  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
+  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonById(input: DeletePersonByIdInput!): DeletePersonByIdPayload
+  deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostById(input: UpdatePostByIdInput!): UpdatePostByIdPayload
+  updatePostById(input: UpdatePostByIdInput!): UpdatePostPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostById(input: DeletePostByIdInput!): DeletePostByIdPayload
+  deletePostById(input: DeletePostByIdInput!): DeletePostPayload
 }
 
 # An object with a globally unique \`ID\`.
@@ -335,22 +321,10 @@ input UpdatePersonByEmailInput {
   personPatch: PersonPatch!
 }
 
-type UpdatePersonByEmailPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
-}
-
 input UpdatePersonByIdInput {
   clientMutationId: String
   id: Int!
   personPatch: PersonPatch!
-}
-
-type UpdatePersonByIdPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
 }
 
 input UpdatePersonInput {
@@ -369,12 +343,6 @@ input UpdatePostByIdInput {
   clientMutationId: String
   id: Int!
   postPatch: PostPatch!
-}
-
-type UpdatePostByIdPayload {
-  clientMutationId: String
-  post: Post
-  query: Query
 }
 
 input UpdatePostInput {

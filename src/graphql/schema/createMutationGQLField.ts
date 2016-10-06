@@ -9,6 +9,7 @@ import {
 import { formatName, buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import getQueryGQLType from './getQueryGQLType'
+import createMutationPayloadGQLType from './createMutationPayloadGQLType'
 
 /**
  * The configuration for creating a mutation field.
@@ -20,15 +21,14 @@ type MutationFieldConfig<T> = {
   description?: string | undefined,
   inputFields?: Array<[string, GraphQLInputFieldConfig<mixed>] | false | null | undefined>,
   outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
+  payloadType?: GraphQLObjectType<MutationValue<T>>,
   execute: (context: mixed, input: { [name: string]: mixed }) => Promise<T | null | undefined>,
 }
 
 /**
  * The internal value of a mutation.
- *
- * @private
  */
-type MutationValue<T> = {
+export type MutationValue<T> = {
   clientMutationId?: string,
   value: T,
 }
@@ -47,6 +47,9 @@ export default function createMutationGQLField <T>(
   buildToken: BuildToken,
   config: MutationFieldConfig<T>,
 ): GraphQLFieldConfig<mixed, MutationValue<T>> {
+  if (config.outputFields && config.payloadType)
+    throw new Error('Mutation `outputFields` and `payloadType` may not be defiend at the same time.')
+
   return {
     description: config.description,
 
@@ -79,47 +82,12 @@ export default function createMutationGQLField <T>(
 
     // Next we need to define our output (payload) type. Instead of directly
     // being a value, we instead return an object. This allows us to return
-    // multiple things.
-    type: new GraphQLObjectType<MutationValue<T>>({
-      name: formatName.type(`${config.name}-payload`),
-      // TODO: description
-      fields: buildObject<GraphQLFieldConfig<MutationValue<T>, mixed>>(
-        [
-          // Add the `clientMutationId` output field. This will be the exact
-          // same value as the input `clientMutationId`.
-          ['clientMutationId', {
-            // TODO: description
-            type: GraphQLString,
-            resolve: ({ clientMutationId }) => clientMutationId,
-          }],
-        ],
-        // Add all of our output fields to the output object verbatim. Simple
-        // as that. We do transform the fields to mask the implementation
-        // detail of `MutationValue` being an object. Instead we just pass
-        // `MutationValue#value` directly to the resolver.
-        (config.outputFields || [])
-          .filter(Boolean)
-          .map<[string, GraphQLFieldConfig<MutationValue<T>, mixed>]>(
-            ([fieldName, field]: [string, GraphQLFieldConfig<T, mixed>]) =>
-              [fieldName, <GraphQLFieldConfig<MutationValue<T>, mixed>> {
-                type: field.type,
-                args: field.args,
-                resolve: field.resolve ? ({ value }: MutationValue<T>, ...rest: Array<any>) => (field as any).resolve(value, ...rest) : null,
-                description: field.description,
-                deprecationReason: field.deprecationReason,
-              }]
-          ),
-        [
-          // A reference to the root query type. Allows you to access even more
-          // data in your mutations.
-          ['query', {
-            // TODO: description
-            type: getQueryGQLType(buildToken),
-            resolve: () => null,
-          }],
-        ],
-      ),
-    }),
+    // multiple things. If we were directly given a payload type, however, we
+    // will just use that.
+    type:
+      config.payloadType
+        ? config.payloadType
+        : createMutationPayloadGQLType(buildToken, config),
 
     // Finally we define the resolver for this field which will actually
     // execute the mutation. Basically it will just include the

@@ -2,6 +2,7 @@ import {
   GraphQLInputType,
   GraphQLNonNull,
   GraphQLID,
+  GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLInputFieldConfig,
   GraphQLFieldConfig,
@@ -11,7 +12,8 @@ import { Collection, ObjectType } from '../../../../interface'
 import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
-import createMutationGQLField from '../../createMutationGQLField'
+import createMutationGQLField, { MutationValue } from '../../createMutationGQLField'
+import createMutationPayloadGQLType from '../../createMutationPayloadGQLType'
 import transformGQLInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGQLInputValue'
 import getCollectionGQLType from '../getCollectionGQLType'
 
@@ -54,7 +56,7 @@ export default function createDeleteCollectionMutationFieldEntry (
         type: new GraphQLNonNull(patchType),
       }],
     ],
-    outputFields: createUpdateCollectionOutputFieldEntries(buildToken, collection),
+    payloadType: getUpdateCollectionPayloadGQLType(buildToken, collection),
     // Execute by deserializing the id into its component parts and delete a
     // value in the collection using that key.
     execute: (context, input) => {
@@ -100,19 +102,24 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
   })
 }
 
+export const getUpdateCollectionPayloadGQLType = memoize2(createUpdateCollectionPayloadGQLType)
+
 /**
  * Creates the output fields returned by the collection update mutation.
  */
-export function createUpdateCollectionOutputFieldEntries (
+function createUpdateCollectionPayloadGQLType (
   buildToken: BuildToken,
   collection: Collection,
-): Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]> {
-  return [
-    // Add the updated value as an output field so the user can see the
-    // object they just updated.
-    [formatName.field(collection.type.name), {
-      type: getCollectionGQLType(buildToken, collection),
-      resolve: value => value,
-    }],
-  ]
+): GraphQLObjectType<MutationValue<ObjectType.Value>> {
+  return createMutationPayloadGQLType<ObjectType.Value>(buildToken, {
+    name: `update-${collection.type.name}`,
+    outputFields: [
+      // Add the updated value as an output field so the user can see the
+      // object they just updated.
+      [formatName.field(collection.type.name), {
+        type: getCollectionGQLType(buildToken, collection),
+        resolve: value => value,
+      }],
+    ],
+  })
 }
