@@ -120,8 +120,8 @@ create function c.types_query(a bigint, b boolean, c varchar) returns boolean as
 create function c.types_mutation(a bigint, b boolean, c varchar) returns boolean as $$ select false $$ language sql;
 create function c.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql stable;
 create function c.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
-create function c.table_query(id int) returns a.post as $$ select * from a.post where id = id $$ language sql stable;
-create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = id $$ language sql;
+create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;
+create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql;
 create function c.table_set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
 create function c.table_set_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
 create function c.int_set_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;

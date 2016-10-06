@@ -946,6 +946,94 @@ Object {
 }
 `;
 
+exports[`test operation procedure-mutation.graphql 1`] = `
+Object {
+  "data": Object {
+    "add1Mutation": Object {
+      "clientMutationId": null,
+      "integer": 3,
+    },
+    "add2Mutation": Object {
+      "clientMutationId": "hello",
+      "integer": 4,
+    },
+    "add3Mutation": Object {
+      "clientMutationId": "world",
+      "integer": null,
+    },
+    "add4Mutation": Object {
+      "integer": 4,
+    },
+    "compoundTypeMutation": Object {
+      "compoundType": Object {
+        "a": 420,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "fooBar": 8,
+      },
+    },
+    "intSetMutation": Object {
+      "integers": Array [
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        6,
+      ],
+    },
+    "mult1": Object {
+      "integer": 0,
+    },
+    "mult2": Object {
+      "integer": 1,
+    },
+    "mult3": Object {
+      "integer": 2,
+    },
+    "mult4": Object {
+      "integer": 10,
+    },
+    "noArgsMutation": Object {
+      "clientMutationId": "x",
+      "integer": 2,
+    },
+    "tableMutation": Object {
+      "post": Object {
+        "__id": "WyJwb3N0cyIsNV0=",
+        "authorId": 5,
+        "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        "id": 5,
+      },
+    },
+    "tableSetMutation": Object {
+      "people": Array [
+        Object {
+          "name": "John Smith",
+        },
+        Object {
+          "name": "Sara Smith",
+        },
+        Object {
+          "name": "Budd Deey",
+        },
+        Object {
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "name": "Johnny Tucker",
+        },
+      ],
+    },
+    "typesMutation": Object {
+      "boolean": false,
+    },
+  },
+}
+`;
+
 exports[`test operation query.graphql 1`] = `
 Object {
   "data": Object {

@@ -10,8 +10,12 @@ import { Type, NullableType, ListType } from '../../../../interface'
 import { formatName } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createMutationGQLField from '../../../../graphql/schema/createMutationGQLField'
+import { sql } from '../../../../postgres/utils'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
-import createPGProcedureSignatureFixtures from '../createPGProcedureSignatureFixtures'
+import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
+import transformPGValueIntoValue from '../../../../postgres/inventory/transformPGValueIntoValue'
+import createPGProcedureFixtures from '../createPGProcedureFixtures'
+import createPGProcedureSQLCall from '../createPGProcedureSQLCall'
 
 /**
  * Creates mutation field entries for all of our volatile Postgres procedures.
@@ -37,13 +41,13 @@ function createPGProcedureMutationGQLFieldEntry (
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
-  const signatureFixtures = createPGProcedureSignatureFixtures(buildToken, pgCatalog, pgProcedure)
+  const fixtures = createPGProcedureFixtures(buildToken, pgCatalog, pgProcedure)
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const inputFields = signatureFixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
-    ({ name, gqlType }) =>
-      [formatName.field(name), {
+  const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
+    ({ inputName, gqlType }) =>
+      [inputName, {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
@@ -59,19 +63,43 @@ function createPGProcedureMutationGQLFieldEntry (
       [formatName.field(pgProcedure.returnsSet
         // If we are returning a set, we should pluralize the name just in
         // case.
-        ? pluralize(getTypeFieldName(signatureFixtures.return.type))
-        : getTypeFieldName(signatureFixtures.return.type)
+        ? pluralize(getTypeFieldName(fixtures.return.type))
+        : getTypeFieldName(fixtures.return.type)
       ), {
           // If we are returning a set, we should wrap our type in a GraphQL
           // list.
           type: pgProcedure.returnsSet
-            ? new GraphQLList(signatureFixtures.return.gqlType)
-            : signatureFixtures.return.gqlType,
+            ? new GraphQLList(fixtures.return.gqlType)
+            : fixtures.return.gqlType,
+
+          resolve: value => value,
       }],
     ],
 
-    // TODO: Execution
-    execute: null as any,
+    // Actually execute the procedure here.
+    async execute (context, input) {
+      const client = pgClientFromContext(context)
+
+      // Craft our procedure call. A procedure name with arguments, like any
+      // other function call. Input values must be coerced twice however.
+      const procedureCall = createPGProcedureSQLCall(fixtures, input)
+
+      const aliasIdentifier = Symbol()
+
+      const query = sql.compile(
+        // If the procedure returns a set, we must select a set of values.
+        pgProcedure.returnsSet
+          ? sql.query`select to_json(${sql.identifier(aliasIdentifier)}) as value from ${procedureCall} as ${sql.identifier(aliasIdentifier)}`
+          : sql.query`select to_json(${procedureCall}) as value`
+      )
+
+      const { rows } = await client.query(query)
+      const values = rows.map(({ value }) => transformPGValueIntoValue(fixtures.return.type, value))
+
+      // If we selected a set of values, return the full set. Otherwise only
+      // return the one we queried.
+      return pgProcedure.returnsSet ? values : values[0]
+    },
   })]
 }
 

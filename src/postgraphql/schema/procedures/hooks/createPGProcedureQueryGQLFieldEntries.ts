@@ -4,7 +4,7 @@ import { formatName, buildObject } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createConnectionGQLField from '../../../../graphql/schema/connection/createConnectionGQLField'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
-import createPGProcedureSignatureFixtures from '../createPGProcedureSignatureFixtures'
+import createPGProcedureFixtures from '../createPGProcedureFixtures'
 import PGProcedurePaginator from '../PGProcedurePaginator'
 
 /**
@@ -35,13 +35,13 @@ function createPGProcedureQueryGQLFieldEntry (
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
-  const signatureFixtures = createPGProcedureSignatureFixtures(buildToken, pgCatalog, pgProcedure)
+  const fixtures = createPGProcedureFixtures(buildToken, pgCatalog, pgProcedure)
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const argEntries = signatureFixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
-    ({ name, gqlType }) =>
-      [formatName.field(name), {
+  const argEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
+    ({ inputName, gqlType }) =>
+      [inputName, {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
@@ -49,7 +49,7 @@ function createPGProcedureQueryGQLFieldEntry (
 
   return [formatName.field(pgProcedure.name), {
     description: pgProcedure.description,
-    type: signatureFixtures.return.gqlType,
+    type: fixtures.return.gqlType,
     args: buildObject(argEntries),
     resolve: null as any,
   }]
@@ -64,14 +64,14 @@ function createPGSetProcedureQueryGQLFieldEntry (
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
-  const signatureFixtures = createPGProcedureSignatureFixtures(buildToken, pgCatalog, pgProcedure)
-  const paginator = new PGProcedurePaginator(pgCatalog, pgProcedure, signatureFixtures.return.type)
+  const fixtures = createPGProcedureFixtures(buildToken, pgCatalog, pgProcedure)
+  const paginator = new PGProcedurePaginator(pgCatalog, pgProcedure, fixtures.return.type)
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const inputArgEntries = signatureFixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
-    ({ name, gqlType }) =>
-      [formatName.field(name), {
+  const inputArgEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
+    ({ inputName, gqlType }) =>
+      [inputName, {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
