@@ -3,8 +3,12 @@ import { Type } from '../../../../interface'
 import { formatName, buildObject } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createConnectionGQLField from '../../../../graphql/schema/connection/createConnectionGQLField'
+import { sql } from '../../../../postgres/utils'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
+import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
+import transformPGValueIntoValue from '../../../../postgres/inventory/transformPGValueIntoValue'
 import createPGProcedureFixtures from '../createPGProcedureFixtures'
+import createPGProcedureSQLCall from '../createPGProcedureSQLCall'
 import PGProcedurePaginator from '../PGProcedurePaginator'
 
 /**
@@ -21,7 +25,7 @@ export default function createPGProcedureQueryGQLFieldEntries (
       .map(pgProcedure =>
         pgProcedure.returnsSet
           ? createPGSetProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
-          : createPGProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
+          : createPGSingleProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
       )
   )
 }
@@ -30,7 +34,7 @@ export default function createPGProcedureQueryGQLFieldEntries (
  * Creates a standard query field entry for a procedure. Will execute the
  * procedure with the provided arguments.
  */
-function createPGProcedureQueryGQLFieldEntry (
+function createPGSingleProcedureQueryGQLFieldEntry (
   buildToken: BuildToken,
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
@@ -51,7 +55,13 @@ function createPGProcedureQueryGQLFieldEntry (
     description: pgProcedure.description,
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
-    resolve: null as any,
+
+    async resolve (source, args, context) {
+      const client = pgClientFromContext(context)
+      const query = sql.compile(sql.query`select to_json(${createPGProcedureSQLCall(fixtures, args)}) as value`)
+      const { rows: [row] } = await client.query(query)
+      return row ? transformPGValueIntoValue(fixtures.return.type, row['value']) : null
+    },
   }]
 }
 

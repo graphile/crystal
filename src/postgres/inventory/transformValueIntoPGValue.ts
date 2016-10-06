@@ -42,11 +42,23 @@ export default function transformValueIntoPGValue (type: Type<mixed>, value: mix
   if (
     type instanceof EnumType ||
     type === booleanType ||
-    type === integerType ||
-    type === floatType ||
     type === stringType
   )
     return sql.query`${sql.value(value)}`
+
+  // If this is an integer or a float, return the value but also mark the type
+  // as a number by adding `+ 0`. This way Postgres will not accidently
+  // interpret the value as a string. This is very important for procedures
+  // as if Postgres thinks you are trying to call a function with text and not
+  // a number. Errors will happen.
+  // TODO: This only happens in the one test case where we have an array of
+  // numbers as a procedure argument. Maybe we can only use this trick in that
+  // case?
+  if (
+    type === integerType ||
+    type === floatType
+  )
+    return sql.query`(${sql.value(value)} + 0)`
 
   // If this is a Postgres object type, let’s do some special tuple stuff.
   if (type instanceof PGObjectType) {

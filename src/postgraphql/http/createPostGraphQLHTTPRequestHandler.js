@@ -261,6 +261,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
       // Connect a new Postgres client and start a transaction.
       const pgClient = await pgPool.connect()
+      let pgClientInTransaction = false
 
       // If the user has enabled the debugging of Postgres queries, enhance the
       // query function to log SQL queries.
@@ -270,14 +271,19 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
         pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
 
         pgClient.query = function (...args) {
+          // If the client is not currently in a transaction, run the `begin`
+          // command and then run the actual query.
+          if (!pgClientInTransaction) {
+            pgClientInTransaction = true
+            return pgClient.query('begin').then(() => pgClient.query(...args))
+          }
+
           // Debug just the query text.
           debugPG(args[0].text || args[0])
           // Call the original query method.
           return pgClient[$$pgClientOrigQuery].apply(this, args)
         }
       }
-
-      await pgClient.query('begin')
 
       try {
         result = await executeGraphql(
@@ -292,7 +298,12 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       // Cleanup our Postgres client by ending the transaction and releasing
       // the client back to the pool. Always do this even if the query fails.
       finally {
-        await pgClient.query('commit')
+        // Don’t run the commit statement unless our client is in a
+        // transaction. We don’t open a transaction if no Postgres resources
+        // were needed for the query (like in an introspection query).
+        if (pgClientInTransaction)
+          await pgClient.query('commit')
+
         pgClient.release()
       }
     }
