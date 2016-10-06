@@ -55,7 +55,7 @@
     "graphql": ">=0.6.0 <1.0.0",
     "http-errors": "^1.5.0",
     "jsonwebtoken": "^7.1.9",
-    "lodash": "^4.16.2",
+    "lodash": "^4.16.4",
     "morgan": "^1.7.0",
     "on-finished": "^2.3.0",
     "pg": "5.1.0",
