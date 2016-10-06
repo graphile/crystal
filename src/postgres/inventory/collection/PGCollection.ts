@@ -8,6 +8,7 @@ import PGObjectType from '../type/PGObjectType'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
+import transformValueIntoPGValue from '../transformValueIntoPGValue'
 import PGCollectionPaginator from '../paginator/PGCollectionPaginator'
 import PGCollectionKey from './PGCollectionKey'
 
@@ -125,8 +126,8 @@ class PGCollection implements Collection {
               // Make sure we have one value for every attribute in the class,
               // if there was no such value defined, we should just use
               // `default` and use the user’s default value.
-              sql.query`(${sql.join(Array.from(this.type.fields).map(([fieldName]) =>
-                value.has(fieldName) ? sql.value(value.get(fieldName)) : sql.raw('default')
+              sql.query`(${sql.join(Array.from(this.type.fields).map(([fieldName, field]) =>
+                value.has(fieldName) ? transformValueIntoPGValue(field.type, value.get(fieldName)) : sql.query`default`
               ), ', ')})`
             ), ', ')}
 

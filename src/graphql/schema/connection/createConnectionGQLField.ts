@@ -46,11 +46,11 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
 
   return {
     description: `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
-    type: getConnectionType(buildToken, paginator),
+    type: getConnectionGQLType(buildToken, paginator),
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
-      paginator.orderings && paginator.orderings.size > 0 && ['orderBy', createOrderByArg(buildToken, paginator)],
+      paginator.orderings && paginator.orderings.size > 0 && ['orderBy', createOrderByGQLArg(buildToken, paginator)],
       ['before', {
         description: 'Read all values in the set before (above) this cursor.',
         type: _cursorType,
@@ -122,17 +122,17 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
   }
 }
 
-const getConnectionType = memoize2(_createConnectionType)
+const getConnectionGQLType = memoize2(_createConnectionGQLType)
 
 /**
  * Creates a concrete GraphQL connection object type.
  */
-export function _createConnectionType <TInput, TItemValue>(
+export function _createConnectionGQLType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLObjectType<Connection<TInput, TItemValue, mixed>> {
   const gqlType = getGQLType(buildToken, paginator.itemType, false)
-  const gqlEdgeType = getEdgeType(buildToken, paginator)
+  const gqlEdgeType = getEdgeGQLType(buildToken, paginator)
 
   return new GraphQLObjectType<Connection<TInput, TItemValue, mixed>>({
     name: formatName.type(`${paginator.name}-connection`),
@@ -165,12 +165,12 @@ export function _createConnectionType <TInput, TItemValue>(
   })
 }
 
-export const getEdgeType = memoize2(_createEdgeType)
+export const getEdgeGQLType = memoize2(_createEdgeGQLType)
 
 /**
  * Creates a concrete GraphQL edge object type.
  */
-export function _createEdgeType <TInput, TItemValue>(
+export function _createEdgeGQLType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLObjectType<Edge<TInput, TItemValue, mixed>> {
@@ -182,11 +182,9 @@ export function _createEdgeType <TInput, TItemValue>(
     fields: () => ({
       cursor: {
         description: 'A cursor for use in pagination.',
-        type: new GraphQLNonNull(_cursorType),
-        resolve: <TCursor>({ orderingName, cursor }: Edge<TInput, TItemValue, TCursor>): NamespacedCursor<TCursor> => ({
-          orderingName,
-          cursor,
-        }),
+        type: _cursorType,
+        resolve: <TCursor>({ orderingName, cursor }: Edge<TInput, TItemValue, TCursor>): NamespacedCursor<TCursor> | null =>
+          cursor && { orderingName, cursor },
       },
       node: {
         description: `The ${scrib.type(gqlType)} at the end of the edge.`,
@@ -201,12 +199,12 @@ export function _createEdgeType <TInput, TItemValue>(
  * Creates an argument for the `orderBy` field. The argument will be a correct
  * ordering value for the paginator.
  */
-export function createOrderByArg <TInput, TItemValue>(
+export function createOrderByGQLArg <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLArgumentConfig<string> {
   const gqlType = getGQLType(buildToken, paginator.itemType, false)
-  const enumType = getOrderByEnumType(buildToken, paginator)
+  const enumType = getOrderByGQLEnumType(buildToken, paginator)
   return {
     description: `The method to use when ordering ${scrib.type(gqlType)}.`,
     type: enumType,
@@ -214,22 +212,22 @@ export function createOrderByArg <TInput, TItemValue>(
   }
 }
 
-const _getOrderByEnumType = memoize2(_createOrderByEnumType)
+const _getOrderByGQLEnumType = memoize2(_createOrderByGQLEnumType)
 
 // We use a second `getOrderByEnumType` so we can maintain the function
 // prototype which gets mangled in memoization.
-function getOrderByEnumType <TInput, TItemValue>(
+function getOrderByGQLEnumType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLEnumType<string> {
-  return _getOrderByEnumType(buildToken, paginator)
+  return _getOrderByGQLEnumType(buildToken, paginator)
 }
 
 /**
  * Creates a GraphQL type which can be used by the user to select an ordering
  * strategy.
  */
-export function _createOrderByEnumType <TInput, TItemValue>(
+export function _createOrderByGQLEnumType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLEnumType<string> {
@@ -346,7 +344,7 @@ interface Connection<TInput, TItemValue, TCursor> {
 interface Edge<TInput, TItemValue, TCursor> {
   paginator: Paginator<TInput, TItemValue>
   orderingName: string
-  cursor: TCursor
+  cursor: TCursor | null
   value: TItemValue
 }
 

@@ -122,7 +122,7 @@ type PeopleConnection {
 # A \`Person\` edge in the connection.
 type PeopleEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Person\` at the end of the edge.
   node: Person!
@@ -216,7 +216,7 @@ type PostsConnection {
 # A \`Post\` edge in the connection.
 type PostsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Post\` at the end of the edge.
   node: Post!

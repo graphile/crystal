@@ -272,7 +272,6 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
         pgClient.query = function (...args) {
           // Debug just the query text.
           debugPG(args[0].text || args[0])
-          console.log(args[0].values)
           // Call the original query method.
           return pgClient[$$pgClientOrigQuery].apply(this, args)
         }

@@ -37,19 +37,6 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
   }
 
   /**
-   * Gets the fixed length tuple cursor for the given value. Implemented by
-   * looping over `pgAttributes` and getting the corresponding value name.
-   */
-  public getCursorForValue (value: PGObjectType.Value): AttributesCursor {
-    const type = this.pgPaginator.itemType
-
-    if (!(type instanceof PGObjectType))
-      throw new Error('Type must be an instance of the Postgres object type.')
-
-    return this.pgAttributes.map(pgAttribute => value.get(type.getFieldNameFromPGAttributeName(pgAttribute.name)!))
-  }
-
-  /**
    * Reads a single page for this ordering.
    */
   public async readPage (

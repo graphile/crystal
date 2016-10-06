@@ -101,7 +101,7 @@ type CompoundKeysConnection {
 # A \`CompoundKey\` edge in the connection.
 type CompoundKeysEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`CompoundKey\` at the end of the edge.
   node: CompoundKey!
@@ -354,7 +354,7 @@ type ForeignKeysConnection {
 # A \`ForeignKey\` edge in the connection.
 type ForeignKeysEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`ForeignKey\` at the end of the edge.
   node: ForeignKey!
@@ -402,7 +402,7 @@ type IntSetQueryConnection {
 # A \`Int\` edge in the connection.
 type IntSetQueryEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Int\` at the end of the edge.
   node: Int
@@ -560,7 +560,7 @@ type NonUpdatableViewsConnection {
 # A \`NonUpdatableView\` edge in the connection.
 type NonUpdatableViewsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`NonUpdatableView\` at the end of the edge.
   node: NonUpdatableView!
@@ -606,7 +606,7 @@ type PeopleConnection {
 # A \`Person\` edge in the connection.
 type PeopleEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Person\` at the end of the edge.
   node: Person!
@@ -705,7 +705,7 @@ type PostsConnection {
 # A \`Post\` edge in the connection.
 type PostsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Post\` at the end of the edge.
   node: Post!
@@ -1017,7 +1017,7 @@ type TableSetQueryConnection {
 # A \`Person\` edge in the connection.
 type TableSetQueryEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Person\` at the end of the edge.
   node: Person
@@ -1084,7 +1084,7 @@ type TypesConnection {
 # A \`Type\` edge in the connection.
 type TypesEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Type\` at the end of the edge.
   node: Type!
@@ -1166,7 +1166,7 @@ type UpdatableViewsConnection {
 # A \`UpdatableView\` edge in the connection.
 type UpdatableViewsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`UpdatableView\` at the end of the edge.
   node: UpdatableView!
@@ -1372,7 +1372,7 @@ type CompoundKeysConnection {
 # A \`CompoundKey\` edge in the connection.
 type CompoundKeysEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`CompoundKey\` at the end of the edge.
   node: CompoundKey!
@@ -1625,7 +1625,7 @@ type ForeignKeysConnection {
 # A \`ForeignKey\` edge in the connection.
 type ForeignKeysEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`ForeignKey\` at the end of the edge.
   node: ForeignKey!
@@ -1673,7 +1673,7 @@ type IntSetQueryConnection {
 # A \`Int\` edge in the connection.
 type IntSetQueryEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Int\` at the end of the edge.
   node: Int
@@ -1831,7 +1831,7 @@ type NonUpdatableViewsConnection {
 # A \`NonUpdatableView\` edge in the connection.
 type NonUpdatableViewsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`NonUpdatableView\` at the end of the edge.
   node: NonUpdatableView!
@@ -1877,7 +1877,7 @@ type PeopleConnection {
 # A \`Person\` edge in the connection.
 type PeopleEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Person\` at the end of the edge.
   node: Person!
@@ -1976,7 +1976,7 @@ type PostsConnection {
 # A \`Post\` edge in the connection.
 type PostsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Post\` at the end of the edge.
   node: Post!
@@ -2288,7 +2288,7 @@ type TableSetQueryConnection {
 # A \`Person\` edge in the connection.
 type TableSetQueryEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Person\` at the end of the edge.
   node: Person
@@ -2355,7 +2355,7 @@ type TypesConnection {
 # A \`Type\` edge in the connection.
 type TypesEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`Type\` at the end of the edge.
   node: Type!
@@ -2437,7 +2437,7 @@ type UpdatableViewsConnection {
 # A \`UpdatableView\` edge in the connection.
 type UpdatableViewsEdge {
   # A cursor for use in pagination.
-  cursor: Cursor!
+  cursor: Cursor
 
   # The \`UpdatableView\` at the end of the edge.
   node: UpdatableView!

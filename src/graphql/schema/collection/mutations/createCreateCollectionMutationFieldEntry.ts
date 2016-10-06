@@ -5,7 +5,7 @@ import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
 import transformGQLInputValue from '../../transformGQLInputValue'
 import createMutationGQLField from '../../createMutationGQLField'
-import { getEdgeType, createOrderByArg } from '../../connection/createConnectionGQLField'
+import { getEdgeGQLType, createOrderByGQLArg } from '../../connection/createConnectionGQLField'
 import getCollectionGQLType from '../getCollectionGQLType'
 
 /**
@@ -53,12 +53,12 @@ export default function createCreateCollectionMutationFieldEntry (
       // Also Relay 1 requires us to return the edge.
       collection.paginator && [formatName.field(`${collection.type.name}-edge`), {
         // TODO: description
-        type: getEdgeType(buildToken, collection.paginator),
-        args: { orderBy: createOrderByArg(buildToken, collection.paginator) },
+        type: getEdgeGQLType(buildToken, collection.paginator),
+        args: { orderBy: createOrderByGQLArg(buildToken, collection.paginator) },
         resolve: (value, args) => ({
           paginator: collection.paginator,
           ordering: args['orderBy'],
-          // TODO: cursor
+          cursor: null,
           value,
         }),
       }],

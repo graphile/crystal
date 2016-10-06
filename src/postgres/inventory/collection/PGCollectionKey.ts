@@ -5,6 +5,7 @@ import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
+import transformValueIntoPGValue from '../transformValueIntoPGValue'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
 
@@ -85,7 +86,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    */
   private _getSQLKeyCondition (key: PGObjectType.Value): sql.SQL {
     return sql.join(this._keyTypeFields.map(([fieldName, field]) =>
-      sql.query`${sql.identifier(field.pgAttribute.name)} = ${sql.value(key.get(fieldName))}`
+      sql.query`${sql.identifier(field.pgAttribute.name)} = ${transformValueIntoPGValue(field.type, key.get(fieldName))}`
     ), ' and ')
   }
 
@@ -186,6 +187,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
             set ${sql.join(Array.from(patch).map(([fieldName, value]) => {
+              const field = this.collection.type.fields.get(fieldName)!
               const pgAttributeName = this.collection.type.getPGAttributeNameFromFieldName(fieldName)
 
               if (pgAttributeName == null)
@@ -193,7 +195,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
 
               // Use the actual name of the Postgres attribute when
               // comparing, not the field name which may be different.
-              return sql.query`${sql.identifier(pgAttributeName)} = ${value === null ? sql.raw('null') : sql.value(value)}`
+              return sql.query`${sql.identifier(pgAttributeName)} = ${transformValueIntoPGValue(field.type, value)}`
             }), ', ')}
 
             where ${this._getSQLKeyCondition(key)}

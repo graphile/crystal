@@ -3,7 +3,7 @@ jest.mock('../../getGQLType')
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLString } from 'graphql'
 import { ObjectType, stringType } from '../../../../interface'
 import getGQLType from '../../getGQLType'
-import createConnectionGQLField, { _cursorType, _pageInfoType, _createEdgeType, _createOrderByEnumType, _createConnectionType } from '../createConnectionGQLField'
+import createConnectionGQLField, { _cursorType, _pageInfoType, _createEdgeGQLType, _createOrderByGQLEnumType, _createConnectionGQLType } from '../createConnectionGQLField'
 
 const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject) =>
   promise
@@ -84,20 +84,20 @@ test('_pageInfoType will get the correct end cursor', () => {
   })
 })
 
-test('_createEdgeType will create an object type', () => {
-  const edgeType = _createEdgeType({}, {})
+test('_createEdgeGQLType will create an object type', () => {
+  const edgeType = _createEdgeGQLType({}, {})
   expect(edgeType instanceof GraphQLObjectType).toBe(true)
 })
 
-test('_createEdgeType will have the correct name', () => {
-  const edgeType = _createEdgeType({}, { name: 'foo' })
+test('_createEdgeGQLType will have the correct name', () => {
+  const edgeType = _createEdgeGQLType({}, { name: 'foo' })
   expect(edgeType.name).toBe('FooEdge')
 })
 
-test('_createEdgeType will correctly return a namespaced cursor', () => {
+test('_createEdgeGQLType will correctly return a namespaced cursor', () => {
   getGQLType.mockReturnValueOnce(GraphQLString)
   const paginator = { name: 'foo' }
-  const edgeType = _createEdgeType({}, paginator)
+  const edgeType = _createEdgeGQLType({}, paginator)
   expect(edgeType.getFields().cursor.resolve({ paginator, cursor: 'foobar' }))
     .toEqual({
       orderingName: undefined,
@@ -110,19 +110,19 @@ test('_createEdgeType will correctly return a namespaced cursor', () => {
     })
 })
 
-test('_createEdgeType will just return the value for the node field', () => {
+test('_createEdgeGQLType will just return the value for the node field', () => {
   getGQLType.mockReturnValueOnce(GraphQLString)
   const value = Symbol('value')
-  const edgeType = _createEdgeType({}, {})
+  const edgeType = _createEdgeGQLType({}, {})
   expect(edgeType.getFields().node.resolve({ value })).toBe(value)
 })
 
-test('_createOrderByEnumType will create an enum type with all the paginator orderings', () => {
+test('_createOrderByGQLEnumType will create an enum type with all the paginator orderings', () => {
   const a = Symbol('a')
   const b = Symbol('b')
   const orderings = new Map([['a', { a }], ['b', { b }]])
   const paginator = { name: 'bar', orderings }
-  const enumType = _createOrderByEnumType({}, paginator)
+  const enumType = _createOrderByGQLEnumType({}, paginator)
 
   expect(enumType.name).toBe('BarOrderBy')
   expect(enumType.getValues()).toEqual([{
@@ -138,19 +138,19 @@ test('_createOrderByEnumType will create an enum type with all the paginator ord
   }])
 })
 
-test('_createConnectionType will have the right name', () => {
-  const connectionType = _createConnectionType({}, { name: 'bar' })
+test('_createConnectionGQLType will have the right name', () => {
+  const connectionType = _createConnectionGQLType({}, { name: 'bar' })
   expect(connectionType.name).toBe('BarConnection')
 })
 
-test('_createConnectionType will resolve the source verbatim for pageInfo', () => {
+test('_createConnectionGQLType will resolve the source verbatim for pageInfo', () => {
   const source = Symbol('source')
   getGQLType.mockReturnValueOnce(GraphQLString)
-  const connectionType = _createConnectionType({}, {})
+  const connectionType = _createConnectionGQLType({}, {})
   expect(connectionType.getFields().pageInfo.resolve(source)).toBe(source)
 })
 
-// test('_createConnectionType will use the paginators count method for totalCount', () => {
+// test('_createConnectionGQLType will use the paginators count method for totalCount', () => {
 //   const count = Symbol('count')
 //   const args = Symbol('args')
 //   const context = new Context()
@@ -159,29 +159,29 @@ test('_createConnectionType will resolve the source verbatim for pageInfo', () =
 //   const paginator = { count: jest.fn(() => count) }
 
 //   getGQLType.mockReturnValueOnce(GraphQLString)
-//   const connectionType = _createConnectionType({}, paginator, {})
+//   const connectionType = _createConnectionGQLType({}, paginator, {})
 
 //   expect(connectionType.getFields().totalCount.resolve({ paginator, input }, args, context)).toBe(count)
 //   expect(paginator.count.mock.calls).toEqual([[context, input]])
 // })
 
-// test('_createConnectionType will get the edges from the source page with some extra info', () => {
+// test('_createConnectionGQLType will get the edges from the source page with some extra info', () => {
 //   const paginator = Symbol('paginator')
 //   const orderingName = Symbol('orderingName')
 //   const values = [{ value: 'a', cursor: 1 }, { value: 'b', cursor: 2 }]
 
 //   getGQLType.mockReturnValueOnce(GraphQLString)
-//   const connectionType = _createConnectionType({}, {})
+//   const connectionType = _createConnectionGQLType({}, {})
 
 //   expect(connectionType.getFields().edges.resolve({ paginator, orderingName, page: { values } }, {}, new Context()))
 //     .toEqual([{ value: 'a', cursor: 1, paginator, orderingName }, { value: 'b', cursor: 2, paginator, orderingName }])
 // })
 
-// test('_createConnectionType will map the nodes field to page values', () => {
+// test('_createConnectionGQLType will map the nodes field to page values', () => {
 //   const value1 = Symbol('value1')
 //   const value2 = Symbol('value2')
 //   getGQLType.mockReturnValueOnce(GraphQLString)
-//   const connectionType = _createConnectionType({}, {})
+//   const connectionType = _createConnectionGQLType({}, {})
 //   expect(connectionType.getFields().nodes.resolve({ page: { values: [{ value: value1 }, { value: value2 }] } }, {}, new Context()))
 //     .toEqual([value1, value2])
 // })

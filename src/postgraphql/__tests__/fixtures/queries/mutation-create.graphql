@@ -1,0 +1,122 @@
+mutation {
+  a: createType(input: {
+    type: {
+      id: 201
+      bigint: 50
+      boolean: false
+      varchar: "abc"
+      enum: RED
+      domain: 6
+      domain2: 5
+      compoundType: {
+        a: 123,
+        b: "abc"
+        c: GREEN
+        d: "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf"
+        fooBar: 20
+      }
+      nestedCompoundType: {
+        a: {
+          a: 456
+          b: "def"
+          c: BLUE
+          d: "79863dcf-0433-4c3d-bc51-978326d4546f"
+          fooBar: 42
+        }
+        b: {
+          a: 789
+          b: "ghi"
+          c: RED
+          d: "b687ee42-c515-4544-b742-525e39517e7d"
+          fooBar: -8
+        }
+        bazBuz: 0
+      }
+    }
+  }) {
+    clientMutationId
+    type {
+      __id
+      id
+      bigint
+      boolean
+      varchar
+      enum
+      domain
+      domain2
+      compoundType { a b c d fooBar }
+      nestedCompoundType {
+        a { a b c d fooBar }
+        b { a b c d fooBar }
+        bazBuz
+      }
+    }
+  }
+  b: createPerson(input: {
+    person: {
+      id: 9000
+      name: "John Smith Jr."
+      email: "johnny.boy.smith@email.com"
+      about: "Son of Sara and John Smith."
+    }
+  }) { ...createPersonPayload }
+  c: createPerson(input: {
+    clientMutationId: "hello",
+    person: {
+      id: 20
+      name: "Best Pal"
+      email: "best.pal@email.com"
+      about: "My archnemisis is Budd Deey."
+    }
+  }) { ...createPersonPayload }
+  d: createCompoundKey(input: {
+    clientMutationId: "world",
+    compoundKey: {
+      personId1: 9000
+      personId2: 20
+      extra: false
+    }
+  }) {
+    clientMutationId
+    compoundKey {
+      __id
+      personId1
+      personId2
+      extra
+      personByPersonId1 {
+        __id
+        name
+      }
+      personByPersonId2 {
+        __id
+        name
+      }
+    }
+  }
+}
+
+fragment createPersonPayload on CreatePersonPayload {
+  clientMutationId
+  person {
+    __id
+    id
+    name
+    email
+    about
+  }
+  a: personEdge(orderBy: PRIMARY_KEY_ASC) { ...peopleEdge }
+  b: personEdge(orderBy: PRIMARY_KEY_DESC) { ...peopleEdge }
+  c: personEdge(orderBy: ID_ASC) { ...peopleEdge }
+  d: personEdge(orderBy: ID_DESC) { ...peopleEdge }
+  e: personEdge(orderBy: EMAIL_ASC) { ...peopleEdge }
+  f: personEdge(orderBy: EMAIL_DESC) { ...peopleEdge }
+  g: personEdge(orderBy: NATURAL) { ...peopleEdge }
+}
+
+fragment peopleEdge on PeopleEdge {
+  cursor
+  node {
+    __id
+    name
+  }
+}

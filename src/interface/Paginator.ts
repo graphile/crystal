@@ -79,17 +79,6 @@ namespace Paginator {
    */
   export interface Ordering<TInput, TItemValue, TCursor> {
     /**
-     * Gets the cursor for a single value in the set. There are two ways to get
-     * the cursor for a value, the first is to get the cursor returned by
-     * `readPage`, the other is to use this method. Calling this function will
-     * be generally less performant then just using the cursor returned by
-     * `readPage`. Use this method only when you can’t call `readPage`.
-     *
-     * May return synchronously or asynchronously.
-     */
-    getCursorForValue? (value: TItemValue): TCursor | Promise<TCursor>
-
-    /**
      * Reads values in a collection relative to a cursor which is used as a
      * “bookmark” for a specific value in the paginator’s ordered collection.
      *

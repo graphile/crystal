@@ -409,6 +409,185 @@ Object {
 }
 `;
 
+exports[`test operation mutation-create.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "type": Object {
+        "__id": "WyJ0eXBlcyIsMjAxXQ==",
+        "bigint": 50,
+        "boolean": false,
+        "compoundType": Object {
+          "a": 123,
+          "b": "abc",
+          "c": "GREEN",
+          "d": "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf",
+          "fooBar": 20,
+        },
+        "domain": 6,
+        "domain2": 5,
+        "enum": "RED",
+        "id": 201,
+        "nestedCompoundType": Object {
+          "a": Object {
+            "a": 456,
+            "b": "def",
+            "c": "BLUE",
+            "d": "79863dcf-0433-4c3d-bc51-978326d4546f",
+            "fooBar": 42,
+          },
+          "b": Object {
+            "a": 789,
+            "b": "ghi",
+            "c": "RED",
+            "d": "b687ee42-c515-4544-b742-525e39517e7d",
+            "fooBar": -8,
+          },
+          "bazBuz": 0,
+        },
+        "varchar": "abc",
+      },
+    },
+    "b": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+      },
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDkwMDBd",
+        "about": "Son of Sara and John Smith.",
+        "email": "johnny.boy.smith@email.com",
+        "id": 9000,
+        "name": "John Smith Jr.",
+      },
+    },
+    "c": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "clientMutationId": "hello",
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+      },
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDIwXQ==",
+        "about": "My archnemisis is Budd Deey.",
+        "email": "best.pal@email.com",
+        "id": 20,
+        "name": "Best Pal",
+      },
+    },
+    "d": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "__id": "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
+        "extra": false,
+        "personByPersonId1": Object {
+          "__id": "WyJwZW9wbGUiLDkwMDBd",
+          "name": "John Smith Jr.",
+        },
+        "personByPersonId2": Object {
+          "__id": "WyJwZW9wbGUiLDIwXQ==",
+          "name": "Best Pal",
+        },
+        "personId1": 9000,
+        "personId2": 20,
+      },
+    },
+  },
+}
+`;
+
 exports[`test operation mutation-delete.graphql 1`] = `
 Object {
   "data": Object {
