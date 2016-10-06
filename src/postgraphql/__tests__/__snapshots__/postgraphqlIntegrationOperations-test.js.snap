@@ -946,6 +946,23 @@ Object {
 }
 `;
 
+exports[`test operation query.graphql 1`] = `
+Object {
+  "data": Object {
+    "node": null,
+    "query": Object {
+      "node": null,
+      "query": Object {
+        "node": null,
+        "query": Object {
+          "node": null,
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`test operation relation-tail-head.graphql 1`] = `
 Object {
   "data": Object {
@@ -1070,23 +1087,6 @@ Object {
           "personId": null,
         },
       ],
-    },
-  },
-}
-`;
-
-exports[`test operation relay.graphql 1`] = `
-Object {
-  "data": Object {
-    "node": null,
-    "relay": Object {
-      "node": null,
-      "relay": Object {
-        "node": null,
-        "relay": Object {
-          "node": null,
-        },
-      },
     },
   },
 }

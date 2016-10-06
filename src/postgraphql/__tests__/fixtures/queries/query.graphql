@@ -1,10 +1,10 @@
 query {
   ...query
-  relay {
+  query {
     ...query
-    relay {
+    query {
       ...query
-      relay {
+      query {
         ...query
       }
     }

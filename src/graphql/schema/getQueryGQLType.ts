@@ -32,7 +32,7 @@ function createGQLQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
         .reduce((a, b) => a.concat(b), []),
       [
-        ['relay', {
+        ['query', {
           description: 'Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.',
           type: new GraphQLNonNull(queryType),
           resolve: source => source || {},
