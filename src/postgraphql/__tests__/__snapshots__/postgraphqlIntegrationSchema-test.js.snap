@@ -406,6 +406,48 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+input IntSetMutationInput {
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+type IntSetMutationPayload {
+  clientMutationId: String
+  integers: [Int]
+  query: Query
+}
+
+# A connection to a list of \`Int\` values.
+type IntSetQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Int\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  edges: [IntSetQueryEdge]
+
+  # A list of \`Int\` objects.
+  nodes: [Int]
+}
+
+# A \`Int\` edge in the connection.
+type IntSetQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Int\` at the end of the edge.
+  node: Int
+}
+
+# Methods to use when ordering \`Int\`.
+enum IntSetQueryOrderBy {
+  NATURAL
+}
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -472,10 +514,10 @@ type Mutation {
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
+  intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  setIntMutation(input: SetIntMutationInput!): SetIntMutationPayload
-  setTableMutation(input: SetTableMutationInput!): SetTableMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
+  tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
@@ -739,12 +781,11 @@ type Query {
   # lol, add some stuff 4 query
   add4Query(arg0: Int, b: Int): Int
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  noArgsQuery: Int
 
   # Reads and enables paginatation through a set of \`Int\`.
-  setIntQuery(
+  intSetQuery(
     # The method to use when ordering \`Int\`.
-    orderBy: SetIntQueryOrderBy = NATURAL
+    orderBy: IntSetQueryOrderBy = NATURAL
 
     # Read all values in the set before (above) this cursor.
     before: Cursor
@@ -760,12 +801,14 @@ type Query {
     x: Int
     y: Int
     z: Int
-  ): SetIntQueryConnection
+  ): IntSetQueryConnection
+  noArgsQuery: Int
+  tableQuery(id: Int): Post
 
   # Reads and enables paginatation through a set of \`Person\`.
-  setTableQuery(
+  tableSetQuery(
     # The method to use when ordering \`Person\`.
-    orderBy: SetTableQueryOrderBy = NATURAL
+    orderBy: TableSetQueryOrderBy = NATURAL
 
     # Read all values in the set before (above) this cursor.
     before: Cursor
@@ -778,8 +821,7 @@ type Query {
 
     # Only read the last \`n\` values of the set.
     last: Int
-  ): SetTableQueryConnection
-  tableQuery(id: Int): Post
+  ): TableSetQueryConnection
   typesQuery(a: Int, b: Boolean, c: String): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
@@ -971,87 +1013,6 @@ type Query {
   relay: Query!
 }
 
-input SetIntMutationInput {
-  clientMutationId: String
-  x: Int
-  y: Int
-  z: Int
-}
-
-type SetIntMutationPayload {
-  clientMutationId: String
-  integers: [Int]
-  query: Query
-}
-
-# A connection to a list of \`Int\` values.
-type SetIntQueryConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Int\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
-  edges: [SetIntQueryEdge]
-
-  # A list of \`Int\` objects.
-  nodes: [Int]
-}
-
-# A \`Int\` edge in the connection.
-type SetIntQueryEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Int\` at the end of the edge.
-  node: Int
-}
-
-# Methods to use when ordering \`Int\`.
-enum SetIntQueryOrderBy {
-  NATURAL
-}
-
-input SetTableMutationInput {
-  clientMutationId: String
-}
-
-type SetTableMutationPayload {
-  clientMutationId: String
-  people: [Person]
-  query: Query
-}
-
-# A connection to a list of \`Person\` values.
-type SetTableQueryConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Person\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
-  edges: [SetTableQueryEdge]
-
-  # A list of \`Person\` objects.
-  nodes: [Person]
-}
-
-# A \`Person\` edge in the connection.
-type SetTableQueryEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Person\` at the end of the edge.
-  node: Person
-}
-
-# Methods to use when ordering \`Person\`.
-enum SetTableQueryOrderBy {
-  NATURAL
-}
-
 input TableMutationInput {
   clientMutationId: String
   id: Int
@@ -1061,6 +1022,45 @@ type TableMutationPayload {
   clientMutationId: String
   post: Post
   query: Query
+}
+
+input TableSetMutationInput {
+  clientMutationId: String
+}
+
+type TableSetMutationPayload {
+  clientMutationId: String
+  people: [Person]
+  query: Query
+}
+
+# A connection to a list of \`Person\` values.
+type TableSetQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [TableSetQueryEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type TableSetQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum TableSetQueryOrderBy {
+  NATURAL
 }
 
 type Type implements Node {
@@ -1742,6 +1742,48 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
+input IntSetMutationInput {
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+type IntSetMutationPayload {
+  clientMutationId: String
+  integers: [Int]
+  query: Query
+}
+
+# A connection to a list of \`Int\` values.
+type IntSetQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Int\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  edges: [IntSetQueryEdge]
+
+  # A list of \`Int\` objects.
+  nodes: [Int]
+}
+
+# A \`Int\` edge in the connection.
+type IntSetQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Int\` at the end of the edge.
+  node: Int
+}
+
+# Methods to use when ordering \`Int\`.
+enum IntSetQueryOrderBy {
+  NATURAL
+}
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -1808,10 +1850,10 @@ type Mutation {
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
+  intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  setIntMutation(input: SetIntMutationInput!): SetIntMutationPayload
-  setTableMutation(input: SetTableMutationInput!): SetTableMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
+  tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createPost(input: CreatePostInput!): CreatePostPayload
@@ -2075,12 +2117,11 @@ type Query {
   # lol, add some stuff 4 query
   add4Query(arg0: Int, b: Int): Int
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  noArgsQuery: Int
 
   # Reads and enables paginatation through a set of \`Int\`.
-  setIntQuery(
+  intSetQuery(
     # The method to use when ordering \`Int\`.
-    orderBy: SetIntQueryOrderBy = NATURAL
+    orderBy: IntSetQueryOrderBy = NATURAL
 
     # Read all values in the set before (above) this cursor.
     before: Cursor
@@ -2096,12 +2137,14 @@ type Query {
     x: Int
     y: Int
     z: Int
-  ): SetIntQueryConnection
+  ): IntSetQueryConnection
+  noArgsQuery: Int
+  tableQuery(id: Int): Post
 
   # Reads and enables paginatation through a set of \`Person\`.
-  setTableQuery(
+  tableSetQuery(
     # The method to use when ordering \`Person\`.
-    orderBy: SetTableQueryOrderBy = NATURAL
+    orderBy: TableSetQueryOrderBy = NATURAL
 
     # Read all values in the set before (above) this cursor.
     before: Cursor
@@ -2114,8 +2157,7 @@ type Query {
 
     # Only read the last \`n\` values of the set.
     last: Int
-  ): SetTableQueryConnection
-  tableQuery(id: Int): Post
+  ): TableSetQueryConnection
   typesQuery(a: Int, b: Boolean, c: String): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
@@ -2307,87 +2349,6 @@ type Query {
   relay: Query!
 }
 
-input SetIntMutationInput {
-  clientMutationId: String
-  x: Int
-  y: Int
-  z: Int
-}
-
-type SetIntMutationPayload {
-  clientMutationId: String
-  integers: [Int]
-  query: Query
-}
-
-# A connection to a list of \`Int\` values.
-type SetIntQueryConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Int\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
-  edges: [SetIntQueryEdge]
-
-  # A list of \`Int\` objects.
-  nodes: [Int]
-}
-
-# A \`Int\` edge in the connection.
-type SetIntQueryEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Int\` at the end of the edge.
-  node: Int
-}
-
-# Methods to use when ordering \`Int\`.
-enum SetIntQueryOrderBy {
-  NATURAL
-}
-
-input SetTableMutationInput {
-  clientMutationId: String
-}
-
-type SetTableMutationPayload {
-  clientMutationId: String
-  people: [Person]
-  query: Query
-}
-
-# A connection to a list of \`Person\` values.
-type SetTableQueryConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Person\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
-  edges: [SetTableQueryEdge]
-
-  # A list of \`Person\` objects.
-  nodes: [Person]
-}
-
-# A \`Person\` edge in the connection.
-type SetTableQueryEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor!
-
-  # The \`Person\` at the end of the edge.
-  node: Person
-}
-
-# Methods to use when ordering \`Person\`.
-enum SetTableQueryOrderBy {
-  NATURAL
-}
-
 input TableMutationInput {
   clientMutationId: String
   id: Int
@@ -2397,6 +2358,45 @@ type TableMutationPayload {
   clientMutationId: String
   post: Post
   query: Query
+}
+
+input TableSetMutationInput {
+  clientMutationId: String
+}
+
+type TableSetMutationPayload {
+  clientMutationId: String
+  people: [Person]
+  query: Query
+}
+
+# A connection to a list of \`Person\` values.
+type TableSetQueryConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [TableSetQueryEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type TableSetQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor!
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum TableSetQueryOrderBy {
+  NATURAL
 }
 
 type Type implements Node {

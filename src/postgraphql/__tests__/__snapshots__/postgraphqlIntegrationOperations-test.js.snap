@@ -8,47 +8,47 @@ Object {
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
-            "name": "John Smith"
-          }
+            "name": "John Smith",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
             "email": "sara.smith@email.com",
             "id": 2,
-            "name": "Sara Smith"
-          }
+            "name": "Sara Smith",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           "node": Object {
             "email": "budd.deey@email.com",
             "id": 3,
-            "name": "Budd Deey"
-          }
+            "name": "Budd Deey",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
-            "name": "Kathryn Ramirez"
-          }
+            "name": "Kathryn Ramirez",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
             "email": "johnny.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
+            "name": "Johnny Tucker",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "b": Object {
       "edges": Array [
@@ -57,23 +57,23 @@ Object {
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
-            "name": "John Smith"
-          }
+            "name": "John Smith",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
             "email": "sara.smith@email.com",
             "id": 2,
-            "name": "Sara Smith"
-          }
-        }
+            "name": "Sara Smith",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": true,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "c": Object {
       "edges": Array [
@@ -82,23 +82,23 @@ Object {
           "node": Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
-            "name": "Kathryn Ramirez"
-          }
+            "name": "Kathryn Ramirez",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
             "email": "johnny.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
+            "name": "Johnny Tucker",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": true
+        "hasPreviousPage": true,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "d": Object {
       "edges": Array [
@@ -107,47 +107,47 @@ Object {
           "node": Object {
             "email": "budd.deey@email.com",
             "id": 3,
-            "name": "Budd Deey"
-          }
+            "name": "Budd Deey",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
-            "name": "John Smith"
-          }
+            "name": "John Smith",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJKb2hubnkgVHVja2VyIiw1XV0=",
           "node": Object {
             "email": "johnny.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker"
-          }
+            "name": "Johnny Tucker",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
           "node": Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
-            "name": "Kathryn Ramirez"
-          }
+            "name": "Kathryn Ramirez",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
           "node": Object {
             "email": "sara.smith@email.com",
             "id": 2,
-            "name": "Sara Smith"
-          }
-        }
+            "name": "Sara Smith",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "e": Object {
       "edges": Array [
@@ -156,47 +156,47 @@ Object {
           "node": Object {
             "email": "sara.smith@email.com",
             "id": 2,
-            "name": "Sara Smith"
-          }
+            "name": "Sara Smith",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
           "node": Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
-            "name": "Kathryn Ramirez"
-          }
+            "name": "Kathryn Ramirez",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obm55IFR1Y2tlciIsNV1d",
           "node": Object {
             "email": "johnny.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker"
-          }
+            "name": "Johnny Tucker",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
-            "name": "John Smith"
-          }
+            "name": "John Smith",
+          },
         },
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
           "node": Object {
             "email": "budd.deey@email.com",
             "id": 3,
-            "name": "Budd Deey"
-          }
-        }
+            "name": "Budd Deey",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "f": Object {
       "edges": Array [
@@ -205,15 +205,15 @@ Object {
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
-            "name": "John Smith"
-          }
-        }
+            "name": "John Smith",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": true,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "g": Object {
       "edges": Array [
@@ -222,31 +222,31 @@ Object {
           "node": Object {
             "email": "budd.deey@email.com",
             "id": 3,
-            "name": "Budd Deey"
-          }
+            "name": "Budd Deey",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
-            "name": "Kathryn Ramirez"
-          }
+            "name": "Kathryn Ramirez",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
             "email": "johnny.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker"
-          }
-        }
+            "name": "Johnny Tucker",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": true
+        "hasPreviousPage": true,
       },
-      "totalCount": 5
+      "totalCount": 5,
     },
     "h": Object {
       "edges": Array [
@@ -255,42 +255,42 @@ Object {
           "node": Object {
             "constant": 2,
             "name": "John Smith",
-            "x": 1
-          }
+            "x": 1,
+          },
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiwyXQ==",
           "node": Object {
             "constant": 2,
             "name": "Sara Smith",
-            "x": 2
-          }
+            "x": 2,
+          },
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiwzXQ==",
           "node": Object {
             "constant": 2,
             "name": "Budd Deey",
-            "x": 3
-          }
+            "x": 3,
+          },
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiw0XQ==",
           "node": Object {
             "constant": 2,
             "name": "Kathryn Ramirez",
-            "x": 4
-          }
+            "x": 4,
+          },
         },
         Object {
           "cursor": "WyJuYXR1cmFsIiw1XQ==",
           "node": Object {
             "constant": 2,
             "name": "Johnny Tucker",
-            "x": 5
-          }
-        }
-      ]
+            "x": 5,
+          },
+        },
+      ],
     },
     "i": Object {
       "edges": Array [
@@ -299,42 +299,42 @@ Object {
           "node": Object {
             "constant": 2,
             "name": "John Smith",
-            "x": 1
-          }
+            "x": 1,
+          },
         },
         Object {
           "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
             "constant": 2,
             "name": "Sara Smith",
-            "x": 2
-          }
+            "x": 2,
+          },
         },
         Object {
           "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
             "constant": 2,
             "name": "Budd Deey",
-            "x": 3
-          }
+            "x": 3,
+          },
         },
         Object {
           "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
             "constant": 2,
             "name": "Kathryn Ramirez",
-            "x": 4
-          }
+            "x": 4,
+          },
         },
         Object {
           "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
             "constant": 2,
             "name": "Johnny Tucker",
-            "x": 5
-          }
-        }
-      ]
+            "x": 5,
+          },
+        },
+      ],
     },
     "j": Object {
       "edges": Array [
@@ -342,29 +342,29 @@ Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
             "authorId": 2,
-            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
-          }
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
           "node": Object {
             "authorId": 2,
-            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
-          }
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
           "node": Object {
             "authorId": 2,
-            "headline": "What’s with you kids? Every other day it’s food, food, food."
-          }
-        }
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 3
+      "totalCount": 3,
     },
     "k": Object {
       "edges": Array [
@@ -372,22 +372,22 @@ Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
             "authorId": 2,
-            "headline": "No… It’s a thing; it’s like a plan, but with more greatness."
-          }
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
         },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
           "node": Object {
             "authorId": 2,
-            "headline": "It’s a fez. I wear a fez now. Fezes are cool."
-          }
-        }
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": true,
-        "hasPreviousPage": false
+        "hasPreviousPage": false,
       },
-      "totalCount": 3
+      "totalCount": 3,
     },
     "l": Object {
       "edges": Array [
@@ -395,17 +395,17 @@ Object {
           "cursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
           "node": Object {
             "authorId": 1,
-            "headline": "You hit me with a cricket bat."
-          }
-        }
+            "headline": "You hit me with a cricket bat.",
+          },
+        },
       ],
       "pageInfo": Object {
         "hasNextPage": false,
-        "hasPreviousPage": true
+        "hasPreviousPage": true,
       },
-      "totalCount": 4
-    }
-  }
+      "totalCount": 4,
+    },
+  },
 }
 `;
 
@@ -418,33 +418,33 @@ Object {
           "__id": "WyJwZW9wbGUiLDFd",
           "__typename": "Person",
           "id": 1,
-          "name": "John Smith"
+          "name": "John Smith",
         },
         Object {
           "__id": "WyJwZW9wbGUiLDJd",
           "__typename": "Person",
           "id": 2,
-          "name": "Sara Smith"
+          "name": "Sara Smith",
         },
         Object {
           "__id": "WyJwZW9wbGUiLDNd",
           "__typename": "Person",
           "id": 3,
-          "name": "Budd Deey"
+          "name": "Budd Deey",
         },
         Object {
           "__id": "WyJwZW9wbGUiLDRd",
           "__typename": "Person",
           "id": 4,
-          "name": "Kathryn Ramirez"
+          "name": "Kathryn Ramirez",
         },
         Object {
           "__id": "WyJwZW9wbGUiLDVd",
           "__typename": "Person",
           "id": 5,
-          "name": "Johnny Tucker"
-        }
-      ]
+          "name": "Johnny Tucker",
+        },
+      ],
     },
     "b": Object {
       "nodes": Array [
@@ -452,63 +452,63 @@ Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
           "__typename": "CompoundKey",
           "personId1": 1,
-          "personId2": 2
+          "personId2": 2,
         },
         Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
           "__typename": "CompoundKey",
           "personId1": 2,
-          "personId2": 1
+          "personId2": 1,
         },
         Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
           "__typename": "CompoundKey",
           "personId1": 2,
-          "personId2": 3
+          "personId2": 3,
         },
         Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
           "__typename": "CompoundKey",
           "personId1": 2,
-          "personId2": 5
+          "personId2": 5,
         },
         Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
           "__typename": "CompoundKey",
           "personId1": 4,
-          "personId2": 3
+          "personId2": 3,
         },
         Object {
           "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
           "__typename": "CompoundKey",
           "personId1": 4,
-          "personId2": 4
-        }
-      ]
+          "personId2": 4,
+        },
+      ],
     },
     "c": Object {
       "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "__typename": "CompoundKey",
       "personId1": 2,
-      "personId2": 3
+      "personId2": 3,
     },
     "d": Object {
       "__id": "WyJwZW9wbGUiLDJd",
       "__typename": "Person",
       "id": 2,
-      "name": "Sara Smith"
+      "name": "Sara Smith",
     },
     "e": Object {
       "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "__typename": "CompoundKey",
       "personId1": 1,
-      "personId2": 2
+      "personId2": 2,
     },
     "f": Object {
       "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
-      "name": "Johnny Tucker"
+      "name": "Johnny Tucker",
     },
     "g": null,
     "h": null,
@@ -516,29 +516,29 @@ Object {
       "__id": "WyJwZW9wbGUiLDJd",
       "__typename": "Person",
       "id": 2,
-      "name": "Sara Smith"
+      "name": "Sara Smith",
     },
     "j": Object {
       "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
-      "name": "Johnny Tucker"
+      "name": "Johnny Tucker",
     },
     "k": null,
     "l": Object {
       "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "__typename": "CompoundKey",
       "personId1": 2,
-      "personId2": 3
+      "personId2": 3,
     },
     "m": Object {
       "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "__typename": "CompoundKey",
       "personId1": 1,
-      "personId2": 2
+      "personId2": 2,
     },
-    "n": null
-  }
+    "n": null,
+  },
 }
 `;
 
@@ -551,81 +551,81 @@ Object {
           "extra": null,
           "personByPersonId1": Object {
             "email": "john.smith@email.com",
-            "name": "John Smith"
+            "name": "John Smith",
           },
           "personByPersonId2": Object {
             "email": "sara.smith@email.com",
-            "name": "Sara Smith"
+            "name": "Sara Smith",
           },
           "personId1": 1,
-          "personId2": 2
+          "personId2": 2,
         },
         Object {
           "extra": false,
           "personByPersonId1": Object {
             "email": "sara.smith@email.com",
-            "name": "Sara Smith"
+            "name": "Sara Smith",
           },
           "personByPersonId2": Object {
             "email": "john.smith@email.com",
-            "name": "John Smith"
+            "name": "John Smith",
           },
           "personId1": 2,
-          "personId2": 1
+          "personId2": 1,
         },
         Object {
           "extra": null,
           "personByPersonId1": Object {
             "email": "sara.smith@email.com",
-            "name": "Sara Smith"
+            "name": "Sara Smith",
           },
           "personByPersonId2": Object {
             "email": "budd.deey@email.com",
-            "name": "Budd Deey"
+            "name": "Budd Deey",
           },
           "personId1": 2,
-          "personId2": 3
+          "personId2": 3,
         },
         Object {
           "extra": true,
           "personByPersonId1": Object {
             "email": "sara.smith@email.com",
-            "name": "Sara Smith"
+            "name": "Sara Smith",
           },
           "personByPersonId2": Object {
             "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker"
+            "name": "Johnny Tucker",
           },
           "personId1": 2,
-          "personId2": 5
+          "personId2": 5,
         },
         Object {
           "extra": true,
           "personByPersonId1": Object {
             "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
+            "name": "Kathryn Ramirez",
           },
           "personByPersonId2": Object {
             "email": "budd.deey@email.com",
-            "name": "Budd Deey"
+            "name": "Budd Deey",
           },
           "personId1": 4,
-          "personId2": 3
+          "personId2": 3,
         },
         Object {
           "extra": false,
           "personByPersonId1": Object {
             "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
+            "name": "Kathryn Ramirez",
           },
           "personByPersonId2": Object {
             "email": "kathryn.ramirez@email.com",
-            "name": "Kathryn Ramirez"
+            "name": "Kathryn Ramirez",
           },
           "personId1": 4,
-          "personId2": 4
-        }
-      ]
+          "personId2": 4,
+        },
+      ],
     },
     "allForeignKeys": Object {
       "nodes": Array [
@@ -635,13 +635,13 @@ Object {
           "compoundKeyByCompoundKey1AndCompoundKey2": Object {
             "extra": false,
             "personId1": 2,
-            "personId2": 1
+            "personId2": 1,
           },
           "personByPersonId": Object {
             "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker"
+            "name": "Johnny Tucker",
           },
-          "personId": 5
+          "personId": 5,
         },
         Object {
           "compoundKey1": 4,
@@ -649,10 +649,10 @@ Object {
           "compoundKeyByCompoundKey1AndCompoundKey2": Object {
             "extra": false,
             "personId1": 4,
-            "personId2": 4
+            "personId2": 4,
           },
           "personByPersonId": null,
-          "personId": null
+          "personId": null,
         },
         Object {
           "compoundKey1": 2,
@@ -660,14 +660,14 @@ Object {
           "compoundKeyByCompoundKey1AndCompoundKey2": Object {
             "extra": false,
             "personId1": 2,
-            "personId2": 1
+            "personId2": 1,
           },
           "personByPersonId": null,
-          "personId": null
-        }
-      ]
-    }
-  }
+          "personId": null,
+        },
+      ],
+    },
+  },
 }
 `;
 
@@ -680,11 +680,11 @@ Object {
       "relay": Object {
         "node": null,
         "relay": Object {
-          "node": null
-        }
-      }
-    }
-  }
+          "node": null,
+        },
+      },
+    },
+  },
 }
 `;
 
@@ -701,7 +701,7 @@ Object {
             "b": "2",
             "c": "BLUE",
             "d": "4be8a712-3ff7-432e-aa34-fdb43fbd838d",
-            "fooBar": 8
+            "fooBar": 8,
           },
           "domain": 5,
           "domain2": 6,
@@ -712,21 +712,21 @@ Object {
               "b": "456",
               "c": "RED",
               "d": "aed18400-2a92-46df-8204-b70c728b3520",
-              "fooBar": 93
+              "fooBar": 93,
             },
             "b": Object {
               "a": 42,
               "b": "Hello, world!",
               "c": "BLUE",
               "d": "d34df5e0-83f1-11e6-8dd0-abee917ffd1e",
-              "fooBar": -5
+              "fooBar": -5,
             },
-            "bazBuz": 7
-          }
-        }
-      ]
-    }
-  }
+            "bazBuz": 7,
+          },
+        },
+      ],
+    },
+  },
 }
 `;
 
@@ -735,18 +735,18 @@ Object {
   "data": Object {
     "a": Object {
       "email": "sara.smith@email.com",
-      "name": "Sara Smith"
+      "name": "Sara Smith",
     },
     "b": null,
     "c": Object {
       "personId1": 1,
-      "personId2": 2
+      "personId2": 2,
     },
     "d": Object {
       "personId1": 4,
-      "personId2": 4
+      "personId2": 4,
     },
-    "e": null
-  }
+    "e": null,
+  },
 }
 `;
