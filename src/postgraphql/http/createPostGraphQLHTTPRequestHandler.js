@@ -19,7 +19,7 @@ const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 
-const $$pgClientOrigQuery = Symbol()
+export const $$pgClientOrigQuery = Symbol()
 
 const debugGraphql = new Debugger('postgraphql:graphql')
 const debugPG = new Debugger('postgraphql:postgres')
@@ -263,26 +263,24 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       const pgClient = await pgPool.connect()
       let pgClientInTransaction = false
 
-      // If the user has enabled the debugging of Postgres queries, enhance the
-      // query function to log SQL queries.
-      if (debugPG.enabled) {
-        // Set the original query method to a key on our client. If that key is
-        // already set, use that.
-        pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
+      // Set the original query method to a key on our client. If that key is
+      // already set, use that.
+      pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
 
-        pgClient.query = function (...args) {
-          // If the client is not currently in a transaction, run the `begin`
-          // command and then run the actual query.
-          if (!pgClientInTransaction) {
-            pgClientInTransaction = true
-            return pgClient.query('begin').then(() => pgClient.query(...args))
-          }
-
-          // Debug just the query text.
-          debugPG(args[0].text || args[0])
-          // Call the original query method.
-          return pgClient[$$pgClientOrigQuery].apply(this, args)
+      pgClient.query = function (...args) {
+        // If the client is not currently in a transaction, run the `begin`
+        // command and then run the actual query.
+        if (!pgClientInTransaction) {
+          pgClientInTransaction = true
+          return pgClient.query('begin').then(() => pgClient.query(...args))
         }
+
+        // Debug just the query text. We don’t want to debug variables because
+        // there may be passwords in there.
+        debugPG(args[0] && args[0].text ? args[0].text : args[0])
+
+        // Call the original query method.
+        return pgClient[$$pgClientOrigQuery].apply(this, args)
       }
 
       try {
