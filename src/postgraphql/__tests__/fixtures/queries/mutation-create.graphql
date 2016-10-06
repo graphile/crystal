@@ -8,6 +8,7 @@ mutation {
       enum: RED
       domain: 6
       domain2: 5
+      textArray: ["have", "you", "ever", "been", "down", "the", "water", "spout", "?"]
       compoundType: {
         a: 123,
         b: "abc"
@@ -44,6 +45,7 @@ mutation {
       enum
       domain
       domain2
+      textArray
       compoundType { a b c d fooBar }
       nestedCompoundType {
         a { a b c d fooBar }

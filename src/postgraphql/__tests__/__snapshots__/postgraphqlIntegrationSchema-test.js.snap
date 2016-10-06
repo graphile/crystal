@@ -881,6 +881,7 @@ type Query {
     enum: Color
     domain: AnInt
     domain2: AnotherInt
+    textArray: [String]
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1038,6 +1039,7 @@ type Type implements Node {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundType
   nestedCompoundType: NestedCompoundType
 }
@@ -1050,6 +1052,7 @@ input TypeInput {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1062,6 +1065,7 @@ input TypePatch {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1122,6 +1126,8 @@ enum TypesOrderBy {
   DOMAIN_DESC
   DOMAIN2_ASC
   DOMAIN2_DESC
+  TEXT_ARRAY_ASC
+  TEXT_ARRAY_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
@@ -2152,6 +2158,7 @@ type Query {
     enum: Color
     domain: AnInt
     domain2: AnotherInt
+    textArray: [String]
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2309,6 +2316,7 @@ type Type implements Node {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundType
   nestedCompoundType: NestedCompoundType
 }
@@ -2321,6 +2329,7 @@ input TypeInput {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2333,6 +2342,7 @@ input TypePatch {
   enum: Color
   domain: AnInt
   domain2: AnotherInt
+  textArray: [String]
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2393,6 +2403,8 @@ enum TypesOrderBy {
   DOMAIN_DESC
   DOMAIN2_ASC
   DOMAIN2_DESC
+  TEXT_ARRAY_ASC
+  TEXT_ARRAY_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC

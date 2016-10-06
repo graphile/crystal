@@ -38,5 +38,5 @@ insert into a.foreign_key (person_id, compound_key_1, compound_key_2) values
   (null, 4, 4),
   (null, 2, 1);
 
-insert into b.types (id, "bigint", "boolean", "varchar", "enum", "domain", "domain2", "compound_type", "nested_compound_type") values
-  (50, 200, true, 'xyz', 'green', 5, 6, (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 8), ((3, '456', 'red', 'aed18400-2a92-46df-8204-b70c728b3520', 93), (42, 'Hello, world!', 'blue', 'd34df5e0-83f1-11e6-8dd0-abee917ffd1e', -5), 7));
+insert into b.types (id, "bigint", "boolean", "varchar", "enum", "domain", "domain2", "text_array", "compound_type", "nested_compound_type") values
+  (50, 200, true, 'xyz', 'green', 5, 6, array['hey', 'i', 'just', 'met', 'you'], (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 8), ((3, '456', 'red', 'aed18400-2a92-46df-8204-b70c728b3520', 93), (42, 'Hello, world!', 'blue', 'd34df5e0-83f1-11e6-8dd0-abee917ffd1e', -5), 7));

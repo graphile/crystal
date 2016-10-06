@@ -6,6 +6,7 @@ query {
       enum
       domain
       domain2
+      textArray
       compoundType { ...compoundType }
       nestedCompoundType {
         a { ...compoundType }

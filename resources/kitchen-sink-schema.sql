@@ -89,6 +89,7 @@ create table b.types (
   "enum" b.color,
   "domain" a.an_int,
   "domain2" b.another_int,
+  "text_array" text[],
   "compound_type" c.compound_type,
   "nested_compound_type" b.nested_compound_type
 );
