@@ -1,16 +1,16 @@
 jest.mock('../../../../interface/type/ObjectType')
 jest.mock('../../../introspection/PGCatalog')
-jest.mock('../../transformPGValue')
+jest.mock('../../transformPGValueIntoValue')
 jest.mock('../getTypeFromPGType')
 
 import { NullableType } from '../../../../interface'
 import ObjectType from '../../../../interface/type/ObjectType'
 import PGCatalog from '../../../introspection/PGCatalog'
-import transformPGValue, { $$transformPGValue } from '../../transformPGValue'
+import transformPGValueIntoValue, { $$transformPGValueIntoValue } from '../../transformPGValueIntoValue'
 import getTypeFromPGType from '../getTypeFromPGType'
 import PGObjectType from '../PGObjectType'
 
-transformPGValue.mockImplementation((type, value) => value)
+transformPGValueIntoValue.mockImplementation((type, value) => value)
 
 ObjectType.mockImplementation(function (config) {
   this.fields = config.fields
@@ -142,7 +142,7 @@ test('getFieldNameFromPGAttributeName will get the attribute name from the field
   expect(type.getFieldNameFromPGAttributeName(pgAttribute3.name)).toBe('c')
 })
 
-test('$$transformPGValue will transform a row object into an object map', () => {
+test('$$transformPGValueIntoValue will transform a row object into an object map', () => {
   const pgCatalog = new PGCatalog()
   const pgAttribute1 = { name: 'a' }
   const pgAttribute2 = { name: 'b' }
@@ -161,9 +161,9 @@ test('$$transformPGValue will transform a row object into an object map', () => 
   type.fields.get('x_b').type = Symbol()
   type.fields.get('x_c').type = Symbol()
 
-  expect(type[$$transformPGValue]({ a: 1, b: 2, c: 3 }))
+  expect(type[$$transformPGValueIntoValue]({ a: 1, b: 2, c: 3 }))
     .toEqual(new Map([['x_a', 1], ['x_b', 2], ['x_c', 3]]))
 
-  expect(transformPGValue.mock.calls)
+  expect(transformPGValueIntoValue.mock.calls)
     .toEqual([[type.fields.get('x_a').type, 1], [type.fields.get('x_b').type, 2], [type.fields.get('x_c').type, 3]])
 })

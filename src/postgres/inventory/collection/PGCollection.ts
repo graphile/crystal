@@ -7,7 +7,7 @@ import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } fro
 import PGObjectType from '../type/PGObjectType'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPGValue from '../transformPGValue'
+import transformPGValueIntoValue from '../transformPGValueIntoValue'
 import PGCollectionPaginator from '../paginator/PGCollectionPaginator'
 import PGCollectionKey from './PGCollectionKey'
 
@@ -138,7 +138,7 @@ class PGCollection implements Collection {
         `)
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => transformPGValue(this.type, object))
+        return rows.map(({ object }) => transformPGValueIntoValue(this.type, object))
       }
     )
   }

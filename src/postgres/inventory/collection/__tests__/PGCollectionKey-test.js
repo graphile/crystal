@@ -223,6 +223,6 @@ test('delete fails when trying to remove a value that does not exist', withPGCli
     expect(true).toBe(false)
   }
   catch (error) {
-    expect(error.message).toBe('No values were deleted in collection \'compound_keys\' using key \'person_id_1_and_person_id_2\' because no values were found.')
+    expect(error.message).toBe('No values were deleted in collection \'compound_keys\' because no values were found.')
   }
 }))

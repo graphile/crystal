@@ -1,6 +1,6 @@
 import { ObjectType, NullableType } from '../../../interface'
 import { PGCatalog, PGCatalogAttribute } from '../../introspection'
-import transformPGValue, { $$transformPGValue } from '../transformPGValue'
+import transformPGValueIntoValue, { $$transformPGValueIntoValue } from '../transformPGValueIntoValue'
 import getTypeFromPGType from './getTypeFromPGType'
 
 /**
@@ -87,11 +87,11 @@ class PGObjectType extends ObjectType {
   /**
    * Converts a row returned by Postgres into the correct value object.
    */
-  public [$$transformPGValue] (row: { [key: string]: mixed }): PGObjectType.Value {
+  public [$$transformPGValueIntoValue] (row: { [key: string]: mixed }): PGObjectType.Value {
     const value = new Map<string, mixed>()
 
     for (const [fieldName, { type: fieldType, pgAttribute }] of this.fields)
-      value.set(fieldName, transformPGValue(fieldType, row[pgAttribute.name]))
+      value.set(fieldName, transformPGValueIntoValue(fieldType, row[pgAttribute.name]))
 
     return value
   }

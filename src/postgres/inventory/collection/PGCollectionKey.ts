@@ -4,7 +4,7 @@ import { CollectionKey, Type } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPGValue from '../transformPGValue'
+import transformPGValueIntoValue from '../transformPGValueIntoValue'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
 
@@ -157,7 +157,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         `)
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => object == null ? null : transformPGValue(this.collection.type, object))
+        return rows.map(({ object }) => object == null ? null : transformPGValueIntoValue(this.collection.type, object))
       }
     )
   }
@@ -207,7 +207,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were updated in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
-        return transformPGValue(this.collection.type, result.rows[0]['object'])
+        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object'])
       }
   )
 
@@ -241,7 +241,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were deleted in collection '${this.collection.name}' because no values were found.`)
 
-        return transformPGValue(this.collection.type, result.rows[0]['object'])
+        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object'])
       }
   )
 }

@@ -2,7 +2,7 @@ import { Paginator } from '../../../interface'
 import { PGCatalogAttribute } from '../../introspection'
 import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPGValue from '../transformPGValue'
+import transformPGValueIntoValue from '../transformPGValueIntoValue'
 import PGObjectType from '../type/PGObjectType'
 import PGPaginator from './PGPaginator'
 
@@ -118,7 +118,7 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
     // Convert our rows into usable values.
     const values: Array<{ value: PGObjectType.Value, cursor: AttributesCursor }> =
       rows.map(({ value }) => ({
-        value: transformPGValue(this.pgPaginator.itemType, value),
+        value: transformPGValueIntoValue(this.pgPaginator.itemType, value),
         cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name]),
       }))
 
