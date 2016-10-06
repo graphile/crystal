@@ -75,7 +75,7 @@ function createPGSetProcedureQueryGQLFieldEntry (
   pgProcedure: PGCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
   const fixtures = createPGProcedureFixtures(buildToken, pgCatalog, pgProcedure)
-  const paginator = new PGProcedurePaginator(pgCatalog, pgProcedure, fixtures.return.type)
+  const paginator = new PGProcedurePaginator(fixtures)
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
@@ -87,5 +87,8 @@ function createPGSetProcedureQueryGQLFieldEntry (
       }]
   )
 
-  return [formatName.field(pgProcedure.name), createConnectionGQLField(buildToken, paginator, { inputArgEntries })]
+  return [formatName.field(pgProcedure.name), createConnectionGQLField(buildToken, paginator, {
+    inputArgEntries,
+    getPaginatorInput: (source, args) => args,
+  })]
 }

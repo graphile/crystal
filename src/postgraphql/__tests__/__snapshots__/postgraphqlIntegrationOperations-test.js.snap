@@ -1059,12 +1059,78 @@ Object {
       "d": null,
       "fooBar": 8,
     },
+    "intSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": 1,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": 2,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": 3,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": 4,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": 5,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": null,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw3XQ==",
+          "node": 6,
+        },
+      ],
+    },
     "noArgsQuery": 2,
     "tableQuery": Object {
       "__id": "WyJwb3N0cyIsNV0=",
       "authorId": 5,
       "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
       "id": 5,
+    },
+    "tableSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Johnny Tucker",
+          },
+        },
+      ],
     },
     "typesQuery": false,
   },
