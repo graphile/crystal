@@ -705,6 +705,114 @@ Object {
 }
 `;
 
+exports[`test operation mutation-update.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDFd",
+        "about": "An older John Smith",
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith Sr.",
+      },
+    },
+    "b": Object {
+      "clientMutationId": "hello",
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDJd",
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
+      },
+    },
+    "c": Object {
+      "clientMutationId": "world",
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDJd",
+        "about": "Now with an “H.”",
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
+      },
+    },
+    "d": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDNd",
+        "about": "I have taken over Budd’s account. Hehehe.",
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Best Pal",
+      },
+    },
+    "e": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDRd",
+        "about": "Make art not friends.",
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+    },
+    "f": Object {
+      "clientMutationId": null,
+      "compoundKey": Object {
+        "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
+        "extra": true,
+        "personByPersonId1": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 2,
+        "personId2": 2,
+      },
+    },
+    "g": Object {
+      "clientMutationId": "hello",
+      "compoundKey": Object {
+        "__id": "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
+        "extra": false,
+        "personByPersonId1": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 3,
+        "personId2": 2,
+      },
+    },
+    "h": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+        "extra": false,
+        "personByPersonId1": Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        "personByPersonId2": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personId1": 4,
+        "personId2": 3,
+      },
+    },
+  },
+}
+`;
+
 exports[`test operation node.graphql 1`] = `
 Object {
   "data": Object {

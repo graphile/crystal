@@ -67,12 +67,17 @@ export default function transformGQLInputValue (type: GraphQLInputType<mixed>, v
     const fields = Object.keys(type.getFields()).map(key => type.getFields()[key])
 
     // Map all of our fields to values.
-    return new Map(fields.map<[string, mixed]>(field => [
-      // Use the field’s name, or a custom name.
-      field[$$gqlInputObjectTypeValueKeyName] || field.name,
-      // Transform the value for this field recursively.
-      transformGQLInputValue(field.type, value[field.name]),
-    ]))
+    return new Map(
+      fields
+        .map<[string, mixed]>(field => [
+          // Use the field’s name, or a custom name.
+          field[$$gqlInputObjectTypeValueKeyName] || field.name,
+          // Transform the value for this field recursively.
+          transformGQLInputValue(field.type, value[field.name]),
+        ])
+        // Don’t include exactly undefined values in our map.
+        .filter(([fieldName, fieldValue]) => fieldValue !== undefined)
+    )
   }
 
   // Throw an error here. Just in case.
