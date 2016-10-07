@@ -5,6 +5,7 @@ import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getGQLType from '../getGQLType'
 import createConnectionGQLField from '../connection/createConnectionGQLField'
 import BuildToken from '../BuildToken'
+import createCollectionRelationTailGQLFieldEntries from './createCollectionRelationTailGQLFieldEntries'
 
 // Private implementation of `getCollectionGQLType`, types aren’t that great.
 const _getCollectionGQLType = memoize2(createCollectionGQLType)
@@ -72,37 +73,8 @@ function createCollectionGQLType (buildToken: BuildToken, collection: Collection
         ? buildToken._hooks.objectTypeFieldEntries(type, buildToken)
         : [],
 
-      // Add all of our many-to-one relations (aka tail relations).
-      inventory.getRelations()
-        // We only want the relations for which this collection is the tail
-        // collection and whose `headCollectionKey` have a `read`
-        // implementation.
-        .filter(relation =>
-          relation.tailCollection === collection &&
-          relation.headCollectionKey.read != null
-        )
-        // Transform the relation into a field entry.
-        .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
-          const headCollectionKey = relation.headCollectionKey
-          const headCollection = headCollectionKey.collection
-          const headCollectionType = getCollectionGQLType(buildToken, headCollection)
-
-          return [formatName.field(`${headCollection.type.name}-by-${relation.name}`), {
-            description: `Reads a single ${scrib.type(headCollectionType)} that is related to this \`${collectionTypeName}\`.`,
-
-            type: headCollectionType,
-
-            async resolve (value, args, context): Promise<ObjectType.Value | undefined> {
-              const key = relation.getHeadKeyFromTailValue(value)
-              const headValue = await headCollectionKey.read!(context, key)
-
-              if (!headValue)
-                return
-
-              return headValue
-            },
-          }]
-        }),
+      // Add fields from relations where this collection is the tail.
+      createCollectionRelationTailGQLFieldEntries(buildToken, collection),
 
       // // Add all of our one-to-many relations (aka head relations).
       // inventory.getRelations()

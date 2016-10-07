@@ -691,6 +691,14 @@ Object {
         "personId1": 9000,
         "personId2": 20,
       },
+      "personByPersonId1": Object {
+        "__id": "WyJwZW9wbGUiLDkwMDBd",
+        "name": "John Smith Jr.",
+      },
+      "personByPersonId2": Object {
+        "__id": "WyJwZW9wbGUiLDIwXQ==",
+        "name": "Best Pal",
+      },
     },
   },
 }

@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection, ObjectType } from '../../../../interface'
+import { Collection, Relation, ObjectType } from '../../../../interface'
 import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
@@ -7,6 +7,7 @@ import transformGQLInputValue from '../../transformGQLInputValue'
 import createMutationGQLField from '../../createMutationGQLField'
 import { getEdgeGQLType, createOrderByGQLArg } from '../../connection/createConnectionGQLField'
 import getCollectionGQLType from '../getCollectionGQLType'
+import createCollectionRelationTailGQLFieldEntries from '../createCollectionRelationTailGQLFieldEntries'
 
 /**
  * Creates the mutation field entry for creating values in a collection.
@@ -62,6 +63,9 @@ export default function createCreateCollectionMutationFieldEntry (
           value,
         }),
       }],
+
+      // Add related objects. This helps for Relay mutations.
+      ...createCollectionRelationTailGQLFieldEntries(buildToken, collection),
     ],
 
     // When we execute we just create a value in the collection after

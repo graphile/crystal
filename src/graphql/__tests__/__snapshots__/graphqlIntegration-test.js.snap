@@ -26,6 +26,9 @@ type CreatePostPayload {
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = HEADLINE_ASC
   ): PostsEdge
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthor: Person
   query: Query
 }
 

@@ -162,6 +162,12 @@ type CreateCompoundKeyPayload {
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysEdge
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -177,6 +183,12 @@ type CreateForeignKeyPayload {
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
   ): ForeignKeysEdge
+
+  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
+  personByPersonId: Person
   query: Query
 }
 
@@ -207,6 +219,9 @@ type CreatePostPayload {
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
   ): PostsEdge
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
@@ -1507,6 +1522,12 @@ type CreateCompoundKeyPayload {
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysEdge
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -1522,6 +1543,12 @@ type CreateForeignKeyPayload {
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
   ): ForeignKeysEdge
+
+  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
+  personByPersonId: Person
   query: Query
 }
 
@@ -1552,6 +1579,9 @@ type CreatePostPayload {
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
   ): PostsEdge
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
