@@ -34,7 +34,10 @@ export default function createPGProcedureSQLCall (
   }
 
   const procedureName = sql.identifier(fixtures.pgNamespace.name, fixtures.pgProcedure.name)
-  const procedureArgs = fixtures.args.slice(0, lastArgIdx).map(({ type }, i) => transformValueIntoPGValue(type, values[i]))
+  const procedureArgs =
+    fixtures.args
+      .slice(0, Math.max(lastArgIdx, fixtures.args.length - fixtures.pgProcedure.argDefaultsNum))
+      .map(({ type }, i) => transformValueIntoPGValue(type, values[i]))
 
   return sql.query`${procedureName}(${sql.join(procedureArgs, ', ')})`
 }
