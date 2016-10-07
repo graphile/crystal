@@ -163,7 +163,6 @@ test('will correctly make an input object type', () => {
 
 test('_getJSONGQLType will create a boring JSON type with no dynamic input', () => {
   const jsonGQLType = _getJSONGQLType({ options: { dynamicJson: false } })
-  expect(jsonGQLType.name).toBe('JSON')
   expect(jsonGQLType.serialize('{"a":1,"b":2,"c":3}')).toEqual('{"a":1,"b":2,"c":3}')
   expect(jsonGQLType.parseValue('{"a":1,"b":2,"c":3}')).toEqual('{"a":1,"b":2,"c":3}')
   expect(jsonGQLType.parseLiteral({ kind: Kind.STRING, value: '{"a":1,"b":2,"c":3}' })).toEqual('{"a":1,"b":2,"c":3}')
@@ -176,7 +175,6 @@ test('_getJSONGQLType will create a boring JSON type with no dynamic input', () 
 
 test('_getJSONGQLType will create a dynamic JSON type', () => {
   const jsonGQLType = _getJSONGQLType({ options: { dynamicJson: true } })
-  expect(jsonGQLType.name).toBe('JSON')
   expect(jsonGQLType.serialize('{"a":1,"b":2,"c":3}')).toEqual({ a: 1, b: 2, c: 3 })
   expect(jsonGQLType.parseValue({ a: 1, b: 2, c: 3 })).toEqual('{"a":1,"b":2,"c":3}')
   expect(jsonGQLType.parseLiteral({ kind: Kind.STRING, value: 'hello, world!' })).toEqual('"hello, world!"')

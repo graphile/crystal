@@ -430,7 +430,7 @@ enum IntSetQueryOrderBy {
 }
 
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-scalar JSON
+scalar Json
 
 input Mult1Input {
   clientMutationId: String
@@ -835,7 +835,7 @@ type Query {
     y: Int
     z: Int
   ): IntSetQueryConnection
-  jsonIdentity(json: JSON): JSON
+  jsonIdentity(json: Json): Json
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
@@ -856,7 +856,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: JSON!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -951,8 +951,8 @@ type Query {
     domain: AnInt
     domain2: AnotherInt
     textArray: [String]
-    json: JSON
-    jsonb: JSON
+    json: Json
+    jsonb: Json
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1111,8 +1111,8 @@ type Type implements Node {
   domain: AnInt!
   domain2: AnotherInt!
   textArray: [String]!
-  json: JSON!
-  jsonb: JSON!
+  json: Json!
+  jsonb: Json!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -1126,8 +1126,8 @@ input TypeInput {
   domain: AnInt!
   domain2: AnotherInt!
   textArray: [String]!
-  json: JSON!
-  jsonb: JSON!
+  json: Json!
+  jsonb: Json!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -1141,8 +1141,8 @@ input TypePatch {
   domain: AnInt
   domain2: AnotherInt
   textArray: [String]
-  json: JSON
-  jsonb: JSON
+  json: Json
+  jsonb: Json
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1177,7 +1177,7 @@ input TypesMutationInput {
   b: Boolean!
   c: String!
   d: [Int]!
-  e: JSON!
+  e: Json!
 }
 
 type TypesMutationPayload {
@@ -1790,7 +1790,7 @@ enum IntSetQueryOrderBy {
 }
 
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-scalar JSON
+scalar Json
 
 input Mult1Input {
   clientMutationId: String
@@ -2195,7 +2195,7 @@ type Query {
     y: Int
     z: Int
   ): IntSetQueryConnection
-  jsonIdentity(json: JSON): JSON
+  jsonIdentity(json: Json): Json
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
@@ -2216,7 +2216,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: JSON!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -2311,8 +2311,8 @@ type Query {
     domain: AnInt
     domain2: AnotherInt
     textArray: [String]
-    json: JSON
-    jsonb: JSON
+    json: Json
+    jsonb: Json
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2471,8 +2471,8 @@ type Type implements Node {
   domain: AnInt!
   domain2: AnotherInt!
   textArray: [String]!
-  json: JSON!
-  jsonb: JSON!
+  json: Json!
+  jsonb: Json!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -2486,8 +2486,8 @@ input TypeInput {
   domain: AnInt!
   domain2: AnotherInt!
   textArray: [String]!
-  json: JSON!
-  jsonb: JSON!
+  json: Json!
+  jsonb: Json!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -2501,8 +2501,8 @@ input TypePatch {
   domain: AnInt
   domain2: AnotherInt
   textArray: [String]
-  json: JSON
-  jsonb: JSON
+  json: Json
+  jsonb: Json
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2537,7 +2537,7 @@ input TypesMutationInput {
   b: Boolean!
   c: String!
   d: [Int]!
-  e: JSON!
+  e: Json!
 }
 
 type TypesMutationPayload {

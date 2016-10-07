@@ -116,7 +116,7 @@ export const _getJSONGQLType = memoize1((buildToken: BuildToken): GraphQLScalarT
   buildToken.options.dynamicJson
     ? (
       new GraphQLScalarType({
-        name: 'JSON',
+        name: 'Json',
         description: jsonType.description,
         serialize: value => typeof value === 'string' ? JSON.parse(value) : null,
         parseValue: value => JSON.stringify(value),
@@ -125,7 +125,7 @@ export const _getJSONGQLType = memoize1((buildToken: BuildToken): GraphQLScalarT
     )
     : (
       new GraphQLScalarType({
-        name: 'JSON',
+        name: 'Json',
         description: jsonType.description,
         serialize: String,
         parseValue: String,
