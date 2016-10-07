@@ -273,6 +273,12 @@ type DeleteCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
   deletedCompoundKeyId: ID
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -312,6 +318,9 @@ type DeletePostPayload {
   clientMutationId: String
   post: Post
   deletedPostId: ID
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
@@ -1290,6 +1299,12 @@ input UpdateCompoundKeyInput {
 type UpdateCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -1332,6 +1347,9 @@ input UpdatePostInput {
 type UpdatePostPayload {
   clientMutationId: String
   post: Post
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
@@ -1633,6 +1651,12 @@ type DeleteCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
   deletedCompoundKeyId: ID
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -1672,6 +1696,9 @@ type DeletePostPayload {
   clientMutationId: String
   post: Post
   deletedPostId: ID
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
@@ -2650,6 +2677,12 @@ input UpdateCompoundKeyInput {
 type UpdateCompoundKeyPayload {
   clientMutationId: String
   compoundKey: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
   query: Query
 }
 
@@ -2692,6 +2725,9 @@ input UpdatePostInput {
 type UpdatePostPayload {
   clientMutationId: String
   post: Post
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 

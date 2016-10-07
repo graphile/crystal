@@ -5,6 +5,7 @@ import BuildToken from '../../BuildToken'
 import createMutationGQLField, { MutationValue } from '../../createMutationGQLField'
 import createMutationPayloadGQLType from '../../createMutationPayloadGQLType'
 import getCollectionGQLType from '../getCollectionGQLType'
+import createCollectionRelationTailGQLFieldEntries from '../createCollectionRelationTailGQLFieldEntries'
 
 /**
  * Creates a delete mutation that uses the primary key of a collection and an
@@ -75,6 +76,8 @@ function createDeleteCollectionPayloadGQLType (
         type: GraphQLID,
         resolve: value => idSerde.serialize(collection, value),
       }] : null,
+      // Add related objects. This helps in Relay 1.
+      ...createCollectionRelationTailGQLFieldEntries(buildToken, collection),
     ],
   })
 }

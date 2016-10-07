@@ -66,6 +66,9 @@ type DeletePostPayload {
   clientMutationId: String
   post: Post
   deletedPostId: ID
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthor: Person
   query: Query
 }
 
@@ -357,6 +360,9 @@ input UpdatePostInput {
 type UpdatePostPayload {
   clientMutationId: String
   post: Post
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthor: Person
   query: Query
 }
 "

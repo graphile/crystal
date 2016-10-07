@@ -64,7 +64,7 @@ export default function createCreateCollectionMutationFieldEntry (
         }),
       }],
 
-      // Add related objects. This helps for Relay mutations.
+      // Add related objects. This helps in Relay 1.
       ...createCollectionRelationTailGQLFieldEntries(buildToken, collection),
     ],
 
