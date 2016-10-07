@@ -47,7 +47,7 @@ export default function createCollectionQueryFieldEntries (
         // For all of our field condition entries, let us add an actual
         // condition to test equality with a given field.
         ...inputArgEntries.map(([fieldName, field]) =>
-          args[fieldName] !== undefined
+          typeof args[fieldName] !== 'undefined'
             // If the argument exists, create a condition and transform the
             // input value.
             ? conditionHelpers.fieldEquals(field.internalName, transformGQLInputValue(field.type, args[fieldName]))
