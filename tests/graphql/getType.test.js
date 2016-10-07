@@ -85,7 +85,7 @@ describe('getType', () => {
         { name: 'PURPLE', value: 'purple' },
         { name: 'TOMATO', value: 'tomato' },
         { name: 'HELLO_WORLD', value: 'hello_world' },
-      ].map(variant => assign(variant, { description: noop(), deprecationReason: noop() })))
+      ].map(variant => assign(variant, { description: noop(), deprecationReason: noop(), isDeprecated: false })))
     })
   })
 
