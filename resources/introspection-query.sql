@@ -39,7 +39,8 @@ with
       end as "isStable",
       pro.prorettype as "returnTypeId",
       coalesce(pro.proallargtypes, pro.proargtypes) as "argTypeIds",
-      coalesce(pro.proargnames, array[]::text[]) as "argNames"
+      coalesce(pro.proargnames, array[]::text[]) as "argNames",
+      pro.pronargdefaults as "argDefaultsNum"
     from
       pg_catalog.pg_proc as pro
       left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid

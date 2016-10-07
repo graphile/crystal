@@ -1,6 +1,5 @@
 import { GraphQLOutputType, GraphQLInputType } from 'graphql'
 import { Inventory, Type } from '../../../interface'
-import { formatName } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import getGQLType from '../../../graphql/schema/getGQLType'
 import { PGCatalog, PGCatalogNamespace, PGCatalogType, PGCatalogProcedure } from '../../../postgres/introspection'
@@ -12,7 +11,6 @@ export type PGProcedureFixtures =  {
   pgNamespace: PGCatalogNamespace,
   args: Array<{
     name: string,
-    inputName: string,
     pgType: PGCatalogType,
     type: Type<mixed>,
     gqlType: GraphQLInputType<mixed>,
@@ -48,11 +46,10 @@ export default function createPGProcedureFixtures (
     // the argument name if it does not exist.
     args: pgProcedure.argTypeIds.map((typeId, i) => {
       const name = pgProcedure.argNames[i] || `arg-${i}`
-      const inputName = formatName.field(name)
       const pgType = pgCatalog.assertGetType(typeId)
       const type = getTypeFromPGType(pgCatalog, pgType, inventory)
       const gqlType = getGQLType(buildToken, type, true)
-      return { name, inputName, pgType, type, gqlType }
+      return { name, pgType, type, gqlType }
     }),
 
     return: (() => {

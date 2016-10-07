@@ -12,7 +12,7 @@ import createPGProcedureSQLCall from './createPGProcedureSQLCall'
  *
  * @private
  */
-type ProcedureInput = { [key: string]: mixed }
+type ProcedureInput = Array<mixed>
 
 /**
  * A procedure paginator is one in which a Postgres function is the source of

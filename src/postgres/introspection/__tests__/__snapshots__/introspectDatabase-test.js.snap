@@ -639,6 +639,7 @@ Object {
   ],
   "procedure": Array [
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -654,6 +655,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -669,6 +671,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "a",
         "b",
@@ -687,6 +690,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "a",
         "b",
@@ -705,6 +709,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "",
@@ -723,6 +728,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "",
@@ -741,6 +747,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "",
         "b",
@@ -759,6 +766,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "",
         "b",
@@ -777,6 +785,62 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 2,
+      "argNames": Array [
+        "post",
+        "length",
+        "omission",
+      ],
+      "argTypeIds": Array [
+        "post",
+        "int4",
+        "text",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "post_headline_trimmed",
+      "namespaceId": "a",
+      "returnTypeId": "text",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "object",
+      ],
+      "argTypeIds": Array [
+        "compound_type",
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "compound_type_mutation",
+      "namespaceId": "b",
+      "returnTypeId": "compound_type",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "object",
+      ],
+      "argTypeIds": Array [
+        "compound_type",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "compound_type_query",
+      "namespaceId": "b",
+      "returnTypeId": "compound_type",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -792,6 +856,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -807,6 +872,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -822,6 +888,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -837,24 +904,9 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
-        "object",
-      ],
-      "argTypeIds": Array [
         "compound_type",
-      ],
-      "description": null,
-      "isStable": false,
-      "isStrict": false,
-      "kind": "procedure",
-      "name": "compound_type_mutation",
-      "namespaceId": "c",
-      "returnTypeId": "compound_type",
-      "returnsSet": false,
-    },
-    Object {
-      "argNames": Array [
-        "object",
       ],
       "argTypeIds": Array [
         "compound_type",
@@ -863,12 +915,13 @@ Object {
       "isStable": true,
       "isStrict": false,
       "kind": "procedure",
-      "name": "compound_type_query",
+      "name": "compound_type_computed_field",
       "namespaceId": "c",
-      "returnTypeId": "compound_type",
+      "returnTypeId": "int4",
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "x",
         "y",
@@ -889,6 +942,7 @@ Object {
       "returnsSet": true,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "x",
         "y",
@@ -909,6 +963,7 @@ Object {
       "returnsSet": true,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [],
       "description": null,
@@ -921,6 +976,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [],
       "description": null,
@@ -933,6 +989,41 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "person",
+      ],
+      "argTypeIds": Array [
+        "person",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "person_first_name",
+      "namespaceId": "c",
+      "returnTypeId": "text",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "person",
+      ],
+      "argTypeIds": Array [
+        "person",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "person_friends",
+      "namespaceId": "c",
+      "returnTypeId": "person",
+      "returnsSet": true,
+    },
+    Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "id",
       ],
@@ -949,6 +1040,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "id",
       ],
@@ -965,6 +1057,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [],
       "description": null,
@@ -977,6 +1070,7 @@ Object {
       "returnsSet": true,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [],
       "description": null,
@@ -989,6 +1083,7 @@ Object {
       "returnsSet": true,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "b",
@@ -1011,6 +1106,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "b",
@@ -1369,6 +1465,7 @@ Object {
   ],
   "procedure": Array [
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -1384,6 +1481,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
@@ -1399,6 +1497,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "a",
         "b",
@@ -1417,6 +1516,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "a",
         "b",
@@ -1435,6 +1535,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "",
@@ -1453,6 +1554,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "a",
         "",
@@ -1471,6 +1573,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "",
         "b",
@@ -1489,6 +1592,7 @@ Object {
       "returnsSet": false,
     },
     Object {
+      "argDefaultsNum": 1,
       "argNames": Array [
         "",
         "b",
@@ -1504,6 +1608,27 @@ Object {
       "name": "add_4_query",
       "namespaceId": "a",
       "returnTypeId": "int4",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 2,
+      "argNames": Array [
+        "post",
+        "length",
+        "omission",
+      ],
+      "argTypeIds": Array [
+        "post",
+        "int4",
+        "text",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "post_headline_trimmed",
+      "namespaceId": "a",
+      "returnTypeId": "text",
       "returnsSet": false,
     },
   ],

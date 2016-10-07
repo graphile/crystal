@@ -5,6 +5,7 @@ import { introspectPGDatabase, addPGCatalogToInventory } from '../../postgres'
 import { createGraphQLSchema } from '../../graphql'
 import createPGProcedureMutationGQLFieldEntries from './procedures/hooks/createPGProcedureMutationGQLFieldEntries'
 import createPGProcedureQueryGQLFieldEntries from './procedures/hooks/createPGProcedureQueryGQLFieldEntries'
+import createPGProcedureObjectTypeGQLFieldEntries from './procedures/hooks/createPGProcedureObjectTypeGQLFieldEntries'
 
 /**
  * Creates a PostGraphQL schema by looking at a Postgres client.
@@ -37,7 +38,7 @@ export default async function createPostGraphQLSchema (
     _hooks: {
       mutationFieldEntries: _buildToken => createPGProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
       queryFieldEntries: _buildToken => createPGProcedureQueryGQLFieldEntries(_buildToken, pgCatalog),
-      objectTypeFieldEntries: () => [],
+      objectTypeFieldEntries: (objectType, _buildToken) => createPGProcedureObjectTypeGQLFieldEntries(_buildToken, objectType, pgCatalog),
     },
   })
 

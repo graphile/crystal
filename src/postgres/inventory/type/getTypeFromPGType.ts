@@ -14,7 +14,7 @@ import { memoize2 } from '../../utils'
 import PGCatalog from '../../introspection/PGCatalog'
 import PGCatalogType from '../../introspection/object/PGCatalogType'
 import PGCollection from '../collection/PGCollection'
-import PGObjectType from './PGObjectType'
+import PGClassObjectType from './PGClassObjectType'
 
 /**
  * The type for a JSON blob. It’s just a string…
@@ -107,14 +107,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // If this type is a composite type…
     case 'c': {
       const pgClass = pgCatalog.assertGetClass(pgType.classId)
-
-      const objectType = new PGObjectType({
-        name: pgType.name,
-        description: pgType.description,
-        pgCatalog,
-        pgAttributes: pgCatalog.getClassAttributes(pgClass.id),
-      })
-
+      const objectType = new PGClassObjectType(pgCatalog, pgClass)
       return new NullableType(objectType)
     }
     // If this type is a domain type…

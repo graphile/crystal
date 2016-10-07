@@ -16,6 +16,7 @@ interface PGCatalogProcedure {
   readonly returnTypeId: string
   readonly argTypeIds: Array<string>
   readonly argNames: Array<string>
+  readonly argDefaultsNum: number
 }
 
 export default PGCatalogProcedure

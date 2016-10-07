@@ -957,6 +957,223 @@ Object {
 }
 `;
 
+exports[`test operation procedure-computed-fields.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "firstName": "John",
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Sara",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Budd",
+                      "name": "Budd Deey",
+                    },
+                  ],
+                },
+                "name": "Sara Smith",
+              },
+              Object {
+                "firstName": "Budd",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Kathryn",
+                      "name": "Kathryn Ramirez",
+                    },
+                  ],
+                },
+                "name": "Budd Deey",
+              },
+            ],
+          },
+          "name": "John Smith",
+        },
+        Object {
+          "firstName": "Sara",
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Budd",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Kathryn",
+                      "name": "Kathryn Ramirez",
+                    },
+                  ],
+                },
+                "name": "Budd Deey",
+              },
+              Object {
+                "firstName": "Kathryn",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Johnny",
+                      "name": "Johnny Tucker",
+                    },
+                  ],
+                },
+                "name": "Kathryn Ramirez",
+              },
+            ],
+          },
+          "name": "Sara Smith",
+        },
+        Object {
+          "firstName": "Budd",
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Kathryn",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Johnny",
+                      "name": "Johnny Tucker",
+                    },
+                  ],
+                },
+                "name": "Kathryn Ramirez",
+              },
+              Object {
+                "firstName": "Johnny",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Johnny Tucker",
+              },
+            ],
+          },
+          "name": "Budd Deey",
+        },
+        Object {
+          "firstName": "Kathryn",
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Johnny",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Johnny Tucker",
+              },
+            ],
+          },
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "firstName": "Johnny",
+          "friends": Object {
+            "nodes": Array [],
+          },
+          "name": "Johnny Tucker",
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "a": "No… It’s …",
+          "b": "No… It’s a thi…",
+          "c": "No… It’s a thing; i[...]",
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+        },
+        Object {
+          "a": "I hate yo…",
+          "b": "I hate yogurt.…",
+          "c": "I hate yogurt. It’s[...]",
+          "headline": "I hate yogurt. It’s just stuff with bits in.",
+        },
+        Object {
+          "a": "Is that a…",
+          "b": "Is that a cook…",
+          "c": "Is that a cooking s[...]",
+          "headline": "Is that a cooking show?",
+        },
+        Object {
+          "a": "You hit m…",
+          "b": "You hit me wit…",
+          "c": "You hit me with a c[...]",
+          "headline": "You hit me with a cricket bat.",
+        },
+        Object {
+          "a": "Please, D…",
+          "b": "Please, Don-Bo…",
+          "c": "Please, Don-Bot… lo[...]",
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        },
+        Object {
+          "a": "Stop talk…",
+          "b": "Stop talking, …",
+          "c": "Stop talking, brain[...]",
+          "headline": "Stop talking, brain thinking. Hush.",
+        },
+        Object {
+          "a": "Large bet…",
+          "b": "Large bet on m…",
+          "c": "Large bet on myself[...]",
+          "headline": "Large bet on myself in round one.",
+        },
+        Object {
+          "a": "It’s a fe…",
+          "b": "It’s a fez. I …",
+          "c": "It’s a fez. I wear [...]",
+          "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+        },
+        Object {
+          "a": "You know …",
+          "b": "You know how I…",
+          "c": "You know how I some[...]",
+          "headline": "You know how I sometimes have really brilliant ideas?",
+        },
+        Object {
+          "a": "What’s wi…",
+          "b": "What’s with yo…",
+          "c": "What’s with you kid[...]",
+          "headline": "What’s with you kids? Every other day it’s food, food, food.",
+        },
+        Object {
+          "a": "They’re n…",
+          "b": "They’re not al…",
+          "c": "They’re not aliens,[...]",
+          "headline": "They’re not aliens, they’re Earth…liens!",
+        },
+      ],
+    },
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "compoundType": Object {
+            "a": 1,
+            "computedField": 9,
+            "fooBar": 8,
+          },
+          "nestedCompoundType": Object {
+            "a": Object {
+              "a": 3,
+              "computedField": 96,
+              "fooBar": 93,
+            },
+            "b": Object {
+              "a": 42,
+              "computedField": 37,
+              "fooBar": -5,
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`test operation procedure-mutation.graphql 1`] = `
 Object {
   "data": Object {

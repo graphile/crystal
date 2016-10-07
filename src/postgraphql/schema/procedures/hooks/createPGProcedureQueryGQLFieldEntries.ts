@@ -3,6 +3,7 @@ import { Type } from '../../../../interface'
 import { formatName, buildObject } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createConnectionGQLField from '../../../../graphql/schema/connection/createConnectionGQLField'
+import transformGQLInputValue from '../../../../graphql/schema/transformGQLInputValue'
 import { sql } from '../../../../postgres/utils'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
 import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
@@ -10,6 +11,7 @@ import transformPGValueIntoValue from '../../../../postgres/inventory/transformP
 import createPGProcedureFixtures from '../createPGProcedureFixtures'
 import createPGProcedureSQLCall from '../createPGProcedureSQLCall'
 import PGProcedurePaginator from '../PGProcedurePaginator'
+import isPGProcedureComputedColumn from '../isPGProcedureComputedColumn'
 
 /**
  * Creates all of the fields for query procedures. Query procedures that return
@@ -21,7 +23,7 @@ export default function createPGProcedureQueryGQLFieldEntries (
 ): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
   return (
     pgCatalog.getProcedures()
-      .filter(pgProcedure => pgProcedure.isStable)
+      .filter(pgProcedure => pgProcedure.isStable && !isPGProcedureComputedColumn(pgCatalog, pgProcedure))
       .map(pgProcedure =>
         pgProcedure.returnsSet
           ? createPGSetProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
@@ -44,8 +46,8 @@ function createPGSingleProcedureQueryGQLFieldEntry (
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
   const argEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
-    ({ inputName, gqlType }) =>
-      [inputName, {
+    ({ name, gqlType }) =>
+      [formatName.arg(name), {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
@@ -58,7 +60,8 @@ function createPGSingleProcedureQueryGQLFieldEntry (
 
     async resolve (source, args, context) {
       const client = pgClientFromContext(context)
-      const query = sql.compile(sql.query`select to_json(${createPGProcedureSQLCall(fixtures, args)}) as value`)
+      const input = argEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName]))
+      const query = sql.compile(sql.query`select to_json(${createPGProcedureSQLCall(fixtures, input)}) as value`)
       const { rows: [row] } = await client.query(query)
       return row ? transformPGValueIntoValue(fixtures.return.type, row['value']) : null
     },
@@ -80,15 +83,19 @@ function createPGSetProcedureQueryGQLFieldEntry (
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
   const inputArgEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
-    ({ inputName, gqlType }) =>
-      [inputName, {
+    ({ name, gqlType }) =>
+      [formatName.arg(name), {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
   )
 
-  return [formatName.field(pgProcedure.name), createConnectionGQLField(buildToken, paginator, {
-    inputArgEntries,
-    getPaginatorInput: (source, args) => args,
-  })]
+  return [
+    formatName.field(pgProcedure.name),
+    createConnectionGQLField<mixed, Array<mixed>, mixed>(buildToken, paginator, {
+      inputArgEntries,
+      getPaginatorInput: (source, args) =>
+        inputArgEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName])),
+    })
+  ]
 }

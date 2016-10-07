@@ -10,6 +10,7 @@ import { Type, NullableType, ListType } from '../../../../interface'
 import { formatName } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createMutationGQLField from '../../../../graphql/schema/createMutationGQLField'
+import transformGQLInputValue from '../../../../graphql/schema/transformGQLInputValue'
 import { sql } from '../../../../postgres/utils'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
 import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
@@ -46,8 +47,8 @@ function createPGProcedureMutationGQLFieldEntry (
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
   const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
-    ({ inputName, gqlType }) =>
-      [inputName, {
+    ({ name, gqlType }) =>
+      [formatName.field(name), {
         // TODO: description
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
@@ -77,8 +78,11 @@ function createPGProcedureMutationGQLFieldEntry (
     ],
 
     // Actually execute the procedure here.
-    async execute (context, input) {
+    async execute (context, gqlInput) {
       const client = pgClientFromContext(context)
+
+      // Turn our GraphQL input into an input tuple.
+      const input = inputFields.map(([fieldName, { type }]) => transformGQLInputValue(type, gqlInput[fieldName]))
 
       // Craft our procedure call. A procedure name with arguments, like any
       // other function call. Input values must be coerced twice however.

@@ -13,7 +13,7 @@ test('will fail if creating a type that is not in the catalog', () => {
   expect(() => getTypeFromPGType(catalog2, typeObject)).not.toThrow()
 })
 
-test('will create a an object type from a composite type', () => {
+test('will create an object type from a composite type', () => {
   const typeObject = {
     kind: 'type',
     id: '0',
@@ -35,6 +35,7 @@ test('will create a an object type from a composite type', () => {
   const classAObject = {
     kind: 'class',
     id: '3',
+    typeId: '2',
   }
   const classBObject = {
     kind: 'class',

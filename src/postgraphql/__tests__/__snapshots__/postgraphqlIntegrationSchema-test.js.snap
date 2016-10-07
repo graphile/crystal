@@ -127,6 +127,7 @@ type CompoundType {
   c: Color
   d: Uuid
   fooBar: Int
+  computedField: Int
 }
 
 # Awesome feature!
@@ -474,11 +475,11 @@ type Mutation {
 
   # lol, add some stuff 4 mutation
   add4Mutation(input: Add4MutationInput!): Add4MutationPayload
+  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
-  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
@@ -640,6 +641,54 @@ type Person implements Node {
   about: String
   email: Email
   createdAt: String
+  firstName: String
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  friends(
+    # The method to use when ordering \`Person\`.
+    orderBy: PersonFriendsOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): PersonFriendsConnection
+}
+
+# A connection to a list of \`Person\` values.
+type PersonFriendsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [PersonFriendsEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type PersonFriendsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum PersonFriendsOrderBy {
+  NATURAL
 }
 
 # Person test comment
@@ -668,6 +717,7 @@ type Post implements Node {
   headline: String!
   body: String
   authorId: Int
+  headlineTrimmed(length: Int, omission: String): String
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
@@ -1405,6 +1455,7 @@ type CompoundType {
   c: Color
   d: Uuid
   fooBar: Int
+  computedField: Int
 }
 
 # Awesome feature!
@@ -1752,11 +1803,11 @@ type Mutation {
 
   # lol, add some stuff 4 mutation
   add4Mutation(input: Add4MutationInput!): Add4MutationPayload
+  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
   mult3(input: Mult3Input!): Mult3Payload
   mult4(input: Mult4Input!): Mult4Payload
-  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
@@ -1918,6 +1969,54 @@ type Person implements Node {
   about: String
   email: Email
   createdAt: String
+  firstName: String
+
+  # Reads and enables paginatation through a set of \`Person\`.
+  friends(
+    # The method to use when ordering \`Person\`.
+    orderBy: PersonFriendsOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): PersonFriendsConnection
+}
+
+# A connection to a list of \`Person\` values.
+type PersonFriendsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [PersonFriendsEdge]
+
+  # A list of \`Person\` objects.
+  nodes: [Person]
+}
+
+# A \`Person\` edge in the connection.
+type PersonFriendsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`Person\` at the end of the edge.
+  node: Person
+}
+
+# Methods to use when ordering \`Person\`.
+enum PersonFriendsOrderBy {
+  NATURAL
 }
 
 # Person test comment
@@ -1946,6 +2045,7 @@ type Post implements Node {
   headline: String!
   body: String
   authorId: Int
+  headlineTrimmed(length: Int, omission: String): String
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person

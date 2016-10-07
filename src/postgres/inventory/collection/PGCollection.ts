@@ -5,6 +5,7 @@ import { Collection, Type, NullableType } from '../../../interface'
 import { memoize1, sql, memoizeMethod } from '../../utils'
 import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
+import PGClassObjectType from '../type/PGClassObjectType'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
@@ -48,13 +49,9 @@ class PGCollection implements Collection {
    * We can depend on this type having the exact same number of fields as there
    * are Postgres attributes and in the exact same order.
    */
-  public type = new PGObjectType({
+  public type = new PGClassObjectType(this._pgCatalog, this._pgClass, {
     name: pluralize(this._pgClass.name, 1),
-    description: this._pgClass.description,
-    pgCatalog: this._pgCatalog,
-    pgAttributes: new Map(this._pgAttributes.map<[string, PGCatalogAttribute]>(pgAttribute =>
-      [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
-    )),
+    renameIdToRowId: this._options.renameIdToRowId,
   })
 
   /**
