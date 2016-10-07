@@ -3,9 +3,10 @@ import {
   GraphQLInputType,
   GraphQLOutputType,
   GraphQLNullableType,
-  GraphQLNamedType,
   GraphQLNonNull,
   GraphQLList,
+  GraphQLNamedType,
+  GraphQLScalarType,
   GraphQLEnumType,
   GraphQLEnumValueConfig,
   GraphQLObjectType,
@@ -19,6 +20,7 @@ import {
   getNullableType,
   isInputType,
   isOutputType,
+  Kind,
 } from 'graphql'
 
 import {
@@ -34,6 +36,7 @@ import {
   integerType,
   floatType,
   stringType,
+  jsonType,
 } from '../../interface'
 
 import { buildObject, formatName } from '../utils'
@@ -75,6 +78,19 @@ function getGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolean):
 }
 
 export default getGQLType
+
+/**
+ * The JSON type for our API.
+ *
+ * @private
+ */
+const GraphQLJSONType = new GraphQLScalarType({
+  name: 'JSON',
+  description: jsonType.description,
+  serialize: String,
+  parseValue: String,
+  parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
+})
 
 /**
  * Creates a type. This method mainly wraps `createNullableType`
@@ -154,6 +170,7 @@ function createGQLNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
     case integerType: return GraphQLInt
     case floatType: return GraphQLFloat
     case stringType: return GraphQLString
+    case jsonType: return GraphQLJSONType
   }
 
   throw new Error(

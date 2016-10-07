@@ -8,6 +8,7 @@ import {
   integerType,
   floatType,
   stringType,
+  jsonType,
   ObjectType,
 } from '../../interface'
 
@@ -56,6 +57,11 @@ export default function transformPGValueIntoValue (type: Type<mixed>, value: mix
     type === stringType
   )
     return value
+
+  // If this is JSON, we should stringify the value because the `pg` module
+  // gives it to us as an object.
+  if (type === jsonType)
+    return JSON.stringify(value)
 
   // If the type is an object type, convert the JavaScript object value into a
   // map. If the value is null or not an object, an error will be thrown.

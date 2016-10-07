@@ -414,6 +414,9 @@ enum IntSetQueryOrderBy {
   NATURAL
 }
 
+# A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+scalar JSON
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -932,6 +935,8 @@ type Query {
     domain: AnInt
     domain2: AnotherInt
     textArray: [String]
+    json: JSON
+    jsonb: JSON
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1083,28 +1088,32 @@ type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
   rowId: Int!
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
+  bigint: Int!
+  boolean: Boolean!
+  varchar: String!
+  enum: Color!
   domain: AnInt
   domain2: AnotherInt
-  textArray: [String]
-  compoundType: CompoundType
-  nestedCompoundType: NestedCompoundType
+  textArray: [String]!
+  json: JSON!
+  jsonb: JSON!
+  compoundType: CompoundType!
+  nestedCompoundType: NestedCompoundType!
 }
 
 input TypeInput {
   rowId: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
+  bigint: Int!
+  boolean: Boolean!
+  varchar: String!
+  enum: Color!
   domain: AnInt
   domain2: AnotherInt
-  textArray: [String]
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
+  textArray: [String]!
+  json: JSON!
+  jsonb: JSON!
+  compoundType: CompoundTypeInput!
+  nestedCompoundType: NestedCompoundTypeInput!
 }
 
 input TypePatch {
@@ -1116,6 +1125,8 @@ input TypePatch {
   domain: AnInt
   domain2: AnotherInt
   textArray: [String]
+  json: JSON
+  jsonb: JSON
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1179,6 +1190,10 @@ enum TypesOrderBy {
   DOMAIN2_DESC
   TEXT_ARRAY_ASC
   TEXT_ARRAY_DESC
+  JSON_ASC
+  JSON_DESC
+  JSONB_ASC
+  JSONB_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
@@ -1742,6 +1757,9 @@ enum IntSetQueryOrderBy {
   NATURAL
 }
 
+# A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+scalar JSON
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -2260,6 +2278,8 @@ type Query {
     domain: AnInt
     domain2: AnotherInt
     textArray: [String]
+    json: JSON
+    jsonb: JSON
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2411,28 +2431,32 @@ type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
   id: Int!
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
+  bigint: Int!
+  boolean: Boolean!
+  varchar: String!
+  enum: Color!
   domain: AnInt
   domain2: AnotherInt
-  textArray: [String]
-  compoundType: CompoundType
-  nestedCompoundType: NestedCompoundType
+  textArray: [String]!
+  json: JSON!
+  jsonb: JSON!
+  compoundType: CompoundType!
+  nestedCompoundType: NestedCompoundType!
 }
 
 input TypeInput {
   id: Int
-  bigint: Int
-  boolean: Boolean
-  varchar: String
-  enum: Color
+  bigint: Int!
+  boolean: Boolean!
+  varchar: String!
+  enum: Color!
   domain: AnInt
   domain2: AnotherInt
-  textArray: [String]
-  compoundType: CompoundTypeInput
-  nestedCompoundType: NestedCompoundTypeInput
+  textArray: [String]!
+  json: JSON!
+  jsonb: JSON!
+  compoundType: CompoundTypeInput!
+  nestedCompoundType: NestedCompoundTypeInput!
 }
 
 input TypePatch {
@@ -2444,6 +2468,8 @@ input TypePatch {
   domain: AnInt
   domain2: AnotherInt
   textArray: [String]
+  json: JSON
+  jsonb: JSON
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2507,6 +2533,10 @@ enum TypesOrderBy {
   DOMAIN2_DESC
   TEXT_ARRAY_ASC
   TEXT_ARRAY_DESC
+  JSON_ASC
+  JSON_DESC
+  JSONB_ASC
+  JSONB_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC

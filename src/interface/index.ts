@@ -15,6 +15,7 @@ import booleanType from './type/primitive/booleanType'
 import integerType from './type/primitive/integerType'
 import floatType from './type/primitive/floatType'
 import stringType from './type/primitive/stringType'
+import jsonType from './type/primitive/jsonType'
 
 export {
   Inventory,
@@ -36,4 +37,5 @@ export {
   integerType,
   floatType,
   stringType,
+  jsonType,
 }

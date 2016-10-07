@@ -9,23 +9,13 @@ import {
   integerType,
   floatType,
   stringType,
+  jsonType,
 } from '../../../interface'
 import { memoize2 } from '../../utils'
 import PGCatalog from '../../introspection/PGCatalog'
 import PGCatalogType from '../../introspection/object/PGCatalogType'
 import PGCollection from '../collection/PGCollection'
 import PGClassObjectType from './PGClassObjectType'
-
-/**
- * The type for a JSON blob. It’s just a string…
- *
- * @private
- */
-const jsonType = new AliasType({
-  name: 'json',
-  description: 'An untyped serialized JSON string.',
-  baseType: stringType,
-})
 
 /**
  * The type for a universal identifier as defined by [RFC 4122][1].

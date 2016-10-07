@@ -8,6 +8,7 @@ import {
   integerType,
   floatType,
   stringType,
+  jsonType,
   ObjectType,
 } from '../../interface'
 import { sql } from '../utils'
@@ -42,7 +43,8 @@ export default function transformValueIntoPGValue (type: Type<mixed>, value: mix
   if (
     type instanceof EnumType ||
     type === booleanType ||
-    type === stringType
+    type === stringType ||
+    type === jsonType
   )
     return sql.query`${sql.value(value)}`
 

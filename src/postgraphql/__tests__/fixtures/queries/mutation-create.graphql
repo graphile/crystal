@@ -9,6 +9,8 @@ mutation {
       domain: 6
       domain2: 5
       textArray: ["have", "you", "ever", "been", "down", "the", "water", "spout", "?"]
+      json: "{\"x\":1,\"y\":2,\"z\":3}"
+      jsonb: "{\"a\":1,\"b\":2,\"c\":3}"
       compoundType: {
         a: 123,
         b: "abc"
@@ -46,6 +48,8 @@ mutation {
       domain
       domain2
       textArray
+      json
+      jsonb
       compoundType { a b c d fooBar }
       nestedCompoundType {
         a { a b c d fooBar }

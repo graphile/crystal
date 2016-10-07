@@ -83,15 +83,17 @@ create domain b.another_int as a.an_int;
 
 create table b.types (
   id serial primary key,
-  "bigint" bigint,
-  "boolean" boolean,
-  "varchar" varchar,
-  "enum" b.color,
-  "domain" a.an_int,
-  "domain2" b.another_int,
-  "text_array" text[],
-  "compound_type" c.compound_type,
-  "nested_compound_type" b.nested_compound_type
+  "bigint" bigint not null,
+  "boolean" boolean not null,
+  "varchar" varchar not null,
+  "enum" b.color not null,
+  "domain" a.an_int not null,
+  "domain2" b.another_int not null,
+  "text_array" text[] not null,
+  "json" json not null,
+  "jsonb" jsonb not null,
+  "compound_type" c.compound_type not null,
+  "nested_compound_type" b.nested_compound_type not null
 );
 
 create function a.add_1_mutation(int, int) returns int as $$ select $1 + $2 $$ language sql volatile strict;
