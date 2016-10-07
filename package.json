@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
-    "babel-core": "^6.16.0",
+    "babel-core": "^6.17.0",
     "babel-plugin-module-alias": "^1.6.0",
     "babel-preset-modern-node": "^3.2.0",
     "babel-preset-stage-1": "^6.16.0",
