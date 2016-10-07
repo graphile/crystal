@@ -24,6 +24,9 @@ type BuildToken = {
     // for example, wants the name to be `id`. Soon in the GraphQL spec, an
     // `__id` field will be standardized.
     nodeIdFieldName: string,
+    // By default, JSON is output as a string in our GraphQL queries. If true
+    // then JSON will be output as a dynamic object.
+    dynamicJson: boolean,
   },
   // Hooks for adding custom fields/types into our schema.
   _hooks: _BuildTokenHooks,

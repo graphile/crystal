@@ -16,6 +16,7 @@ export default async function createPostGraphQLSchema (
   schemas: Array<string> = ['public'],
   options: {
     legacyIds?: boolean,
+    dynamicJson?: boolean,
   } = {},
 ): Promise<GraphQLSchema> {
   // Create our inventory.
@@ -43,6 +44,7 @@ export default async function createPostGraphQLSchema (
   // Actually create our GraphQL schema.
   const gqlSchema = createGraphQLSchema(inventory, {
     nodeIdFieldName: options.legacyIds ? 'id' : '__id',
+    dynamicJson: options.dynamicJson,
     _hooks: {
       mutationFieldEntries: _buildToken => createPGProcedureMutationGQLFieldEntries(_buildToken, pgCatalog),
       queryFieldEntries: _buildToken => createPGProcedureQueryGQLFieldEntries(_buildToken, pgCatalog),

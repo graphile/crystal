@@ -21,6 +21,7 @@ import {
   isInputType,
   isOutputType,
   Kind,
+  Value as ASTValue,
 } from 'graphql'
 
 import {
@@ -39,7 +40,7 @@ import {
   jsonType,
 } from '../../interface'
 
-import { buildObject, formatName } from '../utils'
+import { buildObject, formatName, memoize1 } from '../utils'
 import getCollectionGQLType from './collection/getCollectionGQLType'
 import { $$gqlInputObjectTypeValueKeyName } from './transformGQLInputValue'
 import BuildToken from './BuildToken'
@@ -80,17 +81,58 @@ function getGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolean):
 export default getGQLType
 
 /**
- * The JSON type for our API.
+ * Parses a GraphQL AST literal into a JavaScript value.
  *
  * @private
  */
-const GraphQLJSONType = new GraphQLScalarType({
-  name: 'JSON',
-  description: jsonType.description,
-  serialize: String,
-  parseValue: String,
-  parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
-})
+function parseASTLiteralIntoValue (ast: ASTValue): mixed {
+  switch (ast.kind) {
+    case Kind.STRING:
+    case Kind.BOOLEAN:
+      return ast.value
+    case Kind.INT:
+    case Kind.FLOAT:
+      return parseFloat(ast.value)
+    case Kind.OBJECT: {
+      return ast.fields.reduce((object, field) => {
+        object[field.name.value] = parseASTLiteralIntoValue(field.value)
+        return object
+      }, {})
+    }
+    case Kind.LIST:
+      return ast.values.map(parseASTLiteralIntoValue)
+    default:
+      return null
+  }
+}
+
+/**
+ * The JSON type for our API. If the user set the `dynamicJSON` option to true,
+ * arbitrary JSON input and output will be enabled.
+ *
+ * @private
+ */
+export const _getJSONGQLType = memoize1((buildToken: BuildToken): GraphQLScalarType<string> =>
+  buildToken.options.dynamicJson
+    ? (
+      new GraphQLScalarType({
+        name: 'JSON',
+        description: jsonType.description,
+        serialize: value => typeof value === 'string' ? JSON.parse(value) : null,
+        parseValue: value => JSON.stringify(value),
+        parseLiteral: ast => JSON.stringify(parseASTLiteralIntoValue(ast)),
+      })
+    )
+    : (
+      new GraphQLScalarType({
+        name: 'JSON',
+        description: jsonType.description,
+        serialize: String,
+        parseValue: String,
+        parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
+      })
+    )
+)
 
 /**
  * Creates a type. This method mainly wraps `createNullableType`
@@ -170,7 +212,7 @@ function createGQLNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
     case integerType: return GraphQLInt
     case floatType: return GraphQLFloat
     case stringType: return GraphQLString
-    case jsonType: return GraphQLJSONType
+    case jsonType: return _getJSONGQLType(buildToken)
   }
 
   throw new Error(

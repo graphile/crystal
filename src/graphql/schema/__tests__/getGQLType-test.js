@@ -8,6 +8,7 @@ import {
   GraphQLEnumType,
   GraphQLObjectType,
   GraphQLInputObjectType,
+  Kind,
 } from 'graphql'
 
 import {
@@ -23,7 +24,7 @@ import {
 } from '../../../interface'
 
 import { $$gqlInputObjectTypeValueKeyName } from '../transformGQLInputValue'
-import getGQLType from '../getGQLType'
+import getGQLType, { _getJSONGQLType } from '../getGQLType'
 
 const mockBuildToken = () => ({
   inventory: {
@@ -158,4 +159,30 @@ test('will correctly make an input object type', () => {
   expect(gqlType.getFields().b.description).toBe(undefined)
   expect(gqlType.getFields().b.type).toBe(GraphQLBoolean)
   expect(gqlType.getFields().b[$$gqlInputObjectTypeValueKeyName]).toBe('b')
+})
+
+test('_getJSONGQLType will create a boring JSON type with no dynamic input', () => {
+  const jsonGQLType = _getJSONGQLType({ options: { dynamicJson: false } })
+  expect(jsonGQLType.name).toBe('JSON')
+  expect(jsonGQLType.serialize('{"a":1,"b":2,"c":3}')).toEqual('{"a":1,"b":2,"c":3}')
+  expect(jsonGQLType.parseValue('{"a":1,"b":2,"c":3}')).toEqual('{"a":1,"b":2,"c":3}')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.STRING, value: '{"a":1,"b":2,"c":3}' })).toEqual('{"a":1,"b":2,"c":3}')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.BOOLEAN, value: true })).toEqual(null)
+  expect(jsonGQLType.parseLiteral({ kind: Kind.INT, value: 20 })).toEqual(null)
+  expect(jsonGQLType.parseLiteral({ kind: Kind.FLOAT, value: 3.1415 })).toEqual(null)
+  expect(jsonGQLType.parseLiteral({ kind: Kind.OBJECT, fields: [{ name: { value: 'a' }, value: { kind: Kind.INT, value: 1 } }, { name: { value: 'b' }, value: { kind: Kind.INT, value: 2 } }] })).toEqual(null)
+  expect(jsonGQLType.parseLiteral({ kind: Kind.LIST, values: [{ kind: Kind.INT, value: 1 }, { kind: Kind.INT, value: 2 }, { kind: Kind.INT, value: 3 }] })).toEqual(null)
+})
+
+test('_getJSONGQLType will create a dynamic JSON type', () => {
+  const jsonGQLType = _getJSONGQLType({ options: { dynamicJson: true } })
+  expect(jsonGQLType.name).toBe('JSON')
+  expect(jsonGQLType.serialize('{"a":1,"b":2,"c":3}')).toEqual({ a: 1, b: 2, c: 3 })
+  expect(jsonGQLType.parseValue({ a: 1, b: 2, c: 3 })).toEqual('{"a":1,"b":2,"c":3}')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.STRING, value: 'hello, world!' })).toEqual('"hello, world!"')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.BOOLEAN, value: true })).toEqual('true')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.INT, value: 20 })).toEqual('20')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.FLOAT, value: 3.1415 })).toEqual('3.1415')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.OBJECT, fields: [{ name: { value: 'a' }, value: { kind: Kind.INT, value: 1 } }, { name: { value: 'b' }, value: { kind: Kind.INT, value: 2 } }] })).toEqual('{"a":1,"b":2}')
+  expect(jsonGQLType.parseLiteral({ kind: Kind.LIST, values: [{ kind: Kind.INT, value: 1 }, { kind: Kind.INT, value: 2 }, { kind: Kind.INT, value: 3 }] })).toEqual('[1,2,3]')
 })

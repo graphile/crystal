@@ -10,7 +10,11 @@ export type SchemaOptions = {
   // be `id`, but there are some movements in the GraphQL standard to
   // standardize an `__id` field.
   nodeIdFieldName?: string,
-  // TODO: doc
+  // If true then any literal will be accepted to this type and its output will
+  // be plain JSON.
+  dynamicJson?: boolean,
+  // Some hooks to allow extension of the schema. Currently this API is
+  // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
 }
 
@@ -25,9 +29,8 @@ export default function createGQLSchema (inventory: Inventory, options: SchemaOp
   const buildToken: BuildToken = {
     inventory,
     options: {
-      // The default node id field name is `__id` as it is the emerging
-      // standard.
       nodeIdFieldName: options.nodeIdFieldName || '__id',
+      dynamicJson: options.dynamicJson || false,
     },
     _hooks: options._hooks || {},
   }

@@ -3,7 +3,7 @@ query {
   add2Query(a: 2, b: 2)
   add3Query(arg1: 5)
   add4Query(arg0: 1, b: 3)
-  typesQuery(a: 50, b: false, c: "xyz", d: [1, 2, 3])
+  typesQuery(a: 50, b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}")
   compoundTypeQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, fooBar: 8 }) { a b c d fooBar }
   tableQuery(id: 5) { __id id headline authorId }
   tableSetQuery { edges { cursor node { name } } }

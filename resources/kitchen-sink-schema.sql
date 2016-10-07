@@ -119,8 +119,9 @@ create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language 
 create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
 create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
-create function c.types_query(a bigint, b boolean, c varchar, d integer[]) returns boolean as $$ select false $$ language sql stable strict;
-create function c.types_mutation(a bigint, b boolean, c varchar, d integer[]) returns boolean as $$ select false $$ language sql strict;
+create function c.json_identity(json json) returns json as $$ select json $$ language sql immutable;
+create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json) returns boolean as $$ select false $$ language sql stable strict;
+create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json) returns boolean as $$ select false $$ language sql strict;
 create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql stable;
 create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;

@@ -820,6 +820,7 @@ type Query {
     y: Int
     z: Int
   ): IntSetQueryConnection
+  jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
@@ -840,7 +841,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: JSON!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -1161,6 +1162,7 @@ input TypesMutationInput {
   b: Boolean!
   c: String!
   d: [Int]!
+  e: JSON!
 }
 
 type TypesMutationPayload {
@@ -2163,6 +2165,7 @@ type Query {
     y: Int
     z: Int
   ): IntSetQueryConnection
+  jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
@@ -2183,7 +2186,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: JSON!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -2504,6 +2507,7 @@ input TypesMutationInput {
   b: Boolean!
   c: String!
   d: [Int]!
+  e: JSON!
 }
 
 type TypesMutationPayload {

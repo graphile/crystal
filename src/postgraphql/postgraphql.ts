@@ -13,6 +13,7 @@ export default function postgraphql (
   schemas: Array<string> = ['public'],
   options: {
     legacyIds?: boolean,
+    dynamicJson?: boolean,
     graphqlRoute?: string,
     graphiqlRoute?: string,
     graphiql?: boolean,
