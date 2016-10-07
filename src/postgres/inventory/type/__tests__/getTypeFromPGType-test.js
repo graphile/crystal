@@ -105,12 +105,11 @@ test('will create an alias type from a domain type', () => {
   const catalog = new PGCatalog([baseTypeObject, domainTypeObject])
   const baseType = getTypeFromPGType(catalog, baseTypeObject)
   const aliasType = getTypeFromPGType(catalog, domainTypeObject)
-  expect(baseType instanceof NullableType).toBe(true)
-  expect(aliasType instanceof AliasType).toBe(true)
-  expect(aliasType.name).toBe(domainTypeObject.name)
-  expect(aliasType.description).toBe(domainTypeObject.description)
-  expect(aliasType.baseType instanceof NullableType).toBe(true)
-  expect(aliasType.baseType).toBe(baseType)
+  expect(aliasType instanceof NullableType).toBe(true)
+  expect(aliasType.nonNullType instanceof AliasType).toBe(true)
+  expect(aliasType.nonNullType.name).toBe(domainTypeObject.name)
+  expect(aliasType.nonNullType.description).toBe(domainTypeObject.description)
+  expect(aliasType.nonNullType.baseType).toBe(baseType.nonNullType)
 })
 
 test('will create an alias type with a non-null domain type', () => {

@@ -103,20 +103,15 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // If this type is a domain type…
     case 'd': {
       const pgBaseType = pgCatalog.assertGetType(pgType.baseTypeId)
-      let baseType = getTypeFromPGType(pgCatalog, pgBaseType)
-
-      // If the domain type has the `NOT NULL` contraint, we need to strip away the
-      // `NullableType` wrapper that exists most of the time on PostgreSQL types.
-      if (pgType.isNotNull && baseType instanceof NullableType)
-        baseType = baseType.nonNullType
+      const baseType = getTypeFromPGType(pgCatalog, pgBaseType)
 
       const aliasType = new AliasType({
         name: pgType.name,
         description: pgType.description,
-        baseType,
+        baseType: baseType instanceof NullableType ? baseType.nonNullType : baseType,
       })
 
-      return aliasType
+      return pgType.isNotNull ? aliasType : new NullableType(aliasType)
     }
     // If this type is an enum type…
     case 'e': {

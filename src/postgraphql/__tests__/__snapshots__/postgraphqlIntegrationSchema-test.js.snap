@@ -642,7 +642,7 @@ type Person implements Node {
   # The person’s name
   name: String!
   about: String
-  email: Email
+  email: Email!
   createdAt: String
   firstName: String
 
@@ -701,7 +701,7 @@ input PersonInput {
   # The person’s name
   name: String!
   about: String
-  email: Email
+  email: Email!
   createdAt: String
 }
 
@@ -1092,8 +1092,8 @@ type Type implements Node {
   boolean: Boolean!
   varchar: String!
   enum: Color!
-  domain: AnInt
-  domain2: AnotherInt
+  domain: AnInt!
+  domain2: AnotherInt!
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
@@ -1107,8 +1107,8 @@ input TypeInput {
   boolean: Boolean!
   varchar: String!
   enum: Color!
-  domain: AnInt
-  domain2: AnotherInt
+  domain: AnInt!
+  domain2: AnotherInt!
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
@@ -1985,7 +1985,7 @@ type Person implements Node {
   # The person’s name
   name: String!
   about: String
-  email: Email
+  email: Email!
   createdAt: String
   firstName: String
 
@@ -2044,7 +2044,7 @@ input PersonInput {
   # The person’s name
   name: String!
   about: String
-  email: Email
+  email: Email!
   createdAt: String
 }
 
@@ -2435,8 +2435,8 @@ type Type implements Node {
   boolean: Boolean!
   varchar: String!
   enum: Color!
-  domain: AnInt
-  domain2: AnotherInt
+  domain: AnInt!
+  domain2: AnotherInt!
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
@@ -2450,8 +2450,8 @@ input TypeInput {
   boolean: Boolean!
   varchar: String!
   enum: Color!
-  domain: AnInt
-  domain2: AnotherInt
+  domain: AnInt!
+  domain2: AnotherInt!
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
