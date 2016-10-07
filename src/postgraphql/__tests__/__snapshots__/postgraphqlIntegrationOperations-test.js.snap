@@ -511,6 +511,13 @@ Object {
       "clientMutationId": null,
       "type": Object {
         "__id": "WyJ0eXBlcyIsMjAxXQ==",
+        "anIntRange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": 500,
+          },
+          "start": null,
+        },
         "bigint": 50,
         "boolean": false,
         "compoundType": Object {
@@ -542,6 +549,13 @@ Object {
             "fooBar": -8,
           },
           "bazBuz": 0,
+        },
+        "numrange": Object {
+          "end": null,
+          "start": Object {
+            "inclusive": true,
+            "value": 50,
+          },
         },
         "textArray": Array [
           "have",
@@ -1611,6 +1625,16 @@ Object {
     "allTypes": Object {
       "nodes": Array [
         Object {
+          "anIntRange": Object {
+            "end": Object {
+              "inclusive": true,
+              "value": 53,
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": 20,
+            },
+          },
           "bigint": 200,
           "boolean": true,
           "compoundType": Object {
@@ -1641,6 +1665,16 @@ Object {
               "fooBar": -5,
             },
             "bazBuz": 7,
+          },
+          "numrange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": 52,
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": -10,
+            },
           },
           "textArray": Array [
             "hey",

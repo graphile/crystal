@@ -109,4 +109,12 @@ export class Events extends events.EventEmitter {
   public on (event: string, listener: Function): this
 }
 
+export interface Types {
+  getTypeParser (oid: string, format?: 'text' | 'binary'): (value: string) => any
+  setTypeParser (oid: string, parseFn: (value: string) => any): void
+  setTypeParser (oid: string, format: 'text' | 'binary', parseFn: (value: string) => any): void
+}
+
+export const types: Types
+
 }

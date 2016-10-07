@@ -16,7 +16,7 @@ import {
  * If a type has this symbol, then it will be used to transform a value instead
  * of the default transformation.
  */
-export const $$transformPGValueIntoValue = Symbol('transformPGValue')
+export const $$transformPGValueIntoValue = Symbol()
 
 /**
  * Transforms a Postgres value that we get back from the database into a value
@@ -52,11 +52,17 @@ export default function transformPGValueIntoValue (type: Type<mixed>, value: mix
   if (
     type instanceof EnumType ||
     type === booleanType ||
-    type === integerType ||
-    type === floatType ||
     type === stringType
   )
     return value
+
+  // If this is a numeric type (integer or float), return the value. If we got
+  // a string, parse the value into a number first.
+  if (
+    type === integerType ||
+    type === floatType
+  )
+    return typeof value === 'string' ? parseFloat(value) : value
 
   // If this is JSON, we should stringify the value because the `pg` module
   // gives it to us as an object.

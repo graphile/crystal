@@ -99,7 +99,7 @@ test('will create an alias type from a domain type', () => {
     name: Symbol('name'),
     description: Symbol('description'),
     type: 'd',
-    baseTypeId: '0',
+    domainBaseTypeId: '0',
   }
 
   const catalog = new PGCatalog([baseTypeObject, domainTypeObject])
@@ -123,8 +123,8 @@ test('will create an alias type with a non-null domain type', () => {
     name: Symbol('name'),
     description: Symbol('description'),
     type: 'd',
-    baseTypeId: '0',
-    isNotNull: true,
+    domainBaseTypeId: '0',
+    domainIsNotNull: true,
   }
 
   const catalog = new PGCatalog([baseTypeObject, domainTypeObject])

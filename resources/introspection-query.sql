@@ -56,7 +56,10 @@ with
       pro.proiswindow = false and
       -- We want to make sure the argument mode for all of our arguments is
       -- `IN` which means `proargmodes` will be null.
-      pro.proargmodes is null
+      pro.proargmodes is null and
+      -- Do not select procedures that create range types. These are utility
+      -- functions that really don’t need to be exposed in an API.
+      pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace)
     order by
       pro.pronamespace, pro.proname
   ),
@@ -132,12 +135,17 @@ with
         typ.typname as "name",
         dsc.description as "description",
         typ.typnamespace as "namespaceId",
+        -- We include the namespace name in types only because we select so
+        -- many types that are outside of our core set of namespaces. Having
+        -- the namespace name is super helpful when generating SQL, so
+        -- conditionally having namespace names for types is a pain.
+        nsp.nspname as "namespaceName",
         typ.typtype as "type",
         typ.typcategory as "category",
-        typ.typnotnull as "isNotNull",
+        typ.typnotnull as "domainIsNotNull",
         nullif(typ.typelem, 0) as "itemId",
         nullif(typ.typrelid, 0) as "classId",
-        nullif(typ.typbasetype, 0) as "baseTypeId",
+        nullif(typ.typbasetype, 0) as "domainBaseTypeId",
         -- If this type is an enum type, let’s select all of its enum variants.
         --
         -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-enum.html
@@ -149,10 +157,24 @@ with
             order by enm.enumsortorder
           )
           else null
-        end as "enumVariants"
+        end as "enumVariants",
+        -- If this type is a range type, we want to select the sub type of the
+        -- range.
+        --
+        -- @see https://www.postgresql.org/docs/9.6/static/catalog-pg-range.html
+        case
+          when typ.typtype = 'r' then (
+            select rng.rngsubtype
+            from pg_catalog.pg_range as rng
+            where rng.rngtypid = typ.oid
+            limit 1
+          )
+          else null
+        end as "rangeSubTypeId"
       from
         pg_catalog.pg_type as typ
         left join pg_catalog.pg_description as dsc on dsc.objoid = typ.oid
+        left join pg_catalog.pg_namespace as nsp on nsp.oid = typ.typnamespace
     )
     select
       *
@@ -168,7 +190,10 @@ with
       -- the alternative is to do some funky SQL recursion which would be hard
       -- code to read. So we prefer code readability over selecting like 3 or
       -- 4 less type rows.
-      typ.id in (select "baseTypeId" from type_all)
+      --
+      -- We also do this for range sub types.
+      typ.id in (select "domainBaseTypeId" from type_all) or
+      typ.id in (select "rangeSubTypeId" from type_all)
     order by
       "namespaceId", "name"
   ),

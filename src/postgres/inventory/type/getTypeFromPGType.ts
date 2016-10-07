@@ -5,6 +5,7 @@ import {
   NullableType,
   ListType,
   EnumType,
+  ObjectType,
   booleanType,
   integerType,
   floatType,
@@ -16,6 +17,7 @@ import PGCatalog from '../../introspection/PGCatalog'
 import PGCatalogType from '../../introspection/object/PGCatalogType'
 import PGCollection from '../collection/PGCollection'
 import PGClassObjectType from './PGClassObjectType'
+import PGRangeObjectType from './PGRangeObjectType'
 
 /**
  * The type for a universal identifier as defined by [RFC 4122][1].
@@ -92,7 +94,6 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
 
   // If the type is one of these kinds, it is a special case and should be
   // treated as such.
-  // TODO: Add better range type support.
   switch (pgType.type) {
     // If this type is a composite type…
     case 'c': {
@@ -102,7 +103,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     }
     // If this type is a domain type…
     case 'd': {
-      const pgBaseType = pgCatalog.assertGetType(pgType.baseTypeId)
+      const pgBaseType = pgCatalog.assertGetType(pgType.domainBaseTypeId)
       const baseType = getTypeFromPGType(pgCatalog, pgBaseType)
 
       const aliasType = new AliasType({
@@ -111,7 +112,7 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
         baseType: baseType instanceof NullableType ? baseType.nonNullType : baseType,
       })
 
-      return pgType.isNotNull ? aliasType : new NullableType(aliasType)
+      return pgType.domainIsNotNull ? aliasType : new NullableType(aliasType)
     }
     // If this type is an enum type…
     case 'e': {
@@ -121,6 +122,10 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
         variants: new Set(pgType.enumVariants),
       }))
     }
+    // If this type is a range type…
+    // TODO: test
+    case 'r':
+      return new PGRangeObjectType(pgCatalog, pgType)
   }
 
   // If the type isn’t of a certain kind, let’s use the category which is used

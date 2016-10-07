@@ -11,8 +11,9 @@ type PGCatalogType =
   PGCatalogCompositeType |
   PGCatalogDomainType |
   PGCatalogEnumType |
+  PGCatalogRangeType |
   (PGCatalogBaseType & {
-    readonly type: 'b' | 'p' | 'r',
+    readonly type: 'b' | 'p',
   })
 
 export default PGCatalogType
@@ -32,8 +33,8 @@ export interface PGCatalogCompositeType extends PGCatalogBaseType {
  */
 export interface PGCatalogDomainType extends PGCatalogBaseType {
   readonly type: 'd'
-  readonly baseTypeId: string
-  readonly isNotNull: boolean
+  readonly domainBaseTypeId: string
+  readonly domainIsNotNull: boolean
 }
 
 /**
@@ -43,6 +44,15 @@ export interface PGCatalogDomainType extends PGCatalogBaseType {
 export interface PGCatalogEnumType extends PGCatalogBaseType {
   readonly type: 'e'
   readonly enumVariants: Array<string>
+}
+
+/**
+ * A range type is comprised of two values, a beginning and end. It needs a sub
+ * type to know the type of the range bounds.
+ */
+export interface PGCatalogRangeType extends PGCatalogBaseType {
+  readonly type: 'r'
+  readonly rangeSubTypeId: string
 }
 
 /**
@@ -58,6 +68,7 @@ interface PGCatalogBaseType {
   readonly name: string
   readonly description: string | undefined
   readonly namespaceId: string
+  readonly namespaceName: string
   readonly itemId: string | null
   // The category property is used by the parser to do implicit type casting.
   // This is helpful for us as we don’t need to create catalog types for every

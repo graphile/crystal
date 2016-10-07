@@ -11,6 +11,12 @@ mutation {
       textArray: ["have", "you", "ever", "been", "down", "the", "water", "spout", "?"]
       json: "{\"x\":1,\"y\":2,\"z\":3}"
       jsonb: "{\"a\":1,\"b\":2,\"c\":3}"
+      numrange: {
+        start: { value: 50, inclusive: true }
+      }
+      anIntRange: {
+        end: { value: 500, inclusive: false }
+      }
       compoundType: {
         a: 123,
         b: "abc"
@@ -50,6 +56,14 @@ mutation {
       textArray
       json
       jsonb
+      numrange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      anIntRange {
+        start { value inclusive }
+        end { value inclusive }
+      }
       compoundType { a b c d fooBar }
       nestedCompoundType {
         a { a b c d fooBar }

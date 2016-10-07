@@ -9,6 +9,14 @@ query {
       textArray
       json
       jsonb
+      numrange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      anIntRange {
+        start { value inclusive }
+        end { value inclusive }
+      }
       compoundType { ...compoundType }
       nestedCompoundType {
         a { ...compoundType }

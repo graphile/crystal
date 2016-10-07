@@ -14,12 +14,18 @@ import {
 import { sql } from '../utils'
 import PGObjectType from './type/PGObjectType'
 
+export const $$transformValueIntoPGValue = Symbol()
+
 /**
  * Transforms a value into a Postgres value (SQL) using some extra type
  * information.
  */
 // TODO: test
 export default function transformValueIntoPGValue (type: Type<mixed>, value: mixed): sql.SQL {
+  // If the type has defined a custom transformer, use it.
+  if (type[$$transformValueIntoPGValue])
+    return type[$$transformValueIntoPGValue](value)
+
   // If this is a nullable type, just return the null literal if our value is
   // null, if our value is non-null use the non-null type to transform.
   if (type instanceof NullableType)

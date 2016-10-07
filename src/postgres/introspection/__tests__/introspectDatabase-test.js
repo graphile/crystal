@@ -74,7 +74,8 @@ const format = catalog => ({
       id: type.name,
       namespaceId: catalog.getNamespace(type.namespaceId) ? catalog.getNamespace(type.namespaceId).name : null,
       classId: type.classId ? catalog.getClass(type.classId).name : null,
-      baseTypeId: type.baseTypeId ? catalog.getType(type.baseTypeId).name : null,
+      domainBaseTypeId: type.domainBaseTypeId ? catalog.getType(type.domainBaseTypeId).name : null,
+      rangeSubTypeId: type.rangeSubTypeId ? catalog.getType(type.rangeSubTypeId).name : null,
     }))
     // Remove any types outside of our expected namespace. This may exclude
     // relevant types, but the tradeoff is worth it. This test gets flaky when
@@ -93,7 +94,8 @@ const format = catalog => ({
       namespaceId: catalog.getNamespace(procedure.namespaceId).name,
       returnTypeId: catalog.getType(procedure.returnTypeId).name,
       argTypeIds: procedure.argTypeIds.map(typeId => catalog.getType(typeId).name),
-    })),
+    }))
+    .sort(sortBy(({ name, argTypeIds }) => `${name}-${argTypeIds.join('-')}`)),
 })
 
 test('will get everything needed in an introspection', withPGClient(async client => {

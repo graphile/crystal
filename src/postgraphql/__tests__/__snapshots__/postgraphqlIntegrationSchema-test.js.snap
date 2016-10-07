@@ -49,6 +49,26 @@ type Add4MutationPayload {
 
 scalar AnInt
 
+type AnIntRange {
+  start: AnIntRangeBound
+  end: AnIntRangeBound
+}
+
+type AnIntRangeBound {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeBoundInput {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeInput {
+  start: AnIntRangeBoundInput
+  end: AnIntRangeBoundInput
+}
+
 scalar AnotherInt
 
 enum Color {
@@ -342,6 +362,28 @@ type DeleteTypePayload {
 }
 
 scalar Email
+
+# range of numerics
+type FloatRange {
+  start: FloatRangeBound
+  end: FloatRangeBound
+}
+
+type FloatRangeBound {
+  value: Float!
+  inclusive: Boolean!
+}
+
+input FloatRangeBoundInput {
+  value: Float!
+  inclusive: Boolean!
+}
+
+# range of numerics
+input FloatRangeInput {
+  start: FloatRangeBoundInput
+  end: FloatRangeBoundInput
+}
 
 type ForeignKey {
   personId: Int
@@ -865,7 +907,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -962,6 +1004,8 @@ type Query {
     textArray: [String]
     json: Json
     jsonb: Json
+    numrange: FloatRangeInput
+    anIntRange: AnIntRangeInput
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1122,6 +1166,8 @@ type Type implements Node {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  numrange: FloatRange!
+  anIntRange: AnIntRange!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -1137,6 +1183,8 @@ input TypeInput {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  numrange: FloatRangeInput!
+  anIntRange: AnIntRangeInput!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -1152,6 +1200,8 @@ input TypePatch {
   textArray: [String]
   json: Json
   jsonb: Json
+  numrange: FloatRangeInput
+  anIntRange: AnIntRangeInput
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1187,6 +1237,7 @@ input TypesMutationInput {
   c: String!
   d: [Int]!
   e: Json!
+  f: FloatRangeInput!
 }
 
 type TypesMutationPayload {
@@ -1220,6 +1271,10 @@ enum TypesOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  NUMRANGE_ASC
+  NUMRANGE_DESC
+  AN_INT_RANGE_ASC
+  AN_INT_RANGE_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
@@ -1426,6 +1481,26 @@ type Add4MutationPayload {
 }
 
 scalar AnInt
+
+type AnIntRange {
+  start: AnIntRangeBound
+  end: AnIntRangeBound
+}
+
+type AnIntRangeBound {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeBoundInput {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeInput {
+  start: AnIntRangeBoundInput
+  end: AnIntRangeBoundInput
+}
 
 scalar AnotherInt
 
@@ -1720,6 +1795,28 @@ type DeleteTypePayload {
 }
 
 scalar Email
+
+# range of numerics
+type FloatRange {
+  start: FloatRangeBound
+  end: FloatRangeBound
+}
+
+type FloatRangeBound {
+  value: Float!
+  inclusive: Boolean!
+}
+
+input FloatRangeBoundInput {
+  value: Float!
+  inclusive: Boolean!
+}
+
+# range of numerics
+input FloatRangeInput {
+  start: FloatRangeBoundInput
+  end: FloatRangeBoundInput
+}
 
 type ForeignKey {
   personId: Int
@@ -2243,7 +2340,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!): Boolean
+  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -2340,6 +2437,8 @@ type Query {
     textArray: [String]
     json: Json
     jsonb: Json
+    numrange: FloatRangeInput
+    anIntRange: AnIntRangeInput
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2500,6 +2599,8 @@ type Type implements Node {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  numrange: FloatRange!
+  anIntRange: AnIntRange!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -2515,6 +2616,8 @@ input TypeInput {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  numrange: FloatRangeInput!
+  anIntRange: AnIntRangeInput!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -2530,6 +2633,8 @@ input TypePatch {
   textArray: [String]
   json: Json
   jsonb: Json
+  numrange: FloatRangeInput
+  anIntRange: AnIntRangeInput
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2565,6 +2670,7 @@ input TypesMutationInput {
   c: String!
   d: [Int]!
   e: Json!
+  f: FloatRangeInput!
 }
 
 type TypesMutationPayload {
@@ -2598,6 +2704,10 @@ enum TypesOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  NUMRANGE_ASC
+  NUMRANGE_DESC
+  AN_INT_RANGE_ASC
+  AN_INT_RANGE_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
