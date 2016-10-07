@@ -16,11 +16,7 @@ const queriesDir = resolvePath(__dirname, 'fixtures/queries')
 
 for (const file of readdirSync(queriesDir)) {
   test(`operation ${file}`, withPGClient(async pgClient => {
-    const gqlSchema = await createPostGraphQLSchema({
-      pgClient,
-      pgSchemas: ['a', 'b', 'c'],
-      relay1Ids: false,
-    })
+    const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'], { legacyIds: false })
 
     const query = await new Promise((resolve, reject) => {
       readFile(resolvePath(queriesDir, file), (error, data) => {

@@ -245,7 +245,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
       // Validate our GraphQL query using given rules.
       // TODO: Add a complexity GraphQL rule.
-      const validationErrors = validateGraphql(graphqlSchema, queryDocumentAST)
+      const validationErrors = validateGraphql(await graphqlSchema, queryDocumentAST)
 
       // If we have some validation errors, don’t execute the query. Instead
       // send the errors to the client with a `400` code.
@@ -285,7 +285,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
       try {
         result = await executeGraphql(
-          graphqlSchema,
+          await graphqlSchema,
           queryDocumentAST,
           null,
           { [$$pgClient]: pgClient },

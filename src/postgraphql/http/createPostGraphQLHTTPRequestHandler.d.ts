@@ -5,7 +5,7 @@ import { Pool } from 'pg'
 /**
  * A request handler for one of many different `http` frameworks.
  */
-interface HTTPRequestHandler {
+export interface HTTPRequestHandler {
   (req: IncomingMessage, res: ServerResponse, next?: (error?: any) => void): void
   (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
 }
@@ -20,7 +20,7 @@ interface HTTPRequestHandler {
  */
 export default function createPostGraphQLHTTPRequestHandler (config: {
   // The actual GraphQL schema we will use.
-  graphqlSchema: GraphQLSchema,
+  graphqlSchema: GraphQLSchema | Promise<GraphQLSchema>,
 
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool,

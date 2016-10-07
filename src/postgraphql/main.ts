@@ -14,10 +14,7 @@ async function main () {
   const pgPool = new Pool(pgConfig)
   const pgClient = await pgPool.connect()
 
-  const graphqlSchema = await createPostGraphQLSchema({
-    pgClient,
-    pgSchemas: ['a', 'b', 'c'],
-  })
+  const graphqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
 
   pgClient.release()
 
