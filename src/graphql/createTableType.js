@@ -102,7 +102,9 @@ const createColumnField = column => ({
   resolve: source => source[column.name],
 })
 
-const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
+// TODO maybe move these ForeignKey methods to own file ?
+
+export const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createTableType(foreignTable),
   description:
     `Queries a single ${foreignTable.getMarkdownTypeName()} node related to ` +
@@ -115,7 +117,7 @@ const createForeignKeyField = ({ nativeTable, nativeColumns, foreignTable, forei
   ),
 })
 
-const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
+export const createForeignKeyReverseField = ({ nativeTable, nativeColumns, foreignTable, foreignColumns }) => ({
   type: createConnectionType(nativeTable),
   description:
     `Queries and returns a set of ${nativeTable.getMarkdownTypeName()} ` +
