@@ -71,16 +71,18 @@ class Inventory {
   public addRelation (relation: Relation<mixed>): this {
     const { name, tailCollection, headCollectionKey } = relation
 
+    const keyName = `${tailCollection.name}-${headCollectionKey.collection.name}-${name}`
+
     if (!this.hasCollection(tailCollection))
       throw new Error(`Tail collection named '${tailCollection.name}' is not in this inventory.`)
 
     if (!this.hasCollection(headCollectionKey.collection))
       throw new Error(`Head collection named '${headCollectionKey.collection.name}' is not in this inventory.`)
 
-    if (this._relations.has(name))
-      throw new Error(`Relation of name '${name}' already exists in the inventory.`)
+    if (this._relations.has(keyName))
+      throw new Error(`Relation of name '${name}' already exists between head collection '${headCollectionKey.collection.name}' and tail collection '${tailCollection.name}' in the inventory.`)
 
-    this._relations.set(name, relation)
+    this._relations.set(keyName, relation)
 
     return this
   }
