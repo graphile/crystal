@@ -1,0 +1,1 @@
+../forum/schema.sql

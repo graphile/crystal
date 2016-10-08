@@ -21,6 +21,12 @@ create schema forum_example_utils;
 set search_path = forum_example, forum_example_utils, public;
 
 -------------------------------------------------------------------------------
+-- Roles
+
+create role anon_role;
+create role user_role;
+
+-------------------------------------------------------------------------------
 -- Public Tables
 
 create table person (
@@ -39,6 +45,22 @@ comment on column person.family_name is 'The person’s last name.';
 comment on column person.about is 'A short description about the user, written by the user.';
 comment on column person.created_at is 'The time this person was created.';
 comment on column person.updated_at is 'The latest time this person was updated.';
+
+-- NOTE: RLS (Row Level Security)
+-- All normal access to the table for selecting rows or modifying rows must be allowed by a row security policy
+-- If no policy exists for the table, a default-deny policy is used, meaning that no rows are visible or can be modified
+
+alter table person enable row level security;
+
+-- anyone can view a person
+create policy select_person on person for select using(true);
+
+-- a user can only change their own person
+create policy update_person on person
+  for update
+  to user_role
+  using(true)
+  with check (id = (select current_setting('jwt.claims.personId')::integer));
 
 create type post_topic as enum ('discussion', 'inspiration', 'help');
 
@@ -60,6 +82,27 @@ comment on column post.topic is 'The topic this has been posted in.';
 comment on column post.body is 'The main body text of our post.';
 comment on column post.created_at is 'The time this post was created.';
 comment on column post.updated_at is 'The latest time this post was updated.';
+
+alter table post enable row level security;
+
+-- anyone can view a post
+create policy view_post on post for select using(true);
+
+-- only a user can add a post
+create policy add_post on post for insert to user_role with check(true);
+
+-- a user can only change their own posts
+create policy change_post on post
+  for update
+  to user_role
+  using(true)
+  with check (author_id = (select current_setting('jwt.claims.personId')::integer));
+
+-- a user can only delete their own posts
+create policy delete_post on post
+  for delete
+  to user_role
+  using (author_id = (select current_setting('jwt.claims.personId')::integer));
 
 -------------------------------------------------------------------------------
 -- Private Tables
@@ -154,6 +197,7 @@ begin
 end;
 $$ language plpgsql
 strict
+security definer --specifies that the function is to be executed with the privileges of the user that created it.
 set search_path from current;
 
 comment on function register_person(varchar, varchar, varchar, varchar) is 'Register a person in our forum.';
@@ -222,6 +266,8 @@ insert into person (id, given_name, family_name, about) values
 
 alter sequence person_id_seq restart with 15;
 
+select register_person('John', 'Doe', 'john@doe.com', 'password');
+
 insert into post (id, author_id, headline, topic, body) values
   (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.', null, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ullamcorper, sem sed pulvinar rutrum, nisl dui faucibus velit, eget sodales urna mauris nec lorem. Vivamus faucibus augue sit amet semper fringilla. Cras nec vulputate eros. Proin fermentum purus posuere ipsum accumsan interdum. Nunc vitae urna non mauris pellentesque sodales vel nec elit. Suspendisse pulvinar ornare turpis ac vestibulum. Cras eu congue magna. Nulla vel sodales enim, vel semper dolor. Curabitur pellentesque dolor elit. Aenean cursus posuere dui, vitae mollis felis rhoncus ac. In at orci a erat congue consequat ut sed risus. Etiam euismod elit eu lobortis varius. Praesent lacinia lobortis nisi, vel faucibus turpis sodales in. In interdum lectus tellus, facilisis mollis diam feugiat vitae.'),
   (2, 1, 'I hate yogurt. It’s just stuff with bits in.', 'inspiration', null),
@@ -241,7 +287,17 @@ alter sequence post_id_seq restart with 13;
 -------------------------------------------------------------------------------
 -- Permissions
 
-grant select on person, post to public;
+grant anon_role to user_role;
+-- grant user_role to super_role;
+
+grant usage on schema forum_example to anon_role;
+grant select on person, post to anon_role;
+grant execute on function register_person(varchar, varchar, varchar, varchar) to anon_role;
+
+grant usage on all sequences in schema forum_example to user_role;
+grant insert, update, delete on all tables in schema forum_example to user_role;
+
+-- Commit all the changes from this transaction. If any statement failed,
 
 -- Commit all the changes from this transaction. If any statement failed,
 -- these statements will not have succeeded.
