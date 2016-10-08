@@ -1,6 +1,7 @@
 query {
   allTypes {
     nodes {
+      smallint
       bigint
       boolean
       enum
@@ -17,6 +18,7 @@ query {
         start { value inclusive }
         end { value inclusive }
       }
+      money
       compoundType { ...compoundType }
       nestedCompoundType {
         a { ...compoundType }

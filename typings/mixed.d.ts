@@ -15,4 +15,4 @@
  * @see https://github.com/Microsoft/TypeScript/issues/9999
  * @see https://flowtype.org/docs/builtins.html#mixed
  */
-declare type mixed = {} | undefined | null
+declare type mixed = {} | string | number | boolean | undefined | null

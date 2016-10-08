@@ -1134,6 +1134,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
     rowId: Int
+    smallint: Int
     bigint: Int
     boolean: Boolean
     varchar: String
@@ -1152,6 +1153,7 @@ type Query {
     time: Time
     timetz: Time
     interval: IntervalInput
+    money: Float
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1309,6 +1311,7 @@ type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
   rowId: Int!
+  smallint: Int!
   bigint: Int!
   boolean: Boolean!
   varchar: String!
@@ -1327,12 +1330,14 @@ type Type implements Node {
   time: Time!
   timetz: Time!
   interval: Interval!
+  money: Float!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
 
 input TypeInput {
   rowId: Int
+  smallint: Int!
   bigint: Int!
   boolean: Boolean!
   varchar: String!
@@ -1351,12 +1356,14 @@ input TypeInput {
   time: Time!
   timetz: Time!
   interval: IntervalInput!
+  money: Float!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
 
 input TypePatch {
   rowId: Int
+  smallint: Int
   bigint: Int
   boolean: Boolean
   varchar: String
@@ -1375,6 +1382,7 @@ input TypePatch {
   time: Time
   timetz: Time
   interval: IntervalInput
+  money: Float
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1426,6 +1434,8 @@ enum TypesOrderBy {
   NATURAL
   ID_ASC
   ID_DESC
+  SMALLINT_ASC
+  SMALLINT_DESC
   BIGINT_ASC
   BIGINT_DESC
   BOOLEAN_ASC
@@ -1462,6 +1472,8 @@ enum TypesOrderBy {
   TIMETZ_DESC
   INTERVAL_ASC
   INTERVAL_DESC
+  MONEY_ASC
+  MONEY_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
@@ -2754,6 +2766,7 @@ type Query {
     # Only read the last \`n\` values of the set.
     last: Int
     id: Int
+    smallint: Int
     bigint: Int
     boolean: Boolean
     varchar: String
@@ -2772,6 +2785,7 @@ type Query {
     time: Time
     timetz: Time
     interval: IntervalInput
+    money: Float
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2929,6 +2943,7 @@ type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
   id: Int!
+  smallint: Int!
   bigint: Int!
   boolean: Boolean!
   varchar: String!
@@ -2947,12 +2962,14 @@ type Type implements Node {
   time: Time!
   timetz: Time!
   interval: Interval!
+  money: Float!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
 
 input TypeInput {
   id: Int
+  smallint: Int!
   bigint: Int!
   boolean: Boolean!
   varchar: String!
@@ -2971,12 +2988,14 @@ input TypeInput {
   time: Time!
   timetz: Time!
   interval: IntervalInput!
+  money: Float!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
 
 input TypePatch {
   id: Int
+  smallint: Int
   bigint: Int
   boolean: Boolean
   varchar: String
@@ -2995,6 +3014,7 @@ input TypePatch {
   time: Time
   timetz: Time
   interval: IntervalInput
+  money: Float
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -3046,6 +3066,8 @@ enum TypesOrderBy {
   NATURAL
   ID_ASC
   ID_DESC
+  SMALLINT_ASC
+  SMALLINT_DESC
   BIGINT_ASC
   BIGINT_DESC
   BOOLEAN_ASC
@@ -3082,6 +3104,8 @@ enum TypesOrderBy {
   TIMETZ_DESC
   INTERVAL_ASC
   INTERVAL_DESC
+  MONEY_ASC
+  MONEY_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC

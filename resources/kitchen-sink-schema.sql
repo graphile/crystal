@@ -87,6 +87,7 @@ create type a.an_int_range as range (
 
 create table b.types (
   id serial primary key,
+  "smallint" smallint not null,
   "bigint" bigint not null,
   "boolean" boolean not null,
   "varchar" varchar not null,
@@ -105,6 +106,7 @@ create table b.types (
   "time" time not null,
   "timetz" timetz not null,
   "interval" interval not null,
+  "money" money not null,
   "compound_type" c.compound_type not null,
   "nested_compound_type" b.nested_compound_type not null
 );

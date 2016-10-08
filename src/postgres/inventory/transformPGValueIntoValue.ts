@@ -61,8 +61,19 @@ export default function transformPGValueIntoValue (type: Type<mixed>, value: mix
   if (
     type === integerType ||
     type === floatType
-  )
-    return typeof value === 'string' ? parseFloat(value) : value
+  ) {
+    // If the number is a string, we want to parse it.
+    if (typeof value === 'string') {
+      // If this number represents money, it has some extra trimmings that
+      // need to be fixed.
+      if (value.startsWith('$'))
+        return parseFloat(value.slice(1).replace(',', ''))
+
+      return parseFloat(value)
+    }
+
+    return value
+  }
 
   // If this is JSON, we should stringify the value because the `pg` module
   // gives it to us as an object.

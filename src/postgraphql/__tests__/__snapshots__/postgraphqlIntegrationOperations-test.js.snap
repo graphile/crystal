@@ -552,6 +552,7 @@ Object {
         },
         "json": "{\"x\":1,\"y\":2,\"z\":3}",
         "jsonb": "{\"a\":1,\"b\":2,\"c\":3}",
+        "money": 5000,
         "nestedCompoundType": Object {
           "a": Object {
             "a": 456,
@@ -576,6 +577,7 @@ Object {
             "value": 50,
           },
         },
+        "smallint": 30,
         "textArray": Array [
           "have",
           "you",
@@ -1903,6 +1905,7 @@ Object {
           "enum": "GREEN",
           "json": "{\"a\":1,\"b\":2,\"c\":3,\"d\":{\"e\":4,\"f\":5,\"g\":[6,7,8,\"x\",false,null]}}",
           "jsonb": "{\"1\":\"a\",\"2\":\"b\",\"3\":\"c\",\"4\":{\"5\":\"d\",\"6\":\"e\",\"7\":[\"f\",\"g\",\"h\",42,true,null]}}",
+          "money": 1000,
           "nestedCompoundType": Object {
             "a": Object {
               "a": 3,
@@ -1930,6 +1933,7 @@ Object {
               "value": -10,
             },
           },
+          "smallint": 50,
           "textArray": Array [
             "hey",
             "i",
