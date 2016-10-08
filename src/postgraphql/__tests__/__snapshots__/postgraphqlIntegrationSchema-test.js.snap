@@ -89,6 +89,24 @@ type CompoundKey implements Node {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  foreignKeysByCompoundKey1AndCompoundKey2(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): ForeignKeysConnection
 }
 
 input CompoundKeyInput {
@@ -729,6 +747,78 @@ type Person implements Node {
     # Only read the last \`n\` values of the set.
     last: Int
   ): PersonFriendsConnection
+
+  # Reads and enables paginatation through a set of \`Post\`.
+  postsByAuthorId(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): PostsConnection
+
+  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  compoundKeysByPersonId1(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): CompoundKeysConnection
+
+  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  compoundKeysByPersonId2(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): CompoundKeysConnection
+
+  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  foreignKeysByPersonId(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): ForeignKeysConnection
 }
 
 # A connection to a list of \`Person\` values.
@@ -1522,6 +1612,24 @@ type CompoundKey implements Node {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  foreignKeysByCompoundKey1AndCompoundKey2(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): ForeignKeysConnection
 }
 
 input CompoundKeyInput {
@@ -2162,6 +2270,78 @@ type Person implements Node {
     # Only read the last \`n\` values of the set.
     last: Int
   ): PersonFriendsConnection
+
+  # Reads and enables paginatation through a set of \`Post\`.
+  postsByAuthorId(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): PostsConnection
+
+  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  compoundKeysByPersonId1(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): CompoundKeysConnection
+
+  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  compoundKeysByPersonId2(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): CompoundKeysConnection
+
+  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  foreignKeysByPersonId(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+  ): ForeignKeysConnection
 }
 
 # A connection to a list of \`Person\` values.

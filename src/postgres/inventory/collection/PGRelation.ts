@@ -1,4 +1,4 @@
-import { Relation } from '../../../interface'
+import { Condition, conditionHelpers, Relation } from '../../../interface'
 import { PGCatalog, PGCatalogForeignKeyConstraint } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
@@ -25,13 +25,24 @@ class PGRelation implements Relation<PGObjectType.Value> {
   public readonly name = this._tailFieldNames.join('_and_')
 
   /**
-   * Gets an instance of the head collection’s key type by just extracting some keys from
+   * Gets an instance of the head collection’s key type by just extracting some
+   * keys from the tail value.
    */
-  public getHeadKeyFromTailValue (value: PGObjectType.Value): PGObjectType.Value {
+  public getHeadKeyFromTailValue (tailValue: PGObjectType.Value): PGObjectType.Value {
     return this._tailFieldNames.reduce((headKey, tailFieldName, i) => {
-      headKey.set(this._headFieldNames[i], value.get(tailFieldName))
+      headKey.set(this._headFieldNames[i], tailValue.get(tailFieldName))
       return headKey
     }, new Map())
+  }
+
+  /**
+   * Gets a condition from the head value which basically just requires that
+   * the fields equal the right things.
+   */
+  public getTailConditionFromHeadValue (headValue: PGObjectType.Value): Condition {
+    return conditionHelpers.and(...this._headFieldNames.map((headFieldName, i) =>
+      conditionHelpers.fieldEquals(this._tailFieldNames[i], headValue.get(headFieldName))
+    ))
   }
 }
 

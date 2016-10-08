@@ -15,6 +15,7 @@
 // TODO: Consider a text search condition.
 // TODO: Consider some geographic operators.
 // TODO: Consider some array operators.
+// TODO: REFACTOR!!!! The fact that this isn’t type safe is a little scary…
 type Condition =
   ConstantCondition |
   NotCondition |

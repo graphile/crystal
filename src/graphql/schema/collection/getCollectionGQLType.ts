@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, ObjectType, Relation } from '../../../interface'
+import { Collection, Condition, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde, scrib } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getGQLType from '../getGQLType'
@@ -76,28 +76,32 @@ function createCollectionGQLType (buildToken: BuildToken, collection: Collection
       // Add fields from relations where this collection is the tail.
       createCollectionRelationTailGQLFieldEntries(buildToken, collection),
 
-      // // Add all of our one-to-many relations (aka head relations).
-      // inventory.getRelations()
-      //   // We only want the relations for which this collection is the head
-      //   // collection.
-      //   .filter(relation => relation.getHeadCollectionKey().getCollection() === collection)
-      //   // Transform the relation into a field entry.
-      //   .map(<TTailValue, TKey>(relation: Relation<TTailValue, TValue, TKey>): [string, GraphQLFieldConfig<TValue, any>] | undefined => {
-      //     const tailCollection = relation.getTailCollection()
-      //     const tailPaginator = relation.getTailPaginator()
+      // Add all of our one-to-many relations (aka head relations).
+      inventory.getRelations()
+        // We only want the relations for which this collection is the head
+        // collection.
+        .filter(relation => relation.headCollectionKey.collection === collection)
+        // Transform the relation into a field entry.
+        .map(<THeadKey>(relation: Relation<THeadKey>): [string, GraphQLFieldConfig<ObjectType.Value, any>] | null => {
+          const tailCollection = relation.tailCollection
+          const tailPaginator = tailCollection.paginator
 
-      //     // TODO: This shouldn’t be optional?
-      //     if (!tailPaginator) return undefined
+          // If there is no tail paginator, or the relation cannot get a
+          // condition for that paginator we can’t provide this field so
+          // return null.
+          if (!tailPaginator || !relation.getTailConditionFromHeadValue)
+            return null
 
-      //     return [
-      //       formatName.field(`${tailCollection.getName()}-by-${relation.getName()}`),
-      //       createConnectionGQLField(buildToken, tailPaginator, {
-      //         // We use the config when creating a connection field to inject
-      //         // a condition that limits what we select from the paginator.
-      //         getCondition: (headValue: TValue) => relation.getTailConditionFromHeadValue(headValue),
-      //       }),
-      //     ]
-      //   }),
+          return [
+            formatName.field(`${tailCollection.name}-by-${relation.name}`),
+            createConnectionGQLField<ObjectType.Value, Condition, ObjectType.Value>(buildToken, tailPaginator, {
+              // We use the config when creating a connection field to inject
+              // a condition that limits what we select from the paginator.
+              getPaginatorInput: headValue =>
+                relation.getTailConditionFromHeadValue!(headValue),
+            }),
+          ]
+        }),
     ),
   })
 }
