@@ -24,8 +24,11 @@ export default function addPGCatalogToInventory (
 
   // Add all of our collections. If a class is not selectable, it is probably a
   // compound type and we shouldn’t add a collection for it to our inventory.
+  //
+  // We also won’t add collection classes if they exist outside a namespace we
+  // support.
   for (const pgClass of pgCatalog.getClasses()) {
-    if (pgClass.isSelectable) {
+    if (pgClass.isSelectable && pgCatalog.getNamespace(pgClass.namespaceId)) {
       const collection = new PGCollection(options, pgCatalog, pgClass)
       inventory.addCollection(collection)
       collectionByClassId.set(pgClass.id, collection)

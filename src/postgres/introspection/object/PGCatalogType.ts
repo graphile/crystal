@@ -69,7 +69,7 @@ interface PGCatalogBaseType {
   readonly description: string | undefined
   readonly namespaceId: string
   readonly namespaceName: string
-  readonly itemId: string | null
+  readonly arrayItemId: string | null
   // The category property is used by the parser to do implicit type casting.
   // This is helpful for us as we don’t need to create catalog types for every
   // PostgreSQL type. Rather we can group types into “buckets” using this

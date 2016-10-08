@@ -143,7 +143,7 @@ with
         typ.typtype as "type",
         typ.typcategory as "category",
         typ.typnotnull as "domainIsNotNull",
-        nullif(typ.typelem, 0) as "itemId",
+        nullif(typ.typelem, 0) as "arrayItemId",
         nullif(typ.typrelid, 0) as "classId",
         nullif(typ.typbasetype, 0) as "domainBaseTypeId",
         -- If this type is an enum type, let’s select all of its enum variants.
@@ -191,9 +191,10 @@ with
       -- code to read. So we prefer code readability over selecting like 3 or
       -- 4 less type rows.
       --
-      -- We also do this for range sub types.
+      -- We also do this for range sub types and array item types.
       typ.id in (select "domainBaseTypeId" from type_all) or
-      typ.id in (select "rangeSubTypeId" from type_all)
+      typ.id in (select "rangeSubTypeId" from type_all) or
+      typ.id in (select "arrayItemId" from type_all)
     order by
       "namespaceId", "name"
   ),

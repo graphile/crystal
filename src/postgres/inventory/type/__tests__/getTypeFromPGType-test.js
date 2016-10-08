@@ -169,7 +169,7 @@ test('will create list types from arrays', () => {
     name: Symbol('name'),
     description: Symbol('description'),
     category: 'A',
-    itemId: '0',
+    arrayItemId: '0',
   }
 
   const catalog = new PGCatalog([typeObject, arrayTypeObject])
@@ -188,7 +188,7 @@ test('will throw an error if list item type is not in catalog', () => {
     name: Symbol('name'),
     description: Symbol('description'),
     category: 'A',
-    itemId: '0',
+    arrayItemId: '0',
   }
   const catalog = new PGCatalog([arrayTypeObject])
   expect(() => getTypeFromPGType(catalog, arrayTypeObject)).toThrow()

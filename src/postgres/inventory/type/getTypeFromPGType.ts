@@ -133,10 +133,10 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
   switch (pgType.category) {
     // If our type is of the array category, return a list type.
     case 'A': {
-      if (!pgType.itemId)
+      if (!pgType.arrayItemId)
         throw new Error('PostgreSQL array type does not have an associated element type.')
 
-      const itemType = pgCatalog.assertGetType(pgType.itemId)
+      const itemType = pgCatalog.assertGetType(pgType.arrayItemId)
 
       return new NullableType(new ListType(getTypeFromPGType(pgCatalog, itemType)))
     }
