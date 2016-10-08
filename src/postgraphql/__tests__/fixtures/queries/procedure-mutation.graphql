@@ -9,7 +9,7 @@ mutation {
   mult4(input: { arg0: 5, arg1: 2 }) { integer }
   typesMutation(input: { a: 50, b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}", f: { start: { value: 1, inclusive: false }, end: { value: 5, inclusive: false } } }) { boolean }
   compoundTypeMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, fooBar: 8 } }) { compoundType { a b c d fooBar } }
-  tableMutation(input: { id: 5 }) { post { __id id headline authorId } }
+  tableMutation(input: { id: 5 }) { post { __id id headline authorId } personByAuthorId { id name } }
   tableSetMutation(input: {}) { people { name } }
   intSetMutation(input: { x: 5, z: 6 }) { integers }
   noArgsMutation(input: { clientMutationId: "x" }) { clientMutationId integer }

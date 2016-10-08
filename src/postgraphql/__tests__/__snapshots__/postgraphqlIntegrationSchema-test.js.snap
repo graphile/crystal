@@ -1257,6 +1257,9 @@ input TableMutationInput {
 type TableMutationPayload {
   clientMutationId: String
   post: Post
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 
@@ -2874,6 +2877,9 @@ input TableMutationInput {
 type TableMutationPayload {
   clientMutationId: String
   post: Post
+
+  # Reads a single \`Person\` that is related to this \`Post\`.
+  personByAuthorId: Person
   query: Query
 }
 

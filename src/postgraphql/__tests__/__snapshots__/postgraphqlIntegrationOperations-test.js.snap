@@ -1371,6 +1371,10 @@ Object {
       "integer": 2,
     },
     "tableMutation": Object {
+      "personByAuthorId": Object {
+        "id": 5,
+        "name": "Johnny Tucker",
+      },
       "post": Object {
         "__id": "WyJwb3N0cyIsNV0=",
         "authorId": 5,

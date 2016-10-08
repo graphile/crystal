@@ -11,8 +11,10 @@ import { formatName } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createMutationGQLField from '../../../../graphql/schema/createMutationGQLField'
 import transformGQLInputValue from '../../../../graphql/schema/transformGQLInputValue'
+import createCollectionRelationTailGQLFieldEntries from '../../../../graphql/schema/collection/createCollectionRelationTailGQLFieldEntries'
 import { sql } from '../../../../postgres/utils'
 import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
+import PGCollection from '../../../../postgres/inventory/collection/PGCollection'
 import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
 import transformPGValueIntoValue from '../../../../postgres/inventory/transformPGValueIntoValue'
 import createPGProcedureFixtures from '../createPGProcedureFixtures'
@@ -42,7 +44,15 @@ function createPGProcedureMutationGQLFieldEntry (
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
+  const { inventory } = buildToken
   const fixtures = createPGProcedureFixtures(buildToken, pgCatalog, pgProcedure)
+
+  // See if the output type of this procedure is a single object, try to find a
+  // `PGCollection` which has the same type. If it exists we add some extra
+  // stuffs.
+  const pgCollection = !pgProcedure.returnsSet
+    ? inventory.getCollections().find(collection => collection instanceof PGCollection && collection._pgClass.typeId === fixtures.return.pgType.id)
+    : null
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
@@ -75,6 +85,10 @@ function createPGProcedureMutationGQLFieldEntry (
 
           resolve: value => value,
       }],
+
+      // Add related objects if there is an associated `PGCollection`. This
+      // helps in Relay 1.
+      ...(pgCollection ? createCollectionRelationTailGQLFieldEntries(buildToken, pgCollection) : []),
     ],
 
     // Actually execute the procedure here.
