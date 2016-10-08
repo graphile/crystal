@@ -18,7 +18,8 @@ export default function postgraphql (
     graphiqlRoute?: string,
     graphiql?: boolean,
     showErrorStack?: boolean,
-    enableCORS?: boolean,
+    enableQueryLog?: boolean,
+    enableCors?: boolean,
   } = {},
 ): HTTPRequestHandler {
   // Do some things with `poolOrConfig` so that in the end, we actually get a

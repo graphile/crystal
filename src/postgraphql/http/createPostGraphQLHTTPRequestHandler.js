@@ -13,6 +13,7 @@ import {
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 
+const chalk = require('chalk')
 const Debugger = require('debug')
 const httpError = require('http-errors')
 const parseUrl = require('parseurl')
@@ -23,6 +24,7 @@ export const $$pgClientOrigQuery = Symbol()
 
 const debugGraphql = new Debugger('postgraphql:graphql')
 const debugPG = new Debugger('postgraphql:postgres')
+const debugRequest = new Debugger('postgraphql:request')
 
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
@@ -46,7 +48,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
-    throw new Error(`Cannot use the same route '${graphqlRoute}' for both GraphQL and GraphiQL.`)
+    throw new Error(`Cannot use the same route, '${graphqlRoute}', for both GraphQL and GraphiQL. Please use different routes.`)
 
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
@@ -143,7 +145,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
     // Add our CORS headers to be good web citizens (there are perf
     // implications though so be careful!)
-    if (options.enableCORS)
+    if (options.enableCors)
       addCORSHeaders(res)
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
@@ -158,6 +160,10 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
     // a result. We also keep track of `params`.
     let params
     let result
+    let queryDocumentAST
+    const queryTimeStart = process.hrtime()
+
+    debugRequest('GraphQL query request has begun.')
 
     // This big `try`/`catch`/`finally` block represents the execution of our
     // GraphQL query. All errors thrown in this block will be returned to the
@@ -231,7 +237,6 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
         throw httpError(400, `Operation name must be a string, not '${typeof params.operationName}'.`)
 
       const source = new Source(params.query, 'GraphQL HTTP Request')
-      let queryDocumentAST
 
       // Catch an errors while parsing so that we can set the `statusCode` to
       // 400. Otherwise we don’t need to parse this way.
@@ -242,6 +247,8 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
         res.statusCode = 400
         throw error
       }
+
+      debugRequest('GraphQL query is parsed.')
 
       // Validate our GraphQL query using given rules.
       // TODO: Add a complexity GraphQL rule.
@@ -254,6 +261,8 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
         result = { errors: validationErrors }
         return
       }
+
+      debugRequest('GraphQL query is validated.')
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
       if (debugGraphql.enabled)
@@ -303,6 +312,8 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
           await pgClient.query('commit')
 
         pgClient.release()
+
+        debugRequest('GraphQL query has been executed.')
       }
     }
     catch (error) {
@@ -322,6 +333,18 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
       res.end(JSON.stringify(result))
+
+      debugRequest('GraphQL query request finished.')
+
+      // Log the query. If this debugger isn’t enabled, don’t run it.
+      if (queryDocumentAST && options.enableQueryLog) {
+        const prettyQuery = printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim()
+        const errorCount = (result.errors || []).length
+        const ms = Math.round(process.hrtime(queryTimeStart)[1] * 10e-7 * 100) / 100
+
+        // If we have enabled the query log for the HTTP handler, use that.
+        console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)
+      }
     }
   }
 

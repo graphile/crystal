@@ -42,7 +42,9 @@
     "postgres-interval": "^1.0.2"
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.30",
     "@types/change-case": "0.0.29",
+    "@types/commander": "^2.3.30",
     "@types/debug": "0.0.29",
     "@types/jest": "^0.9.30",
     "@types/node": "^6.0.38",

@@ -377,6 +377,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
     test('will render GraphiQL on another route if desired', async () => {
       const server1 = createServer({ graphiqlRoute: '/x' })
       const server2 = createServer({ graphiql: true, graphiqlRoute: '/x' })
+      const server3 = createServer({ graphiql: false, graphiqlRoute: '/x' })
       await (
         request(server1)
         .get('/x')
@@ -387,6 +388,16 @@ for (const [name, createServerFromHandler] of serverCreators) {
         .get('/x')
         .expect(200)
         .expect('Content-Type', 'text/html; charset=utf-8')
+      )
+      await (
+        request(server3)
+        .get('/x')
+        .expect(404)
+      )
+      await (
+        request(server3)
+        .get('/graphiql')
+        .expect(404)
       )
     })
 
