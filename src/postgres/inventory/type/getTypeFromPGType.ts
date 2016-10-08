@@ -52,9 +52,9 @@ const pgTypeIdToType = new Map<string, Type<any>>([
   ['20', integerType], // int8, bigint
   ['21', integerType], // int2, smallint
   ['23', integerType], // int4, integer
-  ['114', jsonType], // json
-  ['3802', jsonType], // jsonb
-  ['2950', uuidType], // uuid
+  ['114', jsonType],   // json
+  ['3802', jsonType],  // jsonb
+  ['2950', uuidType],  // uuid
 ])
 
 const _getTypeFromPGType = memoize2(createTypeFromPGType)

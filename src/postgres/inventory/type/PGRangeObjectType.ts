@@ -6,13 +6,30 @@ import transformPGValueIntoValue, { $$transformPGValueIntoValue } from '../trans
 import transformValueIntoPGValue, { $$transformValueIntoPGValue } from '../transformValueIntoPGValue'
 import getTypeFromPGType from './getTypeFromPGType'
 
+/**
+ * The built in Postgres range types don’t have names that match up with our
+ * traditional conventions. Therefore we want to rename them. This is a map of
+ * the type oids to their new names.
+ *
+ * @private
+ */
+// TODO: Refactor renames.
+// TODO: In the future, just return an `integer_range` `PGRangeObjectType` for
+// `big_integer_range`.
 const typeOidToName = new Map([
-  ['3906', 'float_range'],
-  ['3908', 'timestamp_range'],
-  ['3910', 'timezone_timestamp_range'],
-  ['3912', 'date_range'],
+  ['3904', 'integer_range'],            // `int4range`
+  ['3926', 'big_integer_range'],        // `int8range`
+  ['3906', 'float_range'],              // `numrange`
+  ['3908', 'timestamp_range'],          // `tsrange`
+  ['3910', 'timezone_timestamp_range'], // `tstzrange`
+  ['3912', 'date_range'],               // `daterange`
 ])
 
+/**
+ * This object type represents a Postgres range. It parses the rough set
+ * notation format (looks like `(1,5]`) into an object and serializes that
+ * object back down into the range format.
+ */
 // TODO: test
 class PGRangeObjectType extends ObjectType {
   public readonly pgRangeType: PGCatalogRangeType
@@ -65,20 +82,19 @@ class PGRangeObjectType extends ObjectType {
    * and then setting up an object of the correct type.
    */
   public [$$transformPGValueIntoValue] (rangeLiteral: string): ObjectType.Value {
-    const range = parseRange(rangeLiteral)
+    const range = parseRange(this.pgRangeType.rangeSubTypeId, rangeLiteral)
     const rangeValue = new Map<string, mixed>()
-    const typeParser = types.getTypeParser(this.pgRangeType.rangeSubTypeId, 'text')
 
     if (range.start) {
       rangeValue.set('start', new Map<string, mixed>([
-        ['value', transformPGValueIntoValue(this.subType, typeParser(range.start.value))],
+        ['value', transformPGValueIntoValue(this.subType, range.start.value)],
         ['inclusive', range.start.inclusive],
       ]))
     }
 
     if (range.end) {
       rangeValue.set('end', new Map<string, mixed>([
-        ['value', transformPGValueIntoValue(this.subType, typeParser(range.end.value))],
+        ['value', transformPGValueIntoValue(this.subType, range.end.value)],
         ['inclusive', range.end.inclusive],
       ]))
     }
@@ -87,7 +103,9 @@ class PGRangeObjectType extends ObjectType {
   }
 
   /**
-   * Transform this internal value into a Postgres SQL value.
+   * Transform this internal value into a Postgres SQL value. Does this by
+   * calling the canonical function that goes with the range type. For example
+   * `public.numrange(lowerBound, upperBound, bounds)`.
    */
   // TODO: test
   public [$$transformValueIntoPGValue] (rangeValue: ObjectType.Value): sql.SQL {
@@ -118,7 +136,10 @@ interface PGRange<T> {
 }
 
 /**
- * Matches a Postgres range.
+ * Matches a Postgres range. Taken directly from [`pg-range`][1]. It’s a very
+ * well crafted regular expression.
+ *
+ * [1]: https://github.com/WhoopInc/node-pg-range/blob/65169aa5b920604571ad0bc9d9ec614490241493/lib/parser.js#L4
  *
  * @private
  */
@@ -136,11 +157,12 @@ function parseRangeSegment (whole: string, quoted: string): string | null {
 }
 
 /**
- * Parses a range literal into an object.
+ * Parses a range literal into an object. Heavily inspired by `pg-range`.
  *
  * @private
  */
-function parseRange (rangeLiteral: string): PGRange<string> {
+function parseRange (subTypeId: string, rangeLiteral: string): PGRange<mixed> {
+  const typeParser = types.getTypeParser(subTypeId, 'text')
   const matches = rangeLiteral.match(rangeMatcherRex)
 
   // If there were no matches, empty range.
@@ -154,11 +176,11 @@ function parseRange (rangeLiteral: string): PGRange<string> {
   // Construct our range.
   return {
     start: lower == null ? null : {
-      value: lower,
+      value: typeParser(lower),
       inclusive: matches[1] === '[',
     },
     end: upper == null ? null : {
-      value: upper,
+      value: typeParser(upper),
       inclusive: matches[6] === ']',
     },
   }
