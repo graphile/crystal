@@ -14,8 +14,25 @@ mutation {
       numrange: {
         start: { value: 50, inclusive: true }
       }
+      daterange: {
+        start: { value: "1927-11-05", inclusive: false }
+        end: { value: "1927-11-07", inclusive: false }
+      }
       anIntRange: {
         end: { value: 500, inclusive: false }
+      }
+      timestamp: "2016-10-07 16:12:21.747269"
+      timestamptz: "2016-10-09 16:12:45.218676-04"
+      date: "2016-10-15"
+      time: "19:13:18.625699"
+      timetz: "13:13:29.585176"
+      interval: {
+        seconds: 1
+        minutes: 2
+        hours: 3
+        days: 4
+        months: 5
+        years: 6
       }
       compoundType: {
         a: 123,
@@ -60,10 +77,20 @@ mutation {
         start { value inclusive }
         end { value inclusive }
       }
+      daterange {
+        start { value inclusive }
+        end { value inclusive }
+      }
       anIntRange {
         start { value inclusive }
         end { value inclusive }
       }
+      timestamp
+      timestamptz
+      date
+      time
+      timetz
+      interval { seconds minutes hours days months years }
       compoundType { a b c d fooBar }
       nestedCompoundType {
         a { a b c d fooBar }

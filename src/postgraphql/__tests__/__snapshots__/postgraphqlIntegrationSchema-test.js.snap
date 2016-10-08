@@ -296,6 +296,35 @@ type CreateUpdatableViewPayload {
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+# The day, does not include a time.
+scalar Date
+
+# range of dates
+type DateRange {
+  start: DateRangeBound
+  end: DateRangeBound
+}
+
+type DateRangeBound {
+  value: Date!
+  inclusive: Boolean!
+}
+
+input DateRangeBoundInput {
+  value: Date!
+  inclusive: Boolean!
+}
+
+# range of dates
+input DateRangeInput {
+  start: DateRangeBoundInput
+  end: DateRangeBoundInput
+}
+
+# A point in time as described by the [ISO
+# 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+scalar Datetime
+
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   clientMutationId: String
   personId1: Int!
@@ -454,6 +483,26 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_1_DESC
   COMPOUND_KEY_2_ASC
   COMPOUND_KEY_2_DESC
+}
+
+# An interval of time that has passed.
+type Interval {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
+}
+
+# An interval of time that has passed.
+input IntervalInput {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
 }
 
 input IntSetMutationInput {
@@ -727,7 +776,7 @@ type Person implements Node {
   name: String!
   about: String
   email: Email!
-  createdAt: String
+  createdAt: Datetime
   firstName: String
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -858,7 +907,7 @@ input PersonInput {
   name: String!
   about: String
   email: Email!
-  createdAt: String
+  createdAt: Datetime
 }
 
 input PersonPatch {
@@ -866,7 +915,7 @@ input PersonPatch {
   name: String
   about: String
   email: Email
-  createdAt: String
+  createdAt: Datetime
 }
 
 type Post implements Node {
@@ -1095,7 +1144,14 @@ type Query {
     json: Json
     jsonb: Json
     numrange: FloatRangeInput
+    daterange: DateRangeInput
     anIntRange: AnIntRangeInput
+    timestamp: Datetime
+    timestamptz: Datetime
+    date: Date
+    time: Time
+    timetz: Time
+    interval: IntervalInput
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -1177,7 +1233,7 @@ type Query {
     name: String
     about: String
     email: Email
-    createdAt: String
+    createdAt: Datetime
   ): PeopleConnection
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
@@ -1243,6 +1299,9 @@ enum TableSetQueryOrderBy {
   NATURAL
 }
 
+# The exact time of day, does not include the date. May or may not have a timezone offset.
+scalar Time
+
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
@@ -1257,7 +1316,14 @@ type Type implements Node {
   json: Json!
   jsonb: Json!
   numrange: FloatRange!
+  daterange: DateRange!
   anIntRange: AnIntRange!
+  timestamp: Datetime!
+  timestamptz: Datetime!
+  date: Date!
+  time: Time!
+  timetz: Time!
+  interval: Interval!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -1274,7 +1340,14 @@ input TypeInput {
   json: Json!
   jsonb: Json!
   numrange: FloatRangeInput!
+  daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
+  timestamp: Datetime!
+  timestamptz: Datetime!
+  date: Date!
+  time: Time!
+  timetz: Time!
+  interval: IntervalInput!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -1291,7 +1364,14 @@ input TypePatch {
   json: Json
   jsonb: Json
   numrange: FloatRangeInput
+  daterange: DateRangeInput
   anIntRange: AnIntRangeInput
+  timestamp: Datetime
+  timestamptz: Datetime
+  date: Date
+  time: Time
+  timetz: Time
+  interval: IntervalInput
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -1363,8 +1443,22 @@ enum TypesOrderBy {
   JSONB_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
+  DATERANGE_ASC
+  DATERANGE_DESC
   AN_INT_RANGE_ASC
   AN_INT_RANGE_DESC
+  TIMESTAMP_ASC
+  TIMESTAMP_DESC
+  TIMESTAMPTZ_ASC
+  TIMESTAMPTZ_DESC
+  DATE_ASC
+  DATE_DESC
+  TIME_ASC
+  TIME_DESC
+  TIMETZ_ASC
+  TIMETZ_DESC
+  INTERVAL_ASC
+  INTERVAL_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC
@@ -1819,6 +1913,35 @@ type CreateUpdatableViewPayload {
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+# The day, does not include a time.
+scalar Date
+
+# range of dates
+type DateRange {
+  start: DateRangeBound
+  end: DateRangeBound
+}
+
+type DateRangeBound {
+  value: Date!
+  inclusive: Boolean!
+}
+
+input DateRangeBoundInput {
+  value: Date!
+  inclusive: Boolean!
+}
+
+# range of dates
+input DateRangeInput {
+  start: DateRangeBoundInput
+  end: DateRangeBoundInput
+}
+
+# A point in time as described by the [ISO
+# 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+scalar Datetime
+
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   clientMutationId: String
   personId1: Int!
@@ -1977,6 +2100,26 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_1_DESC
   COMPOUND_KEY_2_ASC
   COMPOUND_KEY_2_DESC
+}
+
+# An interval of time that has passed.
+type Interval {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
+}
+
+# An interval of time that has passed.
+input IntervalInput {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
 }
 
 input IntSetMutationInput {
@@ -2250,7 +2393,7 @@ type Person implements Node {
   name: String!
   about: String
   email: Email!
-  createdAt: String
+  createdAt: Datetime
   firstName: String
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -2381,7 +2524,7 @@ input PersonInput {
   name: String!
   about: String
   email: Email!
-  createdAt: String
+  createdAt: Datetime
 }
 
 input PersonPatch {
@@ -2389,7 +2532,7 @@ input PersonPatch {
   name: String
   about: String
   email: Email
-  createdAt: String
+  createdAt: Datetime
 }
 
 type Post implements Node {
@@ -2618,7 +2761,14 @@ type Query {
     json: Json
     jsonb: Json
     numrange: FloatRangeInput
+    daterange: DateRangeInput
     anIntRange: AnIntRangeInput
+    timestamp: Datetime
+    timestamptz: Datetime
+    date: Date
+    time: Time
+    timetz: Time
+    interval: IntervalInput
     compoundType: CompoundTypeInput
     nestedCompoundType: NestedCompoundTypeInput
   ): TypesConnection
@@ -2700,7 +2850,7 @@ type Query {
     name: String
     about: String
     email: Email
-    createdAt: String
+    createdAt: Datetime
   ): PeopleConnection
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
@@ -2766,6 +2916,9 @@ enum TableSetQueryOrderBy {
   NATURAL
 }
 
+# The exact time of day, does not include the date. May or may not have a timezone offset.
+scalar Time
+
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   __id: ID!
@@ -2780,7 +2933,14 @@ type Type implements Node {
   json: Json!
   jsonb: Json!
   numrange: FloatRange!
+  daterange: DateRange!
   anIntRange: AnIntRange!
+  timestamp: Datetime!
+  timestamptz: Datetime!
+  date: Date!
+  time: Time!
+  timetz: Time!
+  interval: Interval!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
 }
@@ -2797,7 +2957,14 @@ input TypeInput {
   json: Json!
   jsonb: Json!
   numrange: FloatRangeInput!
+  daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
+  timestamp: Datetime!
+  timestamptz: Datetime!
+  date: Date!
+  time: Time!
+  timetz: Time!
+  interval: IntervalInput!
   compoundType: CompoundTypeInput!
   nestedCompoundType: NestedCompoundTypeInput!
 }
@@ -2814,7 +2981,14 @@ input TypePatch {
   json: Json
   jsonb: Json
   numrange: FloatRangeInput
+  daterange: DateRangeInput
   anIntRange: AnIntRangeInput
+  timestamp: Datetime
+  timestamptz: Datetime
+  date: Date
+  time: Time
+  timetz: Time
+  interval: IntervalInput
   compoundType: CompoundTypeInput
   nestedCompoundType: NestedCompoundTypeInput
 }
@@ -2886,8 +3060,22 @@ enum TypesOrderBy {
   JSONB_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
+  DATERANGE_ASC
+  DATERANGE_DESC
   AN_INT_RANGE_ASC
   AN_INT_RANGE_DESC
+  TIMESTAMP_ASC
+  TIMESTAMP_DESC
+  TIMESTAMPTZ_ASC
+  TIMESTAMPTZ_DESC
+  DATE_ASC
+  DATE_DESC
+  TIME_ASC
+  TIME_DESC
+  TIMETZ_ASC
+  TIMETZ_DESC
+  INTERVAL_ASC
+  INTERVAL_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   NESTED_COMPOUND_TYPE_ASC

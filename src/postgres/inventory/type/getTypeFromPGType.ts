@@ -18,21 +18,11 @@ import PGCatalogType from '../../introspection/object/PGCatalogType'
 import PGCollection from '../collection/PGCollection'
 import PGClassObjectType from './PGClassObjectType'
 import PGRangeObjectType from './PGRangeObjectType'
-
-/**
- * The type for a universal identifier as defined by [RFC 4122][1].
- *
- * [1]: https://tools.ietf.org/html/rfc4122
- *
- * @private
- */
-const uuidType = new AliasType({
-  name: 'uuid',
-  description:
-    'A universally unique identifier as defined by ' +
-    '[RFC 4122](https://tools.ietf.org/html/rfc4122).',
-  baseType: stringType,
-})
+import pgUuidType from './individual/pgUuidType'
+import pgDatetimeType from './individual/pgDatetimeType'
+import pgDateType from './individual/pgDateType'
+import pgTimeType from './individual/pgTimeType'
+import pgIntervalType from './individual/pgIntervalType'
 
 /**
  * A hardcoded list of PostgreSQL type OIDs to interface types. Some types
@@ -49,12 +39,18 @@ const uuidType = new AliasType({
  * @private
  */
 const pgTypeIdToType = new Map<string, Type<any>>([
-  ['20', integerType], // int8, bigint
-  ['21', integerType], // int2, smallint
-  ['23', integerType], // int4, integer
-  ['114', jsonType],   // json
-  ['3802', jsonType],  // jsonb
-  ['2950', uuidType],  // uuid
+  ['20', integerType],      // int8, bigint
+  ['21', integerType],      // int2, smallint
+  ['23', integerType],      // int4, integer
+  ['114', jsonType],        // json
+  ['3802', jsonType],       // jsonb
+  ['2950', pgUuidType],     // uuid
+  ['1082', pgDateType],     // date
+  ['1114', pgDatetimeType], // timestamp
+  ['1184', pgDatetimeType], // timestamptz
+  ['1083', pgTimeType],     // time
+  ['1266', pgTimeType],     // timetz
+  ['1186', pgIntervalType], // interval
 ])
 
 const _getTypeFromPGType = memoize2(createTypeFromPGType)
@@ -133,10 +129,10 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
   switch (pgType.category) {
     // If our type is of the array category, return a list type.
     case 'A': {
-      if (!pgType.arrayItemId)
+      if (!pgType.arrayItemTypeId)
         throw new Error('PostgreSQL array type does not have an associated element type.')
 
-      const itemType = pgCatalog.assertGetType(pgType.arrayItemId)
+      const itemType = pgCatalog.assertGetType(pgType.arrayItemTypeId)
 
       return new NullableType(new ListType(getTypeFromPGType(pgCatalog, itemType)))
     }

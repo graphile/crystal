@@ -1,4 +1,3 @@
-import { types } from 'pg'
 import { Type, ObjectType, NullableType, booleanType } from '../../../interface'
 import { sql } from '../../utils'
 import { PGCatalog, PGCatalogRangeType, PGCatalogNamespace } from '../../introspection'
@@ -82,7 +81,7 @@ class PGRangeObjectType extends ObjectType {
    * and then setting up an object of the correct type.
    */
   public [$$transformPGValueIntoValue] (rangeLiteral: string): ObjectType.Value {
-    const range = parseRange(this.pgRangeType.rangeSubTypeId, rangeLiteral)
+    const range = parseRange(rangeLiteral)
     const rangeValue = new Map<string, mixed>()
 
     if (range.start) {
@@ -161,8 +160,7 @@ function parseRangeSegment (whole: string, quoted: string): string | null {
  *
  * @private
  */
-function parseRange (subTypeId: string, rangeLiteral: string): PGRange<mixed> {
-  const typeParser = types.getTypeParser(subTypeId, 'text')
+function parseRange (rangeLiteral: string): PGRange<string> {
   const matches = rangeLiteral.match(rangeMatcherRex)
 
   // If there were no matches, empty range.
@@ -176,11 +174,11 @@ function parseRange (subTypeId: string, rangeLiteral: string): PGRange<mixed> {
   // Construct our range.
   return {
     start: lower == null ? null : {
-      value: typeParser(lower),
+      value: lower,
       inclusive: matches[1] === '[',
     },
     end: upper == null ? null : {
-      value: typeParser(upper),
+      value: upper,
       inclusive: matches[6] === ']',
     },
   }

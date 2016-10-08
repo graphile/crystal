@@ -96,9 +96,15 @@ create table b.types (
   "text_array" text[] not null,
   "json" json not null,
   "jsonb" jsonb not null,
-  "numrange" numrange,
-  -- TODO: "daterange" daterange,
-  "an_int_range" a.an_int_range,
+  "numrange" numrange not null,
+  "daterange" daterange not null,
+  "an_int_range" a.an_int_range not null,
+  "timestamp" timestamp not null,
+  "timestamptz" timestamptz not null,
+  "date" date not null,
+  "time" time not null,
+  "timetz" timetz not null,
+  "interval" interval not null,
   "compound_type" c.compound_type not null,
   "nested_compound_type" b.nested_compound_type not null
 );
