@@ -7,8 +7,6 @@ import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePGConnectionString } from 'pg-connection-string'
 import postgraphql from '../postgraphql'
-import start from './start'
-import demo from './demo'
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../../package.json')).toString())
 const program = new Command('postgraphql')
@@ -47,13 +45,18 @@ if (!module.parent)
 export default program
 
 function main () {
+  // Kill server on exit.
+  process.on('SIGINT', process.exit)
+
+  // Destruct our command line arguments, use defaults, and rename options to
+  // something appropriate for JavaScript.
   const {
     demo: isDemo = false,
     connection: pgConnectionString,
     schema: schemas = ['public'],
     host: hostname = 'localhost',
     port = 5000,
-    disableQueryLog,
+    disableQueryLog = false,
     maxPoolSize,
     graphql: graphqlRoute = '/graphql',
     graphiql: graphiqlRoute = '/graphiql',
@@ -63,16 +66,24 @@ function main () {
     dynamicJson = false,
   } = program as any
 
+  // Create our Postgres config.
   const pgConfig = Object.assign(
     {},
+    // If we have a Postgres connection string, parse it and use that as our
+    // config. If we don’t have a connection string use some environment
+    // variables or final defaults. Other environment variables should be
+    // detected and used by `pg`.
     pgConnectionString ? parsePGConnectionString(pgConnectionString) : {
       host: process.env.PGHOST || 'localhost',
       port: process.env.PGPORT || 5432,
       database: process.env.PGDATABASE,
     },
+    // Add the max pool size to our config.
     { max: maxPoolSize },
   )
 
+  // Create’s our PostGraphQL server and provides all the appropriate
+  // configuration options.
   const server = createServer(postgraphql(pgConfig, schemas, {
     classicIds,
     dynamicJson,
@@ -83,6 +94,8 @@ function main () {
     enableCors,
   }))
 
+  // Start our server by listening to a specific port and host name. Also log
+  // some instructions and other interesting information.
   server.listen(port, hostname, () => {
     console.log('')
     console.log(`PostGraphQL server listening on port ${chalk.underline(port.toString())} 🚀`)
