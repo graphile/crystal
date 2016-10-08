@@ -12,7 +12,7 @@ export default function postgraphql (
   poolOrConfig?: Pool | PoolConfig | string,
   schemas: Array<string> = ['public'],
   options: {
-    legacyIds?: boolean,
+    classicIds?: boolean,
     dynamicJson?: boolean,
     graphqlRoute?: string,
     graphiqlRoute?: string,

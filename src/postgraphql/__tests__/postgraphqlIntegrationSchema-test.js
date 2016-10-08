@@ -8,6 +8,6 @@ test('prints a schema with the default options', withPGClient(async pgClient => 
 }))
 
 test('prints a schema with Relay 1 style ids', withPGClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'], { legacyIds: true })
+  const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'], { classicIds: true })
   expect(printSchema(gqlSchema)).toMatchSnapshot()
 }))
