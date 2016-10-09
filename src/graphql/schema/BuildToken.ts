@@ -1,5 +1,5 @@
-import { GraphQLOutputType, GraphQLInputType, GraphQLFieldConfig } from 'graphql'
-import { Inventory, Type, ObjectType } from '../../interface'
+import { GraphQLFieldConfig } from 'graphql'
+import { Inventory, ObjectType } from '../../interface'
 
 /**
  * A `BuildToken` is a plain object that gets passed around to all of the
