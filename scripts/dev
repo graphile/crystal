@@ -2,11 +2,11 @@
 
 npm_bin=$(npm bin)
 
-rm -rf build/*
+export DEBUG=${DEBUG-postgraphql*}
 
-export DEBUG=postgraphql*
-
-$npm_bin/tsc --watch & \
-(sleep 6 && $npm_bin/nodemon --watch build --exec "node -r source-map-support/register build/postgraphql/main.js")
-
-wait
+$npm_bin/nodemon \
+  --watch src \
+  --ignore __tests__ \
+  --ignore __mocks__ \
+  --ext js,ts \
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli/index.ts --schema a,b,c $@"
