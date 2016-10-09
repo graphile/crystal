@@ -17,7 +17,7 @@ program
   .version(manifest.version)
   .usage('[options]')
   .description(manifest.description)
-  .option('-d, --demo', 'run PostGraphQL using the demo database connection')
+  // .option('-d, --demo', 'run PostGraphQL using the demo database connection')
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment')
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
   .option('-n, --host <string>', 'the hostname to be used. Defaults to `localhost`')
