@@ -17,15 +17,14 @@ import { PGCatalog, PGCatalogProcedure, PGCatalogClass } from '../../../postgres
  * is a computed column *for that class*.
  */
 // TODO: test
-export default function isPGProcedureComputedColumn (
+export default function getPGProcedureComputedClass (
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
-  pgClass?: PGCatalogClass,
-): boolean {
+): PGCatalogClass | null {
   // If there are no arguments for this procedure, this is not a computed
   // column.
   if (pgProcedure.argTypeIds.length === 0)
-    return false
+    return null
 
   const firstArgTypeId = pgProcedure.argTypeIds[0]
   const pgType = pgCatalog.assertGetType(firstArgTypeId)
@@ -33,23 +32,18 @@ export default function isPGProcedureComputedColumn (
   // If the procedure and type are in different namespaces, this is not a
   // computed column.
   if (pgProcedure.namespaceId !== pgType.namespaceId)
-    return false
+    return null
 
   // If the first argument type is not a composite type, this is not a
   // computed column.
   if (pgType.type !== 'c')
-    return false
+    return null
 
   // If the procedure’s name does not start with the first argument’s
   // composite type name, this is not a computed column.
   if (!pgProcedure.name.startsWith(`${pgType.name}_`))
-    return false
+    return null
 
-  // If we were given a `pgClass` parameter, and the first argument’s composite
-  // type is not for this class, this is not a computed column for that class.
-  if (pgClass && pgType.classId !== pgClass.id)
-    return false
-
-  // Otherwise, this is a computed column!
-  return true
+  // Return the class for this type.
+  return pgCatalog.assertGetClass(pgType.classId)
 }

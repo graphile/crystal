@@ -1,33 +1,29 @@
 import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableType } from 'graphql'
-import { formatName, buildObject } from '../../../../graphql/utils'
-import BuildToken from '../../../../graphql/schema/BuildToken'
-import createConnectionGQLField from '../../../../graphql/schema/connection/createConnectionGQLField'
-import transformGQLInputValue from '../../../../graphql/schema/transformGQLInputValue'
-import { sql } from '../../../../postgres/utils'
-import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
-import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
-import transformPGValueIntoValue from '../../../../postgres/inventory/transformPGValueIntoValue'
-import createPGProcedureFixtures from '../createPGProcedureFixtures'
-import createPGProcedureSQLCall from '../createPGProcedureSQLCall'
-import PGProcedurePaginator from '../PGProcedurePaginator'
-import isPGProcedureComputedColumn from '../isPGProcedureComputedColumn'
+import { formatName, buildObject } from '../../../graphql/utils'
+import BuildToken from '../../../graphql/schema/BuildToken'
+import createConnectionGQLField from '../../../graphql/schema/connection/createConnectionGQLField'
+import transformGQLInputValue from '../../../graphql/schema/transformGQLInputValue'
+import { sql } from '../../../postgres/utils'
+import { PGCatalog, PGCatalogProcedure } from '../../../postgres/introspection'
+import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
+import transformPGValueIntoValue from '../../../postgres/inventory/transformPGValueIntoValue'
+import createPGProcedureFixtures from './createPGProcedureFixtures'
+import createPGProcedureSQLCall from './createPGProcedureSQLCall'
+import PGProcedurePaginator from './PGProcedurePaginator'
 
 /**
- * Creates all of the fields for query procedures. Query procedures that return
+ * Creates the fields for query procedures. Query procedures that return
  * a set will expose a GraphQL connection.
  */
-export default function createPGProcedureQueryGQLFieldEntries (
+export default function createPGProcedureQueryGQLFieldEntry (
   buildToken: BuildToken,
   pgCatalog: PGCatalog,
-): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
+  pgProcedure: PGCatalogProcedure,
+): [string, GraphQLFieldConfig<mixed, mixed>] {
   return (
-    pgCatalog.getProcedures()
-      .filter(pgProcedure => pgProcedure.isStable && !isPGProcedureComputedColumn(pgCatalog, pgProcedure))
-      .map(pgProcedure =>
-        pgProcedure.returnsSet
-          ? createPGSetProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
-          : createPGSingleProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
-      )
+    pgProcedure.returnsSet
+      ? createPGSetProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
+      : createPGSingleProcedureQueryGQLFieldEntry(buildToken, pgCatalog, pgProcedure)
   )
 }
 

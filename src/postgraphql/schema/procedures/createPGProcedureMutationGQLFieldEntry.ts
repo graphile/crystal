@@ -6,40 +6,25 @@ import {
   GraphQLInputFieldConfig,
   getNullableType,
 } from 'graphql'
-import { Type, NullableType, ListType } from '../../../../interface'
-import { formatName } from '../../../../graphql/utils'
-import BuildToken from '../../../../graphql/schema/BuildToken'
-import createMutationGQLField from '../../../../graphql/schema/createMutationGQLField'
-import transformGQLInputValue from '../../../../graphql/schema/transformGQLInputValue'
-import createCollectionRelationTailGQLFieldEntries from '../../../../graphql/schema/collection/createCollectionRelationTailGQLFieldEntries'
-import { sql } from '../../../../postgres/utils'
-import { PGCatalog, PGCatalogProcedure } from '../../../../postgres/introspection'
-import PGCollection from '../../../../postgres/inventory/collection/PGCollection'
-import pgClientFromContext from '../../../../postgres/inventory/pgClientFromContext'
-import transformPGValueIntoValue from '../../../../postgres/inventory/transformPGValueIntoValue'
-import createPGProcedureFixtures from '../createPGProcedureFixtures'
-import createPGProcedureSQLCall from '../createPGProcedureSQLCall'
-
-/**
- * Creates mutation field entries for all of our volatile Postgres procedures.
- * May return an empty array if there are not volatile procedures.
- */
-export default function createPGProcedureMutationGQLFieldEntries (
-  buildToken: BuildToken,
-  pgCatalog: PGCatalog,
-): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
-  return (
-    pgCatalog.getProcedures()
-      .filter(pgProcedure => !pgProcedure.isStable)
-      .map(pgProcedure => createPGProcedureMutationGQLFieldEntry(buildToken, pgCatalog, pgProcedure))
-  )
-}
+import { Type, NullableType, ListType } from '../../../interface'
+import { formatName } from '../../../graphql/utils'
+import BuildToken from '../../../graphql/schema/BuildToken'
+import createMutationGQLField from '../../../graphql/schema/createMutationGQLField'
+import transformGQLInputValue from '../../../graphql/schema/transformGQLInputValue'
+import createCollectionRelationTailGQLFieldEntries from '../../../graphql/schema/collection/createCollectionRelationTailGQLFieldEntries'
+import { sql } from '../../../postgres/utils'
+import { PGCatalog, PGCatalogProcedure } from '../../../postgres/introspection'
+import PGCollection from '../../../postgres/inventory/collection/PGCollection'
+import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
+import transformPGValueIntoValue from '../../../postgres/inventory/transformPGValueIntoValue'
+import createPGProcedureFixtures from './createPGProcedureFixtures'
+import createPGProcedureSQLCall from './createPGProcedureSQLCall'
 
 /**
  * Creates a single mutation GraphQL field entry for our procedure. We use the
  * `createMutationGQLField` utility from the `graphql` package to do so.
  */
-function createPGProcedureMutationGQLFieldEntry (
+export default function createPGProcedureMutationGQLFieldEntry (
   buildToken: BuildToken,
   pgCatalog: PGCatalog,
   pgProcedure: PGCatalogProcedure,
