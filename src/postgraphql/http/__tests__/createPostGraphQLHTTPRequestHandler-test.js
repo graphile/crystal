@@ -1,6 +1,9 @@
+jest.mock('../setupRequestPGClientTransaction')
+
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext'
-import createPostGraphQLHTTPRequestHandler, { $$pgClientOrigQuery } from '../createPostGraphQLHTTPRequestHandler'
+import setupRequestPGClientTransaction from '../setupRequestPGClientTransaction'
+import createPostGraphQLHTTPRequestHandler from '../createPostGraphQLHTTPRequestHandler'
 
 const http = require('http')
 const request = require('supertest-as-promised')
@@ -42,7 +45,7 @@ const graphqlSchema = new GraphQLSchema({
 })
 
 const pgClient = {
-  [$$pgClientOrigQuery]: jest.fn(() => Promise.resolve()),
+  query: jest.fn(() => Promise.resolve()),
   release: jest.fn(),
 }
 
@@ -109,7 +112,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
     })
 
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
-      const server = createServer({ enableCORS: true })
+      const server = createServer({ enableCors: true })
       await (
         request(server)
         .options('/graphql')
@@ -122,7 +125,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
     })
 
     test('will always respond to any request with CORS headers when enabled', async () => {
-      const server = createServer({ enableCORS: true })
+      const server = createServer({ enableCors: true })
       await (
         request(server)
         .post('/graphql')
@@ -231,7 +234,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
 
     test('will connect and release a Postgres client from the pool on every request', async () => {
       pgPool.connect.mockClear()
-      pgClient[$$pgClientOrigQuery].mockClear()
+      pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer()
       await (
@@ -243,14 +246,15 @@ for (const [name, createServerFromHandler] of serverCreators) {
         .expect({ data: { hello: 'world' } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient[$$pgClientOrigQuery].mock.calls).toEqual([])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
-    test('will call `begin` and `commit` for requests that use the Postgres client', async () => {
+    test('will setup a transaction for requests that use the Postgres client', async () => {
       pgPool.connect.mockClear()
-      pgClient[$$pgClientOrigQuery].mockClear()
+      pgClient.query.mockClear()
       pgClient.release.mockClear()
+      setupRequestPGClientTransaction.mockClear()
       const server = createServer()
       await (
         request(server)
@@ -261,8 +265,37 @@ for (const [name, createServerFromHandler] of serverCreators) {
         .expect({ data: { query: null } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient[$$pgClientOrigQuery].mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
+      expect(setupRequestPGClientTransaction.mock.calls.length).toEqual(1)
+      expect(setupRequestPGClientTransaction.mock.calls[0].length).toEqual(3)
+      expect(setupRequestPGClientTransaction.mock.calls[0][1]).toBe(pgClient)
+      expect(setupRequestPGClientTransaction.mock.calls[0][2]).toEqual({})
+    })
+
+    test('will setup a transaction and pass down options for requests that use the Postgres client', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      setupRequestPGClientTransaction.mockClear()
+      const jwtSecret = Symbol('jwtSecret')
+      const pgDefaultRole = Symbol('pgDefaultRole')
+      const server = createServer({ jwtSecret, pgDefaultRole })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{query}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { query: null } })
+      )
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+      expect(setupRequestPGClientTransaction.mock.calls.length).toEqual(1)
+      expect(setupRequestPGClientTransaction.mock.calls[0].length).toEqual(3)
+      expect(setupRequestPGClientTransaction.mock.calls[0][1]).toBe(pgClient)
+      expect(setupRequestPGClientTransaction.mock.calls[0][2]).toEqual({ jwtSecret, pgDefaultRole })
     })
 
     test('will respect an operation name', async () => {

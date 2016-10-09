@@ -40,6 +40,15 @@ export default function createPostGraphQLHTTPRequestHandler (config: {
   // functionality.
   graphiqlRoute?: string,
 
+  // The secret to use when decoding JWT tokens from request authorization
+  // headers. Make sure to keep this private, never let anyone else know its
+  // value.
+  jwtSecret?: string,
+
+  // The default Postgres role to use if no role is provided in a provided JWT
+  // token. Also known as the “anonymous” role.
+  pgDefaultRole?: string,
+
   // Specifies whether or not we should show an error’s stack trace. If the
   // value is `json` then the stack will be formatted in a way that is readble
   // in JSON. Helpful for debugging.

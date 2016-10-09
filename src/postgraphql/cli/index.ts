@@ -22,12 +22,13 @@ program
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', option => option.split(','))
   .option('-t, --host <string>', 'the hostname to be used. Defaults to `localhost`')
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
-  .option('-l, --disable-query-log', 'disables the GraphQL query log')
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
+  .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-r, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
+  .option('-e, --secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
+  .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
 
@@ -58,11 +59,12 @@ function main (): void {
     schema: schemas = ['public'],
     host: hostname = 'localhost',
     port = 5000,
-    disableQueryLog = false,
     maxPoolSize,
+    defaultRole: pgDefaultRole,
     graphql: graphqlRoute = '/graphql',
     graphiql: graphiqlRoute = '/graphiql',
     disableGraphiql = false,
+    secret: jwtSecret,
     cors: enableCors = false,
     classicIds = false,
     dynamicJson = false,
@@ -93,7 +95,9 @@ function main (): void {
     graphqlRoute,
     graphiqlRoute,
     graphiql: !disableGraphiql,
-    enableQueryLog: !disableQueryLog,
+    jwtSecret,
+    pgDefaultRole,
+    enableQueryLog: true,
     enableCors,
   }))
 
@@ -103,7 +107,7 @@ function main (): void {
     console.log('')
     console.log(`PostGraphQL server listening on port ${chalk.underline(port.toString())} 🚀`)
     console.log('')
-    console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(`postgres://${pgConfig.host}:${pgConfig.port}${pgConfig.database ? pgConfig.database : ''}`)}`)
+    console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(`postgres://${pgConfig.host}:${pgConfig.port}${pgConfig.database || ''}`)}`)
     console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
     console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
 

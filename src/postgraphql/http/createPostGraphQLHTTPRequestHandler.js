@@ -12,6 +12,7 @@ import {
 } from 'graphql'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
+import setupRequestPGClientTransaction from './setupRequestPGClientTransaction'
 
 const chalk = require('chalk')
 const Debugger = require('debug')
@@ -20,7 +21,7 @@ const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 
-export const $$pgClientOrigQuery = Symbol()
+const $$pgClientOrigQuery = Symbol()
 
 const debugGraphql = new Debugger('postgraphql:graphql')
 const debugPG = new Debugger('postgraphql:postgres')
@@ -270,27 +271,30 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
 
       // Connect a new Postgres client and start a transaction.
       const pgClient = await pgPool.connect()
-      let pgClientInTransaction = false
 
-      // Set the original query method to a key on our client. If that key is
-      // already set, use that.
-      pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
+      // If Postgres debugging is enabled, enhance our query function by adding
+      // a debug statement.
+      if (debugPG.enabled) {
+        // Set the original query method to a key on our client. If that key is
+        // already set, use that.
+        pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
 
-      pgClient.query = function (...args) {
-        // If the client is not currently in a transaction, run the `begin`
-        // command and then run the actual query.
-        if (!pgClientInTransaction) {
-          pgClientInTransaction = true
-          return pgClient.query('begin').then(() => pgClient.query(...args))
+        pgClient.query = function (...args) {
+          // Debug just the query text. We don’t want to debug variables because
+          // there may be passwords in there.
+          debugPG(args[0] && args[0].text ? args[0].text : args[0])
+
+          // Call the original query method.
+          return pgClient[$$pgClientOrigQuery].apply(this, args)
         }
-
-        // Debug just the query text. We don’t want to debug variables because
-        // there may be passwords in there.
-        debugPG(args[0] && args[0].text ? args[0].text : args[0])
-
-        // Call the original query method.
-        return pgClient[$$pgClientOrigQuery].apply(this, args)
       }
+
+      // Begin our transaction and set it up.
+      await pgClient.query('begin')
+      await setupRequestPGClientTransaction(req, pgClient, {
+        jwtSecret: options.jwtSecret,
+        pgDefaultRole: options.pgDefaultRole,
+      })
 
       try {
         result = await executeGraphql(
@@ -305,12 +309,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       // Cleanup our Postgres client by ending the transaction and releasing
       // the client back to the pool. Always do this even if the query fails.
       finally {
-        // Don’t run the commit statement unless our client is in a
-        // transaction. We don’t open a transaction if no Postgres resources
-        // were needed for the query (like in an introspection query).
-        if (pgClientInTransaction)
-          await pgClient.query('commit')
-
+        await pgClient.query('commit')
         pgClient.release()
 
         debugRequest('GraphQL query has been executed.')
