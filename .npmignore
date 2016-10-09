@@ -4,6 +4,7 @@ npm-debug.log*
 TODO.md
 .editorconfig
 tsconfig.json
+tslint.json
 .vscode
 src
 build/**/__tests__
@@ -11,4 +12,5 @@ build/**/__mocks__
 typings
 scripts
 examples
+docs
 resources/jest-preprocessor.js
