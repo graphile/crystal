@@ -28,7 +28,7 @@ program
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
   .option('-e, --secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens', (option: string) => ({ namespaceName: option.split('.', 2)[0], typeName: option.split('.', 2)[1] }))
+  .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens', parseTypeIdentifier)
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
@@ -114,3 +114,21 @@ server.listen(port, hostname, () => {
   console.log(chalk.gray('* * *'))
   console.log('')
 })
+
+/**
+ * Enables the parsing of type identifiers. Type identifiers are a bit tricky,
+ * but this function uses a regular expression to do it. Fun.
+ *
+ * @private
+ */
+function parseTypeIdentifier (typeIdentifier: string): { namespaceName: string, typeName: string } {
+  const match = typeIdentifier.match(/^(?:([a-zA-Z1-2_]+)|"([^"]*)")\.(?:([a-zA-Z1-2_]+)|"([^"]*)")$/)
+
+  if (!match)
+    throw new Error(`Type identifier '${typeIdentifier}' is of the incorrect form.`)
+
+  return {
+    namespaceName: match[1] || match[2],
+    typeName: match[3] || match[4],
+  }
+}

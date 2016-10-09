@@ -53,6 +53,13 @@ export default function postgraphql (
     return subGraphqlSchema
   })()
 
+  // If we fail to build our schema, log the error and exit the process.
+  graphqlSchema.catch(error => {
+    // tslint:disable-next-line no-console
+    console.error(`${error.stack}\n`)
+    process.exit(1)
+  })
+
   // Finally create our HTTP request handler using our options, the Postgres
   // pool, and GraphQL schema. Return the final result.
   return createPostGraphQLHTTPRequestHandler(Object.assign({}, options, {
