@@ -1,9 +1,8 @@
-import { GraphQLFieldConfig, GraphQLID } from 'graphql'
+import { GraphQLFieldConfig } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../../interface'
-import { formatName, idSerde } from '../../../utils'
+import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGQLField from '../../createMutationGQLField'
-import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getDeleteCollectionPayloadGQLType } from './createDeleteCollectionMutationFieldEntry'
 

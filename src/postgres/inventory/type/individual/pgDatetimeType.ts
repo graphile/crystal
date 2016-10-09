@@ -1,6 +1,4 @@
-import moment = require('moment')
 import { AliasType, stringType } from '../../../../interface'
-import { $$transformPGValueIntoValue } from '../../transformPGValueIntoValue'
 
 // TOOD: Maybe this should be in the interface as a primitive?
 const pgDatetimeType = new AliasType({

@@ -14,5 +14,5 @@ test('isTypeOf will be true for any integer', () => {
   expect(integerType.isTypeOf('hello')).toBe(false)
   expect(integerType.isTypeOf({})).toBe(false)
   expect(integerType.isTypeOf([])).toBe(false)
-  expect(integerType.isTypeOf(() => {})).toBe(false)
+  expect(integerType.isTypeOf(() => { /* noop */ })).toBe(false)
 })

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+echo "[1/4]: Installing Dependencies"
+npm install
+
+echo "[2/4]: Building Code"
+scripts/build
+
+echo "[3/4]: Linting Code"
+scripts/lint
+
+echo "[4/4]: Testing Project"
+scripts/test
+
+echo "CI completed succesfully 🎉"

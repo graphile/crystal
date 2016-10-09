@@ -1,6 +1,6 @@
 import { Type, ObjectType, NullableType, booleanType } from '../../../interface'
 import { sql } from '../../utils'
-import { PGCatalog, PGCatalogRangeType, PGCatalogNamespace } from '../../introspection'
+import { PGCatalog, PGCatalogRangeType } from '../../introspection'
 import transformPGValueIntoValue, { $$transformPGValueIntoValue } from '../transformPGValueIntoValue'
 import transformValueIntoPGValue, { $$transformValueIntoPGValue } from '../transformValueIntoPGValue'
 import getTypeFromPGType from './getTypeFromPGType'
@@ -52,7 +52,7 @@ class PGRangeObjectType extends ObjectType {
         }],
         ['inclusive', {
           // TODO: description
-          type: booleanType
+          type: booleanType,
         }],
       ]),
     })
@@ -107,8 +107,11 @@ class PGRangeObjectType extends ObjectType {
    * `public.numrange(lowerBound, upperBound, bounds)`.
    */
   // TODO: test
+  // TODO: no anys?
   public [$$transformValueIntoPGValue] (rangeValue: ObjectType.Value): sql.SQL {
+    // tslint:disable-next-line no-any
     const start: Map<string, mixed> | undefined = rangeValue.get('start') as any
+    // tslint:disable-next-line no-any
     const end: Map<string, mixed> | undefined = rangeValue.get('end') as any
     const lowerInclusive = start != null && start.get('inclusive') ? '[' : '('
     const upperInclusive = end != null && end.get('inclusive') ? ']' : ')'

@@ -10,7 +10,8 @@ const stringType: NamedType<string> = {
     'A sequence of characters. This type is often used to represent textual, ' +
     'human readable data.',
 
-  getNamedType () { return this },
+  getNamedType: (): NamedType<string> =>
+    stringType,
 
   isTypeOf: (value: mixed): value is string =>
     typeof value === 'string',

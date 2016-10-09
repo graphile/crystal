@@ -6,7 +6,7 @@ import { Pool } from 'pg'
  * A request handler for one of many different `http` frameworks.
  */
 export interface HTTPRequestHandler {
-  (req: IncomingMessage, res: ServerResponse, next?: (error?: any) => void): void
+  (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): void
   (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
 }
 

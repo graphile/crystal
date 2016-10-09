@@ -1,6 +1,3 @@
-import NamedType from './type/NamedType'
-import AliasType from './type/AliasType'
-import ObjectType from './type/ObjectType'
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
 
@@ -16,9 +13,8 @@ import Relation from './collection/Relation'
  * *mutable*. Scary, I know.
  */
 class Inventory {
-  private _types = new Map<string, NamedType<mixed>>()
-  private _collections = new Map<string, Collection>()
-  private _relations = new Map<string, Relation<mixed>>()
+  private _collections: Map<string, Collection> = new Map()
+  private _relations: Map<string, Relation<mixed>> = new Map()
 
   /**
    * Adds a single collection to our inventory. If a collection with the same

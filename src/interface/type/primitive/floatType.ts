@@ -12,7 +12,8 @@ const floatType: NamedType<number> = {
     'A signed number with a fractional component (unlike an integer) as specified ' +
     'by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point).',
 
-  getNamedType () { return this },
+  getNamedType: (): NamedType<number> =>
+    floatType,
 
   isTypeOf: (value: mixed): value is number =>
     typeof value === 'number',

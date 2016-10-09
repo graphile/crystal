@@ -1,5 +1,4 @@
 import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableType } from 'graphql'
-import { Type } from '../../../../interface'
 import { formatName, buildObject } from '../../../../graphql/utils'
 import BuildToken from '../../../../graphql/schema/BuildToken'
 import createConnectionGQLField from '../../../../graphql/schema/connection/createConnectionGQLField'
@@ -58,7 +57,7 @@ function createPGSingleProcedureQueryGQLFieldEntry (
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
 
-    async resolve (source, args, context) {
+    async resolve (source, args, context): Promise<mixed> {
       const client = pgClientFromContext(context)
       const input = argEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName]))
       const query = sql.compile(sql.query`select to_json(${createPGProcedureSQLCall(fixtures, input)}) as value`)
@@ -96,6 +95,6 @@ function createPGSetProcedureQueryGQLFieldEntry (
       inputArgEntries,
       getPaginatorInput: (source, args) =>
         inputArgEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName])),
-    })
+    }),
   ]
 }

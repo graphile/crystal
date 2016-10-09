@@ -1,8 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
-import { Inventory } from '../../interface'
 import { buildObject, memoize1 } from '../utils'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
-import getCollectionGQLType from './collection/getCollectionGQLType'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
 import BuildToken from './BuildToken'
 

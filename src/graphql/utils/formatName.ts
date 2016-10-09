@@ -1,7 +1,7 @@
 import { camelCase, pascalCase, constantCase } from 'change-case'
 
-const formatInsideUnderscores = (formatter: (string: string) => string) => (string: string) => {
-  const [, start, name, finish] = /^(_*)(.*?)(_*)$/.exec(string)!
+const formatInsideUnderscores = (formatter: (name: string) => string) => (fullName: string) => {
+  const [, start, name, finish] = /^(_*)(.*?)(_*)$/.exec(fullName)!
   return `${start}${formatter(name)}${finish}`
 }
 

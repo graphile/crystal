@@ -16,7 +16,7 @@ namespace scrib {
    * name of the given type. Will use standard GraphQL syntax like bangs and
    * brackets for non-null and list types appropriately.
    */
-  export function type (type: GraphQLType<mixed>) {
+  export function type (type: GraphQLType<mixed>): string {
     return `\`${getTypeName(type)}\``
   }
 

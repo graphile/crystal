@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
 import { Collection, Condition, ObjectType, Relation } from '../../../interface'
-import { memoize2, formatName, buildObject, idSerde, scrib } from '../../utils'
+import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import getGQLType from '../getGQLType'
 import createConnectionGQLField from '../connection/createConnectionGQLField'
@@ -64,6 +64,7 @@ function createCollectionGQLType (buildToken: BuildToken, collection: Collection
               // to assume the type is ok instead of running an `isTypeOf`
               // check. Generally `isTypeOf` isn’t super efficient so we only
               // use it on user input.
+              // tslint:disable-next-line no-any
               value.get(fieldName) as any,
           }]
         ),
@@ -82,7 +83,7 @@ function createCollectionGQLType (buildToken: BuildToken, collection: Collection
         // collection.
         .filter(relation => relation.headCollectionKey.collection === collection)
         // Transform the relation into a field entry.
-        .map(<THeadKey>(relation: Relation<THeadKey>): [string, GraphQLFieldConfig<ObjectType.Value, any>] | null => {
+        .map(<THeadKey>(relation: Relation<THeadKey>): [string, GraphQLFieldConfig<ObjectType.Value, mixed>] | null => {
           const tailCollection = relation.tailCollection
           const tailPaginator = tailCollection.paginator
 

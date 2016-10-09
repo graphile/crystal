@@ -9,7 +9,8 @@ const booleanType: NamedType<boolean> = {
   description:
     'A value with only two possible variants: true or false.',
 
-  getNamedType () { return this },
+  getNamedType: (): NamedType<boolean> =>
+    booleanType,
 
   isTypeOf: (value: mixed): value is boolean =>
     typeof value === 'boolean',

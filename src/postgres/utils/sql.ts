@@ -28,10 +28,10 @@ namespace sql {
    * raw text. This makes a SQL injection vulnerability harder to create.
    */
   export function query (strings: TemplateStringsArray, ...values: Array<SQLItem | NestedArray<SQLItem>>): Array<SQLItem> {
-    return strings.reduce<Array<SQLItem>>((items, string, i) =>
+    return strings.reduce<Array<SQLItem>>((items, text, i) =>
       !values[i]
-        ? [...items, { type: 'RAW', text: string }]
-        : [...items, { type: 'RAW', text: string }, ...flatten<SQLItem>(values[i])]
+        ? [...items, { type: 'RAW', text }]
+        : [...items, { type: 'RAW', text }, ...flatten<SQLItem>(values[i])]
     , [])
   }
 
@@ -41,7 +41,7 @@ namespace sql {
    */
   export function compile (sql: SQL): QueryConfig {
     // Text holds the query string.
-    let text: string = ''
+    let text = ''
 
     // Values hold the JavaScript values that are represented in the query
     // string by placeholders. They are eager because they were provided before
@@ -89,6 +89,8 @@ namespace sql {
           values.push(item.value)
           text += `$${values.length}`
           break
+        default:
+          throw new Error(`Unexpected SQL item type '${item['type']}'.`)
       }
     }
 
@@ -119,7 +121,7 @@ namespace sql {
    * Creates a SQL item for a value that will be included in our final query.
    * This value will be added in a way which avoids SQL injection.
    */
-  export const value = (value: mixed): SQLItem => ({ type: 'VALUE', value })
+  export const value = (val: mixed): SQLItem => ({ type: 'VALUE', value: val })
 
   /**
    * Join some SQL items together seperated by a string. Useful when dealing

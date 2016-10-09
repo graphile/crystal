@@ -1,6 +1,5 @@
-import { Type, ObjectType, Paginator } from '../../../interface'
+import { Type, Paginator } from '../../../interface'
 import { sql } from '../../../postgres/utils'
-import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogProcedure } from '../../../postgres/introspection'
 import PGPaginator from '../../../postgres/inventory/paginator/PGPaginator'
 import PGPaginatorOrderingOffset from '../../../postgres/inventory/paginator/PGPaginatorOrderingOffset'
 import { PGProcedureFixtures } from './createPGProcedureFixtures'
@@ -20,13 +19,15 @@ type ProcedureInput = Array<mixed>
  */
 class PGProcedurePaginator<TItemValue> extends PGPaginator<ProcedureInput, TItemValue> {
   constructor (
-    private _fixtures: PGProcedureFixtures,
+    _fixtures: PGProcedureFixtures,
   ) {
     super()
+    this._fixtures = _fixtures
   }
 
-  public name = this._fixtures.pgProcedure.name
-  public itemType = this._fixtures.return.type as Type<TItemValue>
+  private _fixtures: PGProcedureFixtures
+  public name: string = this._fixtures.pgProcedure.name
+  public itemType: Type<TItemValue> = this._fixtures.return.type as Type<TItemValue>
 
   /**
    * The different ways we can order our procedure. Of course we can order the
@@ -44,7 +45,7 @@ class PGProcedurePaginator<TItemValue> extends PGPaginator<ProcedureInput, TItem
    * The default ordering for procedures will always be the natural ordering.
    * This is because the procedure may define an order itself.
    */
-  public defaultOrdering = this.orderings.get('natural')!
+  public defaultOrdering: Paginator.Ordering<ProcedureInput, TItemValue, mixed> = this.orderings.get('natural')!
 
   /**
    * The from entry for this paginator is a Postgres function call where the

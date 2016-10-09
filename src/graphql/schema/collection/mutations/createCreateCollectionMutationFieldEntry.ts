@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection, Relation, ObjectType } from '../../../../interface'
+import { Collection, ObjectType } from '../../../../interface'
 import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGQLType from '../../getGQLType'
@@ -71,7 +71,13 @@ export default function createCreateCollectionMutationFieldEntry (
     // When we execute we just create a value in the collection after
     // transforming the correct input field.
     // TODO: test
-    execute: (context, input) =>
-      collection.create!(context, transformGQLInputValue(inputFieldType, input[inputFieldName]) as any),
+    execute: (context, input) => {
+      const value = transformGQLInputValue(inputFieldType, input[inputFieldName])
+
+      if (!collection.type.isTypeOf(value))
+        throw new Error(`Created object is not of the correct type for collection '${collection.name}'.`)
+
+      return collection.create!(context, value)
+    },
   })]
 }

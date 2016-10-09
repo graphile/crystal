@@ -36,13 +36,18 @@ export default function createMutationPayloadGQLType <T>(
         .filter(Boolean)
         .map<[string, GraphQLFieldConfig<MutationValue<T>, mixed>]>(
           ([fieldName, field]: [string, GraphQLFieldConfig<T, mixed>]) =>
-            [fieldName, <GraphQLFieldConfig<MutationValue<T>, mixed>> {
+            [fieldName, {
               type: field.type,
               args: field.args,
-              resolve: field.resolve ? ({ value }: MutationValue<T>, ...rest: Array<any>) => (field as any).resolve(value, ...rest) : null,
+              resolve:
+                field.resolve
+                  ? ({ value }: MutationValue<T>, ...rest: Array<mixed>) =>
+                    // tslint:disable-next-line no-any
+                    (field as any).resolve(value, ...rest)
+                  : null,
               description: field.description,
               deprecationReason: field.deprecationReason,
-            }]
+            } as GraphQLFieldConfig<MutationValue<T>, mixed>]
         ),
       [
         // A reference to the root query type. Allows you to access even more

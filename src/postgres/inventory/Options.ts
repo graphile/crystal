@@ -1,5 +1,3 @@
-import { PGCatalogAttribute } from '../introspection'
-
 /**
  * An object which contains options which will be used to construct our
  * Postgres inventory.

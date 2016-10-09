@@ -51,7 +51,7 @@ function createPGProcedureMutationGQLFieldEntry (
   // `PGCollection` which has the same type. If it exists we add some extra
   // stuffs.
   const pgCollection = !pgProcedure.returnsSet
-    ? inventory.getCollections().find(collection => collection instanceof PGCollection && collection._pgClass.typeId === fixtures.return.pgType.id)
+    ? inventory.getCollections().find(collection => collection instanceof PGCollection && collection.pgClass.typeId === fixtures.return.pgType.id)
     : null
 
   // Create our GraphQL input fields users will use to input data into our
@@ -64,7 +64,7 @@ function createPGProcedureMutationGQLFieldEntry (
       }]
   )
 
-  return [formatName.field(pgProcedure.name), createMutationGQLField(buildToken, {
+  return [formatName.field(pgProcedure.name), createMutationGQLField<mixed>(buildToken, {
     name: pgProcedure.name,
     description: pgProcedure.description,
 
@@ -92,7 +92,7 @@ function createPGProcedureMutationGQLFieldEntry (
     ],
 
     // Actually execute the procedure here.
-    async execute (context, gqlInput) {
+    async execute (context, gqlInput): Promise<mixed> {
       const client = pgClientFromContext(context)
 
       // Turn our GraphQL input into an input tuple.

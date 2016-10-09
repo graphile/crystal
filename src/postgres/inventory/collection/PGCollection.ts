@@ -1,9 +1,9 @@
 import pluralize = require('pluralize')
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { Collection, Type, NullableType } from '../../../interface'
-import { memoize1, sql, memoizeMethod } from '../../utils'
-import { PGCatalog, PGCatalogClass, PGCatalogNamespace, PGCatalogAttribute } from '../../introspection'
+import { Collection } from '../../../interface'
+import { sql, memoizeMethod } from '../../utils'
+import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogAttribute } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import PGClassObjectType from '../type/PGClassObjectType'
 import Options from '../Options'
@@ -20,37 +20,44 @@ import PGCollectionKey from './PGCollectionKey'
  */
 class PGCollection implements Collection {
   constructor (
-    public _options: Options,
-    public _pgCatalog: PGCatalog,
-    public _pgClass: PGCatalogClass,
-  ) {}
+    options: Options,
+    pgCatalog: PGCatalog,
+    pgClass: PGCatalogClass,
+  ) {
+    this._options = options
+    this._pgCatalog = pgCatalog
+    this.pgClass = pgClass
+  }
 
   /**
    * Instantiate some private dependencies of our collection using our instance
    * of `PGCatalog`.
    */
-  private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
-  private _pgAttributes = this._pgCatalog.getClassAttributes(this._pgClass.id)
+  public _options: Options
+  public _pgCatalog: PGCatalog
+  public pgClass: PGCatalogClass
+  private _pgNamespace: PGCatalogNamespace = this._pgCatalog.assertGetNamespace(this.pgClass.namespaceId)
+  private _pgAttributes: Array<PGCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgClass.id)
 
   /**
    * The name of this collection. A pluralized version of the class name. We
    * expect class names to be singular.
    */
-  public name = pluralize(this._pgClass.name)
+  public name: string = pluralize(this.pgClass.name)
 
   /**
    * The description of this collection taken from the Postgres class’s
    * comment.
    */
-  public description = this._pgClass.description
+  public description: string | undefined = this.pgClass.description
 
   /**
    * Gets the type for our collection using the composite type for this class.
    * We can depend on this type having the exact same number of fields as there
    * are Postgres attributes and in the exact same order.
    */
-  public type = new PGClassObjectType(this._pgCatalog, this._pgClass, {
-    name: pluralize(this._pgClass.name, 1),
+  public type: PGClassObjectType = new PGClassObjectType(this._pgCatalog, this.pgClass, {
+    name: pluralize(this.pgClass.name, 1),
     renameIdToRowId: this._options.renameIdToRowId,
   })
 
@@ -61,18 +68,23 @@ class PGCollection implements Collection {
    * The keys are a representation of the primary key constraints and unique
    * constraints in Postgres on the table.
    */
-  public keys = (
+  public keys: Array<PGCollectionKey> = (
     this._pgCatalog.getConstraints()
-      .filter(pgConstraint =>
-        // We only want the constraints that apply to this Postgres class.
-        pgConstraint.classId === this._pgClass.id &&
-        // …and the constraints that are either a primary key constraint or a
-        // unique constraint.
-        (pgConstraint.type === 'p' || pgConstraint.type === 'u')
-      )
+      // We only want the constraints that apply to this Postgres class.
+      .filter(pgConstraint => pgConstraint.classId === this.pgClass.id)
       // Tell TypeScript our constraint is ok (verified in the filter above)
       // with `as any`.
-      .map(pgConstraint => new PGCollectionKey(this, pgConstraint as any))
+      .map(pgConstraint =>
+        // We also only want primary key constraints and unique constraints.
+        pgConstraint.type === 'p' || pgConstraint.type === 'u'
+          ? new PGCollectionKey(this, pgConstraint)
+          // If the constraint wasn’t a primary key or unique constraint,
+          // return null. Since the null is filtered away we can safely mark
+          // the type as `never`.
+          : null as never
+      )
+      // Filter out nulls.
+      .filter(Boolean)
   )
 
   /**
@@ -81,14 +93,14 @@ class PGCollection implements Collection {
    * key to be our primary key so that consumers have a clear choice in what id
    * should be used.
    */
-  public primaryKey = this.keys.find(key => key._pgConstraint.type === 'p')
+  public primaryKey: PGCollectionKey | undefined = this.keys.find(key => key.pgConstraint.type === 'p')
 
-  public paginator = new PGCollectionPaginator(this)
+  public paginator: PGCollectionPaginator = new PGCollectionPaginator(this)
 
   // If we can’t insert into this class, there should be no `create`
   // function. Otherwise our `create` method is pretty basic.
-  public create = (
-    !this._pgClass.isInsertable
+  public create: ((context: mixed, value: PGObjectType.Value) => Promise<PGObjectType.Value>) | null = (
+    !this.pgClass.isInsertable
       ? null
       : (context: mixed, value: PGObjectType.Value): Promise<PGObjectType.Value> =>
         this._getInsertLoader(pgClientFromContext(context)).load(value)
@@ -112,7 +124,7 @@ class PGCollection implements Collection {
           with ${sql.identifier(insertionIdentifier)} as (
             -- Start by defining our header which will be the class we are
             -- inserting into (prefixed by namespace of course).
-            insert into ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
+            insert into ${sql.identifier(this._pgNamespace.name, this.pgClass.name)}
 
             -- Add all of our attributes as columns to be inserted into. This is
             -- helpful in case the columns differ from what we expect.
@@ -136,7 +148,8 @@ class PGCollection implements Collection {
         `)
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => transformPGValueIntoValue(this.type, object))
+        // tslint:disable-next-line no-any
+        return rows.map(({ object }) => transformPGValueIntoValue(this.type, object) as any)
       }
     )
   }

@@ -1,5 +1,5 @@
 import { GraphQLOutputType, GraphQLInputType } from 'graphql'
-import { Inventory, Type } from '../../../interface'
+import { Type } from '../../../interface'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import getGQLType from '../../../graphql/schema/getGQLType'
 import { PGCatalog, PGCatalogNamespace, PGCatalogType, PGCatalogProcedure } from '../../../postgres/introspection'

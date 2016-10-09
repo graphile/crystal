@@ -10,7 +10,8 @@ const jsonType: NamedType<string> = {
     'A JavaScript object encoded in the JSON format as specified by ' +
     '[ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).',
 
-  getNamedType () { return this },
+  getNamedType: (): NamedType<string> =>
+    jsonType,
 
   isTypeOf: (value: mixed): value is string =>
     typeof value === 'string',

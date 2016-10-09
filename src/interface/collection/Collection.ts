@@ -1,4 +1,3 @@
-import Type from '../type/Type'
 import ObjectType from '../type/ObjectType'
 import Paginator from '../Paginator'
 import CollectionKey from './CollectionKey'

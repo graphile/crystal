@@ -1,10 +1,9 @@
 import { GraphQLNonNull, GraphQLFieldConfig } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../../interface'
-import { formatName, idSerde } from '../../../utils'
+import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGQLField from '../../createMutationGQLField'
 import transformGQLInputValue from '../../transformGQLInputValue'
-import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, getUpdateCollectionPayloadGQLType } from './createUpdateCollectionMutationFieldEntry'
 
@@ -25,13 +24,13 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
   const name = `update-${collection.type.name}-by-${collectionKey.name}`
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
-  const patchType = getCollectionPatchType(buildToken, collection)
+  const patchGQLType = getCollectionPatchType(buildToken, collection)
 
   return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
     inputFields: [
       // Include all of the fields we need to construct the key value we will
-      //use to find the single value to update.
+      // use to find the single value to update.
       ...inputHelpers.fieldEntries,
       // Also include the patch object type. This is its own object type so
       // that people can just have a single patch object and not need to rename
@@ -39,14 +38,18 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
       // field.
       [patchFieldName, {
         // TODO: description
-        type: new GraphQLNonNull(patchType),
+        type: new GraphQLNonNull(patchGQLType),
       }],
     ],
     payloadType: getUpdateCollectionPayloadGQLType(buildToken, collection),
     execute: (context, input) => {
       // Get the patch from our input.
-      const patch = transformGQLInputValue(patchType, input[patchFieldName])
-      return collectionKey.update!(context, inputHelpers.getKey(input), patch as any)
+      const patch = transformGQLInputValue(patchGQLType, input[patchFieldName])
+
+      if (!(patch instanceof Map))
+        throw new Error('Patch is not of the correct type. Expected a `Map`.')
+
+      return collectionKey.update!(context, inputHelpers.getKey(input), patch)
     },
   })]
 }

@@ -69,7 +69,10 @@ export default function createDeleteCollectionMutationFieldEntry (
       // Get the patch from our input.
       const patch = transformGQLInputValue(patchType, input[patchFieldName])
 
-      return primaryKey.update!(context, result.keyValue, patch as any)
+      if (!(patch instanceof Map))
+        throw new Error('Patch is not of the correct type. Expected a `Map`.')
+
+      return primaryKey.update!(context, result.keyValue, patch)
     },
   })]
 }
@@ -103,10 +106,15 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
   })
 }
 
+/**
+ * The output object type for collection update mutations.
+ */
 export const getUpdateCollectionPayloadGQLType = memoize2(createUpdateCollectionPayloadGQLType)
 
 /**
  * Creates the output fields returned by the collection update mutation.
+ *
+ * @private
  */
 function createUpdateCollectionPayloadGQLType (
   buildToken: BuildToken,

@@ -16,7 +16,6 @@ export default function createCollectionQueryFieldEntries (
   buildToken: BuildToken,
   collection: Collection,
 ): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
-  const { options } = buildToken
   const type = collection.type
   const entries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = []
   const primaryKey = collection.primaryKey
@@ -96,7 +95,7 @@ function createCollectionPrimaryKeyField <TKey>(
   collectionKey: CollectionKey<TKey>,
 ): GraphQLFieldConfig<mixed, mixed> | undefined {
   const { options, inventory } = buildToken
-  const { collection } = collectionKey
+  const { collection, keyType } = collectionKey
 
   // If we can’t read from this collection key, stop.
   if (collectionKey.read == null)
@@ -121,7 +120,10 @@ function createCollectionPrimaryKeyField <TKey>(
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return await collectionKey.read!(context, result.keyValue as any)
+      if (!keyType.isTypeOf(result.keyValue))
+        throw new Error(`The provided id is not of the correct type.`)
+
+      return await collectionKey.read!(context, result.keyValue)
     },
   }
 }
@@ -138,7 +140,7 @@ function createCollectionKeyField <TKey>(
   if (collectionKey.read == null)
     return
 
-  const { collection, keyType } = collectionKey
+  const { collection } = collectionKey
   const collectionType = getCollectionGQLType(buildToken, collection)
   const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
 

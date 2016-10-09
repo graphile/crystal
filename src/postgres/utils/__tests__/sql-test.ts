@@ -1,3 +1,5 @@
+/* tslint:disable no-any */
+
 import sql from '../sql'
 
 test('raw will create a raw SQL item', () => {

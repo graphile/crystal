@@ -1,8 +1,9 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { CollectionKey, Type } from '../../../interface'
+import { CollectionKey } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
-import { PGCatalog, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
+import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
+import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
 import transformValueIntoPGValue from '../transformValueIntoPGValue'
@@ -15,16 +16,21 @@ import PGCollection from './PGCollection'
  */
 class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   constructor (
-    public collection: PGCollection,
-    public _pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
-  ) {}
+    collection: PGCollection,
+    pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
+  ) {
+    this.collection = collection
+    this.pgConstraint = pgConstraint
+  }
 
   // Steal the options and catalog reference from our collection ;)
-  private _options = this.collection._options
-  private _pgCatalog = this.collection._pgCatalog
-  private _pgClass = this._pgCatalog.assertGetClass(this._pgConstraint.classId)
-  private _pgNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
-  private _pgKeyAttributes = this._pgCatalog.getClassAttributes(this._pgConstraint.classId, this._pgConstraint.keyAttributeNums)
+  public collection: PGCollection
+  public pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint
+  private _options: Options = this.collection._options
+  private _pgCatalog: PGCatalog = this.collection._pgCatalog
+  private _pgClass: PGCatalogClass = this._pgCatalog.assertGetClass(this.pgConstraint.classId)
+  private _pgNamespace: PGCatalogNamespace = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId)
+  private _pgKeyAttributes: Array<PGCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgConstraint.classId, this.pgConstraint.keyAttributeNums)
 
   /**
    * A type used to represent a key value. Consumers can then use this
@@ -33,10 +39,10 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    * We can assume that the fields of `keyType` have the same number and order
    * as our Postgres key attributes.
    */
-  public keyType = new PGObjectType({
+  public keyType: PGObjectType = new PGObjectType({
     // We prefix the name with an underscore because we consider this type to
     // be private. The name could change at any time.
-    name: `_${this._pgConstraint.name}`,
+    name: `_${this.pgConstraint.name}`,
     pgCatalog: this._pgCatalog,
     pgAttributes: new Map(this._pgKeyAttributes.map<[string, PGCatalogAttribute]>(pgAttribute =>
       [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
@@ -50,12 +56,12 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   // Note that we define `name` under `keyType`. This is so that we can use the
   // `keyType` field names when making our name instead of the plain Postgres
   // attribute names.
-  public name = Array.from(this.keyType.fields.keys()).join('_and_')
+  public name: string = Array.from(this.keyType.fields.keys()).join('_and_')
 
   /**
    * We don’t have a great way to get the description for a key at the moment…
    */
-  public description = undefined
+  public description: undefined = undefined
 
   /**
    * Because `Array.from` may potentially be an extra operation we really don’t
@@ -65,7 +71,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    */
   // TODO: Remove all references to `Array.from` from the codebase. Iterables
   // forever!
-  private _keyTypeFields = Array.from(this.keyType.fields)
+  private _keyTypeFields: Array<[string, PGObjectType.Field<mixed>]> = Array.from(this.keyType.fields)
 
   /**
    * Extracts the key value from an object. In the case of this key, we are
@@ -94,7 +100,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    * Reads a value if a user can select from this class. Batches requests to
    * the same client in the background.
    */
-  public read = (
+  public read: ((context: mixed, key: PGObjectType.Value) => Promise<PGObjectType.Value | null>) | null = (
     !this._pgClass.isSelectable
       ? null
       : (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value | null> =>
@@ -158,7 +164,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         `)
 
         const { rows } = await client.query(query)
-        return rows.map(({ object }) => object == null ? null : transformPGValueIntoValue(this.collection.type, object))
+        // tslint:disable-next-line no-any
+        return rows.map(({ object }) => object == null ? null : transformPGValueIntoValue(this.collection.type, object) as any)
       }
     )
   }
@@ -170,7 +177,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    * This method, unlike many of the other asynchronous actions in Postgres
    * collections, is not batched.
    */
-  public update = (
+  public update: ((context: mixed, key: PGObjectType.Value, patch: Map<string, mixed>) => Promise<PGObjectType.Value | null>) | null = (
     !this._pgClass.isUpdatable
       ? null
       : async (context: mixed, key: PGObjectType.Value, patch: Map<string, mixed>): Promise<PGObjectType.Value> => {
@@ -209,7 +216,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were updated in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
 
-        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object'])
+        // tslint:disable-next-line no-any
+        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object']) as any
       }
   )
 
@@ -219,7 +227,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    *
    * This method, unlike many others in Postgres collections, is not batched.
    */
-  public delete = (
+  public delete: ((context: mixed, key: PGObjectType.Value) => Promise<PGObjectType.Value | null>) | null = (
     !this._pgClass.isDeletable
       ? null
       : async (context: mixed, key: PGObjectType.Value): Promise<PGObjectType.Value> => {
@@ -243,7 +251,8 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         if (result.rowCount < 1)
           throw new Error(`No values were deleted in collection '${this.collection.name}' because no values were found.`)
 
-        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object'])
+        // tslint:disable-next-line no-any
+        return transformPGValueIntoValue(this.collection.type, result.rows[0]['object']) as any
       }
   )
 }

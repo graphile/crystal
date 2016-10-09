@@ -5,7 +5,6 @@ import {
   NullableType,
   ListType,
   EnumType,
-  ObjectType,
   booleanType,
   integerType,
   floatType,
@@ -38,7 +37,7 @@ import pgIntervalType from './individual/pgIntervalType'
  *
  * @private
  */
-const pgTypeIdToType = new Map<string, Type<any>>([
+const pgTypeIdToType = new Map<string, Type<mixed>>([
   ['20', integerType],      // int8, bigint
   ['21', integerType],      // int2, smallint
   ['23', integerType],      // int4, integer
@@ -70,7 +69,7 @@ function getTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType, _invent
   //
   // Note that this check is not memoized.
   if (_inventory && pgType.type === 'c') {
-    const collection = _inventory.getCollections().find(collection => collection instanceof PGCollection && collection._pgClass.typeId === pgType.id)
+    const collection = _inventory.getCollections().find(collection => collection instanceof PGCollection && collection.pgClass.typeId === pgType.id)
     if (collection)
       return new NullableType(collection.type)
   }
@@ -122,6 +121,9 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // TODO: test
     case 'r':
       return new PGRangeObjectType(pgCatalog, pgType)
+    default: {
+      /* noop */
+    }
   }
 
   // If the type isn’t of a certain kind, let’s use the category which is used
@@ -142,6 +144,9 @@ function createTypeFromPGType (pgCatalog: PGCatalog, pgType: PGCatalogType): Typ
     // for integers with `pgTypeIdToType`.
     case 'N':
       return new NullableType(floatType)
+    default: {
+      /* noop */
+    }
   }
 
   // If all else fails, we just return a nullable string :)

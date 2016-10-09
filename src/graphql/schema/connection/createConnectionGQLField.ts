@@ -1,26 +1,20 @@
 import {
-  GraphQLOutputType,
-  GraphQLInputType,
   GraphQLScalarType,
-  GraphQLInterfaceType,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLFieldConfig,
   GraphQLArgumentConfig,
-  GraphQLResolveInfo,
   GraphQLEnumType,
   GraphQLEnumValueConfig,
   GraphQLList,
   GraphQLBoolean,
   GraphQLInt,
-  GraphQLString,
   Kind,
 } from 'graphql'
-import { Paginator, Type, NullableType, ObjectType } from '../../../interface'
+import { Paginator } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGQLType from '../getGQLType'
 import BuildToken from '../BuildToken'
-import transformGQLInputValue from '../transformGQLInputValue'
 
 // TODO: doc
 export default function createConnectionGQLField <TSource, TInput, TItemValue>(
@@ -31,7 +25,6 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
-  const paginatorName = paginator.name
   const gqlType = getGQLType(buildToken, paginator.itemType, false)
 
   // This is the type of all the connection arguments.
@@ -146,13 +139,13 @@ export function _createConnectionGQLType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ paginator, input }, args, context) =>
+        resolve: ({ input }, args, context) =>
           paginator.count(context, input),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
         type: new GraphQLList(gqlEdgeType),
-        resolve: <TCursor>({ paginator, orderingName, page }: Connection<TInput, TItemValue, TCursor>): Array<Edge<TInput, TItemValue, TCursor>> =>
+        resolve: <TCursor>({ orderingName, page }: Connection<TInput, TItemValue, TCursor>): Array<Edge<TInput, TItemValue, TCursor>> =>
           page.values.map(({ cursor, value }) => ({ paginator, orderingName, cursor, value })),
       },
       nodes: {
@@ -208,7 +201,7 @@ export function createOrderByGQLArg <TInput, TItemValue>(
   return {
     description: `The method to use when ordering ${scrib.type(gqlType)}.`,
     type: enumType,
-    defaultValue: Array.from(paginator.orderings).find(([name, ordering]) => ordering === paginator.defaultOrdering)![0],
+    defaultValue: Array.from(paginator.orderings).find(([, ordering]) => ordering === paginator.defaultOrdering)![0],
   }
 }
 
@@ -257,7 +250,7 @@ export const _cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
     description: 'A location in a connection that can be used for resuming pagination.',
     serialize: value => serializeCursor(value),
     parseValue: value => typeof value === 'string' ? deserializeCursor(value) : null,
-    parseLiteral: ast => ast.kind === Kind.STRING ? deserializeCursor(ast.value) : null
+    parseLiteral: ast => ast.kind === Kind.STRING ? deserializeCursor(ast.value) : null,
   })
 
 /**
@@ -266,7 +259,7 @@ export const _cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
  *
  * @private
  */
-function serializeCursor ({ orderingName, cursor }: NamespacedCursor<any>): string {
+function serializeCursor ({ orderingName, cursor }: NamespacedCursor<mixed>): string {
   return new Buffer(JSON.stringify([orderingName, cursor])).toString('base64')
 }
 
@@ -275,7 +268,7 @@ function serializeCursor ({ orderingName, cursor }: NamespacedCursor<any>): stri
  *
  * @private
  */
-function deserializeCursor (serializedCursor: string): NamespacedCursor<any> {
+function deserializeCursor (serializedCursor: string): NamespacedCursor<mixed> {
   const [orderingName, cursor] = JSON.parse(new Buffer(serializedCursor, 'base64').toString())
   return { orderingName, cursor }
 }
@@ -305,15 +298,15 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed, mixed>> =
         description: 'When paginating backwards, the cursor to continue.',
         type: _cursorType,
         resolve: ({ orderingName, page }): NamespacedCursor<mixed> => ({
-          orderingName: orderingName,
+          orderingName,
           cursor: page.values[0].cursor,
         }),
       },
       endCursor: {
         description: 'When paginating forwards, the cursor to continue.',
         type: _cursorType,
-        resolve: ({ orderingName, page }): NamespacedCursor<any> => ({
-          orderingName: orderingName,
+        resolve: ({ orderingName, page }): NamespacedCursor<mixed> => ({
+          orderingName,
           cursor: page.values[page.values.length - 1].cursor,
         }),
       },

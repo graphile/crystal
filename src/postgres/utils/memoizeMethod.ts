@@ -8,7 +8,7 @@ import { _memoize } from '../../graphql/utils/memoize'
  * well.
  */
 // TODO: Decorator could use some variadic types as its function call.
-export default function memoizeMethod (target: mixed, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>) {
+export default function memoizeMethod (target: mixed, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): void {
   if (!descriptor.value)
     throw new Error('No method defined to memoize.')
 
@@ -23,7 +23,9 @@ export default function memoizeMethod (target: mixed, propertyKey: string, descr
 
   // Create a function which redirects to the `memoizedMethod` using the
   // `this` context as the first argument.
-  descriptor.value = function memoizeRedirectMethod (...args: Array<mixed>) {
+  // tslint:disable-next-line only-arrow-functions
+  descriptor.value = function memoizeRedirectMethod (...args: Array<mixed>): mixed {
+    // tslint:disable-next-line no-invalid-this
     return memoizedMethod(this, ...args)
   }
 }

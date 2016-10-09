@@ -23,7 +23,7 @@ export const $$transformPGValueIntoValue = Symbol()
  * we can use in our interface. If the type has an implementation for the
  * symbol `$$transformPGValue` then that implementation will be used.
  */
-export default function transformPGValueIntoValue (type: Type<mixed>, value: mixed): any {
+export default function transformPGValueIntoValue (type: Type<mixed>, value: mixed): mixed {
   // If the type has defined a custom implementation for this function, use it.
   if (type[$$transformPGValueIntoValue])
     return type[$$transformPGValueIntoValue](value)
@@ -89,7 +89,7 @@ export default function transformPGValueIntoValue (type: Type<mixed>, value: mix
     if (typeof value !== 'object')
       throw new Error(`Postgres value of object type must be an object, not '${typeof value}'.`)
 
-    return new Map(Array.from(type.fields).map<[string, mixed]>(([fieldName, { type }]) => [fieldName, transformPGValueIntoValue(type, value[fieldName])]))
+    return new Map(Array.from(type.fields).map<[string, mixed]>(([fieldName, field]) => [fieldName, transformPGValueIntoValue(field.type, value[fieldName])]))
   }
 
   // Throw an error if the type still hasn’t been handled.

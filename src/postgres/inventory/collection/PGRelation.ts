@@ -1,5 +1,5 @@
 import { Condition, conditionHelpers, Relation } from '../../../interface'
-import { PGCatalog, PGCatalogForeignKeyConstraint } from '../../introspection'
+import { PGCatalog, PGCatalogAttribute, PGCatalogForeignKeyConstraint } from '../../introspection'
 import PGObjectType from '../type/PGObjectType'
 import PGCollection from './PGCollection'
 import PGCollectionKey from './PGCollectionKey'
@@ -8,21 +8,28 @@ import PGCollectionKey from './PGCollectionKey'
 // TODO: Tests
 class PGRelation implements Relation<PGObjectType.Value> {
   constructor (
-    public tailCollection: PGCollection,
-    public headCollectionKey: PGCollectionKey,
-    private _pgConstraint: PGCatalogForeignKeyConstraint,
-  ) {}
+    tailCollection: PGCollection,
+    headCollectionKey: PGCollectionKey,
+    pgConstraint: PGCatalogForeignKeyConstraint,
+  ) {
+    this.tailCollection = tailCollection
+    this.headCollectionKey = headCollectionKey
+    this.pgConstraint = pgConstraint
+  }
 
-  private _pgCatalog = this.tailCollection._pgCatalog
-  private _pgTailAttributes = this._pgCatalog.getClassAttributes(this._pgConstraint.classId, this._pgConstraint.keyAttributeNums)
-  private _tailFieldNames = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getFieldNameFromPGAttributeName(pgAttribute.name)!)
-  private _headFieldNames = Array.from(this.headCollectionKey.keyType.fields.keys())
+  public tailCollection: PGCollection
+  public headCollectionKey: PGCollectionKey
+  public pgConstraint: PGCatalogForeignKeyConstraint
+  private _pgCatalog: PGCatalog = this.tailCollection._pgCatalog
+  private _pgTailAttributes: Array<PGCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgConstraint.classId, this.pgConstraint.keyAttributeNums)
+  private _tailFieldNames: Array<string> = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getFieldNameFromPGAttributeName(pgAttribute.name)!)
+  private _headFieldNames: Array<string> = Array.from(this.headCollectionKey.keyType.fields.keys())
 
   /**
    * Construct the name for this relation using the native Postgres foreign key
    * constraint attributes.
    */
-  public readonly name = this._tailFieldNames.join('_and_')
+  public readonly name: string = this._tailFieldNames.join('_and_')
 
   /**
    * Gets an instance of the head collection’s key type by just extracting some

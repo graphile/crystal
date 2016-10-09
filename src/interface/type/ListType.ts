@@ -8,9 +8,16 @@ import NamedType from './NamedType'
  * any number of values and this type represents that construct.
  */
 class ListType<TValue extends Array<TItemValue>, TItemValue> extends Type<TValue> {
-  constructor (public readonly itemType: Type<TItemValue>) {
+  constructor (itemType: Type<TItemValue>) {
     super()
+    this.itemType = itemType
   }
+
+  /**
+   * The item type for this list. Every item in the list must adhere to this
+   * type.
+   */
+  public readonly itemType: Type<TItemValue>
 
   /**
    * Checks if the value is an array and if it is an array checks if every item

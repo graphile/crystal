@@ -1,6 +1,6 @@
 import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../interface'
-import { buildObject, formatName } from '../../utils'
+import { formatName } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
 import transformGQLInputValue from '../transformGQLInputValue'
@@ -48,7 +48,7 @@ export default function createCollectionKeyInputHelpers <T>(
         const key = new Map(fieldEntries.map<[string, mixed]>(([fieldName, field]) => [
           field.internalName,
           transformGQLInputValue(field.type, input[fieldName] as mixed),
-        ])) as any
+        ]))
 
         if (!keyType.isTypeOf(key))
           throw new Error('The object key input is not of the correct type.')
@@ -70,7 +70,7 @@ export default function createCollectionKeyInputHelpers <T>(
         }],
       ],
       getKey: input => {
-        const key = transformGQLInputValue(fieldType, input[fieldName]) as any
+        const key = transformGQLInputValue(fieldType, input[fieldName])
 
         if (!keyType.isTypeOf(key))
           throw new Error('The key input is not of the correct type.')

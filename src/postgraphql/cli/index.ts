@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* tslint:disable no-console */
+
 import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
@@ -44,14 +46,14 @@ if (!module.parent)
 
 export default program
 
-function main () {
+function main (): void {
   // Kill server on exit.
   process.on('SIGINT', process.exit)
 
   // Destruct our command line arguments, use defaults, and rename options to
   // something appropriate for JavaScript.
   const {
-    demo: isDemo = false,
+    // demo: isDemo = false,
     connection: pgConnectionString,
     schema: schemas = ['public'],
     host: hostname = 'localhost',
@@ -64,6 +66,7 @@ function main () {
     cors: enableCors = false,
     classicIds = false,
     dynamicJson = false,
+  // tslint:disable-next-line no-any
   } = program as any
 
   // Create our Postgres config.

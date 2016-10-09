@@ -1,5 +1,5 @@
 import { Inventory } from '../../interface'
-import { PGCatalog, PGCatalogAttribute } from '../introspection'
+import { PGCatalog } from '../introspection'
 import PGCollection from './collection/PGCollection'
 import PGRelation from './collection/PGRelation'
 import Options from './Options'
@@ -48,7 +48,7 @@ export default function addPGCatalogToInventory (
         collectionByClassId.get(pgConstraint.foreignClassId)!.keys
           .find(key => {
             const numsA = pgConstraint.foreignKeyAttributeNums
-            const numsB = key._pgConstraint.keyAttributeNums
+            const numsB = key.pgConstraint.keyAttributeNums
 
             // Make sure that the length of `numsA` and `numsB` are the same.
             if (numsA.length !== numsB.length) return false

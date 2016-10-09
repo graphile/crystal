@@ -14,5 +14,5 @@ test('isTypeOf will be true for booleans', () => {
   expect(booleanType.isTypeOf('hello')).toBe(false)
   expect(booleanType.isTypeOf({})).toBe(false)
   expect(booleanType.isTypeOf([])).toBe(false)
-  expect(booleanType.isTypeOf(() => {})).toBe(false)
+  expect(booleanType.isTypeOf(() => { /* noop */ })).toBe(false)
 })

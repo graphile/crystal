@@ -14,5 +14,5 @@ test('isTypeOf will be true for any number', () => {
   expect(floatType.isTypeOf('hello')).toBe(false)
   expect(floatType.isTypeOf({})).toBe(false)
   expect(floatType.isTypeOf([])).toBe(false)
-  expect(floatType.isTypeOf(() => {})).toBe(false)
+  expect(floatType.isTypeOf(() => { /* noop */ })).toBe(false)
 })

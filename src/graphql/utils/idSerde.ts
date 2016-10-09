@@ -1,4 +1,4 @@
-import { Inventory, Collection, ObjectType } from '../../interface'
+import { Inventory, Collection, CollectionKey, ObjectType } from '../../interface'
 
 namespace idSerde {
   /**
@@ -11,7 +11,7 @@ namespace idSerde {
     collection: Collection,
     value: ObjectType.Value,
   ): string {
-    const primaryKey = collection.primaryKey
+    const primaryKey = collection.primaryKey as CollectionKey<TKeyValue> | null | undefined
 
     // If there is no primary key, error.
     if (!primaryKey)
@@ -20,10 +20,13 @@ namespace idSerde {
     const keyType = primaryKey.keyType
     const keyValue = primaryKey.getKeyFromValue(value)
 
+    if (keyValue == null)
+      throw new Error('Could not get a key from the value.')
+
     // If the type is an object type, we convert the key into a tuple array
     // and spread it inside our array to save space.
-    if (keyType instanceof ObjectType) {
-      const keyTuple = Array.from(keyType.fields.keys()).map(fieldName => (keyValue as any).get(fieldName))
+    if (keyType instanceof ObjectType && keyValue instanceof Map) {
+      const keyTuple = Array.from(keyType.fields.keys()).map(fieldName => keyValue.get(fieldName))
       return new Buffer(JSON.stringify([collection.name, ...keyTuple])).toString('base64')
     }
     // Otherwise, let’s just use the single key value.
@@ -37,7 +40,7 @@ namespace idSerde {
    * back into an ID object. Type information is lost in serialization and it
    * doesn’t come back in deserialization.
    */
-  export function deserialize (inventory: Inventory, idString: string): { collection: Collection, keyValue: mixed } {
+  export function deserialize <TKeyValue>(inventory: Inventory, idString: string): { collection: Collection, keyValue: mixed } {
     const [collectionName, ...keyTuple] = JSON.parse(new Buffer(idString, 'base64').toString())
 
     const collection = inventory.getCollection(collectionName)
@@ -48,13 +51,14 @@ namespace idSerde {
     if (!collection.primaryKey)
       throw new Error(`Collection named '${collectionName}' does not have a primary key.`)
 
-    const collectionKey = collection.primaryKey
-    let keyValue: any
+    const collectionKey = collection.primaryKey as CollectionKey<TKeyValue>
+    let keyValue: TKeyValue
 
     // If the key type is an object type, we spread out the values in the id,
     // so we have to reconstruct the key value.
     if (collectionKey.keyType instanceof ObjectType) {
-      keyValue = new Map(Array.from(collectionKey.keyType.fields.keys()).map<[string, mixed]>((fieldName, i) => [fieldName, keyTuple[i]]))
+      // tslint:disable-next-line no-any
+      keyValue = new Map(Array.from(collectionKey.keyType.fields.keys()).map<[string, mixed]>((fieldName, i) => [fieldName, keyTuple[i]])) as any
     }
     // Otherwise, the first item in the key tuple is the correct value.
     else {

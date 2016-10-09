@@ -147,6 +147,7 @@ function createGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolea
   if (type instanceof AliasType) {
     return createGQLTypeAlias(
       // TODO: Remove the `input as any` when the Typescript bug is fixed.
+      // tslint:disable-next-line no-any
       getGQLType(buildToken, type.baseType, input as any),
       formatName.type(type.name),
       type.description,
@@ -155,6 +156,7 @@ function createGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolea
 
   if (type instanceof NullableType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
+      // tslint:disable-next-line no-any
     return getNullableType(getGQLType(buildToken, type.nonNullType, input as any))
 
   return new GraphQLNonNull(createGQLNullableType(buildToken, type, input))
@@ -170,6 +172,7 @@ function createGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolea
 function createGQLNullableType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLNullableType<mixed> {
   if (type instanceof ListType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
+      // tslint:disable-next-line no-any
     return new GraphQLList(getGQLType(buildToken, type.itemType, input as any))
 
   if (!isNamedType(type)) {
@@ -213,6 +216,7 @@ function createGQLNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
     case floatType: return GraphQLFloat
     case stringType: return GraphQLString
     case jsonType: return _getJSONGQLType(buildToken)
+    default: { /* noop */ }
   }
 
   throw new Error(
@@ -229,7 +233,7 @@ function createGQLNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
  */
 function createGQLOutputObjectType (buildToken: BuildToken, type: ObjectType): GraphQLObjectType<mixed> {
   const { inventory } = buildToken
-  const collection = inventory.getCollections().find(collection => collection.type === type)
+  const collection = inventory.getCollections().find(c => c.type === type)
 
   // If there is a collection which uses this type, we should use the
   // collection’s type and not create our own.
@@ -266,16 +270,16 @@ function createGQLInputObjectType <T>(buildToken: BuildToken, type: ObjectType):
     description: type.description,
     fields: () => buildObject<GraphQLInputFieldConfig<mixed>>(
       Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) => {
-        let type = getGQLType(buildToken, field.type, true)
+        let gqlType = getGQLType(buildToken, field.type, true)
 
         // If the field has a default and the type we got was non-null, let’s
         // get the nullable version.
-        if (field.hasDefault && type instanceof GraphQLNonNull)
-          type = type.ofType
+        if (field.hasDefault && gqlType instanceof GraphQLNonNull)
+          gqlType = gqlType.ofType
 
         return [formatName.field(fieldName), {
           description: field.description,
-          type,
+          type: gqlType,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
       })
@@ -291,7 +295,7 @@ function createGQLInputObjectType <T>(buildToken: BuildToken, type: ObjectType):
  *
  * @private
  */
-function createGQLTypeAlias (gqlType: GraphQLType<any>, name: string, description: string | undefined): GraphQLType<any> {
+function createGQLTypeAlias (gqlType: GraphQLType<mixed>, name: string, description: string | undefined): GraphQLType<mixed> {
   if (gqlType instanceof GraphQLNonNull)
     return new GraphQLNonNull(createGQLTypeAlias(gqlType.ofType, name, description))
 

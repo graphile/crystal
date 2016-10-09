@@ -31,9 +31,16 @@ import NamedType from './NamedType'
  * nullable type. This may lead to unexpected behavior.
  */
 class NullableType<TValue extends TNonNullValue | null | undefined, TNonNullValue> extends Type<TValue> {
-  constructor (public readonly nonNullType: Type<TNonNullValue>) {
+  constructor (nonNullType: Type<TNonNullValue>) {
     super()
+    this.nonNullType = nonNullType
   }
+
+  /**
+   * The non-null underlying type. This type cannot be null (unless it is a
+   * `NullableType` itself). However, when wrapped it can be null.
+   */
+  public readonly nonNullType: Type<TNonNullValue>
 
   /**
    * Checks if the value is null, or it is a type of the nullable types non

@@ -105,7 +105,8 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
     // Convert our rows into usable values.
     const values: Array<{ value: PGObjectType.Value, cursor: AttributesCursor }> =
       rows.map(({ value }) => ({
-        value: transformPGValueIntoValue(this.pgPaginator.itemType, value),
+        // tslint:disable-next-line no-any
+        value: transformPGValueIntoValue(this.pgPaginator.itemType, value) as any,
         cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name]),
       }))
 

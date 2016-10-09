@@ -1,3 +1,5 @@
+/* tslint:disable no-any */
+
 import {
   Inventory,
   Condition,
@@ -59,18 +61,16 @@ const personEmailKey: CollectionKey<string> = {
   update: unimplementedFn,
 }
 
-const personOrderings = new Map(
-  <Array<[string, Paginator.Ordering<Condition, ObjectType.Value, mixed>]>> [
-    ['id-asc', { readPage: unimplementedFn }],
-    ['id-desc', { readPage: unimplementedFn }],
-    ['name-asc', { readPage: unimplementedFn }],
-    ['name-desc', { readPage: unimplementedFn }],
-    ['firstName-asc', { readPage: unimplementedFn }],
-    ['firstName-desc', { readPage: unimplementedFn }],
-    ['lastName-asc', { readPage: unimplementedFn }],
-    ['lastName-desc', { readPage: unimplementedFn }],
-  ]
-)
+const personOrderings = new Map<string, Paginator.Ordering<Condition, ObjectType.Value, mixed>>([
+  ['id-asc', { readPage: unimplementedFn }],
+  ['id-desc', { readPage: unimplementedFn }],
+  ['name-asc', { readPage: unimplementedFn }],
+  ['name-desc', { readPage: unimplementedFn }],
+  ['firstName-asc', { readPage: unimplementedFn }],
+  ['firstName-desc', { readPage: unimplementedFn }],
+  ['lastName-asc', { readPage: unimplementedFn }],
+  ['lastName-desc', { readPage: unimplementedFn }],
+])
 
 const personPaginator: Paginator<Condition, ObjectType.Value> = {
   name: 'people',
@@ -119,18 +119,16 @@ const postIdKey: CollectionKey<number> = {
   delete: unimplementedFn,
 }
 
-const postOrderings = new Map(
-  <Array<[string, Paginator.Ordering<Condition, ObjectType.Value, mixed>]>> [
-    ['id-asc', { readPage: unimplementedFn }],
-    ['id-desc', { readPage: unimplementedFn }],
-    ['authorId-asc', { readPage: unimplementedFn }],
-    ['authorId-desc', { readPage: unimplementedFn }],
-    ['status-asc', { readPage: unimplementedFn }],
-    ['status-desc', { readPage: unimplementedFn }],
-    ['headline-asc', { readPage: unimplementedFn }],
-    ['headline-desc', { readPage: unimplementedFn }],
-  ]
-)
+const postOrderings = new Map<string, Paginator.Ordering<Condition, ObjectType.Value, mixed>>([
+  ['id-asc', { readPage: unimplementedFn }],
+  ['id-desc', { readPage: unimplementedFn }],
+  ['authorId-asc', { readPage: unimplementedFn }],
+  ['authorId-desc', { readPage: unimplementedFn }],
+  ['status-asc', { readPage: unimplementedFn }],
+  ['status-desc', { readPage: unimplementedFn }],
+  ['headline-asc', { readPage: unimplementedFn }],
+  ['headline-desc', { readPage: unimplementedFn }],
+])
 
 const postPaginator: Paginator<Condition, ObjectType.Value> = {
   name: 'posts',

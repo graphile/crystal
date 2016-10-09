@@ -1,5 +1,5 @@
-import { GraphQLSchema, GraphQLFieldConfig } from 'graphql'
-import { Inventory, ObjectType } from '../../interface'
+import { GraphQLSchema } from 'graphql'
+import { Inventory } from '../../interface'
 import getCollectionGQLType from './collection/getCollectionGQLType'
 import BuildToken, { _BuildTokenHooks } from './BuildToken'
 import getQueryGQLType from './getQueryGQLType'

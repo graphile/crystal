@@ -12,9 +12,9 @@ export default function conditionToSQL (condition: Condition, path: Array<string
     case 'NOT':
       return sql.query`not(${conditionToSQL(condition.condition, path)})`
     case 'AND':
-      return sql.query`(${sql.join(condition.conditions.map(condition => conditionToSQL(condition, path)), ' and ')})`
+      return sql.query`(${sql.join(condition.conditions.map(c => conditionToSQL(c, path)), ' and ')})`
     case 'OR':
-      return sql.query`(${sql.join(condition.conditions.map(condition => conditionToSQL(condition, path)), ' or ')})`
+      return sql.query`(${sql.join(condition.conditions.map(c => conditionToSQL(c, path)), ' or ')})`
     case 'FIELD':
       // TODO: Because of our implementation, using the field condition name
       // directly is valid, however this is technically the incorrect
@@ -31,5 +31,7 @@ export default function conditionToSQL (condition: Condition, path: Array<string
       return sql.query`(${sql.identifier(...path)} > ${sql.value(condition.value)})`
     case 'REGEXP':
       return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(condition.regexp.source)}, ${sql.value(condition.regexp.flags)})`
+    default:
+      throw new Error(`Condition of type '${condition['type']}' is not recognized.`)
   }
 }

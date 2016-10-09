@@ -10,7 +10,8 @@ const integerType: NamedType<number> = {
     'A number that can be written without a fractional component. So 21, 4, or 0 ' +
     'would be an integer while 3.14 would not.',
 
-  getNamedType () { return this },
+  getNamedType: (): NamedType<number> =>
+    integerType,
 
   isTypeOf: (value: mixed): value is number =>
     typeof value === 'number' && Number.isInteger(value),

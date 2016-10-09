@@ -14,5 +14,5 @@ test('isTypeOf will be true for any string', () => {
   expect(stringType.isTypeOf('hello')).toBe(true)
   expect(stringType.isTypeOf({})).toBe(false)
   expect(stringType.isTypeOf([])).toBe(false)
-  expect(stringType.isTypeOf(() => {})).toBe(false)
+  expect(stringType.isTypeOf(() => { /* noop */ })).toBe(false)
 })

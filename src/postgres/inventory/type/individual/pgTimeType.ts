@@ -1,5 +1,4 @@
 import { AliasType, stringType } from '../../../../interface'
-import { $$transformPGValueIntoValue } from '../../transformPGValueIntoValue'
 
 const pgTimeType = new AliasType({
   name: 'time',

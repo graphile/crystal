@@ -1,5 +1,4 @@
 import { GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
-import { Inventory } from '../../interface'
 import { buildObject, memoize1 } from '../utils'
 import BuildToken from './BuildToken'
 import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'

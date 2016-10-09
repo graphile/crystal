@@ -9,19 +9,23 @@ import PGObjectType from './PGObjectType'
 class PGClassObjectType extends PGObjectType {
   constructor (
     pgCatalog: PGCatalog,
-    public pgClass: PGCatalogClass,
+    pgClass: PGCatalogClass,
     config: { name?: string, renameIdToRowId?: boolean } = {},
   ) {
+    const pgType = pgCatalog.assertGetType(pgClass.typeId)
     super({
-      name: config.name || pgClass.name || pgCatalog.assertGetType(pgClass.typeId).name,
-      description: pgClass.description || pgCatalog.assertGetType(pgClass.typeId).description,
+      name: config.name || pgClass.name || pgType.name,
+      description: pgClass.description || pgType.description,
       pgCatalog,
       pgAttributes: new Map(
         pgCatalog.getClassAttributes(pgClass.id).map<[string, PGCatalogAttribute]>(pgAttribute =>
           [config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
         )),
     })
+    this.pgClass = pgClass
   }
+
+  public pgClass: PGCatalogClass
 }
 
 export default PGClassObjectType

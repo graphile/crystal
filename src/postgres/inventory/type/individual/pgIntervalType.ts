@@ -3,7 +3,7 @@
 
 import parsePGInterval = require('postgres-interval')
 import { NullableType, ObjectType, integerType, floatType } from '../../../../interface'
-import { sql, objectToMap } from '../../../utils'
+import { sql } from '../../../utils'
 import { $$transformPGValueIntoValue } from '../../transformPGValueIntoValue'
 import { $$transformValueIntoPGValue } from '../../transformValueIntoPGValue'
 
@@ -45,7 +45,7 @@ const pgIntervalType = Object.assign(new ObjectType({
   // interval. Does this by adding each key (which we know is a valid interval
   // identifier) to a string with it’s associated value.
   [$$transformValueIntoPGValue]: (value: ObjectType.Value): sql.SQL =>
-    sql.query`${sql.value(Array.from(value).reduce((interval, [key, value]) => `${interval} ${value} ${key}`, ''))}`
+    sql.query`${sql.value(Array.from(value).reduce((interval, [key, num]) => `${interval} ${num} ${key}`, ''))}`,
 })
 
 export default pgIntervalType

@@ -125,7 +125,7 @@ type FieldCondition = {
  */
 type EqualCondition = {
   type: 'EQUAL',
-  value: any,
+  value: mixed,
 }
 
 /**
@@ -137,7 +137,7 @@ type EqualCondition = {
  */
 type LessThanCondition = {
   type: 'LESS_THAN',
-  value: any,
+  value: mixed,
 }
 
 /**
@@ -149,7 +149,7 @@ type LessThanCondition = {
  */
 type GreaterThanCondition = {
   type: 'GREATER_THAN',
-  value: any,
+  value: mixed,
 }
 
 /**

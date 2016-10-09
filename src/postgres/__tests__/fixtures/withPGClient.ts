@@ -7,8 +7,8 @@ import kitchenSinkSchemaSQL from './kitchenSinkSchemaSQL'
  * client. The client will be connected from the pool at the start of the test,
  * and released back at the end. All changes will be rolled back.
  */
-export default function withPGClient (fn: (client: Client) => void | Promise<void>) {
-  return async () => {
+export default function withPGClient (fn: (client: Client) => void | Promise<void>): () => Promise<void> {
+  return async (): Promise<void> => {
     // Connect a client from our pool and begin a transaction.
     const client = await pgPool.connect()
 
@@ -26,6 +26,7 @@ export default function withPGClient (fn: (client: Client) => void | Promise<voi
       await client.query(await kitchenSinkSchemaSQL)
     }
     catch (error) {
+      // tslint:disable-next-line no-console
       console.error(error.stack || error)
       throw error
     }

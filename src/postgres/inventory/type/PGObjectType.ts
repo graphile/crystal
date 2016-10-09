@@ -26,8 +26,8 @@ class PGObjectType extends ObjectType {
    *
    * @private
    */
-  private _fieldNameToPGAttributeName = new Map<string, string>()
-  private _pgAttributeNameToFieldName = new Map<string, string>()
+  private _fieldNameToPGAttributeName: Map<string, string> = new Map()
+  private _pgAttributeNameToFieldName: Map<string, string> = new Map()
 
   constructor (config: {
     name: string,

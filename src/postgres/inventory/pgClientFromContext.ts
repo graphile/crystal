@@ -1,6 +1,6 @@
 // TODO: Refactor this module, it has code smell…
 
-import { PoolConfig, Pool, Client } from 'pg'
+import { Client } from 'pg'
 
 export const $$pgClient = Symbol('postgres/client')
 

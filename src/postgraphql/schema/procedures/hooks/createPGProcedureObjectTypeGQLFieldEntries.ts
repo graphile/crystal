@@ -74,7 +74,7 @@ function createPGSingleProcedureQueryGQLFieldEntry (
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
 
-    async resolve (source, args, context) {
+    async resolve (source, args, context): Promise<mixed> {
       const client = pgClientFromContext(context)
       const input = [source, ...argEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName]))]
       const query = sql.compile(sql.query`select to_json(${createPGProcedureSQLCall(fixtures, input)}) as value`)

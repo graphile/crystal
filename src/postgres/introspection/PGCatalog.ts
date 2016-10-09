@@ -11,12 +11,12 @@ import PGCatalogProcedure from './object/PGCatalogProcedure'
  * introspection query.
  */
 class PGCatalog {
-  private _namespaces = new Map<string, PGCatalogNamespace>()
-  private _classes = new Map<string, PGCatalogClass>()
-  private _attributes = new Map<string, PGCatalogAttribute>()
-  private _types = new Map<string, PGCatalogType>()
-  private _constraints = new Set<PGCatalogConstraint>()
-  private _procedures = new Set<PGCatalogProcedure>()
+  private _namespaces: Map<string, PGCatalogNamespace> = new Map()
+  private _classes: Map<string, PGCatalogClass> = new Map()
+  private _attributes: Map<string, PGCatalogAttribute> = new Map()
+  private _types: Map<string, PGCatalogType> = new Map()
+  private _constraints: Set<PGCatalogConstraint> = new Set()
+  private _procedures: Set<PGCatalogProcedure> = new Set()
 
   constructor (objects: Array<PGCatalogObject>) {
     // Build an in-memory index of all our objects for ease of use:
