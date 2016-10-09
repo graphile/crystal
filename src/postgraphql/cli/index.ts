@@ -19,8 +19,8 @@ program
   .description(manifest.description)
   .option('-d, --demo', 'run PostGraphQL using the demo database connection')
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment')
-  .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', option => option.split(','))
-  .option('-t, --host <string>', 'the hostname to be used. Defaults to `localhost`')
+  .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
+  .option('-n, --host <string>', 'the hostname to be used. Defaults to `localhost`')
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
@@ -28,6 +28,7 @@ program
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
   .option('-e, --secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
+  .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens', (option: string) => ({ namespaceName: option.split('.', 2)[0], typeName: option.split('.', 2)[1] }))
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
@@ -65,6 +66,7 @@ function main (): void {
     graphiql: graphiqlRoute = '/graphiql',
     disableGraphiql = false,
     secret: jwtSecret,
+    token: jwtPGTypeIdentifier,
     cors: enableCors = false,
     classicIds = false,
     dynamicJson = false,
@@ -96,6 +98,7 @@ function main (): void {
     graphiqlRoute,
     graphiql: !disableGraphiql,
     jwtSecret,
+    jwtPGTypeIdentifier,
     pgDefaultRole,
     enableQueryLog: true,
     enableCors,

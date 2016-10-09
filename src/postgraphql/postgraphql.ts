@@ -18,6 +18,7 @@ export default function postgraphql (
     graphiqlRoute?: string,
     graphiql?: boolean,
     jwtSecret?: string,
+    jwtPGTypeIdentifier?: { namespaceName: string, typeName: string },
     pgDefaultRole?: string,
     showErrorStack?: boolean,
     enableQueryLog?: boolean,

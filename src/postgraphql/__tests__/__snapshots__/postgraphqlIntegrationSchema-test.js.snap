@@ -71,6 +71,19 @@ input AnIntRangeInput {
 
 scalar AnotherInt
 
+input AuthenticateInput {
+  clientMutationId: String
+  a: Int
+  b: Int
+  c: Int
+}
+
+type AuthenticatePayload {
+  clientMutationId: String
+  jwtToken: JwtToken
+  query: Query
+}
+
 enum Color {
   RED
   GREEN
@@ -550,6 +563,14 @@ enum IntSetQueryOrderBy {
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 scalar Json
 
+type JwtToken {
+  role: String
+  exp: Int
+  a: Int
+  b: Int
+  c: Int
+}
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -611,6 +632,7 @@ type Mutation {
 
   # lol, add some stuff 4 mutation
   add4Mutation(input: Add4MutationInput!): Add4MutationPayload
+  authenticate(input: AuthenticateInput!): AuthenticatePayload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
@@ -1703,6 +1725,19 @@ input AnIntRangeInput {
 
 scalar AnotherInt
 
+input AuthenticateInput {
+  clientMutationId: String
+  a: Int
+  b: Int
+  c: Int
+}
+
+type AuthenticatePayload {
+  clientMutationId: String
+  jwtToken: JwtToken
+  query: Query
+}
+
 enum Color {
   RED
   GREEN
@@ -2182,6 +2217,14 @@ enum IntSetQueryOrderBy {
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 scalar Json
 
+type JwtToken {
+  role: String
+  exp: Int
+  a: Int
+  b: Int
+  c: Int
+}
+
 input Mult1Input {
   clientMutationId: String
   arg0: Int
@@ -2243,6 +2286,7 @@ type Mutation {
 
   # lol, add some stuff 4 mutation
   add4Mutation(input: Add4MutationInput!): Add4MutationPayload
+  authenticate(input: AuthenticateInput!): AuthenticatePayload
   compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
   mult1(input: Mult1Input!): Mult1Payload
   mult2(input: Mult2Input!): Mult2Payload
