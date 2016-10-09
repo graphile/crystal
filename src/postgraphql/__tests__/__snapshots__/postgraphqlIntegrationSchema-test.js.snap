@@ -1,96 +1,5 @@
 exports[`test prints a schema with Relay 1 style ids 1`] = `
-"input Add1MutationInput {
-  clientMutationId: String
-  arg0: Int!
-  arg1: Int!
-}
-
-type Add1MutationPayload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Add2MutationInput {
-  clientMutationId: String
-  a: Int!
-  b: Int!
-}
-
-type Add2MutationPayload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Add3MutationInput {
-  clientMutationId: String
-  a: Int
-  arg1: Int
-}
-
-type Add3MutationPayload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Add4MutationInput {
-  clientMutationId: String
-  arg0: Int
-  b: Int
-}
-
-type Add4MutationPayload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-scalar AnInt
-
-type AnIntRange {
-  start: AnIntRangeBound
-  end: AnIntRangeBound
-}
-
-type AnIntRangeBound {
-  value: AnInt!
-  inclusive: Boolean!
-}
-
-input AnIntRangeBoundInput {
-  value: AnInt!
-  inclusive: Boolean!
-}
-
-input AnIntRangeInput {
-  start: AnIntRangeBoundInput
-  end: AnIntRangeBoundInput
-}
-
-scalar AnotherInt
-
-input AuthenticateInput {
-  clientMutationId: String
-  a: Int
-  b: Int
-  c: Int
-}
-
-type AuthenticatePayload {
-  clientMutationId: String
-  jwtToken: JwtToken
-  query: Query
-}
-
-enum Color {
-  RED
-  GREEN
-  BLUE
-}
-
-type CompoundKey implements Node {
+"type CompoundKey implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
   personId2: Int!
@@ -102,24 +11,6 @@ type CompoundKey implements Node {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
-
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
-  foreignKeysByCompoundKey1AndCompoundKey2(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-  ): ForeignKeysConnection
 }
 
 input CompoundKeyInput {
@@ -171,36 +62,6 @@ enum CompoundKeysOrderBy {
   EXTRA_DESC
 }
 
-# Awesome feature!
-type CompoundType {
-  a: Int
-  b: String
-  c: Color
-  d: Uuid
-  fooBar: Int
-  computedField: Int
-}
-
-# Awesome feature!
-input CompoundTypeInput {
-  a: Int
-  b: String
-  c: Color
-  d: Uuid
-  fooBar: Int
-}
-
-input CompoundTypeMutationInput {
-  clientMutationId: String
-  object: CompoundTypeInput
-}
-
-type CompoundTypeMutationPayload {
-  clientMutationId: String
-  compoundType: CompoundType
-  query: Query
-}
-
 input CreateCompoundKeyInput {
   clientMutationId: String
   compoundKey: CompoundKeyInput!
@@ -222,27 +83,6 @@ type CreateCompoundKeyPayload {
   query: Query
 }
 
-input CreateForeignKeyInput {
-  clientMutationId: String
-  foreignKey: ForeignKeyInput!
-}
-
-type CreateForeignKeyPayload {
-  clientMutationId: String
-  foreignKey: ForeignKey
-  foreignKeyEdge(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-  ): ForeignKeysEdge
-
-  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
-  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
-  personByPersonId: Person
-  query: Query
-}
-
 input CreatePersonInput {
   clientMutationId: String
   person: PersonInput!
@@ -258,81 +98,8 @@ type CreatePersonPayload {
   query: Query
 }
 
-input CreatePostInput {
-  clientMutationId: String
-  post: PostInput!
-}
-
-type CreatePostPayload {
-  clientMutationId: String
-  post: Post
-  postEdge(
-    # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
-  ): PostsEdge
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
-  query: Query
-}
-
-input CreateTypeInput {
-  clientMutationId: String
-  type: TypeInput!
-}
-
-type CreateTypePayload {
-  clientMutationId: String
-  type: Type
-  typeEdge(
-    # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
-  ): TypesEdge
-  query: Query
-}
-
-input CreateUpdatableViewInput {
-  clientMutationId: String
-  updatableView: UpdatableViewInput!
-}
-
-type CreateUpdatableViewPayload {
-  clientMutationId: String
-  updatableView: UpdatableView
-  updatableViewEdge(
-    # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
-  ): UpdatableViewsEdge
-  query: Query
-}
-
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
-
-# The day, does not include a time.
-scalar Date
-
-# range of dates
-type DateRange {
-  start: DateRangeBound
-  end: DateRangeBound
-}
-
-type DateRangeBound {
-  value: Date!
-  inclusive: Boolean!
-}
-
-input DateRangeBoundInput {
-  value: Date!
-  inclusive: Boolean!
-}
-
-# range of dates
-input DateRangeInput {
-  start: DateRangeBoundInput
-  end: DateRangeBoundInput
-}
 
 # A point in time as described by the [ISO
 # 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
@@ -384,55 +151,7 @@ type DeletePersonPayload {
   query: Query
 }
 
-input DeletePostByRowIdInput {
-  clientMutationId: String
-  rowId: Int!
-}
-
-input DeletePostInput {
-  clientMutationId: String
-  id: ID!
-}
-
-type DeletePostPayload {
-  clientMutationId: String
-  post: Post
-  deletedPostId: ID
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
-  query: Query
-}
-
-input DeleteTypeByRowIdInput {
-  clientMutationId: String
-  rowId: Int!
-}
-
-input DeleteTypeInput {
-  clientMutationId: String
-  id: ID!
-}
-
-type DeleteTypePayload {
-  clientMutationId: String
-  type: Type
-  deletedTypeId: ID
-  query: Query
-}
-
 scalar Email
-
-# range of numerics
-type FloatRange {
-  start: FloatRangeBound
-  end: FloatRangeBound
-}
-
-type FloatRangeBound {
-  value: Float!
-  inclusive: Boolean!
-}
 
 input FloatRangeBoundInput {
   value: Float!
@@ -443,79 +162,6 @@ input FloatRangeBoundInput {
 input FloatRangeInput {
   start: FloatRangeBoundInput
   end: FloatRangeBoundInput
-}
-
-type ForeignKey {
-  personId: Int
-  compoundKey1: Int
-  compoundKey2: Int
-
-  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
-  # Reads a single \`Person\` that is related to this \`ForeignKey\`.
-  personByPersonId: Person
-}
-
-input ForeignKeyInput {
-  personId: Int
-  compoundKey1: Int
-  compoundKey2: Int
-}
-
-# A connection to a list of \`ForeignKey\` values.
-type ForeignKeysConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`ForeignKey\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`ForeignKey\` and cursor to aid in pagination.
-  edges: [ForeignKeysEdge]
-
-  # A list of \`ForeignKey\` objects.
-  nodes: [ForeignKey!]
-}
-
-# A \`ForeignKey\` edge in the connection.
-type ForeignKeysEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor
-
-  # The \`ForeignKey\` at the end of the edge.
-  node: ForeignKey!
-}
-
-# Methods to use when ordering \`ForeignKey\`.
-enum ForeignKeysOrderBy {
-  NATURAL
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  COMPOUND_KEY_1_ASC
-  COMPOUND_KEY_1_DESC
-  COMPOUND_KEY_2_ASC
-  COMPOUND_KEY_2_DESC
-}
-
-# An interval of time that has passed.
-type Interval {
-  seconds: Float
-  minutes: Int
-  hours: Int
-  days: Int
-  months: Int
-  years: Int
-}
-
-# An interval of time that has passed.
-input IntervalInput {
-  seconds: Float
-  minutes: Int
-  hours: Int
-  days: Int
-  months: Int
-  years: Int
 }
 
 input IntSetMutationInput {
@@ -563,98 +209,13 @@ enum IntSetQueryOrderBy {
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 scalar Json
 
-type JwtToken {
-  role: String
-  exp: Int
-  a: Int
-  b: Int
-  c: Int
-}
-
-input Mult1Input {
-  clientMutationId: String
-  arg0: Int
-  arg1: Int
-}
-
-type Mult1Payload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Mult2Input {
-  clientMutationId: String
-  arg0: Int
-  arg1: Int
-}
-
-type Mult2Payload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Mult3Input {
-  clientMutationId: String
-  arg0: Int!
-  arg1: Int!
-}
-
-type Mult3Payload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
-input Mult4Input {
-  clientMutationId: String
-  arg0: Int!
-  arg1: Int!
-}
-
-type Mult4Payload {
-  clientMutationId: String
-  integer: Int
-  query: Query
-}
-
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  # lol, add some stuff 1 mutation
-  add1Mutation(input: Add1MutationInput!): Add1MutationPayload
-
-  # lol, add some stuff 2 mutation
-  add2Mutation(input: Add2MutationInput!): Add2MutationPayload
-
-  # lol, add some stuff 3 mutation
-  add3Mutation(input: Add3MutationInput!): Add3MutationPayload
-
-  # lol, add some stuff 4 mutation
-  add4Mutation(input: Add4MutationInput!): Add4MutationPayload
-  authenticate(input: AuthenticateInput!): AuthenticatePayload
-  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
-  mult1(input: Mult1Input!): Mult1Payload
-  mult2(input: Mult2Input!): Mult2Payload
-  mult3(input: Mult3Input!): Mult3Payload
-  mult4(input: Mult4Input!): Mult4Payload
   intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
   typesMutation(input: TypesMutationInput!): TypesMutationPayload
-  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
-  createPost(input: CreatePostInput!): CreatePostPayload
-  updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostByRowId(input: UpdatePostByRowIdInput!): UpdatePostPayload
-  deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostByRowId(input: DeletePostByRowIdInput!): DeletePostPayload
-  createType(input: CreateTypeInput!): CreateTypePayload
-  updateType(input: UpdateTypeInput!): UpdateTypePayload
-  updateTypeByRowId(input: UpdateTypeByRowIdInput!): UpdateTypePayload
-  deleteType(input: DeleteTypeInput!): DeleteTypePayload
-  deleteTypeByRowId(input: DeleteTypeByRowIdInput!): DeleteTypePayload
-  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
   createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
   updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
   updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
@@ -667,18 +228,6 @@ type Mutation {
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
   deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonPayload
-}
-
-type NestedCompoundType {
-  a: CompoundType
-  b: CompoundType
-  bazBuz: Int
-}
-
-input NestedCompoundTypeInput {
-  a: CompoundTypeInput
-  b: CompoundTypeInput
-  bazBuz: Int
 }
 
 input NoArgsMutationInput {
@@ -695,41 +244,6 @@ type NoArgsMutationPayload {
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
-}
-
-type NonUpdatableView {
-  column: Int
-}
-
-# A connection to a list of \`NonUpdatableView\` values.
-type NonUpdatableViewsConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`NonUpdatableView\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`NonUpdatableView\` and cursor to aid in pagination.
-  edges: [NonUpdatableViewsEdge]
-
-  # A list of \`NonUpdatableView\` objects.
-  nodes: [NonUpdatableView!]
-}
-
-# A \`NonUpdatableView\` edge in the connection.
-type NonUpdatableViewsEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor
-
-  # The \`NonUpdatableView\` at the end of the edge.
-  node: NonUpdatableView!
-}
-
-# Methods to use when ordering \`NonUpdatableView\`.
-enum NonUpdatableViewsOrderBy {
-  NATURAL
-  COLUMN_ASC
-  COLUMN_DESC
 }
 
 # Information about pagination in a connection.
@@ -819,24 +333,6 @@ type Person implements Node {
     last: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
-  postsByAuthorId(
-    # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-  ): PostsConnection
-
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
@@ -872,24 +368,6 @@ type Person implements Node {
     # Only read the last \`n\` values of the set.
     last: Int
   ): CompoundKeysConnection
-
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
-  foreignKeysByPersonId(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-  ): ForeignKeysConnection
 }
 
 # A connection to a list of \`Person\` values.
@@ -940,70 +418,11 @@ input PersonPatch {
   createdAt: Datetime
 }
 
-type Post implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  id: ID!
-  rowId: Int!
+type Post {
+  id: Int!
   headline: String!
   body: String
   authorId: Int
-  headlineTrimmed(length: Int, omission: String): String
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
-}
-
-input PostInput {
-  rowId: Int
-  headline: String!
-  body: String
-  authorId: Int
-}
-
-input PostPatch {
-  rowId: Int
-  headline: String
-  body: String
-  authorId: Int
-}
-
-# A connection to a list of \`Post\` values.
-type PostsConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # The count of *all* \`Post\` you could get from the connection.
-  totalCount: Int
-
-  # A list of edges which contains the \`Post\` and cursor to aid in pagination.
-  edges: [PostsEdge]
-
-  # A list of \`Post\` objects.
-  nodes: [Post!]
-}
-
-# A \`Post\` edge in the connection.
-type PostsEdge {
-  # A cursor for use in pagination.
-  cursor: Cursor
-
-  # The \`Post\` at the end of the edge.
-  node: Post!
-}
-
-# Methods to use when ordering \`Post\`.
-enum PostsOrderBy {
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  NATURAL
-  ID_ASC
-  ID_DESC
-  HEADLINE_ASC
-  HEADLINE_DESC
-  BODY_ASC
-  BODY_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
 }
 
 # The root query type which gives access points into the data universe.
@@ -1013,19 +432,6 @@ type Query {
     # The globally unique \`ID\`.
     id: ID!
   ): Node
-
-  # lol, add some stuff 1 query
-  add1Query(arg0: Int!, arg1: Int!): Int
-
-  # lol, add some stuff 2 query
-  add2Query(a: Int!, b: Int!): Int
-
-  # lol, add some stuff 3 query
-  add3Query(a: Int, arg1: Int): Int
-
-  # lol, add some stuff 4 query
-  add4Query(arg0: Int, b: Int): Int
-  compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
   # Reads and enables paginatation through a set of \`Int\`.
   intSetQuery(
@@ -1069,145 +475,6 @@ type Query {
     last: Int
   ): TableSetQueryConnection
   typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
-
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
-  allForeignKeys(
-    # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    personId: Int
-    compoundKey1: Int
-    compoundKey2: Int
-  ): ForeignKeysConnection
-
-  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
-  allNonUpdatableViews(
-    # The method to use when ordering \`NonUpdatableView\`.
-    orderBy: NonUpdatableViewsOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    column: Int
-  ): NonUpdatableViewsConnection
-
-  # Reads and enables paginatation through a set of \`Post\`.
-  allPosts(
-    # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    rowId: Int
-    headline: String
-    body: String
-    authorId: Int
-  ): PostsConnection
-
-  # Reads a single \`Post\` using its globally unique \`ID\`.
-  post(
-    # The globally unique \`ID\` to be used in selecting a single \`Post\`.
-    id: ID!
-  ): Post
-  postByRowId(rowId: Int!): Post
-
-  # Reads and enables paginatation through a set of \`Type\`.
-  allTypes(
-    # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    rowId: Int
-    smallint: Int
-    bigint: Int
-    boolean: Boolean
-    varchar: String
-    enum: Color
-    domain: AnInt
-    domain2: AnotherInt
-    textArray: [String]
-    json: Json
-    jsonb: Json
-    numrange: FloatRangeInput
-    daterange: DateRangeInput
-    anIntRange: AnIntRangeInput
-    timestamp: Datetime
-    timestamptz: Datetime
-    date: Date
-    time: Time
-    timetz: Time
-    interval: IntervalInput
-    money: Float
-    compoundType: CompoundTypeInput
-    nestedCompoundType: NestedCompoundTypeInput
-  ): TypesConnection
-
-  # Reads a single \`Type\` using its globally unique \`ID\`.
-  type(
-    # The globally unique \`ID\` to be used in selecting a single \`Type\`.
-    id: ID!
-  ): Type
-  typeByRowId(rowId: Int!): Type
-
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
-  allUpdatableViews(
-    # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-    x: Int
-    name: String
-    description: String
-    constant: Int
-  ): UpdatableViewsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   allCompoundKeys(
@@ -1281,9 +548,6 @@ input TableMutationInput {
 type TableMutationPayload {
   clientMutationId: String
   post: Post
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
   query: Query
 }
 
@@ -1326,13 +590,462 @@ enum TableSetQueryOrderBy {
   NATURAL
 }
 
+input TypesMutationInput {
+  clientMutationId: String
+  a: Int!
+  b: Boolean!
+  c: String!
+  d: [Int]!
+  e: Json!
+  f: FloatRangeInput!
+}
+
+type TypesMutationPayload {
+  clientMutationId: String
+  boolean: Boolean
+  query: Query
+}
+
+input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+input UpdateCompoundKeyInput {
+  clientMutationId: String
+  id: ID!
+  compoundKeyPatch: CompoundKeyPatch!
+}
+
+type UpdateCompoundKeyPayload {
+  clientMutationId: String
+  compoundKey: CompoundKey
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+  query: Query
+}
+
+input UpdatePersonByEmailInput {
+  clientMutationId: String
+  email: Email!
+  personPatch: PersonPatch!
+}
+
+input UpdatePersonByRowIdInput {
+  clientMutationId: String
+  rowId: Int!
+  personPatch: PersonPatch!
+}
+
+input UpdatePersonInput {
+  clientMutationId: String
+  id: ID!
+  personPatch: PersonPatch!
+}
+
+type UpdatePersonPayload {
+  clientMutationId: String
+  person: Person
+  query: Query
+}
+"
+`;
+
+exports[`test prints a schema with a JWT generating mutation 1`] = `
+"scalar AnInt
+
+type AnIntRange {
+  start: AnIntRangeBound
+  end: AnIntRangeBound
+}
+
+type AnIntRangeBound {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeBoundInput {
+  value: AnInt!
+  inclusive: Boolean!
+}
+
+input AnIntRangeInput {
+  start: AnIntRangeBoundInput
+  end: AnIntRangeBoundInput
+}
+
+scalar AnotherInt
+
+input AuthenticateInput {
+  clientMutationId: String
+  a: Int
+  b: Int
+  c: Int
+}
+
+type AuthenticatePayload {
+  clientMutationId: String
+  token: Jwt
+  query: Query
+}
+
+enum Color {
+  RED
+  GREEN
+  BLUE
+}
+
+# Awesome feature!
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+# Awesome feature!
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: Uuid
+  fooBar: Int
+}
+
+input CompoundTypeMutationInput {
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+type CompoundTypeMutationPayload {
+  clientMutationId: String
+  compoundType: CompoundType
+  query: Query
+}
+
+input CreateTypeInput {
+  clientMutationId: String
+  type: TypeInput!
+}
+
+type CreateTypePayload {
+  clientMutationId: String
+  type: Type
+  typeEdge(
+    # The method to use when ordering \`Type\`.
+    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+  ): TypesEdge
+  query: Query
+}
+
+input CreateUpdatableViewInput {
+  clientMutationId: String
+  updatableView: UpdatableViewInput!
+}
+
+type CreateUpdatableViewPayload {
+  clientMutationId: String
+  updatableView: UpdatableView
+  updatableViewEdge(
+    # The method to use when ordering \`UpdatableView\`.
+    orderBy: UpdatableViewsOrderBy = NATURAL
+  ): UpdatableViewsEdge
+  query: Query
+}
+
+# A location in a connection that can be used for resuming pagination.
+scalar Cursor
+
+# The day, does not include a time.
+scalar Date
+
+# range of dates
+type DateRange {
+  start: DateRangeBound
+  end: DateRangeBound
+}
+
+type DateRangeBound {
+  value: Date!
+  inclusive: Boolean!
+}
+
+input DateRangeBoundInput {
+  value: Date!
+  inclusive: Boolean!
+}
+
+# range of dates
+input DateRangeInput {
+  start: DateRangeBoundInput
+  end: DateRangeBoundInput
+}
+
+# A point in time as described by the [ISO
+# 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+scalar Datetime
+
+input DeleteTypeByIdInput {
+  clientMutationId: String
+  id: Int!
+}
+
+input DeleteTypeInput {
+  clientMutationId: String
+  __id: ID!
+}
+
+type DeleteTypePayload {
+  clientMutationId: String
+  type: Type
+  deletedTypeId: ID
+  query: Query
+}
+
+# range of numerics
+type FloatRange {
+  start: FloatRangeBound
+  end: FloatRangeBound
+}
+
+type FloatRangeBound {
+  value: Float!
+  inclusive: Boolean!
+}
+
+input FloatRangeBoundInput {
+  value: Float!
+  inclusive: Boolean!
+}
+
+# range of numerics
+input FloatRangeInput {
+  start: FloatRangeBoundInput
+  end: FloatRangeBoundInput
+}
+
+# An interval of time that has passed.
+type Interval {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
+}
+
+# An interval of time that has passed.
+input IntervalInput {
+  seconds: Float
+  minutes: Int
+  hours: Int
+  days: Int
+  months: Int
+  years: Int
+}
+
+# A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+scalar Json
+
+# A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519)
+# which securely represents claims between two parties.
+scalar Jwt
+
+input Mult1Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult1Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult2Input {
+  clientMutationId: String
+  arg0: Int
+  arg1: Int
+}
+
+type Mult2Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult3Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult3Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+input Mult4Input {
+  clientMutationId: String
+  arg0: Int!
+  arg1: Int!
+}
+
+type Mult4Payload {
+  clientMutationId: String
+  integer: Int
+  query: Query
+}
+
+# The root mutation type which contains root level fields which mutate data.
+type Mutation {
+  authenticate(input: AuthenticateInput!): AuthenticatePayload
+  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
+  mult1(input: Mult1Input!): Mult1Payload
+  mult2(input: Mult2Input!): Mult2Payload
+  mult3(input: Mult3Input!): Mult3Payload
+  mult4(input: Mult4Input!): Mult4Payload
+  createType(input: CreateTypeInput!): CreateTypePayload
+  updateType(input: UpdateTypeInput!): UpdateTypePayload
+  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypePayload
+  deleteType(input: DeleteTypeInput!): DeleteTypePayload
+  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypePayload
+  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
+}
+
+type NestedCompoundType {
+  a: CompoundType
+  b: CompoundType
+  bazBuz: Int
+}
+
+input NestedCompoundTypeInput {
+  a: CompoundTypeInput
+  b: CompoundTypeInput
+  bazBuz: Int
+}
+
+# An object with a globally unique \`ID\`.
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+}
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: Cursor
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: Cursor
+}
+
+# The root query type which gives access points into the data universe.
+type Query {
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    __id: ID!
+  ): Node
+  compoundTypeQuery(object: CompoundTypeInput): CompoundType
+
+  # Reads and enables paginatation through a set of \`Type\`.
+  allTypes(
+    # The method to use when ordering \`Type\`.
+    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    id: Int
+    smallint: Int
+    bigint: Int
+    boolean: Boolean
+    varchar: String
+    enum: Color
+    domain: AnInt
+    domain2: AnotherInt
+    textArray: [String]
+    json: Json
+    jsonb: Json
+    numrange: FloatRangeInput
+    daterange: DateRangeInput
+    anIntRange: AnIntRangeInput
+    timestamp: Datetime
+    timestamptz: Datetime
+    date: Date
+    time: Time
+    timetz: Time
+    interval: IntervalInput
+    money: Float
+    compoundType: CompoundTypeInput
+    nestedCompoundType: NestedCompoundTypeInput
+  ): TypesConnection
+
+  # Reads a single \`Type\` using its globally unique \`ID\`.
+  type(
+    # The globally unique \`ID\` to be used in selecting a single \`Type\`.
+    __id: ID!
+  ): Type
+  typeById(id: Int!): Type
+
+  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  allUpdatableViews(
+    # The method to use when ordering \`UpdatableView\`.
+    orderBy: UpdatableViewsOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+    x: Int
+    name: String
+    description: String
+    constant: Int
+  ): UpdatableViewsConnection
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  query: Query!
+}
+
 # The exact time of day, does not include the date. May or may not have a timezone offset.
 scalar Time
 
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  id: ID!
-  rowId: Int!
+  __id: ID!
+  id: Int!
   smallint: Int!
   bigint: Int!
   boolean: Boolean!
@@ -1358,7 +1071,7 @@ type Type implements Node {
 }
 
 input TypeInput {
-  rowId: Int
+  id: Int
   smallint: Int!
   bigint: Int!
   boolean: Boolean!
@@ -1384,7 +1097,7 @@ input TypeInput {
 }
 
 input TypePatch {
-  rowId: Int
+  id: Int
   smallint: Int
   bigint: Int
   boolean: Boolean
@@ -1431,22 +1144,6 @@ type TypesEdge {
 
   # The \`Type\` at the end of the edge.
   node: Type!
-}
-
-input TypesMutationInput {
-  clientMutationId: String
-  a: Int!
-  b: Boolean!
-  c: String!
-  d: [Int]!
-  e: Json!
-  f: FloatRangeInput!
-}
-
-type TypesMutationPayload {
-  clientMutationId: String
-  boolean: Boolean
-  query: Query
 }
 
 # Methods to use when ordering \`Type\`.
@@ -1559,85 +1256,15 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
-input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+input UpdateTypeByIdInput {
   clientMutationId: String
-  personId1: Int!
-  personId2: Int!
-  compoundKeyPatch: CompoundKeyPatch!
-}
-
-input UpdateCompoundKeyInput {
-  clientMutationId: String
-  id: ID!
-  compoundKeyPatch: CompoundKeyPatch!
-}
-
-type UpdateCompoundKeyPayload {
-  clientMutationId: String
-  compoundKey: CompoundKey
-
-  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
-
-  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
-  query: Query
-}
-
-input UpdatePersonByEmailInput {
-  clientMutationId: String
-  email: Email!
-  personPatch: PersonPatch!
-}
-
-input UpdatePersonByRowIdInput {
-  clientMutationId: String
-  rowId: Int!
-  personPatch: PersonPatch!
-}
-
-input UpdatePersonInput {
-  clientMutationId: String
-  id: ID!
-  personPatch: PersonPatch!
-}
-
-type UpdatePersonPayload {
-  clientMutationId: String
-  person: Person
-  query: Query
-}
-
-input UpdatePostByRowIdInput {
-  clientMutationId: String
-  rowId: Int!
-  postPatch: PostPatch!
-}
-
-input UpdatePostInput {
-  clientMutationId: String
-  id: ID!
-  postPatch: PostPatch!
-}
-
-type UpdatePostPayload {
-  clientMutationId: String
-  post: Post
-
-  # Reads a single \`Person\` that is related to this \`Post\`.
-  personByAuthorId: Person
-  query: Query
-}
-
-input UpdateTypeByRowIdInput {
-  clientMutationId: String
-  rowId: Int!
+  id: Int!
   typePatch: TypePatch!
 }
 
 input UpdateTypeInput {
   clientMutationId: String
-  id: ID!
+  __id: ID!
   typePatch: TypePatch!
 }
 

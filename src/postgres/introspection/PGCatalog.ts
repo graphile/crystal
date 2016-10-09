@@ -75,7 +75,7 @@ class PGCatalog {
 
   /**
    * Gets a namespace by its name. Helpful in tests where we know the name, but
-   * not the id it has been assigned.
+   * not the id it has been assigned, and it is helpful for user input.
    */
   public getNamespaceByName (namespaceName: string): PGCatalogNamespace | undefined {
     return this.getNamespaces().find(namespace => namespace.name === namespaceName)
@@ -111,7 +111,7 @@ class PGCatalog {
   /**
    * Gets a class by its name, also use the namespace name to ensure
    * there are no naming collisions. Helpful in tests where we know the name,
-   * but not the id it has been assigned.
+   * but not the id it has been assigned, and it is helpful for user input.
    */
   public getClassByName (namespaceName: string, className: string): PGCatalogClass | undefined {
     const namespace = this.getNamespaceByName(namespaceName)
@@ -211,7 +211,7 @@ class PGCatalog {
   /**
    * Gets a type by its name, also use the namespace name to ensure
    * there are no naming collisions. Helpful in tests where we know the name,
-   * but not the id it has been assigned.
+   * but not the id it has been assigned, and it is helpful for user input.
    */
   public getTypeByName (namespaceName: string, typeName: string): PGCatalogType | undefined {
     const namespace = this.getNamespaceByName(namespaceName)
@@ -231,6 +231,17 @@ class PGCatalog {
    */
   public getProcedures (): Array<PGCatalogProcedure> {
     return Array.from(this._procedures)
+  }
+
+  /**
+   * Gets a procedure by its name, also use the namespace name to ensure
+   * there are no naming collisions. Helpful in tests where we know the name,
+   * but not the id it has been assigned, and it is helpful for user input.
+   */
+  public getProcedureByName (namespaceName: string, procedureName: string): PGCatalogProcedure | undefined {
+    const namespace = this.getNamespaceByName(namespaceName)
+    if (!namespace) return
+    return this.getProcedures().find(procedure => procedure.namespaceId === namespace.id && procedure.name === procedureName)
   }
 }
 

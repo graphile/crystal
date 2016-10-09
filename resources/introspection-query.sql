@@ -212,12 +212,12 @@ with
       pg_catalog.pg_constraint as con
     where
       -- Only get constraints for classes we have selected.
-      con.conrelid in (select "id" from class) and
+      con.conrelid in (select "id" from class where "namespaceId" in (select "id" from namespace)) and
       case
         -- If this is a foreign key constraint, we want to ensure that the
         -- foreign class is also in the list of classes we have already
         -- selected.
-        when con.contype = 'f' then con.confrelid in (select "id" from class)
+        when con.contype = 'f' then con.confrelid in (select "id" from class where "namespaceId" in (select "id" from namespace))
         -- Otherwise, this should be true.
         else true
       end and
