@@ -56,6 +56,7 @@ const pgPool = {
 const defaultOptions = {
   graphqlSchema,
   pgPool,
+  disableQueryLog: true,
 }
 
 const serverCreators = new Map([

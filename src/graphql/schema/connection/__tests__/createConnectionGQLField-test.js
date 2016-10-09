@@ -129,11 +129,13 @@ test('_createOrderByGQLEnumType will create an enum type with all the paginator 
     name: 'A',
     value: 'a',
     description: undefined,
+    isDeprecated: false,
     deprecationReason: undefined,
   }, {
     name: 'B',
     value: 'b',
     description: undefined,
+    isDeprecated: false,
     deprecationReason: undefined,
   }])
 })

@@ -11,4 +11,6 @@ scripts/lint
 echo "[3/3]: Testing Project"
 scripts/test
 
+echo ""
 echo "CI completed succesfully 🎉"
+echo ""
