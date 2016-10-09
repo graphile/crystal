@@ -59,7 +59,12 @@ with
       pro.proargmodes is null and
       -- Do not select procedures that create range types. These are utility
       -- functions that really don’t need to be exposed in an API.
-      pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace)
+      pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace) and
+      -- We also don’t want procedures that have been defined in our namespace
+      -- twice. This leads to duplicate fields in the API which throws an
+      -- error. In the future we may support this case. For now though, it is
+      -- too complex.
+      (select count(pro2.*) from pg_catalog.pg_proc as pro2 where pro2.pronamespace = pro.pronamespace and pro2.proname = pro.proname) = 1
     order by
       pro.pronamespace, pro.proname
   ),

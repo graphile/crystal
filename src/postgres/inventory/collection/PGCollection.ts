@@ -35,8 +35,20 @@ class PGCollection implements Collection {
   /**
    * The name of this collection. A pluralized version of the class name. We
    * expect class names to be singular.
+   *
+   * If a class with the pluralized version of the name exists, we won’t
+   * pluralize the class name.
    */
-  public name: string = pluralize(this.pgClass.name)
+  public name: string = (() => {
+    const pluralName = pluralize(this.pgClass.name)
+    let pluralNameExists = false
+
+    for (const pgNamespace of this._pgCatalog.getNamespaces())
+      if (this._pgCatalog.getClassByName(pgNamespace.name, pluralName))
+        pluralNameExists = true
+
+    return pluralNameExists ? this.pgClass.name : pluralName
+  })()
 
   /**
    * The description of this collection taken from the Postgres class’s
@@ -50,7 +62,19 @@ class PGCollection implements Collection {
    * are Postgres attributes and in the exact same order.
    */
   public type: PGClassObjectType = new PGClassObjectType(this._pgCatalog, this.pgClass, {
-    name: pluralize(this.pgClass.name, 1),
+    // Singularize the name of our type, *unless* a class already exists in our
+    // catalog with that name. If a class already has the name we will just
+    // cause a conflict.
+    name: (() => {
+      const singularName = pluralize(this.pgClass.name, 1)
+      let singularNameExists = false
+
+      for (const pgNamespace of this._pgCatalog.getNamespaces())
+        if (this._pgCatalog.getClassByName(pgNamespace.name, singularName))
+          singularNameExists = true
+
+      return singularNameExists ? this.pgClass.name : singularName
+    })(),
     renameIdToRowId: this._options.renameIdToRowId,
   })
 
