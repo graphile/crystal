@@ -1,4 +1,0 @@
-{
-  "presets": [["modern-node", { "version": "4.0.0" }], "stage-1"],
-  "plugins": [["module-alias", [{ "src": "./src", "expose": "#" }]]]
-}
