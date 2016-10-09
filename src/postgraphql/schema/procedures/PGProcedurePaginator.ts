@@ -19,13 +19,11 @@ type ProcedureInput = Array<mixed>
  */
 class PGProcedurePaginator<TItemValue> extends PGPaginator<ProcedureInput, TItemValue> {
   constructor (
-    _fixtures: PGProcedureFixtures,
+    private _fixtures: PGProcedureFixtures,
   ) {
     super()
-    this._fixtures = _fixtures
   }
 
-  private _fixtures: PGProcedureFixtures
   public name: string = this._fixtures.pgProcedure.name
   public itemType: Type<TItemValue> = this._fixtures.return.type as Type<TItemValue>
 

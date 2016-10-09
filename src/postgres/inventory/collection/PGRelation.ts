@@ -8,18 +8,11 @@ import PGCollectionKey from './PGCollectionKey'
 // TODO: Tests
 class PGRelation implements Relation<PGObjectType.Value> {
   constructor (
-    tailCollection: PGCollection,
-    headCollectionKey: PGCollectionKey,
-    pgConstraint: PGCatalogForeignKeyConstraint,
-  ) {
-    this.tailCollection = tailCollection
-    this.headCollectionKey = headCollectionKey
-    this.pgConstraint = pgConstraint
-  }
+    public tailCollection: PGCollection,
+    public headCollectionKey: PGCollectionKey,
+    public pgConstraint: PGCatalogForeignKeyConstraint,
+  ) {}
 
-  public tailCollection: PGCollection
-  public headCollectionKey: PGCollectionKey
-  public pgConstraint: PGCatalogForeignKeyConstraint
   private _pgCatalog: PGCatalog = this.tailCollection._pgCatalog
   private _pgTailAttributes: Array<PGCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgConstraint.classId, this.pgConstraint.keyAttributeNums)
   private _tailFieldNames: Array<string> = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getFieldNameFromPGAttributeName(pgAttribute.name)!)

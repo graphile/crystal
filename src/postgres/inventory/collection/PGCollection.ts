@@ -20,22 +20,15 @@ import PGCollectionKey from './PGCollectionKey'
  */
 class PGCollection implements Collection {
   constructor (
-    options: Options,
-    pgCatalog: PGCatalog,
-    pgClass: PGCatalogClass,
-  ) {
-    this._options = options
-    this._pgCatalog = pgCatalog
-    this.pgClass = pgClass
-  }
+    public _options: Options,
+    public _pgCatalog: PGCatalog,
+    public pgClass: PGCatalogClass,
+  ) {}
 
   /**
    * Instantiate some private dependencies of our collection using our instance
    * of `PGCatalog`.
    */
-  public _options: Options
-  public _pgCatalog: PGCatalog
-  public pgClass: PGCatalogClass
   private _pgNamespace: PGCatalogNamespace = this._pgCatalog.assertGetNamespace(this.pgClass.namespaceId)
   private _pgAttributes: Array<PGCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgClass.id)
 

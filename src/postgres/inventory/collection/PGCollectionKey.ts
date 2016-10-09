@@ -16,16 +16,11 @@ import PGCollection from './PGCollection'
  */
 class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
   constructor (
-    collection: PGCollection,
-    pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
-  ) {
-    this.collection = collection
-    this.pgConstraint = pgConstraint
-  }
+    public collection: PGCollection,
+    public pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint,
+  ) {}
 
   // Steal the options and catalog reference from our collection ;)
-  public collection: PGCollection
-  public pgConstraint: PGCatalogPrimaryKeyConstraint | PGCatalogUniqueConstraint
   private _options: Options = this.collection._options
   private _pgCatalog: PGCatalog = this.collection._pgCatalog
   private _pgClass: PGCatalogClass = this._pgCatalog.assertGetClass(this.pgConstraint.classId)

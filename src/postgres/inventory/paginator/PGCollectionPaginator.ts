@@ -16,13 +16,10 @@ import PGPaginatorOrderingOffset from './PGPaginatorOrderingOffset'
  */
 class PGCollectionPaginator extends PGPaginator<Condition, PGObjectType.Value> {
   constructor (
-    collection: PGCollection,
+    public collection: PGCollection,
   ) {
     super()
-    this.collection = collection
   }
-
-  public collection: PGCollection
 
   // Steal some stuff from our collection…
   private _pgCatalog: PGCatalog = this.collection._pgCatalog
