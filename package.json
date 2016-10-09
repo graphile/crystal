@@ -22,8 +22,12 @@
     "connection"
   ],
   "main": "build/index.js",
-  "bin": "build/postgraphql/cli/main.js",
-  "scripts": {},
+  "bin": {
+    "postgraphql": "build/postgraphql/cli/main.js"
+  },
+  "scripts": {
+    "prepublish": "scripts/build"
+  },
   "dependencies": {
     "body-parser": "^1.15.2",
     "chalk": "1.1.3",
