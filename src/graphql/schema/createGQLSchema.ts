@@ -38,10 +38,5 @@ export default function createGQLSchema (inventory: Inventory, options: SchemaOp
   return new GraphQLSchema({
     query: getQueryGQLType(buildToken),
     mutation: getMutationGQLType(buildToken),
-    types: [
-      // Make sure to always include the types for our collections, even if
-      // they have no other output.
-      ...inventory.getCollections().map(collection => getCollectionGQLType(buildToken, collection)),
-    ],
   })
 }
