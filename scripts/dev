@@ -9,4 +9,4 @@ $npm_bin/nodemon \
   --ignore __tests__ \
   --ignore __mocks__ \
   --ext js,ts \
-  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli/index.ts --schema a,b,c $@"
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli/main.ts --schema a,b,c $@"

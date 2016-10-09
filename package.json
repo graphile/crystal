@@ -21,8 +21,8 @@
     "relay",
     "connection"
   ],
-  "main": "index.js",
-  "bin": "build/postgraphql/cli/index.js",
+  "main": "build/index.js",
+  "bin": "build/postgraphql/cli/main.js",
   "scripts": {},
   "dependencies": {
     "body-parser": "^1.15.2",
