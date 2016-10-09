@@ -336,7 +336,7 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       debugRequest('GraphQL query request finished.')
 
       // Log the query. If this debugger isn’t enabled, don’t run it.
-      if (queryDocumentAST && options.enableQueryLog) {
+      if (queryDocumentAST && !options.disableQueryLog) {
         const prettyQuery = printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim()
         const errorCount = (result.errors || []).length
         const ms = Math.round(process.hrtime(queryTimeStart)[1] * 10e-7 * 100) / 100

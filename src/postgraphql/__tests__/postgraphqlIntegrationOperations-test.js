@@ -6,7 +6,7 @@ import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 const kitchenSinkData = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../resources/kitchen-sink-data.sql'), (error, data) => {
+  readFile(resolvePath(__dirname, '../../../examples/kitchen-sink/data.sql'), (error, data) => {
     if (error) reject(error)
     else resolve(data.toString())
   })

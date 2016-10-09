@@ -22,7 +22,7 @@ export default async function createPostGraphQLSchema (
     classicIds?: boolean,
     dynamicJson?: boolean,
     jwtSecret?: string,
-    jwtPGTypeIdentifier?: { namespaceName: string, typeName: string },
+    jwtPGTypeIdentifier?: string,
   } = {},
 ): Promise<GraphQLSchema> {
   // Create our inventory.

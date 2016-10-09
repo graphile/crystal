@@ -7,8 +7,10 @@ import { PGCatalog, PGCatalogCompositeType } from '../../../postgres/introspecti
  */
 export default function getPGTokenTypeFromIdentifier (
   pgCatalog: PGCatalog,
-  { namespaceName, typeName }: { namespaceName: string, typeName: string },
+  jwtPGTypeIdentifier: string,
 ): PGCatalogCompositeType {
+  const { namespaceName, typeName } = parseTypeIdentifier(jwtPGTypeIdentifier)
+
   // Try to get the type from our catalog by name.
   const pgType = pgCatalog.getTypeByName(namespaceName, typeName)
 
@@ -32,4 +34,22 @@ export default function getPGTokenTypeFromIdentifier (
 
   // If we have gotten past all that, here is our type.
   return pgType
+}
+
+/**
+ * Enables the parsing of type identifiers. Type identifiers are a bit tricky,
+ * but this function uses a regular expression to do it. Fun.
+ *
+ * @private
+ */
+function parseTypeIdentifier (typeIdentifier: string): { namespaceName: string, typeName: string } {
+  const match = typeIdentifier.match(/^(?:([a-zA-Z1-2_]+)|"([^"]*)")\.(?:([a-zA-Z1-2_]+)|"([^"]*)")$/)
+
+  if (!match)
+    throw new Error(`Type identifier '${typeIdentifier}' is of the incorrect form.`)
+
+  return {
+    namespaceName: match[1] || match[2],
+    typeName: match[3] || match[4],
+  }
 }

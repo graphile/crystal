@@ -54,9 +54,9 @@ export default function createPostGraphQLHTTPRequestHandler (config: {
   // in JSON. Helpful for debugging.
   showErrorStack?: boolean | 'json',
 
-  // Enables a query log. Whenever a GraphQL query is about to be executed, it
+  // Disables the query log. Whenever a GraphQL query is about to be executed, it
   // will first be logged to the console.
-  enableQueryLogin?: boolean,
+  disableQueryLog?: boolean,
 
   // Enables some CORS rules. When enabled there may be some pre-flight
   // requests with negative performance impacts.
