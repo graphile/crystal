@@ -83,6 +83,21 @@ type CreateCompoundKeyPayload {
   query: Query
 }
 
+input CreateEdgeCaseInput {
+  clientMutationId: String
+  edgeCase: EdgeCaseInput!
+}
+
+type CreateEdgeCasePayload {
+  clientMutationId: String
+  edgeCase: EdgeCase
+  edgeCaseEdge(
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+  ): EdgeCasesEdge
+  query: Query
+}
+
 input CreatePersonInput {
   clientMutationId: String
   person: PersonInput!
@@ -149,6 +164,45 @@ type DeletePersonPayload {
   person: Person
   deletedPersonId: ID
   query: Query
+}
+
+type EdgeCase {
+  notNullHasDefault: Boolean!
+}
+
+input EdgeCaseInput {
+  notNullHasDefault: Boolean
+}
+
+# A connection to a list of \`EdgeCase\` values.
+type EdgeCasesConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`EdgeCase\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`EdgeCase\` and cursor to aid in pagination.
+  edges: [EdgeCasesEdge]
+
+  # A list of \`EdgeCase\` objects.
+  nodes: [EdgeCase!]
+}
+
+# A \`EdgeCase\` edge in the connection.
+type EdgeCasesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`EdgeCase\` at the end of the edge.
+  node: EdgeCase!
+}
+
+# Methods to use when ordering \`EdgeCase\`.
+enum EdgeCasesOrderBy {
+  NATURAL
+  NOT_NULL_HAS_DEFAULT_ASC
+  NOT_NULL_HAS_DEFAULT_DESC
 }
 
 scalar Email
@@ -221,6 +275,7 @@ type Mutation {
   updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
+  createEdgeCase(input: CreateEdgeCaseInput!): CreateEdgeCasePayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
@@ -527,6 +582,29 @@ type Query implements Node {
     id: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  allEdgeCases(
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+    notNullHasDefault: Boolean
+  ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.
   allPeople(
@@ -1549,6 +1627,21 @@ type CreateCompoundKeyPayload {
   query: Query
 }
 
+input CreateEdgeCaseInput {
+  clientMutationId: String
+  edgeCase: EdgeCaseInput!
+}
+
+type CreateEdgeCasePayload {
+  clientMutationId: String
+  edgeCase: EdgeCase
+  edgeCaseEdge(
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+  ): EdgeCasesEdge
+  query: Query
+}
+
 input CreateForeignKeyInput {
   clientMutationId: String
   foreignKey: ForeignKeyInput!
@@ -1746,6 +1839,45 @@ type DeleteTypePayload {
   type: Type
   deletedTypeId: ID
   query: Query
+}
+
+type EdgeCase {
+  notNullHasDefault: Boolean!
+}
+
+input EdgeCaseInput {
+  notNullHasDefault: Boolean
+}
+
+# A connection to a list of \`EdgeCase\` values.
+type EdgeCasesConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`EdgeCase\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`EdgeCase\` and cursor to aid in pagination.
+  edges: [EdgeCasesEdge]
+
+  # A list of \`EdgeCase\` objects.
+  nodes: [EdgeCase!]
+}
+
+# A \`EdgeCase\` edge in the connection.
+type EdgeCasesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`EdgeCase\` at the end of the edge.
+  node: EdgeCase!
+}
+
+# Methods to use when ordering \`EdgeCase\`.
+enum EdgeCasesOrderBy {
+  NATURAL
+  NOT_NULL_HAS_DEFAULT_ASC
+  NOT_NULL_HAS_DEFAULT_DESC
 }
 
 scalar Email
@@ -1987,6 +2119,7 @@ type Mutation {
   updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
   deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
   deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
+  createEdgeCase(input: CreateEdgeCaseInput!): CreateEdgeCasePayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
@@ -2615,6 +2748,29 @@ type Query implements Node {
     __id: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  allEdgeCases(
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+    notNullHasDefault: Boolean
+  ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.
   allPeople(

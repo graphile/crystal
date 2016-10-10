@@ -152,6 +152,22 @@ mutation {
       name
     }
   }
+  e: createEdgeCase(input: {
+    edgeCase: {
+      notNullHasDefault: true
+    }
+  }) {
+    edgeCase {
+      notNullHasDefault
+    }
+  }
+  f: createEdgeCase(input: {
+    edgeCase: {}
+  }) {
+    edgeCase {
+      notNullHasDefault
+    }
+  }
 }
 
 fragment createPersonPayload on CreatePersonPayload {

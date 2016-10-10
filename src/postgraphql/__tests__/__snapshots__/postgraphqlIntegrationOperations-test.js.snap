@@ -772,6 +772,16 @@ Object {
         "name": "Best Pal",
       },
     },
+    "e": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": true,
+      },
+    },
+    "f": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": false,
+      },
+    },
   },
 }
 `;

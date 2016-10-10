@@ -74,8 +74,10 @@ export default function createCreateCollectionMutationFieldEntry (
     execute: (context, input) => {
       const value = transformGQLInputValue(inputFieldType, input[inputFieldName])
 
-      if (!collection.type.isTypeOf(value))
-        throw new Error(`Created object is not of the correct type for collection '${collection.name}'.`)
+      // TODO: This can’t be the best solution? `isTypeOf` fails though for
+      // default fields that don’t exist.
+      if (!(value instanceof Map))
+        throw new Error('Value must be a `Map`.')
 
       return collection.create!(context, value)
     },
