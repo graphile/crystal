@@ -11745,7 +11745,7 @@ type PlpgsqlValidatorPayload {
 }
 
 # The root query type which gives access points into the data universe.
-type Query {
+type Query implements Node {
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
@@ -20124,6 +20124,9 @@ type Query {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   query: Query!
+
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  __id: ID!
 }
 
 input RandomInput {

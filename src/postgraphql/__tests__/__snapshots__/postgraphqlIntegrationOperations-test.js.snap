@@ -1505,13 +1505,38 @@ Object {
 exports[`test operation query.graphql 1`] = `
 Object {
   "data": Object {
-    "node": null,
+    "__id": "query",
+    "a": null,
+    "b": Object {
+      "__id": "query",
+      "__typename": "Query",
+      "a": null,
+      "b": Object {
+        "__id": "query",
+        "__typename": "Query",
+      },
+    },
     "query": Object {
-      "node": null,
+      "__id": "query",
+      "a": null,
+      "b": Object {
+        "__id": "query",
+        "__typename": "Query",
+      },
       "query": Object {
-        "node": null,
+        "__id": "query",
+        "a": null,
+        "b": Object {
+          "__id": "query",
+          "__typename": "Query",
+        },
         "query": Object {
-          "node": null,
+          "__id": "query",
+          "a": null,
+          "b": Object {
+            "__id": "query",
+            "__typename": "Query",
+          },
         },
       },
     },
