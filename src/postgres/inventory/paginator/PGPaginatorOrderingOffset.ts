@@ -49,12 +49,18 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     config: Paginator.PageConfig<OffsetCursor>,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
     const client = pgClientFromContext(context)
-    const { first, last, beforeCursor, afterCursor } = config
+    const { first, last, beforeCursor, afterCursor, _offset } = config
 
     // Do not allow `first` and `last` to be defined at the same time. THERE
     // MAY ONLY BE 1!!
     if (first != null && last != null)
       throw new Error('`first` and `last` may not be defined at the same time.')
+
+    // Disallow the use of `offset` with `last`. We are currently still
+    // evaluating how best to implement paginators and offsets, trying to
+    // support `last` and `offset` adds complexity we don’t need.
+    if (_offset != null && last != null)
+      throw new Error('`offset` may not be used with `last`.')
 
     // Check that the types of our cursors is exactly what we would expect.
     if (afterCursor != null && !Number.isInteger(afterCursor))
@@ -90,7 +96,9 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     if (last == null || (last != null && beforeCursor != null && beforeCursor - (afterCursor != null ? afterCursor : 0) <= last)) {
       // Start selecting at the offset specified by `after`. If there is no
       // after, we start selecting at the beginning (0).
-      offset = afterCursor != null ? afterCursor : 0
+      //
+      // Also add our offset if given one.
+      offset = (afterCursor != null ? afterCursor : 0) + (_offset || 0)
 
       // Next create our limit (what we will be selecting to relative to our
       // `offset`).

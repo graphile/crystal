@@ -46,12 +46,18 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
   ): Promise<Paginator.Page<PGObjectType.Value, AttributesCursor>> {
     const client = pgClientFromContext(context)
     const { descending, pgAttributes } = this
-    const { beforeCursor, afterCursor, first, last } = config
+    const { beforeCursor, afterCursor, first, last, _offset } = config
 
     // Do not allow `first` and `last` to be defined at the same time. THERE
     // MAY ONLY BE 1!!
     if (first != null && last != null)
       throw new Error('`first` and `last` may not be defined at the same time.')
+
+    // Disallow the use of `offset` with `last`. We are currently still
+    // evaluating how best to implement paginators and offsets, trying to
+    // support `last` and `offset` adds complexity we don’t need.
+    if (_offset != null && last != null)
+      throw new Error('`offset` may not be used with `last`.')
 
     // Perform some validations on our cursors. If they do not pass these
     // conditions, we should not proceed.
@@ -89,6 +95,9 @@ implements Paginator.Ordering<TInput, PGObjectType.Value, AttributesCursor> {
 
       -- Finally, apply the appropriate limit.
       limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
+
+      -- If we have an offset, add that as well.
+      ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
     `)
 
     let { rows } = await client.query(query)

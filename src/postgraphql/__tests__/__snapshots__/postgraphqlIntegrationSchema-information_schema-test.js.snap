@@ -2371,6 +2371,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     oid: Float
     fdwowner: Float
     fdwoptions: [String]
@@ -2396,6 +2400,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     oid: Float
     srvoptions: [String]
     foreignServerCatalog: SqlIdentifier
@@ -2423,6 +2431,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     nspname: String
     relname: String
     attname: String
@@ -2445,6 +2457,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignTableCatalog: SqlIdentifier
     foreignTableSchema: String
     foreignTableName: String
@@ -2470,6 +2486,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     oid: Float
     umoptions: [String]
     umuser: Float
@@ -2495,6 +2515,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantee: SqlIdentifier
     roleName: SqlIdentifier
     isGrantable: YesOrNo
@@ -2516,6 +2540,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantee: SqlIdentifier
     roleName: SqlIdentifier
     isGrantable: YesOrNo
@@ -2537,6 +2565,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     udtCatalog: SqlIdentifier
     udtSchema: SqlIdentifier
     udtName: SqlIdentifier
@@ -2586,6 +2618,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     characterSetCatalog: SqlIdentifier
     characterSetSchema: SqlIdentifier
     characterSetName: SqlIdentifier
@@ -2612,6 +2648,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -2636,6 +2676,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -2658,6 +2702,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     collationCatalog: SqlIdentifier
     collationSchema: SqlIdentifier
     collationName: SqlIdentifier
@@ -2682,6 +2730,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     collationCatalog: SqlIdentifier
     collationSchema: SqlIdentifier
     collationName: SqlIdentifier
@@ -2704,6 +2756,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     domainCatalog: SqlIdentifier
     domainSchema: SqlIdentifier
     domainName: SqlIdentifier
@@ -2729,6 +2785,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: String
     tableName: String
@@ -2753,6 +2813,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     tableCatalog: SqlIdentifier
@@ -2779,6 +2843,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     udtCatalog: SqlIdentifier
     udtSchema: SqlIdentifier
     udtName: SqlIdentifier
@@ -2804,6 +2872,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier
@@ -2866,6 +2938,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier
@@ -2891,6 +2967,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier
@@ -2915,6 +2995,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     objectCatalog: SqlIdentifier
     objectSchema: SqlIdentifier
     objectName: SqlIdentifier
@@ -2938,6 +3022,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -2964,6 +3052,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     udtCatalog: SqlIdentifier
     udtSchema: SqlIdentifier
     udtName: SqlIdentifier
@@ -2988,6 +3080,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     domainCatalog: SqlIdentifier
     domainSchema: SqlIdentifier
     domainName: SqlIdentifier
@@ -3033,6 +3129,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     objectCatalog: SqlIdentifier
     objectSchema: SqlIdentifier
     objectName: SqlIdentifier
@@ -3080,6 +3180,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     roleName: SqlIdentifier
   ): EnabledRolesConnection
 
@@ -3099,6 +3203,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignDataWrapperCatalog: SqlIdentifier
     foreignDataWrapperName: SqlIdentifier
     optionName: SqlIdentifier
@@ -3121,6 +3229,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignDataWrapperCatalog: SqlIdentifier
     foreignDataWrapperName: SqlIdentifier
     authorizationIdentifier: SqlIdentifier
@@ -3144,6 +3256,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignServerCatalog: SqlIdentifier
     foreignServerName: SqlIdentifier
     optionName: SqlIdentifier
@@ -3166,6 +3282,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignServerCatalog: SqlIdentifier
     foreignServerName: SqlIdentifier
     foreignDataWrapperCatalog: SqlIdentifier
@@ -3191,6 +3311,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignTableCatalog: SqlIdentifier
     foreignTableSchema: String
     foreignTableName: String
@@ -3214,6 +3338,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     foreignTableCatalog: SqlIdentifier
     foreignTableSchema: String
     foreignTableName: String
@@ -3237,6 +3365,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     catalogName: SqlIdentifier
   ): InformationSchemaCatalogNamesConnection
 
@@ -3256,6 +3388,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -3283,6 +3419,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     specificCatalog: SqlIdentifier
     specificSchema: SqlIdentifier
     specificName: SqlIdentifier
@@ -3333,6 +3473,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -3360,6 +3504,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     tableCatalog: SqlIdentifier
@@ -3386,6 +3534,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     specificCatalog: SqlIdentifier
@@ -3414,6 +3566,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     tableCatalog: SqlIdentifier
@@ -3440,6 +3596,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     udtCatalog: SqlIdentifier
@@ -3465,6 +3625,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     objectCatalog: SqlIdentifier
@@ -3491,6 +3655,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     specificCatalog: SqlIdentifier
@@ -3519,6 +3687,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     specificCatalog: SqlIdentifier
     specificSchema: SqlIdentifier
     specificName: SqlIdentifier
@@ -3619,6 +3791,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     catalogName: SqlIdentifier
     schemaName: SqlIdentifier
     schemaOwner: SqlIdentifier
@@ -3644,6 +3820,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     sequenceCatalog: SqlIdentifier
     sequenceSchema: SqlIdentifier
     sequenceName: SqlIdentifier
@@ -3674,6 +3854,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     featureId: CharacterData
     featureName: CharacterData
     subFeatureId: CharacterData
@@ -3699,6 +3883,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     implementationInfoId: CharacterData
     implementationInfoName: CharacterData
     integerValue: CardinalNumber
@@ -3722,6 +3910,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     sqlLanguageSource: CharacterData
     sqlLanguageYear: CharacterData
     sqlLanguageConformance: CharacterData
@@ -3747,6 +3939,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     featureId: CharacterData
     featureName: CharacterData
     isSupported: YesOrNo
@@ -3770,6 +3966,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     featureId: CharacterData
     featureName: CharacterData
     isSupported: YesOrNo
@@ -3793,6 +3993,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     sizingId: CardinalNumber
     sizingName: CharacterData
     supportedValue: CardinalNumber
@@ -3815,6 +4019,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     sizingId: CardinalNumber
     sizingName: CharacterData
     profileId: CharacterData
@@ -3838,6 +4046,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     constraintCatalog: SqlIdentifier
     constraintSchema: SqlIdentifier
     constraintName: SqlIdentifier
@@ -3865,6 +4077,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     tableCatalog: SqlIdentifier
@@ -3891,6 +4107,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier
@@ -3921,6 +4141,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     udtCatalog: SqlIdentifier
     udtSchema: SqlIdentifier
     udtName: SqlIdentifier
@@ -3947,6 +4171,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     triggerCatalog: SqlIdentifier
     triggerSchema: SqlIdentifier
     triggerName: SqlIdentifier
@@ -3972,6 +4200,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     triggerCatalog: SqlIdentifier
     triggerSchema: SqlIdentifier
     triggerName: SqlIdentifier
@@ -4007,6 +4239,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     udtCatalog: SqlIdentifier
@@ -4032,6 +4268,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     grantor: SqlIdentifier
     grantee: SqlIdentifier
     objectCatalog: SqlIdentifier
@@ -4058,6 +4298,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     userDefinedTypeCatalog: SqlIdentifier
     userDefinedTypeSchema: SqlIdentifier
     userDefinedTypeName: SqlIdentifier
@@ -4105,6 +4349,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     authorizationIdentifier: SqlIdentifier
     foreignServerCatalog: SqlIdentifier
     foreignServerName: SqlIdentifier
@@ -4128,6 +4376,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     authorizationIdentifier: SqlIdentifier
     foreignServerCatalog: SqlIdentifier
     foreignServerName: SqlIdentifier
@@ -4149,6 +4401,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     viewCatalog: SqlIdentifier
     viewSchema: SqlIdentifier
     viewName: SqlIdentifier
@@ -4174,6 +4430,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier
@@ -4198,6 +4458,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     viewCatalog: SqlIdentifier
     viewSchema: SqlIdentifier
     viewName: SqlIdentifier
@@ -4222,6 +4486,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     tableCatalog: SqlIdentifier
     tableSchema: SqlIdentifier
     tableName: SqlIdentifier

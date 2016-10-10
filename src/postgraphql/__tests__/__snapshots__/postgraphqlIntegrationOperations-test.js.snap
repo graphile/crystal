@@ -405,6 +405,39 @@ Object {
       },
       "totalCount": 4,
     },
+    "m": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+      },
+      "totalCount": 5,
+    },
   },
 }
 `;

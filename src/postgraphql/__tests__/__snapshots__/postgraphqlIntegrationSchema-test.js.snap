@@ -331,6 +331,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): PersonFriendsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -349,6 +353,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -367,6 +375,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): CompoundKeysConnection
 }
 
@@ -449,6 +461,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     x: Int
     y: Int
     z: Int
@@ -473,6 +489,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): TableSetQueryConnection
   typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
@@ -492,6 +512,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     personId2: Int
     personId1: Int
     extra: Boolean
@@ -520,6 +544,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     rowId: Int
     name: String
     about: String
@@ -983,6 +1011,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     id: Int
     smallint: Int
     bigint: Int
@@ -1031,6 +1063,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     x: Int
     name: String
     description: String
@@ -1406,6 +1442,10 @@ type CompoundKey implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): ForeignKeysConnection
 }
 
@@ -2104,6 +2144,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): PersonFriendsConnection
 
   # Reads and enables paginatation through a set of \`Post\`.
@@ -2122,6 +2166,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): PostsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -2140,6 +2188,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -2158,6 +2210,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
@@ -2176,6 +2232,10 @@ type Person implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): ForeignKeysConnection
 }
 
@@ -2330,6 +2390,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     x: Int
     y: Int
     z: Int
@@ -2354,6 +2418,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
   ): TableSetQueryConnection
   typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
@@ -2373,6 +2441,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     personId: Int
     compoundKey1: Int
     compoundKey2: Int
@@ -2394,6 +2466,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     column: Int
   ): NonUpdatableViewsConnection
 
@@ -2413,6 +2489,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     id: Int
     headline: String
     body: String
@@ -2442,6 +2522,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     id: Int
     smallint: Int
     bigint: Int
@@ -2490,6 +2574,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     x: Int
     name: String
     description: String
@@ -2512,6 +2600,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     personId2: Int
     personId1: Int
     extra: Boolean
@@ -2540,6 +2632,10 @@ type Query implements Node {
 
     # Only read the last \`n\` values of the set.
     last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
     id: Int
     name: String
     about: String

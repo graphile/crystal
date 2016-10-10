@@ -34,7 +34,7 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
     after?: NamespacedCursor<TCursor>,
     first?: number,
     last?: number,
-    input: TInput,
+    offset?: number,
   }
 
   return {
@@ -60,6 +60,10 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
         description: 'Only read the last `n` values of the set.',
         type: GraphQLInt,
       }],
+      ['offset', {
+        description: 'Skip the first `n` values from our `after` cursor, an alternative to cursor based pagination. May not be used with `last`.',
+        type: GraphQLInt,
+      }],
       // Add all of the field entries that will eventually make up our
       // condition.
       ...(config.inputArgEntries ? config.inputArgEntries : []),
@@ -77,6 +81,7 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
         after: afterCursor,
         first,
         last,
+        offset: _offset,
       } = args
 
       // Throw an error if the user is trying to use a cursor from another
@@ -97,6 +102,7 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
         afterCursor: afterCursor && afterCursor.cursor,
         first,
         last,
+        _offset,
       }
 
       // Get our ordering.

@@ -425,8 +425,25 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
+        test('will offset the results when provided an `offset`', async () => {
+          const [page1, page2] = await Promise.all([
+            ordering.readPage(context, true, { _offset: 1 }),
+            ordering.readPage(context, true, { _offset: 3 }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(3))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([false, true, false, true])
+        })
+
         test('will fail when trying to use `first` and `last` together', async () => {
           expect((await ordering.readPage(context, true, { first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
+        })
+
+        test('will fail when trying to use `last` and `offset` together', async () => {
+          expect((await ordering.readPage(context, true, { last: 1, _offset: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`offset` may not be used with `last`.')
         })
 
         test('can use `beforeCursor` and `first` together', async () => {
@@ -505,6 +522,45 @@ paginatorFixtures.forEach(paginatorFixture => {
 
           expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
             .toEqual([true, true, true, true])
+        })
+
+        test('can use `first` with `offset`', async () => {
+          const [page1, page2] = await Promise.all([
+            ordering.readPage(context, true, { first: 2, _offset: 1 }),
+            ordering.readPage(context, true, { first: 2, _offset: 3 }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(1, 3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(3, 5))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, false, true])
+        })
+
+        test('can use `afterCursor` with `offset`', async () => {
+          const [page1, page2] = await Promise.all([
+            ordering.readPage(context, true, { _offset: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
+            ordering.readPage(context, true, { _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(3))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([false, true, false, true])
+        })
+
+        test('can use `first`, `afterCursor`, and `offset` together', async () => {
+          const [page1, page2] = await Promise.all([
+            ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[0].cursor }),
+            ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
+          ])
+
+          expect(page1.values).toEqual(sortedValuesWithCursors.slice(2, 3))
+          expect(page2.values).toEqual(sortedValuesWithCursors.slice(3))
+
+          expect(await Promise.all([page1.hasNextPage(), page1.hasPreviousPage(), page2.hasNextPage(), page2.hasPreviousPage()]))
+            .toEqual([true, true, false, true])
         })
       })
     })

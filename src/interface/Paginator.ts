@@ -105,6 +105,7 @@ namespace Paginator {
    *
    * Cannot use `first` and `last` at the same time.
    */
+  // TODO: Create a better way to manage page configs…
   export type PageConfig<TCursor> = {
     first?: number,
     last?: number,
@@ -112,6 +113,12 @@ namespace Paginator {
     afterCursor?: TCursor,
     // TODO: rename to end cursor
     beforeCursor?: TCursor,
+    // TODO: make this official or remove it. Perhaps add another limit/offset
+    // paginator method? This should only work with `first`, which is basically
+    // “limit”. You’ll generally only ever want to use `offset` with `first`
+    // anyway.
+    // TODO: rename to `skip`?
+    _offset?: number,
   }
 
   /**
