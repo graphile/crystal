@@ -73,7 +73,7 @@
     "eslint": "^3.7.1",
     "eslint-config-calebmer": "^8.2.1",
     "expect": "^1.20.2",
-    "mocha": "^3.1.0",
+    "mocha": "^3.1.2",
     "supertest": "^2.0.0",
     "supertest-as-promised": "^4.0.0"
   }
