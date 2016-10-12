@@ -92,6 +92,16 @@ Object {
       "typeId": "bool",
     },
     Object {
+      "classId": "edge_case",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "wont_cast_easy",
+      "num": 2,
+      "typeId": "int2",
+    },
+    Object {
       "classId": "foreign_key",
       "description": null,
       "hasDefault": false,
@@ -1068,6 +1078,23 @@ Object {
       "name": "compound_type_query",
       "namespaceId": "b",
       "returnTypeId": "compound_type",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "edge_case",
+      ],
+      "argTypeIds": Array [
+        "edge_case",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "edge_case_computed",
+      "namespaceId": "c",
+      "returnTypeId": "text",
       "returnsSet": false,
     },
     Object {

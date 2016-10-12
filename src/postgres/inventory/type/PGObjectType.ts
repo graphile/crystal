@@ -16,6 +16,7 @@ import getTypeFromPGType from './getTypeFromPGType'
  * Users of this type are still expected to provide their own name and
  * description.
  */
+// TODO: Refactor this and `PGClassObjectType`
 class PGObjectType extends ObjectType {
   // Overrides the `fields` type so that we recognize our custom field type.
   public readonly fields: Map<string, PGObjectType.Field<mixed>>

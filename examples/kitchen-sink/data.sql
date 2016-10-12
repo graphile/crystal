@@ -63,3 +63,8 @@ insert into b.types values (
   (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 8),
   ((3, '456', 'red', 'aed18400-2a92-46df-8204-b70c728b3520', 93), (42, 'Hello, world!', 'blue', 'd34df5e0-83f1-11e6-8dd0-abee917ffd1e', -5), 7)
 );
+
+insert into c.edge_case values
+  (default, 20),
+  (true, null),
+  (false, -512);

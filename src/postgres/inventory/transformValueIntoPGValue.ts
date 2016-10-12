@@ -12,7 +12,7 @@ import {
   ObjectType,
 } from '../../interface'
 import { sql } from '../utils'
-import PGObjectType from './type/PGObjectType'
+import PGClassObjectType from './type/PGClassObjectType'
 
 export const $$transformValueIntoPGValue = Symbol()
 
@@ -69,7 +69,7 @@ export default function transformValueIntoPGValue (type: Type<mixed>, value: mix
     return sql.query`(${sql.value(value)} + 0)`
 
   // If this is a Postgres object type, let’s do some special tuple stuff.
-  if (type instanceof PGObjectType) {
+  if (type instanceof PGClassObjectType) {
     // Check that we have a value of the correct type.
     if (!type.isTypeOf(value))
       throw new Error('Value is not of the correct type.')
@@ -78,13 +78,13 @@ export default function transformValueIntoPGValue (type: Type<mixed>, value: mix
     // `PGObjectType`, so we just build a tuple using our fields.
     return sql.query`(${sql.join(Array.from(type.fields).map(([fieldName, field]) =>
       transformValueIntoPGValue(field.type, value.get(fieldName))
-    ), ', ')})`
+    ), ', ')})::${sql.identifier(type.pgType.namespaceName, type.pgType.name)}`
   }
 
   // If this a normal object type, throw an error. Ain’t nobody got time for
   // dat!
   if (type instanceof ObjectType)
-    throw new Error('All Postgres object types should be `PGObjectType`.')
+    throw new Error('All Postgres object types going into the database should be `PGClassObjectType`.')
 
   // If we don’t recognize the type, throw an error.
   throw new Error(`Type '${type.toString()}' is not a recognized type for transforming values into SQL.`)

@@ -34,4 +34,11 @@ query {
       }
     }
   }
+  allEdgeCases {
+    nodes {
+      notNullHasDefault
+      wontCastEasy
+      computed
+    }
+  }
 }

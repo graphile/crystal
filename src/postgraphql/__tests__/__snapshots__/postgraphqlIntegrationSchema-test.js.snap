@@ -168,10 +168,13 @@ type DeletePersonPayload {
 
 type EdgeCase {
   notNullHasDefault: Boolean!
+  wontCastEasy: Int
+  computed: String
 }
 
 input EdgeCaseInput {
   notNullHasDefault: Boolean
+  wontCastEasy: Int
 }
 
 # A connection to a list of \`EdgeCase\` values.
@@ -203,6 +206,8 @@ enum EdgeCasesOrderBy {
   NATURAL
   NOT_NULL_HAS_DEFAULT_ASC
   NOT_NULL_HAS_DEFAULT_DESC
+  WONT_CAST_EASY_ASC
+  WONT_CAST_EASY_DESC
 }
 
 scalar Email
@@ -604,6 +609,7 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
     notNullHasDefault: Boolean
+    wontCastEasy: Int
   ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -1843,10 +1849,13 @@ type DeleteTypePayload {
 
 type EdgeCase {
   notNullHasDefault: Boolean!
+  wontCastEasy: Int
+  computed: String
 }
 
 input EdgeCaseInput {
   notNullHasDefault: Boolean
+  wontCastEasy: Int
 }
 
 # A connection to a list of \`EdgeCase\` values.
@@ -1878,6 +1887,8 @@ enum EdgeCasesOrderBy {
   NATURAL
   NOT_NULL_HAS_DEFAULT_ASC
   NOT_NULL_HAS_DEFAULT_DESC
+  WONT_CAST_EASY_ASC
+  WONT_CAST_EASY_DESC
 }
 
 scalar Email
@@ -2770,6 +2781,7 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
     notNullHasDefault: Boolean
+    wontCastEasy: Int
   ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.

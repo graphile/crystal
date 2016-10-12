@@ -1147,6 +1147,25 @@ Object {
 exports[`test operation procedure-computed-fields.graphql 1`] = `
 Object {
   "data": Object {
+    "allEdgeCases": Object {
+      "nodes": Array [
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": false,
+          "wontCastEasy": 20,
+        },
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": true,
+          "wontCastEasy": null,
+        },
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": false,
+          "wontCastEasy": -512,
+        },
+      ],
+    },
     "allPeople": Object {
       "nodes": Array [
         Object {
