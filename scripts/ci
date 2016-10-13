@@ -2,11 +2,6 @@
 
 set -e
 
-ls .
-ls ./src
-ls ./src/graphql
-ls ./src/graphql/schema
-
 echo "[1/3]: Building Code"
 scripts/build
 
