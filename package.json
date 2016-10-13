@@ -25,9 +25,7 @@
   "bin": {
     "postgraphql": "build/postgraphql/cli/main.js"
   },
-  "scripts": {
-    "prepublish": "scripts/build"
-  },
+  "scripts": {},
   "dependencies": {
     "body-parser": "^1.15.2",
     "chalk": "1.1.3",
