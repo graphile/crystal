@@ -125,7 +125,11 @@ with
       left join pg_catalog.pg_description as dsc on dsc.objoid = att.attrelid and dsc.objsubid = att.attnum
     where
       att.attrelid in (select "id" from class) and
-      att.attnum > 0
+      att.attnum > 0 and
+      -- We need to make sure that the type id is not 0, because dropped
+      -- columns will still exist in the `pg_catalog.pg_attribute` table with a
+      -- type id of 0! This way we can filter out dropped columns.
+      att.atttypid != 0
     order by
       att.attrelid, att.attnum
   ),

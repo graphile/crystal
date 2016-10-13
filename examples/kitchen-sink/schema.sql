@@ -80,8 +80,11 @@ create table a.foreign_key (
 
 create table c.edge_case (
   not_null_has_default boolean not null default false,
-  wont_cast_easy smallint
+  wont_cast_easy smallint,
+  drop_me text
 );
+
+alter table c.edge_case drop column drop_me;
 
 create function c.edge_case_computed(edge_case c.edge_case) returns text as $$ select 'hello world'::text $$ language sql stable;
 
