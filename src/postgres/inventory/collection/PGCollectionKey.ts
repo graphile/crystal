@@ -2,7 +2,7 @@ import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { CollectionKey } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
-import { PGCatalog, PGCatalogNamespace, PGCatalogType, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
+import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
