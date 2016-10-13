@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - "6"
+  - "5"
+
+addons:
+  postgresql:
+    - "9.4"
+    - "9.5"
+
+env:
+  TEST_PG_URL: postgres://localhost:5432/travis
+
+script:
+  - scripts/ci
