@@ -13,6 +13,7 @@ import {
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import setupRequestPGClientTransaction from './setupRequestPGClientTransaction'
+import debugPGClient from './debugPGClient'
 
 const chalk = require('chalk')
 const Debugger = require('debug')
@@ -21,10 +22,7 @@ const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 
-const $$pgClientOrigQuery = Symbol()
-
 const debugGraphql = new Debugger('postgraphql:graphql')
-const debugPG = new Debugger('postgraphql:postgres')
 const debugRequest = new Debugger('postgraphql:request')
 
 const favicon = new Promise((resolve, reject) => {
@@ -272,22 +270,8 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       // Connect a new Postgres client and start a transaction.
       const pgClient = await pgPool.connect()
 
-      // If Postgres debugging is enabled, enhance our query function by adding
-      // a debug statement.
-      if (debugPG.enabled) {
-        // Set the original query method to a key on our client. If that key is
-        // already set, use that.
-        pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
-
-        pgClient.query = function (...args) {
-          // Debug just the query text. We don’t want to debug variables because
-          // there may be passwords in there.
-          debugPG(args[0] && args[0].text ? args[0].text : args[0])
-
-          // Call the original query method.
-          return pgClient[$$pgClientOrigQuery].apply(this, args)
-        }
-      }
+      // Enhance our Postgres client with debugging stuffs.
+      debugPGClient(pgClient)
 
       // Begin our transaction and set it up.
       await pgClient.query('begin')
@@ -339,7 +323,8 @@ export default function createPostGraphQLHTTPRequestHandler (options) {
       if (queryDocumentAST && !options.disableQueryLog) {
         const prettyQuery = printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim()
         const errorCount = (result.errors || []).length
-        const ms = Math.round(process.hrtime(queryTimeStart)[1] * 10e-7 * 100) / 100
+        const timeDiff = process.hrtime(queryTimeStart)
+        const ms = Math.round(timeDiff[0] * 1000) + (Math.round(timeDiff[1] * 10e-7 * 100) / 100)
 
         // If we have enabled the query log for the HTTP handler, use that.
         console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)

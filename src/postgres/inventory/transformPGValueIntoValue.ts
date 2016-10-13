@@ -23,6 +23,7 @@ export const $$transformPGValueIntoValue = Symbol()
  * we can use in our interface. If the type has an implementation for the
  * symbol `$$transformPGValue` then that implementation will be used.
  */
+// TODO: Remove need for transformers.
 export default function transformPGValueIntoValue (type: Type<mixed>, value: mixed): mixed {
   // If the type has defined a custom implementation for this function, use it.
   if (type[$$transformPGValueIntoValue])

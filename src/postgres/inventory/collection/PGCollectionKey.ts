@@ -2,7 +2,7 @@ import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { CollectionKey } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
-import { PGCatalog, PGCatalogNamespace, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
+import { PGCatalog, PGCatalogNamespace, PGCatalogType, PGCatalogClass, PGCatalogAttribute, PGCatalogPrimaryKeyConstraint, PGCatalogUniqueConstraint } from '../../introspection'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import transformPGValueIntoValue from '../transformPGValueIntoValue'
@@ -85,7 +85,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
    *
    * @private
    */
-  private _getSQLKeyCondition (key: PGObjectType.Value): sql.SQL {
+  private _getSQLSingleKeyCondition (key: PGObjectType.Value): sql.SQL {
     return sql.join(this._keyTypeFields.map(([fieldName, field]) =>
       sql.query`${sql.identifier(field.pgAttribute.name)} = ${transformValueIntoPGValue(field.type, key.get(fieldName))}`
     ), ' and ')
@@ -133,34 +133,50 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         // query to remove whitespace and disable query minimization when
         // compiling.
         const query = sql.compile(sql.query`
-          ${sql.join(keys.map(key =>
-            // We wrap our actual selection in another select to allow a
-            // local `limit` clause.
-            sql.query`
-              select (
-                -- Select our rows as JSON objects.
-                select row_to_json(${sql.identifier(aliasIdentifier)}) as object
-                from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
+          -- Select our rows as JSON objects.
+          select row_to_json(${sql.identifier(aliasIdentifier)}) as object
+          from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
 
-                -- For all of our key attributes we need to test equality with a
-                -- key value.
-                where ${this._getSQLKeyCondition(key)}
-
-                -- Combine our selected row with a single null and a limit.
-                -- This way if our where clause misses, we’ll get the null. If
-                -- our where clause does not miss we will get the row and no
-                -- null.
-                union all
-                select null
-                limit 1
-              )
+          -- For all of our key attributes we need to test equality with a
+          -- key value. If we only have one key type field, we make anoptimization.
+          where ${this._keyTypeFields.length === 1
+            // Our optimization will allow us to pass an array of single key
+            // values. Once we get into the world of arrays of compound types,
+            // that’s where this approach gets tricky. By far this method
+            // appears to be the fastest.
+            ? sql.query`${sql.identifier(this._keyTypeFields[0][1].pgAttribute.name)} = any(${sql.value(keys.map(key => key.get(this._keyTypeFields[0][0])))})`
+            // Otherwise we send all of our keys as parametized values for
+            // compound keys. This could be optimized, it would appear as if
+            // the approach above will almost always be fastest.
+            : sql.query`
+              (${sql.join(this._keyTypeFields.map(([, field]) => sql.identifier(field.pgAttribute.name)), ', ')})
+              in (${sql.join(keys.map(key =>
+                sql.query`(${sql.join(this._keyTypeFields.map(([fieldName, field]) =>
+                  transformValueIntoPGValue(field.type, key.get(fieldName))
+                ), ', ')})`
+              ), ', ')})
             `
-          ), ' union all ')}
+          }
+
+          -- Throw in a limit for good measure.
+          limit ${sql.value(keys.length)}
         `)
 
         const { rows } = await client.query(query)
+
+        const values = new Map(rows.map<[string, PGObjectType.Value]>(({ object }) => {
+          const value = transformPGValueIntoValue(this.collection.type, object) as PGObjectType.Value
+          const keyString = this._keyTypeFields.map(([fieldName]) => value.get(fieldName)).join('-')
+          return [keyString, value]
+        }))
+
+        return keys.map(key => {
+          const keyString = this._keyTypeFields.map(([fieldName]) => key.get(fieldName)).join('-')
+          return values.get(keyString) || null
+        })
+
         // tslint:disable-next-line no-any
-        return rows.map(({ object }) => object == null ? null : transformPGValueIntoValue(this.collection.type, object) as any)
+        // return rows.map(({ object }) => object == null ? null : transformPGValueIntoValue(this.collection.type, object) as any)
       }
     )
   }
@@ -200,7 +216,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
               return sql.query`${sql.identifier(pgAttributeName)} = ${transformValueIntoPGValue(field.type, value)}`
             }), ', ')}
 
-            where ${this._getSQLKeyCondition(key)}
+            where ${this._getSQLSingleKeyCondition(key)}
             returning *
           )
           select row_to_json(${sql.identifier(updatedIdentifier)}) as object from ${sql.identifier(updatedIdentifier)}
@@ -235,7 +251,7 @@ class PGCollectionKey implements CollectionKey<PGObjectType.Value> {
         const query = sql.compile(sql.query`
           with ${sql.identifier(deletedIdentifier)} as (
             delete from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)}
-            where ${this._getSQLKeyCondition(key)}
+            where ${this._getSQLSingleKeyCondition(key)}
             returning *
           )
           select row_to_json(${sql.identifier(deletedIdentifier)}) as object from ${sql.identifier(deletedIdentifier)}
