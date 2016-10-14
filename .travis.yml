@@ -10,5 +10,9 @@ addons:
 env:
   TEST_PG_URL: postgres://localhost:5432/travis
 
+cache:
+  directories:
+    - node_modules
+
 script:
   - scripts/ci
