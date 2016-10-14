@@ -1,6 +1,6 @@
 import { GraphQLSchema } from 'graphql'
 import { Inventory } from '../../interface'
-import BuildToken, { _BuildTokenHooks } from './BuildToken'
+import BuildToken, { _BuildTokenHooks, _BuildTokenTypeOverrides } from './BuildToken'
 import getQueryGQLType from './getQueryGQLType'
 import getMutationGQLType from './getMutationGQLType'
 
@@ -15,6 +15,9 @@ export type SchemaOptions = {
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
+  // GraphQL types that override the default type generation. Currently this
+  // API is private. Use at your own risk.
+  _typeOverrides?: _BuildTokenTypeOverrides,
 }
 
 /**
@@ -32,6 +35,7 @@ export default function createGQLSchema (inventory: Inventory, options: SchemaOp
       dynamicJson: options.dynamicJson || false,
     },
     _hooks: options._hooks || {},
+    _typeOverrides: options._typeOverrides || new Map(),
   }
 
   return new GraphQLSchema({

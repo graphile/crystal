@@ -26,10 +26,13 @@ import {
 import { $$gqlInputObjectTypeValueKeyName } from '../transformGQLInputValue'
 import getGQLType, { _getJSONGQLType } from '../getGQLType'
 
-const mockBuildToken = () => ({
+const mockBuildToken = ({
+  _typeOverrides = new Map(),
+} = {}) => ({
   inventory: {
     getCollections: () => [],
   },
+  _typeOverrides,
 })
 
 const mockEnumType = () =>
@@ -159,6 +162,28 @@ test('will correctly make an input object type', () => {
   expect(gqlType.getFields().b.description).toBe(undefined)
   expect(gqlType.getFields().b.type).toBe(GraphQLBoolean)
   expect(gqlType.getFields().b[$$gqlInputObjectTypeValueKeyName]).toBe('b')
+})
+
+test('will use type overrides', () => {
+  const a = Symbol('a')
+  const b = Symbol('b')
+  const c = Symbol('c')
+  const d = Symbol('d')
+  const buildToken = mockBuildToken({
+    _typeOverrides: new Map([
+      [stringType, { input: a, output: b }],
+      [booleanType, { input: c }],
+      [integerType, { output: d }],
+    ]),
+  })
+  expect(getGQLType(buildToken, stringType, true)).toEqual(a)
+  expect(getGQLType(buildToken, stringType, false)).toEqual(b)
+  expect(getGQLType(buildToken, booleanType, true)).toEqual(c)
+  expect(getGQLType(buildToken, booleanType, false)).toEqual(new GraphQLNonNull(GraphQLBoolean))
+  expect(getGQLType(buildToken, integerType, true)).toEqual(new GraphQLNonNull(GraphQLInt))
+  expect(getGQLType(buildToken, integerType, false)).toEqual(d)
+  expect(getGQLType(buildToken, floatType, true)).toEqual(new GraphQLNonNull(GraphQLFloat))
+  expect(getGQLType(buildToken, floatType, false)).toEqual(new GraphQLNonNull(GraphQLFloat))
 })
 
 test('_getJSONGQLType will create a boring JSON type with no dynamic input', () => {

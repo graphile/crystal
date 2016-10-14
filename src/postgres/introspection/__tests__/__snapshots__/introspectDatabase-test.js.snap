@@ -1032,6 +1032,27 @@ Object {
     Object {
       "argDefaultsNum": 0,
       "argNames": Array [
+        "a",
+        "b",
+        "c",
+      ],
+      "argTypeIds": Array [
+        "int4",
+        "int4",
+        "int4",
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "authenticate_many",
+      "namespaceId": "b",
+      "returnTypeId": "_jwt_token",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
         "compound_type",
       ],
       "argTypeIds": Array [
@@ -1417,6 +1438,22 @@ Object {
     },
   ],
   "types": Array [
+    Object {
+      "arrayItemTypeId": "jwt_token",
+      "category": "A",
+      "classId": null,
+      "description": null,
+      "domainBaseTypeId": null,
+      "domainIsNotNull": false,
+      "enumVariants": null,
+      "id": "_jwt_token",
+      "kind": "type",
+      "name": "_jwt_token",
+      "namespaceId": "b",
+      "namespaceName": "b",
+      "rangeSubTypeId": null,
+      "type": "b",
+    },
     Object {
       "arrayItemTypeId": null,
       "category": "N",

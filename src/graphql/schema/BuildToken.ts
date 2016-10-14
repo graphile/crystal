@@ -1,5 +1,5 @@
-import { GraphQLFieldConfig } from 'graphql'
-import { Inventory, ObjectType } from '../../interface'
+import { GraphQLInputType, GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
+import { Inventory, Type, ObjectType } from '../../interface'
 
 /**
  * A `BuildToken` is a plain object that gets passed around to all of the
@@ -30,19 +30,29 @@ interface BuildToken {
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,
+  // GraphQL type overrides. Currently private API.
+  readonly _typeOverrides: _BuildTokenTypeOverrides,
 }
 
 /**
  * We want to allow extensibility in our GraphQL schema, so we provide some
  * hooks which allows consumers to add custom fields/types in certain places.
  * Currently hooks are a private API. They will likely change in the future.
- *
- * @private
  */
 export type _BuildTokenHooks = {
   readonly queryFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
   readonly mutationFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
   readonly objectTypeFieldEntries?: (type: ObjectType, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
 }
+
+/**
+ * Overrides the GraphQL input and output of certain interface types. Can be
+ * used for ‘special’ types that may be created from time to time. Currently
+ * this is a private API.
+ */
+export type _BuildTokenTypeOverrides = Map<Type<mixed>, {
+  input?: GraphQLInputType<mixed>,
+  output?: GraphQLOutputType<mixed>,
+}>
 
 export default BuildToken

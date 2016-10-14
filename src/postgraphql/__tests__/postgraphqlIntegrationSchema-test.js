@@ -16,6 +16,6 @@ test('prints a schema with Relay 1 style ids', withPGClient(async pgClient => {
 }))
 
 test('prints a schema with a JWT generating mutation', withPGClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, ['b'], { jwtSecret: 'secret', jwtPGTypeIdentifier: 'b.jwt_token' })
+  const gqlSchema = await createPostGraphQLSchema(pgClient, ['b'], { jwtSecret: 'secret', jwtPgTypeIdentifier: 'b.jwt_token' })
   expect(printSchema(gqlSchema)).toMatchSnapshot()
 }))

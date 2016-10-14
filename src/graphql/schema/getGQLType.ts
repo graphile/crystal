@@ -58,6 +58,17 @@ const cache = new WeakMap<BuildToken, {
 function getGQLType (buildToken: BuildToken, type: Type<mixed>, input: true): GraphQLInputType<mixed>
 function getGQLType (buildToken: BuildToken, type: Type<mixed>, input: false): GraphQLOutputType<mixed>
 function getGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
+  const { _typeOverrides } = buildToken
+
+  // If this type has an override, let us try to use it. If we want an input
+  // type, and there is an input type override, use it. If we want an output
+  // type and there is an output type override, use it.
+  if (_typeOverrides.has(type)) {
+    const typeOverride = _typeOverrides.get(type)!
+    if (input && typeOverride.input) return typeOverride.input
+    if (!input && typeOverride.output) return typeOverride.output
+  }
+
   if (!cache.get(buildToken))
     cache.set(buildToken, { inputCache: new WeakMap(), outputCache: new WeakMap() })
 

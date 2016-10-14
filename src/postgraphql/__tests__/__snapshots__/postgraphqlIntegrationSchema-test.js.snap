@@ -1057,15 +1057,30 @@ input AuthenticateInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
   # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
-
-  # Filter out values where \`a\` is not exactly equal to this value.
   a: Int
-
-  # Filter out values where \`b\` is not exactly equal to this value.
   b: Int
-
-  # Filter out values where \`c\` is not exactly equal to this value.
   c: Int
+}
+
+# All input for the \`authenticateMany\` mutation.
+input AuthenticateManyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  a: Int
+  b: Int
+  c: Int
+}
+
+# The output of our \`authenticateMany\` mutation.
+type AuthenticateManyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  jwtTokens: [JwtToken]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
 }
 
 # The output of our \`authenticate\` mutation.
@@ -1073,7 +1088,7 @@ type AuthenticatePayload {
   # The exact same \`clientMutationId\` that was provided in the mutation input,
   # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
-  token: Jwt
+  jwtToken: JwtToken
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -1343,7 +1358,7 @@ scalar Json
 
 # A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519)
 # which securely represents claims between two parties.
-scalar Jwt
+scalar JwtToken
 
 # All input for the \`mult1\` mutation.
 input Mult1Input {
@@ -1431,6 +1446,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload
+  authenticateMany(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateManyInput!
+  ): AuthenticateManyPayload
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
@@ -2002,6 +2021,27 @@ input AuthenticateInput {
   a: Int
   b: Int
   c: Int
+}
+
+# All input for the \`authenticateMany\` mutation.
+input AuthenticateManyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  a: Int
+  b: Int
+  c: Int
+}
+
+# The output of our \`authenticateMany\` mutation.
+type AuthenticateManyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  jwtTokens: [JwtToken]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
 }
 
 # The output of our \`authenticate\` mutation.
@@ -2898,6 +2938,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload
+  authenticateMany(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateManyInput!
+  ): AuthenticateManyPayload
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!

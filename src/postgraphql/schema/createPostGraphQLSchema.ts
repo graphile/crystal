@@ -1,8 +1,9 @@
 import { Client, ClientConfig, connect as connectPgClient } from 'pg'
-import { GraphQLSchema } from 'graphql'
-import { Inventory } from '../../interface'
+import { GraphQLSchema, GraphQLInputType, GraphQLOutputType } from 'graphql'
+import { Inventory, Type, ObjectType } from '../../interface'
 import { introspectPGDatabase, addPGCatalogToInventory } from '../../postgres'
 import { PGCatalog, PGCatalogClass, PGCatalogProcedure } from '../../postgres/introspection'
+import getTypeFromPGType from '../../postgres/inventory/type/getTypeFromPGType'
 import PGClassObjectType from '../../postgres/inventory/type/PGClassObjectType'
 import { createGraphQLSchema } from '../../graphql'
 import createPGProcedureMutationGQLFieldEntry from './procedures/createPGProcedureMutationGQLFieldEntry'
@@ -10,7 +11,7 @@ import createPGProcedureQueryGQLFieldEntry from './procedures/createPGProcedureQ
 import createPGProcedureObjectTypeGQLFieldEntry from './procedures/createPGProcedureObjectTypeGQLFieldEntry'
 import getPGProcedureComputedClass from './procedures/getPGProcedureComputedClass'
 import getPGTokenTypeFromIdentifier from './auth/getPGTokenTypeFromIdentifier'
-import createPGProcedureMutationJWTGQLFieldEntry from './auth/createPGProcedureMutationJWTGQLFieldEntry'
+import getJwtGqlType from './auth/getJwtGqlType'
 
 /**
  * Creates a PostGraphQL schema by looking at a Postgres client.
@@ -22,7 +23,7 @@ export default async function createPostGraphQLSchema (
     classicIds?: boolean,
     dynamicJson?: boolean,
     jwtSecret?: string,
-    jwtPGTypeIdentifier?: string,
+    jwtPgTypeIdentifier?: string,
   } = {},
 ): Promise<GraphQLSchema> {
   // Create our inventory.
@@ -44,12 +45,12 @@ export default async function createPostGraphQLSchema (
 
   // Gets the Postgres token type from our provided identifier. Just null if
   // we don’t have a token type identifier.
-  const jwtPGType = options.jwtPGTypeIdentifier
-    ? getPGTokenTypeFromIdentifier(pgCatalog, options.jwtPGTypeIdentifier)
-    : null
+  const jwtPgType = options.jwtPgTypeIdentifier
+    ? getPGTokenTypeFromIdentifier(pgCatalog, options.jwtPgTypeIdentifier)
+    : undefined
 
   // If a token type is defined, but the JWT secret is not. Throw an error.
-  if (jwtPGType && !options.jwtSecret)
+  if (jwtPgType && !options.jwtSecret)
     throw new Error('Postgres token type is defined, but a JWT secret is not defined. Please provide a JWT secret.')
 
   // Add all of our Postgres constructs to that inventory.
@@ -96,17 +97,22 @@ export default async function createPostGraphQLSchema (
   const gqlSchema = createGraphQLSchema(inventory, {
     nodeIdFieldName: options.classicIds ? 'id' : '__id',
     dynamicJson: options.dynamicJson,
+
+    // If we have a JWT Postgres type, let us override the GraphQL output type
+    // with our own.
+    _typeOverrides: jwtPgType && new Map<Type<mixed>, { input?: GraphQLInputType<mixed>, output?: GraphQLOutputType<mixed> }>([
+      [getTypeFromPGType(pgCatalog, jwtPgType), {
+        // Throw an error if the user tries to use this as input.
+        get input (): never { throw new Error(`Using the JWT Token type '${options.jwtPgTypeIdentifier}' as input is not yet implemented.`) },
+        // Use our JWT GraphQL type as the output.
+        output: getJwtGqlType(getTypeFromPGType(pgCatalog, jwtPgType), options.jwtSecret!),
+      }],
+    ]),
+
     _hooks: {
       // Extra field entries to go on the mutation type.
       mutationFieldEntries: _buildToken =>
-        pgMutationProcedures.map(pgProcedure =>
-          // If we have a JWT type, and this procedure is returning a single
-          // value of this type. Let’s use a different mutation implementation
-          // here that will actually return a token instead of an object.
-          jwtPGType && !pgProcedure.returnsSet && pgProcedure.returnTypeId === jwtPGType.id
-            ? createPGProcedureMutationJWTGQLFieldEntry(_buildToken, pgCatalog, pgProcedure, options.jwtSecret!)
-            : createPGProcedureMutationGQLFieldEntry(_buildToken, pgCatalog, pgProcedure)
-        ),
+        pgMutationProcedures.map(pgProcedure => createPGProcedureMutationGQLFieldEntry(_buildToken, pgCatalog, pgProcedure)),
 
       // Extra field entries to go on the query type.
       queryFieldEntries: _buildToken =>
