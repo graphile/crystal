@@ -23,7 +23,7 @@
   ],
   "main": "build/index.js",
   "bin": {
-    "postgraphql": "build/postgraphql/cli/main.js"
+    "postgraphql": "build/postgraphql/cli.js"
   },
   "scripts": {},
   "dependencies": {
