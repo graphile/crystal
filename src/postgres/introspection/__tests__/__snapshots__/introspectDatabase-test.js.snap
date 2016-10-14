@@ -1179,6 +1179,23 @@ Object {
     },
     Object {
       "argDefaultsNum": 0,
+      "argNames": Array [
+        "json",
+      ],
+      "argTypeIds": Array [
+        "json",
+      ],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "json_identity_mutation",
+      "namespaceId": "c",
+      "returnTypeId": "json",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
       "argNames": Array [],
       "argTypeIds": Array [
         "int4",
