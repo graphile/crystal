@@ -12,6 +12,7 @@ env:
 cache:
   directories:
     - node_modules
+    - $NVM_DIR
 
 script:
   - scripts/ci
