@@ -1,0 +1,46 @@
+query {
+  a: allPeople { ...personConnection }
+  b: allPeople(first: 2) { ...personConnection }
+  c: allPeople(last: 2) { ...personConnection }
+  d: allPeople(orderBy: NAME_ASC) { ...personConnection }
+  e: allPeople(orderBy: NAME_DESC) { ...personConnection }
+  f: allPeople(orderBy: PRIMARY_KEY_ASC, before: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=") { ...personConnection }
+  g: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=") { ...personConnection }
+  h: allUpdatableViews { edges { cursor node { x name constant } } }
+  i: allUpdatableViews(orderBy: CONSTANT_ASC) { edges { cursor node { x name constant } } }
+  j: allPosts(authorId: 2) { ...postConnection }
+  k: allPosts(first: 2, authorId: 2) { ...postConnection }
+  l: allPosts(last: 1, orderBy: HEADLINE_ASC, authorId: 1) { ...postConnection }
+  m: allPeople(first: 3, offset: 1) { ...personConnection }
+}
+
+fragment personConnection on PeopleConnection {
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+  }
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      name
+      email
+    }
+  }
+}
+
+fragment postConnection on PostsConnection {
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+  }
+  totalCount
+  edges {
+    cursor
+    node {
+      headline
+      authorId
+    }
+  }
+}

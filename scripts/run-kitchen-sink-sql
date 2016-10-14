@@ -1,0 +1,15 @@
+#!/bin/bash
+
+example_dir=examples/$1
+
+query="
+begin;
+
+$(cat examples/kitchen-sink/schema.sql)
+
+$(cat examples/kitchen-sink/data.sql)
+
+commit;
+"
+
+echo "$query" | psql $@

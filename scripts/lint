@@ -1,0 +1,5 @@
+#!/bin/bash
+
+npm_bin=$(npm bin)
+
+$npm_bin/tslint $(find src -name "*.ts")

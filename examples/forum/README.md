@@ -12,12 +12,12 @@ cd postgraphql/examples/forum
 ```
 
 ## Running
-Once you are in this directory and have checked to make sure PostgreSQL is running on port 5432, run the following:
+Once you are in this directory and have checked to make sure Postgre is running on port 5432, run the following:
 
 ```bash
-npm install
+npm install -g postgraphql
 psql -f schema.sql
-postgraphql postgres://localhost:5432 --schema forum_example --development
+postgraphql --schema forum_example
 ```
 
 This will run the SQL in `schema.sql` on your default database and start PostGraphQL. Navigate to the URL printed in your console and you should see GraphiQL. Use it to navigate the generated documentation for the GraphQL server.
@@ -29,8 +29,9 @@ To get a post by ID:
 
 ```graphql
 {
-  post(id: "YXJ0aXN0OjE=") {
-    id, headline
+  postById(id: 3) {
+    id
+    headline
   }
 }
 ```
@@ -39,9 +40,12 @@ To get a list of all posts:
 
 ```graphql
 {
-  postNodes {
-    nodes {
-      id, headline
+  allPosts {
+    edges {
+      node {
+        id
+        headline
+      }
     }
   }
 }

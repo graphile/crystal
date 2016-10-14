@@ -1,5 +1,5 @@
 .DS_Store
 node_modules
-npm-debug.log
-dist/
+npm-debug.log*
+build/
 TODO.md

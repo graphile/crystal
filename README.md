@@ -22,21 +22,30 @@ First install using npm:
 npm install -g postgraphql
 ```
 
-and then just run it!
+…and then just run it! By default, PostGraphQL will connect to your local database at `postgres://localhost:5432` and introspect the `public` schema.
 
 ```bash
-postgraphql postgres://localhost:5432/mydb --schema forum --development
+postgraphql
 ```
 
-For more information run:
+For information about how to change these defaults, just run:
 
 ```bash
 postgraphql --help
 ```
 
-Check out the **[forum example][]** for a demo of PostGraphQL in action.
+You can also use PostGraphQL as native HTTP, Connect, Express, or Koa middleware. Just import `postgraphql`:
 
-Also check out relevant [documentation links](#documentation).
+```js
+import { createServer } from 'http'
+import postgraphql from 'postgraphql'
+
+createServer(postgraphql())
+```
+
+For more information around using PostGraphQL as a library, and the options the API expects read the [library usage documentation article](https://github.com/calebmer/postgraphql/blob/master/docs/library.md).
+
+Also make sure to check out the **[forum example][]** for a demo of a PostGraphQL compliant schema.
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 
@@ -62,12 +71,14 @@ Can query relations like so:
 
 ```graphql
 {
-  postNodes {
-    nodes {
-      headline
-      body
-      author: userByAuthorId {
-        name
+  allPosts {
+    edges {
+      node {
+        headline
+        body
+        author: userByAuthorId {
+          name
+        }
       }
     }
   }
@@ -98,9 +109,12 @@ And queried through GraphQL like this:
       hasNextPage
     }
     totalCount
-    nodes {
-      headline
-      body
+    edges {
+      cursor
+      node {
+        headline
+        body
+      }
     }
   }
 }
@@ -192,17 +206,10 @@ The specific specs PostGraphQL implements are:
 * * *
 
 ## Documentation
-- [Using PostGraphQL as ExpressJS or Connect middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
+- [Using PostGraphQL as Express, Connect, or Koa middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
 - [Adding advanced queries to PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md)
 - [Using PostgreSQL functions to extend your PostGraphQL schema.](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md)
 - [A crash course in PostgreSQL roles for PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/anonymous-role.md)
-
-## Roadmap
-In the future, things PostGraphQL will be able to do will include:
-
-- Authentication using PostgreSQL roles.
-- Whitelisted queries in production.
-- Subscriptions using the PostgreSQL [`NOTIFY`][pg-notify] feature.
 
 ## Evaluating PostGraphQL For Your Project
 Hopefully you’ve been convinced that PostGraphQL serves an awesome GraphQL API, but now let’s take a more critical look at whether or not you should adopt PostGraphQL for your project.

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+npm_bin=$(npm bin)
+
+export DEBUG=${DEBUG-postgraphql*,-postgraphql:graphql}
+
+$npm_bin/nodemon \
+  --watch src \
+  --ignore __tests__ \
+  --ignore __mocks__ \
+  --ext js,ts \
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli/main.ts --schema a,b,c $@"

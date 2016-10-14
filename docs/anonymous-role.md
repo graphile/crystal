@@ -6,7 +6,7 @@ You can make any number of PostgreSQL roles with [`CREATE ROLE`](https://www.pos
 PostgreSQL roles are also hierarchical. That is you can “grant” roles to other roles. For example if I had role `editor` which could change the data in our database and role `admin`, if I granted the `editor` role to `admin` with the command:
 
 ```sql
-GRANT editor TO admin;
+grant editor to admin;
 ```
 
 Then the `admin` role would have the same permissions the `editor` role has. The `admin` role would also be able to *change* its role to the `editor` role. This means for the rest of the session you don’t have any `admin` permissions, but only permissions given to the `editor` role.
@@ -14,15 +14,15 @@ Then the `admin` role would have the same permissions the `editor` role has. The
 In PostgreSQL you also have the idea of a user. A user is just a role that can login. So for example, the following are equivalent as the create an `admin` role that can log in (or a user):
 
 ```sql
-CREATE ROLE admin LOGIN;
-CREATE USER admin;
+create role admin login;
+create user admin;
 ```
 
 …and the following are also equivalent as they create a role that *can’t* log in:
 
 ```sql
-CREATE ROLE editor;
-CREATE ROLE editor NOLOGIN;
+create role editor;
+create role editor nologin;
 ```
 
 “Logging in” just means we can use the role when authenticating in the PostgreSQL authentication section of the connection string. So with the above roles you could start a PostgreSQL connection with `postgres://admin@localhost:5432/mydb`, but not `postgres://editor@localhost:5432/mydb`.

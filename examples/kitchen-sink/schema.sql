@@ -1,173 +1,174 @@
-begin;
+-- We don’t have a `begin`/`commit` in here to let the users of this query
+-- control the data lifecycle.
 
-create schema kitchen_sink;
+drop schema if exists a, b, c cascade;
 
-set search_path = kitchen_sink;
+create schema a;
+create schema b;
+create schema c;
 
-create table thing (
-  id               serial not null primary key,
-  note             text not null,
-  lucky_number     int unique,
-  some_boolean     boolean
+comment on schema a is 'The a schema.';
+comment on schema b is 'qwerty';
+
+create domain b.email as text
+  check (value ~* '^.+@.+\..+$');
+
+create table c.person (
+  id serial primary key,
+  name varchar not null,
+  about text,
+  email b.email not null unique,
+  created_at timestamp default current_timestamp
 );
 
-create table relation (
-  a_thing_id        int not null references thing(id) on delete cascade,
-  b_thing_id        int not null references thing(id) on delete cascade,
+comment on table c.person is 'Person test comment';
+comment on column c.person.name is 'The person’s name';
 
-  primary key (a_thing_id, b_thing_id)
+create table a.post (
+  id serial primary key,
+  headline text not null,
+  body text,
+  author_id int4 references c.person(id)
 );
 
-create table another_thing (
-  id               serial not null primary key,
-  note             text not null,
-  published        boolean not null,
-  tags             text[] not null,
-  thing_id         int references thing(id) on delete cascade
+create type a.letter as enum ('a', 'b', 'c', 'd');
+create type b.color as enum ('red', 'green', 'blue');
+
+create type c.compound_type as (
+  a int,
+  b text,
+  c b.color,
+  d uuid,
+  foo_bar int
 );
 
--- Do not add a primary key to this table.
-create table anything_goes (
-  foo              int,
-  bar              int,
-  interval         interval,
-  json             json,
-  jsonb            jsonb
+create type b.nested_compound_type as (
+  a c.compound_type,
+  b c.compound_type,
+  baz_buz int
 );
 
-create view non_mutation_view as
-  select 1;
+comment on type c.compound_type is 'Awesome feature!';
 
-create view mutation_view_for_thing as
-  select * from thing;
+create view b.updatable_view as
+  select
+    id as x,
+    name,
+    about as description,
+    2 as constant
+  from
+    c.person;
 
-create function add(a int, b int) returns int as $$
-  select a + b
-$$ language sql
-immutable
-strict;
+comment on view b.updatable_view is 'YOYOYO!!';
+comment on column b.updatable_view.constant is 'This is constantly 2';
 
-create function first_thing() returns thing as $$
-  select * from thing limit 1
-$$ language sql
-stable
-set search_path from current;
+create view a.non_updatable_view as select 2;
 
-create type http_status as enum (
-  'Continue',
-  'Ok',
-  'Bad Request',
-  'I’m a teapot',
-  'Internal Server Error'
+create table c.compound_key (
+  person_id_2 int references c.person(id),
+  person_id_1 int references c.person(id),
+  extra boolean,
+  primary key (person_id_1, person_id_2)
 );
 
-create function http_status_code(status http_status) returns int as $$
-  select case
-    when status = 'Continue' then 100
-    when status = 'Ok' then 200
-    when status = 'Bad Request' then 400
-    when status = 'I’m a teapot' then 418
-    when status = 'Internal Server Error' then 500
-    else 0
-  end
-$$ language sql
-stable
-strict;
+create table a.foreign_key (
+  person_id int references c.person(id),
+  compound_key_1 int,
+  compound_key_2 int,
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
+);
 
-create function things_modulo(modulo int, remainder int) returns setof thing as $$
-  select * from thing where id % coalesce(modulo, 2) = coalesce(remainder, 1)
-$$ language sql
-stable
-set search_path from current;
+create table c.edge_case (
+  not_null_has_default boolean not null default false,
+  wont_cast_easy smallint,
+  drop_me text
+);
 
-create function thing_display(thing thing) returns text as $$
-  select thing.id || ': ' || thing.note || '!'
-$$ language sql
-stable;
+alter table c.edge_case drop column drop_me;
 
-create function thing_b_things(thing) returns setof thing as $$
-  select t.* from relation as r left join thing as t on t.id = r.b_thing_id where r.a_thing_id = $1.id
-$$ language sql
-stable
-set search_path from current;
+create function c.edge_case_computed(edge_case c.edge_case) returns text as $$ select 'hello world'::text $$ language sql stable;
 
-create function notes() returns setof text as $$
-  select note from thing
-$$ language sql
-stable
-set search_path from current;
+create domain a.an_int as integer;
+create domain b.another_int as a.an_int;
 
-create function thing_add(thing, a int, b int) returns int as $$
-  select a + b
-$$ language sql
-stable
-strict;
+create type a.an_int_range as range (
+  subtype = a.an_int
+);
 
-create function another_thing_display(another_thing another_thing) returns text as $$
-  select another_thing.id || ': ' || another_thing.note || '!'
-$$ language sql
-stable;
+create table b.types (
+  id serial primary key,
+  "smallint" smallint not null,
+  "bigint" bigint not null,
+  "boolean" boolean not null,
+  "varchar" varchar not null,
+  "enum" b.color not null,
+  "domain" a.an_int not null,
+  "domain2" b.another_int not null,
+  "text_array" text[] not null,
+  "json" json not null,
+  "jsonb" jsonb not null,
+  "numrange" numrange not null,
+  "daterange" daterange not null,
+  "an_int_range" a.an_int_range not null,
+  "timestamp" timestamp not null,
+  "timestamptz" timestamptz not null,
+  "date" date not null,
+  "time" time not null,
+  "timetz" timetz not null,
+  "interval" interval not null,
+  "money" money not null,
+  "compound_type" c.compound_type not null,
+  "nested_compound_type" b.nested_compound_type not null
+);
 
-create function insert_node(
-  note text,
-  published boolean,
-  tags text[]
-) returns another_thing as $$
-declare
-  row another_thing;
-begin
-  insert into another_thing (note, published, tags) values (note, published, tags) returning * into row;
-  return row;
-end;
-$$ language plpgsql
-strict
-set search_path from current;
+create function a.add_1_mutation(int, int) returns int as $$ select $1 + $2 $$ language sql volatile strict;
+create function a.add_2_mutation(a int, b int default 2) returns int as $$ select $1 + $2 $$ language sql strict;
+create function a.add_3_mutation(a int, int) returns int as $$ select $1 + $2 $$ language sql volatile;
+create function a.add_4_mutation(int, b int default 2) returns int as $$ select $1 + $2 $$ language sql;
+create function a.add_1_query(int, int) returns int as $$ select $1 + $2 $$ language sql immutable strict;
+create function a.add_2_query(a int, b int default 2) returns int as $$ select $1 + $2 $$ language sql stable strict;
+create function a.add_3_query(a int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
+create function a.add_4_query(int, b int default 2) returns int as $$ select $1 + $2 $$ language sql stable;
 
-create function insert_related_nodes(
-  note_a text,
-  note_b text
-) returns relation as $$
-declare
-  thing_a thing;
-  thing_b thing;
-  relation relation;
-begin
-  insert into thing (note) values (note_a) returning * into thing_a;
-  insert into thing (note) values (note_b) returning * into thing_b;
-  insert into relation (a_thing_id, b_thing_id) values (thing_a.id, thing_b.id) returning * into relation;
-  return relation;
-end;
-$$ language plpgsql
-strict
-set search_path from current;
+comment on function a.add_1_mutation(int, int) is 'lol, add some stuff 1 mutation';
+comment on function a.add_2_mutation(int, int) is 'lol, add some stuff 2 mutation';
+comment on function a.add_3_mutation(int, int) is 'lol, add some stuff 3 mutation';
+comment on function a.add_4_mutation(int, int) is 'lol, add some stuff 4 mutation';
+comment on function a.add_1_query(int, int) is 'lol, add some stuff 1 query';
+comment on function a.add_2_query(int, int) is 'lol, add some stuff 2 query';
+comment on function a.add_3_query(int, int) is 'lol, add some stuff 3 query';
+comment on function a.add_4_query(int, int) is 'lol, add some stuff 4 query';
 
-insert into thing (note, lucky_number) values
-  ('hello', 42),
-  ('world', 420),
-  ('foo', 12),
-  ('bar', 7),
-  ('baz', 98),
-  ('bux', 66),
-  ('qux', 0);
+create function b.mult_1(int, int) returns int as $$ select $1 * $2 $$ language sql;
+create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language sql called on null input;
+create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
+create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
-insert into relation (a_thing_id, b_thing_id) values
-  (1, 2),
-  (1, 3),
-  (1, 7),
-  (2, 3),
-  (3, 4),
-  (3, 5),
-  (4, 3),
-  (7, 1);
+create function c.json_identity(json json) returns json as $$ select json $$ language sql immutable;
+create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql stable strict;
+create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql strict;
+create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql stable;
+create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
+create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;
+create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql;
+create function c.table_set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
+create function c.table_set_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
+create function c.int_set_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;
+create function c.int_set_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
+create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
+create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;
 
-insert into another_thing (note, published, tags, thing_id) values
-  ('hello', true, '{"a", "b"}', 1),
-  ('world', true, '{"c", "d"}', null),
-  ('foo', false, '{"a"}', 2);
+create function c.person_first_name(person c.person) returns text as $$ select split_part(person.name, ' ', 1) $$ language sql stable;
+create function c.person_friends(person c.person) returns setof c.person as $$ select friend.* from c.person as friend where friend.id in (person.id + 1, person.id + 2) $$ language sql stable;
+create function c.compound_type_computed_field(compound_type c.compound_type) returns integer as $$ select compound_type.a + compound_type.foo_bar $$ language sql stable;
+create function a.post_headline_trimmed(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
 
-insert into anything_goes (foo, bar, json, jsonb) values
-  (1, 2, '{"a":1,"b":2,"c":3}', '{"a":1,"b":2,"c":3}'),
-  (2, 3, null, null),
-  (3, 4, null, null);
+create type b.jwt_token as (
+  role text,
+  exp integer,
+  a integer,
+  b integer,
+  c integer
+);
 
-commit;
+create function b.authenticate(a integer, b integer, c integer) returns b.jwt_token as $$ select ('yay', 5, a, b, c)::b.jwt_token $$ language sql;

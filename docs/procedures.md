@@ -90,13 +90,13 @@ $$ language sql immutable strict;
 By default, a procedure is “volatile” and PostGraphQL will treat it as a mutation. So for example, a procedure defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE SQL;
+create function my_function(a int, b int) returns int as $$ … $$ language sql;
 ```
 
 Is equivalent to a procedure defined as:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE SQL VOLATILE;
+create function my_function(a int, b int) returns int as $$ … $$ language sql volatile;
 ```
 
 From the PostgreSQL docs:
@@ -123,15 +123,15 @@ Always look at the documentation in GraphiQL to find all the parameters you may 
 Similar to how you use `VOLATILE` to specify a mutative procedure, a query procedure can be specified using `IMMUTABLE` or `STABLE` identifiers. For example:
 
 ```sql
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE SQL STABLE;
+create function my_function(a int, b int) returns int as $$ … $$ language sql stable;
 
 -- or…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS int AS $$ … $$ LANGUAGE SQL IMMUTABLE;
+create function my_function(a int, b int) returns int as $$ … $$ language sql immutable;
 
 -- or if you wanted to return a row from a table…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS my_table AS $$ … $$ LANGUAGE SQL STABLE;
+create function my_function(a int, b int) returns my_table as $$ … $$ language sql stable;
 ```
 
 From the PostgreSQL docs:
@@ -169,7 +169,7 @@ To create a function that returns a connection, use the following SQL:
 ```sql
 -- Assuming we already have a table named `person`…
 
-CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANGUAGE SQL;
+create function my_function(a int, b int) returns setof person as $$ … $$ language sql;
 ```
 
 To query a set in PostGraphQL, you would use all of the connection arguments you are familiar with in addition to the arguments to your procedure. For example:
@@ -196,23 +196,15 @@ For more information on constructing advanced queries, read [this article][advan
 [advanced-queries]: https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md
 
 ## Computed Columns
-PostGraphQL also provides support for computed columns. In order to define a computed column, just write a function that is `STABLE` or `IMMUTABLE` and has a table in your schema as its first argument. For example:
+PostGraphQL also provides support for computed columns. In order to define a computed column, just write a function that is `STABLE` or `IMMUTABLE`, has a table in your schema as its first argument, and the name starts with the table’s name. For example:
 
 ```sql
-CREATE FUNCTION full_name(person person) RETURNS text AS $$
+create function person_full_name(person person) returns text as $$
   select person.given_name || ' ' || person.family_name
-$$ LANGUAGE SQL;
+$$ language sql;
 ```
 
-Will create a computed column for your table named `person`. If you want, you can also prefix your computed procedure’s name with your table name. This is helpful when you want to avoid namespacing clashes but it is not required.
-
-```sql
--- PostGraphQL will treat this the same as the procedure above.
-
-CREATE FUNCTION person_full_name(person person) RETURNS text AS $$
-  select person.given_name || ' ' || person.family_name
-$$ LANGUAGE SQL;
-```
+Will create a computed column for your table named `person`.
 
 To query these in the PostGraphQL schema, its pretty intuitive:
 

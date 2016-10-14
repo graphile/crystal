@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "1.9.3",
+  "version": "2.0.0-beta.4",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
@@ -21,60 +21,65 @@
     "relay",
     "connection"
   ],
-  "main": "index.js",
-  "files": [
-    "README.md",
-    "LICENSE",
-    "dist",
-    "index.js",
-    "assets"
-  ],
+  "main": "build/index.js",
   "bin": {
-    "postgraphql": "dist/main.js"
+    "postgraphql": "build/postgraphql/cli/main.js"
   },
-  "scripts": {
-    "lint": "scripts/lint.sh",
-    "clean": "scripts/clean.sh",
-    "build": "scripts/build.sh",
-    "test": "scripts/test.sh",
-    "test-watch": "scripts/test-watch.sh",
-    "schema-up": "npm --prefix examples/forum run schema-up",
-    "schema-down": "npm --prefix examples/forum run schema-down",
-    "start": "scripts/start.sh",
-    "preversion": "scripts/test.sh",
-    "prepublish": "scripts/clean.sh && scripts/build.sh"
-  },
+  "scripts": {},
   "dependencies": {
-    "bluebird": "^3.4.6",
-    "commander": "^2.9.0",
+    "body-parser": "^1.15.2",
+    "chalk": "1.1.3",
+    "change-case": "^3.0.0",
+    "commander": "2.9.0",
     "dataloader": "^1.2.0",
     "debug": "^2.2.0",
-    "express": "^4.14.0",
-    "express-graphql": "^0.5.4",
     "finalhandler": "^0.5.0",
     "graphql": ">=0.6.0 <1.0.0",
     "http-errors": "^1.5.0",
     "jsonwebtoken": "^7.1.9",
-    "lodash": "^4.16.3",
-    "morgan": "^1.7.0",
-    "on-finished": "^2.3.0",
-    "pg": "5.1.0",
+    "parseurl": "^1.3.1",
+    "pg": "^6.1.0",
     "pg-connection-string": "^0.1.3",
-    "serve-favicon": "^2.3.0"
+    "pg-minify": "^0.3.3",
+    "pluralize": "^3.0.0",
+    "postgres-interval": "^1.0.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.16.0",
-    "babel-core": "^6.17.0",
-    "babel-plugin-module-alias": "^1.6.0",
-    "babel-preset-modern-node": "^3.2.0",
-    "babel-preset-stage-1": "^6.16.0",
-    "babel-register": "^6.16.0",
-    "babel-watch": "^2.0.3",
-    "eslint": "^3.7.1",
-    "eslint-config-calebmer": "^8.2.1",
-    "expect": "^1.20.2",
-    "mocha": "^3.1.0",
+    "@types/chalk": "^0.4.30",
+    "@types/change-case": "0.0.29",
+    "@types/commander": "^2.3.30",
+    "@types/debug": "0.0.29",
+    "@types/jest": "^0.9.30",
+    "@types/jsonwebtoken": "^7.1.33",
+    "@types/node": "^6.0.38",
+    "@types/pluralize": "0.0.26",
+    "connect": "^3.5.0",
+    "express": "^4.14.0",
+    "jest": "^16.0.1",
+    "koa": "^2.0.0",
+    "nodemon": "^1.11.0",
+    "source-map-support": "^0.4.2",
     "supertest": "^2.0.0",
-    "supertest-as-promised": "^4.0.0"
+    "supertest-as-promised": "^4.0.0",
+    "ts-node": "^1.4.1",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.3"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/resources/jest-preprocessor.js",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/node_modules/source-map-support/register.js"
+    ],
+    "browser": false,
+    "testEnvironment": "node",
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
+    "testRegex": "/__tests__/[^.]+-test.(t|j)s$",
+    "clearMocks": true
   }
 }
