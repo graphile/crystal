@@ -1,12 +1,12 @@
 jest.mock('../../../utils/idSerde')
-jest.mock('../../connection/createConnectionGQLField')
-jest.mock('../getCollectionGQLType')
+jest.mock('../../connection/createConnectionGqlField')
+jest.mock('../getCollectionGqlType')
 
 import { GraphQLNonNull, GraphQLID } from 'graphql'
 import { personCollection, postCollection } from '../../../__tests__/fixtures/forumInventory'
 import idSerde from '../../../utils/idSerde'
-import createConnectionGQLField from '../../connection/createConnectionGQLField'
-import getCollectionGQLType from '../getCollectionGQLType'
+import createConnectionGqlField from '../../connection/createConnectionGqlField'
+import getCollectionGqlType from '../getCollectionGqlType'
 import createCollectionQueryFieldEntries from '../createCollectionQueryFieldEntries'
 
 test('will create no entries for a collection with no keys and no paginator', () => {
@@ -20,10 +20,10 @@ test('will create a connection when there is a paginator', () => {
   const fieldEntries = createCollectionQueryFieldEntries(buildToken, { name: 'foo', type: { fields: new Map() }, paginator })
   expect(fieldEntries.length).toEqual(1)
   expect(fieldEntries[0][0]).toEqual('allFoo')
-  expect(createConnectionGQLField.mock.calls.length).toEqual(1)
-  expect(createConnectionGQLField.mock.calls[0].length).toEqual(3)
-  expect(createConnectionGQLField.mock.calls[0][0]).toBe(buildToken)
-  expect(createConnectionGQLField.mock.calls[0][1]).toBe(paginator)
+  expect(createConnectionGqlField.mock.calls.length).toEqual(1)
+  expect(createConnectionGqlField.mock.calls[0].length).toEqual(3)
+  expect(createConnectionGqlField.mock.calls[0][0]).toBe(buildToken)
+  expect(createConnectionGqlField.mock.calls[0][1]).toBe(paginator)
 })
 
 test('will create no entries if there is a primary key with no read method', () => {
@@ -33,7 +33,7 @@ test('will create no entries if there is a primary key with no read method', () 
 
 test('will create a primary key field entry if the primary key has a read method', async () => {
   const collectionGqlType = Symbol('collectionGqlType')
-  getCollectionGQLType.mockReturnValueOnce(collectionGqlType)
+  getCollectionGqlType.mockReturnValueOnce(collectionGqlType)
   const collection = { name: 'foo', type: { name: 'bar' } }
   const readValue = Symbol('readValue')
   const primaryKey = { collection, read: jest.fn(() => Promise.resolve(readValue)) }
@@ -47,7 +47,7 @@ test('will create a primary key field entry if the primary key has a read method
   expect(fieldEntries[0][1].type).toBe(collectionGqlType)
   expect(Object.keys(fieldEntries[0][1].args)).toEqual([nodeIdFieldName])
   expect(fieldEntries[0][1].args[nodeIdFieldName].type).toEqual(new GraphQLNonNull(GraphQLID))
-  expect(getCollectionGQLType.mock.calls).toEqual([[buildToken, collection]])
+  expect(getCollectionGqlType.mock.calls).toEqual([[buildToken, collection]])
   const resolve = fieldEntries[0][1].resolve
   // const context = new Context()
   // const idValue = Symbol('idValue')

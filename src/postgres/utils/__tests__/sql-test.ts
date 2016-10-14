@@ -2,24 +2,24 @@
 
 import sql from '../sql'
 
-test('raw will create a raw SQL item', () => {
+test('raw will create a raw Sql item', () => {
   const text = 'abcdefg\'hijk-lmn"op'
   expect(sql.raw(text)).toEqual({ type: 'RAW', text })
 })
 
-test('identifier will create an identifier SQL item', () => {
+test('identifier will create an identifier Sql item', () => {
   const name = 'abcdefg\'hijk-lmn"op'
   expect(sql.identifier(name)).toEqual({ type: 'IDENTIFIER', names: [name] })
 })
 
-test('identifier will create an identifier SQL item with multiple names', () => {
+test('identifier will create an identifier Sql item with multiple names', () => {
   const name1 = 'name1'
   const name2 = 'name2'
   const name3 = 'name3'
   expect(sql.identifier(name1, name2, name3)).toEqual({ type: 'IDENTIFIER', names: [name1, name2, name3] })
 })
 
-test('value will create an eager SQL value', () => {
+test('value will create an eager Sql value', () => {
   const value = Symbol('value')
   expect(sql.value(value)).toEqual({ type: 'VALUE', value })
 })
@@ -33,7 +33,7 @@ test('join will flatten singly nested arrays', () => {
   expect(sql.join([item1, [item2, item3], item4, [item5]])).toEqual([item1, item2, item3, item4, item5])
 })
 
-test('join will add raw SQL seperators if supplied a string', () => {
+test('join will add raw Sql seperators if supplied a string', () => {
   const seperator = Symbol('seperator') as any
   const item1 = Symbol('item1') as any
   const item2 = Symbol('item2') as any
@@ -42,7 +42,7 @@ test('join will add raw SQL seperators if supplied a string', () => {
     .toEqual([item1, sql.raw(seperator), item2, sql.raw(seperator), item3])
 })
 
-test('join will not add raw SQL seperators between nested arrays', () => {
+test('join will not add raw Sql seperators between nested arrays', () => {
   const seperator = Symbol('seperator') as any
   const item1 = Symbol('item1') as any
   const item2 = Symbol('item2') as any
@@ -57,7 +57,7 @@ test('query will output raw strings', () => {
   expect(sql.query`hello world`).toEqual([sql.raw('hello world')])
 })
 
-test('query will add items to the SQL', () => {
+test('query will add items to the Sql', () => {
   const item1 = Symbol('item1') as any
   const item2 = Symbol('item2') as any
   const item3 = Symbol('item3') as any

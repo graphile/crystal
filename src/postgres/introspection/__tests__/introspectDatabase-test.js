@@ -1,5 +1,5 @@
-import withPGClient from '../../__tests__/fixtures/withPGClient'
-import createKitchenSinkPGSchema from '../../__tests__/fixtures/createKitchenSinkPGSchema'
+import withPgClient from '../../__tests__/fixtures/withPgClient'
+import createKitchenSinkPgSchema from '../../__tests__/fixtures/createKitchenSinkPgSchema'
 import introspectDatabase from '../introspectDatabase'
 
 // This test suite can be flaky in CI. Increase it’s timeout.
@@ -8,9 +8,9 @@ if (process.env.CI)
 
 /**
  * Gets a local identifier that is independent of the object id assigned by
- * PostgreSQL which will be consistent across tests.
+ * PostgreSql which will be consistent across tests.
  *
- * Just a concatenation of the PostgreSQL object’s kind and name. For
+ * Just a concatenation of the PostgreSql object’s kind and name. For
  * attributes we also include the number.
  */
 const getLocalId = pgObject => {
@@ -48,7 +48,7 @@ const sortBy = getKey => (a, b) => {
 }
 
 /**
- * Formats a `PGCatalog` object into a form that is easily snapshotable by
+ * Formats a `PgCatalog` object into a form that is easily snapshotable by
  * Jest. This gives us all the benefits of snapshot testing.
  */
 const format = catalog => ({
@@ -103,7 +103,7 @@ const format = catalog => ({
     .sort(sortBy(({ name, argTypeIds }) => `${name}-${argTypeIds.join('-')}`)),
 })
 
-test('will get everything needed in an introspection', withPGClient(async client => {
+test('will get everything needed in an introspection', withPgClient(async client => {
   expect(format(await introspectDatabase(client, ['a', 'b', 'c']))).toMatchSnapshot()
   // TODO: expect(format(await introspectDatabase(client, ['a']))).toMatchSnapshot()
 }))

@@ -2,10 +2,10 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLInputObjectType, 
 import { Condition, conditionHelpers, Collection, CollectionKey, NullableType, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
-import getGQLType from '../getGQLType'
-import transformGQLInputValue from '../transformGQLInputValue'
-import createConnectionGQLField from '../connection/createConnectionGQLField'
-import getCollectionGQLType from './getCollectionGQLType'
+import getGqlType from '../getGqlType'
+import transformGqlInputValue from '../transformGqlInputValue'
+import createConnectionGqlField from '../connection/createConnectionGqlField'
+import getCollectionGqlType from './getCollectionGqlType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 
 /**
@@ -31,7 +31,7 @@ export default function createCollectionQueryFieldEntries (
           description: `Checks for equality with the object’s \`${formatName.field(fieldName)}\` field.`,
           // Get the type for this field, but always make sure that it is
           // nullable. We don’t want to require conditions.
-          type: getGQLType(buildToken, new NullableType(field.type), true),
+          type: getGqlType(buildToken, new NullableType(field.type), true),
           // We include this internal name so that we can resolve the arguments
           // back into actual values.
           internalName: fieldName,
@@ -57,7 +57,7 @@ export default function createCollectionQueryFieldEntries (
           typeof args.condition![fieldName] !== 'undefined'
             // If the argument exists, create a condition and transform the
             // input value.
-            ? conditionHelpers.fieldEquals(field.internalName, transformGQLInputValue(field.type, args.condition![fieldName]))
+            ? conditionHelpers.fieldEquals(field.internalName, transformGqlInputValue(field.type, args.condition![fieldName]))
             // If the argument does not exist, this condition should just be
             // true (which will get filtered out by `conditionHelpers.and`).
             : true
@@ -67,7 +67,7 @@ export default function createCollectionQueryFieldEntries (
 
     entries.push([
       formatName.field(`all-${collection.name}`),
-      createConnectionGQLField(buildToken, paginator, {
+      createConnectionGqlField(buildToken, paginator, {
         // The one input arg we have for this connection is the `condition` arg.
         inputArgEntries: [
           ['condition', {
@@ -119,7 +119,7 @@ function createCollectionPrimaryKeyField <TKey>(
   if (collectionKey.read == null)
     return
 
-  const collectionType = getCollectionGQLType(buildToken, collection)
+  const collectionType = getCollectionGqlType(buildToken, collection)
 
   return {
     description: `Reads a single ${scrib.type(collectionType)} using its globally unique ${scrib.type(GraphQLID)}.`,
@@ -159,7 +159,7 @@ function createCollectionKeyField <TKey>(
     return
 
   const { collection } = collectionKey
-  const collectionType = getCollectionGQLType(buildToken, collection)
+  const collectionType = getCollectionGqlType(buildToken, collection)
   const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
 
   return {

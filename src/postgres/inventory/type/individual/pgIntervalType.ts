@@ -1,11 +1,11 @@
 // TODO: test
 // TODO: Better module name?
 
-import parsePGInterval = require('postgres-interval')
+import parsePgInterval = require('postgres-interval')
 import { NullableType, ObjectType, integerType, floatType } from '../../../../interface'
 import { sql } from '../../../utils'
-import { $$transformPGValueIntoValue } from '../../transformPGValueIntoValue'
-import { $$transformValueIntoPGValue } from '../../transformValueIntoPGValue'
+import { $$transformPgValueIntoValue } from '../../transformPgValueIntoValue'
+import { $$transformValueIntoPgValue } from '../../transformValueIntoPgValue'
 
 /**
  * The interval type represents a Postgres time interval which will have one of
@@ -46,8 +46,8 @@ const pgIntervalType = Object.assign(new ObjectType({
 }), {
   // The `pg` module will parse this into an object with the correct keys, we
   // just need to put it into a map to be good.
-  [$$transformPGValueIntoValue]: (rawInterval: string): ObjectType.Value => {
-    const interval = parsePGInterval(rawInterval)
+  [$$transformPgValueIntoValue]: (rawInterval: string): ObjectType.Value => {
+    const interval = parsePgInterval(rawInterval)
     return new Map<string, number | undefined>([
       ['seconds', interval.seconds],
       ['minutes', interval.minutes],
@@ -61,7 +61,7 @@ const pgIntervalType = Object.assign(new ObjectType({
   // Take our map and turn it into a string representation of a Postgres
   // interval. Does this by adding each key (which we know is a valid interval
   // identifier) to a string with it’s associated value.
-  [$$transformValueIntoPGValue]: (value: ObjectType.Value): sql.SQL =>
+  [$$transformValueIntoPgValue]: (value: ObjectType.Value): sql.Sql =>
     sql.query`${sql.value(Array.from(value).reduce((interval, [key, num]) => `${interval} ${num} ${key}`, ''))}`,
 })
 

@@ -2,12 +2,12 @@ import { GraphQLFieldConfig } from 'graphql'
 import { Collection, ObjectType } from '../../../../interface'
 import { formatName, scrib } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import getGQLType from '../../getGQLType'
-import transformGQLInputValue from '../../transformGQLInputValue'
-import createMutationGQLField from '../../createMutationGQLField'
-import { getEdgeGQLType, createOrderByGQLArg } from '../../connection/createConnectionGQLField'
-import getCollectionGQLType from '../getCollectionGQLType'
-import createCollectionRelationTailGQLFieldEntries from '../createCollectionRelationTailGQLFieldEntries'
+import getGqlType from '../../getGqlType'
+import transformGqlInputValue from '../../transformGqlInputValue'
+import createMutationGqlField from '../../createMutationGqlField'
+import { getEdgeGqlType, createOrderByGqlArg } from '../../connection/createConnectionGqlField'
+import getCollectionGqlType from '../getCollectionGqlType'
+import createCollectionRelationTailGqlFieldEntries from '../createCollectionRelationTailGqlFieldEntries'
 
 /**
  * Creates the mutation field entry for creating values in a collection.
@@ -23,19 +23,19 @@ export default function createCreateCollectionMutationFieldEntry (
 
   const name = `create-${collection.type.name}`
   const inputFieldName = formatName.field(collection.type.name)
-  const inputFieldType = getGQLType(buildToken, collection.type, true)
-  const collectionGQLType = getCollectionGQLType(buildToken, collection)
+  const inputFieldType = getGqlType(buildToken, collection.type, true)
+  const collectionGqlType = getCollectionGqlType(buildToken, collection)
 
-  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGqlField<ObjectType.Value>(buildToken, {
     name,
-    description: `Creates a single ${scrib.type(collectionGQLType)}.`,
+    description: `Creates a single ${scrib.type(collectionGqlType)}.`,
 
     inputFields: [
       // The only input we need when creating a new object is the type in input
       // object form. We nest the input object instead of flattening its fields
       // so that you only need object per value you create.
       [inputFieldName, {
-        description: `The ${scrib.type(collectionGQLType)} to be created by this mutation.`,
+        description: `The ${scrib.type(collectionGqlType)} to be created by this mutation.`,
         type: inputFieldType,
       }],
     ],
@@ -45,8 +45,8 @@ export default function createCreateCollectionMutationFieldEntry (
       // this as a starting point to query relations that were created
       // with this object.
       [formatName.field(collection.type.name), {
-        description: `The ${scrib.type(collectionGQLType)} that was created by this mutation.`,
-        type: collectionGQLType,
+        description: `The ${scrib.type(collectionGqlType)} that was created by this mutation.`,
+        type: collectionGqlType,
         resolve: value => value,
       }],
 
@@ -57,9 +57,9 @@ export default function createCreateCollectionMutationFieldEntry (
       //
       // We may deprecate this in the future if Relay 2 doesn’t need it.
       collection.paginator && [formatName.field(`${collection.type.name}-edge`), {
-        description: `An edge for our ${scrib.type(collectionGQLType)}. May be used by Relay 1.`,
-        type: getEdgeGQLType(buildToken, collection.paginator),
-        args: { orderBy: createOrderByGQLArg(buildToken, collection.paginator) },
+        description: `An edge for our ${scrib.type(collectionGqlType)}. May be used by Relay 1.`,
+        type: getEdgeGqlType(buildToken, collection.paginator),
+        args: { orderBy: createOrderByGqlArg(buildToken, collection.paginator) },
         resolve: (value, args) => ({
           paginator: collection.paginator,
           ordering: args['orderBy'],
@@ -69,14 +69,14 @@ export default function createCreateCollectionMutationFieldEntry (
       }],
 
       // Add related objects. This helps in Relay 1.
-      ...createCollectionRelationTailGQLFieldEntries(buildToken, collection),
+      ...createCollectionRelationTailGqlFieldEntries(buildToken, collection),
     ],
 
     // When we execute we just create a value in the collection after
     // transforming the correct input field.
     // TODO: test
     execute: (context, input) => {
-      const value = transformGQLInputValue(inputFieldType, input[inputFieldName])
+      const value = transformGqlInputValue(inputFieldType, input[inputFieldName])
 
       // TODO: This can’t be the best solution? `isTypeOf` fails though for
       // default fields that don’t exist.

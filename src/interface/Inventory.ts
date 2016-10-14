@@ -6,7 +6,7 @@ import Relation from './collection/Relation'
  * static data definition language. Inventory is the root level interface
  * to this definition.
  *
- * If a database is strongly typed (like PostgreSQL) it may implement the
+ * If a database is strongly typed (like PostgreSql) it may implement the
  * inventory interfaces to expose its underlying data.
  *
  * Believe it or not, a `Inventory` and all of the objects inside it are

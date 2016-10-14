@@ -2,8 +2,8 @@ import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphq
 import { CollectionKey, ObjectType } from '../../../interface'
 import { formatName, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
-import getGQLType from '../getGQLType'
-import transformGQLInputValue from '../transformGQLInputValue'
+import getGqlType from '../getGqlType'
+import transformGqlInputValue from '../transformGqlInputValue'
 
 /**
  * There are different ways to create the input for a collection key given the
@@ -35,7 +35,7 @@ export default function createCollectionKeyInputHelpers <T>(
       Array.from(keyType.fields).map<[string, GraphQLInputFieldConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
         [formatName.arg(fieldName), {
           description: field.description,
-          type: new GraphQLNonNull(getNullableType(getGQLType(buildToken, field.type, true))),
+          type: new GraphQLNonNull(getNullableType(getGqlType(buildToken, field.type, true))),
           // We add an `internalName` so that we can use that name to
           // reconstruct the correct object value.
           internalName: fieldName,
@@ -47,7 +47,7 @@ export default function createCollectionKeyInputHelpers <T>(
       getKey: input => {
         const key = new Map(fieldEntries.map<[string, mixed]>(([fieldName, field]) => [
           field.internalName,
-          transformGQLInputValue(field.type, input[fieldName] as mixed),
+          transformGqlInputValue(field.type, input[fieldName] as mixed),
         ]))
 
         if (!keyType.isTypeOf(key))
@@ -60,7 +60,7 @@ export default function createCollectionKeyInputHelpers <T>(
   // Otherwise, we just put the type into a single field entry. Pretty boring.
   else {
     const fieldName = formatName.arg(collectionKey.name)
-    const fieldType = getGQLType(buildToken, keyType, true)
+    const fieldType = getGqlType(buildToken, keyType, true)
 
     return {
       fieldEntries: [
@@ -70,7 +70,7 @@ export default function createCollectionKeyInputHelpers <T>(
         }],
       ],
       getKey: input => {
-        const key = transformGQLInputValue(fieldType, input[fieldName])
+        const key = transformGqlInputValue(fieldType, input[fieldName])
 
         if (!keyType.isTypeOf(key))
           throw new Error('The key input is not of the correct type.')

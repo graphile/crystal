@@ -1,11 +1,11 @@
 import { Pool, PoolConfig } from 'pg'
-import { parse as parsePGConnectionString } from 'pg-connection-string'
+import { parse as parsePgConnectionString } from 'pg-connection-string'
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
-import createPostGraphQLHTTPRequestHandler, { HTTPRequestHandler } from './http/createPostGraphQLHTTPRequestHandler'
+import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 
 /**
- * Creates a PostGraphQL HTTP request handler by first introspecting the
- * database to get a GraphQL schema, and then using that to create the HTTP
+ * Creates a PostGraphQL Http request handler by first introspecting the
+ * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
 export default function postgraphql (
@@ -24,7 +24,7 @@ export default function postgraphql (
     disableQueryLog?: boolean,
     enableCors?: boolean,
   } = {},
-): HTTPRequestHandler {
+): HttpRequestHandler {
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
   const pgPool =
@@ -34,7 +34,7 @@ export default function postgraphql (
       : new Pool(typeof poolOrConfig === 'string'
         // Otherwise if it is a string, let us parse it to get a config to
         // create a `Pool`.
-        ? parsePGConnectionString(poolOrConfig)
+        ? parsePgConnectionString(poolOrConfig)
         // Finally, it must just be a config itself. If it is undefined, we
         // will just use an empty config and let the defaults take over.
         : poolOrConfig || {}
@@ -60,9 +60,9 @@ export default function postgraphql (
     process.exit(1)
   })
 
-  // Finally create our HTTP request handler using our options, the Postgres
+  // Finally create our Http request handler using our options, the Postgres
   // pool, and GraphQL schema. Return the final result.
-  return createPostGraphQLHTTPRequestHandler(Object.assign({}, options, {
+  return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
     graphqlSchema,
     pgPool,
   }))

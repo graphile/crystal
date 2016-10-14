@@ -7,7 +7,7 @@ import { readFileSync } from 'fs'
 import { createServer } from 'http'
 import chalk = require('chalk')
 import { Command } from 'commander'
-import { parse as parsePGConnectionString } from 'pg-connection-string'
+import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from '../postgraphql'
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../../package.json')).toString())
@@ -73,10 +73,10 @@ const pgConfig = Object.assign(
   // config. If we don’t have a connection string use some environment
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
-  pgConnectionString ? parsePGConnectionString(pgConnectionString) : {
-    host: process.env.PGHOST || 'localhost',
-    port: process.env.PGPORT || 5432,
-    database: process.env.PGDATABASE,
+  pgConnectionString ? parsePgConnectionString(pgConnectionString) : {
+    host: process.env.PgHOST || 'localhost',
+    port: process.env.PgPORT || 5432,
+    database: process.env.PgDATABASE,
   },
   // Add the max pool size to our config.
   { max: maxPoolSize },

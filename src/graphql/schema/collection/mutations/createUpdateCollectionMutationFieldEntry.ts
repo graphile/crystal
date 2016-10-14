@@ -11,12 +11,12 @@ import {
 import { Collection, ObjectType } from '../../../../interface'
 import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import getGQLType from '../../getGQLType'
-import createMutationGQLField, { MutationValue } from '../../createMutationGQLField'
-import createMutationPayloadGQLType from '../../createMutationPayloadGQLType'
-import transformGQLInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGQLInputValue'
-import getCollectionGQLType from '../getCollectionGQLType'
-import createCollectionRelationTailGQLFieldEntries from '../createCollectionRelationTailGQLFieldEntries'
+import getGqlType from '../../getGqlType'
+import createMutationGqlField, { MutationValue } from '../../createMutationGqlField'
+import createMutationPayloadGqlType from '../../createMutationPayloadGqlType'
+import transformGqlInputValue, { $$gqlInputObjectTypeValueKeyName } from '../../transformGqlInputValue'
+import getCollectionGqlType from '../getCollectionGqlType'
+import createCollectionRelationTailGqlFieldEntries from '../createCollectionRelationTailGqlFieldEntries'
 
 /**
  * Creates a update mutation that uses the primary key of a collection and an
@@ -39,7 +39,7 @@ export default function createUpdateCollectionMutationFieldEntry (
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const patchType = getCollectionPatchType(buildToken, collection)
 
-  return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGqlField<ObjectType.Value>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using its globally unique id and a patch.`,
     inputFields: [
@@ -58,7 +58,7 @@ export default function createUpdateCollectionMutationFieldEntry (
         type: new GraphQLNonNull(patchType),
       }],
     ],
-    payloadType: getUpdateCollectionPayloadGQLType(buildToken, collection),
+    payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
     // Execute by deserializing the id into its component parts and update a
     // value in the collection using that key.
     execute: (context, input) => {
@@ -68,7 +68,7 @@ export default function createUpdateCollectionMutationFieldEntry (
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
       // Get the patch from our input.
-      const patch = transformGQLInputValue(patchType, input[patchFieldName])
+      const patch = transformGqlInputValue(patchType, input[patchFieldName])
 
       if (!(patch instanceof Map))
         throw new Error('Patch is not of the correct type. Expected a `Map`.')
@@ -99,7 +99,7 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
       Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
         [formatName.field(fieldName), {
           description: field.description,
-          type: getNullableType(getGQLType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
+          type: getNullableType(getGqlType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
       )
@@ -110,28 +110,28 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
 /**
  * The output object type for collection update mutations.
  */
-export const getUpdateCollectionPayloadGQLType = memoize2(createUpdateCollectionPayloadGQLType)
+export const getUpdateCollectionPayloadGqlType = memoize2(createUpdateCollectionPayloadGqlType)
 
 /**
  * Creates the output fields returned by the collection update mutation.
  *
  * @private
  */
-function createUpdateCollectionPayloadGQLType (
+function createUpdateCollectionPayloadGqlType (
   buildToken: BuildToken,
   collection: Collection,
 ): GraphQLObjectType<MutationValue<ObjectType.Value>> {
-  return createMutationPayloadGQLType<ObjectType.Value>(buildToken, {
+  return createMutationPayloadGqlType<ObjectType.Value>(buildToken, {
     name: `update-${collection.type.name}`,
     outputFields: [
       // Add the updated value as an output field so the user can see the
       // object they just updated.
       [formatName.field(collection.type.name), {
-        type: getCollectionGQLType(buildToken, collection),
+        type: getCollectionGqlType(buildToken, collection),
         resolve: value => value,
       }],
       // Add related objects. This helps in Relay 1.
-      ...createCollectionRelationTailGQLFieldEntries(buildToken, collection),
+      ...createCollectionRelationTailGqlFieldEntries(buildToken, collection),
     ],
   })
 }

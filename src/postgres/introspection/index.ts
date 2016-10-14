@@ -1,24 +1,24 @@
 import introspectDatabase from './introspectDatabase'
-import PGCatalog from './PGCatalog'
-import PGCatalogObject from './object/PGCatalogObject'
-import PGCatalogNamespace from './object/PGCatalogNamespace'
-import PGCatalogClass from './object/PGCatalogClass'
-import PGCatalogAttribute from './object/PGCatalogAttribute'
-import PGCatalogType from './object/PGCatalogType'
-import PGCatalogConstraint from './object/PGCatalogConstraint'
-import PGCatalogProcedure from './object/PGCatalogProcedure'
+import PgCatalog from './PgCatalog'
+import PgCatalogObject from './object/PgCatalogObject'
+import PgCatalogNamespace from './object/PgCatalogNamespace'
+import PgCatalogClass from './object/PgCatalogClass'
+import PgCatalogAttribute from './object/PgCatalogAttribute'
+import PgCatalogType from './object/PgCatalogType'
+import PgCatalogConstraint from './object/PgCatalogConstraint'
+import PgCatalogProcedure from './object/PgCatalogProcedure'
 
 export {
   introspectDatabase,
-  PGCatalog,
-  PGCatalogObject,
-  PGCatalogNamespace,
-  PGCatalogClass,
-  PGCatalogAttribute,
-  PGCatalogType,
-  PGCatalogConstraint,
-  PGCatalogProcedure,
+  PgCatalog,
+  PgCatalogObject,
+  PgCatalogNamespace,
+  PgCatalogClass,
+  PgCatalogAttribute,
+  PgCatalogType,
+  PgCatalogConstraint,
+  PgCatalogProcedure,
 }
 
-export * from './object/PGCatalogType'
-export * from './object/PGCatalogConstraint'
+export * from './object/PgCatalogType'
+export * from './object/PgCatalogConstraint'

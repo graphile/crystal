@@ -7,7 +7,7 @@ import NamedType from './NamedType'
  * `Maybe` in Haskell, or `Option` in Rust.
  *
  * Why did we choose to default to non-nullable when the two original
- * technologies (PostgreSQL and GraphQL) have every type as nullable by
+ * technologies (PostgreSql and GraphQL) have every type as nullable by
  * default?
  *
  * 1. Non-nullable makes sense. It’s hard to remember that the domain of every
@@ -22,7 +22,7 @@ import NamedType from './NamedType'
  * 3. Matches functional programming patterns. As mentioned before, this is a
  *    ubiquitous pattern in functional programming languages.
  *
- * Given the problem space of PostgreSQL and GraphQL it makes sense they would
+ * Given the problem space of PostgreSql and GraphQL it makes sense they would
  * default to all types being nullable, however given the problem space of our
  * interface, it makes more sense to be non-nullable by default then wrap types
  * with an instance of this type.

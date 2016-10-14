@@ -1,4 +1,4 @@
-import createGraphQLSchema from './schema/createGQLSchema'
+import createGraphQLSchema from './schema/createGqlSchema'
 
 export {
   createGraphQLSchema,

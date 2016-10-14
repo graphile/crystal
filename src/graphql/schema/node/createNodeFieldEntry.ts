@@ -2,7 +2,7 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, ObjectType } from '../../../interface'
 import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
-import { $$isQuery } from '../getQueryGQLType'
+import { $$isQuery } from '../getQueryGqlType'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
 // TODO: doc
