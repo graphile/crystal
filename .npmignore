@@ -13,4 +13,4 @@ typings
 scripts
 examples
 docs
-resources/jest-preprocessor.js
+resources/jest-*

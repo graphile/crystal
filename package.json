@@ -72,7 +72,7 @@
       "js"
     ],
     "setupFiles": [
-      "<rootDir>/node_modules/source-map-support/register.js"
+      "<rootDir>/resources/jest-setup.js"
     ],
     "browser": false,
     "testEnvironment": "node",
