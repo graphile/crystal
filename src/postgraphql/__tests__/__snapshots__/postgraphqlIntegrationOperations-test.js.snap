@@ -38,9 +38,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
-            "email": "johnny.tucker@email.com",
+            "email": "joe.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
           },
         },
       ],
@@ -88,9 +88,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
-            "email": "johnny.tucker@email.com",
+            "email": "joe.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
           },
         },
       ],
@@ -111,19 +111,19 @@ Object {
           },
         },
         Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2UgVHVja2VyIiw1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
-          },
-        },
-        Object {
-          "cursor": "WyJuYW1lX2FzYyIsWyJKb2hubnkgVHVja2VyIiw1XV0=",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker",
           },
         },
         Object {
@@ -168,19 +168,19 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obm55IFR1Y2tlciIsNV1d",
-          "node": Object {
-            "email": "johnny.tucker@email.com",
-            "id": 5,
-            "name": "Johnny Tucker",
-          },
-        },
-        Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
           "node": Object {
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9lIFR1Y2tlciIsNV1d",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
           },
         },
         Object {
@@ -236,9 +236,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
-            "email": "johnny.tucker@email.com",
+            "email": "joe.tucker@email.com",
             "id": 5,
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
           },
         },
       ],
@@ -286,7 +286,7 @@ Object {
           "cursor": "WyJuYXR1cmFsIiw1XQ==",
           "node": Object {
             "constant": 2,
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
             "x": 5,
           },
         },
@@ -330,7 +330,7 @@ Object {
           "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
           "node": Object {
             "constant": 2,
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
             "x": 5,
           },
         },
@@ -1044,7 +1044,7 @@ Object {
           "__id": "WyJwZW9wbGUiLDVd",
           "__typename": "Person",
           "id": 5,
-          "name": "Johnny Tucker",
+          "name": "Joe Tucker",
         },
       ],
     },
@@ -1110,7 +1110,7 @@ Object {
       "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
-      "name": "Johnny Tucker",
+      "name": "Joe Tucker",
     },
     "g": null,
     "h": null,
@@ -1124,7 +1124,7 @@ Object {
       "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
-      "name": "Johnny Tucker",
+      "name": "Joe Tucker",
     },
     "k": null,
     "l": Object {
@@ -1221,8 +1221,8 @@ Object {
                 "friends": Object {
                   "nodes": Array [
                     Object {
-                      "firstName": "Johnny",
-                      "name": "Johnny Tucker",
+                      "firstName": "Joe",
+                      "name": "Joe Tucker",
                     },
                   ],
                 },
@@ -1241,19 +1241,19 @@ Object {
                 "friends": Object {
                   "nodes": Array [
                     Object {
-                      "firstName": "Johnny",
-                      "name": "Johnny Tucker",
+                      "firstName": "Joe",
+                      "name": "Joe Tucker",
                     },
                   ],
                 },
                 "name": "Kathryn Ramirez",
               },
               Object {
-                "firstName": "Johnny",
+                "firstName": "Joe",
                 "friends": Object {
                   "nodes": Array [],
                 },
-                "name": "Johnny Tucker",
+                "name": "Joe Tucker",
               },
             ],
           },
@@ -1264,22 +1264,22 @@ Object {
           "friends": Object {
             "nodes": Array [
               Object {
-                "firstName": "Johnny",
+                "firstName": "Joe",
                 "friends": Object {
                   "nodes": Array [],
                 },
-                "name": "Johnny Tucker",
+                "name": "Joe Tucker",
               },
             ],
           },
           "name": "Kathryn Ramirez",
         },
         Object {
-          "firstName": "Johnny",
+          "firstName": "Joe",
           "friends": Object {
             "nodes": Array [],
           },
-          "name": "Johnny Tucker",
+          "name": "Joe Tucker",
         },
       ],
     },
@@ -1437,7 +1437,7 @@ Object {
     "tableMutation": Object {
       "personByAuthorId": Object {
         "id": 5,
-        "name": "Johnny Tucker",
+        "name": "Joe Tucker",
       },
       "post": Object {
         "__id": "WyJwb3N0cyIsNV0=",
@@ -1461,7 +1461,7 @@ Object {
           "name": "Kathryn Ramirez",
         },
         Object {
-          "name": "Johnny Tucker",
+          "name": "Joe Tucker",
         },
       ],
     },
@@ -1554,7 +1554,7 @@ Object {
         Object {
           "cursor": "WyJuYXR1cmFsIiw1XQ==",
           "node": Object {
-            "name": "Johnny Tucker",
+            "name": "Joe Tucker",
           },
         },
       ],
@@ -1817,7 +1817,7 @@ Object {
             ],
           },
           "id": 5,
-          "name": "Johnny Tucker",
+          "name": "Joe Tucker",
           "postsByAuthorId": Object {
             "nodes": Array [
               Object {
@@ -1884,8 +1884,8 @@ Object {
             "name": "Sara Smith",
           },
           "personByPersonId2": Object {
-            "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker",
+            "email": "joe.tucker@email.com",
+            "name": "Joe Tucker",
           },
           "personId1": 2,
           "personId2": 5,
@@ -1929,8 +1929,8 @@ Object {
             "personId2": 1,
           },
           "personByPersonId": Object {
-            "email": "johnny.tucker@email.com",
-            "name": "Johnny Tucker",
+            "email": "joe.tucker@email.com",
+            "name": "Joe Tucker",
           },
           "personId": 5,
         },
