@@ -10,7 +10,7 @@ import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/
  */
 export default function postgraphql (
   poolOrConfig?: Pool | PoolConfig | string,
-  schemas: Array<string> = ['public'],
+  schema: string | Array<string> = 'public',
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
@@ -44,7 +44,7 @@ export default function postgraphql (
   // client from our pool to introspect the database.
   const graphqlSchema = (async () => {
     const pgClient = await pgPool.connect()
-    const subGraphqlSchema = await createPostGraphQLSchema(pgClient, schemas, options)
+    const subGraphqlSchema = await createPostGraphQLSchema(pgClient, Array.isArray(schema) ? schema : [schema], options)
 
     // If no release function exists, don’t release. This is just for tests.
     if (pgClient && pgClient.release)
