@@ -8,7 +8,7 @@ import { createServer } from 'http'
 import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import postgraphql from '../postgraphql'
+import postgraphql from './postgraphql'
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../../package.json')).toString())
 const program = new Command('postgraphql')
