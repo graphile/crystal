@@ -4,8 +4,7 @@ node_js:
   - "6"
 
 addons:
-  - postgresql: "9.4"
-  - postgresql: "9.5"
+  postgresql: "9.4"
 
 env:
   TEST_PG_URL: postgres://localhost:5432/travis
