@@ -161,6 +161,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     let result
     let queryDocumentAST
     const queryTimeStart = process.hrtime()
+    let pgRole
 
     debugRequest('GraphQL query request has begun.')
 
@@ -275,7 +276,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // Begin our transaction and set it up.
       await pgClient.query('begin')
-      await setupRequestPgClientTransaction(req, pgClient, {
+      pgRole = await setupRequestPgClientTransaction(req, pgClient, {
         jwtSecret: options.jwtSecret,
         pgDefaultRole: options.pgDefaultRole,
       })
@@ -327,7 +328,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         const ms = Math.round(timeDiff[0] * 1000) + (Math.round(timeDiff[1] * 10e-7 * 100) / 100)
 
         // If we have enabled the query log for the Http handler, use that.
-        console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)
+        console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''}in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)
       }
     }
   }

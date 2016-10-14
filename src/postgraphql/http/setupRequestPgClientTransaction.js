@@ -73,6 +73,8 @@ export default async function setupRequestPgClientTransaction (request, pgClient
     // Execute the query.
     await pgClient.query(query)
   }
+
+  return role
 }
 
 /**
