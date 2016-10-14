@@ -56,7 +56,7 @@ test('will use a connected client from the pool, the schemas, and options to cre
   pgPool.connect.mockReturnValue(Promise.resolve(pgClient))
   await postgraphql(pgPool, schemas, options)
   expect(pgPool.connect.mock.calls).toEqual([[]])
-  expect(createPostGraphQLSchema.mock.calls).toEqual([[pgClient, schemas, options]])
+  expect(createPostGraphQLSchema.mock.calls).toEqual([[pgClient, [schemas], options]])
   expect(pgClient.release.mock.calls).toEqual([[]])
 })
 

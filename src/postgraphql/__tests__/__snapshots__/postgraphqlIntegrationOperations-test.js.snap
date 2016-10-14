@@ -1418,6 +1418,9 @@ Object {
         6,
       ],
     },
+    "jsonIdentityMutation": Object {
+      "json": "{\"a\":1,\"b\":2,\"c\":3}",
+    },
     "mult1": Object {
       "integer": 0,
     },

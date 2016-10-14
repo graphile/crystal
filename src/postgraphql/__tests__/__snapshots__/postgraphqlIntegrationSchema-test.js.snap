@@ -378,12 +378,35 @@ enum IntSetQueryOrderBy {
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 scalar Json
 
+# All input for the \`jsonIdentityMutation\` mutation.
+input JsonIdentityMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  json: Json
+}
+
+# The output of our \`jsonIdentityMutation\` mutation.
+type JsonIdentityMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: Json
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
   ): IntSetMutationPayload
+  jsonIdentityMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonIdentityMutationInput!
+  ): JsonIdentityMutationPayload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
@@ -2964,6 +2987,25 @@ enum IntSetQueryOrderBy {
 # A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 scalar Json
 
+# All input for the \`jsonIdentityMutation\` mutation.
+input JsonIdentityMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  json: Json
+}
+
+# The output of our \`jsonIdentityMutation\` mutation.
+type JsonIdentityMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: Json
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 type JwtToken {
   role: String
   exp: Int
@@ -3109,6 +3151,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
   ): IntSetMutationPayload
+  jsonIdentityMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonIdentityMutationInput!
+  ): JsonIdentityMutationPayload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!

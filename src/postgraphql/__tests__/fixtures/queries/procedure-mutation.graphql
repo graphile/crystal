@@ -1,4 +1,5 @@
 mutation {
+  jsonIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }
   add1Mutation(input: { arg0: 1, arg1: 2 }) { clientMutationId integer }
   add2Mutation(input: { clientMutationId: "hello", a: 2, b: 2 }) { clientMutationId integer }
   add3Mutation(input: { clientMutationId: "world", arg1: 5 }) { clientMutationId integer }

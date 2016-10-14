@@ -5,7 +5,7 @@ import NamedType from '../NamedType'
  * be defined as an array of characters.
  */
 const jsonType: NamedType<string> = {
-  name: 'string',
+  name: 'json',
   description:
     'A JavaScript object encoded in the JSON format as specified by ' +
     '[ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).',
