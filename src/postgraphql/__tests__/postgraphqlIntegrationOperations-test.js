@@ -5,6 +5,10 @@ import withPGClient from '../../postgres/__tests__/fixtures/withPGClient'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
+// This test suite can be flaky in CI. Increase it’s timeout.
+if (process.env.CI)
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
+
 const kitchenSinkData = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../examples/kitchen-sink/data.sql'), (error, data) => {
     if (error) reject(error)

@@ -8,8 +8,7 @@ import { PGCatalog, introspectDatabase } from '../../../introspection'
 import { $$pgClient } from '../../pgClientFromContext'
 import PGCollection from '../PGCollection'
 
-// This test file gets pretty flaky in CI, so let’s increase its timeout
-// interval to 10 seconds.
+// This test suite can be flaky in CI. Increase it’s timeout.
 if (process.env.CI)
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
 

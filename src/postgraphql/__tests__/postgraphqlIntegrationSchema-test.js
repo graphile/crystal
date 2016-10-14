@@ -5,6 +5,10 @@ import { printSchema } from 'graphql'
 import withPGClient from '../../postgres/__tests__/fixtures/withPGClient'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
+// This test suite can be flaky in CI. Increase it’s timeout.
+if (process.env.CI)
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
+
 test('prints a schema with the default options', withPGClient(async pgClient => {
   const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
   expect(printSchema(gqlSchema)).toMatchSnapshot()
