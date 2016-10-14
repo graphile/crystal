@@ -21,6 +21,7 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
   config: {
+    description?: string,
     inputArgEntries?: Array<[string, GraphQLArgumentConfig<mixed>]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
@@ -38,7 +39,7 @@ export default function createConnectionGQLField <TSource, TInput, TItemValue>(
   }
 
   return {
-    description: `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
+    description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGQLType(buildToken, paginator),
     args: buildObject<GraphQLArgumentConfig<mixed>>([
       // Only include an `orderBy` field if there are ways in which we can

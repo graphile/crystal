@@ -41,11 +41,12 @@ export default function createDeleteCollectionMutationFieldEntry (
 
   return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
+    description: `Updates a single \`${formatName.type(collection.type.name)}\` using its globally unique id and a patch.`,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
       [options.nodeIdFieldName, {
-        // TODO: description
+        description: `The globally unique \`ID\` which will identify a single \`${formatName.type(collection.type.name)}\` to be updated.`,
         type: new GraphQLNonNull(GraphQLID),
       }],
       // Also include the patch object type. This is its own object type so
@@ -53,7 +54,7 @@ export default function createDeleteCollectionMutationFieldEntry (
       // keys. This also means users can freely upload entire objects to this
       // field.
       [patchFieldName, {
-        // TODO: description
+        description: `An object where the defined keys will be set on the \`${formatName.type(collection.type.name)}\` identified by our globally unique \`ID\`.`,
         type: new GraphQLNonNull(patchType),
       }],
     ],
@@ -93,11 +94,11 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
   const { type } = collection
   return new GraphQLInputObjectType({
     name: formatName.type(`${type.name}-patch`),
-    // TODO: description
+    description: `Represents an update to a \`${formatName.type(type.name)}\`. Fields that are set will be updated.`,
     fields: () => buildObject<GraphQLInputFieldConfig<mixed>>(
       Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed>]>(([fieldName, field]) =>
         [formatName.field(fieldName), {
-          // TODO: description
+          description: field.description,
           type: getNullableType(getGQLType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]

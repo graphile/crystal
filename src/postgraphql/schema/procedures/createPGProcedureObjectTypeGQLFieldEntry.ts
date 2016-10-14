@@ -47,7 +47,7 @@ function createPGSingleProcedureQueryGQLFieldEntry (
   const argEntries = fixtures.args.slice(1).map<[string, GraphQLArgumentConfig<mixed>]>(
     ({ name, gqlType }) =>
       [formatName.arg(name), {
-        // TODO: description
+        // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
   )
@@ -85,12 +85,13 @@ function createPGSetProcedureQueryGQLFieldEntry (
   const inputArgEntries = fixtures.args.slice(1).map<[string, GraphQLArgumentConfig<mixed>]>(
     ({ name, gqlType }) =>
       [formatName.arg(name), {
-        // TODO: description
+        // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
   )
 
   return [formatName.field(pgProcedure.name.substring(fixtures.args[0].pgType.name.length + 1)), createConnectionGQLField<mixed, Array<mixed>, mixed>(buildToken, paginator, {
+    description: pgProcedure.description,
     inputArgEntries,
     getPaginatorInput: (source, args) =>
       [source, ...inputArgEntries.map(([argName, { type }]) => transformGQLInputValue(type, args[argName]))],

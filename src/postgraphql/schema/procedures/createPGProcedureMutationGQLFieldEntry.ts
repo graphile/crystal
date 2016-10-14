@@ -45,7 +45,7 @@ export default function createPGProcedureMutationGQLFieldEntry (
   const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
     ({ name, gqlType }) =>
       [formatName.field(name), {
-        // TODO: description
+        // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
   )

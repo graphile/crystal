@@ -13,18 +13,35 @@ import { $$transformValueIntoPGValue } from '../../transformValueIntoPGValue'
  */
 const pgIntervalType = Object.assign(new ObjectType({
   name: 'interval',
-  description: 'An interval of time that has passed.',
+  description: 'An interval of time that has passed where the smallest distinct unit is a second.',
   fields: new Map([
     // All values in an interval are integers, except the value for seconds
     // which can store a fractional. Basically fractions will ”overflow” from
     // the integers all the way down to `seconds`.
-    // TODO: descriptions…
-    ['seconds', { type: new NullableType(floatType) }],
-    ['minutes', { type: new NullableType(integerType) }],
-    ['hours', { type: new NullableType(integerType) }],
-    ['days', { type: new NullableType(integerType) }],
-    ['months', { type: new NullableType(integerType) }],
-    ['years', { type: new NullableType(integerType) }],
+    ['seconds', {
+      description: 'A quantity of seconds. This is the only non-integer field, as all the other fields will dump their overflow into a smaller unit of time. Intervals don’t have a smaller unit than seconds.',
+      type: new NullableType(floatType),
+    }],
+    ['minutes', {
+      description: 'A quantity of minutes.',
+      type: new NullableType(integerType),
+    }],
+    ['hours', {
+      description: 'A quantity of hours.',
+      type: new NullableType(integerType),
+    }],
+    ['days', {
+      description: 'A quantity of days.',
+      type: new NullableType(integerType),
+    }],
+    ['months', {
+      description: 'A quantity of months',
+      type: new NullableType(integerType),
+    }],
+    ['years', {
+      description: 'A quantity of years',
+      type: new NullableType(integerType),
+    }],
   ]),
 }), {
   // The `pg` module will parse this into an object with the correct keys, we

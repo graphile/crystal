@@ -28,6 +28,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
 
   return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
+    description: `Updates a single \`${formatName.type(collection.type.name)}\` using a unique key and a patch.`,
     inputFields: [
       // Include all of the fields we need to construct the key value we will
       // use to find the single value to update.
@@ -37,7 +38,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
       // keys. This also means users can freely upload entire objects to this
       // field.
       [patchFieldName, {
-        // TODO: description
+        description: `An object where the defined keys will be set on the \`${formatName.type(collection.type.name)}\` identified by our unique key.`,
         type: new GraphQLNonNull(patchGQLType),
       }],
     ],

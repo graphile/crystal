@@ -58,16 +58,16 @@ export default function createMutationGQLField <T>(
     // mutation (it’s a Relay 1 that happens to be a good idea, as many are).
     args: {
       input: {
-        // TODO: description
+        description: 'The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.',
         type: new GraphQLNonNull(new GraphQLInputObjectType({
           name: formatName.type(`${config.name}-input`),
-          // TODO: description
+          description: `All input for the \`${formatName.field(config.name)}\` mutation.`,
           fields: buildObject<GraphQLInputFieldConfig<mixed>>(
             [
               // Relay 1 requires us to have a `clientMutationId`. This can be
               // helpful for tracking the results of mutations.
               ['clientMutationId', {
-                // TODO: description
+                description: 'An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.',
                 type: GraphQLString,
               }],
             ],

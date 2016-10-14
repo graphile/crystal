@@ -10,6 +10,9 @@ import createPostGraphQLHTTPRequestHandler, { HTTPRequestHandler } from './http/
  */
 export default function postgraphql (
   poolOrConfig?: Pool | PoolConfig | string,
+  // TODO: Return a JWT for the `--token` type wherever it is an output type.
+  // This allows us to return lists of JWTs or an object with a JWT key.
+  // TODO: Descriptions.
   schemas: Array<string> = ['public'],
   options: {
     classicIds?: boolean,

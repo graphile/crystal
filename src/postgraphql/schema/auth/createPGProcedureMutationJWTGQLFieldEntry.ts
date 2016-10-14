@@ -31,7 +31,7 @@ export default function createPGProcedureMutationJWTGQLFieldEntry (
   const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
     ({ name, gqlType }) =>
       [formatName.field(name), {
-        // TODO: description
+        description: `Filter out values where \`${formatName.field(name)}\` is not exactly equal to this value.`,
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
       }]
   )

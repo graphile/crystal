@@ -1,6 +1,6 @@
 import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphql'
 import { CollectionKey, ObjectType } from '../../../interface'
-import { formatName } from '../../utils'
+import { formatName, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGQLType from '../getGQLType'
 import transformGQLInputValue from '../transformGQLInputValue'
@@ -65,7 +65,7 @@ export default function createCollectionKeyInputHelpers <T>(
     return {
       fieldEntries: [
         [fieldName, {
-          // TODO: description
+          description: `The ${scrib.type(fieldType)} to use when reading a single value.`,
           type: new GraphQLNonNull(getNullableType(fieldType)),
         }],
       ],

@@ -31,7 +31,7 @@ test('will create a field entry with the correct input fields', () => {
   const type = { name: 'person' }
   const collection = { name: 'people', type, create: true }
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
-  expect(fieldEntry[1].inputFields).toEqual([['person', { type: gqlType }]])
+  expect(fieldEntry[1].inputFields).toEqual([['person', { type: gqlType, description: 'The `` to be created by this mutation.' }]])
   expect(getGQLType.mock.calls).toEqual([[buildToken, type, true]])
 })
 

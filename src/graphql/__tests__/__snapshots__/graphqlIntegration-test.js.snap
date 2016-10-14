@@ -1,27 +1,53 @@
 exports[`test will generate the correct forum schema 1`] = `
-"input CreatePersonInput {
+"# All input for the \`createPerson\` mutation.
+input CreatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Person\` to be created by this mutation.
   person: PersonInput!
 }
 
+# The output of our \`createPerson\` mutation.
 type CreatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Person\` that was created by this mutation.
   person: Person
+
+  # An edge for our \`Person\`. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = NAME_ASC
   ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createPost\` mutation.
 input CreatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Post\` to be created by this mutation.
   post: PostInput!
 }
 
+# The output of our \`createPost\` mutation.
 type CreatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Post\` that was created by this mutation.
   post: Post
+
+  # An edge for our \`Post\`. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = HEADLINE_ASC
@@ -29,46 +55,78 @@ type CreatePostPayload {
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthor: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
+# All input for the \`deletePersonById\` mutation.
 input DeletePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Int\` to use when reading a single value.
   id: Int!
 }
 
+# All input for the \`deletePerson\` mutation.
 input DeletePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deletePerson\` mutation.
 type DeletePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
   deletedPersonId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`deletePostById\` mutation.
 input DeletePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Int\` to use when reading a single value.
   id: Int!
 }
 
+# All input for the \`deletePost\` mutation.
 input DeletePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deletePost\` mutation.
 type DeletePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
   deletedPostId: ID
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthor: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -76,17 +134,71 @@ scalar Email
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  createPerson(input: CreatePersonInput!): CreatePersonPayload
-  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
-  deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
-  createPost(input: CreatePostInput!): CreatePostPayload
-  updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostById(input: UpdatePostByIdInput!): UpdatePostPayload
-  deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostById(input: DeletePostByIdInput!): DeletePostPayload
+  # Creates a single \`Person\`.
+  createPerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  # Updates a single \`Person\` using its globally unique id and a patch.
+  updatePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  # Deletes a single \`Person\` using its globally unique id.
+  deletePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
+
+  # Creates a single \`Post\`.
+  createPost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePostInput!
+  ): CreatePostPayload
+
+  # Updates a single \`Post\` using its globally unique id and a patch.
+  updatePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  # Updates a single \`Post\` using a unique key and a patch.
+  updatePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  # Deletes a single \`Post\` using its globally unique id.
+  deletePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostInput!
+  ): DeletePostPayload
+
+  # Deletes a single \`Post\` using a unique key.
+  deletePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
 }
 
 # An object with a globally unique \`ID\`.
@@ -166,6 +278,7 @@ input PersonInput {
   about: String
 }
 
+# Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   id: Int
   name: String
@@ -196,6 +309,7 @@ input PostInput {
   body: String
 }
 
+# Represents an update to a \`Post\`. Fields that are set will be updated.
 input PostPatch {
   id: Int
   authorId: Int
@@ -286,9 +400,18 @@ type Query implements Node {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     __id: ID!
   ): Person
-  personById(id: Int!): Person
-  personByName(name: String!): Person
-  personByEmail(email: String!): Person
+  personById(
+    # The \`Int\` to use when reading a single value.
+    id: Int!
+  ): Person
+  personByName(
+    # The \`String\` to use when reading a single value.
+    name: String!
+  ): Person
+  personByEmail(
+    # The \`String\` to use when reading a single value.
+    email: String!
+  ): Person
 
   # Reads and enables paginatation through a set of \`Post\`.
   allPosts(
@@ -322,7 +445,10 @@ type Query implements Node {
     # The globally unique \`ID\` to be used in selecting a single \`Post\`.
     __id: ID!
   ): Post
-  postById(id: Int!): Post
+  postById(
+    # The \`Int\` to use when reading a single value.
+    id: Int!
+  ): Post
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
@@ -332,48 +458,93 @@ type Query implements Node {
   __id: ID!
 }
 
+# All input for the \`updatePersonByEmail\` mutation.
 input UpdatePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`String\` to use when reading a single value.
   email: String!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePersonById\` mutation.
 input UpdatePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Int\` to use when reading a single value.
   id: Int!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePerson\` mutation.
 input UpdatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our globally unique \`ID\`.
   personPatch: PersonPatch!
 }
 
+# The output of our \`updatePerson\` mutation.
 type UpdatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updatePostById\` mutation.
 input UpdatePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Int\` to use when reading a single value.
   id: Int!
+
+  # An object where the defined keys will be set on the \`Post\` identified by our unique key.
   postPatch: PostPatch!
 }
 
+# All input for the \`updatePost\` mutation.
 input UpdatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Post\` identified by our globally unique \`ID\`.
   postPatch: PostPatch!
 }
 
+# The output of our \`updatePost\` mutation.
 type UpdatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthor: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 "

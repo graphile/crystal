@@ -44,14 +44,14 @@ class PGRangeObjectType extends ObjectType {
 
     const boundType = new ObjectType({
       name: `${name}-bound`,
-      // TODO: description
+      description: 'The value at one end of a range. A range can either include this value, or not.',
       fields: new Map<string, ObjectType.Field<mixed>>([
         ['value', {
-          // TODO: description
+          description: 'The value at one end of our range.',
           type: subType instanceof NullableType ? subType.nonNullType : subType,
         }],
         ['inclusive', {
-          // TODO: description
+          description: 'Whether or not the value of this bound is included in the range.',
           type: booleanType,
         }],
       ]),
@@ -62,11 +62,11 @@ class PGRangeObjectType extends ObjectType {
       description: pgRangeType.description,
       fields: new Map<string, ObjectType.Field<mixed>>([
         ['start', {
-          // TODO: description
+          description: 'The starting bound of our range.',
           type: new NullableType(boundType),
         }],
         ['end', {
-          // TODO: description
+          description: 'The ending bound of our range.',
           type: new NullableType(boundType),
         }],
       ]),

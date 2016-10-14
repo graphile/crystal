@@ -17,13 +17,13 @@ export default function createMutationPayloadGQLType <T>(
 ): GraphQLObjectType<MutationValue<T>> {
   return new GraphQLObjectType<MutationValue<T>>({
     name: formatName.type(`${config.name}-payload`),
-    // TODO: description
+    description: `The output of our \`${formatName.field(config.name)}\` mutation.`,
     fields: buildObject<GraphQLFieldConfig<MutationValue<T>, mixed>>(
       [
         // Add the `clientMutationId` output field. This will be the exact
         // same value as the input `clientMutationId`.
         ['clientMutationId', {
-          // TODO: description
+          description: `The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.`,
           type: GraphQLString,
           resolve: ({ clientMutationId }) => clientMutationId,
         }],
@@ -53,7 +53,7 @@ export default function createMutationPayloadGQLType <T>(
         // A reference to the root query type. Allows you to access even more
         // data in your mutations.
         ['query', {
-          // TODO: description
+          description: 'Our root query field type. Allows us to run any query from our mutation payload.',
           type: getQueryGQLType(buildToken),
           resolve: () => null,
         }],

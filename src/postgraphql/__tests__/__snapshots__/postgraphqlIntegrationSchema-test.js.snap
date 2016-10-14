@@ -19,6 +19,7 @@ input CompoundKeyInput {
   extra: Boolean
 }
 
+# Represents an update to a \`CompoundKey\`. Fields that are set will be updated.
 input CompoundKeyPatch {
   personId2: Int
   personId1: Int
@@ -62,14 +63,26 @@ enum CompoundKeysOrderBy {
   EXTRA_DESC
 }
 
+# All input for the \`createCompoundKey\` mutation.
 input CreateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`CompoundKey\` to be created by this mutation.
   compoundKey: CompoundKeyInput!
 }
 
+# The output of our \`createCompoundKey\` mutation.
 type CreateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`CompoundKey\` that was created by this mutation.
   compoundKey: CompoundKey
+
+  # An edge for our \`CompoundKey\`. May be used by Relay 1.
   compoundKeyEdge(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -80,36 +93,66 @@ type CreateCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createEdgeCase\` mutation.
 input CreateEdgeCaseInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`EdgeCase\` to be created by this mutation.
   edgeCase: EdgeCaseInput!
 }
 
+# The output of our \`createEdgeCase\` mutation.
 type CreateEdgeCasePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`EdgeCase\` that was created by this mutation.
   edgeCase: EdgeCase
+
+  # An edge for our \`EdgeCase\`. May be used by Relay 1.
   edgeCaseEdge(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
   ): EdgeCasesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createPerson\` mutation.
 input CreatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Person\` to be created by this mutation.
   person: PersonInput!
 }
 
+# The output of our \`createPerson\` mutation.
 type CreatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Person\` that was created by this mutation.
   person: Person
+
+  # An edge for our \`Person\`. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
   ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -120,18 +163,29 @@ scalar Cursor
 # 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 scalar Datetime
 
+# All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   personId1: Int!
   personId2: Int!
 }
 
+# All input for the \`deleteCompoundKey\` mutation.
 input DeleteCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be deleted.
   id: ID!
 }
 
+# The output of our \`deleteCompoundKey\` mutation.
 type DeleteCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundKey: CompoundKey
   deletedCompoundKeyId: ID
@@ -141,28 +195,46 @@ type DeleteCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`deletePersonByEmail\` mutation.
 input DeletePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   email: Email!
 }
 
+# All input for the \`deletePersonByRowId\` mutation.
 input DeletePersonByRowIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   rowId: Int!
 }
 
+# All input for the \`deletePerson\` mutation.
 input DeletePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
   id: ID!
 }
 
+# The output of our \`deletePerson\` mutation.
 type DeletePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
   deletedPersonId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -212,27 +284,42 @@ enum EdgeCasesOrderBy {
 
 scalar Email
 
+# The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
+  # The value at one end of our range.
   value: Float!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 # range of numerics
 input FloatRangeInput {
+  # The starting bound of our range.
   start: FloatRangeBoundInput
+
+  # The ending bound of our range.
   end: FloatRangeBoundInput
 }
 
+# All input for the \`intSetMutation\` mutation.
 input IntSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   x: Int
   y: Int
   z: Int
 }
 
+# The output of our \`intSetMutation\` mutation.
 type IntSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integers: [Int]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -270,33 +357,121 @@ scalar Json
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
-  noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  tableMutation(input: TableMutationInput!): TableMutationPayload
-  tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
-  typesMutation(input: TypesMutationInput!): TypesMutationPayload
-  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
-  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
-  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
-  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
-  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
-  createEdgeCase(input: CreateEdgeCaseInput!): CreateEdgeCasePayload
-  createPerson(input: CreatePersonInput!): CreatePersonPayload
-  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
-  updatePersonByRowId(input: UpdatePersonByRowIdInput!): UpdatePersonPayload
-  deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
-  deletePersonByRowId(input: DeletePersonByRowIdInput!): DeletePersonPayload
+  intSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: IntSetMutationInput!
+  ): IntSetMutationPayload
+  noArgsMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: NoArgsMutationInput!
+  ): NoArgsMutationPayload
+  tableMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableMutationInput!
+  ): TableMutationPayload
+  tableSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableSetMutationInput!
+  ): TableSetMutationPayload
+  typesMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TypesMutationInput!
+  ): TypesMutationPayload
+
+  # Creates a single \`CompoundKey\`.
+  createCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateCompoundKeyInput!
+  ): CreateCompoundKeyPayload
+
+  # Updates a single \`CompoundKey\` using its globally unique id and a patch.
+  updateCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyInput!
+  ): UpdateCompoundKeyPayload
+
+  # Updates a single \`CompoundKey\` using a unique key and a patch.
+  updateCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyByPersonId1AndPersonId2Input!
+  ): UpdateCompoundKeyPayload
+
+  # Deletes a single \`CompoundKey\` using its globally unique id.
+  deleteCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyInput!
+  ): DeleteCompoundKeyPayload
+
+  # Deletes a single \`CompoundKey\` using a unique key.
+  deleteCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyByPersonId1AndPersonId2Input!
+  ): DeleteCompoundKeyPayload
+
+  # Creates a single \`EdgeCase\`.
+  createEdgeCase(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateEdgeCaseInput!
+  ): CreateEdgeCasePayload
+
+  # Creates a single \`Person\`.
+  createPerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  # Updates a single \`Person\` using its globally unique id and a patch.
+  updatePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByRowId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByRowIdInput!
+  ): UpdatePersonPayload
+
+  # Deletes a single \`Person\` using its globally unique id.
+  deletePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByEmailInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByRowId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByRowIdInput!
+  ): DeletePersonPayload
 }
 
+# All input for the \`noArgsMutation\` mutation.
 input NoArgsMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
 }
 
+# The output of our \`noArgsMutation\` mutation.
 type NoArgsMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -482,8 +657,11 @@ input PersonInput {
   createdAt: Datetime
 }
 
+# Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   rowId: Int
+
+  # The person’s name
   name: String
   about: String
   email: Email
@@ -655,24 +833,40 @@ type Query implements Node {
   id: ID!
 }
 
+# All input for the \`tableMutation\` mutation.
 input TableMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int
 }
 
+# The output of our \`tableMutation\` mutation.
 type TableMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`tableSetMutation\` mutation.
 input TableSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
 }
 
+# The output of our \`tableSetMutation\` mutation.
 type TableSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   people: [Person]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -705,7 +899,10 @@ enum TableSetQueryOrderBy {
   NATURAL
 }
 
+# All input for the \`typesMutation\` mutation.
 input TypesMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   a: Int!
   b: Boolean!
@@ -715,26 +912,46 @@ input TypesMutationInput {
   f: FloatRangeInput!
 }
 
+# The output of our \`typesMutation\` mutation.
 type TypesMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   boolean: Boolean
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   personId1: Int!
   personId2: Int!
+
+  # An object where the defined keys will be set on the \`CompoundKey\` identified by our unique key.
   compoundKeyPatch: CompoundKeyPatch!
 }
 
+# All input for the \`updateCompoundKey\` mutation.
 input UpdateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be updated.
   id: ID!
+
+  # An object where the defined keys will be set on the \`CompoundKey\` identified by our globally unique \`ID\`.
   compoundKeyPatch: CompoundKeyPatch!
 }
 
+# The output of our \`updateCompoundKey\` mutation.
 type UpdateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundKey: CompoundKey
 
@@ -743,30 +960,54 @@ type UpdateCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updatePersonByEmail\` mutation.
 input UpdatePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   email: Email!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePersonByRowId\` mutation.
 input UpdatePersonByRowIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   rowId: Int!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePerson\` mutation.
 input UpdatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
   id: ID!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our globally unique \`ID\`.
   personPatch: PersonPatch!
 }
 
+# The output of our \`updatePerson\` mutation.
 type UpdatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 "
@@ -776,37 +1017,65 @@ exports[`test prints a schema with a JWT generating mutation 1`] = `
 "scalar AnInt
 
 type AnIntRange {
+  # The starting bound of our range.
   start: AnIntRangeBound
+
+  # The ending bound of our range.
   end: AnIntRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type AnIntRangeBound {
+  # The value at one end of our range.
   value: AnInt!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input AnIntRangeBoundInput {
+  # The value at one end of our range.
   value: AnInt!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 input AnIntRangeInput {
+  # The starting bound of our range.
   start: AnIntRangeBoundInput
+
+  # The ending bound of our range.
   end: AnIntRangeBoundInput
 }
 
 scalar AnotherInt
 
+# All input for the \`authenticate\` mutation.
 input AuthenticateInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # Filter out values where \`a\` is not exactly equal to this value.
   a: Int
+
+  # Filter out values where \`b\` is not exactly equal to this value.
   b: Int
+
+  # Filter out values where \`c\` is not exactly equal to this value.
   c: Int
 }
 
+# The output of our \`authenticate\` mutation.
 type AuthenticatePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   token: Jwt
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -834,44 +1103,80 @@ input CompoundTypeInput {
   fooBar: Int
 }
 
+# All input for the \`compoundTypeMutation\` mutation.
 input CompoundTypeMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   object: CompoundTypeInput
 }
 
+# The output of our \`compoundTypeMutation\` mutation.
 type CompoundTypeMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundType: CompoundType
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createType\` mutation.
 input CreateTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Type\` to be created by this mutation.
   type: TypeInput!
 }
 
+# The output of our \`createType\` mutation.
 type CreateTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Type\` that was created by this mutation.
   type: Type
+
+  # An edge for our \`Type\`. May be used by Relay 1.
   typeEdge(
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createUpdatableView\` mutation.
 input CreateUpdatableViewInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`UpdatableView\` to be created by this mutation.
   updatableView: UpdatableViewInput!
 }
 
+# The output of our \`createUpdatableView\` mutation.
 type CreateUpdatableViewPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`UpdatableView\` that was created by this mutation.
   updatableView: UpdatableView
+
+  # An edge for our \`UpdatableView\`. May be used by Relay 1.
   updatableViewEdge(
     # The method to use when ordering \`UpdatableView\`.
     orderBy: UpdatableViewsOrderBy = NATURAL
   ): UpdatableViewsEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -883,23 +1188,37 @@ scalar Date
 
 # range of dates
 type DateRange {
+  # The starting bound of our range.
   start: DateRangeBound
+
+  # The ending bound of our range.
   end: DateRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type DateRangeBound {
+  # The value at one end of our range.
   value: Date!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input DateRangeBoundInput {
+  # The value at one end of our range.
   value: Date!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 # range of dates
 input DateRangeInput {
+  # The starting bound of our range.
   start: DateRangeBoundInput
+
+  # The ending bound of our range.
   end: DateRangeBoundInput
 }
 
@@ -907,62 +1226,115 @@ input DateRangeInput {
 # 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 scalar Datetime
 
+# All input for the \`deleteTypeById\` mutation.
 input DeleteTypeByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
 }
 
+# All input for the \`deleteType\` mutation.
 input DeleteTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Type\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deleteType\` mutation.
 type DeleteTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   type: Type
   deletedTypeId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
 # range of numerics
 type FloatRange {
+  # The starting bound of our range.
   start: FloatRangeBound
+
+  # The ending bound of our range.
   end: FloatRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type FloatRangeBound {
+  # The value at one end of our range.
   value: Float!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
+  # The value at one end of our range.
   value: Float!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 # range of numerics
 input FloatRangeInput {
+  # The starting bound of our range.
   start: FloatRangeBoundInput
+
+  # The ending bound of our range.
   end: FloatRangeBoundInput
 }
 
-# An interval of time that has passed.
+# An interval of time that has passed where the smallest distinct unit is a second.
 type Interval {
+  # A quantity of seconds. This is the only non-integer field, as all the other
+  # fields will dump their overflow into a smaller unit of time. Intervals don’t
+  # have a smaller unit than seconds.
   seconds: Float
+
+  # A quantity of minutes.
   minutes: Int
+
+  # A quantity of hours.
   hours: Int
+
+  # A quantity of days.
   days: Int
+
+  # A quantity of months
   months: Int
+
+  # A quantity of years
   years: Int
 }
 
-# An interval of time that has passed.
+# An interval of time that has passed where the smallest distinct unit is a second.
 input IntervalInput {
+  # A quantity of seconds. This is the only non-integer field, as all the other
+  # fields will dump their overflow into a smaller unit of time. Intervals don’t
+  # have a smaller unit than seconds.
   seconds: Float
+
+  # A quantity of minutes.
   minutes: Int
+
+  # A quantity of hours.
   hours: Int
+
+  # A quantity of days.
   days: Int
+
+  # A quantity of months
   months: Int
+
+  # A quantity of years
   years: Int
 }
 
@@ -973,68 +1345,148 @@ scalar Json
 # which securely represents claims between two parties.
 scalar Jwt
 
+# All input for the \`mult1\` mutation.
 input Mult1Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int
   arg1: Int
 }
 
+# The output of our \`mult1\` mutation.
 type Mult1Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult2\` mutation.
 input Mult2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int
   arg1: Int
 }
 
+# The output of our \`mult2\` mutation.
 type Mult2Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult3\` mutation.
 input Mult3Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int!
   arg1: Int!
 }
 
+# The output of our \`mult3\` mutation.
 type Mult3Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult4\` mutation.
 input Mult4Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int!
   arg1: Int!
 }
 
+# The output of our \`mult4\` mutation.
 type Mult4Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
-  authenticate(input: AuthenticateInput!): AuthenticatePayload
-  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
-  mult1(input: Mult1Input!): Mult1Payload
-  mult2(input: Mult2Input!): Mult2Payload
-  mult3(input: Mult3Input!): Mult3Payload
-  mult4(input: Mult4Input!): Mult4Payload
-  createType(input: CreateTypeInput!): CreateTypePayload
-  updateType(input: UpdateTypeInput!): UpdateTypePayload
-  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypePayload
-  deleteType(input: DeleteTypeInput!): DeleteTypePayload
-  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypePayload
-  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
+  authenticate(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateInput!
+  ): AuthenticatePayload
+  compoundTypeMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CompoundTypeMutationInput!
+  ): CompoundTypeMutationPayload
+  mult1(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult1Input!
+  ): Mult1Payload
+  mult2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult2Input!
+  ): Mult2Payload
+  mult3(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult3Input!
+  ): Mult3Payload
+  mult4(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult4Input!
+  ): Mult4Payload
+
+  # Creates a single \`Type\`.
+  createType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateTypeInput!
+  ): CreateTypePayload
+
+  # Updates a single \`Type\` using its globally unique id and a patch.
+  updateType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateTypeInput!
+  ): UpdateTypePayload
+
+  # Updates a single \`Type\` using a unique key and a patch.
+  updateTypeById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateTypeByIdInput!
+  ): UpdateTypePayload
+
+  # Deletes a single \`Type\` using its globally unique id.
+  deleteType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteTypeInput!
+  ): DeleteTypePayload
+
+  # Deletes a single \`Type\` using a unique key.
+  deleteTypeById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteTypeByIdInput!
+  ): DeleteTypePayload
+
+  # Creates a single \`UpdatableView\`.
+  createUpdatableView(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateUpdatableViewInput!
+  ): CreateUpdatableViewPayload
 }
 
 type NestedCompoundType {
@@ -1222,6 +1674,7 @@ input TypeInput {
   nestedCompoundType: NestedCompoundTypeInput!
 }
 
+# Represents an update to a \`Type\`. Fields that are set will be updated.
 input TypePatch {
   id: Int
   smallint: Int
@@ -1382,21 +1835,38 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+# All input for the \`updateTypeById\` mutation.
 input UpdateTypeByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
+
+  # An object where the defined keys will be set on the \`Type\` identified by our unique key.
   typePatch: TypePatch!
 }
 
+# All input for the \`updateType\` mutation.
 input UpdateTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Type\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Type\` identified by our globally unique \`ID\`.
   typePatch: TypePatch!
 }
 
+# The output of our \`updateType\` mutation.
 type UpdateTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   type: Type
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -1406,88 +1876,142 @@ scalar Uuid
 `;
 
 exports[`test prints a schema with the default options 1`] = `
-"input Add1MutationInput {
+"# All input for the \`add1Mutation\` mutation.
+input Add1MutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int!
   arg1: Int!
 }
 
+# The output of our \`add1Mutation\` mutation.
 type Add1MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`add2Mutation\` mutation.
 input Add2MutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   a: Int!
   b: Int!
 }
 
+# The output of our \`add2Mutation\` mutation.
 type Add2MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`add3Mutation\` mutation.
 input Add3MutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   a: Int
   arg1: Int
 }
 
+# The output of our \`add3Mutation\` mutation.
 type Add3MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`add4Mutation\` mutation.
 input Add4MutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int
   b: Int
 }
 
+# The output of our \`add4Mutation\` mutation.
 type Add4MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
 scalar AnInt
 
 type AnIntRange {
+  # The starting bound of our range.
   start: AnIntRangeBound
+
+  # The ending bound of our range.
   end: AnIntRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type AnIntRangeBound {
+  # The value at one end of our range.
   value: AnInt!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input AnIntRangeBoundInput {
+  # The value at one end of our range.
   value: AnInt!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 input AnIntRangeInput {
+  # The starting bound of our range.
   start: AnIntRangeBoundInput
+
+  # The ending bound of our range.
   end: AnIntRangeBoundInput
 }
 
 scalar AnotherInt
 
+# All input for the \`authenticate\` mutation.
 input AuthenticateInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   a: Int
   b: Int
   c: Int
 }
 
+# The output of our \`authenticate\` mutation.
 type AuthenticatePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   jwtToken: JwtToken
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -1539,6 +2063,7 @@ input CompoundKeyInput {
   extra: Boolean
 }
 
+# Represents an update to a \`CompoundKey\`. Fields that are set will be updated.
 input CompoundKeyPatch {
   personId2: Int
   personId1: Int
@@ -1601,25 +2126,45 @@ input CompoundTypeInput {
   fooBar: Int
 }
 
+# All input for the \`compoundTypeMutation\` mutation.
 input CompoundTypeMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   object: CompoundTypeInput
 }
 
+# The output of our \`compoundTypeMutation\` mutation.
 type CompoundTypeMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundType: CompoundType
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createCompoundKey\` mutation.
 input CreateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`CompoundKey\` to be created by this mutation.
   compoundKey: CompoundKeyInput!
 }
 
+# The output of our \`createCompoundKey\` mutation.
 type CreateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`CompoundKey\` that was created by this mutation.
   compoundKey: CompoundKey
+
+  # An edge for our \`CompoundKey\`. May be used by Relay 1.
   compoundKeyEdge(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -1630,32 +2175,60 @@ type CreateCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createEdgeCase\` mutation.
 input CreateEdgeCaseInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`EdgeCase\` to be created by this mutation.
   edgeCase: EdgeCaseInput!
 }
 
+# The output of our \`createEdgeCase\` mutation.
 type CreateEdgeCasePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`EdgeCase\` that was created by this mutation.
   edgeCase: EdgeCase
+
+  # An edge for our \`EdgeCase\`. May be used by Relay 1.
   edgeCaseEdge(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
   ): EdgeCasesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createForeignKey\` mutation.
 input CreateForeignKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`ForeignKey\` to be created by this mutation.
   foreignKey: ForeignKeyInput!
 }
 
+# The output of our \`createForeignKey\` mutation.
 type CreateForeignKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`ForeignKey\` that was created by this mutation.
   foreignKey: ForeignKey
+
+  # An edge for our \`ForeignKey\`. May be used by Relay 1.
   foreignKeyEdge(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -1666,32 +2239,60 @@ type CreateForeignKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`ForeignKey\`.
   personByPersonId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createPerson\` mutation.
 input CreatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Person\` to be created by this mutation.
   person: PersonInput!
 }
 
+# The output of our \`createPerson\` mutation.
 type CreatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Person\` that was created by this mutation.
   person: Person
+
+  # An edge for our \`Person\`. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
   ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createPost\` mutation.
 input CreatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Post\` to be created by this mutation.
   post: PostInput!
 }
 
+# The output of our \`createPost\` mutation.
 type CreatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Post\` that was created by this mutation.
   post: Post
+
+  # An edge for our \`Post\`. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
@@ -1699,36 +2300,66 @@ type CreatePostPayload {
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createType\` mutation.
 input CreateTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`Type\` to be created by this mutation.
   type: TypeInput!
 }
 
+# The output of our \`createType\` mutation.
 type CreateTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`Type\` that was created by this mutation.
   type: Type
+
+  # An edge for our \`Type\`. May be used by Relay 1.
   typeEdge(
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`createUpdatableView\` mutation.
 input CreateUpdatableViewInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The \`UpdatableView\` to be created by this mutation.
   updatableView: UpdatableViewInput!
 }
 
+# The output of our \`createUpdatableView\` mutation.
 type CreateUpdatableViewPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # The \`UpdatableView\` that was created by this mutation.
   updatableView: UpdatableView
+
+  # An edge for our \`UpdatableView\`. May be used by Relay 1.
   updatableViewEdge(
     # The method to use when ordering \`UpdatableView\`.
     orderBy: UpdatableViewsOrderBy = NATURAL
   ): UpdatableViewsEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -1740,23 +2371,37 @@ scalar Date
 
 # range of dates
 type DateRange {
+  # The starting bound of our range.
   start: DateRangeBound
+
+  # The ending bound of our range.
   end: DateRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type DateRangeBound {
+  # The value at one end of our range.
   value: Date!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input DateRangeBoundInput {
+  # The value at one end of our range.
   value: Date!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 # range of dates
 input DateRangeInput {
+  # The starting bound of our range.
   start: DateRangeBoundInput
+
+  # The ending bound of our range.
   end: DateRangeBoundInput
 }
 
@@ -1764,18 +2409,29 @@ input DateRangeInput {
 # 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 scalar Datetime
 
+# All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   personId1: Int!
   personId2: Int!
 }
 
+# All input for the \`deleteCompoundKey\` mutation.
 input DeleteCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deleteCompoundKey\` mutation.
 type DeleteCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundKey: CompoundKey
   deletedCompoundKeyId: ID
@@ -1785,65 +2441,109 @@ type DeleteCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`deletePersonByEmail\` mutation.
 input DeletePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   email: Email!
 }
 
+# All input for the \`deletePersonById\` mutation.
 input DeletePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
 }
 
+# All input for the \`deletePerson\` mutation.
 input DeletePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deletePerson\` mutation.
 type DeletePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
   deletedPersonId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`deletePostById\` mutation.
 input DeletePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
 }
 
+# All input for the \`deletePost\` mutation.
 input DeletePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deletePost\` mutation.
 type DeletePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
   deletedPostId: ID
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`deleteTypeById\` mutation.
 input DeleteTypeByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
 }
 
+# All input for the \`deleteType\` mutation.
 input DeleteTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Type\` to be deleted.
   __id: ID!
 }
 
+# The output of our \`deleteType\` mutation.
 type DeleteTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   type: Type
   deletedTypeId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -1895,23 +2595,37 @@ scalar Email
 
 # range of numerics
 type FloatRange {
+  # The starting bound of our range.
   start: FloatRangeBound
+
+  # The ending bound of our range.
   end: FloatRangeBound
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 type FloatRangeBound {
+  # The value at one end of our range.
   value: Float!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
+# The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
+  # The value at one end of our range.
   value: Float!
+
+  # Whether or not the value of this bound is included in the range.
   inclusive: Boolean!
 }
 
 # range of numerics
 input FloatRangeInput {
+  # The starting bound of our range.
   start: FloatRangeBoundInput
+
+  # The ending bound of our range.
   end: FloatRangeBoundInput
 }
 
@@ -1968,36 +2682,70 @@ enum ForeignKeysOrderBy {
   COMPOUND_KEY_2_DESC
 }
 
-# An interval of time that has passed.
+# An interval of time that has passed where the smallest distinct unit is a second.
 type Interval {
+  # A quantity of seconds. This is the only non-integer field, as all the other
+  # fields will dump their overflow into a smaller unit of time. Intervals don’t
+  # have a smaller unit than seconds.
   seconds: Float
+
+  # A quantity of minutes.
   minutes: Int
+
+  # A quantity of hours.
   hours: Int
+
+  # A quantity of days.
   days: Int
+
+  # A quantity of months
   months: Int
+
+  # A quantity of years
   years: Int
 }
 
-# An interval of time that has passed.
+# An interval of time that has passed where the smallest distinct unit is a second.
 input IntervalInput {
+  # A quantity of seconds. This is the only non-integer field, as all the other
+  # fields will dump their overflow into a smaller unit of time. Intervals don’t
+  # have a smaller unit than seconds.
   seconds: Float
+
+  # A quantity of minutes.
   minutes: Int
+
+  # A quantity of hours.
   hours: Int
+
+  # A quantity of days.
   days: Int
+
+  # A quantity of months
   months: Int
+
+  # A quantity of years
   years: Int
 }
 
+# All input for the \`intSetMutation\` mutation.
 input IntSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   x: Int
   y: Int
   z: Int
 }
 
+# The output of our \`intSetMutation\` mutation.
 type IntSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integers: [Int]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -2041,103 +2789,305 @@ type JwtToken {
   c: Int
 }
 
+# All input for the \`mult1\` mutation.
 input Mult1Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int
   arg1: Int
 }
 
+# The output of our \`mult1\` mutation.
 type Mult1Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult2\` mutation.
 input Mult2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int
   arg1: Int
 }
 
+# The output of our \`mult2\` mutation.
 type Mult2Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult3\` mutation.
 input Mult3Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int!
   arg1: Int!
 }
 
+# The output of our \`mult3\` mutation.
 type Mult3Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`mult4\` mutation.
 input Mult4Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   arg0: Int!
   arg1: Int!
 }
 
+# The output of our \`mult4\` mutation.
 type Mult4Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
 # The root mutation type which contains root level fields which mutate data.
 type Mutation {
   # lol, add some stuff 1 mutation
-  add1Mutation(input: Add1MutationInput!): Add1MutationPayload
+  add1Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add1MutationInput!
+  ): Add1MutationPayload
 
   # lol, add some stuff 2 mutation
-  add2Mutation(input: Add2MutationInput!): Add2MutationPayload
+  add2Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add2MutationInput!
+  ): Add2MutationPayload
 
   # lol, add some stuff 3 mutation
-  add3Mutation(input: Add3MutationInput!): Add3MutationPayload
+  add3Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add3MutationInput!
+  ): Add3MutationPayload
 
   # lol, add some stuff 4 mutation
-  add4Mutation(input: Add4MutationInput!): Add4MutationPayload
-  authenticate(input: AuthenticateInput!): AuthenticatePayload
-  compoundTypeMutation(input: CompoundTypeMutationInput!): CompoundTypeMutationPayload
-  mult1(input: Mult1Input!): Mult1Payload
-  mult2(input: Mult2Input!): Mult2Payload
-  mult3(input: Mult3Input!): Mult3Payload
-  mult4(input: Mult4Input!): Mult4Payload
-  intSetMutation(input: IntSetMutationInput!): IntSetMutationPayload
-  noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
-  tableMutation(input: TableMutationInput!): TableMutationPayload
-  tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
-  typesMutation(input: TypesMutationInput!): TypesMutationPayload
-  createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
-  createPost(input: CreatePostInput!): CreatePostPayload
-  updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updatePostById(input: UpdatePostByIdInput!): UpdatePostPayload
-  deletePost(input: DeletePostInput!): DeletePostPayload
-  deletePostById(input: DeletePostByIdInput!): DeletePostPayload
-  createType(input: CreateTypeInput!): CreateTypePayload
-  updateType(input: UpdateTypeInput!): UpdateTypePayload
-  updateTypeById(input: UpdateTypeByIdInput!): UpdateTypePayload
-  deleteType(input: DeleteTypeInput!): DeleteTypePayload
-  deleteTypeById(input: DeleteTypeByIdInput!): DeleteTypePayload
-  createUpdatableView(input: CreateUpdatableViewInput!): CreateUpdatableViewPayload
-  createCompoundKey(input: CreateCompoundKeyInput!): CreateCompoundKeyPayload
-  updateCompoundKey(input: UpdateCompoundKeyInput!): UpdateCompoundKeyPayload
-  updateCompoundKeyByPersonId1AndPersonId2(input: UpdateCompoundKeyByPersonId1AndPersonId2Input!): UpdateCompoundKeyPayload
-  deleteCompoundKey(input: DeleteCompoundKeyInput!): DeleteCompoundKeyPayload
-  deleteCompoundKeyByPersonId1AndPersonId2(input: DeleteCompoundKeyByPersonId1AndPersonId2Input!): DeleteCompoundKeyPayload
-  createEdgeCase(input: CreateEdgeCaseInput!): CreateEdgeCasePayload
-  createPerson(input: CreatePersonInput!): CreatePersonPayload
-  updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
-  updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
-  updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
-  deletePerson(input: DeletePersonInput!): DeletePersonPayload
-  deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
-  deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
+  add4Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add4MutationInput!
+  ): Add4MutationPayload
+  authenticate(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateInput!
+  ): AuthenticatePayload
+  compoundTypeMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CompoundTypeMutationInput!
+  ): CompoundTypeMutationPayload
+  mult1(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult1Input!
+  ): Mult1Payload
+  mult2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult2Input!
+  ): Mult2Payload
+  mult3(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult3Input!
+  ): Mult3Payload
+  mult4(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Mult4Input!
+  ): Mult4Payload
+  intSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: IntSetMutationInput!
+  ): IntSetMutationPayload
+  noArgsMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: NoArgsMutationInput!
+  ): NoArgsMutationPayload
+  tableMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableMutationInput!
+  ): TableMutationPayload
+  tableSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableSetMutationInput!
+  ): TableSetMutationPayload
+  typesMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TypesMutationInput!
+  ): TypesMutationPayload
+
+  # Creates a single \`ForeignKey\`.
+  createForeignKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateForeignKeyInput!
+  ): CreateForeignKeyPayload
+
+  # Creates a single \`Post\`.
+  createPost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePostInput!
+  ): CreatePostPayload
+
+  # Updates a single \`Post\` using its globally unique id and a patch.
+  updatePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  # Updates a single \`Post\` using a unique key and a patch.
+  updatePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  # Deletes a single \`Post\` using its globally unique id.
+  deletePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostInput!
+  ): DeletePostPayload
+
+  # Deletes a single \`Post\` using a unique key.
+  deletePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
+
+  # Creates a single \`Type\`.
+  createType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateTypeInput!
+  ): CreateTypePayload
+
+  # Updates a single \`Type\` using its globally unique id and a patch.
+  updateType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateTypeInput!
+  ): UpdateTypePayload
+
+  # Updates a single \`Type\` using a unique key and a patch.
+  updateTypeById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateTypeByIdInput!
+  ): UpdateTypePayload
+
+  # Deletes a single \`Type\` using its globally unique id.
+  deleteType(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteTypeInput!
+  ): DeleteTypePayload
+
+  # Deletes a single \`Type\` using a unique key.
+  deleteTypeById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteTypeByIdInput!
+  ): DeleteTypePayload
+
+  # Creates a single \`UpdatableView\`.
+  createUpdatableView(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateUpdatableViewInput!
+  ): CreateUpdatableViewPayload
+
+  # Creates a single \`CompoundKey\`.
+  createCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateCompoundKeyInput!
+  ): CreateCompoundKeyPayload
+
+  # Updates a single \`CompoundKey\` using its globally unique id and a patch.
+  updateCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyInput!
+  ): UpdateCompoundKeyPayload
+
+  # Updates a single \`CompoundKey\` using a unique key and a patch.
+  updateCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyByPersonId1AndPersonId2Input!
+  ): UpdateCompoundKeyPayload
+
+  # Deletes a single \`CompoundKey\` using its globally unique id.
+  deleteCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyInput!
+  ): DeleteCompoundKeyPayload
+
+  # Deletes a single \`CompoundKey\` using a unique key.
+  deleteCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyByPersonId1AndPersonId2Input!
+  ): DeleteCompoundKeyPayload
+
+  # Creates a single \`EdgeCase\`.
+  createEdgeCase(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateEdgeCaseInput!
+  ): CreateEdgeCasePayload
+
+  # Creates a single \`Person\`.
+  createPerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  # Updates a single \`Person\` using its globally unique id and a patch.
+  updatePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+
+  # Deletes a single \`Person\` using its globally unique id.
+  deletePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByEmailInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
 }
 
 type NestedCompoundType {
@@ -2152,13 +3102,21 @@ input NestedCompoundTypeInput {
   bazBuz: Int
 }
 
+# All input for the \`noArgsMutation\` mutation.
 input NoArgsMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
 }
 
+# The output of our \`noArgsMutation\` mutation.
 type NoArgsMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -2423,8 +3381,11 @@ input PersonInput {
   createdAt: Datetime
 }
 
+# Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   id: Int
+
+  # The person’s name
   name: String
   about: String
   email: Email
@@ -2451,6 +3412,7 @@ input PostInput {
   authorId: Int
 }
 
+# Represents an update to a \`Post\`. Fields that are set will be updated.
 input PostPatch {
   id: Int
   headline: String
@@ -2827,27 +3789,43 @@ type Query implements Node {
   __id: ID!
 }
 
+# All input for the \`tableMutation\` mutation.
 input TableMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int
 }
 
+# The output of our \`tableMutation\` mutation.
 type TableMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`tableSetMutation\` mutation.
 input TableSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
 }
 
+# The output of our \`tableSetMutation\` mutation.
 type TableSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   people: [Person]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -2937,6 +3915,7 @@ input TypeInput {
   nestedCompoundType: NestedCompoundTypeInput!
 }
 
+# Represents an update to a \`Type\`. Fields that are set will be updated.
 input TypePatch {
   id: Int
   smallint: Int
@@ -2987,7 +3966,10 @@ type TypesEdge {
   node: Type!
 }
 
+# All input for the \`typesMutation\` mutation.
 input TypesMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   a: Int!
   b: Boolean!
@@ -2997,9 +3979,14 @@ input TypesMutationInput {
   f: FloatRangeInput!
 }
 
+# The output of our \`typesMutation\` mutation.
 type TypesMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   boolean: Boolean
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
@@ -3113,20 +4100,35 @@ enum UpdatableViewsOrderBy {
   CONSTANT_DESC
 }
 
+# All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   personId1: Int!
   personId2: Int!
+
+  # An object where the defined keys will be set on the \`CompoundKey\` identified by our unique key.
   compoundKeyPatch: CompoundKeyPatch!
 }
 
+# All input for the \`updateCompoundKey\` mutation.
 input UpdateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`CompoundKey\` identified by our globally unique \`ID\`.
   compoundKeyPatch: CompoundKeyPatch!
 }
 
+# The output of our \`updateCompoundKey\` mutation.
 type UpdateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   compoundKey: CompoundKey
 
@@ -3135,69 +4137,127 @@ type UpdateCompoundKeyPayload {
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updatePersonByEmail\` mutation.
 input UpdatePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   email: Email!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePersonById\` mutation.
 input UpdatePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our unique key.
   personPatch: PersonPatch!
 }
 
+# All input for the \`updatePerson\` mutation.
 input UpdatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Person\` identified by our globally unique \`ID\`.
   personPatch: PersonPatch!
 }
 
+# The output of our \`updatePerson\` mutation.
 type UpdatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updatePostById\` mutation.
 input UpdatePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
+
+  # An object where the defined keys will be set on the \`Post\` identified by our unique key.
   postPatch: PostPatch!
 }
 
+# All input for the \`updatePost\` mutation.
 input UpdatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Post\` identified by our globally unique \`ID\`.
   postPatch: PostPatch!
 }
 
+# The output of our \`updatePost\` mutation.
 type UpdatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   post: Post
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 
+# All input for the \`updateTypeById\` mutation.
 input UpdateTypeByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
   id: Int!
+
+  # An object where the defined keys will be set on the \`Type\` identified by our unique key.
   typePatch: TypePatch!
 }
 
+# All input for the \`updateType\` mutation.
 input UpdateTypeInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Type\` to be updated.
   __id: ID!
+
+  # An object where the defined keys will be set on the \`Type\` identified by our globally unique \`ID\`.
   typePatch: TypePatch!
 }
 
+# The output of our \`updateType\` mutation.
 type UpdateTypePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   type: Type
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
 

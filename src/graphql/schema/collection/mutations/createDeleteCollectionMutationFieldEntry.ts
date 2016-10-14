@@ -28,11 +28,12 @@ export default function createDeleteCollectionMutationFieldEntry (
 
   return [formatName.field(name), createMutationGQLField<ObjectType.Value>(buildToken, {
     name,
+    description: `Deletes a single \`${formatName.type(collection.type.name)}\` using its globally unique id.`,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
       [options.nodeIdFieldName, {
-        // TODO: description
+        description: `The globally unique \`ID\` which will identify a single \`${formatName.type(collection.type.name)}\` to be deleted.`,
         type: new GraphQLNonNull(GraphQLID),
       }],
     ],
