@@ -8,7 +8,7 @@ import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, getUpdateCollectionPayloadGQLType } from './createUpdateCollectionMutationFieldEntry'
 
 /**
- * Creates a delete mutation which will delete a single value from a collection
+ * Creates a update mutation which will update a single value from a collection
  * using a given collection key.
  */
 // TODO: test

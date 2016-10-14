@@ -19,17 +19,17 @@ import getCollectionGQLType from '../getCollectionGQLType'
 import createCollectionRelationTailGQLFieldEntries from '../createCollectionRelationTailGQLFieldEntries'
 
 /**
- * Creates a delete mutation that uses the primary key of a collection and an
- * object’s global GraphQL identifier to delete a value in the collection.
+ * Creates a update mutation that uses the primary key of a collection and an
+ * object’s global GraphQL identifier to update a value in the collection.
  */
 // TODO: test
-export default function createDeleteCollectionMutationFieldEntry (
+export default function createUpdateCollectionMutationFieldEntry (
   buildToken: BuildToken,
   collection: Collection,
 ): [string, GraphQLFieldConfig<mixed, mixed>] | undefined {
   const { primaryKey } = collection
 
-  // If there is no primary key, or the primary key has no delete method. End
+  // If there is no primary key, or the primary key has no update method. End
   // early.
   if (!primaryKey || !primaryKey.update)
     return
@@ -59,7 +59,7 @@ export default function createDeleteCollectionMutationFieldEntry (
       }],
     ],
     payloadType: getUpdateCollectionPayloadGQLType(buildToken, collection),
-    // Execute by deserializing the id into its component parts and delete a
+    // Execute by deserializing the id into its component parts and update a
     // value in the collection using that key.
     execute: (context, input) => {
       const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
