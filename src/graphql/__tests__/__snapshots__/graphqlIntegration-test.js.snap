@@ -269,6 +269,27 @@ type Person implements Node {
   about: String
 }
 
+# A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PersonCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`email\` field.
+  email: Email
+
+  # Checks for equality with the object’s \`firstName\` field.
+  firstName: String
+
+  # Checks for equality with the object’s \`lastName\` field.
+  lastName: String
+
+  # Checks for equality with the object’s \`about\` field.
+  about: String
+}
+
 input PersonInput {
   id: Int!
   name: String!
@@ -299,6 +320,24 @@ type Post implements Node {
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthor: Person
+}
+
+# A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PostCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`authorId\` field.
+  authorId: Int
+
+  # Checks for equality with the object’s \`status\` field.
+  status: PostStatus
+
+  # Checks for equality with the object’s \`headline\` field.
+  headline: String
+
+  # Checks for equality with the object’s \`body\` field.
+  body: String
 }
 
 input PostInput {
@@ -387,12 +426,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    name: String
-    email: Email
-    firstName: String
-    lastName: String
-    about: String
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonCondition
   ): PeopleConnection
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
@@ -433,11 +469,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    authorId: Int
-    status: PostStatus
-    headline: String
-    body: String
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PostCondition
   ): PostsConnection
 
   # Reads a single \`Post\` using its globally unique \`ID\`.

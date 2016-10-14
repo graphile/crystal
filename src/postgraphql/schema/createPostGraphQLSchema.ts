@@ -1,6 +1,6 @@
 import { Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLInputType, GraphQLOutputType } from 'graphql'
-import { Inventory, Type, ObjectType } from '../../interface'
+import { Inventory, Type } from '../../interface'
 import { introspectPGDatabase, addPGCatalogToInventory } from '../../postgres'
 import { PGCatalog, PGCatalogClass, PGCatalogProcedure } from '../../postgres/introspection'
 import getTypeFromPGType from '../../postgres/inventory/type/getTypeFromPGType'

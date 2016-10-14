@@ -8,9 +8,9 @@ query {
   g: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=") { ...personConnection }
   h: allUpdatableViews { edges { cursor node { x name constant } } }
   i: allUpdatableViews(orderBy: CONSTANT_ASC) { edges { cursor node { x name constant } } }
-  j: allPosts(authorId: 2) { ...postConnection }
-  k: allPosts(first: 2, authorId: 2) { ...postConnection }
-  l: allPosts(last: 1, orderBy: HEADLINE_ASC, authorId: 1) { ...postConnection }
+  j: allPosts(condition: { authorId: 2 }) { ...postConnection }
+  k: allPosts(first: 2, condition: { authorId: 2 }) { ...postConnection }
+  l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) { ...postConnection }
   m: allPeople(first: 3, offset: 1) { ...personConnection }
 }
 

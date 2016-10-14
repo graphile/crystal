@@ -13,6 +13,19 @@ exports[`test prints a schema with Relay 1 style ids 1`] = `
   personByPersonId2: Person
 }
 
+# A condition to be used against \`CompoundKey\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input CompoundKeyCondition {
+  # Checks for equality with the object’s \`personId2\` field.
+  personId2: Int
+
+  # Checks for equality with the object’s \`personId1\` field.
+  personId1: Int
+
+  # Checks for equality with the object’s \`extra\` field.
+  extra: Boolean
+}
+
 input CompoundKeyInput {
   personId2: Int!
   personId1: Int!
@@ -242,6 +255,16 @@ type EdgeCase {
   notNullHasDefault: Boolean!
   wontCastEasy: Int
   computed: String
+}
+
+# A condition to be used against \`EdgeCase\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input EdgeCaseCondition {
+  # Checks for equality with the object’s \`notNullHasDefault\` field.
+  notNullHasDefault: Boolean
+
+  # Checks for equality with the object’s \`wontCastEasy\` field.
+  wontCastEasy: Int
 }
 
 input EdgeCaseInput {
@@ -617,6 +640,24 @@ type Person implements Node {
   ): CompoundKeysConnection
 }
 
+# A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PersonCondition {
+  # Checks for equality with the object’s \`rowId\` field.
+  rowId: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`about\` field.
+  about: String
+
+  # Checks for equality with the object’s \`email\` field.
+  email: Email
+
+  # Checks for equality with the object’s \`createdAt\` field.
+  createdAt: Datetime
+}
+
 # A connection to a list of \`Person\` values.
 type PersonFriendsConnection {
   # Information to aid in pagination.
@@ -754,9 +795,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    personId2: Int
-    personId1: Int
-    extra: Boolean
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -786,8 +827,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    notNullHasDefault: Boolean
-    wontCastEasy: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -810,11 +852,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    rowId: Int
-    name: String
-    about: String
-    email: Email
-    createdAt: Datetime
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonCondition
   ): PeopleConnection
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
@@ -1570,29 +1610,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    smallint: Int
-    bigint: Int
-    boolean: Boolean
-    varchar: String
-    enum: Color
-    domain: AnInt
-    domain2: AnotherInt
-    textArray: [String]
-    json: Json
-    jsonb: Json
-    numrange: FloatRangeInput
-    daterange: DateRangeInput
-    anIntRange: AnIntRangeInput
-    timestamp: Datetime
-    timestamptz: Datetime
-    date: Date
-    time: Time
-    timetz: Time
-    interval: IntervalInput
-    money: Float
-    compoundType: CompoundTypeInput
-    nestedCompoundType: NestedCompoundTypeInput
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: TypeCondition
   ): TypesConnection
 
   # Reads a single \`Type\` using its globally unique \`ID\`.
@@ -1622,10 +1642,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    x: Int
-    name: String
-    description: String
-    constant: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: UpdatableViewCondition
   ): UpdatableViewsConnection
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
@@ -1665,6 +1684,78 @@ type Type implements Node {
   money: Float!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
+}
+
+# A condition to be used against \`Type\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input TypeCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`smallint\` field.
+  smallint: Int
+
+  # Checks for equality with the object’s \`bigint\` field.
+  bigint: Int
+
+  # Checks for equality with the object’s \`boolean\` field.
+  boolean: Boolean
+
+  # Checks for equality with the object’s \`varchar\` field.
+  varchar: String
+
+  # Checks for equality with the object’s \`enum\` field.
+  enum: Color
+
+  # Checks for equality with the object’s \`domain\` field.
+  domain: AnInt
+
+  # Checks for equality with the object’s \`domain2\` field.
+  domain2: AnotherInt
+
+  # Checks for equality with the object’s \`textArray\` field.
+  textArray: [String]
+
+  # Checks for equality with the object’s \`json\` field.
+  json: Json
+
+  # Checks for equality with the object’s \`jsonb\` field.
+  jsonb: Json
+
+  # Checks for equality with the object’s \`numrange\` field.
+  numrange: FloatRangeInput
+
+  # Checks for equality with the object’s \`daterange\` field.
+  daterange: DateRangeInput
+
+  # Checks for equality with the object’s \`anIntRange\` field.
+  anIntRange: AnIntRangeInput
+
+  # Checks for equality with the object’s \`timestamp\` field.
+  timestamp: Datetime
+
+  # Checks for equality with the object’s \`timestamptz\` field.
+  timestamptz: Datetime
+
+  # Checks for equality with the object’s \`date\` field.
+  date: Date
+
+  # Checks for equality with the object’s \`time\` field.
+  time: Time
+
+  # Checks for equality with the object’s \`timetz\` field.
+  timetz: Time
+
+  # Checks for equality with the object’s \`interval\` field.
+  interval: IntervalInput
+
+  # Checks for equality with the object’s \`money\` field.
+  money: Float
+
+  # Checks for equality with the object’s \`compoundType\` field.
+  compoundType: CompoundTypeInput
+
+  # Checks for equality with the object’s \`nestedCompoundType\` field.
+  nestedCompoundType: NestedCompoundTypeInput
 }
 
 input TypeInput {
@@ -1804,6 +1895,22 @@ type UpdatableView {
   description: String
 
   # This is constantly 2
+  constant: Int
+}
+
+# A condition to be used against \`UpdatableView\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input UpdatableViewCondition {
+  # Checks for equality with the object’s \`x\` field.
+  x: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`description\` field.
+  description: String
+
+  # Checks for equality with the object’s \`constant\` field.
   constant: Int
 }
 
@@ -2095,6 +2202,19 @@ type CompoundKey implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): ForeignKeysConnection
+}
+
+# A condition to be used against \`CompoundKey\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input CompoundKeyCondition {
+  # Checks for equality with the object’s \`personId2\` field.
+  personId2: Int
+
+  # Checks for equality with the object’s \`personId1\` field.
+  personId1: Int
+
+  # Checks for equality with the object’s \`extra\` field.
+  extra: Boolean
 }
 
 input CompoundKeyInput {
@@ -2593,6 +2713,16 @@ type EdgeCase {
   computed: String
 }
 
+# A condition to be used against \`EdgeCase\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input EdgeCaseCondition {
+  # Checks for equality with the object’s \`notNullHasDefault\` field.
+  notNullHasDefault: Boolean
+
+  # Checks for equality with the object’s \`wontCastEasy\` field.
+  wontCastEasy: Int
+}
+
 input EdgeCaseInput {
   notNullHasDefault: Boolean
   wontCastEasy: Int
@@ -2679,6 +2809,19 @@ type ForeignKey {
 
   # Reads a single \`Person\` that is related to this \`ForeignKey\`.
   personByPersonId: Person
+}
+
+# A condition to be used against \`ForeignKey\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input ForeignKeyCondition {
+  # Checks for equality with the object’s \`personId\` field.
+  personId: Int
+
+  # Checks for equality with the object’s \`compoundKey1\` field.
+  compoundKey1: Int
+
+  # Checks for equality with the object’s \`compoundKey2\` field.
+  compoundKey2: Int
 }
 
 input ForeignKeyInput {
@@ -3174,6 +3317,13 @@ type NonUpdatableView {
   column: Int
 }
 
+# A condition to be used against \`NonUpdatableView\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input NonUpdatableViewCondition {
+  # Checks for equality with the object’s \`column\` field.
+  column: Int
+}
+
 # A connection to a list of \`NonUpdatableView\` values.
 type NonUpdatableViewsConnection {
   # Information to aid in pagination.
@@ -3385,6 +3535,24 @@ type Person implements Node {
   ): ForeignKeysConnection
 }
 
+# A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PersonCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`about\` field.
+  about: String
+
+  # Checks for equality with the object’s \`email\` field.
+  email: Email
+
+  # Checks for equality with the object’s \`createdAt\` field.
+  createdAt: Datetime
+}
+
 # A connection to a list of \`Person\` values.
 type PersonFriendsConnection {
   # Information to aid in pagination.
@@ -3447,6 +3615,21 @@ type Post implements Node {
 
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
+}
+
+# A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PostCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`headline\` field.
+  headline: String
+
+  # Checks for equality with the object’s \`body\` field.
+  body: String
+
+  # Checks for equality with the object’s \`authorId\` field.
+  authorId: Int
 }
 
 input PostInput {
@@ -3595,9 +3778,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    personId: Int
-    compoundKey1: Int
-    compoundKey2: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: ForeignKeyCondition
   ): ForeignKeysConnection
 
   # Reads and enables paginatation through a set of \`NonUpdatableView\`.
@@ -3620,7 +3803,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    column: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: NonUpdatableViewCondition
   ): NonUpdatableViewsConnection
 
   # Reads and enables paginatation through a set of \`Post\`.
@@ -3643,10 +3828,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    headline: String
-    body: String
-    authorId: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PostCondition
   ): PostsConnection
 
   # Reads a single \`Post\` using its globally unique \`ID\`.
@@ -3676,29 +3860,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    smallint: Int
-    bigint: Int
-    boolean: Boolean
-    varchar: String
-    enum: Color
-    domain: AnInt
-    domain2: AnotherInt
-    textArray: [String]
-    json: Json
-    jsonb: Json
-    numrange: FloatRangeInput
-    daterange: DateRangeInput
-    anIntRange: AnIntRangeInput
-    timestamp: Datetime
-    timestamptz: Datetime
-    date: Date
-    time: Time
-    timetz: Time
-    interval: IntervalInput
-    money: Float
-    compoundType: CompoundTypeInput
-    nestedCompoundType: NestedCompoundTypeInput
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: TypeCondition
   ): TypesConnection
 
   # Reads a single \`Type\` using its globally unique \`ID\`.
@@ -3728,10 +3892,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    x: Int
-    name: String
-    description: String
-    constant: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: UpdatableViewCondition
   ): UpdatableViewsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -3754,9 +3917,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    personId2: Int
-    personId1: Int
-    extra: Boolean
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -3786,8 +3949,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    notNullHasDefault: Boolean
-    wontCastEasy: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -3810,11 +3974,9 @@ type Query implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
-    id: Int
-    name: String
-    about: String
-    email: Email
-    createdAt: Datetime
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonCondition
   ): PeopleConnection
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
@@ -3931,6 +4093,78 @@ type Type implements Node {
   money: Float!
   compoundType: CompoundType!
   nestedCompoundType: NestedCompoundType!
+}
+
+# A condition to be used against \`Type\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input TypeCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`smallint\` field.
+  smallint: Int
+
+  # Checks for equality with the object’s \`bigint\` field.
+  bigint: Int
+
+  # Checks for equality with the object’s \`boolean\` field.
+  boolean: Boolean
+
+  # Checks for equality with the object’s \`varchar\` field.
+  varchar: String
+
+  # Checks for equality with the object’s \`enum\` field.
+  enum: Color
+
+  # Checks for equality with the object’s \`domain\` field.
+  domain: AnInt
+
+  # Checks for equality with the object’s \`domain2\` field.
+  domain2: AnotherInt
+
+  # Checks for equality with the object’s \`textArray\` field.
+  textArray: [String]
+
+  # Checks for equality with the object’s \`json\` field.
+  json: Json
+
+  # Checks for equality with the object’s \`jsonb\` field.
+  jsonb: Json
+
+  # Checks for equality with the object’s \`numrange\` field.
+  numrange: FloatRangeInput
+
+  # Checks for equality with the object’s \`daterange\` field.
+  daterange: DateRangeInput
+
+  # Checks for equality with the object’s \`anIntRange\` field.
+  anIntRange: AnIntRangeInput
+
+  # Checks for equality with the object’s \`timestamp\` field.
+  timestamp: Datetime
+
+  # Checks for equality with the object’s \`timestamptz\` field.
+  timestamptz: Datetime
+
+  # Checks for equality with the object’s \`date\` field.
+  date: Date
+
+  # Checks for equality with the object’s \`time\` field.
+  time: Time
+
+  # Checks for equality with the object’s \`timetz\` field.
+  timetz: Time
+
+  # Checks for equality with the object’s \`interval\` field.
+  interval: IntervalInput
+
+  # Checks for equality with the object’s \`money\` field.
+  money: Float
+
+  # Checks for equality with the object’s \`compoundType\` field.
+  compoundType: CompoundTypeInput
+
+  # Checks for equality with the object’s \`nestedCompoundType\` field.
+  nestedCompoundType: NestedCompoundTypeInput
 }
 
 input TypeInput {
@@ -4094,6 +4328,22 @@ type UpdatableView {
   description: String
 
   # This is constantly 2
+  constant: Int
+}
+
+# A condition to be used against \`UpdatableView\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input UpdatableViewCondition {
+  # Checks for equality with the object’s \`x\` field.
+  x: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`description\` field.
+  description: String
+
+  # Checks for equality with the object’s \`constant\` field.
   constant: Int
 }
 

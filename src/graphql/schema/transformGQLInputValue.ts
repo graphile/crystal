@@ -8,6 +8,14 @@ import {
 } from 'graphql'
 
 /**
+ * Allows types to define a custom transform function from GraphQL input. If
+ * defined, `transformGQLInputValue` will just call this instead of performing
+ * its own logic.
+ */
+// TODO: Use types to express how this works. That would be cool.
+export const $$fromGqlInput = Symbol('fromGqlInput')
+
+/**
  * Sometimes we will have a different field name in GraphQL then the actual
  * internal object key name that we want. When that is the case, use this
  * symbol and `transformGQLInputValue` will rename the field.
@@ -20,6 +28,10 @@ export const $$gqlInputObjectTypeValueKeyName = Symbol('gqlInputObjectTypeValueK
  * them with our interface.
  */
 export default function transformGQLInputValue (type: GraphQLInputType<mixed>, value: mixed): mixed {
+  // If `$$fromGqlInput` is defined, use it!
+  if (type[$$fromGqlInput])
+    return type[$$fromGqlInput](value)
+
   // If this is the value for a scalar type or enum type, it is likely it has
   // already gone through the appropriate transforms. We should just return.
   if (type instanceof GraphQLScalarType || type instanceof GraphQLEnumType)

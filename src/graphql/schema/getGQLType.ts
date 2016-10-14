@@ -156,7 +156,7 @@ function createGQLType (buildToken: BuildToken, type: Type<mixed>, input: boolea
   // are aliasing is nullable or non null then `AliasType` will automatically
   // pick that up.
   if (type instanceof AliasType) {
-    return createGQLTypeAlias(
+    return _createGQLTypeAlias(
       // TODO: Remove the `input as any` when the Typescript bug is fixed.
       // tslint:disable-next-line no-any
       getGQLType(buildToken, type.baseType, input as any),
@@ -306,12 +306,12 @@ function createGQLInputObjectType <T>(buildToken: BuildToken, type: ObjectType):
  *
  * @private
  */
-function createGQLTypeAlias (gqlType: GraphQLType<mixed>, name: string, description: string | undefined): GraphQLType<mixed> {
+export function _createGQLTypeAlias (gqlType: GraphQLType<mixed>, name: string, description: string | undefined): GraphQLType<mixed> {
   if (gqlType instanceof GraphQLNonNull)
-    return new GraphQLNonNull(createGQLTypeAlias(gqlType.ofType, name, description))
+    return new GraphQLNonNull(_createGQLTypeAlias(gqlType.ofType, name, description))
 
   if (gqlType instanceof GraphQLList)
-    return new GraphQLList(createGQLTypeAlias(gqlType.ofType, name, description))
+    return new GraphQLList(_createGQLTypeAlias(gqlType.ofType, name, description))
 
   // Use prototypes to inherit all of the methods from the type we are
   // aliasing, then set the `name` and `description` properties to the aliased
