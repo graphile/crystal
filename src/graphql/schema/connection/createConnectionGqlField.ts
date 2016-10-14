@@ -94,6 +94,10 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       if (afterCursor && afterCursor.orderingName !== orderingName)
         throw new Error('`after` cursor can not be used for this `orderBy` value.')
 
+      // Don’t allow the use of cursors with `offset`.
+      if (beforeCursor != null && _offset != null || beforeCursor != null && _offset != null)
+        throw new Error('Cannot use `before`/`after` cursors with `offset`!')
+
       // Get our input.
       const input = config.getPaginatorInput(source, args)
 
