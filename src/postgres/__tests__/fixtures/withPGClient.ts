@@ -20,6 +20,7 @@ export default function withPGClient (fn: (client: Client) => void | Promise<voi
       throw client
 
     await client.query('begin')
+    await client.query('set local timezone to \'US/Eastern\'')
 
     // Run our kichen sink schema SQL, if there is an error we should report it
     try {
