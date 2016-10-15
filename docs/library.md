@@ -36,11 +36,11 @@ var postgraphql = require('postgraphql').postgraphql
 
 The `postgraphql` function can take the following arguments:
 
-## postgraphql(pgConfig?, schemaNames? = ['public'], options?)
+## postgraphql(pgConfig?, schemaName? = 'public', options?)
 Arguments include:
 
 - **`pgConfig`**: An object or string that will be passed to the [`pg`][] library and used to connect to a PostgreSQL backend.
-- **`schemaName`**: A string which specifies the PostgreSQL schema you will be serving with PostGraphQL. The default schema is the `public` schema.
+- **`schemaName`**: A string which specifies the PostgreSQL schema you will be serving with PostGraphQL. The default schema is the `public` schema. May be an array for multiple schemas.
 - **`options`**: An object containing other miscellaneous options. Options could be:
   - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `__id` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
   - `dynamicJson`: Setting this to `true` enables dynamic JSON which will allow you to use any JSON as input and get any arbitrary JSON as output. By default JSON types are just a JSON string.
