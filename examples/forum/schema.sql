@@ -128,22 +128,22 @@ create function forum_example.register_person(
   password text
 ) returns forum_example.person as $$
 declare
-  row forum_example.person;
+  person forum_example.person;
 begin
   insert into forum_example.person (first_name, last_name) values
     (first_name, last_name)
-    returning * into row;
+    returning * into person;
 
-  insert into forum_example_private.person_account (person_id, email, pass_hash) values
-    (row.id, email, crypt(password, gen_salt('bf')));
+  insert into forum_example_private.person_account (person_id, email, password_hash) values
+    (person.id, email, crypt(password, gen_salt('bf')));
 
-  return row;
+  return person;
 end;
 $$ language plpgsql strict security definer;
 
 comment on function forum_example.register_person(text, text, text, text) is 'Registers a single user and creates an account in our forum.';
 
-create role forum_example_postgraphql login password 'password';
+create role forum_example_postgraphql login password 'xyz';
 
 create role forum_example_anonymous;
 grant forum_example_anonymous to forum_example_postgraphql;
@@ -155,10 +155,6 @@ create type forum_example.jwt_token as (
   role text,
   person_id integer
 );
-
-comment on type forum_example.jwt_token is 'The JWT which will identify users in our database.';
-comment on column forum_example.jwt_token.role is 'The Postgres role that the user identified by this token may use.';
-comment on column forum_example.jwt_token.person_id is 'The person who is identified by this JWT.';
 
 create function forum_example.authenticate(
   email text,
