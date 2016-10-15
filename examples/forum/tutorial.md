@@ -13,36 +13,26 @@ The application we will build uses the following specification:
 >
 > TODO: More + better description
 
-Outline:
-
-- About this tutorial.
-- Database setup
-  - Schemas
-    - Naming
-    - Public
-    - Private
-- Person
-  - Main Table
-  - Comments
-- Post
-  - Enum
-  - Table
-- Procedures
-  - Simple add function.
-  - Computed Columns (`person_full_name`)
-  - More complex computed columns (`person_latest_post`, `post_summary`)
-  - Set returning function (`search_posts`)
-  - Triggers (`updated_at`)
-- Auth
-  - Person Account Table
-  - Create account: Plpgsql (`register_person`)
-  - Login: (`authenticate`)
-  - Procedures (`current_person`)
-  - Access
-    - Grant
-    - Row Level Security
-- Conclusion
-- Likes?
+## Table of Contents
+- [Installing Postgres](#installing-postgres)
+- [The Basics](#the-basics)
+  - [Setting Up Your Schemas](#setting-up-your-schemas)
+  - [The Person Table](#the-person-table)
+  - [Table Documentation](#table-documentation)
+  - [The Post Table](#the-post-table)
+- [Database Functions](#database-functions)
+  - [Set Returning Functions](#set-returning-functions)
+  - [Triggers](#triggers)
+- [Authentication and Authorization](#authentication-and-authorization)
+  - [Storing Emails and Passwords](#storing-emails-and-passwords)
+  - [Registering Users](#registering-users)
+  - [Postgres Roles](#postgres-roles)
+  - [JSON Web Tokens](#json-web-tokens)
+  - [Logging In](#logging-in)
+  - [Using the Authorized User](#using-the-authorized-user)
+  - [Grants](#grants)
+  - [Row Level Security](#row-level-security)
+- [Conclusion](#conclusion)
 
 ## Installing Postgres
 First, you are going to need to make sure Postgres is installed. You can skip this section if you already have Postgres installed 👍
@@ -107,7 +97,7 @@ You could create more or less schemas, it is all up to you and how you want to s
 
 Theoretically we want a user to be able to log in directly to our Postgres database, and only be able to create, read, update, and delete data for their user all within SQL. This is a mindshift from how we traditionally use a SQL database. Normally, we assume whoever is querying the database has full visibility into the system as the only one with database access is our application. In this tutorial, we want to restrict access at the database level. Don’t worry though! Postgres is very secure about this, users will have no more permissions then that which you explicitly grant.
 
-### Person Table
+### The Person Table
 Now we are going to create the tables in our database which will correspond to our users. We will do this by running the Postgres [`CREATE TABLE`](https://www.postgresql.org/docs/current/static/sql-createtable.html) command. Here is the definition for our person table:
 
 ```sql
@@ -170,7 +160,7 @@ Incredibly simple, yet also incredibly powerful.
 
 With this we have completed our person table, now let’s create a table for our forum posts.
 
-### Post Table
+### The Post Table
 The users of our forum will want to be able to create posts. That’s the entire reason we have a forum after all. To create the post table we go through a very similar process as creating our `forum_example.person` table, but first we want to create a type we will use in one of the columns. See the SQL below:
 
 ```sql
@@ -483,7 +473,7 @@ At the end of the implementation you will see `language plpgsql strict security 
 
 This function will create a user and their account, but how will we log the user in? Before we define a function which allows users to login, sign-in, authenticate, whatever you want to call it let us go over how auth works at a high level in PostGraphQL. While this article is trying to be somewhat PostGraphQL agnostic, the next two sections will be specific to PostGraphQL, but useful to anyone wanting to learn just a little bit more about Postgres and JSON Web Tokens (JWTs).
 
-### Roles
+### Postgres Roles
 When a user logs in, we want them to make their queries using a specific PostGraphQL role. Using that role we can define rules that restrict what data the user may access. So what roles do we need to define for our forum example? Remember when we were connecting to Postgres and we used a URL like `postgres://localhost:5432/mydb`? Well, when you use a connection string like that, you are logging into Postgres using your computer account’s username and no password. Say your computer account username is `buddy`, then connecting with the URL `postgres://localhost:5432/mydb`, would be the same as connecting with the URL `postgres://buddy@localhost:5432/mydb`. If you wanted to connect to your Postgres database with a password it would look like `postgres://buddy:password@localhost:5432/mydb`. When you run Postgres locally, this account will probably be the superuser. So when you run `postgraphql -c postgres://localhost:5432/mydb`, you are running PostGraphQL with superuser privileges. To change that let’s create a role that PostGraphQL can use to connect to our database:
 
 ```sql
@@ -522,7 +512,7 @@ grant forum_example_person to forum_example_postgraphql;
 
 Ok, so now we have three roles. `forum_example_postgraphql`, `forum_example_anonymous`, and `forum_example_person`. We know how `forum_example_postgraphql` and `forum_example_anonymous` get used, but how do we know when a user is logged in and should be using `forum_example_person`? The answer is JSON Web Tokens.
 
-### JSON Web Tokens (JWTs)
+### JSON Web Tokens
 PostGraphQL uses [JSON Web Tokens (JWTs)](https://jwt.io/) for authorization. A JWT is just a JSON object that has been hashed and cryptographically signed to confirm the identity of its contents. So an object like:
 
 ```json
