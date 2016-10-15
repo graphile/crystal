@@ -10,9 +10,9 @@ if (process.env.CI)
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
 
 const kitchenSinkData = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../examples/kitchen-sink/data.sql'), (error, data) => {
+  readFile('examples/kitchen-sink/data.sql', (error, data) => {
     if (error) reject(error)
-    else resolve(data.toString())
+    else resolve(data.toString().replace(/begin;|commit;/g, ''))
   })
 })
 

@@ -1,5 +1,5 @@
 # PostGraphQL Forum Example
-This directory contains an example PostgreSQL schema which will work with PostGraphQL. The schema used is contained in the `schema.sql` file and some sample data is contained in the `data.sql` file. A comprehensive tutorial on the decisions made in creating that schema may be found in `schema-design.md`.
+This directory contains an example PostgreSQL schema which will work with PostGraphQL. The schema used is contained in the `schema.sql` file and some sample data is contained in the `data.sql` file. A comprehensive tutorial on the decisions made in creating that schema may be found in `tutorial.md`.
 
 When running the `schema.sql` file on your PostgreSQL database everything will be created in the `forum_example` schema.
 

@@ -4,7 +4,6 @@ set -e
 
 scripts/build-schema
 
-psql -c 'drop schema if exists forum_example, forum_example_private cascade' $@
-psql -c 'drop role if exists forum_example_postgraphql, forum_example_anonymous, forum_example_person' $@
+psql -f schema-drop.sql $@
 psql -f schema.sql $@
 psql -f data.sql $@

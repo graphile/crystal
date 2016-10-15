@@ -1,5 +1,4 @@
--- We don’t have a `begin`/`commit` in here to let the users of this query
--- control the data lifecycle.
+begin;
 
 insert into c.person (id, name, email, about, created_at) values
   (1, 'John Smith', 'john.smith@email.com', null, null),
@@ -68,3 +67,5 @@ insert into c.edge_case values
   (default, 20),
   (true, null),
   (false, -512);
+
+commit;

@@ -44,7 +44,7 @@ export default function postgraphql (
   // client from our pool to introspect the database.
   const graphqlSchema = (async () => {
     const pgClient = await pgPool.connect()
-    const subGraphqlSchema = await createPostGraphQLSchema(pgClient, Array.isArray(schema) ? schema : [schema], options)
+    const subGraphqlSchema = await createPostGraphQLSchema(pgClient, schema, options)
 
     // If no release function exists, don’t release. This is just for tests.
     if (pgClient && pgClient.release)

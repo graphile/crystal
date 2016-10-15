@@ -18,7 +18,7 @@ import getJwtGqlType from './auth/getJwtGqlType'
  */
 export default async function createPostGraphQLSchema (
   clientOrConfig?: Client | ClientConfig | string,
-  schemas: Array<string> = ['public'],
+  schema: string | Array<string> = 'public',
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
@@ -26,6 +26,9 @@ export default async function createPostGraphQLSchema (
     jwtPgTypeIdentifier?: string,
   } = {},
 ): Promise<GraphQLSchema> {
+  // If our argument was not an array, make it one.
+  const schemas = Array.isArray(schema) ? schema : [schema]
+
   // Create our inventory.
   const inventory = new Inventory()
   let pgCatalog: PgCatalog
