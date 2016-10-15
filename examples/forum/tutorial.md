@@ -5,13 +5,7 @@ Often developers may find themselves re-implimenting authentication and authoriz
 
 This reimplementation of features that come with Postgres is not just an inefficient way to spend developer resources, but may also result in an interface that is slower than if the logic was implemented in Postgres itself. PostGraphQL aims to make developers more efficient and their APIs faster by packaging the repeatable work in one open source project that encourages community contributions.
 
-In this article we will walk through the Postgres schema design for a forum application. While we will discuss how you can use the schema we create with PostGraphQL, this article should be useful for anyone designing a Postgres schema.
-
-The application we will build uses the following specification:
-
-> Our forum should have many users who can all create posts and leave comments on those posts. Users should also be able to like posts they found particularly interesting.
->
-> TODO: More + better description
+In this tutorial we will walk through the Postgres schema design for a forum application with users who can login and write forum posts. While we will discuss how you can use the schema we create with PostGraphQL, this article should be useful for anyone designing a Postgres schema.
 
 ## Table of Contents
 - [Installing Postgres](#installing-postgres)
