@@ -64,8 +64,8 @@ insert into b.types values (
 );
 
 insert into c.edge_case values
-  (default, 20),
-  (true, null),
-  (false, -512);
+  (default, 20, 1),
+  (true, null, 2),
+  (false, -512, 3);
 
 commit;

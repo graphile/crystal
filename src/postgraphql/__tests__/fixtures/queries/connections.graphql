@@ -13,6 +13,7 @@ query {
   l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) { ...postConnection }
   m: allPeople(first: 3, offset: 1) { ...personConnection }
   n: allPeople(first: 0) { ...personConnection }
+  o: allEdgeCases(condition: { rowId: 2 }) { nodes { rowId } }
 }
 
 fragment personConnection on PeopleConnection {

@@ -43,7 +43,7 @@ class PgCollectionPaginator extends PgPaginator<Condition, PgObjectType.Value> {
    * the input value.
    */
   public getConditionSql (condition: Condition): sql.Sql {
-    return conditionToSql(condition)
+    return conditionToSql(condition, [], this.collection.type.getFieldNameFromPgAttributeName('id') === 'row_id')
   }
 
   /**

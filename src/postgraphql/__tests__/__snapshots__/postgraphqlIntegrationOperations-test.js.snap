@@ -1,3 +1,26 @@
+exports[`test operation classic-ids.graphql 1`] = `
+Object {
+  "data": Object {
+    "allEdgeCases": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": "WyJwb3N0cyIsMV0=",
+          "rowId": 1,
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`test operation connections.graphql 1`] = `
 Object {
   "data": Object {
@@ -469,6 +492,13 @@ Object {
         "startCursor": null,
       },
       "totalCount": 5,
+    },
+    "o": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
     },
   },
 }

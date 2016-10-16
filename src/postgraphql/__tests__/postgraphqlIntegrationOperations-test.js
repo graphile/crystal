@@ -21,7 +21,7 @@ const queriesDir = resolvePath(__dirname, 'fixtures/queries')
 for (const file of readdirSync(queriesDir)) {
   test(`operation ${file}`, withPgClient(async pgClient => {
     const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'], {
-      classicIds: false,
+      classicIds: file === 'classic-ids.graphql',
       dynamicJson: file === 'dynamic-json.graphql',
     })
 

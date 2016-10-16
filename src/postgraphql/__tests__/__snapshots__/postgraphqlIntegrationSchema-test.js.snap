@@ -254,6 +254,7 @@ type DeletePersonPayload {
 type EdgeCase {
   notNullHasDefault: Boolean!
   wontCastEasy: Int
+  rowId: Int
   computed: String
 }
 
@@ -265,11 +266,15 @@ input EdgeCaseCondition {
 
   # Checks for equality with the object’s \`wontCastEasy\` field.
   wontCastEasy: Int
+
+  # Checks for equality with the object’s \`rowId\` field.
+  rowId: Int
 }
 
 input EdgeCaseInput {
   notNullHasDefault: Boolean
   wontCastEasy: Int
+  rowId: Int
 }
 
 # A connection to a list of \`EdgeCase\` values.
@@ -303,6 +308,8 @@ enum EdgeCasesOrderBy {
   NOT_NULL_HAS_DEFAULT_DESC
   WONT_CAST_EASY_ASC
   WONT_CAST_EASY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 scalar Email
@@ -2733,6 +2740,7 @@ type DeleteTypePayload {
 type EdgeCase {
   notNullHasDefault: Boolean!
   wontCastEasy: Int
+  rowId: Int
   computed: String
 }
 
@@ -2744,11 +2752,15 @@ input EdgeCaseCondition {
 
   # Checks for equality with the object’s \`wontCastEasy\` field.
   wontCastEasy: Int
+
+  # Checks for equality with the object’s \`rowId\` field.
+  rowId: Int
 }
 
 input EdgeCaseInput {
   notNullHasDefault: Boolean
   wontCastEasy: Int
+  rowId: Int
 }
 
 # A connection to a list of \`EdgeCase\` values.
@@ -2782,6 +2794,8 @@ enum EdgeCasesOrderBy {
   NOT_NULL_HAS_DEFAULT_DESC
   WONT_CAST_EASY_ASC
   WONT_CAST_EASY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 scalar Email

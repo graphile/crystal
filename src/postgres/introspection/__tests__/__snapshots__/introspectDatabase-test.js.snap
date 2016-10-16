@@ -102,6 +102,16 @@ Object {
       "typeId": "int2",
     },
     Object {
+      "classId": "edge_case",
+      "description": null,
+      "hasDefault": false,
+      "isNotNull": false,
+      "kind": "attribute",
+      "name": "row_id",
+      "num": 4,
+      "typeId": "int4",
+    },
+    Object {
       "classId": "foreign_key",
       "description": null,
       "hasDefault": false,

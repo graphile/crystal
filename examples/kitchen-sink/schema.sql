@@ -80,7 +80,8 @@ create table a.foreign_key (
 create table c.edge_case (
   not_null_has_default boolean not null default false,
   wont_cast_easy smallint,
-  drop_me text
+  drop_me text,
+  row_id integer
 );
 
 alter table c.edge_case drop column drop_me;
