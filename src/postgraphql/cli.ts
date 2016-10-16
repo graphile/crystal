@@ -35,6 +35,7 @@ program
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
+  .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -65,6 +66,7 @@ const {
   cors: enableCors = false,
   classicIds = false,
   dynamicJson = false,
+  showErrorStack,
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -102,6 +104,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   pgDefaultRole,
   disableQueryLog: false,
   enableCors,
+  showErrorStack,
 }))
 
 // Start our server by listening to a specific port and host name. Also log

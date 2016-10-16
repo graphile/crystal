@@ -12,10 +12,13 @@ query {
   k: allPosts(first: 2, condition: { authorId: 2 }) { ...postConnection }
   l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) { ...postConnection }
   m: allPeople(first: 3, offset: 1) { ...personConnection }
+  n: allPeople(first: 0) { ...personConnection }
 }
 
 fragment personConnection on PeopleConnection {
   pageInfo {
+    startCursor
+    endCursor
     hasNextPage
     hasPreviousPage
   }
@@ -32,6 +35,8 @@ fragment personConnection on PeopleConnection {
 
 fragment postConnection on PostsConnection {
   pageInfo {
+    startCursor
+    endCursor
     hasNextPage
     hasPreviousPage
   }

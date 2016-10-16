@@ -308,18 +308,18 @@ export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed, mixed>> =
       startCursor: {
         description: 'When paginating backwards, the cursor to continue.',
         type: _cursorType,
-        resolve: ({ orderingName, page }): NamespacedCursor<mixed> => ({
-          orderingName,
-          cursor: page.values[0].cursor,
-        }),
+        resolve: ({ orderingName, page }): NamespacedCursor<mixed> | null =>
+          page.values[0]
+            ? { orderingName, cursor: page.values[0].cursor }
+            : null,
       },
       endCursor: {
         description: 'When paginating forwards, the cursor to continue.',
         type: _cursorType,
-        resolve: ({ orderingName, page }): NamespacedCursor<mixed> => ({
-          orderingName,
-          cursor: page.values[page.values.length - 1].cursor,
-        }),
+        resolve: ({ orderingName, page }): NamespacedCursor<mixed> | null =>
+          page.values[page.values.length - 1]
+            ? { orderingName, cursor: page.values[page.values.length - 1].cursor }
+            : null,
       },
     },
   })
