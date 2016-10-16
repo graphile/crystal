@@ -201,7 +201,7 @@ PostGraphQL also provides support for computed columns. In order to define a com
 ```sql
 create function person_full_name(person person) returns text as $$
   select person.given_name || ' ' || person.family_name
-$$ language sql;
+$$ language sql stable;
 ```
 
 Will create a computed column for your table named `person`.

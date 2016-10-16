@@ -289,6 +289,7 @@ Don’t get too stuck on the function implementations. It is fairly easy to disc
 > 1. The function has a table row as the first argument.
 > 2. The function is in the same schema as the table of the first argument.
 > 3. The function’s name is prefixed by the table first argument’s name.
+> 4. The function is marked as `stable` or `immutable` which makes it a query and not a mutation.
 >
 > All three of the above functions meet these conditions and as such will be computed fields. In GraphQL this ends up looking like:
 >
