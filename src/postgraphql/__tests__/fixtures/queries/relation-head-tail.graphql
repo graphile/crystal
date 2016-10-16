@@ -1,0 +1,39 @@
+query {
+	allPeople {
+    nodes {
+      id
+      name
+      postsByAuthorId(last: 2) {
+        nodes {
+          headline
+          authorId
+        }
+      }
+      compoundKeysByPersonId1 {
+        nodes {
+          personId1
+          personId2
+        }
+      }
+      compoundKeysByPersonId2 {
+        nodes {
+          personId1
+          personId2
+        }
+      }
+    }
+  }
+  allCompoundKeys {
+    nodes {
+      personId1
+      personId2
+      foreignKeysByCompoundKey1AndCompoundKey2 {
+        nodes {
+          personId
+          compoundKey1
+          compoundKey2
+        }
+      }
+    }
+  }
+}

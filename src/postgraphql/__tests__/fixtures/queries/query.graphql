@@ -1,0 +1,34 @@
+query {
+  ...query
+  query {
+    ...query
+    query {
+      ...query
+      query {
+        ...query
+      }
+    }
+  }
+  a: node(__id: "hello") {
+    __typename
+    __id
+    ...query
+  }
+  b: node(__id: "query") {
+    __typename
+    __id
+    ...query
+  }
+}
+
+fragment query on Query {
+  __id
+  a: node(__id: "hello") {
+    __typename
+    __id
+  }
+  b: node(__id: "query") {
+    __typename
+    __id
+  }
+}

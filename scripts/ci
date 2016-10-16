@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+echo "[1/3]: Building Code"
+scripts/build
+
+echo "[2/3]: Linting Code"
+scripts/lint
+
+echo "[3/3]: Testing Project"
+scripts/test
+
+echo ""
+echo "CI completed succesfully 🎉"
+echo ""

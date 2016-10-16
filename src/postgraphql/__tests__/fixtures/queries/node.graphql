@@ -1,0 +1,29 @@
+query {
+  a: allPeople { nodes { ...node } }
+  b: allCompoundKeys { nodes { ...node } }
+  c: node(__id: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  d: node(__id: "WyJwZW9wbGUiLDJd") { ...node }
+  e: node(__id: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  f: node(__id: "WyJwZW9wbGUiLDVd") { ...node }
+  g: node(__id: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  h: node(__id: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+  i: person(__id: "WyJwZW9wbGUiLDJd") { ...node }
+  j: person(__id: "WyJwZW9wbGUiLDVd") { ...node }
+  k: person(__id: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  l: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  m: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  n: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+}
+
+fragment node on Node {
+  __typename
+  __id
+  ... on Person {
+    id
+    name
+  }
+  ... on CompoundKey {
+    personId1
+    personId2
+  }
+}

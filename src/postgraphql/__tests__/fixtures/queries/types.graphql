@@ -1,0 +1,38 @@
+query {
+  allTypes {
+    nodes {
+      smallint
+      bigint
+      boolean
+      enum
+      domain
+      domain2
+      textArray
+      json
+      jsonb
+      numrange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      anIntRange {
+        start { value inclusive }
+        end { value inclusive }
+      }
+      money
+      compoundType { ...compoundType }
+      nestedCompoundType {
+        a { ...compoundType }
+        b { ...compoundType }
+        bazBuz
+      }
+    }
+  }
+}
+
+fragment compoundType on CompoundType {
+  a
+  b
+  c
+  d
+  fooBar
+}

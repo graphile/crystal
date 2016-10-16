@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+const path = require('path')
+const fs = require('fs')
+
+const schemaMarkdownPath = path.resolve('tutorial.md')
+const schemaMarkdownFile = fs.readFileSync(schemaMarkdownPath, 'utf8')
+
+// State for our filterer.
+let isInsideMarkdownSQLCode = false
+
+// Create a file with just our schema’s SQL.
+const schemaSQLFile = `
+-- This file was automatically generated from the \`schema-design.md\` which
+-- contains a complete explanation of how this schema works and why certain
+-- decisions were made. If you are looking for a comprehensive tutorial,
+-- definetly check it out as this file is a little tough to read.
+--
+-- If you want to contribute to this file, please change the
+-- \`schema-design.md\` file and then rebuild this file :)
+
+begin;
+
+
+${schemaMarkdownFile
+  // Split our file up into all of its lines.
+  .split('\n')
+  // Reduce our file back so that it is just SQL.
+  .reduce((sql, line) => {
+    // If we are inside some SQL code, we want to include this code in our
+    // final file.
+    if (isInsideMarkdownSQLCode) {
+      // If this line closes our SQL, do not include this line, but do
+      // change our state.
+      if (line === '```') {
+        isInsideMarkdownSQLCode = false
+        return `${sql}\n`
+      }
+      return `${sql}${line}\n`
+    }
+    // If we are not inside some SQL code, we should just return back the
+    // code so far.
+    else {
+      // If this line opens a block of SQL, change our state.
+      if (line === '```sql')
+        isInsideMarkdownSQLCode = true
+
+      return sql
+    }
+  }, '')}
+commit;
+`.slice(1)
+
+// Output that file to our build directory wrapped in a transaction.
+fs.writeFileSync(path.resolve('schema.sql'), schemaSQLFile, 'utf8')

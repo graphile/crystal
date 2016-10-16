@@ -2,14 +2,20 @@ language: node_js
 
 node_js:
   - "6"
-  - "5"
 
 addons:
   postgresql: "9.4"
 
 env:
-  TEST_DB: postgres://localhost:5432/travis
+  TEST_PG_URL: postgres://localhost:5432/travis
+
+cache:
+  directories:
+    - node_modules
+    - $NVM_DIR
 
 script:
-  - npm run lint
-  - npm test
+  - scripts/ci
+
+after_success:
+  - "cd examples/forum && scripts/run-schema-demo $DEMO_PG_URL"
