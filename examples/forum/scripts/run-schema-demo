@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+scripts/run-schema $@
+
+psql -f schema-demo.sql $@

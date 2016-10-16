@@ -16,3 +16,6 @@ cache:
 
 script:
   - scripts/ci
+
+after_success:
+  - "cd examples/forum && scripts/run-schema-demo $DEMO_PG_URL"
