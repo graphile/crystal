@@ -1,43 +1,5 @@
-import Inventory from './Inventory'
-import Paginator from './Paginator'
-import Collection from './collection/Collection'
-import CollectionKey from './collection/CollectionKey'
-import Condition, { conditionHelpers } from './collection/Condition'
-import Relation from './collection/Relation'
-// import Type from './type/Type'
-// import NullableType from './type/NullableType'
-// import ListType from './type/ListType'
-// import NamedType from './type/NamedType'
-// import AliasType from './type/AliasType'
-// import EnumType from './type/EnumType'
-// import ObjectType from './type/ObjectType'
-import booleanType from './type/primitive/booleanType'
-import integerType from './type/primitive/integerType'
-import floatType from './type/primitive/floatType'
-import stringType from './type/primitive/stringType'
-import jsonType from './type/primitive/jsonType'
-
-export {
-  Inventory,
-  Paginator,
-  Collection,
-  CollectionKey,
-  Condition,
-  conditionHelpers,
-  Relation,
-  Type,
-  NullableType,
-  ListType,
-  NamedType,
-  AliasType,
-  EnumType,
-  ObjectType,
-  booleanType,
-  integerType,
-  floatType,
-  stringType,
-  jsonType,
-}
+// ```ts
+/* tslint:disable */
 
 interface Type<TValue> {
   readonly kind: string
@@ -47,13 +9,12 @@ interface Type<TValue> {
 // TODO: Could this just be an either type?
 interface NullableType<
   TNullValue,
-  TNonNullValue,
-> extends Type<TNullValue | TNonNullValue> {
+  TNotNullValue,
+> extends Type<TNullValue | TNotNullValue> {
   readonly kind: 'NULLABLE'
-  readonly nonNullType: Type<TNonNullValue>
-  readonly nullValue: TNullValue
-  isNull (value: TNullValue | TNonNullValue): value is TNullValue
-  isNotNull (value: TNullValue | TNonNullValue): value is TNonNullValue
+  readonly nonNullType: Type<TNotNullValue>
+  isNull (value: TNullValue | TNotNullValue): value is TNullValue
+  isNotNull (value: TNullValue | TNotNullValue): value is TNotNullValue
 }
 
 interface ListType<
@@ -80,7 +41,8 @@ interface AliasType<TValue> extends NamedType<TValue> {
 
 interface EnumType<TValue> extends NamedType<TValue> {
   readonly kind: 'ENUM'
-  readonly variants: Map<string, TValue>
+  readonly variants: Set<TValue>
+  getName (variant: TValue): string
 }
 
 interface ObjectType<TValue> extends NamedType<TValue> {
@@ -105,9 +67,9 @@ type SwitchTypeCases<T> = {
   object: (type: ObjectType<mixed>) => T,
 }
 
-export function switchType <T>(type: Type<mixed>, cases: SwitchTypeCases<T>): T
-export function switchType <T>(cases: SwitchTypeCases<T>): (type: Type<mixed>) => T
-export function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCases?: SwitchTypeCases<T>): T | ((type: Type<mixed>) => T) {
+function switchType <T>(type: Type<mixed>, cases: SwitchTypeCases<T>): T
+function switchType <T>(cases: SwitchTypeCases<T>): (type: Type<mixed>) => T
+function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCases?: SwitchTypeCases<T>): T | ((type: Type<mixed>) => T) {
   if (typeof typeOrCases['kind'] === 'string' && maybeCases)
     return switchType(maybeCases)(typeOrCases as any)
 
@@ -125,10 +87,12 @@ export function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, ma
   }
 }
 
-export const getNamedType: (type: Type<mixed>) => NamedType<mixed> = switchType<NamedType<mixed>>({
+const getNamedType: (type: Type<mixed>) => NamedType<mixed> = switchType<NamedType<mixed>>({
   nullable: type => getNamedType(type.nonNullType),
   list: type => getNamedType(type.itemType),
   alias: type => type,
   enum: type => type,
   object: type => type,
 })
+
+// ```

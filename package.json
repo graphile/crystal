@@ -55,6 +55,7 @@
     "@types/change-case": "0.0.29",
     "@types/commander": "^2.3.30",
     "@types/debug": "0.0.29",
+    "@types/graphql": "^0.7.1",
     "@types/jest": "^0.9.30",
     "@types/jsonwebtoken": "^7.1.33",
     "@types/node": "^6.0.38",

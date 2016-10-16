@@ -38,9 +38,3 @@ abstract class NamedType<TValue> extends Type<TValue> {
 }
 
 export default NamedType
-
-/**
- * Detects if a given type is a named type or not.
- */
-export const isNamedType = <TValue>(type: Type<TValue>): type is NamedType<TValue> =>
-  typeof type['name'] === 'string'

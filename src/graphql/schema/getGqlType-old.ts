@@ -29,7 +29,6 @@ import {
   NullableType,
   ListType,
   NamedType,
-  isNamedType,
   AliasType,
   EnumType,
   ObjectType,
@@ -38,6 +37,7 @@ import {
   floatType,
   stringType,
   jsonType,
+  switchType,
 } from '../../interface'
 
 import { buildObject, formatName, memoize1 } from '../utils'
@@ -152,6 +152,7 @@ export const _getJsonGqlType = memoize1((buildToken: BuildToken): GraphQLScalarT
  * @private
  */
 function createGqlType (buildToken: BuildToken, type: Type<mixed>, input: boolean): GraphQLType<mixed> {
+  switchType(type, {})
   // We want to ignore the nullability rules for `AliasType`. If the type we
   // are aliasing is nullable or non null then `AliasType` will automatically
   // pick that up.
