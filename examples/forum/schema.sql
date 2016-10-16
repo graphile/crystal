@@ -1,10 +1,10 @@
--- This file was automatically generated from the `schema-design.md` which
+-- This file was automatically generated from the `TUTORIAL.md` which
 -- contains a complete explanation of how this schema works and why certain
 -- decisions were made. If you are looking for a comprehensive tutorial,
 -- definetly check it out as this file is a little tough to read.
 --
 -- If you want to contribute to this file, please change the
--- `schema-design.md` file and then rebuild this file :)
+-- `TUTORIAL.md` file and then rebuild this file :)
 
 begin;
 
@@ -222,7 +222,8 @@ create policy insert_post on forum_example.post for insert to forum_example_pers
   with check (author_id = current_setting('jwt.claims.person_id')::integer);
 
 create policy update_post on forum_example.post for update to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id')::integer)
+  with check (author_id = current_setting('jwt.claims.person_id')::integer);
 
 create policy delete_post on forum_example.post for delete to forum_example_person
   using (author_id = current_setting('jwt.claims.person_id')::integer);
