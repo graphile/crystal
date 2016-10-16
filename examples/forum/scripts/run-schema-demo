@@ -1,7 +1,9 @@
 #!/bin/bash
 
-set -e
+# TODO: Demo Postgres database
 
-scripts/run-schema $@
+# set -e
 
-psql -f schema-demo.sql $@
+# scripts/run-schema $@
+
+# psql -f schema-demo.sql $@

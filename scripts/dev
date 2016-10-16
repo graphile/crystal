@@ -2,7 +2,7 @@
 
 npm_bin=$(npm bin)
 
-export DEBUG=${DEBUG-postgraphql*,-postgraphql:graphql}
+export DEBUG=${DEBUG-postgraphql*,-postgraphql:graphql,-postgraphql:postgres:explain}
 
 $npm_bin/nodemon \
   --watch src \

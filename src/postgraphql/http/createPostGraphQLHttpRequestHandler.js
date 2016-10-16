@@ -325,7 +325,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         const prettyQuery = printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim()
         const errorCount = (result.errors || []).length
         const timeDiff = process.hrtime(queryTimeStart)
-        const ms = Math.round(timeDiff[0] * 1000) + (Math.round(timeDiff[1] * 10e-7 * 100) / 100)
+        const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
 
         // If we have enabled the query log for the Http handler, use that.
         console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''}in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)

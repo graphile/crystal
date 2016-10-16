@@ -10,12 +10,15 @@ import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from './postgraphql'
 
+// TODO: Demo Postgres database
+const DEMO_PG_URL = null
+
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString())
 const program = new Command('postgraphql')
 
 program
   .version(manifest.version)
-  .usage('[options]')
+  .usage('[options...]')
   .description(manifest.description)
   // .option('-d, --demo', 'run PostGraphQL using the demo database connection')
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment')
@@ -48,9 +51,8 @@ process.on('SIGINT', process.exit)
 // Destruct our command line arguments, use defaults, and rename options to
 // something appropriate for JavaScript.
 const {
-  // demo: isDemo = false,
+  demo: isDemo = false,
   connection: pgConnectionString,
-  schema: schemas = ['public'],
   host: hostname = 'localhost',
   port = 5000,
   maxPoolSize,
@@ -66,6 +68,11 @@ const {
 // tslint:disable-next-line no-any
 } = program as any
 
+// Add custom logic for getting the schemas from our CLI. If we are in demo
+// mode, we want to use the `forum_example` schema. Otherwise the `public`
+// schema is what we want.
+const schemas: Array<string> = program['schema'] || (isDemo ? ['forum_example'] : ['public'])
+
 // Create our Postgres config.
 const pgConfig = Object.assign(
   {},
@@ -73,10 +80,10 @@ const pgConfig = Object.assign(
   // config. If we don’t have a connection string use some environment
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
-  pgConnectionString ? parsePgConnectionString(pgConnectionString) : {
-    host: process.env.PgHOST || 'localhost',
-    port: process.env.PgPORT || 5432,
-    database: process.env.PgDATABASE,
+  pgConnectionString || isDemo ? parsePgConnectionString(pgConnectionString || DEMO_PG_URL) : {
+    host: process.env.PGHOST || 'localhost',
+    port: process.env.PGPORT || 5432,
+    database: process.env.PGDATABASE,
   },
   // Add the max pool size to our config.
   { max: maxPoolSize },
@@ -103,7 +110,7 @@ server.listen(port, hostname, () => {
   console.log('')
   console.log(`PostGraphQL server listening on port ${chalk.underline(port.toString())} 🚀`)
   console.log('')
-  console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(`postgres://${pgConfig.host}:${pgConfig.port}${pgConfig.database || ''}`)}`)
+  console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
   console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
   console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
 
