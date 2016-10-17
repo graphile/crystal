@@ -1,0 +1,21 @@
+@import 'sanitize.css/sanitize.css';
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  color: #333;
+  overflow: scroll;
+}
+
+a {
+  color: #0095ff;
+}
+
+label {
+  display: block;
+}
+
+input {
+  font-family: 'Source Sans Pro', sans-serif;
+  border: 1px solid #ccc;
+  padding: 0.5em;
+}
