@@ -8,7 +8,9 @@ This reimplementation of features that come with Postgres is not just an ineffic
 In this tutorial we will walk through the Postgres schema design for a forum application with users who can login and write forum posts. While we will discuss how you can use the schema we create with PostGraphQL, this article should be useful for anyone designing a Postgres schema.
 
 ## Table of Contents
-- [Installing Postgres](#installing-postgres)
+- [Installation](#installation)
+  - [Installing Postgres](#installing-postgres)
+  - [Installing PostGraphQL](#installing-postgraphql)
 - [The Basics](#the-basics)
   - [Setting Up Your Schemas](#setting-up-your-schemas)
   - [The Person Table](#the-person-table)
@@ -28,7 +30,8 @@ In this tutorial we will walk through the Postgres schema design for a forum app
   - [Row Level Security](#row-level-security)
 - [Conclusion](#conclusion)
 
-## Installing Postgres
+## Installation
+### Installing Postgres
 First, you are going to need to make sure Postgres is installed. You can skip this section if you already have Postgres installed 👍
 
 If you are running on MacOS, it is highly recommended that you install and use [Postgres.app](http://postgresapp.com/). If you are on another platform, go to the [Postgres download page](https://www.postgresql.org/download/) to pick up a copy of Postgres. We recommend using a version of Postgres higher than `9.5.0` as Postgres `9.5` introduces Row Level Security, an important feature when building your business logic into the database.
@@ -43,15 +46,7 @@ $ psql postgres://localhost:5432/testdb # Connects to the `testdb` database at `
 $ psql postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
 ```
 
-> **Note:** Remember what URL you use with `psql`. You will use the same URL, or “connection string,” whenever you connect to Postgres. In fact you start PostGraphQL in a similar way:
->
-> ```bash
-> $ postgraphql                                     # Connects to the default database at `postgres://localhost:5432`
-> $ postgraphql -c postgres://localhost:5432/testdb # Connects to the `testdb` database at `postgres://localhost:5432`
-> $ postgraphql -c postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
-> ```
->
-> Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats.
+Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats.
 
 After running `psql` with your database URL, you should be in a SQL prompt:
 
@@ -74,6 +69,21 @@ Run the following query to make sure things are working smoothly:
 =#
 ```
 
+### Installing PostGraphQL
+It’s way easier to install PostGraphQL. If you have npm, you practically have PostGraphQL as well.
+
+```
+$ npm install -g postgraphql
+```
+
+To run PostGraphQL, you’ll use the same URL that you used for `psql`:
+
+```bash
+$ postgraphql                                     # Connects to the default database at `postgres://localhost:5432`
+$ postgraphql -c postgres://localhost:5432/testdb # Connects to the `testdb` database at `postgres://localhost:5432`
+$ postgraphql -c postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
+```
+
 Excellent, now we can go on to setting up our database schemas.
 
 ## The Basics
@@ -90,6 +100,8 @@ create schema forum_example_private;
 You could create more or less schemas, it is all up to you and how you want to structure your database. We decided to create two schemas. One of which, `forum_example`, is meant to hold data users can see, whereas `forum_example_private` will never be directly accessible to users.
 
 Theoretically we want a user to be able to log in directly to our Postgres database, and only be able to create, read, update, and delete data for their user all within SQL. This is a mindshift from how we traditionally use a SQL database. Normally, we assume whoever is querying the database has full visibility into the system as the only one with database access is our application. In this tutorial, we want to restrict access at the database level. Don’t worry though! Postgres is very secure about this, users will have no more permissions then that which you explicitly grant.
+
+> **Note:** When starting PostGraphQL, you will want to use the name of the schema you created with the `--schema` option, like so: `postgraphql --schema forum_example`. Make sure to rerun PostGraphQL periodically through the tutorial so you can see what it does with the tables and types we create!
 
 ### The Person Table
 Now we are going to create the tables in our database which will correspond to our users. We will do this by running the Postgres [`CREATE TABLE`](https://www.postgresql.org/docs/current/static/sql-createtable.html) command. Here is the definition for our person table:
