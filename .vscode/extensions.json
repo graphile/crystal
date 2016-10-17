@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "christian-kohler.path-intellisense",
+    "eg2.tslint"
+  ]
+}
