@@ -2,15 +2,19 @@ jest.mock('pg')
 jest.mock('pg-connection-string')
 jest.mock('../schema/createPostGraphQLSchema')
 jest.mock('../http/createPostGraphQLHttpRequestHandler')
+jest.mock('../watch/watchPgSchemas')
 
 import { Pool } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler from '../http/createPostGraphQLHttpRequestHandler'
+import watchPgSchemas from '../watch/watchPgSchemas'
 import postgraphql from '../postgraphql'
 
-createPostGraphQLHttpRequestHandler
-  .mockImplementation(({ graphqlSchema }) => Promise.resolve(graphqlSchema).then(() => null))
+const chalk = require('chalk')
+
+createPostGraphQLHttpRequestHandler.mockImplementation(({ getGqlSchema }) => Promise.resolve(getGqlSchema()).then(() => null))
+watchPgSchemas.mockImplementation(() => Promise.resolve())
 
 test('will use the first parameter as the pool if it is an instance of `Pool`', async () => {
   const pgPool = new Pool()
@@ -50,7 +54,7 @@ test('will use a connected client from the pool, the schemas, and options to cre
   createPostGraphQLSchema.mockClear()
   createPostGraphQLHttpRequestHandler.mockClear()
   const pgPool = new Pool()
-  const schemas = Symbol('schemas')
+  const schemas = [Symbol('schemas')]
   const options = Symbol('options')
   const pgClient = { release: jest.fn() }
   pgPool.connect.mockReturnValue(Promise.resolve(pgClient))
@@ -60,13 +64,64 @@ test('will use a connected client from the pool, the schemas, and options to cre
   expect(pgClient.release.mock.calls).toEqual([[]])
 })
 
-test('will use a created GraphQL schema to create the Http request handler and pass down options', async () => {
+test('will use a created GraphQL schema to create the HTTP request handler and pass down options', async () => {
   createPostGraphQLHttpRequestHandler.mockClear()
   const pgPool = new Pool()
-  const graphqlSchema = Promise.resolve(Symbol('graphqlSchema'))
+  const gqlSchema = Symbol('graphqlSchema')
   const options = { a: 1, b: 2, c: 3 }
-  createPostGraphQLSchema.mockReturnValueOnce(graphqlSchema)
+  createPostGraphQLSchema.mockReturnValueOnce(Promise.resolve(gqlSchema))
   await postgraphql(pgPool, null, options)
-  expect(createPostGraphQLHttpRequestHandler.mock.calls)
-    .toEqual([[{ pgPool, graphqlSchema, a: 1, b: 2, c: 3 }]])
+  expect(createPostGraphQLHttpRequestHandler.mock.calls.length).toBe(1)
+  expect(createPostGraphQLHttpRequestHandler.mock.calls[0].length).toBe(1)
+  expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool'])
+  expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].pgPool).toBe(pgPool)
+  expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].a).toBe(options.a)
+  expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].b).toBe(options.b)
+  expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].c).toBe(options.c)
+  expect(await createPostGraphQLHttpRequestHandler.mock.calls[0][0].getGqlSchema()).toBe(gqlSchema)
+})
+
+test('will watch Postgres schemas when `watchPg` is true', async () => {
+  const pgPool = new Pool()
+  const pgSchemas = [Symbol('a'), Symbol('b'), Symbol('c')]
+  await postgraphql(pgPool, pgSchemas, { watchPg: false })
+  await postgraphql(pgPool, pgSchemas, { watchPg: true })
+  expect(watchPgSchemas.mock.calls.length).toBe(1)
+  expect(watchPgSchemas.mock.calls[0].length).toBe(1)
+  expect(Object.keys(watchPgSchemas.mock.calls[0][0])).toEqual(['pgPool', 'pgSchemas', 'onChange'])
+  expect(watchPgSchemas.mock.calls[0][0].pgPool).toBe(pgPool)
+  expect(watchPgSchemas.mock.calls[0][0].pgSchemas).toBe(pgSchemas)
+  expect(typeof watchPgSchemas.mock.calls[0][0].onChange).toBe('function')
+})
+
+test('will create a new PostGraphQL schema on when `watchPgSchemas` emits a change', async () => {
+  watchPgSchemas.mockClear()
+  createPostGraphQLHttpRequestHandler.mockClear()
+  const gqlSchemas = [Symbol('a'), Symbol('b'), Symbol('c')]
+  let gqlSchemaI = 0
+  createPostGraphQLSchema.mockClear()
+  createPostGraphQLSchema.mockImplementation(() => Promise.resolve(gqlSchemas[gqlSchemaI++]))
+  const pgPool = new Pool()
+  const pgClient = { release: jest.fn() }
+  pgPool.connect.mockReturnValue(Promise.resolve(pgClient))
+  const mockLog = jest.fn()
+  const origLog = console.log
+  console.log = mockLog
+  await postgraphql(pgPool, [], { watchPg: true })
+  const { onChange } = watchPgSchemas.mock.calls[0][0]
+  const { getGqlSchema } = createPostGraphQLHttpRequestHandler.mock.calls[0][0]
+  expect(pgPool.connect.mock.calls).toEqual([[]])
+  expect(pgClient.release.mock.calls).toEqual([[]])
+  expect(await getGqlSchema()).toBe(gqlSchemas[0])
+  onChange({ commands: ['a', 'b', 'c'] })
+  expect(await getGqlSchema()).toBe(gqlSchemas[1])
+  onChange({ commands: ['d', 'e'] })
+  expect(await getGqlSchema()).toBe(gqlSchemas[2])
+  expect(pgPool.connect.mock.calls).toEqual([[], [], []])
+  expect(pgClient.release.mock.calls).toEqual([[], [], []])
+  expect(mockLog.mock.calls).toEqual([
+    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('a')}, ${chalk.bold.cyan('b')}, ${chalk.bold.cyan('c')}`],
+    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('d')}, ${chalk.bold.cyan('e')}`],
+  ])
+  console.log = origLog
 })

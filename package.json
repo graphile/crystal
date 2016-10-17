@@ -79,7 +79,6 @@
     "testPathDirs": [
       "<rootDir>/src"
     ],
-    "testRegex": "/__tests__/[^.]+-test.(t|j)s$",
-    "clearMocks": true
+    "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   }
 }

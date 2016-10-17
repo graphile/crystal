@@ -20,7 +20,7 @@ export interface HttpRequestHandler {
  */
 export default function createPostGraphQLHttpRequestHandler (config: {
   // The actual GraphQL schema we will use.
-  graphqlSchema: GraphQLSchema | Promise<GraphQLSchema>,
+  getGqlSchema: () => Promise<GraphQLSchema>,
 
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool,

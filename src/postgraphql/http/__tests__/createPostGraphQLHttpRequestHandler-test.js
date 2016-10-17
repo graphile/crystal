@@ -11,7 +11,7 @@ const connect = require('connect')
 const express = require('express')
 const Koa = require('koa')
 
-const graphqlSchema = new GraphQLSchema({
+const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
     fields: {
@@ -54,7 +54,7 @@ const pgPool = {
 }
 
 const defaultOptions = {
-  graphqlSchema,
+  getGqlSchema: () => gqlSchema,
   pgPool,
   disableQueryLog: true,
 }
@@ -435,26 +435,18 @@ for (const [name, createServerFromHandler] of serverCreators) {
       )
     })
 
-    test('can use a promised GraphQL schema', async () => {
+    test('cannot use a rejected GraphQL schema', async () => {
       const rejectedGraphQLSchema = Promise.reject(new Error('Uh oh!'))
       // We don’t want Jest to complain about uncaught promise rejections.
       rejectedGraphQLSchema.catch(() => {})
-      const server1 = createServer({ graphqlSchema: Promise.resolve(graphqlSchema) })
-      const server2 = createServer({ graphqlSchema: rejectedGraphQLSchema })
-      await (
-        request(server1)
-        .post('/graphql')
-        .send({ query: '{hello}' })
-        .expect(200)
-        .expect({ data: { hello: 'world' } })
-      )
+      const server = createServer({ getGqlSchema: () => rejectedGraphQLSchema })
       // We want to hide `console.error` warnings because we are intentionally
       // generating some here.
       const origConsoleError = console.error
       console.error = () => {}
       try {
         await (
-          request(server2)
+          request(server)
           .post('/graphql')
           .send({ query: '{hello}' })
           .expect(500)

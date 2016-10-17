@@ -19,7 +19,7 @@ create function postgraphql_watch.notify_watchers() returns event_trigger as $$
 begin
   perform pg_notify(
     'postgraphql_watch',
-    (select array_to_json(array_agg(x)) from (select objid as id, command_tag as tag from pg_event_trigger_ddl_commands()) as x)::text
+    (select array_to_json(array_agg(x)) from (select schema_name as schema, command_tag as command from pg_event_trigger_ddl_commands()) as x)::text
   );
 end;
 $$ language plpgsql;
