@@ -427,7 +427,7 @@ comment on column forum_example_private.person_account.email is 'The email addre
 comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
-> **Warning:** Never store passwords in plaintext! The `password_hash` column will contained the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
+> **Warning:** Never store passwords in plaintext! The `password_hash` column will contain the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
 
 Why would we choose to create a new table in the `forum_example_private` schema instead of just adding columns to `forum_example.person`? There are a couple of answers to this question. The first and most fundamental is seperation of concerns. By moving `email` and `password_hash` to a second table we make it much harder to accidently select those values when reading `forum_example.person`. Also, users will not have the permission to directly query data from `forum_example_private` (as we will see) making this approach more secure. This approach is also good for PostGraphQL as the `forum_example_private` schema is never exposed in PostGraphQL, so you will never accidently expose password hashes in GraphQL.
 
