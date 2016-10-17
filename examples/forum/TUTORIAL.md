@@ -84,7 +84,15 @@ $ postgraphql -c postgres://localhost:5432/testdb # Connects to the `testdb` dat
 $ postgraphql -c postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
 ```
 
-Excellent, now we can go on to setting up our database schemas.
+You can also run PostGraphQL with the watch flag:
+
+```bash
+$ postgraphql --watch
+```
+
+With the `--watch` flag, whenever the Postgres schemas you are introspecting change PostGraphQL will automatically update your GraphQL API.
+
+Let’s go on to setting up our database schemas.
 
 ## The Basics
 ### Setting Up Your Schemas
@@ -101,7 +109,7 @@ You could create more or less schemas, it is all up to you and how you want to s
 
 Theoretically we want a user to be able to log in directly to our Postgres database, and only be able to create, read, update, and delete data for their user all within SQL. This is a mindshift from how we traditionally use a SQL database. Normally, we assume whoever is querying the database has full visibility into the system as the only one with database access is our application. In this tutorial, we want to restrict access at the database level. Don’t worry though! Postgres is very secure about this, users will have no more permissions then that which you explicitly grant.
 
-> **Note:** When starting PostGraphQL, you will want to use the name of the schema you created with the `--schema` option, like so: `postgraphql --schema forum_example`. Make sure to rerun PostGraphQL periodically through the tutorial so you can see what it does with the tables and types we create!
+> **Note:** When starting PostGraphQL, you will want to use the name of the schema you created with the `--schema` option, like so: `postgraphql --schema forum_example`. Also, don’t forget to add the `--watch` flag, with watch mode enabled PostGraphQL will update your API as we add tables and types throughout this tutorial.
 
 ### The Person Table
 Now we are going to create the tables in our database which will correspond to our users. We will do this by running the Postgres [`CREATE TABLE`](https://www.postgresql.org/docs/current/static/sql-createtable.html) command. Here is the definition for our person table:
