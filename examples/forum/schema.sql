@@ -222,8 +222,7 @@ create policy insert_post on forum_example.post for insert to forum_example_pers
   with check (author_id = current_setting('jwt.claims.person_id')::integer);
 
 create policy update_post on forum_example.post for update to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer)
-  with check (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id')::integer);
 
 create policy delete_post on forum_example.post for delete to forum_example_person
   using (author_id = current_setting('jwt.claims.person_id')::integer);
