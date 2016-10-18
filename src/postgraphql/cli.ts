@@ -23,6 +23,7 @@ program
   // .option('-d, --demo', 'run PostGraphQL using the demo database connection')
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment')
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
+  .option('-w, --watch', 'watches the Postgres schema for changes and reruns introspection if a change was detected')
   .option('-n, --host <string>', 'the hostname to be used. Defaults to `localhost`')
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
@@ -54,6 +55,7 @@ process.on('SIGINT', process.exit)
 const {
   demo: isDemo = false,
   connection: pgConnectionString,
+  watch: watchPg,
   host: hostname = 'localhost',
   port = 5000,
   maxPoolSize,
@@ -102,9 +104,10 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   jwtSecret,
   jwtPgTypeIdentifier,
   pgDefaultRole,
+  watchPg,
+  showErrorStack,
   disableQueryLog: false,
   enableCors,
-  showErrorStack,
 }))
 
 // Start our server by listening to a specific port and host name. Also log

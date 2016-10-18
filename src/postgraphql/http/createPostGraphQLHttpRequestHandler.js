@@ -39,7 +39,7 @@ const favicon = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { graphqlSchema, pgPool } = options
+  const { getGqlSchema, pgPool } = options
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
@@ -159,7 +159,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // a result. We also keep track of `params`.
     let params
     let result
-    let queryDocumentAST
+    let queryDocumentAst
     const queryTimeStart = process.hrtime()
     let pgRole
 
@@ -169,6 +169,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // GraphQL query. All errors thrown in this block will be returned to the
     // client as GraphQL errors.
     try {
+      // First thing we need to do is get the GraphQL schema for this request.
+      // It should never really change unless we are in watch mode.
+      const gqlSchema = await getGqlSchema()
+
       // Run all of our middleware by converting them into promises and
       // chaining them together. Remember that if we have a middleware that
       // never calls `next`, we will have a promise that never resolves! Avoid
@@ -241,7 +245,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       // Catch an errors while parsing so that we can set the `statusCode` to
       // 400. Otherwise we don’t need to parse this way.
       try {
-        queryDocumentAST = parseGraphql(source)
+        queryDocumentAst = parseGraphql(source)
       }
       catch (error) {
         res.statusCode = 400
@@ -252,7 +256,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // Validate our GraphQL query using given rules.
       // TODO: Add a complexity GraphQL rule.
-      const validationErrors = validateGraphql(await graphqlSchema, queryDocumentAST)
+      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst)
 
       // If we have some validation errors, don’t execute the query. Instead
       // send the errors to the client with a `400` code.
@@ -266,7 +270,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
       if (debugGraphql.enabled)
-        debugGraphql(printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim())
+        debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
       // Connect a new Postgres client and start a transaction.
       const pgClient = await pgPool.connect()
@@ -283,8 +287,8 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       try {
         result = await executeGraphql(
-          await graphqlSchema,
-          queryDocumentAST,
+          gqlSchema,
+          queryDocumentAst,
           null,
           { [$$pgClient]: pgClient },
           params.variables,
@@ -321,8 +325,8 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       debugRequest('GraphQL query request finished.')
 
       // Log the query. If this debugger isn’t enabled, don’t run it.
-      if (queryDocumentAST && !options.disableQueryLog) {
-        const prettyQuery = printGraphql(queryDocumentAST).replace(/\s+/g, ' ').trim()
+      if (queryDocumentAst && !options.disableQueryLog) {
+        const prettyQuery = printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim()
         const errorCount = (result.errors || []).length
         const timeDiff = process.hrtime(queryTimeStart)
         const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
