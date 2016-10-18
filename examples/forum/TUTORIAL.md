@@ -416,7 +416,7 @@ To store user emails and passwords we will create another table in the `forum_ex
 
 ```sql
 create table forum_example_private.person_account (
-  person_id        integer primary key references forum_example.person(id),
+  person_id        integer primary key references forum_example.person(id) on delete cascade,
   email            text not null unique check (email ~* '^.+@.+\..+$'),
   password_hash    text not null
 );
