@@ -1,7 +1,7 @@
-# The Anonymous Role
+# The Default Role
 PostGraphQL makes full use of PostgreSQL roles, so in this article we will explain briefly how PostgreSQL roles and users work and how that relates to how we use them in PostGraphQL.
 
-You can make any number of PostgreSQL roles with [`CREATE ROLE`](https://www.postgresql.org/docs/9.5/static/sql-createrole.html) comand and assign permissions to those roles with the [`GRANT`](https://www.postgresql.org/docs/9.5/static/sql-grant.html) command. Permissions like select from the table `post` or insert rows into the `person` table.
+You can make any number of PostgreSQL roles with [`CREATE ROLE`](https://www.postgresql.org/docs/9.5/static/sql-createrole.html) command and assign permissions to those roles with the [`GRANT`](https://www.postgresql.org/docs/9.5/static/sql-grant.html) command. Permissions like select from the table `post` or insert rows into the `person` table.
 
 PostgreSQL roles are also hierarchical. That is you can “grant” roles to other roles. For example if I had role `editor` which could change the data in our database and role `admin`, if I granted the `editor` role to `admin` with the command:
 
@@ -36,14 +36,14 @@ postgraphql postgres://auth_user@localhost:5432/mydb
 
 The `auth_user` will have all the priveleges PostGraphQL might need.
 
-You can also specify an `anonymous_role` with PostGraphQL. The `anonymous_role` will be used by PostGraphQL whenever no authorization token is provided or when the role claim in the authorization token is not specified. So all users that don’t explicitly specify a role will automatically use the `anonymous_role`.
+You can also specify a `default_role` with PostGraphQL. The `default_role` will be used by PostGraphQL whenever no authorization token is provided or when the role claim in the authorization token is not specified. So all users that don’t explicitly specify a role will automatically use the `default_role`.
 
-So the `anonymous_role` should have restricted priveleges to only your data that is publicly accessible.
+So the `default_role` should have restricted priveleges to only your data that is publicly accessible.
 
-After that you could also specify more roles like a `user_role` which should be included in the payload of your authorization tokens which may have more or less permissions then `anonymous_role`.
+After that you could also specify more roles like a `user_role` which should be included in the payload of your authorization tokens which may have more or less permissions then `default_role`.
 
-In order to configure an anonymous role just do the following:
+In order to configure an default role just do the following:
 
 ```bash
-postgraphql postgres://auth_user@localhost:5432/mydb --anonymous-role anonymous_role
+postgraphql postgres://auth_user@localhost:5432/mydb --default-role default_role
 ```
