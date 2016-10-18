@@ -109,7 +109,7 @@ create trigger post_updated_at before update
   execute procedure forum_example_private.set_updated_at();
 
 create table forum_example_private.person_account (
-  person_id        integer primary key references forum_example.person(id),
+  person_id        integer primary key references forum_example.person(id) on delete cascade,
   email            text not null unique check (email ~* '^.+@.+\..+$'),
   password_hash    text not null
 );

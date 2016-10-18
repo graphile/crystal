@@ -416,7 +416,7 @@ To store user emails and passwords we will create another table in the `forum_ex
 
 ```sql
 create table forum_example_private.person_account (
-  person_id        integer primary key references forum_example.person(id),
+  person_id        integer primary key references forum_example.person(id) on delete cascade,
   email            text not null unique check (email ~* '^.+@.+\..+$'),
   password_hash    text not null
 );
@@ -427,7 +427,7 @@ comment on column forum_example_private.person_account.email is 'The email addre
 comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
-> **Warning:** Never store passwords in plaintext! The `password_hash` column will contained the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
+> **Warning:** Never store passwords in plaintext! The `password_hash` column will contain the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
 
 Why would we choose to create a new table in the `forum_example_private` schema instead of just adding columns to `forum_example.person`? There are a couple of answers to this question. The first and most fundamental is seperation of concerns. By moving `email` and `password_hash` to a second table we make it much harder to accidently select those values when reading `forum_example.person`. Also, users will not have the permission to directly query data from `forum_example_private` (as we will see) making this approach more secure. This approach is also good for PostGraphQL as the `forum_example_private` schema is never exposed in PostGraphQL, so you will never accidently expose password hashes in GraphQL.
 
@@ -665,7 +665,7 @@ $$ language sql stable;
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
 ```
 
-This is a simple function that we can use in PostGraphQL or our database to get the person who is currently executing the query. The one new concept here is `current_setting('jwt.claims.person_id')::integer`. As we discussed before, PostGraphQL will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
+This is a simple function that we can use in PostGraphQL or our database to get the person who is currently executing the query — by means of the token in the request header. The one new concept here is `current_setting('jwt.claims.person_id')::integer`. As we discussed before, PostGraphQL will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
 
 Now, let’s use the JWT to define permissions.
 
