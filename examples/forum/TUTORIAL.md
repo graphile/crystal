@@ -665,7 +665,7 @@ $$ language sql stable;
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
 ```
 
-This is a simple function that we can use in PostGraphQL or our database to get the person who is currently executing the query. The one new concept here is `current_setting('jwt.claims.person_id')::integer`. As we discussed before, PostGraphQL will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
+This is a simple function that we can use in PostGraphQL or our database to get the person who is currently executing the query — by means of the token in the request header. The one new concept here is `current_setting('jwt.claims.person_id')::integer`. As we discussed before, PostGraphQL will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
 
 Now, let’s use the JWT to define permissions.
 
