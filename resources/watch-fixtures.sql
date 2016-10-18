@@ -7,7 +7,7 @@ begin;
 -- Drop the `postgraphql_watch` schema and all of its dependant objects
 -- including the event trigger function and the event trigger itself. We will
 -- recreate those objects in this script.
-drop schema postgraphql_watch cascade;
+drop schema if exists postgraphql_watch cascade;
 
 -- Create a schema for the PostGraphQL watch functionality. This schema will
 -- hold things like trigger functions that are used to implement schema
