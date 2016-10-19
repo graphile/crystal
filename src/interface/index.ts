@@ -105,6 +105,7 @@ type SwitchTypeCases<T> = {
   object: (type: ObjectType<mixed>) => T,
 }
 
+// tslint:disable no-any
 export function switchType <T>(type: Type<mixed>, cases: SwitchTypeCases<T>): T
 export function switchType <T>(cases: SwitchTypeCases<T>): (type: Type<mixed>) => T
 export function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCases?: SwitchTypeCases<T>): T | ((type: Type<mixed>) => T) {
@@ -124,6 +125,7 @@ export function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, ma
     }
   }
 }
+// tslint:enable no-any
 
 export const getNamedType: (type: Type<mixed>) => NamedType<mixed> = switchType<NamedType<mixed>>({
   nullable: type => getNamedType(type.nonNullType),

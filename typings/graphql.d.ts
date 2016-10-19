@@ -1,5 +1,6 @@
 declare module 'graphql' {
   import {
+    GraphQLType,
     GraphQLScalarType,
     GraphQLObjectType,
     GraphQLInterfaceType,
@@ -7,6 +8,7 @@ declare module 'graphql' {
     GraphQLInputObjectType,
     GraphQLList,
     GraphQLNonNull,
+    GraphQLUnionType,
   } from 'graphql'
 
   export type GraphQLType =
@@ -16,7 +18,8 @@ declare module 'graphql' {
     GraphQLEnumType |
     GraphQLInputObjectType |
     GraphQLList<any> |
-    GraphQLNonNull<any>
+    GraphQLNonNull<any> |
+    GraphQLUnionType
 
   export type GraphQLInputType =
     GraphQLScalarType |
@@ -29,4 +32,22 @@ declare module 'graphql' {
       GraphQLInputObjectType |
       GraphQLList<any>
     >
+
+  export type GraphQLOutputType =
+    GraphQLScalarType |
+    GraphQLObjectType |
+    GraphQLInterfaceType |
+    GraphQLUnionType |
+    GraphQLEnumType |
+    GraphQLList<any> |
+    GraphQLNonNull<
+      GraphQLScalarType |
+      GraphQLObjectType |
+      GraphQLInterfaceType |
+      GraphQLUnionType |
+      GraphQLEnumType |
+      GraphQLList<any>
+    >;
+
+  export function isOutputType (type: GraphQLType): type is GraphQLOutputType
 }
