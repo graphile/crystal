@@ -28,3 +28,12 @@ interface Type<TValue> {
 }
 
 export default Type
+
+/**
+ * This user-defined type guard will check to see if the value being passed in
+ * is a type. We do this by checking the value is an object and has a string
+ * `kind` field.
+ */
+export function isType (value: mixed): value is Type<mixed> {
+  return value != null && typeof value === 'object' && typeof value['kind'] === 'string'
+}

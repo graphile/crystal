@@ -1,8 +1,8 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, Condition, ObjectType, Relation, conditionHelpers } from '../../../interface'
-import { memoize2, formatName, buildObject, idSerde } from '../../utils'
+import { Collection, Condition, ObjectType, Relation } from '../../../interface'
+import { formatName, buildObject, idSerde } from '../../utils'
+import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
-import getGqlType from '../getGqlType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
@@ -13,7 +13,10 @@ import getConditionGqlType from './getConditionGqlType'
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-export default function createCollectionGqlType (buildToken: BuildToken, collection: Collection): GraphQLObjectType {
+export default function createCollectionGqlType<TValue> (
+  buildToken: BuildToken,
+  collection: Collection<TValue>,
+): GraphQLObjectType {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
   const collectionTypeName = formatName.type(type.name)
@@ -34,25 +37,24 @@ export default function createCollectionGqlType (buildToken: BuildToken, collect
         primaryKey && [options.nodeIdFieldName, {
           description: 'A globally unique identifier. Can be used in various places throughout the system to identify this single value.',
           type: new GraphQLNonNull(GraphQLID),
-          resolve: value => idSerde.serialize(collection, value),
+          resolve: (value: TValue) => idSerde.serialize(collection, value),
         }],
       ],
 
       // Add all of the basic fields to our type.
-      Array.from(type.fields.entries())
-        .map(<TFieldValue>([fieldName, field]: [string, ObjectType.Field<TFieldValue>]): [string, GraphQLFieldConfig<ObjectType.Value, TFieldValue>] =>
-          [formatName.field(fieldName), {
-            description: field.description,
-            type: getGqlType(buildToken, field.type, false) as GraphQLOutputType<TFieldValue>,
-            resolve: value =>
-              // Since we get `mixed` back here from the map, we’re just going
-              // to assume the type is ok instead of running an `isTypeOf`
-              // check. Generally `isTypeOf` isn’t super efficient so we only
-              // use it on user input.
-              // tslint:disable-next-line no-any
-              value.get(fieldName) as any,
-          }],
-        ),
+      Array.from(type.fields).map(
+        <TFieldValue>([fieldName, field]: [string, ObjectType.Field<TValue, TFieldValue>]) => {
+          const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, field.type)
+          return {
+            key: formatName.field(fieldName),
+            value: {
+              description: field.description,
+              type: gqlType,
+              resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
+            },
+          }
+        },
+      ),
 
       // Add extra fields that may exist in our hooks.
       buildToken._hooks.objectTypeFieldEntries

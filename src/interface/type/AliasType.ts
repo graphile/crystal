@@ -1,4 +1,3 @@
-import Type from './Type'
 import NamedType from './NamedType'
 
 /**
@@ -14,27 +13,15 @@ import NamedType from './NamedType'
  * services that don’t support type aliasing. Like in GraphQL which doesn’t
  * support aliasing unnamed types.
  */
-class AliasType<TValue> extends NamedType<TValue> {
+// TODO: Remove alias types?
+interface AliasType<TValue> extends NamedType<TValue> {
+  // The unique string tag for alias types.
+  readonly kind: 'ALIAS'
+
   /**
    * The type this alias is based on.
    */
-  public readonly baseType: Type<TValue>
-
-  constructor (config: {
-    name: string,
-    description?: string | undefined,
-    baseType: Type<TValue>,
-  }) {
-    super(config)
-    this.baseType = config.baseType
-  }
-
-  /**
-   * Proxies the `isTypeOf` check to the base type of this alias.
-   */
-  public isTypeOf (value: mixed): value is TValue {
-    return this.baseType.isTypeOf(value)
-  }
+  readonly baseType: Type<TValue>
 }
 
 export default AliasType
