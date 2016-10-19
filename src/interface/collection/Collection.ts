@@ -7,7 +7,7 @@ import Condition from './Condition'
  * A collection represents a set of typed values that can be operated on in
  * basic CRUD fashion in our system.
  */
-interface Collection {
+interface Collection<TValue> {
   /**
    * The name of our collection.
    */
@@ -21,7 +21,7 @@ interface Collection {
   /**
    * The type of *all* the values in our collection.
    */
-  readonly type: ObjectType
+  readonly type: ObjectType<TValue>
 
   /**
    * Get all of the unique identifiers for this collection. A key is a token

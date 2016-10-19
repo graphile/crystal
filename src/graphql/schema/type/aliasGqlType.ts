@@ -1,6 +1,7 @@
-import { GraphQLType, GraphQLInputType, GraphQLNonNull, GraphQLList } from 'graphql'
+import { GraphQLType, GraphQLInputType, GraphQLOutputType, GraphQLNonNull, GraphQLList } from 'graphql'
 
 // TODO: test
+export default function aliasGqlType (gqlType: GraphQLOutputType, name: string, description?: string | undefined): GraphQLOutputType
 export default function aliasGqlType (gqlType: GraphQLInputType, name: string, description?: string | undefined): GraphQLInputType
 export default function aliasGqlType (gqlType: GraphQLType, name: string, description?: string | undefined): GraphQLType {
   if (gqlType instanceof GraphQLNonNull)

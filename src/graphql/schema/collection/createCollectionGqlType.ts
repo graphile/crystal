@@ -8,31 +8,17 @@ import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
 import getConditionGqlType from './getConditionGqlType'
 
-// Private implementation of `getCollectionGqlType`, types aren’t that great.
-const _getCollectionGqlType = memoize2(createCollectionGqlType)
-
 /**
  * Creates the output object type for a collection. This type will include all
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionGqlType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
-  return _getCollectionGqlType(buildToken, collection)
-}
-
-export default getCollectionGqlType
-
-/**
- * The private non-memoized implementation of `getCollectionGqlType`.
- *
- * @private
- */
-function createCollectionGqlType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
+export default function createCollectionGqlType (buildToken: BuildToken, collection: Collection): GraphQLObjectType {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
   const collectionTypeName = formatName.type(type.name)
 
-  return new GraphQLObjectType<ObjectType.Value>({
+  return new GraphQLObjectType({
     name: collectionTypeName,
     description: collection.description,
 

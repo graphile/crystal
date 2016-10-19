@@ -61,6 +61,16 @@ class Inventory {
   }
 
   /**
+   * Gets a collection in our inventory for the given type. If a collection in
+   * our inventory has this type it will be returned. Otherwise nothing will be
+   * returned.
+   */
+  // TODO: Don’t use `any`
+  public getCollectionForType (type: any): Collection | undefined {
+    return this.getCollections().find(collection => collection.type === type)
+  }
+
+  /**
    * Adds a single relation to our inventory. If the related collections are not
    * members of this inventory we fail with an error.
    */

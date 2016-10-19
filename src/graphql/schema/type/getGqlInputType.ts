@@ -2,9 +2,9 @@ import {
   GraphQLInputType,
   GraphQLNonNull,
   GraphQLList,
-  GraphQLEnumType,
   GraphQLInputObjectType,
   getNullableType as getNullableGqlType,
+  isInputType as isInputGqlType,
 } from 'graphql'
 
 import {
@@ -15,11 +15,14 @@ import {
   AliasType,
   EnumType,
   ObjectType,
+  ScalarType,
+  getNamedType,
 } from '../../../interface'
 
 import { buildObject, formatName, memoize2 } from '../../utils'
 import BuildToken from '../BuildToken'
 import aliasGqlType from './aliasGqlType'
+import getGqlOutputType from './getGqlOutputType'
 
 /**
  * The values to be returned by `getGqlInputType`. A GraphQL input type, and a
@@ -87,15 +90,11 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
     // Enum types will be turned into a non-null GraphQL enum type, the
     // variants of which will return the actual enum value requiring no extra
     // value coercion in `fromGqlInput` other than a type check.
+    //
+    // We use the `getGqlOutputType` implementation for this as the input and
+    // output types will be the same.
     enum: (type: EnumType<TValue>): GetGqlInputReturn<TValue> => ({
-      gqlType: new GraphQLNonNull(new GraphQLEnumType({
-        name: formatName.type(type.name),
-        description: type.description,
-        values: buildObject(Array.from(type.variants).map(([key, value]) => ({
-          key: formatName.enumValue(key),
-          value: { value },
-        }))),
-      })),
+      gqlType: getGqlInputTypeFromOutputType(buildToken, type),
       fromGqlInput: gqlInput =>
         type.isTypeOf(gqlInput)
           ? gqlInput
@@ -139,10 +138,38 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
             : (() => { throw new Error(`Input value must be an object, not '${typeof gqlInput}'.`) })(),
       }
     },
+
+    // For scalar types we want to use the same input type as output type. This
+    // will be our GraphQL type. Our `fromGqlInput` will then just be an
+    // identity function because the scalar type defines `parseValue` and
+    // `parseLiteral` already to coerce our value inside the GraphQL type.
+    scalar: (type: ScalarType<TValue>): GetGqlInputReturn<TValue> => ({
+      gqlType: getGqlInputTypeFromOutputType(buildToken, type),
+      fromGqlInput: gqlInput => gqlInput as TValue,
+    }),
   })
 
-// Because we use dependant types in the signature, we have to wrap our
-// memoized function to get the right signature.
+/**
+ * This function will allow you to use `getGqlOutputType` to create the type,
+ * but will check that it’s an input type and return it as an input type.
+ *
+ * We use this because some GraphQL types can be both input and output types
+ * so we want to share logic. This is the way we do it.
+ *
+ * @private
+ */
+function getGqlInputTypeFromOutputType (buildToken: BuildToken, type: Type<mixed>): GraphQLInputType {
+  const gqlOutputType = getGqlOutputType(buildToken, type)
+
+  if (isInputGqlType(gqlOutputType))
+    return gqlOutputType
+
+  // Should be unreachable if we use this function wisely.
+  throw new Error(`Expected GraphQL input type '${gqlOutputType.toString()}' to also be an output type.`)
+}
+
+// The actual memoized function. It may not have exactly correct types and we’d
+// also like to add special cases.
 const _getGqlInputType = memoize2(createGqlInputType)
 
 /**
@@ -152,7 +179,14 @@ const _getGqlInputType = memoize2(createGqlInputType)
  * convert the value resultant from that input type into a proper value to be
  * used by our interface.
  */
-// TODO: test
 export default function getGqlInputType <TValue>(buildToken: BuildToken, type: Type<TValue>): GetGqlInputReturn<TValue> {
+  // If we have an input type override for this type, throw an error because
+  // that is not yet implemented!
+  if (buildToken._typeOverrides) {
+    const typeOverride = buildToken._typeOverrides.get(type)
+    if (typeOverride && typeOverride.input)
+      throw new Error(`Unimplemented, cannot create an input type for '${getNamedType(type).name}'.`)
+  }
+
   return _getGqlInputType(buildToken, type) as GetGqlInputReturn<TValue>
 }

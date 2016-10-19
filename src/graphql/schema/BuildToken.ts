@@ -54,8 +54,8 @@ export type _BuildTokenHooks = {
  * this is a private API.
  */
 export type _BuildTokenTypeOverrides = Map<Type<mixed>, {
-  input?: GraphQLInputType<mixed>,
-  output?: GraphQLOutputType<mixed>,
+  input?: true,
+  output?: GraphQLOutputType,
 }>
 
 export default BuildToken

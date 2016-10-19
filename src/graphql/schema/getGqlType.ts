@@ -168,7 +168,7 @@ function createGqlType (buildToken: BuildToken, type: Type<mixed>, input: boolea
 
   if (type instanceof NullableType)
     // TODO: Remove the `input as any` when the Typescript bug is fixed.
-      // tslint:disable-next-line no-any
+    // tslint:disable-next-line no-any
     return getNullableType(getGqlType(buildToken, type.nonNullType, input as any))
 
   return new GraphQLNonNull(createGqlNullableType(buildToken, type, input))

@@ -50,4 +50,5 @@ declare module 'graphql' {
     >;
 
   export function isOutputType (type: GraphQLType): type is GraphQLOutputType
+  export function isInputType (type: GraphQLType): type is GraphQLInputType
 }
