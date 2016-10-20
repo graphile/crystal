@@ -7,7 +7,7 @@ import Collection from './Collection'
  * may then be used to reliably reselect the value. A collection may have many
  * keys, but only one primary key.
  */
-interface CollectionKey<TKeyValue> {
+interface CollectionKey<TValue, TKeyValue> {
   /**
    * The collection this key is for.
    *
@@ -21,7 +21,7 @@ interface CollectionKey<TKeyValue> {
    *
    * Everyone wins, so we add it to the interface.
    */
-  readonly collection: Collection
+  readonly collection: Collection<TValue>
 
   /**
    * The name of our collection key.
@@ -47,7 +47,7 @@ interface CollectionKey<TKeyValue> {
    * However, not all values must have a key therefore the return type is
    * nullable.
    */
-  getKeyFromValue (value: ObjectType.Value): TKeyValue | undefined
+  getKeyFromValue (value: TValue): TKeyValue | undefined
 
   /**
    * Reads a single value from the collection using that value’s key.
@@ -55,7 +55,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  readonly read?: ((context: mixed, key: TKeyValue) => Promise<ObjectType.Value | null>) | null
+  readonly read?: ((context: mixed, key: TKeyValue) => Promise<TValue | null>) | null
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is
@@ -68,7 +68,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was updated, an error should be thrown.
    */
   // TODO: Test this.
-  readonly update?: ((context: mixed, key: TKeyValue, patch: Map<string, mixed>) => Promise<ObjectType.Value>) | null
+  readonly update?: ((context: mixed, key: TKeyValue, patch: Map<string, mixed>) => Promise<TValue>) | null
 
   /**
    * Delete a value from the collection by using the value’s key. Returned is
@@ -77,7 +77,7 @@ interface CollectionKey<TKeyValue> {
    * If nothing was deleted an error should be thrown.
    */
   // TODO: Test this.
-  readonly delete?: ((context: mixed, key: TKeyValue) => Promise<ObjectType.Value>) | null
+  readonly delete?: ((context: mixed, key: TKeyValue) => Promise<TValue>) | null
 }
 
 export default CollectionKey

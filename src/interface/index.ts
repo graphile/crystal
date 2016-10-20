@@ -11,6 +11,7 @@ import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
 import EnumType from './type/EnumType'
 import ObjectType from './type/ObjectType'
+import ScalarType from './type/ScalarType'
 import booleanType from './type/scalar/booleanType'
 import integerType from './type/scalar/integerType'
 import floatType from './type/scalar/floatType'
@@ -33,6 +34,7 @@ export {
   AliasType,
   EnumType,
   ObjectType,
+  ScalarType,
   booleanType,
   integerType,
   floatType,

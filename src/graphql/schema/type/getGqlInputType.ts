@@ -159,7 +159,7 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
  * @private
  */
 function getGqlInputTypeFromOutputType (buildToken: BuildToken, type: Type<mixed>): GraphQLInputType {
-  const gqlOutputType = getGqlOutputType(buildToken, type)
+  const { gqlType: gqlOutputType } = getGqlOutputType(buildToken, type)
 
   if (isInputGqlType(gqlOutputType))
     return gqlOutputType

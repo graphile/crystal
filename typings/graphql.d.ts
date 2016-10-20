@@ -51,4 +51,42 @@ declare module 'graphql' {
 
   export function isOutputType (type: GraphQLType): type is GraphQLOutputType
   export function isInputType (type: GraphQLType): type is GraphQLInputType
+
+  export interface GraphQLFieldConfig<TSource> {
+    type: GraphQLOutputType;
+    args?: GraphQLFieldConfigArgumentMap;
+    resolve?: GraphQLFieldResolveFn<TSource>;
+    deprecationReason?: string;
+    description?: string;
+  }
+
+  export type GraphQLFieldResolveFn<TSource> = (
+    source: TSource,
+    args: { [argName: string]: any },
+    context: any,
+    info: GraphQLResolveInfo
+  ) => any;
+
+  export interface GraphQLResolveInfo {
+    fieldName: string;
+    // fieldASTs: Array<Field>;
+    returnType: GraphQLOutputType;
+    // parentType: GraphQLCompositeType;
+    path: Array<string | number>;
+    // schema: GraphQLSchema;
+    // fragments: { [fragmentName: string]: FragmentDefinition };
+    rootValue: any;
+    // operation: OperationDefinition;
+    variableValues: { [variableName: string]: any };
+  }
+
+  export interface GraphQLFieldConfigArgumentMap {
+    [argName: string]: GraphQLArgumentConfig;
+  }
+
+  export interface GraphQLArgumentConfig {
+    type: GraphQLInputType;
+    defaultValue?: any;
+    description?: string;
+  }
 }

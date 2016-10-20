@@ -2,6 +2,7 @@ import Type, { isType } from './Type'
 import NullableType from './NullableType'
 import ListType from './ListType'
 import AliasType from './AliasType'
+import EnumType from './EnumType'
 import ObjectType from './ObjectType'
 import ScalarType from './ScalarType'
 

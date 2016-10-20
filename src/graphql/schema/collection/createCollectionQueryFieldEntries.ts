@@ -2,8 +2,9 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, CollectionKey, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
+import getGqlOutputType from '../type/getGqlOutputType'
+import transformGqlInputValue from '../transformGqlInputValue'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
-import getCollectionGqlType from './getCollectionGqlType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 import getConditionGqlType from './getConditionGqlType'
 
@@ -11,12 +12,12 @@ import getConditionGqlType from './getConditionGqlType'
  * Creates any number of query field entries for a collection. These fields
  * will be on the root query type.
  */
-export default function createCollectionQueryFieldEntries (
+export default function createCollectionQueryFieldEntries <TValue>(
   buildToken: BuildToken,
-  collection: Collection,
-): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
+  collection: Collection<TValue>,
+): Array<[string, GraphQLFieldConfig<mixed>]> {
   const type = collection.type
-  const entries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = []
+  const entries: Array<[string, GraphQLFieldConfig<mixed>]> = []
   const primaryKey = collection.primaryKey
   const paginator = collection.paginator
 
@@ -69,10 +70,10 @@ export default function createCollectionQueryFieldEntries (
  * Creates the field used to select an object by its primary key using a
  * GraphQL global id.
  */
-function createCollectionPrimaryKeyField <TKey>(
+function createCollectionPrimaryKeyField <TValue, TKey>(
   buildToken: BuildToken,
-  collectionKey: CollectionKey<TKey>,
-): GraphQLFieldConfig<mixed, mixed> | undefined {
+  collectionKey: CollectionKey<TValue, TKey>,
+): GraphQLFieldConfig<mixed> | undefined {
   const { options, inventory } = buildToken
   const { collection, keyType } = collectionKey
 
@@ -80,20 +81,20 @@ function createCollectionPrimaryKeyField <TKey>(
   if (collectionKey.read == null)
     return
 
-  const collectionType = getCollectionGqlType(buildToken, collection)
+  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
 
   return {
-    description: `Reads a single ${scrib.type(collectionType)} using its globally unique ${scrib.type(GraphQLID)}.`,
-    type: collectionType,
+    description: `Reads a single ${scrib.type(collectionGqlType)} using its globally unique ${scrib.type(GraphQLID)}.`,
+    type: collectionGqlType,
 
     args: {
       [options.nodeIdFieldName]: {
-        description: `The globally unique ${scrib.type(GraphQLID)} to be used in selecting a single ${scrib.type(collectionType)}.`,
+        description: `The globally unique ${scrib.type(GraphQLID)} to be used in selecting a single ${scrib.type(collectionGqlType)}.`,
         type: new GraphQLNonNull(GraphQLID),
       },
     },
 
-    async resolve (_source, args, context): Promise<ObjectType.Value | null> {
+    async resolve (_source, args, context): Promise<mixed> {
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
 
       if (result.collection !== collection)
@@ -102,7 +103,12 @@ function createCollectionPrimaryKeyField <TKey>(
       if (!keyType.isTypeOf(result.keyValue))
         throw new Error(`The provided id is not of the correct type.`)
 
-      return await collectionKey.read!(context, result.keyValue)
+      const value = await collectionKey.read!(context, result.keyValue)
+
+      if (value == null)
+        return
+
+      return intoGqlOutput(value)
     },
   }
 }

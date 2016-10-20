@@ -19,6 +19,7 @@ import {
   Type,
   NullableType,
   ListType,
+  AliasType,
   ObjectType,
   ScalarType,
   booleanType,
@@ -90,7 +91,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
     // output type from our base type.
     //
     // We use the same coercer as the base type.
-    alias: type => {
+    alias: (type: AliasType<TValue>): GetGqlOutputTypeReturn<TValue> => {
       const { gqlType: baseGqlType, intoGqlOutput } = getGqlOutputType(buildToken, type.baseType)
       return {
         gqlType: aliasGqlType(baseGqlType, formatName.type(type.name), type.description),
