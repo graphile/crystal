@@ -43,7 +43,7 @@ export default async function createPostGraphQLSchema (
   else {
     const pgClient = await connectPgClient(clientOrConfig || {})
     pgCatalog = await introspectPgDatabase(pgClient, schemas)
-    pgClient.release()
+    pgClient.end()
   }
 
   // Gets the Postgres token type from our provided identifier. Just null if
