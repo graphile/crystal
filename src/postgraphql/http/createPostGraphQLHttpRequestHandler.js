@@ -208,9 +208,11 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       //   be executing.
       params = typeof req.body === 'string' ? { query: req.body } : req.body
 
-      // Throw an error if no query string was defined.
-      if (!params.query)
-        throw httpError(400, 'Must provide a query string.')
+      // Validate our params object a bit.
+      if (params == null) throw httpError(400, 'Must provide an object parameters, not nullish value.')
+      if (typeof params === 'object') throw httpError(400, `Expected parameter object, not value of type '${typeof params}'.`)
+      if (Array.isArray(params)) throw httpError(501, 'Batching queries as an array is currently unsupported. Please provide a single query object.')
+      if (!params.query) throw httpError(400, 'Must provide a query string.')
 
       // If variables is a string, we assume it is a JSON string and that it
       // needs to be parsed.
