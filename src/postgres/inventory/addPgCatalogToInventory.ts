@@ -37,14 +37,14 @@ export default function addPgCatalogToInventory (
 
   // Add all of the relations that exist in our database to the inventory. We
   // discover relations by looking at foreign key constraints in Postgres.
+  // TODO: This implementation of relations could be better…
   for (const pgConstraint of pgCatalog.getConstraints()) {
     if (pgConstraint.type === 'f') {
-      // TODO: This implementation of relation could be better…
-      inventory.addRelation(new PgRelation(
-        collectionByClassId.get(pgConstraint.classId)!,
+      const tailCollection = collectionByClassId.get(pgConstraint.classId)!
 
-        // Here we get the collection key for our foreign table that has the
-        // same key attribute numbers we are looking for.
+      // Here we get the collection key for our foreign table that has the
+      // same key attribute numbers we are looking for.
+      const headCollectionKey =
         collectionByClassId.get(pgConstraint.foreignClassId)!.keys
           .find(key => {
             const numsA = pgConstraint.foreignKeyAttributeNums
@@ -56,10 +56,22 @@ export default function addPgCatalogToInventory (
             // Make sure all of the items in `numsA` are also in `numsB` (order
             // does not matter).
             return numsA.reduce((last, num) => last && numsB.indexOf(num) !== -1, true)
-          })!,
+          })
 
-        pgConstraint,
-      ))
+      // If no collection key could be found, we need to throw an error.
+      if (!headCollectionKey) {
+        throw new Error(
+          'No primary key or unique constraint found for the column(s) ' +
+          `${pgCatalog.getClassAttributes(pgConstraint.foreignClassId, pgConstraint.foreignKeyAttributeNums).map(({ name }) => `'${name}'`).join(', ')} ` +
+          'of table ' +
+          `'${pgCatalog.assertGetClass(pgConstraint.foreignClassId).name}'. ` +
+          'Cannot create a relation without such a constraint. Without this ' +
+          'constraint referenced values are not ensured to be unique and ' +
+          'lookups may not be performant.'
+        )
+      }
+
+      inventory.addRelation(new PgRelation(tailCollection, headCollectionKey, pgConstraint))
     }
   }
 }
