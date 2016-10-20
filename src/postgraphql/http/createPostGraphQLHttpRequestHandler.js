@@ -210,7 +210,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // Validate our params object a bit.
       if (params == null) throw httpError(400, 'Must provide an object parameters, not nullish value.')
-      if (typeof params === 'object') throw httpError(400, `Expected parameter object, not value of type '${typeof params}'.`)
+      if (typeof params !== 'object') throw httpError(400, `Expected parameter object, not value of type '${typeof params}'.`)
       if (Array.isArray(params)) throw httpError(501, 'Batching queries as an array is currently unsupported. Please provide a single query object.')
       if (!params.query) throw httpError(400, 'Must provide a query string.')
 
