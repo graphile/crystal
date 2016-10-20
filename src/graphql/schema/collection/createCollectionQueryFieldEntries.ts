@@ -96,18 +96,10 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
 
     async resolve (_source, args, context): Promise<mixed> {
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
-
-      if (result.collection !== collection)
-        throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
-
-      if (!keyType.isTypeOf(result.keyValue))
-        throw new Error(`The provided id is not of the correct type.`)
-
+      if (result.collection !== collection) throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
+      if (!keyType.isTypeOf(result.keyValue)) throw new Error(`The provided id is not of the correct type.`)
       const value = await collectionKey.read!(context, result.keyValue)
-
-      if (value == null)
-        return
-
+      if (value == null) return
       return intoGqlOutput(value)
     },
   }
@@ -117,24 +109,26 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
  * Creates a field using the value from any collection key.
  */
 // TODO: test
-function createCollectionKeyField <TKey>(
+function createCollectionKeyField <TValue, TKey>(
   buildToken: BuildToken,
-  collectionKey: CollectionKey<TKey>,
-): GraphQLFieldConfig<mixed, mixed> | undefined {
+  collectionKey: CollectionKey<TValue, TKey>,
+): GraphQLFieldConfig<mixed> | undefined {
   // If we can’t read from this collection key, stop.
   if (collectionKey.read == null)
     return
 
   const { collection } = collectionKey
-  const collectionType = getCollectionGqlType(buildToken, collection)
+  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
   const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
 
   return {
-    type: collectionType,
+    type: collectionGqlType,
     args: buildObject(inputHelpers.fieldEntries),
-    async resolve (_source, args, context): Promise<ObjectType.Value | null> {
+    async resolve (_source, args, context): Promise<mixed> {
       const key = inputHelpers.getKey(args)
-      return await collectionKey.read!(context, key)
+      const value = await collectionKey.read!(context, key)
+      if (value == null) return
+      return intoGqlOutput(value)
     },
   }
 }

@@ -20,7 +20,7 @@ import Type from './Type'
  *    type includes `null`. However, if we specify that a type’s domain *must*
  *    include `null` through this nullable type, our programs are easier to
  *    think about.
- * 2. It’s easier to statically type. With Typescript we can easily *add* types
+ * 2. It’s easier to statically type. With TypeScript we can easily *add* types
  *    with a union, but we can’t take away a type. It would also be a pain to
  *    add `| null` to every `TValue`. Note that we are looking at this problem
  *    from the perspective of `strictNullTypes` on. Without `strictNullTypes`
@@ -47,11 +47,6 @@ interface NullableType<
    * The single null value for this type.
    */
   readonly nullValue: TNullValue
-
-  /**
-   * Determines if the value passed in is the null variant.
-   */
-  isNull (value: TNullValue | TNonNullValue): value is TNullValue
 
   /**
    * Determines if the value passed in is the non-null variant.
