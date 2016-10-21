@@ -13,6 +13,7 @@ import {
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import setupRequestPgClientTransaction from './setupRequestPgClientTransaction'
+import setupServerSentEvents from './setupServerSentEvents'
 import debugPgClient from './debugPgClient'
 
 const chalk = require('chalk')
@@ -27,6 +28,13 @@ const debugRequest = new Debugger('postgraphql:request')
 
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
+    if (error) reject(error)
+    else resolve(data)
+  })
+})
+
+const graphiqlJs = new Promise((resolve, reject) => {
+  readFile(resolvePath(__dirname, '../graphiql/graphiql.dist.js'), (error, data) => {
     if (error) reject(error)
     else resolve(data)
   })
@@ -112,6 +120,24 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       return
     }
 
+    // Serve the JavaScript for GraphiQL on a namespaced path
+    if (parseUrl(req).pathname === '/_postgraphql/graphiql.js') {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/javascript')
+      res.end(await graphiqlJs)
+      return
+    }
+
+    // Setup an event stream so we can broadcast events to graphiql, etc.
+    if (parseUrl(req).pathname === '/_postgraphql/stream') {
+      if (req.headers.accept !== 'text/event-stream') {
+        res.end()
+        return
+      }
+      setupServerSentEvents(req, res, options)
+      return
+    }
+
     // If this is the GraphiQL route, show GraphiQL and stop execution.
     if (parseUrl(req).pathname === graphiqlRoute) {
       if (!(req.method === 'GET' || req.method === 'HEAD')) {
@@ -131,7 +157,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       }
 
       // Actually renders GraphiQL.
-      res.end(renderGraphiQL(graphqlRoute))
+      res.end(renderGraphiQL(graphqlRoute, options))
       return
     }
 

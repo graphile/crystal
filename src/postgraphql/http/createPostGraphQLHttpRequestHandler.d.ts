@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
+import EventEmitter = require('events')
 
 /**
  * A request handler for one of many different `http` frameworks.
@@ -24,6 +25,8 @@ export default function createPostGraphQLHttpRequestHandler (config: {
 
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool,
+
+  _emitter: EventEmitter,
 
   // The exact (and only) route our request handler will respond to.
   graphqlRoute?: string,
