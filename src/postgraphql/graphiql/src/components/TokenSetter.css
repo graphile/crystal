@@ -1,0 +1,63 @@
+.root {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.monospace {
+  font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
+}
+
+.label {
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 12px;
+  padding-right: 4px;
+}
+
+.token {
+  composes: monospace;
+  color: #777;
+  cursor: pointer;
+  font-size: 12px;
+  display: block;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.token:hover {
+  text-decoration: underline;
+}
+
+.button {
+  outline: none;
+  background: #fdfdfd;
+  border-width: 0.5px;
+  border-style: solid;
+  border-color: #d3d3d3 #d0d0d0 #bababa;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.13), inset 0 1px #fff;
+  display: inline-block;
+  margin-left: 6px;
+  color: #444;
+  cursor: pointer;
+  padding: 4px 8px 5px;
+  text-decoration: none;
+}
+
+.form {
+  margin: 0;
+  width: 100%;
+  padding-right: 24px;
+}
+
+.input {
+  composes: monospace;
+  height: 32px;
+  font-size: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 6px;
+}

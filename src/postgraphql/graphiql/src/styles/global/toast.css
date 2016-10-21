@@ -1,0 +1,24 @@
+.toast-top-right {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  z-index: 1;
+}
+
+.toast {
+  background: white;
+  padding: 14px 24px;
+  margin-right: 14px;
+}
+
+.toast-success {
+  background-color: hsl(90, 42%, 91%);
+  border: 1px solid hsl(90, 42%, 67%);
+  color: hsl(90, 42%, 67%);
+}
+
+.toast-error {
+  background-color: hsl(360, 60%, 93%);
+  border: 1px solid hsl(360, 60%, 63%);
+  color: hsl(360, 60%, 63%);
+}
