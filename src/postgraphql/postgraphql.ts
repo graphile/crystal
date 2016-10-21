@@ -1,6 +1,7 @@
 import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
+import EventEmitter = require('events')
 import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
@@ -82,6 +83,8 @@ export default function postgraphql (
   // out the `gqlSchema`.
   let gqlSchema = createGqlSchema()
 
+  const _emitter = new EventEmitter()
+
   // If the user wants us to watch the schema, execute the following:
   if (options.watchPg) {
     watchPgSchemas({
@@ -90,6 +93,8 @@ export default function postgraphql (
       onChange: ({ commands }) => {
         // tslint:disable-next-line no-console
         console.log(`Restarting PostGraphQL API after Postgres command(s)${options.graphiql ? '. Make sure to reload GraphiQL' : ''}: ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
+
+        _emitter.emit('schemas:changed')
 
         // Actually restart the GraphQL schema by creating a new one. Note that
         // `createGqlSchema` returns a promise and we aren’t ‘await’ing it.
@@ -110,6 +115,7 @@ export default function postgraphql (
   return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
     getGqlSchema: () => gqlSchema,
     pgPool,
+    _emitter,
   }))
 
   /**
