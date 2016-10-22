@@ -12,6 +12,9 @@ export type SchemaOptions = {
   // If true then any literal will be accepted to this type and its output will
   // be plain JSON.
   dynamicJson?: boolean,
+  // If true then the default mutations for tables (e.g. createMyTable) will
+  // not be created
+  disableDefaultMutations?: boolean,
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
@@ -40,6 +43,6 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
 
   return new GraphQLSchema({
     query: getQueryGqlType(buildToken),
-    mutation: getMutationGqlType(buildToken),
+    mutation: getMutationGqlType(buildToken, options.disableDefaultMutations),
   })
 }
