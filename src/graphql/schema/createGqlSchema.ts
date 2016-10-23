@@ -43,6 +43,6 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
 
   return new GraphQLSchema({
     query: getQueryGqlType(buildToken),
-    mutation: getMutationGqlType(buildToken, options.disableDefaultMutations),
+    mutation: getMutationGqlType(buildToken, options),
   })
 }

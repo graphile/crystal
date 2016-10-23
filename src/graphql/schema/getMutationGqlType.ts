@@ -17,7 +17,7 @@ export default getMutationGqlType
  *
  * @private
  */
-function createMutationGqlType (buildToken: BuildToken, disableDefaultMutations?: boolean): GraphQLObjectType<mixed> | undefined {
+function createMutationGqlType (buildToken: BuildToken, options: { disableDefaultMutations?: boolean } = {}): GraphQLObjectType<mixed> | undefined {
   const { inventory } = buildToken
 
   // A list of all the mutations we are able to run.
@@ -29,7 +29,7 @@ function createMutationGqlType (buildToken: BuildToken, disableDefaultMutations?
         : []
     ),
     ...(
-      disableDefaultMutations
+      options.disableDefaultMutations
         ? []
         : // Get the mutations for all of our collections and creates mutations
           // for them.
