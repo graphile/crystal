@@ -26,6 +26,7 @@ export default function postgraphql (
     watchPg?: boolean,
     showErrorStack?: boolean,
     disableQueryLog?: boolean,
+    disableDefaultMutations?: boolean,
     enableCors?: boolean,
   } = {},
 ): HttpRequestHandler {

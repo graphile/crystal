@@ -27,6 +27,9 @@ interface BuildToken {
     // By default, JSON is output as a string in our GraphQL queries. If true
     // then JSON will be output as a dynamic object.
     readonly dynamicJson: boolean,
+    // If true then the default mutations for tables (e.g. createMyTable) will
+    // not be created
+    readonly disableDefaultMutations: boolean,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,

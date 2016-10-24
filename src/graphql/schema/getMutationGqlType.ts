@@ -18,7 +18,7 @@ export default getMutationGqlType
  * @private
  */
 function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
-  const { inventory } = buildToken
+  const { inventory, options } = buildToken
 
   // A list of all the mutations we are able to run.
   const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [
@@ -29,12 +29,14 @@ function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType<mixed
         : []
     ),
     ...(
-      // Get the mutations for all of our collections and creates mutations
-      // for them.
-      inventory
-        .getCollections()
-        .map(collection => createCollectionMutationFieldEntries(buildToken, collection))
-        .reduce((a, b) => a.concat(b), [])
+      options.disableDefaultMutations
+        ? []
+        : // Get the mutations for all of our collections and creates mutations
+          // for them.
+          inventory
+            .getCollections()
+            .map(collection => createCollectionMutationFieldEntries(buildToken, collection))
+            .reduce((a, b) => a.concat(b), [])
     ),
   ]
 
