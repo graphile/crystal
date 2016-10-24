@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
-import { buildObject, memoize2 } from '../utils'
+import { buildObject, memoize1 } from '../utils'
 import BuildToken from './BuildToken'
 import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'
 
@@ -8,7 +8,7 @@ import createCollectionMutationFieldEntries from './collection/createCollectionM
  * schema. If there are no mutations, instead of throwing an error we will just
  * return `undefined`.
  */
-const getMutationGqlType = memoize2(createMutationGqlType)
+const getMutationGqlType = memoize1(createMutationGqlType)
 
 export default getMutationGqlType
 
@@ -17,8 +17,8 @@ export default getMutationGqlType
  *
  * @private
  */
-function createMutationGqlType (buildToken: BuildToken, options: { disableDefaultMutations?: boolean } = {}): GraphQLObjectType<mixed> | undefined {
-  const { inventory } = buildToken
+function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
+  const { inventory, options } = buildToken
 
   // A list of all the mutations we are able to run.
   const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [

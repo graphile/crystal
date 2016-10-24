@@ -36,6 +36,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
     options: {
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
+      disableDefaultMutations: options.disableDefaultMutations || false,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),
@@ -43,6 +44,6 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
 
   return new GraphQLSchema({
     query: getQueryGqlType(buildToken),
-    mutation: getMutationGqlType(buildToken, options),
+    mutation: getMutationGqlType(buildToken),
   })
 }
