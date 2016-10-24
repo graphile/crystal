@@ -12,6 +12,9 @@ export type SchemaOptions = {
   // If true then any literal will be accepted to this type and its output will
   // be plain JSON.
   dynamicJson?: boolean,
+  // If true then the default mutations for tables (e.g. createMyTable) will
+  // not be created
+  disableDefaultMutations?: boolean,
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
@@ -33,6 +36,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
     options: {
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
+      disableDefaultMutations: options.disableDefaultMutations || false,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

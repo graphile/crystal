@@ -24,6 +24,7 @@ export default async function createPostGraphQLSchema (
     dynamicJson?: boolean,
     jwtSecret?: string,
     jwtPgTypeIdentifier?: string,
+    disableDefaultMutations?: boolean,
   } = {},
 ): Promise<GraphQLSchema> {
   // If our argument was not an array, make it one.
@@ -100,6 +101,7 @@ export default async function createPostGraphQLSchema (
   const gqlSchema = createGraphQLSchema(inventory, {
     nodeIdFieldName: options.classicIds ? 'id' : '__id',
     dynamicJson: options.dynamicJson,
+    disableDefaultMutations: options.disableDefaultMutations,
 
     // If we have a JWT Postgres type, let us override the GraphQL output type
     // with our own.
