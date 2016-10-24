@@ -131,6 +131,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // Setup an event stream so we can broadcast events to graphiql, etc.
     if (parseUrl(req).pathname === '/_postgraphql/stream') {
       if (req.headers.accept !== 'text/event-stream') {
+        res.statusCode = 405
         res.end()
         return
       }
