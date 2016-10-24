@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "./graphiql.dist.js",
   "scripts": {
-    "dev": "webpack --watch",
-    "build": "NODE_ENV=production webpack"
+    "dev": "NODE_ENV=development webpack --watch",
+    "build": "NODE_ENV=production webpack",
+    "test": "jest"
   },
   "dependencies": {
     "animate.css": "3.5.2",
@@ -18,12 +19,23 @@
   },
   "devDependencies": {
     "babel-cli": "6.16.0",
+    "babel-jest": "16.0.0",
     "babel-loader": "6.2.5",
     "babel-plugin-transform-class-properties": "6.16.0",
     "babel-preset-latest": "6.16.0",
     "babel-preset-react": "6.16.0",
     "css-loader": "0.25.0",
+    "enzyme": "2.5.1",
+    "enzyme-to-json": "1.1.5",
+    "identity-obj-proxy": "3.0.0",
+    "jest": "16.0.2",
+    "react-addons-test-utils": "15.3.2",
     "style-loader": "0.13.1",
     "webpack": "2.1.0-beta.25"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^.+\\.css$": "identity-obj-proxy"
+    }
   }
 }

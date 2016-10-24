@@ -8,17 +8,24 @@ import styles from './EnhancedGraphiQL.css'
 const ToastMessageFactory = React.createFactory(ToastMessage.animation)
 
 class EnhancedGraphiQL extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      schema: undefined,
-      token: undefined,
-    }
+  static propTypes = {
+    config: React.PropTypes.shape({
+      graphqlPath: React.PropTypes.string.isRequired,
+      watchPg: React.PropTypes.bool.isRequired,
+      jwt: React.PropTypes.bool.isRequired,
+    }),
+    setupEventSource: React.PropTypes.func.isRequired,
+  }
+
+  state = {
+    schema: undefined,
+    token: undefined,
   }
 
   componentWillMount() {
-    if (this.props.config.watchPg) {
-      this._source = setupSource({
+    const { config, setupEventSource } = this.props
+    if (config.watchPg) {
+      this._eventSource = setupEventSource({
         onChange: this.onSchemaChange,
         onOpen: this.onSourceOpen,
         onError: this.onSourceError,
@@ -27,16 +34,13 @@ class EnhancedGraphiQL extends React.Component {
   }
 
   componentWillUnmount() {
-    this._source.close()
+    this._eventSource.close()
   }
 
   render() {
     let headers
-    if (this.state.token) {
-      headers = {
-        'Authorization': `Bearer: ${this.state.token}`
-      }
-    }
+    if (this.state.token)
+      headers = { 'Authorization': `Bearer: ${this.state.token}` }
 
     const graphQLFetcher = this.configureGraphQLFetcher({ headers })
 
@@ -108,20 +112,6 @@ class EnhancedGraphiQL extends React.Component {
   setToken = token => {
     this.setState({ token })
   }
-}
-
-const setupSource = ({
-  onOpen,
-  onChange,
-  onError
-}) => {
-  // Starts listening to the event stream
-  const source = new EventSource('/_postgraphql/stream')
-  // Setup listeners for specific events
-  source.addEventListener('changed', event => onChange(event), false)
-  source.addEventListener('open', event => onOpen(event), false)
-  source.addEventListener('error', event => onError(event), false)
-  return source
 }
 
 export default EnhancedGraphiQL
