@@ -44,6 +44,7 @@ Arguments include:
 - **`options`**: An object containing other miscellaneous options. Options could be:
   - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `__id` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
   - `dynamicJson`: Setting this to `true` enables dynamic JSON which will allow you to use any JSON as input and get any arbitrary JSON as output. By default JSON types are just a JSON string.
+  - `disableDefaultMutations`: Setting this to `true` will prevent the creation of the default mutation types & fields. Database mutation will only be possible through Postgres functions.
   - `graphiql`: Set this to `true` to enable the GraphiQL interface.
   - `graphqlRoute`: The endpoint the GraphQL executer will listen on. Defaults to `/graphql`.
   - `graphiqlRoute`: The endpoint the GraphiQL query interface will listen on (**NOTE:** GraphiQL will not be enabled unless the `graphiql` option is set to `true`). Defaults to `/graphiql`.
