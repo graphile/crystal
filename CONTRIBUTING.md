@@ -9,6 +9,9 @@ npm run build
 npm test
 ```
 
+PostGraphQL uses Travis CI to test builds and enforce lint rules:
+[travis-ci.org/calebmer/postgraphql](https://travis-ci.org/calebmer/postgraphql).
+
 The codebase is documented via READMEs throughout the src folder heirarchy,
 starting with [src/README.md](src/README.md). Contributions are also encouraged
 where these files are missing or inadequate.
