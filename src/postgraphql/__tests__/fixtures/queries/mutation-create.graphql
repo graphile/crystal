@@ -102,6 +102,7 @@ mutation {
         bazBuz
       }
     }
+    query { __id }
   }
   b: createPerson(input: {
     person: {
@@ -151,6 +152,7 @@ mutation {
       __id
       name
     }
+    query { __id }
   }
   e: createEdgeCase(input: {
     edgeCase: {
@@ -160,6 +162,7 @@ mutation {
     edgeCase {
       notNullHasDefault
     }
+    query { __id }
   }
   f: createEdgeCase(input: {
     edgeCase: {}
@@ -167,6 +170,7 @@ mutation {
     edgeCase {
       notNullHasDefault
     }
+    query { __id }
   }
 }
 
@@ -186,6 +190,7 @@ fragment createPersonPayload on CreatePersonPayload {
   e: personEdge(orderBy: EMAIL_ASC) { ...peopleEdge }
   f: personEdge(orderBy: EMAIL_DESC) { ...peopleEdge }
   g: personEdge(orderBy: NATURAL) { ...peopleEdge }
+  query { __id }
 }
 
 fragment peopleEdge on PeopleEdge {

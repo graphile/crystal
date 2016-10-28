@@ -21,6 +21,7 @@ fragment deletePostPayload on DeletePostPayload {
     headline
     authorId
   }
+  query { __id }
 }
 
 fragment deleteCompoundKeyPayload on DeleteCompoundKeyPayload {
@@ -39,6 +40,7 @@ fragment deleteCompoundKeyPayload on DeleteCompoundKeyPayload {
       name
     }
   }
+  query { __id }
 }
 
 fragment deletePersonPayload on DeletePersonPayload {
@@ -50,4 +52,5 @@ fragment deletePersonPayload on DeletePersonPayload {
     name
     email
   }
+  query { __id }
 }
