@@ -1,8 +1,0 @@
-{
-  "presets": [
-    "latest", "react"
-  ],
-  "plugins": [
-    "transform-class-properties"
-  ]
-}

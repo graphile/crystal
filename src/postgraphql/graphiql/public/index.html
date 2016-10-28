@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GraphiQL</title>
+    <meta name="robots" content="noindex"/>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.POSTGRAPHQL_CONFIG = {
+        graphqlUrl: 'http://localhost:5000/graphql',
+        streamUrl: 'http://localhost:5000/_postgraphql/stream',
+      }
+    </script>
+  </body>
+</html>
