@@ -64,13 +64,26 @@ test('will use a connected client from the pool, the schemas, and options to cre
   expect(pgClient.release.mock.calls).toEqual([[]])
 })
 
+test('will use a connected client from the pool, the default schema, and options to create a GraphQL schema', async () => {
+  createPostGraphQLSchema.mockClear()
+  createPostGraphQLHttpRequestHandler.mockClear()
+  const pgPool = new Pool()
+  const options = Symbol('options')
+  const pgClient = { release: jest.fn() }
+  pgPool.connect.mockReturnValue(Promise.resolve(pgClient))
+  await postgraphql(pgPool, options)
+  expect(pgPool.connect.mock.calls).toEqual([[]])
+  expect(createPostGraphQLSchema.mock.calls).toEqual([[pgClient, ['public'], options]])
+  expect(pgClient.release.mock.calls).toEqual([[]])
+})
+
 test('will use a created GraphQL schema to create the HTTP request handler and pass down options', async () => {
   createPostGraphQLHttpRequestHandler.mockClear()
   const pgPool = new Pool()
-  const gqlSchema = Symbol('graphqlSchema')
+  const gqlSchema = Symbol('gqlSchema')
   const options = { a: 1, b: 2, c: 3 }
   createPostGraphQLSchema.mockReturnValueOnce(Promise.resolve(gqlSchema))
-  await postgraphql(pgPool, null, options)
+  await postgraphql(pgPool, [], options)
   expect(createPostGraphQLHttpRequestHandler.mock.calls.length).toBe(1)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0].length).toBe(1)
   expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool'])
