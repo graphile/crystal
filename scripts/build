@@ -1,5 +1,18 @@
 #!/bin/bash
 
+set -e
+
 npm_bin=$(npm bin)
 
+echo "Cleaning build"
+rm -rf build/*
+
+echo "Compiling with TypeScript"
 $npm_bin/tsc
+
+echo "Building GraphiQL"
+npm --prefix src/postgraphql/graphiql run build
+
+echo "Moving GraphiQL build output"
+mkdir -p build/postgraphql/graphiql/public
+mv src/postgraphql/graphiql/build/* build/postgraphql/graphiql/public

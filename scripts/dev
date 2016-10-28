@@ -2,11 +2,20 @@
 
 npm_bin=$(npm bin)
 
+export POSTGRAPHQL_ENV=development
 export DEBUG=${DEBUG-postgraphql*,-postgraphql:graphql,-postgraphql:postgres:explain}
 
+# Run Nodemon and watch the PostGraphQL source code for changes.
 $npm_bin/nodemon \
   --watch src \
   --ignore __tests__ \
   --ignore __mocks__ \
+  --ignore src/postgraphql/graphiql \
   --ext js,ts \
-  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli.ts --schema a,b,c --show-error-stack json --watch $@"
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli.ts --schema a,b,c --show-error-stack json --watch $@" & \
+
+# Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
+# output to `/dev/null`.
+PORT=5001 npm --prefix src/postgraphql/graphiql run start > /dev/null
+
+wait
