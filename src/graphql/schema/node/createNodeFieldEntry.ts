@@ -5,6 +5,8 @@ import BuildToken from '../BuildToken'
 import { $$isQuery } from '../getQueryGqlType'
 import getNodeInterfaceType from './getNodeInterfaceType'
 
+export const $$nodeValueCollection = Symbol('nodeValueCollection')
+
 // TODO: doc
 export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<mixed, mixed>] {
   const { inventory, options } = buildToken
@@ -45,7 +47,18 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       if (!primaryKey || !primaryKey.read)
         throw new Error(`Invalid id, no readable primary key on collection named '${name}'.`)
 
-      return primaryKey.read(context, keyValue)
+      const value = await primaryKey.read(context, keyValue)
+
+      // If the value is null, end early.
+      if (value == null)
+        return value
+
+      // Add the collection to the value so we can accurately determine the
+      // type. This way we will know exactly which collection this is for and
+      // can avoid ambiguous `isTypeOf` checks.
+      value[$$nodeValueCollection] = collection
+
+      return value
     },
   }]
 }

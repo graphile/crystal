@@ -175,4 +175,18 @@ create type b.jwt_token as (
 create function b.authenticate(a integer, b integer, c integer) returns b.jwt_token as $$ select ('yay', 5, a, b, c)::b.jwt_token $$ language sql;
 create function b.authenticate_many(a integer, b integer, c integer) returns b.jwt_token[] as $$ select array[('foo', 1, a, b, c)::b.jwt_token, ('bar', 2, a + 1, b + 1, c + 1)::b.jwt_token, ('baz', 3, a + 2, b + 2, c + 2)::b.jwt_token] $$ language sql;
 
+create table a.similar_table_1 (
+  id serial primary key,
+  col1 int,
+  col2 int,
+  col3 int not null
+);
+
+create table a.similar_table_2 (
+  id serial primary key,
+  col3 int not null,
+  col4 int,
+  col5 int
+);
+
 commit;

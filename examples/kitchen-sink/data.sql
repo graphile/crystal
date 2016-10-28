@@ -68,4 +68,18 @@ insert into c.edge_case values
   (true, null, 2),
   (false, -512, 3);
 
+insert into a.similar_table_1 (id, col1, col2, col3) values
+  (1, null, 6, 3),
+  (2, null, null, -3),
+  (3, -78, 4, 20),
+  (4, 86, null, 362),
+  (5, null, 1, 14);
+
+insert into a.similar_table_2 (id, col4, col5, col3) values
+  (1, null, 6, 3),
+  (2, null, null, -3),
+  (3, -78, 4, 20),
+  (4, 86, null, 362),
+  (5, null, 1, 14);
+
 commit;
