@@ -25,7 +25,12 @@
   "bin": {
     "postgraphql": "build/postgraphql/cli.js"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "./scripts/build",
+    "dev": "./scripts/dev",
+    "lint": "./scripts/lint",
+    "test": "./scripts/test"
+  },
   "dependencies": {
     "body-parser": "^1.15.2",
     "chalk": "1.1.3",
