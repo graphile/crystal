@@ -6,30 +6,57 @@ import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import watchPgSchemas from './watch/watchPgSchemas'
 
+type PostGraphQLOptions = {
+  classicIds?: boolean,
+  dynamicJson?: boolean,
+  graphqlRoute?: string,
+  graphiqlRoute?: string,
+  graphiql?: boolean,
+  pgDefaultRole?: string,
+  jwtSecret?: string,
+  jwtPgTypeIdentifier?: string,
+  watchPg?: boolean,
+  showErrorStack?: boolean,
+  disableQueryLog?: boolean,
+  disableDefaultMutations?: boolean,
+  enableCors?: boolean,
+}
+
 /**
  * Creates a PostGraphQL Http request handler by first introspecting the
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
+export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
 export default function postgraphql (
   poolOrConfig?: Pool | PoolConfig | string,
-  schema: string | Array<string> = 'public',
-  options: {
-    classicIds?: boolean,
-    dynamicJson?: boolean,
-    graphqlRoute?: string,
-    graphiqlRoute?: string,
-    graphiql?: boolean,
-    pgDefaultRole?: string,
-    jwtSecret?: string,
-    jwtPgTypeIdentifier?: string,
-    watchPg?: boolean,
-    showErrorStack?: boolean,
-    disableQueryLog?: boolean,
-    disableDefaultMutations?: boolean,
-    enableCors?: boolean,
-  } = {},
+  schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
+  maybeOptions?: PostGraphQLOptions,
 ): HttpRequestHandler {
+  let schema: string | Array<string>
+  let options: PostGraphQLOptions
+
+  // If the second argument is undefined, use defaults for both `schema` and
+  // `options`.
+  if (typeof schemaOrOptions === 'undefined') {
+    schema = 'public'
+    options = {}
+  }
+  // If the second argument is a string or array, it is the schemas so set the
+  // `schema` value and try to use the third argument (or a default) for
+  // `options`.
+  else if (typeof schemaOrOptions === 'string' || Array.isArray(schemaOrOptions)) {
+    schema = schemaOrOptions
+    options = maybeOptions || {}
+  }
+  // Otherwise the second argument is the options so set `schema` to the
+  // default and `options` to the second argument.
+  else {
+    schema = 'public'
+    options = schemaOrOptions
+  }
+
   // Creates the Postgres schemas array.
   const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
 
