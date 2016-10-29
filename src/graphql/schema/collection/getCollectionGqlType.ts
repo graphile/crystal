@@ -2,6 +2,7 @@ import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, Graph
 import { Collection, Condition, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
+import { $$nodeValueCollection } from '../node/createNodeFieldEntry'
 import getGqlType from '../getGqlType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
@@ -35,7 +36,14 @@ function createCollectionGqlType (buildToken: BuildToken, collection: Collection
     name: collectionTypeName,
     description: collection.description,
 
-    isTypeOf: value => type.isTypeOf(value),
+    // Determines the type of this value. If it came from our `node` field
+    // then that field gave it some extra information about the collection
+    // it came from so we must check that extra information.
+    isTypeOf: value => (
+      value != null && typeof value[$$nodeValueCollection] !== 'undefined'
+        ? value[$$nodeValueCollection] === collection
+        : true
+    ) && type.isTypeOf(value),
 
     // If there is a primary key, this is a node.
     interfaces: primaryKey ? [getNodeInterfaceType(buildToken)] : [],

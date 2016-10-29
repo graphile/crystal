@@ -1271,6 +1271,38 @@ Object {
       "personId2": 2,
     },
     "n": null,
+    "o": Object {
+      "__id": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+    },
+    "p": Object {
+      "__id": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+    },
+    "q": Object {
+      "__id": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+    },
+    "r": Object {
+      "__id": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+    },
   },
 }
 `;
