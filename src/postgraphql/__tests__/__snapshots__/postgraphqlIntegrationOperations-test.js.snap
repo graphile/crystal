@@ -604,6 +604,9 @@ Object {
   "data": Object {
     "a": Object {
       "clientMutationId": null,
+      "query": Object {
+        "__id": "query",
+      },
       "type": Object {
         "__id": "WyJ0eXBlcyIsMjAxXQ==",
         "anIntRange": Object {
@@ -749,6 +752,9 @@ Object {
         "id": 9000,
         "name": "John Smith Jr.",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "c": Object {
       "a": Object {
@@ -808,6 +814,9 @@ Object {
         "id": 20,
         "name": "Best Pal",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "d": Object {
       "clientMutationId": "world",
@@ -833,15 +842,24 @@ Object {
         "__id": "WyJwZW9wbGUiLDIwXQ==",
         "name": "Best Pal",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "e": Object {
       "edgeCase": Object {
         "notNullHasDefault": true,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "f": Object {
       "edgeCase": Object {
         "notNullHasDefault": false,
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
   },
@@ -860,6 +878,9 @@ Object {
         "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
         "id": 1,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "b": Object {
       "clientMutationId": "hello",
@@ -869,6 +890,9 @@ Object {
         "authorId": 1,
         "headline": "I hate yogurt. It’s just stuff with bits in.",
         "id": 2,
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
     "c": null,
@@ -881,6 +905,9 @@ Object {
         "headline": "Is that a cooking show?",
         "id": 3,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "e": Object {
       "clientMutationId": null,
@@ -890,6 +917,9 @@ Object {
         "authorId": 3,
         "headline": "Stop talking, brain thinking. Hush.",
         "id": 6,
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
     "f": Object {
@@ -901,6 +931,9 @@ Object {
         "headline": "You know how I sometimes have really brilliant ideas?",
         "id": 9,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "g": null,
     "h": Object {
@@ -911,6 +944,9 @@ Object {
         "authorId": 3,
         "headline": "They’re not aliens, they’re Earth…liens!",
         "id": 11,
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
     "i": Object {
@@ -929,6 +965,9 @@ Object {
         "personId2": 3,
       },
       "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+      "query": Object {
+        "__id": "query",
+      },
     },
     "j": Object {
       "clientMutationId": null,
@@ -946,6 +985,9 @@ Object {
         "personId2": 3,
       },
       "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "query": Object {
+        "__id": "query",
+      },
     },
     "k": Object {
       "clientMutationId": null,
@@ -955,6 +997,9 @@ Object {
         "email": "budd.deey@email.com",
         "id": 3,
         "name": "Budd Deey",
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
   },
@@ -977,6 +1022,9 @@ Object {
         "id": 1,
         "name": "John Smith Sr.",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "b": Object {
       "clientMutationId": "hello",
@@ -986,6 +1034,9 @@ Object {
         "email": "sarah.smith@email.com",
         "id": 2,
         "name": "Sarah Smith",
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
     "c": Object {
@@ -997,6 +1048,9 @@ Object {
         "id": 2,
         "name": "Sarah Smith",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "d": Object {
       "clientMutationId": null,
@@ -1007,6 +1061,9 @@ Object {
         "id": 3,
         "name": "Best Pal",
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "e": Object {
       "clientMutationId": null,
@@ -1016,6 +1073,9 @@ Object {
         "email": "kathryn.ramirez@email.com",
         "id": 4,
         "name": "Kathryn Ramirez",
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
     "f": Object {
@@ -1034,6 +1094,9 @@ Object {
         "personId1": 2,
         "personId2": 2,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "g": Object {
       "clientMutationId": "hello",
@@ -1051,6 +1114,9 @@ Object {
         "personId1": 3,
         "personId2": 2,
       },
+      "query": Object {
+        "__id": "query",
+      },
     },
     "h": Object {
       "clientMutationId": "world",
@@ -1067,6 +1133,9 @@ Object {
         },
         "personId1": 4,
         "personId2": 3,
+      },
+      "query": Object {
+        "__id": "query",
       },
     },
   },

@@ -69,6 +69,7 @@ fragment updatePersonPayload on UpdatePersonPayload {
     email
     about
   }
+  query { __id }
 }
 
 fragment updateCompoundKeyPayload on UpdateCompoundKeyPayload {
@@ -87,4 +88,5 @@ fragment updateCompoundKeyPayload on UpdateCompoundKeyPayload {
       name
     }
   }
+  query { __id }
 }

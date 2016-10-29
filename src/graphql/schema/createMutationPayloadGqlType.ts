@@ -2,7 +2,7 @@ import { GraphQLString, GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
 import { formatName, buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import { MutationValue } from './createMutationGqlField'
-import getQueryGqlType from './getQueryGqlType'
+import getQueryGqlType, { $$isQuery } from './getQueryGqlType'
 
 /**
  * Creates the payload type for a GraphQL mutation. Uses the provided output
@@ -55,7 +55,7 @@ export default function createMutationPayloadGqlType <T>(
         ['query', {
           description: 'Our root query field type. Allows us to run any query from our mutation payload.',
           type: getQueryGqlType(buildToken),
-          resolve: () => null,
+          resolve: () => $$isQuery,
         }],
       ],
     ),

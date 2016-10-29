@@ -1,7 +1,7 @@
 jest.mock('../getQueryGqlType')
 
 import { GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInputObjectType } from 'graphql'
-import getQueryGqlType from '../getQueryGqlType'
+import getQueryGqlType, { $$isQuery } from '../getQueryGqlType'
 import createMutationGqlField from '../createMutationGqlField'
 
 // Create a new object where `GraphQLString` is the prototype. This means it
@@ -58,7 +58,7 @@ test('will always include `clientMutationId` and `query` fields', () => {
   expect(field.type.getFields().clientMutationId.type).toBe(GraphQLString)
   expect(field.type.getFields().clientMutationId.resolve({ clientMutationId })).toBe(clientMutationId)
   expect(field.type.getFields().query.type).toBe(queryType)
-  expect(field.type.getFields().query.resolve()).toBe(null)
+  expect(field.type.getFields().query.resolve()).toBe($$isQuery)
   expect(getQueryGqlType.mock.calls).toEqual([[buildToken]])
 })
 
