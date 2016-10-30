@@ -1,12 +1,10 @@
-import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLInputObjectType, GraphQLInputFieldConfig } from 'graphql'
-import { Condition, conditionHelpers, Collection, CollectionKey, NullableType, ObjectType } from '../../../interface'
+import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
+import { Collection, CollectionKey, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
-import getGqlType from '../getGqlType'
-import transformGqlInputValue from '../transformGqlInputValue'
-import createConnectionGqlField from '../connection/createConnectionGqlField'
 import getCollectionGqlType from './getCollectionGqlType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
+import createConnectionFieldFromPaginator from './createConnectionFieldFromPaginator'
 
 /**
  * Creates any number of query field entries for a collection. These fields
@@ -24,60 +22,7 @@ export default function createCollectionQueryFieldEntries (
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
-    // Creates the field entries for our paginator condition type.
-    const gqlConditionFieldEntries =
-      Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
-        [formatName.field(fieldName), {
-          description: `Checks for equality with the object’s \`${formatName.field(fieldName)}\` field.`,
-          // Get the type for this field, but always make sure that it is
-          // nullable. We don’t want to require conditions.
-          type: getGqlType(buildToken, new NullableType(field.type), true),
-          // We include this internal name so that we can resolve the arguments
-          // back into actual values.
-          internalName: fieldName,
-        }],
-      )
-
-    // Creates our GraphQL condition type.
-    const gqlConditionType = new GraphQLInputObjectType({
-      name: formatName.type(`${type.name}-condition`),
-      description: `A condition to be used against \`${formatName.type(type.name)}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
-      fields: buildObject<GraphQLInputFieldConfig<mixed>>(gqlConditionFieldEntries),
-    })
-
-    // Gets the condition input for our paginator by looking through the
-    // arguments object and adding a field condition for all the values we
-    // find.
-    const getPaginatorInput = (source: mixed, args: { condition?: { [key: string]: mixed } }): Condition =>
-      args.condition ? (
-        conditionHelpers.and(
-        // For all of our field condition entries, let us add an actual
-        // condition to test equality with a given field.
-        ...gqlConditionFieldEntries.map(([fieldName, field]) =>
-          typeof args.condition![fieldName] !== 'undefined'
-            // If the argument exists, create a condition and transform the
-            // input value.
-            ? conditionHelpers.fieldEquals(field.internalName, transformGqlInputValue(field.type, args.condition![fieldName]))
-            // If the argument does not exist, this condition should just be
-            // true (which will get filtered out by `conditionHelpers.and`).
-            : true
-        )
-      )
-      ) : true
-
-    entries.push([
-      formatName.field(`all-${collection.name}`),
-      createConnectionGqlField(buildToken, paginator, {
-        // The one input arg we have for this connection is the `condition` arg.
-        inputArgEntries: [
-          ['condition', {
-            description: 'A condition to be used in determining which values should be returned by the collection.',
-            type: gqlConditionType,
-          }],
-        ],
-        getPaginatorInput,
-      }),
-    ])
+    entries.push(createConnectionFieldFromPaginator(buildToken, paginator, collection, null))
   }
 
   // Add a field to select our collection by its primary key, if the

@@ -1,12 +1,12 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, Condition, ObjectType, Relation } from '../../../interface'
+import { Collection, ObjectType, Relation } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import { $$nodeValueCollection } from '../node/createNodeFieldEntry'
 import getGqlType from '../getGqlType'
-import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
+import createConnectionFieldFromPaginator from './createConnectionFieldFromPaginator'
 
 // Private implementation of `getCollectionGqlType`, types aren’t that great.
 const _getCollectionGqlType = memoize2(createCollectionGqlType)
@@ -101,15 +101,7 @@ function createCollectionGqlType (buildToken: BuildToken, collection: Collection
           if (!tailPaginator || !relation.getTailConditionFromHeadValue)
             return null
 
-          return [
-            formatName.field(`${tailCollection.name}-by-${relation.name}`),
-            createConnectionGqlField<ObjectType.Value, Condition, ObjectType.Value>(buildToken, tailPaginator, {
-              // We use the config when creating a connection field to inject
-              // a condition that limits what we select from the paginator.
-              getPaginatorInput: headValue =>
-                relation.getTailConditionFromHeadValue!(headValue),
-            }),
-          ]
+          return createConnectionFieldFromPaginator(buildToken, tailPaginator, tailCollection, relation)
         }),
     ),
   })

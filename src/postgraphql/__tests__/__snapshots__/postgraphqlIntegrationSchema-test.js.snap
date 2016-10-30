@@ -645,6 +645,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -667,6 +670,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 }
 
@@ -2231,6 +2237,9 @@ type CompoundKey implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: ForeignKeyCondition
   ): ForeignKeysConnection
 }
 
@@ -3704,6 +3713,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PostCondition
   ): PostsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -3726,6 +3738,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -3748,6 +3763,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
@@ -3770,6 +3788,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: ForeignKeyCondition
   ): ForeignKeysConnection
 }
 
@@ -5472,6 +5493,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
@@ -5494,6 +5518,9 @@ type Person implements Node {
     # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     # based pagination. May not be used with \`last\`.
     offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
   ): CompoundKeysConnection
 }
 
