@@ -2,9 +2,10 @@ import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, CollectionKey, ObjectType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
+import createConnectionGqlField from '../connection/createConnectionGqlField'
 import getCollectionGqlType from './getCollectionGqlType'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
-import createConnectionFieldFromPaginator from './createConnectionFieldFromPaginator'
+import getConditionGqlType from './getConditionGqlType'
 
 /**
  * Creates any number of query field entries for a collection. These fields
@@ -22,7 +23,22 @@ export default function createCollectionQueryFieldEntries (
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
-    entries.push(createConnectionFieldFromPaginator(buildToken, paginator, collection, null))
+    const {gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput} = getConditionGqlType(buildToken, type)
+    entries.push([
+      formatName.field(`all-${collection.name}`),
+      createConnectionGqlField(buildToken, paginator, {
+        // The one input arg we have for this connection is the `condition` arg.
+        inputArgEntries: [
+          ['condition', {
+            description: 'A condition to be used in determining which values should be returned by the collection.',
+            type: gqlConditionType,
+          }],
+        ],
+        getPaginatorInput: (headValue: mixed, args: { condition?: { [key: string]: mixed } }) =>
+          conditionFromGqlInput(args.condition),
+      }),
+    ])
+
   }
 
   // Add a field to select our collection by its primary key, if the

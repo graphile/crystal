@@ -1,12 +1,13 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
-import { Collection, ObjectType, Relation } from '../../../interface'
+import { Collection, Condition, ObjectType, Relation, conditionHelpers } from '../../../interface'
 import { memoize2, formatName, buildObject, idSerde } from '../../utils'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import { $$nodeValueCollection } from '../node/createNodeFieldEntry'
 import getGqlType from '../getGqlType'
+import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
-import createConnectionFieldFromPaginator from './createConnectionFieldFromPaginator'
+import getConditionGqlType from './getConditionGqlType'
 
 // Private implementation of `getCollectionGqlType`, types aren’t that great.
 const _getCollectionGqlType = memoize2(createCollectionGqlType)
@@ -101,7 +102,26 @@ function createCollectionGqlType (buildToken: BuildToken, collection: Collection
           if (!tailPaginator || !relation.getTailConditionFromHeadValue)
             return null
 
-          return createConnectionFieldFromPaginator(buildToken, tailPaginator, tailCollection, relation)
+          const {gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput} = getConditionGqlType(buildToken, tailCollection.type)
+          return [
+            formatName.field(`${tailCollection.name}-by-${relation.name}`),
+            createConnectionGqlField<ObjectType.Value, Condition, ObjectType.Value>(buildToken, tailPaginator, {
+              // The one input arg we have for this connection is the `condition` arg.
+              inputArgEntries: [
+                ['condition', {
+                  description: 'A condition to be used in determining which values should be returned by the collection.',
+                  type: gqlConditionType,
+                }],
+              ],
+              // We use the config when creating a connection field to inject
+              // a condition that limits what we select from the paginator.
+              getPaginatorInput: (headValue: ObjectType.Value, args: { condition?: { [key: string]: mixed } }) =>
+                conditionHelpers.and(
+                  relation.getTailConditionFromHeadValue!(headValue),
+                  conditionFromGqlInput(args.condition),
+                ),
+            }),
+          ]
         }),
     ),
   })
