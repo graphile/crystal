@@ -9,6 +9,12 @@ query {
           authorId
         }
       }
+      roundOnePost: postsByAuthorId(condition: {headline: "Large bet on myself in round one."}) {
+        nodes {
+          headline
+          authorId
+        }
+      }
       compoundKeysByPersonId1 {
         nodes {
           personId1
