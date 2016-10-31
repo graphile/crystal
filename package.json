@@ -63,7 +63,7 @@
     "jest": "^16.0.2",
     "koa": "^2.0.0",
     "nodemon": "^1.11.0",
-    "source-map-support": "^0.4.5",
+    "source-map-support": "^0.4.6",
     "supertest": "^2.0.0",
     "supertest-as-promised": "^4.0.1",
     "ts-node": "^1.6.1",
