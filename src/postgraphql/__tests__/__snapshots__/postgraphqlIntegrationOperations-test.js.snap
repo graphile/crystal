@@ -1871,6 +1871,14 @@ Object {
               },
             ],
           },
+          "roundOnePost": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "headline": "Large bet on myself in round one.",
+              },
+            ],
+          },
         },
         Object {
           "compoundKeysByPersonId1": Object {
@@ -1911,6 +1919,9 @@ Object {
               },
             ],
           },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
         },
         Object {
           "compoundKeysByPersonId1": Object {
@@ -1942,6 +1953,9 @@ Object {
               },
             ],
           },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
         },
         Object {
           "compoundKeysByPersonId1": Object {
@@ -1969,6 +1983,9 @@ Object {
           "postsByAuthorId": Object {
             "nodes": Array [],
           },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
         },
         Object {
           "compoundKeysByPersonId1": Object {
@@ -1991,6 +2008,9 @@ Object {
                 "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
               },
             ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
           },
         },
       ],
