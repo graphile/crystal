@@ -102,7 +102,7 @@ function createCollectionGqlType (buildToken: BuildToken, collection: Collection
           if (!tailPaginator || !relation.getTailConditionFromHeadValue)
             return null
 
-          const {gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput} = getConditionGqlType(buildToken, tailCollection.type)
+          const { gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput } = getConditionGqlType(buildToken, tailCollection.type)
           return [
             formatName.field(`${tailCollection.name}-by-${relation.name}`),
             createConnectionGqlField<ObjectType.Value, Condition, ObjectType.Value>(buildToken, tailPaginator, {
