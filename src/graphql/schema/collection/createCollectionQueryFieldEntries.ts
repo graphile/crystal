@@ -23,7 +23,7 @@ export default function createCollectionQueryFieldEntries (
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
-    const {gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput} = getConditionGqlType(buildToken, type)
+    const { gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput } = getConditionGqlType(buildToken, type)
     entries.push([
       formatName.field(`all-${collection.name}`),
       createConnectionGqlField(buildToken, paginator, {
