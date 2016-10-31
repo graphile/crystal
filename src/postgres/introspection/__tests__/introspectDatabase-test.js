@@ -2,9 +2,8 @@ import withPgClient from '../../__tests__/fixtures/withPgClient'
 import createKitchenSinkPgSchema from '../../__tests__/fixtures/createKitchenSinkPgSchema'
 import introspectDatabase from '../introspectDatabase'
 
-// This test suite can be flaky in CI. Increase it’s timeout.
-if (process.env.CI)
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
+// This test suite can be flaky. Increase it’s timeout.
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
 /**
  * Gets a local identifier that is independent of the object id assigned by

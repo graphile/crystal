@@ -5,9 +5,8 @@ import { $$pgClient } from '../../pgClientFromContext.ts'
 import PgCollection from '../PgCollection'
 import PgCollectionKey from '../PgCollectionKey'
 
-// This test suite can be flaky in CI. Increase it’s timeout.
-if (process.env.CI)
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 10
+// This test suite can be flaky. Increase it’s timeout.
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
 /**
  * @type {PgCollectionKey}
