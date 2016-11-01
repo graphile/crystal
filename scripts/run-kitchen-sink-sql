@@ -1,7 +1,5 @@
 #!/bin/bash
 
-example_dir=examples/$1
-
 query="
 begin;
 
