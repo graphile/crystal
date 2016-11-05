@@ -1,3 +1,13 @@
+import executeQuery from './executeQuery'
+import {
+  Source,
+  parse as parseGraphql,
+  validate as validateGraphql,
+  execute as executeGraphql,
+  getOperationAST,
+  formatError as defaultFormatError,
+  print as printGraphql,
+} from 'graphql'
 // See: https://facebook.github.io/relay/docs/interfaces-relay-network-layer.html
 //
 // This class implements a "network layer" for relay that can be used on the
@@ -16,7 +26,6 @@ export default class ServerSideNetworkLayer {
   }
 
   sendQueries(queryRequests) {
-    console.dir(queryRequests)
     return Promise.all(queryRequests.map(
       queryRequest => this._fetch(queryRequest).then(result => {
         if (result.errors) {
@@ -34,14 +43,23 @@ export default class ServerSideNetworkLayer {
 
   // Private:
 
-  _fetch(queryRequest) {
-    return new Promise((resolve, reject) => {
+  _fetch(request) {
+    return new Promise(async (resolve, reject) => {
       let result
       let pgRole
       let error
-      reject(new Error('Unimplemented'))
-      return
-      /*
+      const query = request.getQueryString()
+      const variables = request.getVariables()
+      const source = new Source(query, 'GraphQL Http Request')
+      let queryDocumentAst
+      let operationName
+      try {
+        queryDocumentAst = parseGraphql(source)
+      }
+      catch (error) {
+        reject(error)
+        return
+      }
       try {
         ;({result, pgRole} = await executeQuery(
           this.pgPool,
@@ -58,11 +76,8 @@ export default class ServerSideNetworkLayer {
       if (error) {
         reject(error);
       } else {
-        console.dir(result);
-        // result.errors, result.data
         resolve(result);
       }
-      */
     })
   }
 };

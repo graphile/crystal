@@ -29,7 +29,7 @@ type PostGraphQLOptions = {
  * request handler.
  */
 interface ServerSideNetworkLayerFactory {
-  (jwtToken: string): ServerSideNetworkLayer
+  (jwtToken: string, done: (err?: Error, result?: ServerSideNetworkLayer) => void): void
 }
 export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
 export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
@@ -55,13 +55,20 @@ export function postgraphqlServerSideNetworkLayerFactory (
   maybeOptions?: PostGraphQLOptions,
 ): ServerSideNetworkLayerFactory {
   const {getGqlSchema, pgPool, options} = _postgraphql(poolOrConfig, schemaOrOptions, maybeOptions)
-  return ((jwtToken) => {
-    return new ServerSideNetworkLayer(
+  return (async (jwtToken, done) => {
+    let gqlSchema: GraphQLSchema
+    try {
+      gqlSchema = await getGqlSchema()
+    } catch (e) {
+      done(e)
+      return
+    }
+    done(undefined, new ServerSideNetworkLayer(
       pgPool,
-      getGqlSchema(),
+      gqlSchema,
       jwtToken,
       options,
-    )
+    ))
   })
 }
 
