@@ -10,10 +10,9 @@ import {
   formatError as defaultFormatError,
   print as printGraphql,
 } from 'graphql'
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
-import setupRequestPgClientTransaction from './setupRequestPgClientTransaction'
-import debugPgClient from './debugPgClient'
+import executeQuery from './executeQuery'
+import {getJWTToken} from './setupRequestPgClientTransaction'
 
 const chalk = require('chalk')
 const Debugger = require('debug')
@@ -274,37 +273,23 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       if (debugGraphql.enabled)
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
-      // Connect a new Postgres client and start a transaction.
-      const pgClient = await pgPool.connect()
-
-      // Enhance our Postgres client with debugging stuffs.
-      debugPgClient(pgClient)
-
-      // Begin our transaction and set it up.
-      await pgClient.query('begin')
-      pgRole = await setupRequestPgClientTransaction(req, pgClient, {
-        jwtSecret: options.jwtSecret,
-        pgDefaultRole: options.pgDefaultRole,
-      })
+      // Get the JWT token string from our request.
+      const jwtToken = getJWTToken(req)
 
       try {
-        result = await executeGraphql(
+        ;({result, pgRole} = await executeQuery(
+          pgPool,
+          options,
+          jwtToken,
           gqlSchema,
           queryDocumentAst,
-          null,
-          { [$$pgClient]: pgClient },
           params.variables,
-          params.operationName,
-        )
-      }
-      // Cleanup our Postgres client by ending the transaction and releasing
-      // the client back to the pool. Always do this even if the query fails.
-      finally {
-        await pgClient.query('commit')
-        pgClient.release()
-
+          params.operationName
+        ));
+      } finally {
         debugRequest('GraphQL query has been executed.')
       }
+
     }
     catch (error) {
       // Set our status code and send the client our results!

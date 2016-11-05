@@ -5,6 +5,7 @@ import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import watchPgSchemas from './watch/watchPgSchemas'
+import ServerSideNetworkLayer from './http/ServerSideNetworkLayer'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -27,6 +28,9 @@ type PostGraphQLOptions = {
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
+interface ServerSideNetworkLayerFactory {
+  (jwtToken: string): ServerSideNetworkLayer
+}
 export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
 export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
 export default function postgraphql (
@@ -34,6 +38,38 @@ export default function postgraphql (
   schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
   maybeOptions?: PostGraphQLOptions,
 ): HttpRequestHandler {
+  const {getGqlSchema, pgPool, options} = _postgraphql(poolOrConfig, schemaOrOptions, maybeOptions)
+  // Finally create our Http request handler using our options, the Postgres
+  // pool, and GraphQL schema. Return the final result.
+  return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
+    getGqlSchema,
+    pgPool,
+  }))
+}
+
+export function postgraphqlServerSideNetworkLayerFactory (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): ServerSideNetworkLayerFactory
+export function postgraphqlServerSideNetworkLayerFactory (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): ServerSideNetworkLayerFactory
+export function postgraphqlServerSideNetworkLayerFactory (
+  poolOrConfig?: Pool | PoolConfig | string,
+  schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
+  maybeOptions?: PostGraphQLOptions,
+): ServerSideNetworkLayerFactory {
+  const {getGqlSchema, pgPool, options} = _postgraphql(poolOrConfig, schemaOrOptions, maybeOptions)
+  return ((jwtToken) => {
+    return new ServerSideNetworkLayer(
+      pgPool,
+      getGqlSchema(),
+      jwtToken,
+      options,
+    )
+  })
+}
+
+function _postgraphql(
+  poolOrConfig?: Pool | PoolConfig | string,
+  schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
+  maybeOptions?: PostGraphQLOptions,
+) {
   let schema: string | Array<string>
   let options: PostGraphQLOptions
 
@@ -104,13 +140,12 @@ export default function postgraphql (
         process.exit(1)
       })
   }
-
-  // Finally create our Http request handler using our options, the Postgres
-  // pool, and GraphQL schema. Return the final result.
-  return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
+  return {
     getGqlSchema: () => gqlSchema,
+    options,
     pgPool,
-  }))
+  };
+
 
   /**
    * Creates a GraphQL schema by connecting a client from our pool which will

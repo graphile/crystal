@@ -17,9 +17,7 @@ const jwt = require('jsonwebtoken')
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-export default async function setupRequestPgClientTransaction (request, pgClient, { jwtSecret, pgDefaultRole } = {}) {
-  // Get the JWT token string from our request.
-  const jwtToken = getJWTToken(request)
+export default async function setupRequestPgClientTransaction (jwtToken, pgClient, { jwtSecret, pgDefaultRole } = {}) {
 
   // If a JWT token was defined, but a secret was not procided to the server
   // throw a 403 error.
@@ -103,7 +101,7 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
  * @param {IncomingMessage} request
  * @returns {string | null}
  */
-function getJWTToken (request) {
+export function getJWTToken (request) {
   const { authorization } = request.headers
 
   // If there was no authorization header, just return null.
