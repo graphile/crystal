@@ -1,0 +1,6 @@
+"use strict";
+const introspectDatabase_1 = require('./introspection/introspectDatabase');
+exports.introspectPgDatabase = introspectDatabase_1.default;
+const addPgCatalogToInventory_1 = require('./inventory/addPgCatalogToInventory');
+exports.addPgCatalogToInventory = addPgCatalogToInventory_1.default;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvcG9zdGdyZXMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLHFDQUFpQyxvQ0FDakMsQ0FBQyxDQURvRTtBQUluRSw0QkFBb0I7QUFIdEIsMENBQW9DLHFDQUVwQyxDQUFDLENBRndFO0FBSXZFLCtCQUF1QjtBQUN4QiJ9
