@@ -76,7 +76,7 @@ test('will add `outputFields` in payload type and skip falsies', () => {
   expect(Object.keys(field.type.getFields())).toEqual(['clientMutationId', 'a', 'b', 'c', 'query'])
   expect(field.type.getFields().a).toEqual({ name: 'a', type: GraphQLString, args: [], resolve: null, isDeprecated: false })
   expect(field.type.getFields().b).toEqual({ name: 'b', type: GraphQLString, args: [], resolve: null, isDeprecated: false })
-  expect(field.type.getFields().c).toEqual({ name: 'c', type: GraphQLString, args: [{ name: 'arg', type: GraphQLString, defaultValue: null, description: null }], resolve: field.type.getFields().c.resolve, description, deprecationReason, isDeprecated: true })
+  expect(field.type.getFields().c).toEqual({ name: 'c', type: GraphQLString, args: [{ name: 'arg', type: GraphQLString, defaultValue: undefined, description: null }], resolve: field.type.getFields().c.resolve, description, deprecationReason, isDeprecated: true })
 })
 
 test('will proxy the resolved value to the resolver in `outputFields`', () => {
