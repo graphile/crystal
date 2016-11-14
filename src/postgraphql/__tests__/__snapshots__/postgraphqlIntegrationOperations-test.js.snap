@@ -595,6 +595,24 @@ Object {
         4,
       ],
     ],
+    "j": Array [
+      true,
+      null,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": null,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        null,
+        3,
+        4,
+      ],
+    ],
   },
 }
 `;
