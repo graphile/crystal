@@ -71,7 +71,9 @@
     "typescript": "^2.0.10"
   },
   "jest": {
-    "scriptPreprocessor": "<rootDir>/resources/jest-preprocessor.js",
+    "transform": {
+      ".*": "<rootDir>/resources/jest-preprocessor.js"
+    },
     "moduleFileExtensions": [
       "ts",
       "js"
