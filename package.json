@@ -60,6 +60,7 @@
     "@types/pluralize": "0.0.26",
     "connect": "^3.5.0",
     "express": "^4.14.0",
+    "graphql": "^0.8.2",
     "jest": "^17.0.3",
     "koa": "^2.0.0",
     "nodemon": "^1.11.0",
