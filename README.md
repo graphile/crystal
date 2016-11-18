@@ -247,6 +247,9 @@ Still worried about a certain aspect of a schema driven API? Open an issue, conf
 
 * * *
 
+## Contributing
+Want to help testing and developing PostGraphQL? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!
+
 ## Thanks
 Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definetly a huge inspiration for this project! The core contributors are awesome and taught me so much 😊. Ironically, they also convinced me that GraphQL was superior to REST…
 
