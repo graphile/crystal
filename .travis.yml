@@ -15,8 +15,6 @@ cache:
     - $NVM_DIR
 
 script:
-  - npm ls
-  - cat yarn.lock
   - scripts/ci
 
 after_success:
