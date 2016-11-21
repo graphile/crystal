@@ -31,7 +31,7 @@ create role editor nologin;
 So how does this apply to PostGraphQL? PostGraphQL requires you to have at least one user (role that can log in) when connecting to the server. That role will be specified in your connection string and will from here on out be referred to as the `auth_user`. You’d connect with your `auth_user` as follows:
 
 ```bash
-postgraphql --connection postgres://auth_user@localhost:5432/mydb
+postgraphql -c postgres://auth_user@localhost:5432/mydb
 ```
 
 The `auth_user` will have all the priveleges PostGraphQL might need.
@@ -45,5 +45,5 @@ After that you could also specify more roles like a `user_role` which should be 
 In order to configure an default role just do the following:
 
 ```bash
-postgraphql --connection postgres://auth_user@localhost:5432/mydb --default-role default_role
+postgraphql -c postgres://auth_user@localhost:5432/mydb --default-role default_role
 ```
