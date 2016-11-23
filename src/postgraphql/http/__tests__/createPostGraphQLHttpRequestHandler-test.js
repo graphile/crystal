@@ -9,7 +9,7 @@ const http = require('http')
 const request = require('supertest-as-promised')
 const connect = require('connect')
 const express = require('express')
-const Koa = require('koa')
+const Koa = require('koa') // tslint:disable-line variable-name
 
 const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -29,7 +29,7 @@ const gqlSchema = new GraphQLSchema({
       query: {
         type: GraphQLString,
         resolve: (source, args, context) =>
-          context[$$pgClient].query()
+          context[$$pgClient].query(),
       },
     },
   }),
@@ -438,12 +438,12 @@ for (const [name, createServerFromHandler] of serverCreators) {
     test('cannot use a rejected GraphQL schema', async () => {
       const rejectedGraphQLSchema = Promise.reject(new Error('Uh oh!'))
       // We don’t want Jest to complain about uncaught promise rejections.
-      rejectedGraphQLSchema.catch(() => {})
+      rejectedGraphQLSchema.catch(() => { /* noop */ })
       const server = createServer({ getGqlSchema: () => rejectedGraphQLSchema })
       // We want to hide `console.error` warnings because we are intentionally
       // generating some here.
       const origConsoleError = console.error
-      console.error = () => {}
+      console.error = () => { /* noop */ }
       try {
         await (
           request(server)

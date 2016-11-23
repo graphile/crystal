@@ -21,7 +21,7 @@ export default function createCollectionKeyInputHelpers <T>(
   collectionKey: CollectionKey<T>,
 ): {
   fieldEntries: Array<[string, GraphQLInputFieldConfig<mixed>]>
-  getKey: (input: { [key: string]: mixed }) => T
+  getKey: (input: { [key: string]: mixed }) => T,
 } {
   const { keyType } = collectionKey
 
@@ -39,7 +39,7 @@ export default function createCollectionKeyInputHelpers <T>(
           // We add an `internalName` so that we can use that name to
           // reconstruct the correct object value.
           internalName: fieldName,
-        }]
+        }],
       )
 
     return {

@@ -47,7 +47,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       [formatName.field(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [formatName.field(pgProcedure.name), createMutationGqlField<mixed>(buildToken, {
@@ -61,7 +61,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
         // If we are returning a set, we should pluralize the name just in
         // case.
         ? pluralize(getTypeFieldName(fixtures.return.type))
-        : getTypeFieldName(fixtures.return.type)
+        : getTypeFieldName(fixtures.return.type),
       ), {
           // If we are returning a set, we should wrap our type in a GraphQL
           // list.
@@ -94,7 +94,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
         // If the procedure returns a set, we must select a set of values.
         pgProcedure.returnsSet
           ? sql.query`select to_json(${sql.identifier(aliasIdentifier)}) as value from ${procedureCall} as ${sql.identifier(aliasIdentifier)}`
-          : sql.query`select to_json(${procedureCall}) as value`
+          : sql.query`select to_json(${procedureCall}) as value`,
       )
 
       const { rows } = await client.query(query)

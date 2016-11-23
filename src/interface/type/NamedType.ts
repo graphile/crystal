@@ -21,7 +21,7 @@ abstract class NamedType<TValue> extends Type<TValue> {
 
   constructor (config: {
     name: string,
-    description?: string | undefined
+    description?: string | undefined,
   }) {
     super()
     this.name = config.name

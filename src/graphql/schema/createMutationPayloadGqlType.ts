@@ -47,7 +47,7 @@ export default function createMutationPayloadGqlType <T>(
                   : null,
               description: field.description,
               deprecationReason: field.deprecationReason,
-            } as GraphQLFieldConfig<MutationValue<T>, mixed>]
+            } as GraphQLFieldConfig<MutationValue<T>, mixed>],
         ),
       [
         // A reference to the root query type. Allows you to access even more

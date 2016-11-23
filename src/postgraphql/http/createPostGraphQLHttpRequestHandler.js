@@ -16,7 +16,7 @@ import setupRequestPgClientTransaction from './setupRequestPgClientTransaction'
 import debugPgClient from './debugPgClient'
 
 const chalk = require('chalk')
-const Debugger = require('debug')
+const Debugger = require('debug') // tslint:disable-line variable-name
 const httpError = require('http-errors')
 const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
@@ -313,6 +313,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // If the status code is 500, let’s log our error.
       if (res.statusCode === 500)
+        // tslint:disable-next-line no-console
         console.error(error.stack)
     }
     // Finally, we send the client the contents of `result`.
@@ -334,6 +335,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
 
         // If we have enabled the query log for the Http handler, use that.
+        // tslint:disable-next-line no-console
         console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''}in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)
       }
     }
@@ -374,9 +376,9 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       // Execute our request handler.
       requestHandler(req, res, next).then(
         // If the request was fulfilled, noop.
-        () => {},
+        () => { /* noop */ },
         // If the request errored out, call `next` with the error.
-        error => next(error)
+        error => next(error),
       )
     }
   }

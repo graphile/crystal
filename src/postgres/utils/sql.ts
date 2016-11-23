@@ -161,8 +161,7 @@ namespace sql {
   function escapeSqlIdentifier (str: string): string {
     let escaped = '"'
 
-    for (let i = 0; i < str.length; i++) {
-      let c = str[i]
+    for (const c of str) {
       if (c === '"') escaped += c + c
       else escaped += c
     }

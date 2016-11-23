@@ -23,7 +23,7 @@ function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
     interfaces: [getNodeInterfaceType(buildToken)],
     // A value in our system is the value of this query type if there is no parent type
     // (i.e. it is the root type), or the value is the symbol `$$isQuery`.
-    isTypeOf: (value, context, info) => info.parentType == null || value === $$isQuery,
+    isTypeOf: (value, _context, info) => info.parentType == null || value === $$isQuery,
     fields: () => buildObject<GraphQLFieldConfig<mixed, mixed>>(
       [
         createNodeFieldEntry(buildToken),
@@ -42,7 +42,7 @@ function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
         ['query', {
           description: 'Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.',
           type: new GraphQLNonNull(queryType),
-          resolve: source => $$isQuery,
+          resolve: _source => $$isQuery,
         }],
         // The root query type needs to implement `Node` and have an id for
         // Relay 1 mutations. This may be deprecated in the future.

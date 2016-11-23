@@ -12,7 +12,9 @@ import PgObjectType from '../PgObjectType'
 
 transformPgValueIntoValue.mockImplementation((type, value) => value)
 
+// tslint:disable-next-line only-arrow-functions
 ObjectType.mockImplementation(function (config) {
+  // tslint:disable-next-line no-invalid-this
   this.fields = config.fields
 })
 
@@ -20,7 +22,7 @@ test('it will call ObjectType with an appropriate config', () => {
   const pgCatalog = new PgCatalog()
 
   pgCatalog.assertGetType.mockImplementation(({ type }) => type)
-  getTypeFromPgType.mockImplementation((pgCatalog, type) => type)
+  getTypeFromPgType.mockImplementation((_, type) => type)
 
   const pgAttribute1 = { name: Symbol(), description: Symbol(), typeId: { type: Symbol() } }
   const pgAttribute2 = { name: Symbol(), description: Symbol(), typeId: { type: new NullableType(Symbol()) } }
@@ -29,6 +31,7 @@ test('it will call ObjectType with an appropriate config', () => {
   const name = Symbol()
   const description = Symbol()
 
+  // tslint:disable-next-line no-unused-new
   new PgObjectType({
     name,
     description,
@@ -57,7 +60,7 @@ test('it will call ObjectType with an appropriate config', () => {
         description: pgAttribute3.description,
         type: pgAttribute3.typeId.type.nonNullType,
         pgAttribute: pgAttribute3,
-      }]
+      }],
     ]),
   }]])
 })
@@ -70,11 +73,13 @@ test('it will allow fields with different names', () => {
   const pgAttribute2 = { name: 'b' }
   const pgAttribute3 = { name: 'c' }
 
+  // tslint:disable-next-line no-unused-new
   new PgObjectType({
     pgCatalog,
     pgAttributes: [pgAttribute1, pgAttribute2, pgAttribute3],
   })
 
+  // tslint:disable-next-line no-unused-new
   new PgObjectType({
     pgCatalog,
     pgAttributes: new Map([

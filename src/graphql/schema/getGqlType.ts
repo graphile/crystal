@@ -142,7 +142,7 @@ export const _getJsonGqlType = memoize1((buildToken: BuildToken): GraphQLScalarT
         parseValue: String,
         parseLiteral: ast => (ast.kind === Kind.STRING ? ast.value : null),
       })
-    )
+    ),
 )
 
 /**
@@ -189,7 +189,7 @@ function createGqlNullableType (buildToken: BuildToken, type: Type<mixed>, input
   if (!isNamedType(type)) {
     throw new Error(
       `Cannot convert unnamed type of constructor '${type.constructor.name}' ` +
-      'to a GraphQL type.'
+      'to a GraphQL type.',
     )
   }
 
@@ -210,7 +210,7 @@ function createGqlNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
         Array.from(type.variants).map<[string, GraphQLEnumValueConfig<string>]>(variant =>
           [formatName.enumValue(variant), {
             value: variant,
-          }]
+          }],
         ),
       ),
     })
@@ -232,7 +232,7 @@ function createGqlNamedType (buildToken: BuildToken, type: NamedType<mixed>, inp
 
   throw new Error(
     `Cannot convert named type of constructor '${type.constructor.name}' ` +
-    'to a GraphQL type.'
+    'to a GraphQL type.',
   )
 }
 
@@ -260,7 +260,7 @@ function createGqlOutputObjectType (buildToken: BuildToken, type: ObjectType): G
           description: field.description,
           type: getGqlType(buildToken, field.type, false),
           resolve: object => object.get(fieldName),
-        }]
+        }],
       ),
       // Add extra fields that may exist in our hooks.
       buildToken._hooks && buildToken._hooks.objectTypeFieldEntries
@@ -293,7 +293,7 @@ function createGqlInputObjectType <T>(buildToken: BuildToken, type: ObjectType):
           type: gqlType,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
         }]
-      })
+      }),
     ),
   })
 }

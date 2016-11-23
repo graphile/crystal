@@ -150,7 +150,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ input }, args, context) =>
+        resolve: ({ input }, _args, context) =>
           paginator.count(context, input),
       },
       edges: {
@@ -243,8 +243,8 @@ export function _createOrderByGqlEnumType <TInput, TItemValue>(
     values: buildObject(
       Array.from(paginator.orderings)
         .map<[string, GraphQLEnumValueConfig<string>]>(
-          ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }]
-        )
+          ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }],
+        ),
     ),
   })
 }

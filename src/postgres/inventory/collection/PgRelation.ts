@@ -41,7 +41,7 @@ class PgRelation implements Relation<PgObjectType.Value> {
    */
   public getTailConditionFromHeadValue (headValue: PgObjectType.Value): Condition {
     return conditionHelpers.and(...this._headFieldNames.map((headFieldName, i) =>
-      conditionHelpers.fieldEquals(this._tailFieldNames[i], headValue.get(headFieldName))
+      conditionHelpers.fieldEquals(this._tailFieldNames[i], headValue.get(headFieldName)),
     ))
   }
 }

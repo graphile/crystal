@@ -11,7 +11,7 @@ const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject
     .catch(error => {
       expect(() => { throw error }).toThrowError(matcher)
       resolve()
-    })
+    }),
 )
 
 test('_cursorType will correctly serialize namespaced cursors', () => {

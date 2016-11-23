@@ -79,7 +79,7 @@ const format = catalog => ({
       classId: type.classId ? catalog.assertGetClass(type.classId).name : null,
       domainBaseTypeId: type.domainBaseTypeId ? catalog.assertGetType(type.domainBaseTypeId).name : null,
       rangeSubTypeId: type.rangeSubTypeId ? catalog.assertGetType(type.rangeSubTypeId).name : null,
-      arrayItemTypeId: type.arrayItemTypeId ? catalog.assertGetType(type.arrayItemTypeId).name : null
+      arrayItemTypeId: type.arrayItemTypeId ? catalog.assertGetType(type.arrayItemTypeId).name : null,
     }))
     // Remove any types outside of our expected namespace. This may exclude
     // relevant types, but the tradeoff is worth it. This test gets flaky when

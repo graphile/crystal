@@ -93,7 +93,7 @@ type NotCondition = {
  */
 type AndCondition = {
   type: 'AND',
-  conditions: Condition[],
+  conditions: Array<Condition>,
 }
 
 /**
@@ -101,7 +101,7 @@ type AndCondition = {
  */
 type OrCondition = {
   type: 'OR',
-  conditions: Condition[],
+  conditions: Array<Condition>,
 }
 
 /**

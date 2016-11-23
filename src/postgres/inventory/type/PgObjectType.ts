@@ -44,7 +44,7 @@ class PgObjectType extends ObjectType {
         Array.from(
           Array.isArray(config.pgAttributes)
             ? new Map(config.pgAttributes.map<[string, PgCatalogAttribute]>(pgAttribute => [pgAttribute.name, pgAttribute]))
-            : config.pgAttributes
+            : config.pgAttributes,
         ).map<[string, PgObjectType.Field<mixed>]>(([fieldName, pgAttribute]) =>
           [fieldName, {
             description: pgAttribute.description,
@@ -69,8 +69,8 @@ class PgObjectType extends ObjectType {
             // Notice how we add an extra `pgAttribute` property here as per
             // our custom field type.
             pgAttribute,
-          }]
-        )
+          }],
+        ),
       ),
     })
 

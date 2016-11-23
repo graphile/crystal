@@ -52,7 +52,7 @@ test('will convert ObjectType into a map and recursively call transformPgValueIn
       ['a', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['b', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['c', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
-    ])
+    ]),
   })
   expect(transformPgValueIntoValue(type, { a: 1, b: 2, c: 3 })).toEqual(new Map([['a', 1], ['b', 2], ['c', 3]]))
   expect(type.fields.get('a').type[$$transformPgValueIntoValue].mock.calls).toEqual([[1]])
@@ -67,7 +67,7 @@ test('will throw an error with type ObjectType and value null', () => {
       ['a', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['b', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['c', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
-    ])
+    ]),
   })
   expect(() => transformPgValueIntoValue(type, null)).toThrow('Postgres value of object type may not be nullish.')
 })
@@ -79,7 +79,7 @@ test('will throw an error with type ObjectType and a value that is not an object
       ['a', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['b', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
       ['c', { type: { [$$transformPgValueIntoValue]: jest.fn(x => x) } }],
-    ])
+    ]),
   })
   expect(() => transformPgValueIntoValue(type, 5)).toThrow('Postgres value of object type must be an object, not \'number\'.')
 })

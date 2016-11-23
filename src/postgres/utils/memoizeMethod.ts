@@ -8,7 +8,7 @@ import { _memoize } from '../../graphql/utils/memoize'
  * well.
  */
 // TODO: Decorator could use some variadic types as its function call.
-export default function memoizeMethod (target: mixed, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): void {
+export default function memoizeMethod (_target: mixed, _propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): void {
   if (!descriptor.value)
     throw new Error('No method defined to memoize.')
 

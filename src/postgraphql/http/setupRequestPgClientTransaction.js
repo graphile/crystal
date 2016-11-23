@@ -67,7 +67,7 @@ export default async function setupRequestPgClientTransaction (request, pgClient
     const query = sql.compile(sql.query`select ${sql.join(Array.from(localSettings).map(([key, value]) =>
       // Make sure that the third config is always `true` so that we are only
       // ever setting variables on the transaction.
-      sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`
+      sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
     ), ', ')}`)
 
     // Execute the query.

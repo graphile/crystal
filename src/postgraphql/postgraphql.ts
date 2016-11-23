@@ -72,7 +72,7 @@ export default function postgraphql (
         ? parsePgConnectionString(poolOrConfig)
         // Finally, it must just be a config itself. If it is undefined, we
         // will just use an empty config and let the defaults take over.
-        : poolOrConfig || {}
+        : poolOrConfig || {},
       )
 
   // Creates a promise which will resolve to a GraphQL schema. Connects a

@@ -91,7 +91,7 @@ export default function createMutationGqlField <T>(
     // Finally we define the resolver for this field which will actually
     // execute the mutation. Basically it will just include the
     // `clientMutationId` in the payload, and calls `config.execute`.
-    async resolve (source, args, context): Promise<MutationValue<T>> {
+    async resolve (_source, args, context): Promise<MutationValue<T>> {
       const { clientMutationId } = args['input']
       const value = await config.execute(context, args['input'])
 

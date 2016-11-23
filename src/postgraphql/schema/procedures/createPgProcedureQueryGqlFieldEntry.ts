@@ -45,7 +45,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [formatName.field(pgProcedure.name), {
@@ -53,7 +53,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
 
-    async resolve (source, args, context): Promise<mixed> {
+    async resolve (_source, args, context): Promise<mixed> {
       const client = pgClientFromContext(context)
       const input = argEntries.map(([argName, { type }]) => transformGqlInputValue(type, args[argName]))
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
@@ -82,7 +82,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [
@@ -90,7 +90,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
     createConnectionGqlField<mixed, Array<mixed>, mixed>(buildToken, paginator, {
       description: pgProcedure.description,
       inputArgEntries,
-      getPaginatorInput: (source, args) =>
+      getPaginatorInput: (_source, args) =>
         inputArgEntries.map(([argName, { type }]) => transformGqlInputValue(type, args[argName])),
     }),
   ]

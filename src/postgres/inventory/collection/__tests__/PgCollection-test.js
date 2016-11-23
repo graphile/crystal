@@ -11,15 +11,17 @@ import PgCollection from '../PgCollection'
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
-/**
- * @type {PgCatalog}
- */
+/** @type {PgCatalog} */
 let pgCatalog
 
-/**
- * @type {PgCollection}
- */
-let collection1, collection2, collection3
+/** @type {PgCollection} */
+let collection1
+
+/** @type {PgCollection} */
+let collection2
+
+/** @type {PgCollection} */
+let collection3
 
 beforeAll(withPgClient(async client => {
   pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])

@@ -23,7 +23,6 @@ test('prints a schema with a JWT generating mutation', withPgClient(async pgClie
   expect(printSchema(gqlSchema)).toMatchSnapshot()
 }))
 
-
 test('prints a schema without default mutations', withPgClient(async pgClient => {
   const gqlSchema = await createPostGraphQLSchema(pgClient, 'c', { disableDefaultMutations: true })
   expect(printSchema(gqlSchema)).toMatchSnapshot()

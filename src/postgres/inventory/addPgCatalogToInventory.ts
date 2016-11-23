@@ -67,7 +67,7 @@ export default function addPgCatalogToInventory (
           `'${pgCatalog.assertGetClass(pgConstraint.foreignClassId).name}'. ` +
           'Cannot create a relation without such a constraint. Without this ' +
           'constraint referenced values are not ensured to be unique and ' +
-          'lookups may not be performant.'
+          'lookups may not be performant.',
         )
       }
 
