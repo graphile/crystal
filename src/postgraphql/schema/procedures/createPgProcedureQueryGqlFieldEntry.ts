@@ -45,7 +45,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [formatName.field(pgProcedure.name), {
@@ -82,7 +82,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [

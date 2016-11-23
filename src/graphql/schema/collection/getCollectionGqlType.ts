@@ -75,7 +75,7 @@ function createCollectionGqlType (buildToken: BuildToken, collection: Collection
               // use it on user input.
               // tslint:disable-next-line no-any
               value.get(fieldName) as any,
-          }]
+          }],
         ),
 
       // Add extra fields that may exist in our hooks.

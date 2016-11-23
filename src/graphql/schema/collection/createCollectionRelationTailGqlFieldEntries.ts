@@ -32,7 +32,7 @@ export default function createCollectionRelationTailGqlFieldEntries (
       // implementation.
       .filter(relation =>
         relation.tailCollection === collection &&
-        relation.headCollectionKey.read != null
+        relation.headCollectionKey.read != null,
       )
       // Transform the relation into a field entry.
       .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {

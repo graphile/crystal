@@ -2,4 +2,4 @@
 
 npm_bin=$(npm bin)
 
-$npm_bin/tslint $(find src -name "*.ts")
+$npm_bin/tslint $(find src -name "*.ts") $@

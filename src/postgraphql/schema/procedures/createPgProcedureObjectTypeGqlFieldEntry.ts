@@ -49,7 +49,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [formatName.field(pgProcedure.name.substring(fixtures.args[0].pgType.name.length + 1)), {
@@ -87,7 +87,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
       [formatName.arg(name), {
         // No description…
         type: pgProcedure.isStrict ? new GraphQLNonNull(getNullableType(gqlType)) : gqlType,
-      }]
+      }],
   )
 
   return [formatName.field(pgProcedure.name.substring(fixtures.args[0].pgType.name.length + 1)), createConnectionGqlField<mixed, Array<mixed>, mixed>(buildToken, paginator, {

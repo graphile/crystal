@@ -243,8 +243,8 @@ export function _createOrderByGqlEnumType <TInput, TItemValue>(
     values: buildObject(
       Array.from(paginator.orderings)
         .map<[string, GraphQLEnumValueConfig<string>]>(
-          ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }]
-        )
+          ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }],
+        ),
     ),
   })
 }

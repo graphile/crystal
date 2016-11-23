@@ -98,7 +98,7 @@ class PgCollection implements Collection {
           // If the constraint wasn’t a primary key or unique constraint,
           // return null. Since the null is filtered away we can safely mark
           // the type as `never`.
-          : null as never
+          : null as never,
       )
       // Filter out nulls.
       .filter(Boolean)
@@ -153,8 +153,8 @@ class PgCollection implements Collection {
               // if there was no such value defined, we should just use
               // `default` and use the user’s default value.
               sql.query`(${sql.join(Array.from(this.type.fields).map(([fieldName, field]) =>
-                value.has(fieldName) ? transformValueIntoPgValue(field.type, value.get(fieldName)) : sql.query`default`
-              ), ', ')})`
+                value.has(fieldName) ? transformValueIntoPgValue(field.type, value.get(fieldName)) : sql.query`default`,
+              ), ', ')})`,
             ), ', ')}
 
             -- Finally, return everything.
@@ -167,7 +167,7 @@ class PgCollection implements Collection {
         const { rows } = await client.query(query)
         // tslint:disable-next-line no-any
         return rows.map(({ object }) => transformPgValueIntoValue(this.type, object) as any)
-      }
+      },
     )
   }
 }

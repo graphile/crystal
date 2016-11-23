@@ -101,8 +101,8 @@ function createCollectionPatchType (buildToken: BuildToken, collection: Collecti
           description: field.description,
           type: getNullableType(getGqlType(buildToken, field.type, true)) as GraphQLInputType<mixed>,
           [$$gqlInputObjectTypeValueKeyName]: fieldName,
-        }]
-      )
+        }],
+      ),
     ),
   })
 }

@@ -40,8 +40,8 @@ export default memoize2(<TSource>(buildToken: BuildToken, type: ObjectType): {
             ? conditionHelpers.fieldEquals(field.internalName, transformGqlInputValue(field.type, condition![fieldName]))
             // If the argument does not exist, this condition should just be
             // true (which will get filtered out by `conditionHelpers.and`).
-            : true
-        )
+            : true,
+        ),
       )
     ) : true
 

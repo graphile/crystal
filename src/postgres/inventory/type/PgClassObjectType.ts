@@ -20,7 +20,7 @@ class PgClassObjectType extends PgObjectType {
       pgCatalog,
       pgAttributes: new Map(
         pgCatalog.getClassAttributes(pgClass.id).map<[string, PgCatalogAttribute]>(pgAttribute =>
-          [config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
+          [config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute],
         )),
     })
     this.pgClass = pgClass

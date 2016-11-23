@@ -77,7 +77,7 @@ export default function transformValueIntoPgValue (type: Type<mixed>, value: mix
     // We can depend on fields being in the correct tuple order for
     // `PgObjectType`, so we just build a tuple using our fields.
     return sql.query`(${sql.join(Array.from(type.fields).map(([fieldName, field]) =>
-      transformValueIntoPgValue(field.type, value.get(fieldName))
+      transformValueIntoPgValue(field.type, value.get(fieldName)),
     ), ', ')})::${sql.identifier(type.pgType.namespaceName, type.pgType.name)}`
   }
 

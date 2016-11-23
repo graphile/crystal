@@ -88,7 +88,7 @@ export default function transformGqlInputValue (type: GraphQLInputType<mixed>, v
           transformGqlInputValue(field.type, value[field.name]),
         ])
         // Don’t include exactly undefined values in our map.
-        .filter(([, fieldValue]) => typeof fieldValue !== 'undefined')
+        .filter(([, fieldValue]) => typeof fieldValue !== 'undefined'),
     )
   }
 

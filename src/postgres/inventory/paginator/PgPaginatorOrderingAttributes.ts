@@ -90,7 +90,7 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
       -- a last property was defined we need to reverse our ordering so the
       -- limit will work. We will fix the order in JavaScript.
       order by ${sql.join(pgAttributes.map(pgAttribute =>
-        sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`
+        sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
       ), ', ')}
 
       -- Finally, apply the appropriate limit.

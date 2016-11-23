@@ -40,7 +40,7 @@ class PgCollectionKey implements CollectionKey<PgObjectType.Value> {
     name: `_${this.pgConstraint.name}`,
     pgCatalog: this._pgCatalog,
     pgAttributes: new Map(this._pgKeyAttributes.map<[string, PgCatalogAttribute]>(pgAttribute =>
-      [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute]
+      [this._options.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name, pgAttribute],
     )),
   })
 
@@ -75,7 +75,7 @@ class PgCollectionKey implements CollectionKey<PgObjectType.Value> {
   public getKeyFromValue (value: PgObjectType.Value): PgObjectType.Value {
     return new Map<string, mixed>(
       this._keyTypeFields
-        .map<[string, mixed]>(([fieldName]) => [fieldName, value.get(fieldName)])
+        .map<[string, mixed]>(([fieldName]) => [fieldName, value.get(fieldName)]),
     )
   }
 
@@ -87,7 +87,7 @@ class PgCollectionKey implements CollectionKey<PgObjectType.Value> {
    */
   private _getSqlSingleKeyCondition (key: PgObjectType.Value): sql.Sql {
     return sql.join(this._keyTypeFields.map(([fieldName, field]) =>
-      sql.query`${sql.identifier(field.pgAttribute.name)} = ${transformValueIntoPgValue(field.type, key.get(fieldName))}`
+      sql.query`${sql.identifier(field.pgAttribute.name)} = ${transformValueIntoPgValue(field.type, key.get(fieldName))}`,
     ), ' and ')
   }
 
@@ -152,8 +152,8 @@ class PgCollectionKey implements CollectionKey<PgObjectType.Value> {
               (${sql.join(this._keyTypeFields.map(([, field]) => sql.identifier(field.pgAttribute.name)), ', ')})
               in (${sql.join(keys.map(key =>
                 sql.query`(${sql.join(this._keyTypeFields.map(([fieldName, field]) =>
-                  transformValueIntoPgValue(field.type, key.get(fieldName))
-                ), ', ')})`
+                  transformValueIntoPgValue(field.type, key.get(fieldName)),
+                ), ', ')})`,
               ), ', ')})
             `
           }
@@ -177,7 +177,7 @@ class PgCollectionKey implements CollectionKey<PgObjectType.Value> {
 
         // tslint:disable-next-line no-any
         // return rows.map(({ object }) => object == null ? null : transformPgValueIntoValue(this.collection.type, object) as any)
-      }
+      },
     )
   }
 
