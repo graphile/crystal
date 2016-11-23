@@ -17,7 +17,7 @@ const _getCollectionGqlType = memoize2(createCollectionGqlType)
  * of the fields in the object, as well as an id field, computed columns, and
  * relations (head and tail).
  */
-function getCollectionGqlType <TValue>(buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
+function getCollectionGqlType (buildToken: BuildToken, collection: Collection): GraphQLObjectType<ObjectType.Value> {
   return _getCollectionGqlType(buildToken, collection)
 }
 

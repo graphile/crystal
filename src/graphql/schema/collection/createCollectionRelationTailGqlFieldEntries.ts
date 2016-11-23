@@ -35,7 +35,7 @@ export default function createCollectionRelationTailGqlFieldEntries (
         relation.headCollectionKey.read != null,
       )
       // Transform the relation into a field entry.
-      .map(<THeadValue, TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
+      .map(<TKey>(relation: Relation<TKey>): [string, GraphQLFieldConfig<ObjectType.Value, ObjectType.Value>] => {
         const headCollectionKey = relation.headCollectionKey
         const headCollection = headCollectionKey.collection
         const headCollectionGqlType = getCollectionGqlType(buildToken, headCollection)
@@ -47,7 +47,7 @@ export default function createCollectionRelationTailGqlFieldEntries (
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this \`${collectionGqlType}\`.`,
             type: headCollectionGqlType,
-            async resolve (source, args, context): Promise<ObjectType.Value | undefined> {
+            async resolve (source, _args, context): Promise<ObjectType.Value | undefined> {
               const value = options.getCollectionValue ? options.getCollectionValue(source) : source
               const key = relation.getHeadKeyFromTailValue(value)
               const headValue = await headCollectionKey.read!(context, key)

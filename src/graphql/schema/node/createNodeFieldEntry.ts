@@ -19,7 +19,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    async resolve (source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<ObjectType.Value | Symbol | null> {
+    async resolve (_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<ObjectType.Value | Symbol | null> {
       let deserializationResult: { collection: Collection, keyValue: mixed }
       const idString = args[options.nodeIdFieldName]
 

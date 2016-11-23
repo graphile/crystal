@@ -150,7 +150,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ input }, args, context) =>
+        resolve: ({ input }, _args, context) =>
           paginator.count(context, input),
       },
       edges: {

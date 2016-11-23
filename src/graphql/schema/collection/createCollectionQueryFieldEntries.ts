@@ -34,7 +34,7 @@ export default function createCollectionQueryFieldEntries (
             type: gqlConditionType,
           }],
         ],
-        getPaginatorInput: (headValue: mixed, args: { condition?: { [key: string]: mixed } }) =>
+        getPaginatorInput: (_headValue: mixed, args: { condition?: { [key: string]: mixed } }) =>
           conditionFromGqlInput(args.condition),
       }),
     ])
@@ -93,7 +93,7 @@ function createCollectionPrimaryKeyField <TKey>(
       },
     },
 
-    async resolve (source, args, context): Promise<ObjectType.Value | null> {
+    async resolve (_source, args, context): Promise<ObjectType.Value | null> {
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
 
       if (result.collection !== collection)
@@ -126,7 +126,7 @@ function createCollectionKeyField <TKey>(
   return {
     type: collectionType,
     args: buildObject(inputHelpers.fieldEntries),
-    async resolve (source, args, context): Promise<ObjectType.Value | null> {
+    async resolve (_source, args, context): Promise<ObjectType.Value | null> {
       const key = inputHelpers.getKey(args)
       return await collectionKey.read!(context, key)
     },
