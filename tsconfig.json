@@ -12,7 +12,9 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true
   },
   "exclude": [
     "index.js",
