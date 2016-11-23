@@ -44,7 +44,7 @@ const mockObjectType = () =>
     description: 'yoyoyo',
     fields: new Map([
       ['a', { type: booleanType, description: 'aaaa!' }],
-      ['b', { type: new NullableType(booleanType) }]
+      ['b', { type: new NullableType(booleanType) }],
     ]),
   })
 

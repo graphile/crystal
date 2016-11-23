@@ -1,4 +1,4 @@
-const Debugger = require('debug')
+const Debugger = require('debug') // tslint:disable-line variable-name
 
 const $$pgClientOrigQuery = Symbol()
 
@@ -13,11 +13,13 @@ export default function debugPgClient (pgClient) {
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
 
+    // tslint:disable-next-line only-arrow-functions
     pgClient.query = function (...args) {
       // Debug just the query text. We don’t want to debug variables because
       // there may be passwords in there.
       debugPg(args[0] && args[0].text ? args[0].text : args[0])
 
+      // tslint:disable-next-line no-invalid-this
       const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args)
 
       // Report the error with our Postgres debugger.
@@ -32,12 +34,13 @@ export default function debugPgClient (pgClient) {
         if (debugPgExplain.enabled && ['SELECT'].indexOf(result.command) !== -1) {
           pgClient[$$pgClientOrigQuery]
             // Call the query function and prepend `explain analyze`.
+            // tslint:disable-next-line no-invalid-this
             .call(this, {
               text: `explain analyze ${args[0] && args[0].text ? args[0].text : args[0]}`,
               values: args[0] && args[0].values ? args[0].values : args[1] || [],
             })
-            .then(result =>
-              debugPgExplain(`\n${result.rows.map(row => row['QUERY PLAN']).join('\n')}`))
+            .then(explainResult =>
+              debugPgExplain(`\n${explainResult.rows.map(row => row['QUERY PLAN']).join('\n')}`))
             .catch(error =>
               debugPgExplain(error))
         }

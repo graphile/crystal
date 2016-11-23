@@ -21,7 +21,7 @@ const introspectionQuery = new Promise<string>((resolve, reject) => {
  * `PgObjects` which can then be consumed. Note that some translation is done
  * from the raw Postgres catalog to the friendlier `PgObjects` interface.
  */
-export default async function introspectDatabase (client: Client, schemas: string[]): Promise<PgCatalog> {
+export default async function introspectDatabase (client: Client, schemas: Array<string>): Promise<PgCatalog> {
   // Run our single introspection query in the database.
   const result = await client.query({
     name: 'introspectionQuery',
