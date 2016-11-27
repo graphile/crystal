@@ -5,14 +5,23 @@ As PostGraphQL may be a piece of critical infrastructure in your app, it is only
 
 The codebase is documented via READMEs throughout the `src` folder heirarchy, starting with [`src/README.md`](src/README.md). Contributions are also encouraged where these files are missing or inadequate.
 
-To get started hacking on the codebase, make sure Postgres is listening on `localhost:5432` and then run the following to install postgraphql schemas into your default database:
+To get started hacking on the codebase, first install all of the dependencies like so:
+
+```bash
+npm install
+npm --prefix src/postgraphql/graphiql install
+```
+
+This will install all of the dependencies for the PostGraphQL server. The second command will install all of the dependencies for the GraphiQL PostGraphQL client which is a [`create-react-app`](https://github.com/facebookincubator/create-react-app) app.
+
+Next make sure Postgres is listening on `localhost:5432` and then run the following to install postgraphql schemas into your default database:
 
 ```bash
 scripts/run-kitchen-sink-schema
 scripts/dev
 ```
 
-The first script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The second script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
+The first script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The second script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running. `scripts/dev` should also open the GraphiQL interface in your default browser.
 
 If you want to use a different database (e.g. after `createdb postgraphql`), you can do so by passing the database URL to these commands, like this:
 
