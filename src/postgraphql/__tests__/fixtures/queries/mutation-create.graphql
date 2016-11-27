@@ -172,6 +172,14 @@ mutation {
     }
     query { __id }
   }
+  g: createPerson(input: {
+    person: {
+      id: 1998
+      name: "Budd Deey"
+      email: "budd.deey.the.second@email.com"
+      about: null
+    }
+  }) { ...createPersonPayload }
 }
 
 fragment createPersonPayload on CreatePersonPayload {
