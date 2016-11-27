@@ -1,11 +1,13 @@
 #!/bin/bash
 
 set -e
+cd $(dirname $0)/..
 
 npm_bin=$(npm bin)
 
 echo "Cleaning build"
-rm -rf build/*
+rm -rf build
+mkdir build
 
 echo "Compiling with TypeScript"
 $npm_bin/tsc
