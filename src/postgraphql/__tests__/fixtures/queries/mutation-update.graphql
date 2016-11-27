@@ -21,6 +21,12 @@ mutation {
       about: "Now with an “H.”"
     }
   }) { ...updatePersonPayload }
+  i: updatePerson(input: {
+    __id: "WyJwZW9wbGUiLDJd"
+    personPatch: {
+      about: null
+    }
+  }) { ...updatePersonPayload }
   d: updatePersonById(input: {
     id: 3
     personPatch: {

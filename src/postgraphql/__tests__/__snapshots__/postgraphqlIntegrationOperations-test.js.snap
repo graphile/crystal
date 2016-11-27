@@ -880,6 +880,68 @@ Object {
         "__id": "query",
       },
     },
+    "g": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "__id": "WyJwZW9wbGUiLDE5OThd",
+          "name": "Budd Deey",
+        },
+      },
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDE5OThd",
+        "about": null,
+        "email": "budd.deey.the.second@email.com",
+        "id": 1998,
+        "name": "Budd Deey",
+      },
+      "query": Object {
+        "__id": "query",
+      },
+    },
   },
 }
 `;
@@ -1151,6 +1213,19 @@ Object {
         },
         "personId1": 4,
         "personId2": 3,
+      },
+      "query": Object {
+        "__id": "query",
+      },
+    },
+    "i": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "__id": "WyJwZW9wbGUiLDJd",
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
       },
       "query": Object {
         "__id": "query",
