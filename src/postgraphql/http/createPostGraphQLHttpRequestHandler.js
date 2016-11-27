@@ -32,17 +32,29 @@ const debugRequest = new Debugger('postgraphql:request')
 
 const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
 
+/**
+ * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
+ * client.
+ *
+ * @type {Promise<Buffer>}
+ */
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
     if (error) reject(error)
-    else resolve(data.toString())
+    else resolve(data)
   })
 })
 
+/**
+ * The GraphiQL HTML file as a string. We need it to be a string, because we
+ * will use a regular expression to replace some variables.
+ *
+ * @type {Promise<string>}
+ */
 const origGraphiqlHtml = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../graphiql/public/index.html'), (error, data) => {
+  readFile(resolvePath(__dirname, '../graphiql/public/index.html'), 'utf8', (error, data) => {
     if (error) reject(error)
-    else resolve(data.toString())
+    else resolve(data)
   })
 })
 
