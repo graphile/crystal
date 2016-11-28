@@ -12,7 +12,10 @@ $npm_bin/nodemon \
   --ignore __mocks__ \
   --ignore src/postgraphql/graphiql \
   --ext js,ts \
-  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli.ts --schema a,b,c --show-error-stack json --watch $@" & \
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli.ts --schema a,b,c --show-error-stack json --watch $@" &
+
+# Ensure forked process is killed even if we die unexpectedly
+trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS || true' SIGINT SIGTERM EXIT
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
