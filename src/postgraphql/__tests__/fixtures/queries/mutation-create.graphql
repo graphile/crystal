@@ -4,6 +4,8 @@ mutation {
       id: 201
       smallint: 30
       bigint: 50
+      numeric: 15.2
+      decimal: 15.2
       boolean: false
       varchar: "abc"
       enum: RED
@@ -68,6 +70,8 @@ mutation {
       id
       smallint
       bigint
+      numeric
+      decimal
       boolean
       varchar
       enum

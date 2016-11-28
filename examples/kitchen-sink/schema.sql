@@ -99,6 +99,8 @@ create table b.types (
   id serial primary key,
   "smallint" smallint not null,
   "bigint" bigint not null,
+  "numeric" numeric not null,
+  "decimal" decimal not null,
   "boolean" boolean not null,
   "varchar" varchar not null,
   "enum" b.color not null,
