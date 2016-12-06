@@ -48,7 +48,7 @@ For more information around using PostGraphQL as a library, and the options the 
 Also make sure to check out the **[forum example][]** and especially **[step by step tutorial][]** for a demo of a PostGraphQL compliant schema and authentication.
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
-[step by step tutorial]: https://github.com/kenota/postgraphql/blob/master/examples/forum/TUTORIAL.md
+[step by step tutorial]: https://github.com/calebmer/postgraphql/blob/master/examples/forum/TUTORIAL.md
 
 ## Benefits
 PostGraphQL uses the joint benefits of PostgreSQL and GraphQL to provide a number of key benefits.
