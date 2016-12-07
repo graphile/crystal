@@ -6,5 +6,5 @@ import PostGraphiQL from './components/PostGraphiQL'
 
 ReactDOM.render(
   <PostGraphiQL/>,
-  document.getElementById('root')
+  document.getElementById('root'),
 )

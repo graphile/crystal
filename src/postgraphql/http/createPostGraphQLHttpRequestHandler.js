@@ -195,7 +195,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     if (parseUrl(req).pathname === graphiqlRoute) {
       // If we are developing PostGraphQL, instead just redirect.
       if (POSTGRAPHQL_ENV === 'development') {
-        res.writeHead(302, { 'Location': 'http://localhost:5783' })
+        res.writeHead(302, { Location: 'http://localhost:5783' })
         res.end()
         return
       }

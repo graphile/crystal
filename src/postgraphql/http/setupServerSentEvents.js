@@ -9,11 +9,11 @@ const setupServerSentEvents = (req, res, options) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    Connection: 'keep-alive',
   })
 
-  const sse = string => {
-    res.write(string)
+  const sse = str => {
+    res.write(str)
     // support running within the compression middleware
     // https://github.com/expressjs/compression#server-sent-events
     if (res.flushHeaders) res.flushHeaders()
