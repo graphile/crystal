@@ -3,6 +3,8 @@
 set -e
 cd $(dirname $0)/..
 
+./scripts/postinstall
+
 npm_bin=$(npm bin)
 
 echo "Cleaning build"
