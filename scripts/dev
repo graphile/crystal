@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -e
+cd $(dirname $0)/..
+
+./scripts/postinstall
+
 npm_bin=$(npm bin)
 
 export POSTGRAPHQL_ENV=development
@@ -15,7 +20,7 @@ $npm_bin/nodemon \
   --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphql/cli.ts --schema a,b,c --show-error-stack json --watch $@" &
 
 # Ensure forked process is killed even if we die unexpectedly
-trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS || true' SIGINT SIGTERM EXIT
+trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS 2>/dev/null || true' SIGINT SIGTERM EXIT
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
