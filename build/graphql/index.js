@@ -1,0 +1,4 @@
+"use strict";
+const createGqlSchema_1 = require('./schema/createGqlSchema');
+exports.createGraphQLSchema = createGqlSchema_1.default;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvZ3JhcGhxbC9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsa0NBQWdDLDBCQUVoQyxDQUFDLENBRnlEO0FBR3hELDJCQUFtQjtBQUNwQiJ9
