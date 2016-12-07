@@ -122,7 +122,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // implications though so be careful!)
     //
     // Always enable CORS when developing PostGraphQL because GraphiQL will be
-    // on port 5001.
+    // on port 5783.
     if (options.enableCors || POSTGRAPHQL_ENV === 'development')
       addCORSHeaders(res)
 
@@ -195,7 +195,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     if (parseUrl(req).pathname === graphiqlRoute) {
       // If we are developing PostGraphQL, instead just redirect.
       if (POSTGRAPHQL_ENV === 'development') {
-        res.writeHead(302, { 'Location': 'http://localhost:5001' })
+        res.writeHead(302, { 'Location': 'http://localhost:5783' })
         res.end()
         return
       }
