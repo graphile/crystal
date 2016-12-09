@@ -92,7 +92,7 @@ export default function postgraphql (
       pgSchemas,
       onChange: ({ commands }) => {
         // tslint:disable-next-line no-console
-        console.log(`Restarting PostGraphQL API after Postgres command(s)${options.graphiql ? '. Make sure to reload GraphiQL' : ''}: ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
+        console.log(`Rebuilding PostGraphQL API after Postgres command(s): ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
 
         _emitter.emit('schemas:changed')
 
