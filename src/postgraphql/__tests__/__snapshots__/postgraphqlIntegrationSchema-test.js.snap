@@ -4491,6 +4491,12 @@ type TableMutationPayload {
   clientMutationId: String
   post: Post
 
+  # An edge for our \`Post\`. May be used by Relay 1.
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsEdge
+
   # Reads a single \`Person\` that is related to this \`Post\`.
   personByAuthorId: Person
 
