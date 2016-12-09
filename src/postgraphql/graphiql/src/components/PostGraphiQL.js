@@ -1,4 +1,3 @@
-// tslint:disable no-console
 import React from 'react'
 import GraphiQL from 'graphiql'
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql'
@@ -19,7 +18,7 @@ class PostGraphiQL extends React.Component {
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
     this.updateSchema()
-      .catch(error => console.error(error))
+      .catch(error => console.error(error)) // tslint:disable-line no-console
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -30,13 +29,13 @@ class PostGraphiQL extends React.Component {
       // When we get a change notification, we want to update our schema.
       eventSource.addEventListener('changed', () => {
         this.updateSchema()
-          .then(() => console.log('PostGraphQL: Schema updated'))
-          .catch(error => console.error(error))
+          .then(() => console.log('PostGraphQL: Schema updated')) // tslint:disable-line no-console
+          .catch(error => console.error(error)) // tslint:disable-line no-console
       }, false)
 
       // Add event listeners that just log things in the console.
-      eventSource.addEventListener('open', () => console.log('PostGraphQL: Listening for server sent events'), false)
-      eventSource.addEventListener('error', () => console.log('PostGraphQL: Failed to connect to server'), false)
+      eventSource.addEventListener('open', () => console.log('PostGraphQL: Listening for server sent events'), false) // tslint:disable-line no-console
+      eventSource.addEventListener('error', () => console.log('PostGraphQL: Failed to connect to server'), false) // tslint:disable-line no-console
 
       // Store our event source so we can unsubscribe later.
       this._eventSource = eventSource
