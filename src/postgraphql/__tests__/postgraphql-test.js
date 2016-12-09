@@ -133,8 +133,8 @@ test('will create a new PostGraphQL schema on when `watchPgSchemas` emits a chan
   expect(pgPool.connect.mock.calls).toEqual([[], [], []])
   expect(pgClient.release.mock.calls).toEqual([[], [], []])
   expect(mockLog.mock.calls).toEqual([
-    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('a')}, ${chalk.bold.cyan('b')}, ${chalk.bold.cyan('c')}`],
-    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('d')}, ${chalk.bold.cyan('e')}`],
+    [`Rebuilding PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('a')}, ${chalk.bold.cyan('b')}, ${chalk.bold.cyan('c')}`],
+    [`Rebuilding PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('d')}, ${chalk.bold.cyan('e')}`],
   ])
   console.log = origLog
 })

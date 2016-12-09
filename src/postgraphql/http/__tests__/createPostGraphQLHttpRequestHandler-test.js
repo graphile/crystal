@@ -1,15 +1,20 @@
+jest.mock('send')
 jest.mock('../setupRequestPgClientTransaction')
 
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext'
 import setupRequestPgClientTransaction from '../setupRequestPgClientTransaction'
-import createPostGraphQLHttpRequestHandler from '../createPostGraphQLHttpRequestHandler'
+import createPostGraphQLHttpRequestHandler, { graphiqlDirectory } from '../createPostGraphQLHttpRequestHandler'
 
+const path = require('path')
 const http = require('http')
 const request = require('supertest-as-promised')
 const connect = require('connect')
 const express = require('express')
 const Koa = require('koa') // tslint:disable-line variable-name
+const sendFile = require('send')
+
+sendFile.mockImplementation(() => ({ pipe: jest.fn(res => res.end()) }))
 
 const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -119,7 +124,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
         .options('/graphql')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'POST')
+        .expect('Access-Control-Request-Method', 'HEAD, GET, POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
         .expect('')
       )
@@ -131,7 +136,7 @@ for (const [name, createServerFromHandler] of serverCreators) {
         request(server)
         .post('/graphql')
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'POST')
+        .expect('Access-Control-Request-Method', 'HEAD, GET, POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
       )
     })
@@ -373,9 +378,9 @@ for (const [name, createServerFromHandler] of serverCreators) {
       )
     })
 
-    test('will serve a favicon', async () => {
-      const server1 = createServer()
-      const server2 = createServer({ route: '/graphql' })
+    test('will serve a favicon when graphiql is enabled', async () => {
+      const server1 = createServer({ graphiql: true })
+      const server2 = createServer({ graphiql: true, route: '/graphql' })
       await (
         request(server1)
         .get('/favicon.ico')
@@ -392,18 +397,79 @@ for (const [name, createServerFromHandler] of serverCreators) {
       )
     })
 
-    test('will serve the js for graphiql', async () => {
-      const server = createServer({ graphiql: true })
+    test('will not serve a favicon when graphiql is disabled', async () => {
+      const server1 = createServer({ graphiql: false })
+      const server2 = createServer({ graphiql: false, route: '/graphql' })
       await (
-        request(server)
-        .get('/_postgraphql/graphiql.js')
-        .expect(200)
-        .expect('Content-Type', 'text/javascript')
+        request(server1)
+        .get('/favicon.ico')
+        .expect(404)
+      )
+      await (
+        request(server2)
+        .get('/favicon.ico')
+        .expect(404)
       )
     })
 
+    test('will serve any assets for graphiql', async () => {
+      sendFile.mockClear()
+      const server = createServer({ graphiql: true })
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/anything.css')
+        .expect(200)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/something.js')
+        .expect(200)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/very/deeply/nested')
+        .expect(200)
+      )
+      expect(sendFile.mock.calls.map(([res, filepath, options]) => [path.relative(graphiqlDirectory, filepath), options]))
+        .toEqual([
+          ['anything.css', { index: false }],
+          ['something.js', { index: false }],
+          ['very/deeply/nested', { index: false }],
+        ])
+    })
+
+    test('will not serve some graphiql assets', async () => {
+      const server = createServer({ graphiql: true })
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/index.html')
+        .expect(404)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/asset-manifest.json')
+        .expect(404)
+      )
+    })
+
+    test('will not serve any assets for graphiql when disabled', async () => {
+      sendFile.mockClear()
+      const server = createServer({ graphiql: false })
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/anything.css')
+        .expect(404)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/something.js')
+        .expect(404)
+      )
+      expect(sendFile.mock.calls.length).toEqual(0)
+    })
+
     test('will not allow if no text/event-stream headers are set', async () => {
-      const server = createServer()
+      const server = createServer({ graphiql: true })
       await (
         request(server)
         .get('/_postgraphql/stream')
