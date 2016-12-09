@@ -3,6 +3,7 @@ const Debugger = require('debug') // tslint:disable-line variable-name
 const $$pgClientOrigQuery = Symbol()
 
 const debugPg = new Debugger('postgraphql:postgres')
+const debugPgError = new Debugger('postgraphql:postgres:error')
 const debugPgExplain = new Debugger('postgraphql:postgres:explain')
 
 export default function debugPgClient (pgClient) {
@@ -23,7 +24,7 @@ export default function debugPgClient (pgClient) {
       const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args)
 
       // Report the error with our Postgres debugger.
-      promiseResult.catch(error => debugPg(error))
+      promiseResult.catch(error => debugPgError(error))
 
       // Call the original query method.
       return promiseResult.then(result => {

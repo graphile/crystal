@@ -66,7 +66,7 @@ export default function transformValueIntoPgValue (type: Type<mixed>, value: mix
     type === integerType ||
     type === floatType
   )
-    return sql.query`(${sql.value(value)} + 0)`
+    return sql.query`(${sql.value(value)} + ${type === integerType ? sql.query`0` : sql.query`0.0`})`
 
   // If this is a Postgres object type, let’s do some special tuple stuff.
   if (type instanceof PgClassObjectType) {
