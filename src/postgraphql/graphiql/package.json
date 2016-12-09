@@ -2,20 +2,5 @@
   "private": true,
   "name": "postgraphql-graphiql",
   "version": "1.0.0",
-  "homepage": "https://postgraphql.com/_postgraphql/graphiql",
-  "devDependencies": {
-    "react-scripts": "0.7.0"
-  },
-  "dependencies": {
-    "graphiql": "0.7.8",
-    "graphql": "0.7.2",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  }
+  "homepage": "https://postgraphql.com/_postgraphql/graphiql"
 }

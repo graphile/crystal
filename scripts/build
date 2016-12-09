@@ -3,8 +3,6 @@
 set -e
 cd $(dirname $0)/..
 
-./scripts/postinstall
-
 npm_bin=$(npm bin)
 
 echo "Cleaning build"
@@ -15,7 +13,7 @@ echo "Compiling with TypeScript"
 $npm_bin/tsc
 
 echo "Building GraphiQL"
-npm --prefix src/postgraphql/graphiql run build
+(cd src/postgraphql/graphiql && $npm_bin/react-scripts build)
 
 echo "Moving GraphiQL build output"
 mkdir -p build/postgraphql/graphiql/public

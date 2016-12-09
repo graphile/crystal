@@ -3,8 +3,6 @@
 set -e
 cd $(dirname $0)/..
 
-./scripts/postinstall
-
 npm_bin=$(npm bin)
 
 export POSTGRAPHQL_ENV=development
@@ -24,6 +22,6 @@ trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
-PORT=5783 npm --prefix src/postgraphql/graphiql run start > /dev/null
+(cd src/postgraphql/graphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null
 
 wait

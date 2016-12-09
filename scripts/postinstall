@@ -1,5 +1,0 @@
-#!/bin/bash
-
-if [ ! -d src/postgraphql/graphiql/node_modules ]; then
-  npm --prefix src/postgraphql/graphiql install
-fi
