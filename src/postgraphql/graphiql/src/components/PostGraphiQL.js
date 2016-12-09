@@ -56,10 +56,10 @@ class PostGraphiQL extends React.Component {
     const response = await fetch(POSTGRAPHQL_CONFIG.graphqlUrl, {
       method: 'POST',
       headers: Object.assign({
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       }, jwtToken ? {
-        Authorization: `Bearer ${jwtToken}`,
+        'Authorization': `Bearer ${jwtToken}`,
       } : {}),
       body: JSON.stringify(graphQLParams),
     })

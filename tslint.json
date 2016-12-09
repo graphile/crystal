@@ -150,7 +150,7 @@
     "jsdoc-format": true,
     "new-parens": true,
     "no-consecutive-blank-lines": true,
-    "object-literal-key-quotes": [true, "as-needed"],
+    "object-literal-key-quotes": false,
     "object-literal-shorthand": true,
     "one-line": [true, "check-open-brace", "check-whitespace"],
     "one-variable-per-declaration": true,
