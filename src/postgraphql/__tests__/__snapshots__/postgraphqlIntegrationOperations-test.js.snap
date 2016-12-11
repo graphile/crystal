@@ -1704,6 +1704,13 @@ Object {
         "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
         "id": 5,
       },
+      "postEdge": Object {
+        "cursor": null,
+        "node": Object {
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          "id": 5,
+        },
+      },
     },
     "tableSetMutation": Object {
       "people": Array [
