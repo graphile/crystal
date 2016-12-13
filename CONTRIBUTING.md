@@ -5,23 +5,15 @@ As PostGraphQL may be a piece of critical infrastructure in your app, it is only
 
 The codebase is documented via READMEs throughout the `src` folder heirarchy, starting with [`src/README.md`](src/README.md). Contributions are also encouraged where these files are missing or inadequate.
 
-To get started hacking on the codebase, first install all of the dependencies like so:
+To get started hacking on the codebase, make sure Postgres is listening on `localhost:5432`, go to the project folder and then run the following to install all dependencies and PostGraphQL schemas into your default database:
 
 ```bash
 npm install
-npm --prefix src/postgraphql/graphiql install
-```
-
-This will install all of the dependencies for the PostGraphQL server. The second command will install all of the dependencies for the GraphiQL PostGraphQL client which is a [`create-react-app`](https://github.com/facebookincubator/create-react-app) app.
-
-Next make sure Postgres is listening on `localhost:5432` and then run the following to install postgraphql schemas into your default database:
-
-```bash
-scripts/run-kitchen-sink-schema
+scripts/run-kitchen-sink-sql
 scripts/dev
 ```
 
-The first script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The second script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running. `scripts/dev` should also open the GraphiQL interface in your default browser.
+The first script will install all dependencies of PostGraphQL project. The second script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The third script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
 
 If you want to use a different database (e.g. after `createdb postgraphql`), you can do so by passing the database URL to these commands, like this:
 
@@ -64,9 +56,14 @@ PostGraphQL makes use of the Jest snapshot feature. Even when you change small t
 PostGraphQL uses [TSLint](http://palantir.github.io/tslint/) and Travis CI to test builds and enforce lint rules:
 [travis-ci.org/calebmer/postgraphql](https://travis-ci.org/calebmer/postgraphql).
 
+## GraphiQL
+The instance of GraphiQL used by PostGraphQL is a [`create-react-app`](https://github.com/facebookincubator/create-react-app) located in `src/postgraphql/graphiql`. When developing PostGraphQL (running `scripts/dev` only), GraphiQL will run on a different port to take advantage of the `create-react-app` developer experience.
+
+When we build PostGraphQL before publishing (with `scripts/build`), GraphiQL is built into a few JS, CSS, and HTML files then served by the PostGraphQL middleware people import into their projects.
+
 ## Commit messages
 PostGraphQL team use [karma-style](http://karma-runner.github.io/1.0/dev/git-commit-msg.html) commit messages: a type
-(`feat`/`fix`/`chore`/`doc`/etc.), a scope (`graphql`/`postgraphql`/`examples`/`tests`) and
+(`feat`/`fix`/`chore`/`docs`/etc.), a scope (`graphql`/`postgraphql`/`examples`/`tests`) and
 then the commit message. Commit messages are written in the imperative tense.
 
 Here’s a few examples:
