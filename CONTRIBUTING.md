@@ -5,14 +5,15 @@ As PostGraphQL may be a piece of critical infrastructure in your app, it is only
 
 The codebase is documented via READMEs throughout the `src` folder heirarchy, starting with [`src/README.md`](src/README.md). Contributions are also encouraged where these files are missing or inadequate.
 
-To get started hacking on the codebase, make sure Postgres is listening on `localhost:5432` and then run the following to install postgraphql schemas into your default database:
+To get started hacking on the codebase, make sure Postgres is listening on `localhost:5432`, go to the project folder and then run the following to install all dependencies and PostGraphQL schemas into your default database:
 
 ```bash
-scripts/run-kitchen-sink-schema
+npm install
+scripts/run-kitchen-sink-sql
 scripts/dev
 ```
 
-The first script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The second script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
+The first script will install all dependencies of PostGraphQL project. The second script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The third script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
 
 If you want to use a different database (e.g. after `createdb postgraphql`), you can do so by passing the database URL to these commands, like this:
 
@@ -57,7 +58,7 @@ PostGraphQL uses [TSLint](http://palantir.github.io/tslint/) and Travis CI to te
 
 ## Commit messages
 PostGraphQL team use [karma-style](http://karma-runner.github.io/1.0/dev/git-commit-msg.html) commit messages: a type
-(`feat`/`fix`/`chore`/`doc`/etc.), a scope (`graphql`/`postgraphql`/`examples`/`tests`) and
+(`feat`/`fix`/`chore`/`docs`/etc.), a scope (`graphql`/`postgraphql`/`examples`/`tests`) and
 then the commit message. Commit messages are written in the imperative tense.
 
 Here’s a few examples:
