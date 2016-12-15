@@ -7,7 +7,7 @@ import {
   getNullableType,
 } from 'graphql'
 import { Type, NullableType, ListType } from '../../../interface'
-import { formatName } from '../../../graphql/utils'
+import { formatName, scrib } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import createMutationGqlField from '../../../graphql/schema/createMutationGqlField'
 import transformGqlInputValue from '../../../graphql/schema/transformGqlInputValue'
@@ -19,6 +19,8 @@ import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext
 import transformPgValueIntoValue from '../../../postgres/inventory/transformPgValueIntoValue'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
+import { getEdgeGqlType, createOrderByGqlArg } from '../../../graphql/schema/connection/createConnectionGqlField'
+import getCollectionGqlType from '../../../graphql/schema/collection/getCollectionGqlType'
 
 /**
  * Creates a single mutation GraphQL field entry for our procedure. We use the
@@ -70,6 +72,24 @@ export default function createPgProcedureMutationGqlFieldEntry (
             : fixtures.return.gqlType,
 
           resolve: value => value,
+      }],
+
+      // An edge variant of the created value. Because we use cursor
+      // based pagination, it is also helpful to get the cursor for the
+      // value we just created (thus why this is in the form of an edge).
+      // Also Relay 1 requires us to return the edge.
+      //
+      // We may deprecate this in the future if Relay 2 doesn’t need it.
+      pgCollection && pgCollection.paginator && [formatName.field(`${pgCollection.type.name}-edge`), {
+        description: `An edge for our ${scrib.type(getCollectionGqlType(buildToken, pgCollection))}. May be used by Relay 1.`,
+        type: getEdgeGqlType(buildToken, pgCollection.paginator),
+        args: { orderBy: createOrderByGqlArg(buildToken, pgCollection.paginator) },
+        resolve: (value, args) => ({
+          paginator: pgCollection.paginator,
+          ordering: args['orderBy'],
+          cursor: null,
+          value,
+        }),
       }],
 
       // Add related objects if there is an associated `PgCollection`. This
