@@ -654,6 +654,7 @@ Object {
             "value": "1927-11-06",
           },
         },
+        "decimal": 15.2,
         "domain": 6,
         "domain2": 5,
         "enum": "RED",
@@ -686,6 +687,7 @@ Object {
           },
           "bazBuz": 0,
         },
+        "numeric": 15.2,
         "numrange": Object {
           "end": null,
           "start": Object {

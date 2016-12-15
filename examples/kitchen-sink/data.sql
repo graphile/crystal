@@ -41,6 +41,8 @@ insert into b.types values (
   12,
   50,
   200,
+  15.2,
+  15.2,
   true,
   'xyz',
   'green',
