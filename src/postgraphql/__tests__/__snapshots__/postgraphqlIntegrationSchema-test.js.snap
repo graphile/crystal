@@ -1700,6 +1700,8 @@ type Type implements Node {
   id: Int!
   smallint: Int!
   bigint: Int!
+  numeric: Float!
+  decimal: Float!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -1732,6 +1734,12 @@ input TypeCondition {
 
   # Checks for equality with the object’s \`bigint\` field.
   bigint: Int
+
+  # Checks for equality with the object’s \`numeric\` field.
+  numeric: Float
+
+  # Checks for equality with the object’s \`decimal\` field.
+  decimal: Float
 
   # Checks for equality with the object’s \`boolean\` field.
   boolean: Boolean
@@ -1798,6 +1806,8 @@ input TypeInput {
   id: Int
   smallint: Int!
   bigint: Int!
+  numeric: Float!
+  decimal: Float!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -1825,6 +1835,8 @@ input TypePatch {
   id: Int
   smallint: Int
   bigint: Int
+  numeric: Float
+  decimal: Float
   boolean: Boolean
   varchar: String
   enum: Color
@@ -1882,6 +1894,10 @@ enum TypesOrderBy {
   SMALLINT_DESC
   BIGINT_ASC
   BIGINT_DESC
+  NUMERIC_ASC
+  NUMERIC_DESC
+  DECIMAL_ASC
+  DECIMAL_DESC
   BOOLEAN_ASC
   BOOLEAN_DESC
   VARCHAR_ASC
@@ -4554,6 +4570,8 @@ type Type implements Node {
   id: Int!
   smallint: Int!
   bigint: Int!
+  numeric: Float!
+  decimal: Float!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -4586,6 +4604,12 @@ input TypeCondition {
 
   # Checks for equality with the object’s \`bigint\` field.
   bigint: Int
+
+  # Checks for equality with the object’s \`numeric\` field.
+  numeric: Float
+
+  # Checks for equality with the object’s \`decimal\` field.
+  decimal: Float
 
   # Checks for equality with the object’s \`boolean\` field.
   boolean: Boolean
@@ -4652,6 +4676,8 @@ input TypeInput {
   id: Int
   smallint: Int!
   bigint: Int!
+  numeric: Float!
+  decimal: Float!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -4679,6 +4705,8 @@ input TypePatch {
   id: Int
   smallint: Int
   bigint: Int
+  numeric: Float
+  decimal: Float
   boolean: Boolean
   varchar: String
   enum: Color
@@ -4760,6 +4788,10 @@ enum TypesOrderBy {
   SMALLINT_DESC
   BIGINT_ASC
   BIGINT_DESC
+  NUMERIC_ASC
+  NUMERIC_DESC
+  DECIMAL_ASC
+  DECIMAL_DESC
   BOOLEAN_ASC
   BOOLEAN_DESC
   VARCHAR_ASC
