@@ -4,15 +4,15 @@ import {
   GraphQLList,
   GraphQLEnumType,
   GraphQLObjectType,
+  GraphQLFieldConfig,
   GraphQLScalarType,
   GraphQLBoolean,
   GraphQLInt,
   GraphQLFloat,
   GraphQLString,
   getNullableType as getNullableGqlType,
+  ValueNode,
 } from 'graphql'
-
-import { Value as AstValue } from 'graphql/language/ast'
 
 import {
   switchType,
@@ -146,7 +146,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
         gqlType: new GraphQLNonNull(new GraphQLObjectType({
           name: formatName.type(type.name),
           description: type.description,
-          fields: buildObject(
+          fields: buildObject<GraphQLFieldConfig<TValue, {}>>(
             // Add all of the fields from the interface object type.
             Array.from(type.fields).map(
               <TFieldValue>([fieldName, field]: [string, ObjectType.Field<TValue, TFieldValue>]) => {
@@ -159,7 +159,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
                     resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
                   },
                 }
-              }
+              },
             ),
             // Add extra fields that may exist in our hooks.
             buildToken._hooks.objectTypeFieldEntries
@@ -195,7 +195,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
           description: type.description,
           serialize: (value: TValue): mixed => type.intoOutput(value),
           parseValue: (value: mixed): TValue => type.fromInput(value),
-          parseLiteral: (ast: AstValue): TValue => type.fromInput(parseGqlLiteralToValue(ast)),
+          parseLiteral: (ast: ValueNode): TValue => type.fromInput(parseGqlLiteralToValue(ast)),
         })),
         intoGqlOutput: value => value,
       }

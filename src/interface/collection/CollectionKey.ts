@@ -1,5 +1,4 @@
 import Type from '../type/Type'
-import ObjectType from '../type/ObjectType'
 import Collection from './Collection'
 
 /**

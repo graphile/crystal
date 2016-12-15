@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID, GraphQLOutputType } from 'graphql'
+import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, Condition, ObjectType, Relation } from '../../../interface'
 import { formatName, buildObject, idSerde } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
