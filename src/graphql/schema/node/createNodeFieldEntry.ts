@@ -3,9 +3,8 @@ import { Collection, ObjectType } from '../../../interface'
 import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import { $$isQuery } from '../getQueryGqlType'
-import getNodeInterfaceType from './getNodeInterfaceType'
-
-export const $$nodeValueCollection = Symbol('nodeValueCollection')
+import getCollectionGqlType from '../collection/getCollectionGqlType'
+import getNodeInterfaceType, { $$nodeType } from './getNodeInterfaceType'
 
 // TODO: doc
 export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<mixed, mixed>] {
@@ -56,7 +55,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       // Add the collection to the value so we can accurately determine the
       // type. This way we will know exactly which collection this is for and
       // can avoid ambiguous `isTypeOf` checks.
-      value[$$nodeValueCollection] = collection
+      value[$$nodeType] = getCollectionGqlType(buildToken, collection)
 
       return value
     },
