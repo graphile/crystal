@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection, Condition, ObjectType, Relation } from '../../../interface'
+import { Collection, Condition, ObjectType, Relation, conditionHelpers } from '../../../interface'
 import { formatName, buildObject, idSerde } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
@@ -30,7 +30,7 @@ export default function createCollectionGqlType<TValue> (
 
     // We make `fields` here a thunk because we don’t want to eagerly create
     // types for collections used in this type.
-    fields: () => buildObject<GraphQLFieldConfig<ObjectType.Value, mixed>>(
+    fields: () => buildObject<GraphQLFieldConfig<TValue, mixed>>(
       // Our id field. It is powered by the collection’s primary key. If we
       // have no primary key, we have no id field.
       [
@@ -93,7 +93,7 @@ export default function createCollectionGqlType<TValue> (
               ],
               // We use the config when creating a connection field to inject
               // a condition that limits what we select from the paginator.
-              getPaginatorInput: (headValue: ObjectType.Value, args: { condition?: { [key: string]: mixed } }) =>
+              getPaginatorInput: (headValue: TValue, args: { condition?: { [key: string]: mixed } }) =>
                 conditionHelpers.and(
                   relation.getTailConditionFromHeadValue!(headValue),
                   conditionFromGqlInput(args.condition),

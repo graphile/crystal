@@ -18,9 +18,9 @@ import createMutationPayloadGqlType from './createMutationPayloadGqlType'
 type MutationFieldConfig<T> = {
   name: string,
   description?: string | undefined,
-  inputFields?: Array<[string, GraphQLInputFieldConfig<mixed>] | false | null | undefined>,
+  inputFields?: Array<[string, GraphQLInputFieldConfig] | false | null | undefined>,
   outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
-  payloadType?: GraphQLObjectType<MutationValue<T>>,
+  payloadType?: GraphQLObjectType,
   execute: (context: mixed, input: { [name: string]: mixed }) => Promise<T>,
 }
 
@@ -62,7 +62,7 @@ export default function createMutationGqlField <T>(
         type: new GraphQLNonNull(new GraphQLInputObjectType({
           name: formatName.type(`${config.name}-input`),
           description: `All input for the \`${formatName.field(config.name)}\` mutation.`,
-          fields: buildObject<GraphQLInputFieldConfig<mixed>>(
+          fields: buildObject<GraphQLInputFieldConfig>(
             [
               // Relay 1 requires us to have a `clientMutationId`. This can be
               // helpful for tracking the results of mutations.

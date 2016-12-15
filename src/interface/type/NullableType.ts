@@ -31,27 +31,33 @@ import Type from './Type'
  * Also note that a nullable type may wrap another nullable type unlike in
  * GraphQL where a non-null type may not wrap another non-null type.
  */
-interface NullableType<
-  TNullValue,
-  TNonNullValue,
-> extends Type<TNullValue | TNonNullValue> {
+class NullableType<TNonNullValue> implements Type<TNonNullValue | null | undefined> {
   // The unique type kind.
-  readonly kind: 'NULLABLE'
+  public readonly kind: 'NULLABLE' = 'NULLABLE'
 
   /**
    * The type for the non-null value.
    */
-  readonly nonNullType: Type<TNonNullValue>
+  public readonly nonNullType: Type<TNonNullValue>
 
-  /**
-   * The single null value for this type.
-   */
-  readonly nullValue: TNullValue
+  constructor (nonNullType: Type<TNonNullValue>) {
+    this.nonNullType = nonNullType
+  }
 
   /**
    * Determines if the value passed in is the non-null variant.
    */
-  isNonNull (value: TNullValue | TNonNullValue): value is TNonNullValue
+  public isNonNull (value: TNonNullValue | null | undefined): value is TNonNullValue {
+    return value != null
+  }
+
+  /**
+   * Checks if the value is null, if so returns true. Otherwise we run
+   * `nonNullType.isTypeOf` on the value.
+   */
+  public isTypeOf (value: mixed): value is TNonNullValue | null | undefined {
+    return value == null || this.nonNullType.isTypeOf(value)
+  }
 }
 
 export default NullableType

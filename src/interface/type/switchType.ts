@@ -12,7 +12,7 @@ import ScalarType from './ScalarType'
  * @private
  */
 type SwitchTypeCases<T> = {
-  nullable: (type: NullableType<mixed, mixed>) => T,
+  nullable: (type: NullableType<mixed>) => T,
   list: (type: ListType<mixed, mixed>) => T,
   alias: (type: AliasType<mixed>) => T,
   enum: (type: EnumType<mixed>) => T,

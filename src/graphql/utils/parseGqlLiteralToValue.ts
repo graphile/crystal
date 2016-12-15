@@ -1,12 +1,11 @@
-import { Kind } from 'graphql'
-import { Value as AstValue } from 'graphql/language/ast'
+import { Kind, ValueNode } from 'graphql'
 
 /**
  * Parses a GraphQL AST literal into a JavaScript value.
  *
  * @private
  */
-export default function parseGqlLiteralToValue (ast: AstValue): mixed {
+export default function parseGqlLiteralToValue (ast: ValueNode): mixed {
   switch (ast.kind) {
     case Kind.STRING:
     case Kind.BOOLEAN:

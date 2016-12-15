@@ -49,13 +49,13 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
     // nullable version of the internal non null type. When converting GraphQL
     // input, if the input value is null, we will return null. Otherwise we
     // will delegate to our non-null type’s `fromGqlInput`.
-    nullable: <TNullValue, TNonNullValue>(type: NullableType<TNullValue, TNonNullValue>): GetGqlInputReturn<TNullValue | TNonNullValue> => {
+    nullable: <TNonNullValue>(type: NullableType<TNonNullValue>): GetGqlInputReturn<TNonNullValue | null> => {
       const { gqlType: nonNullGqlType, fromGqlInput: fromNonNullGqlInput } = getGqlInputType(buildToken, type.nonNullType)
       return {
         gqlType: getNullableGqlType(nonNullGqlType),
         fromGqlInput: gqlInput =>
           gqlInput == null
-            ? type.nullValue
+            ? null
             : fromNonNullGqlInput(gqlInput),
       }
     },

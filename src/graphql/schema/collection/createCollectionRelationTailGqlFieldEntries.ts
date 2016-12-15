@@ -16,7 +16,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
     getCollectionValue: (source: TSource) => TValue,
     getFieldName?: (relation: Relation<TValue, mixed, mixed>, collection: Collection<mixed>) => string,
   },
-): Array<[string, GraphQLFieldConfig<TSource>]> {
+): Array<[string, GraphQLFieldConfig<TSource, mixed>]> {
   const { inventory } = buildToken
 
   // Some tests may choose to not include the inventory. If this is the case,
@@ -35,7 +35,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
         relation.headCollectionKey.read != null,
       )
       // Transform the relation into a field entry.
-      .map(<THeadValue, THeadKey>(relation: Relation<TValue, THeadValue, THeadKey>): [string, GraphQLFieldConfig<TSource>] => {
+      .map(<THeadValue, THeadKey>(relation: Relation<TValue, THeadValue, THeadKey>): [string, GraphQLFieldConfig<TSource, mixed>] => {
         const headCollectionKey = relation.headCollectionKey
         const headCollection = headCollectionKey.collection
         const { gqlType: headCollectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, headCollection.type)

@@ -1,9 +1,8 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection, CollectionKey, ObjectType } from '../../../interface'
+import { Collection, CollectionKey } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
-import transformGqlInputValue from '../transformGqlInputValue'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
 import createCollectionKeyInputHelpers from './createCollectionKeyInputHelpers'
 import getConditionGqlType from './getConditionGqlType'
@@ -15,9 +14,9 @@ import getConditionGqlType from './getConditionGqlType'
 export default function createCollectionQueryFieldEntries <TValue>(
   buildToken: BuildToken,
   collection: Collection<TValue>,
-): Array<[string, GraphQLFieldConfig<mixed>]> {
+): Array<[string, GraphQLFieldConfig<never, never>]> {
   const type = collection.type
-  const entries: Array<[string, GraphQLFieldConfig<mixed>]> = []
+  const entries: Array<[string, GraphQLFieldConfig<never, never>]> = []
   const primaryKey = collection.primaryKey
   const paginator = collection.paginator
 
@@ -73,7 +72,7 @@ export default function createCollectionQueryFieldEntries <TValue>(
 function createCollectionPrimaryKeyField <TValue, TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TValue, TKey>,
-): GraphQLFieldConfig<mixed> | undefined {
+): GraphQLFieldConfig<never, never> | undefined {
   const { options, inventory } = buildToken
   const { collection, keyType } = collectionKey
 
@@ -112,20 +111,20 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
 function createCollectionKeyField <TValue, TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TValue, TKey>,
-): GraphQLFieldConfig<mixed> | undefined {
+): GraphQLFieldConfig<never, never> | undefined {
   // If we can’t read from this collection key, stop.
   if (collectionKey.read == null)
     return
 
   const { collection } = collectionKey
   const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
-  const inputHelpers = createCollectionKeyInputHelpers<TKey>(buildToken, collectionKey)
+  const inputHelpers = createCollectionKeyInputHelpers<TValue, TKey>(buildToken, collectionKey)
 
   return {
     type: collectionGqlType,
     args: buildObject(inputHelpers.fieldEntries),
     async resolve (_source, args, context): Promise<mixed> {
-      const key = inputHelpers.getKey(args)
+      const key = inputHelpers.getKeyFromInput(args)
       const value = await collectionKey.read!(context, key)
       if (value == null) return
       return intoGqlOutput(value)

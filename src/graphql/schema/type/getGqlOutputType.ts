@@ -62,7 +62,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
     // When coercing into the output format expected by GraphQL, if the value
     // is of the null variant, we just return `null`. Otherwise we coerce the
     // value using the non-null funciton.
-    nullable: <TNullValue, TNonNullValue>(type: NullableType<TNullValue, TNonNullValue>): GetGqlOutputTypeReturn<TNullValue | TNonNullValue> => {
+    nullable: <TNonNullValue>(type: NullableType<TNonNullValue>): GetGqlOutputTypeReturn<TNonNullValue | null> => {
       const { gqlType: nonNullGqlType, intoGqlOutput: intoNonNullGqlOutput } = getGqlOutputType(buildToken, type.nonNullType)
       return {
         gqlType: getNullableGqlType(nonNullGqlType),

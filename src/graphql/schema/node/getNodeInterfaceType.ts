@@ -9,9 +9,9 @@ const getNodeInterfaceType = memoize1(createNodeInterfaceType)
 
 export default getNodeInterfaceType
 
-function createNodeInterfaceType (buildToken: BuildToken): GraphQLInterfaceType<mixed> {
+function createNodeInterfaceType (buildToken: BuildToken): GraphQLInterfaceType {
   const { options } = buildToken
-  return new GraphQLInterfaceType<mixed>({
+  return new GraphQLInterfaceType({
     name: 'Node',
     description: `An object with a globally unique ${scrib.type(GraphQLID)}.`,
     resolveType: (value: {}) => value === $$isQuery ? getQueryGqlType(buildToken) : value[$$nodeType],
