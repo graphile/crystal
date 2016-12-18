@@ -169,6 +169,38 @@ type CreatePersonPayload {
   query: Query
 }
 
+# All input for the \`createPersonSecret\` mutation.
+input CreatePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`PersonSecret\` to be created by this mutation.
+  personSecret: PersonSecretInput!
+}
+
+# The output of our \`createPersonSecret\` mutation.
+type CreatePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`PersonSecret\` that was created by this mutation.
+  personSecret: PersonSecret
+
+  # An edge for our \`PersonSecret\`. May be used by Relay 1.
+  personSecretEdge(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+  ): PersonSecretsEdge
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
@@ -246,6 +278,39 @@ type DeletePersonPayload {
   clientMutationId: String
   person: Person
   deletedPersonId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`deletePersonSecretByPersonId\` mutation.
+input DeletePersonSecretByPersonIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  personId: Int!
+}
+
+# All input for the \`deletePersonSecret\` mutation.
+input DeletePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`PersonSecret\` to be deleted.
+  id: ID!
+}
+
+# The output of our \`deletePersonSecret\` mutation.
+type DeletePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  personSecret: PersonSecret
+  deletedPersonSecretId: ID
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -508,6 +573,36 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeletePersonByRowIdInput!
   ): DeletePersonPayload
+
+  # Creates a single \`PersonSecret\`.
+  createPersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonSecretInput!
+  ): CreatePersonSecretPayload
+
+  # Updates a single \`PersonSecret\` using its globally unique id and a patch.
+  updatePersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonSecretInput!
+  ): UpdatePersonSecretPayload
+
+  # Updates a single \`PersonSecret\` using a unique key and a patch.
+  updatePersonSecretByPersonId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonSecretByPersonIdInput!
+  ): UpdatePersonSecretPayload
+
+  # Deletes a single \`PersonSecret\` using its globally unique id.
+  deletePersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonSecretInput!
+  ): DeletePersonSecretPayload
+
+  # Deletes a single \`PersonSecret\` using a unique key.
+  deletePersonSecretByPersonId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonSecretByPersonIdInput!
+  ): DeletePersonSecretPayload
 }
 
 # All input for the \`noArgsMutation\` mutation.
@@ -624,6 +719,31 @@ type Person implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): PersonFriendsConnection
+
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  personSecretsByPersonId(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
@@ -743,6 +863,72 @@ input PersonPatch {
   about: String
   email: Email
   createdAt: Datetime
+}
+
+type PersonSecret implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  id: ID!
+  personId: Int!
+  secret: String!
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+}
+
+# A condition to be used against \`PersonSecret\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input PersonSecretCondition {
+  # Checks for equality with the object’s \`personId\` field.
+  personId: Int
+
+  # Checks for equality with the object’s \`secret\` field.
+  secret: String
+}
+
+input PersonSecretInput {
+  personId: Int
+  secret: String!
+}
+
+# Represents an update to a \`PersonSecret\`. Fields that are set will be updated.
+input PersonSecretPatch {
+  personId: Int
+  secret: String
+}
+
+# A connection to a list of \`PersonSecret\` values.
+type PersonSecretsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`PersonSecret\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`PersonSecret\` and cursor to aid in pagination.
+  edges: [PersonSecretsEdge]
+
+  # A list of \`PersonSecret\` objects.
+  nodes: [PersonSecret!]
+}
+
+# A \`PersonSecret\` edge in the connection.
+type PersonSecretsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`PersonSecret\` at the end of the edge.
+  node: PersonSecret!
+}
+
+# Methods to use when ordering \`PersonSecret\`.
+enum PersonSecretsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  SECRET_ASC
+  SECRET_DESC
 }
 
 type Post {
@@ -900,6 +1086,38 @@ type Query implements Node {
   ): Person
   personByEmail(email: Email!): Person
   personByRowId(rowId: Int!): Person
+
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  allPersonSecrets(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
+
+  # Reads a single \`PersonSecret\` using its globally unique \`ID\`.
+  personSecret(
+    # The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
+    id: ID!
+  ): PersonSecret
+  personSecretByPersonId(personId: Int!): PersonSecret
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
@@ -1082,6 +1300,44 @@ type UpdatePersonPayload {
   # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
   person: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`updatePersonSecretByPersonId\` mutation.
+input UpdatePersonSecretByPersonIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  personId: Int!
+
+  # An object where the defined keys will be set on the \`PersonSecret\` identified by our unique key.
+  personSecretPatch: PersonSecretPatch!
+}
+
+# All input for the \`updatePersonSecret\` mutation.
+input UpdatePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`PersonSecret\` to be updated.
+  id: ID!
+
+  # An object where the defined keys will be set on the \`PersonSecret\` identified by our globally unique \`ID\`.
+  personSecretPatch: PersonSecretPatch!
+}
+
+# The output of our \`updatePersonSecret\` mutation.
+type UpdatePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  personSecret: PersonSecret
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -2488,6 +2744,38 @@ type CreatePersonPayload {
   query: Query
 }
 
+# All input for the \`createPersonSecret\` mutation.
+input CreatePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`PersonSecret\` to be created by this mutation.
+  personSecret: PersonSecretInput!
+}
+
+# The output of our \`createPersonSecret\` mutation.
+type CreatePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`PersonSecret\` that was created by this mutation.
+  personSecret: PersonSecret
+
+  # An edge for our \`PersonSecret\`. May be used by Relay 1.
+  personSecretEdge(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+  ): PersonSecretsEdge
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # All input for the \`createPost\` mutation.
 input CreatePostInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
@@ -2752,6 +3040,39 @@ type DeletePersonPayload {
   clientMutationId: String
   person: Person
   deletedPersonId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`deletePersonSecretByPersonId\` mutation.
+input DeletePersonSecretByPersonIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  personId: Int!
+}
+
+# All input for the \`deletePersonSecret\` mutation.
+input DeletePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`PersonSecret\` to be deleted.
+  __id: ID!
+}
+
+# The output of our \`deletePersonSecret\` mutation.
+type DeletePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  personSecret: PersonSecret
+  deletedPersonSecretId: ID
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -3538,6 +3859,36 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeletePersonByIdInput!
   ): DeletePersonPayload
+
+  # Creates a single \`PersonSecret\`.
+  createPersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonSecretInput!
+  ): CreatePersonSecretPayload
+
+  # Updates a single \`PersonSecret\` using its globally unique id and a patch.
+  updatePersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonSecretInput!
+  ): UpdatePersonSecretPayload
+
+  # Updates a single \`PersonSecret\` using a unique key and a patch.
+  updatePersonSecretByPersonId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonSecretByPersonIdInput!
+  ): UpdatePersonSecretPayload
+
+  # Deletes a single \`PersonSecret\` using its globally unique id.
+  deletePersonSecret(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonSecretInput!
+  ): DeletePersonSecretPayload
+
+  # Deletes a single \`PersonSecret\` using a unique key.
+  deletePersonSecretByPersonId(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonSecretByPersonIdInput!
+  ): DeletePersonSecretPayload
 }
 
 type NestedCompoundType {
@@ -3709,6 +4060,31 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  personSecretsByPersonId(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
+
   # Reads and enables paginatation through a set of \`Post\`.
   postsByAuthorId(
     # The method to use when ordering \`Post\`.
@@ -3877,6 +4253,72 @@ input PersonPatch {
   about: String
   email: Email
   createdAt: Datetime
+}
+
+type PersonSecret implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  personId: Int!
+  secret: String!
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+}
+
+# A condition to be used against \`PersonSecret\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input PersonSecretCondition {
+  # Checks for equality with the object’s \`personId\` field.
+  personId: Int
+
+  # Checks for equality with the object’s \`secret\` field.
+  secret: String
+}
+
+input PersonSecretInput {
+  personId: Int
+  secret: String!
+}
+
+# Represents an update to a \`PersonSecret\`. Fields that are set will be updated.
+input PersonSecretPatch {
+  personId: Int
+  secret: String
+}
+
+# A connection to a list of \`PersonSecret\` values.
+type PersonSecretsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`PersonSecret\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`PersonSecret\` and cursor to aid in pagination.
+  edges: [PersonSecretsEdge]
+
+  # A list of \`PersonSecret\` objects.
+  nodes: [PersonSecret!]
+}
+
+# A \`PersonSecret\` edge in the connection.
+type PersonSecretsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`PersonSecret\` at the end of the edge.
+  node: PersonSecret!
+}
+
+# Methods to use when ordering \`PersonSecret\`.
+enum PersonSecretsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  SECRET_ASC
+  SECRET_DESC
 }
 
 type Post implements Node {
@@ -4325,6 +4767,38 @@ type Query implements Node {
   ): Person
   personByEmail(email: Email!): Person
   personById(id: Int!): Person
+
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  allPersonSecrets(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
+
+  # Reads a single \`PersonSecret\` using its globally unique \`ID\`.
+  personSecret(
+    # The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
+    __id: ID!
+  ): PersonSecret
+  personSecretByPersonId(personId: Int!): PersonSecret
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
@@ -5001,6 +5475,44 @@ type UpdatePersonPayload {
   query: Query
 }
 
+# All input for the \`updatePersonSecretByPersonId\` mutation.
+input UpdatePersonSecretByPersonIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  personId: Int!
+
+  # An object where the defined keys will be set on the \`PersonSecret\` identified by our unique key.
+  personSecretPatch: PersonSecretPatch!
+}
+
+# All input for the \`updatePersonSecret\` mutation.
+input UpdatePersonSecretInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`PersonSecret\` to be updated.
+  __id: ID!
+
+  # An object where the defined keys will be set on the \`PersonSecret\` identified by our globally unique \`ID\`.
+  personSecretPatch: PersonSecretPatch!
+}
+
+# The output of our \`updatePersonSecret\` mutation.
+type UpdatePersonSecretPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  personSecret: PersonSecret
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # All input for the \`updatePostById\` mutation.
 input UpdatePostByIdInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
@@ -5511,6 +6023,31 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  personSecretsByPersonId(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
+
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
@@ -5607,6 +6144,61 @@ type PersonFriendsEdge {
 # Methods to use when ordering \`Person\`.
 enum PersonFriendsOrderBy {
   NATURAL
+}
+
+type PersonSecret implements Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  __id: ID!
+  personId: Int!
+  secret: String!
+
+  # Reads a single \`Person\` that is related to this \`PersonSecret\`.
+  personByPersonId: Person
+}
+
+# A condition to be used against \`PersonSecret\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input PersonSecretCondition {
+  # Checks for equality with the object’s \`personId\` field.
+  personId: Int
+
+  # Checks for equality with the object’s \`secret\` field.
+  secret: String
+}
+
+# A connection to a list of \`PersonSecret\` values.
+type PersonSecretsConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`PersonSecret\` you could get from the connection.
+  totalCount: Int
+
+  # A list of edges which contains the \`PersonSecret\` and cursor to aid in pagination.
+  edges: [PersonSecretsEdge]
+
+  # A list of \`PersonSecret\` objects.
+  nodes: [PersonSecret!]
+}
+
+# A \`PersonSecret\` edge in the connection.
+type PersonSecretsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`PersonSecret\` at the end of the edge.
+  node: PersonSecret!
+}
+
+# Methods to use when ordering \`PersonSecret\`.
+enum PersonSecretsOrderBy {
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  SECRET_ASC
+  SECRET_DESC
 }
 
 type Post {
@@ -5764,6 +6356,38 @@ type Query implements Node {
   ): Person
   personByEmail(email: Email!): Person
   personById(id: Int!): Person
+
+  # Reads and enables paginatation through a set of \`PersonSecret\`.
+  allPersonSecrets(
+    # The method to use when ordering \`PersonSecret\`.
+    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonSecretCondition
+  ): PersonSecretsConnection
+
+  # Reads a single \`PersonSecret\` using its globally unique \`ID\`.
+  personSecret(
+    # The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
+    __id: ID!
+  ): PersonSecret
+  personSecretByPersonId(personId: Int!): PersonSecret
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.

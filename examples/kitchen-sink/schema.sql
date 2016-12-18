@@ -23,6 +23,11 @@ create table c.person (
 comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
 
+create table c.person_secret (
+  person_id serial primary key references c.person on delete cascade,
+  secret varchar not null
+);
+
 create table a.post (
   id serial primary key,
   headline text not null,
