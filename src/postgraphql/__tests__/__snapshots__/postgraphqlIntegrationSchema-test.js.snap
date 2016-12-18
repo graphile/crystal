@@ -720,30 +720,8 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`PersonSecret\`.
-  personSecretsByPersonId(
-    # The method to use when ordering \`PersonSecret\`.
-    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-
-    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    # based pagination. May not be used with \`last\`.
-    offset: Int
-
-    # A condition to be used in determining which values should be returned by the collection.
-    condition: PersonSecretCondition
-  ): PersonSecretsConnection
+  # Reads a single \`PersonSecret\` that is related to this \`Person\`.
+  personSecretByPersonId: PersonSecret
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
@@ -4060,30 +4038,8 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`PersonSecret\`.
-  personSecretsByPersonId(
-    # The method to use when ordering \`PersonSecret\`.
-    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-
-    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    # based pagination. May not be used with \`last\`.
-    offset: Int
-
-    # A condition to be used in determining which values should be returned by the collection.
-    condition: PersonSecretCondition
-  ): PersonSecretsConnection
+  # Reads a single \`PersonSecret\` that is related to this \`Person\`.
+  personSecretByPersonId: PersonSecret
 
   # Reads and enables paginatation through a set of \`Post\`.
   postsByAuthorId(
@@ -6023,30 +5979,8 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`PersonSecret\`.
-  personSecretsByPersonId(
-    # The method to use when ordering \`PersonSecret\`.
-    orderBy: PersonSecretsOrderBy = PRIMARY_KEY_ASC
-
-    # Read all values in the set before (above) this cursor.
-    before: Cursor
-
-    # Read all values in the set after (below) this cursor.
-    after: Cursor
-
-    # Only read the first \`n\` values of the set.
-    first: Int
-
-    # Only read the last \`n\` values of the set.
-    last: Int
-
-    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    # based pagination. May not be used with \`last\`.
-    offset: Int
-
-    # A condition to be used in determining which values should be returned by the collection.
-    condition: PersonSecretCondition
-  ): PersonSecretsConnection
+  # Reads a single \`PersonSecret\` that is related to this \`Person\`.
+  personSecretByPersonId: PersonSecret
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
