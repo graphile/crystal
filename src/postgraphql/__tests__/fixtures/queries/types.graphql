@@ -10,6 +10,10 @@ query {
       textArray
       json
       jsonb
+      nullableRange {
+        start { value inclusive }
+        end { value inclusive }
+      }
       numrange {
         start { value inclusive }
         end { value inclusive }
