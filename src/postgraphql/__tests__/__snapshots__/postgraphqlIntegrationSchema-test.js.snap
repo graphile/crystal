@@ -1710,6 +1710,7 @@ type Type implements Node {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  nullableRange: FloatRange
   numrange: FloatRange!
   daterange: DateRange!
   anIntRange: AnIntRange!
@@ -1765,6 +1766,9 @@ input TypeCondition {
   # Checks for equality with the object’s \`jsonb\` field.
   jsonb: Json
 
+  # Checks for equality with the object’s \`nullableRange\` field.
+  nullableRange: FloatRangeInput
+
   # Checks for equality with the object’s \`numrange\` field.
   numrange: FloatRangeInput
 
@@ -1816,6 +1820,7 @@ input TypeInput {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  nullableRange: FloatRangeInput
   numrange: FloatRangeInput!
   daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
@@ -1845,6 +1850,7 @@ input TypePatch {
   textArray: [String]
   json: Json
   jsonb: Json
+  nullableRange: FloatRangeInput
   numrange: FloatRangeInput
   daterange: DateRangeInput
   anIntRange: AnIntRangeInput
@@ -1914,6 +1920,8 @@ enum TypesOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  NULLABLE_RANGE_ASC
+  NULLABLE_RANGE_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
   DATERANGE_ASC
@@ -4586,6 +4594,7 @@ type Type implements Node {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  nullableRange: FloatRange
   numrange: FloatRange!
   daterange: DateRange!
   anIntRange: AnIntRange!
@@ -4641,6 +4650,9 @@ input TypeCondition {
   # Checks for equality with the object’s \`jsonb\` field.
   jsonb: Json
 
+  # Checks for equality with the object’s \`nullableRange\` field.
+  nullableRange: FloatRangeInput
+
   # Checks for equality with the object’s \`numrange\` field.
   numrange: FloatRangeInput
 
@@ -4692,6 +4704,7 @@ input TypeInput {
   textArray: [String]!
   json: Json!
   jsonb: Json!
+  nullableRange: FloatRangeInput
   numrange: FloatRangeInput!
   daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
@@ -4721,6 +4734,7 @@ input TypePatch {
   textArray: [String]
   json: Json
   jsonb: Json
+  nullableRange: FloatRangeInput
   numrange: FloatRangeInput
   daterange: DateRangeInput
   anIntRange: AnIntRangeInput
@@ -4814,6 +4828,8 @@ enum TypesOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  NULLABLE_RANGE_ASC
+  NULLABLE_RANGE_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
   DATERANGE_ASC

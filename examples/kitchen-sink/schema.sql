@@ -109,6 +109,7 @@ create table b.types (
   "text_array" text[] not null,
   "json" json not null,
   "jsonb" jsonb not null,
+  "nullable_range" numrange,
   "numrange" numrange not null,
   "daterange" daterange not null,
   "an_int_range" a.an_int_range not null,

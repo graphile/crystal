@@ -51,6 +51,7 @@ insert into b.types values (
   array['hey', 'i', 'just', 'met', 'you'],
   '{"a":1,"b":2,"c":3,"d":{"e":4,"f":5,"g":[6,7,8,"x",false,null]}}',
   '{"1":"a","2":"b","3":"c","4":{"5":"d","6":"e","7":["f","g","h",42,true,null]}}',
+  null,
   numrange(-10, 52),
   daterange('1998-07-12', '2016-10-07'),
   '[20, 53]',

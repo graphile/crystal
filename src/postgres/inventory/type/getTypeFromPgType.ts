@@ -120,7 +120,7 @@ function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Typ
     // If this type is a range type…
     // TODO: test
     case 'r':
-      return new PgRangeObjectType(pgCatalog, pgType)
+      return new NullableType(new PgRangeObjectType(pgCatalog, pgType))
     default: {
       /* noop */
     }
