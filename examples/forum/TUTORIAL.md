@@ -731,7 +731,7 @@ create policy delete_person on forum_example.person for delete to forum_example_
   using (id = current_setting('jwt.claims.person_id')::integer);
 ```
 
-We use the current `person_id` from our JWT and only allow updates and deletes on rows with the same id. Also note how we added `to forum_example_person`. This is because we only want these policies to apply for the `forum_example_person` role.
+We use the current `person_id` from our JWT and only allow updates and deletes on rows with the same id. Also note how we added to `forum_example_person`. This is because we only want these policies to apply for the `forum_example_person` role.
 
 That’s all we need to define for our person table. Now let’s define three policies for our posts table. One for `INSERT`, `UPDATE`, and `DELETE`.
 
@@ -757,7 +757,7 @@ postgraphql \
   --connection postgres://forum_example_postgraphql:xyz@localhost:5432 \
   --schema forum_example \
   --default-role forum_example_anonymous \
-  --secret keyboard_kiten \
+  --secret keyboard_kitten \
   --token forum_example.jwt_token
 ```
 
