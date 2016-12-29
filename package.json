@@ -61,7 +61,7 @@
     "connect": "^3.5.0",
     "express": "^4.14.0",
     "graphql": "^0.8.2",
-    "jest": "^17.0.3",
+    "jest": "^18.1.0",
     "koa": "^2.0.0",
     "nodemon": "^1.11.0",
     "source-map-support": "^0.4.6",
