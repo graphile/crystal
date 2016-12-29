@@ -38,22 +38,22 @@ export default async function setupRequestPgClientTransaction (request, pgClient
     try {
       // Check optional JWT audience. if none provided, default to postgraphql.
       if (jwtAudience == undefined)
-        jwtAudience = "postgraphql";
+        jwtAudience = "postgraphql"
           
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience });
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience })
           
       // If there is a `role` property in the claims, use that instead of our
       // default role. If no `role` property is found, check if there is a `roles`
       // array. If so, use the first role inside of that array. The `roles`
       // bring support for JWTs produced by Auth0.
       if (jwtClaims.role != null)
-        role = jwtClaims.role;
+        role = jwtClaims.role
       else if (jwtClaims.roles[0] != null)
-        role = jwtClaims.roles[0];
+        role = jwtClaims.roles[0]
     }
     catch (error) {
-      error.statusCode = 403;
-      throw error;
+      error.statusCode = 403
+      throw error
     }
   }
 
