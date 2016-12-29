@@ -284,6 +284,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       await pgClient.query('begin')
       pgRole = await setupRequestPgClientTransaction(req, pgClient, {
         jwtSecret: options.jwtSecret,
+        jwtAudience: options.jwtAudience,
         pgDefaultRole: options.pgDefaultRole,
       })
 
