@@ -33,28 +33,28 @@ export default async function setupRequestPgClientTransaction (request, pgClient
   // If we were provided a JWT token, let us try to verify it. If verification
   // fails we want to throw an error.
   if (jwtToken) {
-      // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
-      // as a 403 error because the token is not trustworthy.
-      try {
-          // Check optional JWT audience. if none provided, default to postgraphql.
-          if (jwtAudience == undefined)
-              jwtAudience = "postgraphql";
+    // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
+    // as a 403 error because the token is not trustworthy.
+    try {
+      // Check optional JWT audience. if none provided, default to postgraphql.
+      if (jwtAudience == undefined)
+        jwtAudience = "postgraphql";
           
-          jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience });
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience });
           
-          // If there is a `role` property in the claims, use that instead of our
-          // default role. If no `role` property is found, check if there is a `roles`
-          // array. If so, use the first role inside of that array. The `roles`
-          // bring support for JWTs produced by Auth0.
-          if (jwtClaims.role != null)
-              role = jwtClaims.role;
-          else if (jwtClaims.roles[0] != null)
-              role = jwtClaims.roles[0];
-      }
-      catch (error) {
-          error.statusCode = 403;
-          throw error;
-      }
+      // If there is a `role` property in the claims, use that instead of our
+      // default role. If no `role` property is found, check if there is a `roles`
+      // array. If so, use the first role inside of that array. The `roles`
+      // bring support for JWTs produced by Auth0.
+      if (jwtClaims.role != null)
+        role = jwtClaims.role;
+      else if (jwtClaims.roles[0] != null)
+        role = jwtClaims.roles[0];
+    }
+    catch (error) {
+      error.statusCode = 403;
+      throw error;
+    }
   }
 
   // Instantiate a map of local settings. This map will be transformed into a
