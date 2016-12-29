@@ -37,11 +37,11 @@ export default async function setupRequestPgClientTransaction (request, pgClient
     // as a 403 error because the token is not trustworthy.
     try {
       // Check optional JWT audience. if none provided, default to postgraphql.
-      if (jwtAudience == undefined)
-        jwtAudience = "postgraphql"
-          
+      if (jwtAudience === undefined)
+        jwtAudience = 'postgraphql'
+
       jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience })
-          
+
       // If there is a `role` property in the claims, use that instead of our
       // default role. If no `role` property is found, check if there is a `roles`
       // array. If so, use the first role inside of that array. The `roles`
