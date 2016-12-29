@@ -67,7 +67,7 @@
     "source-map-support": "^0.4.6",
     "supertest": "^2.0.0",
     "supertest-as-promised": "^4.0.2",
-    "ts-node": "^1.7.0",
+    "ts-node": "^2.0.0",
     "tslint": "^4.2.0",
     "typescript": "^2.0.10"
   },
