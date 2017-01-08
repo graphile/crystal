@@ -14,7 +14,8 @@
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "lib": ["es2015"]
   },
   "exclude": [
     "index.js",
