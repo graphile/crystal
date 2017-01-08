@@ -2,7 +2,7 @@ language: node_js
 
 node_js:
   - "6"
-  - "4"
+  - "4.3.2"
 
 addons:
   postgresql: "9.4"
