@@ -3,7 +3,7 @@
     "allowJs": true,
     "rootDir": "src",
     "outDir": "build",
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "inlineSourceMap": true,
@@ -14,7 +14,8 @@
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "lib": ["es2015"]
   },
   "exclude": [
     "index.js",

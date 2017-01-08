@@ -69,7 +69,7 @@
     "supertest-as-promised": "^4.0.2",
     "ts-node": "^1.7.0",
     "tslint": "^4.2.0",
-    "typescript": "^2.0.10"
+    "typescript": "^2.2.0-dev.20170107"
   },
   "jest": {
     "transform": {
