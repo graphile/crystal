@@ -3,7 +3,7 @@
     "allowJs": true,
     "rootDir": "src",
     "outDir": "build",
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "inlineSourceMap": true,
