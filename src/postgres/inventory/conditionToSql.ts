@@ -25,7 +25,12 @@ export default function conditionToSql (condition: Condition, path: Array<string
     case 'GREATER_THAN':
       return sql.query`(${sql.identifier(...path)} > ${sql.value(condition.value)})`
     case 'REGEXP':
-      return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(condition.regexp.source)}, ${sql.value(condition.regexp.flags)})`
+      // Parse out the regular expression. In Node.js v4 we can’t get the
+      // `flags` property so we need to do it this way.
+      const match = condition.regexp.toString().match(/^\/(.*?)\/(g?i?m?u?y?)$/i)
+      if (!match) throw new Error('Invalid regular expression.')
+      const [, pattern, flags] = match
+      return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(pattern)}, ${sql.value(flags)})`
     default:
       throw new Error(`Condition of type '${condition['type']}' is not recognized.`)
   }
