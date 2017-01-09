@@ -18,7 +18,7 @@ import getJwtGqlType from './auth/getJwtGqlType'
  */
 export default async function createPostGraphQLSchema (
   clientOrConfig?: Client | ClientConfig | string,
-  schema: string | Array<string> = 'public',
+  schemaOrCatalog: string | Array<string> | PgCatalog = 'public',
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
@@ -27,24 +27,30 @@ export default async function createPostGraphQLSchema (
     disableDefaultMutations?: boolean,
   } = {},
 ): Promise<GraphQLSchema> {
-  // If our argument was not an array, make it one.
-  const schemas = Array.isArray(schema) ? schema : [schema]
-
   // Create our inventory.
   const inventory = new Inventory()
   let pgCatalog: PgCatalog
 
-  // Introspect our Postgres database to get a catalog. If we weren’t given a
-  // client, we will just connect a default client from the `pg` module.
-  // TODO: test
-  if (clientOrConfig instanceof Client) {
-    const pgClient = clientOrConfig
-    pgCatalog = await introspectPgDatabase(pgClient, schemas)
+  // If schema already is a PgCatalog use it, otherwise 'build' the PgCatalog
+  if (schemaOrCatalog instanceof PgCatalog) {
+    pgCatalog = schemaOrCatalog
   }
   else {
-    const pgClient = await connectPgClient(clientOrConfig || {})
-    pgCatalog = await introspectPgDatabase(pgClient, schemas)
-    pgClient.end()
+    // If our argument was not an array, make it one.
+    const schemas = Array.isArray(schemaOrCatalog) ? schemaOrCatalog : [schemaOrCatalog]
+
+    // Introspect our Postgres database to get a catalog. If we weren’t given a
+    // client, we will just connect a default client from the `pg` module.
+    // TODO: test
+    if (clientOrConfig instanceof Client) {
+      const pgClient = clientOrConfig
+      pgCatalog = await introspectPgDatabase(pgClient, schemas)
+    }
+    else {
+      const pgClient = await connectPgClient(clientOrConfig || {})
+      pgCatalog = await introspectPgDatabase(pgClient, schemas)
+      pgClient.end()
+    }
   }
 
   // Gets the Postgres token type from our provided identifier. Just null if
