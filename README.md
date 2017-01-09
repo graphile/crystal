@@ -64,7 +64,7 @@ create table post (
   author_id int non null references user(id),
   headline text,
   body text,
-  …
+  ...
 );
 ```
 
@@ -134,7 +134,7 @@ Documenting PostgreSQL objects with the [`COMMENT`][sql-comment] command like so
 ```sql
 create table user (
   username text non null unique,
-  …
+  ...
 );
 
 comment on table user is 'A human user of the forum.';
@@ -145,7 +145,7 @@ Will let you reflect on the schema and get the JSON below:
 
 ```graphql
 {
-  __type(name: "User") { … }
+  __type(name: "User") { ... }
 }
 ```
 
@@ -170,8 +170,6 @@ Will let you reflect on the schema and get the JSON below:
 [GraphiQL][graphiql] is a great tool by Facebook to let you interactively explore your data. When development mode is enabled in PostGraphQL, the GraphiQL interface will be *automatically* displayed at your GraphQL endpoint.
 
 Just navigate with your browser to the URL printed to your console after starting PostGraphQL and use GraphiQL with your data! Even if you don’t want to use GraphQL in your app, this is a great interface for working with any PostgreSQL database.
-
-Just remember to use the `--development` flag when starting PostGraphQL!
 
 [graphiql]: https://github.com/graphql/graphiql
 
