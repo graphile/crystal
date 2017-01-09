@@ -64,7 +64,7 @@ create table post (
   author_id int non null references user(id),
   headline text,
   body text,
-  …
+  ...
 );
 ```
 
@@ -134,7 +134,7 @@ Documenting PostgreSQL objects with the [`COMMENT`][sql-comment] command like so
 ```sql
 create table user (
   username text non null unique,
-  …
+  ...
 );
 
 comment on table user is 'A human user of the forum.';
@@ -145,7 +145,7 @@ Will let you reflect on the schema and get the JSON below:
 
 ```graphql
 {
-  __type(name: "User") { … }
+  __type(name: "User") { ... }
 }
 ```
 
