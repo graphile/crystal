@@ -27,7 +27,7 @@ export default function conditionToSql (condition: Condition, path: Array<string
     case 'REGEXP':
       // Parse out the regular expression. In Node.js v4 we can’t get the
       // `flags` property so we need to do it this way.
-      const match = condition.regexp.toString().match(/^\/(.*?)\/(g?i?m?u?y?)$/i)
+      const match = condition.regexp.toString().match(/^\/(.*)\/([gimuy]*)$/i)
       if (!match) throw new Error('Invalid regular expression.')
       const [, pattern, flags] = match
       return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(pattern)}, ${sql.value(flags)})`
