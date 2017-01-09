@@ -18,7 +18,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    async resolve (_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<ObjectType.Value | Symbol | null> {
+    async resolve (_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<ObjectType.Value | symbol | null> {
       let deserializationResult: { collection: Collection, keyValue: mixed }
       const idString = args[options.nodeIdFieldName]
 
@@ -44,7 +44,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       const primaryKey = collection.primaryKey
 
       if (!primaryKey || !primaryKey.read)
-        throw new Error(`Invalid id, no readable primary key on collection named '${name}'.`)
+        throw new Error(`Invalid id, no readable primary key on collection named '${collection.name}'.`)
 
       const value = await primaryKey.read(context, keyValue)
 
