@@ -171,8 +171,6 @@ Will let you reflect on the schema and get the JSON below:
 
 Just navigate with your browser to the URL printed to your console after starting PostGraphQL and use GraphiQL with your data! Even if you don’t want to use GraphQL in your app, this is a great interface for working with any PostgreSQL database.
 
-Just remember to use the `--development` flag when starting PostGraphQL!
-
 [graphiql]: https://github.com/graphql/graphiql
 
 ### Token Based Authorization
