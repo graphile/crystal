@@ -18,7 +18,7 @@ import getJwtGqlType from './auth/getJwtGqlType'
  */
 export default async function createPostGraphQLSchema (
   clientOrConfig?: Client | ClientConfig | string,
-  schema: string | Array<string> | PgCatalog = 'public',
+  schemaOrCatalog: string | Array<string> | PgCatalog = 'public',
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
@@ -32,12 +32,12 @@ export default async function createPostGraphQLSchema (
   let pgCatalog: PgCatalog
 
   // If schema already is a PgCatalog use it, otherwise 'build' the PgCatalog
-  if (schema instanceof PgCatalog) {
-    pgCatalog = schema
+  if (schemaOrCatalog instanceof PgCatalog) {
+    pgCatalog = schemaOrCatalog
   }
   else {
     // If our argument was not an array, make it one.
-    const schemas = Array.isArray(schema) ? schema : [schema]
+    const schemas = Array.isArray(schemaOrCatalog) ? schemaOrCatalog : [schemaOrCatalog]
 
     // Introspect our Postgres database to get a catalog. If we weren’t given a
     // client, we will just connect a default client from the `pg` module.
