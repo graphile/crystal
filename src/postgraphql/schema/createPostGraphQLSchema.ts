@@ -32,9 +32,10 @@ export default async function createPostGraphQLSchema (
   let pgCatalog: PgCatalog
 
   // If schema already is a PgCatalog use it, otherwise 'build' the PgCatalog
-  if(schema instanceof PgCatalog) {
+  if (schema instanceof PgCatalog) {
     pgCatalog = schema
-  } else {
+  }
+  else {
     // If our argument was not an array, make it one.
     const schemas = Array.isArray(schema) ? schema : [schema]
 
