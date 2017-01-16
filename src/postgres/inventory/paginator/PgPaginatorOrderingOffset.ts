@@ -1,7 +1,6 @@
 import { Paginator } from '../../../interface'
 import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPgValueIntoValue from '../transformPgValueIntoValue'
 import PgPaginator from './PgPaginator'
 
 /**
@@ -141,8 +140,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =
       rows.map(({ value }, i) => ({
-        // tslint:disable-next-line no-any
-        value: transformPgValueIntoValue(this.pgPaginator.itemType, value) as any,
+        value: this.pgPaginator.itemType.transformPgValueIntoValue(value),
         cursor: offset + 1 + i,
       }))
 

@@ -1,27 +1,24 @@
-import {
-  Inventory,
-  Type,
-  AliasType,
-  NullableType,
-  ListType,
-  EnumType,
-  booleanType,
-  integerType,
-  floatType,
-  stringType,
-  jsonType,
-} from '../../../interface'
+import { Inventory, getNonNullableType } from '../../../interface'
 import { memoize2 } from '../../utils'
 import PgCatalog from '../../introspection/PgCatalog'
 import PgCatalogType from '../../introspection/object/PgCatalogType'
 import PgCollection from '../collection/PgCollection'
-import PgClassObjectType from './PgClassObjectType'
-import PgRangeObjectType from './PgRangeObjectType'
-import pgUuidType from './individual/pgUuidType'
-import pgDatetimeType from './individual/pgDatetimeType'
-import pgDateType from './individual/pgDateType'
-import pgTimeType from './individual/pgTimeType'
-import pgIntervalType from './individual/pgIntervalType'
+import PgClassType from './PgClassType'
+import PgRangeType from './PgRangeType'
+import pgBooleanType from './scalar/pgBooleanType'
+import pgIntegerType from './scalar/pgIntegerType'
+import pgFloatType from './scalar/pgFloatType'
+import pgStringType from './scalar/pgStringType'
+import pgUuidType from './custom/pgUuidType'
+import pgDatetimeType from './custom/pgDatetimeType'
+import pgDateType from './custom/pgDateType'
+import pgTimeType from './custom/pgTimeType'
+import pgIntervalType from './custom/pgIntervalType'
+import PgType from './PgType'
+import PgNullableType from './PgNullableType'
+import PgAliasType from './PgAliasType'
+import PgEnumType from './PgEnumType'
+import PgListType from './PgListType'
 
 /**
  * A hardcoded list of PostgreSql type OIDs to interface types. Some types
@@ -37,10 +34,10 @@ import pgIntervalType from './individual/pgIntervalType'
  *
  * @private
  */
-const pgTypeIdToType = new Map<string, Type<mixed>>([
-  ['20', integerType],      // int8, bigint
-  ['21', integerType],      // int2, smallint
-  ['23', integerType],      // int4, integer
+const pgTypeIdToType = new Map<string, PgType<mixed>>([
+  ['20', pgIntegerType],    // int8, bigint
+  ['21', pgIntegerType],    // int2, smallint
+  ['23', pgIntegerType],    // int4, integer
   ['114', jsonType],        // json
   ['3802', jsonType],       // jsonb
   ['2950', pgUuidType],     // uuid
@@ -61,7 +58,7 @@ const _getTypeFromPgType = memoize2(createTypeFromPgType)
  * equality.
  */
 // TODO: The third `Inventory` argument is hacky and should be refactored.
-function getTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType, _inventory?: Inventory): Type<mixed> {
+function getTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType, _inventory?: Inventory): PgType<mixed> {
   // If this is a composite type, then it may be the type for a row. Search our
   // collections (if an `Inventory` was provided) to see if this type
   // truly is a row type. If we find a collection, just return the collection’s
@@ -69,9 +66,9 @@ function getTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType, _invent
   //
   // Note that this check is not memoized.
   if (_inventory && pgType.type === 'c') {
-    const collection = _inventory.getCollections().find(aCollection => aCollection instanceof PgCollection && aCollection.pgClass.typeId === pgType.id)
+    const collection = _inventory.getCollections().find(aCollection => aCollection instanceof PgCollection && aCollection.pgClass.typeId === pgType.id) as PgCollection | undefined
     if (collection)
-      return new NullableType(collection.type)
+      return new PgNullableType(collection.type)
   }
 
   return _getTypeFromPgType(pgCatalog, pgType)
@@ -79,13 +76,13 @@ function getTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType, _invent
 
 export default getTypeFromPgType
 
-function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Type<mixed> {
+function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): PgType<mixed> {
   if (!pgCatalog.hasType(pgType))
     throw new Error(`Postgres type of name '${pgType.name}' and id '${pgType.id}' does not exist.`)
 
   // If our type id was hardcoded to have a certain type, use it.
   if (pgTypeIdToType.has(pgType.id))
-    return new NullableType(pgTypeIdToType.get(pgType.id)!)
+    return new PgNullableType(pgTypeIdToType.get(pgType.id)!)
 
   // If the type is one of these kinds, it is a special case and should be
   // treated as such.
@@ -93,25 +90,25 @@ function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Typ
     // If this type is a composite type…
     case 'c': {
       const pgClass = pgCatalog.assertGetClass(pgType.classId)
-      const objectType = new PgClassObjectType(pgCatalog, pgClass)
-      return new NullableType(objectType)
+      const objectType = new PgClassType(pgCatalog, pgClass)
+      return new PgNullableType(objectType)
     }
     // If this type is a domain type…
     case 'd': {
       const pgBaseType = pgCatalog.assertGetType(pgType.domainBaseTypeId)
       const baseType = getTypeFromPgType(pgCatalog, pgBaseType)
 
-      const aliasType = new AliasType({
+      const aliasType = new PgAliasType({
         name: pgType.name,
         description: pgType.description,
-        baseType: baseType instanceof NullableType ? baseType.nonNullType : baseType,
+        baseType: getNonNullableType(baseType) as PgType<mixed>,
       })
 
-      return pgType.domainIsNotNull ? aliasType : new NullableType(aliasType)
+      return pgType.domainIsNotNull ? aliasType : new PgNullableType(aliasType)
     }
     // If this type is an enum type…
     case 'e': {
-      return new NullableType(new EnumType({
+      return new PgNullableType(new PgEnumType({
         name: pgType.name,
         description: pgType.description,
         variants: new Set(pgType.enumVariants),
@@ -120,7 +117,7 @@ function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Typ
     // If this type is a range type…
     // TODO: test
     case 'r':
-      return new NullableType(new PgRangeObjectType(pgCatalog, pgType))
+      return new PgNullableType(new PgRangeType(pgCatalog, pgType))
     default: {
       /* noop */
     }
@@ -136,19 +133,19 @@ function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Typ
 
       const itemType = pgCatalog.assertGetType(pgType.arrayItemTypeId)
 
-      return new NullableType(new ListType(getTypeFromPgType(pgCatalog, itemType)))
+      return new PgNullableType(new PgListType(getTypeFromPgType(pgCatalog, itemType)))
     }
     case 'B':
-      return new NullableType(booleanType)
+      return new PgNullableType(pgBooleanType)
     // If our type is of the number category, return a float type. We check
     // for integers with `pgTypeIdToType`.
     case 'N':
-      return new NullableType(floatType)
+      return new PgNullableType(pgFloatType)
     default: {
       /* noop */
     }
   }
 
   // If all else fails, we just return a nullable string :)
-  return new NullableType(stringType)
+  return new PgNullableType(pgStringType)
 }

@@ -4,12 +4,9 @@ import { Client } from 'pg'
 import { Collection } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PgCatalog, PgCatalogNamespace, PgCatalogClass, PgCatalogAttribute } from '../../introspection'
-import PgObjectType from '../type/PgObjectType'
-import PgClassObjectType from '../type/PgClassObjectType'
+import PgClassType from '../type/PgClassType'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPgValueIntoValue from '../transformPgValueIntoValue'
-import transformValueIntoPgValue from '../transformValueIntoPgValue'
 import PgCollectionPaginator from '../paginator/PgCollectionPaginator'
 import PgCollectionKey from './PgCollectionKey'
 
@@ -18,7 +15,7 @@ import PgCollectionKey from './PgCollectionKey'
  * data. A collection aligns fairly well with a Postgres “class” that is
  * selectable. Non-selectable classes are generally compound types.
  */
-class PgCollection implements Collection {
+class PgCollection implements Collection<PgClassType.Value> {
   constructor (
     public _options: Options,
     public _pgCatalog: PgCatalog,
@@ -61,7 +58,7 @@ class PgCollection implements Collection {
    * We can depend on this type having the exact same number of fields as there
    * are Postgres attributes and in the exact same order.
    */
-  public type: PgClassObjectType = new PgClassObjectType(this._pgCatalog, this.pgClass, {
+  public type: PgClassType = new PgClassType(this._pgCatalog, this.pgClass, {
     // Singularize the name of our type, *unless* a class already exists in our
     // catalog with that name. If a class already has the name we will just
     // cause a conflict.
@@ -116,10 +113,10 @@ class PgCollection implements Collection {
 
   // If we can’t insert into this class, there should be no `create`
   // function. Otherwise our `create` method is pretty basic.
-  public create: ((context: mixed, value: PgObjectType.Value) => Promise<PgObjectType.Value>) | null = (
+  public create: ((context: mixed, value: PgClassType.Value) => Promise<PgClassType.Value>) | null = (
     !this.pgClass.isInsertable
       ? null
-      : (context: mixed, value: PgObjectType.Value): Promise<PgObjectType.Value> =>
+      : (context: mixed, value: PgClassType.Value): Promise<PgClassType.Value> =>
         this._getInsertLoader(pgClientFromContext(context)).load(value)
   )
 
@@ -131,9 +128,9 @@ class PgCollection implements Collection {
    * @private
    */
   @memoizeMethod
-  private _getInsertLoader (client: Client): DataLoader<PgObjectType.Value, PgObjectType.Value> {
-    return new DataLoader<PgObjectType.Value, PgObjectType.Value>(
-      async (values: Array<PgObjectType.Value>): Promise<Array<PgObjectType.Value>> => {
+  private _getInsertLoader (client: Client): DataLoader<PgClassType.Value, PgClassType.Value> {
+    return new DataLoader<PgClassType.Value, PgClassType.Value>(
+      async (values: Array<PgClassType.Value>): Promise<Array<PgClassType.Value>> => {
         const insertionIdentifier = Symbol()
 
         // Create our insert query.
@@ -152,9 +149,10 @@ class PgCollection implements Collection {
               // Make sure we have one value for every attribute in the class,
               // if there was no such value defined, we should just use
               // `default` and use the user’s default value.
-              sql.query`(${sql.join(Array.from(this.type.fields).map(([fieldName, field]) =>
-                value.has(fieldName) ? transformValueIntoPgValue(field.type, value.get(fieldName)) : sql.query`default`,
-              ), ', ')})`,
+              sql.query`(${sql.join(Array.from(this.type.fields.values()).map(field => {
+                const fieldValue = field.getValue(value)
+                return typeof fieldValue === 'undefined' ? sql.query`default` : field.type.transformValueIntoPgValue(fieldValue)
+              }), ', ')})`,
             ), ', ')}
 
             -- Finally, return everything.
@@ -165,8 +163,7 @@ class PgCollection implements Collection {
         `)
 
         const { rows } = await client.query(query)
-        // tslint:disable-next-line no-any
-        return rows.map(({ object }) => transformPgValueIntoValue(this.type, object) as any)
+        return rows.map(({ object }) => this.type.transformPgValueIntoValue(object))
       },
     )
   }

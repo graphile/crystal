@@ -6,21 +6,18 @@ import {
   GraphQLInputFieldConfig,
   getNullableType,
 } from 'graphql'
-import { Type, NullableType, ListType } from '../../../interface'
-import { formatName, scrib } from '../../../graphql/utils'
+import { Type, switchType } from '../../../interface'
+import { formatName } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import createMutationGqlField from '../../../graphql/schema/createMutationGqlField'
-import transformGqlInputValue from '../../../graphql/schema/transformGqlInputValue'
 import createCollectionRelationTailGqlFieldEntries from '../../../graphql/schema/collection/createCollectionRelationTailGqlFieldEntries'
 import { sql } from '../../../postgres/utils'
 import { PgCatalog, PgCatalogProcedure } from '../../../postgres/introspection'
 import PgCollection from '../../../postgres/inventory/collection/PgCollection'
 import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
-import transformPgValueIntoValue from '../../../postgres/inventory/transformPgValueIntoValue'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import { getEdgeGqlType, createOrderByGqlArg } from '../../../graphql/schema/connection/createConnectionGqlField'
-import getCollectionGqlType from '../../../graphql/schema/collection/getCollectionGqlType'
 
 /**
  * Creates a single mutation GraphQL field entry for our procedure. We use the
@@ -44,7 +41,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig<mixed>]>(
+  const inputFields = fixtures.args.map<[string, GraphQLInputFieldConfig]>(
     ({ name, gqlType }) =>
       [formatName.field(name), {
         // No description…
@@ -71,7 +68,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
             ? new GraphQLList(fixtures.return.gqlType)
             : fixtures.return.gqlType,
 
-          resolve: value => value,
+          resolve: value => fixtures.return.intoGqlOutput(value),
       }],
 
       // An edge variant of the created value. Because we use cursor
@@ -81,7 +78,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       //
       // We may deprecate this in the future if Relay 2 doesn’t need it.
       pgCollection && pgCollection.paginator && [formatName.field(`${pgCollection.type.name}-edge`), {
-        description: `An edge for our ${scrib.type(getCollectionGqlType(buildToken, pgCollection))}. May be used by Relay 1.`,
+        description: `An edge for the type. May be used by Relay 1.`,
         type: getEdgeGqlType(buildToken, pgCollection.paginator),
         args: { orderBy: createOrderByGqlArg(buildToken, pgCollection.paginator) },
         resolve: (value, args) => ({
@@ -94,7 +91,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
 
       // Add related objects if there is an associated `PgCollection`. This
       // helps in Relay 1.
-      ...(pgCollection ? createCollectionRelationTailGqlFieldEntries(buildToken, pgCollection) : []),
+      ...(pgCollection ? createCollectionRelationTailGqlFieldEntries(buildToken, pgCollection, { getCollectionValue: value => value }) : []),
     ],
 
     // Actually execute the procedure here.
@@ -102,7 +99,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       const client = pgClientFromContext(context)
 
       // Turn our GraphQL input into an input tuple.
-      const input = inputFields.map(([fieldName, { type }]) => transformGqlInputValue(type, gqlInput[fieldName]))
+      const input = inputFields.map(([fieldName], i) => fixtures.args[i].fromGqlInput(gqlInput[fieldName]))
 
       // Craft our procedure call. A procedure name with arguments, like any
       // other function call. Input values must be coerced twice however.
@@ -118,7 +115,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       )
 
       const { rows } = await client.query(query)
-      const values = rows.map(({ value }) => transformPgValueIntoValue(fixtures.return.type, value))
+      const values = rows.map(({ value }) => fixtures.return.type.transformPgValueIntoValue(value))
 
       // If we selected a set of values, return the full set. Otherwise only
       // return the one we queried.
@@ -131,12 +128,13 @@ export default function createPgProcedureMutationGqlFieldEntry (
  * Gets the field name for any given type. Pluralizes the name of for item
  * types in list types.
  */
-function getTypeFieldName (type: Type<mixed>): string {
-  if (type instanceof NullableType)
-    return getTypeFieldName(type.nonNullType)
-
-  if (type instanceof ListType)
-    return pluralize(getTypeFieldName(type.itemType))
-
-  return type.getNamedType().name
+function getTypeFieldName (_type: Type<mixed>): string {
+  return switchType<string>(_type, {
+    nullable: type => getTypeFieldName(type.nonNullType),
+    list: type => pluralize(getTypeFieldName(type.itemType)),
+    alias: type => type.name,
+    enum: type => type.name,
+    object: type => type.name,
+    scalar: type => type.name,
+  })
 }

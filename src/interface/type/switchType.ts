@@ -43,9 +43,10 @@ function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCase
 
   const cases = typeOrCases
 
-  return (type: Type<mixed>): T => {
+  function callSwitchTypeCase (type: Type<mixed>): T {
     switch (type.kind) {
       // tslint:disable no-any
+      case 'ADAPTER': return callSwitchTypeCase((type as any).baseType)
       case 'NULLABLE': return cases.nullable(type as any)
       case 'LIST': return cases.list(type as any)
       case 'ALIAS': return cases.alias(type as any)
@@ -56,6 +57,8 @@ function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCase
       default: throw new Error(`Type of kind '${type.kind}' is unrecognized.`)
     }
   }
+
+  return callSwitchTypeCase
 }
 
 export default switchType

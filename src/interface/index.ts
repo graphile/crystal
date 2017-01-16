@@ -12,12 +12,15 @@ import AliasType from './type/AliasType'
 import EnumType from './type/EnumType'
 import ObjectType from './type/ObjectType'
 import ScalarType from './type/ScalarType'
+import AdapterType from './type/AdapterType'
 import booleanType from './type/scalar/booleanType'
 import integerType from './type/scalar/integerType'
 import floatType from './type/scalar/floatType'
 import stringType from './type/scalar/stringType'
 import switchType from './type/switchType'
 import getNamedType from './type/getNamedType'
+import getNonNullableType from './type/getNonNullableType'
+import BasicObjectType from './type/BasicObjectType'
 
 export {
   Inventory,
@@ -35,10 +38,13 @@ export {
   EnumType,
   ObjectType,
   ScalarType,
+  AdapterType,
   booleanType,
   integerType,
   floatType,
   stringType,
   switchType,
   getNamedType,
+  getNonNullableType,
+  BasicObjectType,
 }

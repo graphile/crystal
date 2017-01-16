@@ -1,9 +1,13 @@
-import { Type, ObjectType, NullableType, booleanType } from '../../../interface'
+import { ObjectType, NullableType, booleanType, BasicObjectType } from '../../../interface'
 import { sql } from '../../utils'
 import { PgCatalog, PgCatalogRangeType } from '../../introspection'
-import transformPgValueIntoValue, { $$transformPgValueIntoValue } from '../transformPgValueIntoValue'
-import transformValueIntoPgValue, { $$transformValueIntoPgValue } from '../transformValueIntoPgValue'
 import getTypeFromPgType from './getTypeFromPgType'
+import PgType from './PgType'
+
+interface PgRange<T> {
+  start?: { value: T, inclusive: boolean } | null
+  end?: { value: T, inclusive: boolean } | null
+}
 
 /**
  * The built in Postgres range types don’t have names that match up with our
@@ -30,22 +34,28 @@ const typeOidToName = new Map([
  * object back down into the range format.
  */
 // TODO: test
-class PgRangeObjectType extends ObjectType {
+class PgRangeType extends PgType<PgRange<mixed>> implements ObjectType<PgRange<mixed>> {
+  public readonly kind: 'OBJECT' = 'OBJECT'
+  public readonly name: string
+  public readonly description: string | undefined
   public readonly pgRangeType: PgCatalogRangeType
-  public readonly subType: Type<mixed>
+  public readonly subType: PgType<mixed>
+  public readonly fields: Map<string, ObjectType.Field<PgRange<mixed>, mixed>>
 
   constructor (
     pgCatalog: PgCatalog,
     pgRangeType: PgCatalogRangeType,
   ) {
+    super()
+
     const name = typeOidToName.get(pgRangeType.id) || pgRangeType.name
     const pgSubType = pgCatalog.assertGetType(pgRangeType.rangeSubTypeId)
     const subType = getTypeFromPgType(pgCatalog, pgSubType)
 
-    const boundType = new ObjectType({
+    const boundType = new BasicObjectType({
       name: `${name}-bound`,
       description: 'The value at one end of a range. A range can either include this value, or not.',
-      fields: new Map<string, ObjectType.Field<mixed>>([
+      fields: new Map([
         ['value', {
           description: 'The value at one end of our range.',
           type: subType instanceof NullableType ? subType.nonNullType : subType,
@@ -57,45 +67,58 @@ class PgRangeObjectType extends ObjectType {
       ]),
     })
 
-    super({
-      name,
-      description: pgRangeType.description,
-      fields: new Map<string, ObjectType.Field<mixed>>([
-        ['start', {
-          description: 'The starting bound of our range.',
-          type: new NullableType(boundType),
-        }],
-        ['end', {
-          description: 'The ending bound of our range.',
-          type: new NullableType(boundType),
-        }],
-      ]),
-    })
+    this.fields = new Map<string, ObjectType.Field<PgRange<mixed>, mixed>>([
+      ['start', {
+        description: 'The starting bound of our range.',
+        type: new NullableType(boundType),
+        getValue: (range: PgRange<mixed>) => range.start,
+      }],
+      ['end', {
+        description: 'The ending bound of our range.',
+        type: new NullableType(boundType),
+        getValue: (range: PgRange<mixed>) => range.start,
+      }],
+    ])
 
+    this.name = name
+    this.description = pgRangeType.description
     this.pgRangeType = pgRangeType
     this.subType = subType
+  }
+
+  public isTypeOf (_value: mixed): _value is PgRange<mixed> {
+    throw new Error('Unimplemented.')
+  }
+
+  public fromFields (fields: Map<string, mixed>): PgRange<mixed> {
+    const start = fields.get('start') as { value: mixed, inclusive: boolean } | undefined
+    const end = fields.get('end') as { value: mixed, inclusive: boolean } | undefined
+    return {
+      start,
+      end,
+    }
   }
 
   /**
    * Transform a Postgres value into a range value by parsing the range literal
    * and then setting up an object of the correct type.
    */
-  public [$$transformPgValueIntoValue] (rangeLiteral: string): ObjectType.Value {
+  public transformPgValueIntoValue (rangeLiteral: string): PgRange<mixed> {
     const range = parseRange(rangeLiteral)
-    const rangeValue = new Map<string, mixed>()
+    const rangeValue: PgRange<mixed> = {}
 
     if (range.start) {
-      rangeValue.set('start', new Map<string, mixed>([
-        ['value', transformPgValueIntoValue(this.subType, range.start.value)],
-        ['inclusive', range.start.inclusive],
-      ]))
+      rangeValue.start = {
+        value: this.subType.transformPgValueIntoValue(range.start.value),
+        inclusive: range.start.inclusive,
+      }
     }
 
     if (range.end) {
-      rangeValue.set('end', new Map<string, mixed>([
-        ['value', transformPgValueIntoValue(this.subType, range.end.value)],
-        ['inclusive', range.end.inclusive],
-      ]))
+      rangeValue.end = {
+        value: this.subType.transformPgValueIntoValue(range.end.value),
+        inclusive: range.end.inclusive,
+      }
     }
 
     return rangeValue
@@ -108,20 +131,18 @@ class PgRangeObjectType extends ObjectType {
    */
   // TODO: test
   // TODO: no anys?
-  public [$$transformValueIntoPgValue] (rangeValue: ObjectType.Value): sql.Sql {
-    // tslint:disable-next-line no-any
-    const start: Map<string, mixed> | undefined = rangeValue.get('start') as any
-    // tslint:disable-next-line no-any
-    const end: Map<string, mixed> | undefined = rangeValue.get('end') as any
-    const lowerInclusive = start != null && start.get('inclusive') ? '[' : '('
-    const upperInclusive = end != null && end.get('inclusive') ? ']' : ')'
-    const lowerBound = start != null ? transformValueIntoPgValue(this.subType, start.get('value')) : sql.query`null`
-    const upperBound = end != null ? transformValueIntoPgValue(this.subType, end.get('value')) : sql.query`null`
+  public transformValueIntoPgValue (rangeValue: PgRange<mixed>): sql.Sql {
+    const start = rangeValue.start
+    const end = rangeValue.end
+    const lowerInclusive = start != null && start.inclusive ? '[' : '('
+    const upperInclusive = end != null && end.inclusive ? ']' : ')'
+    const lowerBound = start != null ? this.subType.transformValueIntoPgValue(start.value) : sql.query`null`
+    const upperBound = end != null ? this.subType.transformValueIntoPgValue(end.value) : sql.query`null`
     return sql.query`${sql.identifier(this.pgRangeType.namespaceName, this.pgRangeType.name)}(${lowerBound}, ${upperBound}, ${sql.value(lowerInclusive + upperInclusive)})`
   }
 }
 
-export default PgRangeObjectType
+export default PgRangeType
 
 /**
  * The following range parser was inspired by [`pg-range`][1],
@@ -131,11 +152,6 @@ export default PgRangeObjectType
  * [2]: https://github.com/goodybag/pg-range-parser/blob/3810f0e1cae95f0e49d9ac914bdfcab07d06551a/index.js
  * [3]: https://www.postgresql.org/docs/9.6/static/rangetypes.html
  */
-
-interface PgRange<T> {
-  start?: { value: T, inclusive: boolean } | null
-  end?: { value: T, inclusive: boolean } | null
-}
 
 /**
  * Matches a Postgres range. Taken directly from [`pg-range`][1]. It’s a very

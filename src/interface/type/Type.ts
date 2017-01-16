@@ -24,6 +24,7 @@ interface Type<TValue> {
   /**
    * Tests if a given value is of this type.
    */
+  // TODO: Remove this.
   isTypeOf (value: mixed): value is TValue
 }
 

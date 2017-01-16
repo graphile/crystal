@@ -1,5 +1,4 @@
 import { sql } from '../../../postgres/utils'
-import transformValueIntoPgValue from '../../../postgres/inventory/transformValueIntoPgValue'
 import { PgProcedureFixtures } from './createPgProcedureFixtures'
 
 /**
@@ -37,7 +36,7 @@ export default function createPgProcedureSqlCall (
   const procedureArgs =
     fixtures.args
       .slice(0, Math.max(lastArgIdx, fixtures.args.length - fixtures.pgProcedure.argDefaultsNum))
-      .map(({ type }, i) => transformValueIntoPgValue(type, values[i]))
+      .map(({ type }, i) => type.transformValueIntoPgValue(values[i]))
 
   return sql.query`${procedureName}(${sql.join(procedureArgs, ', ')})`
 }
