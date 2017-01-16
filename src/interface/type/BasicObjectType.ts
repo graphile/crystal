@@ -18,8 +18,8 @@ class BasicObjectType implements ObjectType<BasicObjectType.Value> {
     fields,
   }: {
     name: string,
-    description: string | undefined,
-    fields: Map<string, { description: string | undefined, type: Type<mixed> }>,
+    description?: string | undefined,
+    fields: Map<string, BasicObjectType.Field<mixed>>,
   }) {
     this.name = name
     this.description = description
@@ -66,6 +66,11 @@ class BasicObjectType implements ObjectType<BasicObjectType.Value> {
 
 namespace BasicObjectType {
   export type Value = { [fieldName: string]: mixed }
+
+  export type Field<T> = {
+    description?: string | undefined,
+    type: Type<T>,
+  }
 }
 
 export default BasicObjectType
