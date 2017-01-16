@@ -2,7 +2,6 @@ import { sign as signJwt } from 'jsonwebtoken'
 import { GraphQLScalarType } from 'graphql'
 import { ObjectType } from '../../../interface'
 import { formatName, memoize2 } from '../../../graphql/utils'
-import { mapToObject } from '../../../postgres/utils'
 
 const _getJwtGqlType = memoize2(_createJwtGqlType)
 
@@ -24,11 +23,18 @@ export function _createJwtGqlType <TValue>(type: ObjectType<TValue>, jwtSecret: 
     description:
       'A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519) ' +
       'which securely represents claims between two parties.',
-    serialize: value =>
-      value instanceof Map ? signJwt(mapToObject(value), jwtSecret, {
+    serialize: value => {
+      const token = {}
+
+      type.fields.forEach((field, fieldName) => {
+        token[fieldName] = field.getValue(value)
+      })
+
+      return signJwt(token, jwtSecret, {
         audience: 'postgraphql',
         issuer: 'postgraphql',
-        expiresIn: value.get('exp') ? undefined : '1 day',
-      }) : null,
+        expiresIn: token['exp'] ? undefined : '1 day',
+      })
+    },
   })
 }

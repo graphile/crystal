@@ -1,4 +1,5 @@
 import Type, { isType } from './Type'
+import AdapterType from './AdapterType'
 import NullableType from './NullableType'
 import ListType from './ListType'
 import AliasType from './AliasType'
@@ -12,6 +13,7 @@ import ScalarType from './ScalarType'
  * @private
  */
 type SwitchTypeCases<T> = {
+  adapter?: (type: AdapterType<mixed>) => T,
   nullable: (type: NullableType<mixed>) => T,
   list: (type: ListType<mixed, mixed>) => T,
   alias: (type: AliasType<mixed>) => T,
@@ -43,10 +45,13 @@ function switchType <T>(typeOrCases: Type<mixed> | SwitchTypeCases<T>, maybeCase
 
   const cases = typeOrCases
 
+  if (!cases.nullable || !cases.list || !cases.alias || !cases.enum || !cases.object || !cases.scalar)
+    throw new Error('Invalid cases object. Make sure you provided a valid type.')
+
   function callSwitchTypeCase (type: Type<mixed>): T {
     switch (type.kind) {
       // tslint:disable no-any
-      case 'ADAPTER': return callSwitchTypeCase((type as any).baseType)
+      case 'ADAPTER': return cases.adapter ? cases.adapter(type as any) : callSwitchTypeCase((type as any).baseType)
       case 'NULLABLE': return cases.nullable(type as any)
       case 'LIST': return cases.list(type as any)
       case 'ALIAS': return cases.alias(type as any)

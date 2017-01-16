@@ -56,7 +56,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
 
     async resolve (source, args, context): Promise<mixed> {
       const client = pgClientFromContext(context)
-      const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))]
+      const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))]
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
       const { rows: [row] } = await client.query(query)
       return row ? fixtures.return.intoGqlOutput(row['value']) : null
@@ -91,6 +91,6 @@ function createPgSetProcedureQueryGqlFieldEntry (
     description: pgProcedure.description,
     inputArgEntries,
     getPaginatorInput: (source, args) =>
-      [source, ...inputArgEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))],
+      [source, ...inputArgEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))],
   })]
 }

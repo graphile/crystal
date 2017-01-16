@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection, Relation } from '../../../interface'
+import { Collection, Relation, NullableType } from '../../../interface'
 import { formatName, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
@@ -38,7 +38,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
       .map(<THeadValue, THeadKey>(relation: Relation<TValue, THeadValue, THeadKey>): [string, GraphQLFieldConfig<TSource, mixed>] => {
         const headCollectionKey = relation.headCollectionKey
         const headCollection = headCollectionKey.collection
-        const { gqlType: headCollectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, headCollection.type)
+        const { gqlType: headCollectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(headCollection.type))
 
         return [
           options.getFieldName

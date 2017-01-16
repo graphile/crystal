@@ -1,4 +1,4 @@
-import { ObjectType, NullableType, booleanType, BasicObjectType } from '../../../interface'
+import { ObjectType, NullableType, booleanType, BasicObjectType, getNonNullableType } from '../../../interface'
 import { sql } from '../../utils'
 import { PgCatalog, PgCatalogRangeType } from '../../introspection'
 import getTypeFromPgType from './getTypeFromPgType'
@@ -58,7 +58,7 @@ class PgRangeType extends PgType<PgRange<mixed>> implements ObjectType<PgRange<m
       fields: new Map([
         ['value', {
           description: 'The value at one end of our range.',
-          type: subType instanceof NullableType ? subType.nonNullType : subType,
+          type: getNonNullableType(subType),
         }],
         ['inclusive', {
           description: 'Whether or not the value of this bound is included in the range.',
@@ -76,7 +76,7 @@ class PgRangeType extends PgType<PgRange<mixed>> implements ObjectType<PgRange<m
       ['end', {
         description: 'The ending bound of our range.',
         type: new NullableType(boundType),
-        getValue: (range: PgRange<mixed>) => range.start,
+        getValue: (range: PgRange<mixed>) => range.end,
       }],
     ])
 

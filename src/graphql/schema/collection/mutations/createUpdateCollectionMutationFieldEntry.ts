@@ -107,9 +107,16 @@ function createCollectionPatchType <TValue>(buildToken: BuildToken, collection: 
       description: `Represents an update to a \`${formatName.type(type.name)}\`. Fields that are set will be updated.`,
       fields: () => buildObject<GraphQLInputFieldConfig>(fields),
     }),
-    fromGqlInput: (input: { [key: string]: mixed }): Map<string, mixed> =>
-      new Map(fields.map<[string, mixed]>(({ key: fieldName, value: { internalName, fromGqlInput } }) =>
-        [internalName, fromGqlInput(input[fieldName])])),
+    fromGqlInput: (input: { [key: string]: mixed }): Map<string, mixed> => {
+      const patch = new Map()
+      fields.forEach(({ key: fieldName, value: { internalName, fromGqlInput } }) => {
+        const fieldValue = input[fieldName]
+        if (typeof fieldValue !== 'undefined') {
+          patch.set(internalName, fromGqlInput(fieldValue))
+        }
+      })
+      return patch
+    },
   }
 }
 
@@ -127,7 +134,7 @@ function createUpdateCollectionPayloadGqlType <TValue>(
   buildToken: BuildToken,
   collection: Collection<TValue>,
 ): GraphQLObjectType {
-  const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
+  const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `update-${collection.type.name}`,
     outputFields: [

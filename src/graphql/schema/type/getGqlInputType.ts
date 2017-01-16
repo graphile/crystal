@@ -5,11 +5,13 @@ import {
   GraphQLInputObjectType,
   getNullableType as getNullableGqlType,
   isInputType as isInputGqlType,
+  isOutputType as isOutputGqlType,
 } from 'graphql'
 
 import {
   switchType,
   Type,
+  AdapterType,
   NullableType,
   ListType,
   AliasType,
@@ -45,6 +47,9 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
   // Switch on our type argument. Depending on the kind of our type, different
   // cases will run.
   switchType<GetGqlInputReturn<TValue>>(_type, {
+    // Adapter types should try again with their base type.
+    adapter: <TValue>(type: AdapterType<TValue>) => getGqlInputType(buildToken, type.baseType),
+
     // If the kind of this type is a nullable type, we want to return the
     // nullable version of the internal non null type. When converting GraphQL
     // input, if the input value is null, we will return null. Otherwise we
@@ -81,6 +86,22 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
     // modification.
     alias: (type: AliasType<TValue>): GetGqlInputReturn<TValue> => {
       const { gqlType: baseGqlType, fromGqlInput } = getGqlInputType(buildToken, type.baseType)
+
+      // If the base GraphQL type is an output type then we should return
+      // whatever type `getGqlOutputType` creates to avoid creating two types
+      // with the same name.
+      if (isOutputGqlType(baseGqlType)) {
+        const { gqlType } = getGqlOutputType(buildToken, type)
+
+        if (!isInputGqlType(gqlType))
+          throw new Error('Expected an input GraphQL type')
+
+        return {
+          gqlType,
+          fromGqlInput,
+        }
+      }
+
       return {
         gqlType: aliasGqlType(baseGqlType, formatName.type(type.name), type.description),
         fromGqlInput,
@@ -128,7 +149,7 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
             key,
             value: {
               description: field.description,
-              type: gqlType,
+              type: field.hasDefault ? getNullableGqlType(gqlType) : gqlType,
             },
           }))),
         })),

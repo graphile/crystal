@@ -49,7 +49,7 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
           })(),
 
           // // Pass along the `hasDefault` information.
-          // hasDefault: pgAttribute.hasDefault,
+          hasDefault: pgAttribute.hasDefault,
 
           // Notice how we add an extra `pgAttribute` property here as per
           // our custom field type.

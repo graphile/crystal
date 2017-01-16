@@ -1,6 +1,6 @@
 import { Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLOutputType } from 'graphql'
-import { Inventory, Type } from '../../interface'
+import { Inventory, Type, getNonNullableType } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
 import getTypeFromPgType from '../../postgres/inventory/type/getTypeFromPgType'
@@ -117,7 +117,7 @@ export default async function createPostGraphQLSchema (
         // Throw an error if the user tries to use this as input.
         get input (): never { throw new Error(`Using the JWT Token type '${options.jwtPgTypeIdentifier}' as input is not yet implemented.`) },
         // Use our JWT GraphQL type as the output.
-        output: getJwtGqlType(getTypeFromPgType(pgCatalog, jwtPgType) as PgClassType, options.jwtSecret!),
+        output: getJwtGqlType(getNonNullableType(getTypeFromPgType(pgCatalog, jwtPgType)) as PgClassType, options.jwtSecret!),
       }],
     ]),
 

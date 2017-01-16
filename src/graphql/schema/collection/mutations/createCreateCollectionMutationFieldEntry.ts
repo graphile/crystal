@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from 'graphql'
-import { Collection } from '../../../../interface'
+import { Collection, NullableType } from '../../../../interface'
 import { formatName, scrib } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGqlInputType from '../../type/getGqlInputType'
@@ -23,7 +23,7 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
   const name = `create-${collection.type.name}`
   const inputFieldName = formatName.field(collection.type.name)
   const { gqlType: inputGqlType, fromGqlInput: inputFromGqlInput } = getGqlInputType(buildToken, collection.type)
-  const { gqlType: collectionGqlType } = getGqlOutputType(buildToken, collection.type)
+  const { gqlType: collectionGqlType } = getGqlOutputType(buildToken, new NullableType(collection.type))
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,

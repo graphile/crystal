@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection } from '../../../../interface'
+import { Collection, NullableType } from '../../../../interface'
 import { formatName, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
@@ -61,7 +61,7 @@ function createDeleteCollectionPayloadGqlType <TValue>(
   collection: Collection<TValue>,
 ): GraphQLObjectType {
   const { primaryKey } = collection
-  const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
+  const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `delete-${collection.type.name}`,
     outputFields: [

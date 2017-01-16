@@ -45,7 +45,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
         description: pgAttribute.description,
         type,
         pgAttribute,
-        getValue: value => value.get(pgAttribute.name),
+        getValue: value => value.get(fieldName),
       }]
     })
   )
@@ -65,8 +65,17 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
     fields: new Map(this._keyTypeFields),
     fromFields: value => value,
     // TODO: implement? I’m not sure if this code path every really gets used...
-    isTypeOf: (_value): _value is PgCollectionKey.Value => {
-      throw new Error('Unimplemented')
+    isTypeOf: (value: mixed): value is PgCollectionKey.Value => {
+      if (!(value instanceof Map))
+        return false
+
+      for (const [, field] of this._keyTypeFields) {
+        if (!field.type.isTypeOf(field.getValue(value))) {
+          return false
+        }
+      }
+
+      return true
     },
   }
 
@@ -218,7 +227,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
             -- Using our patch object we construct the fields we want to set and
             -- the values we want to set them to.
             set ${sql.join(Array.from(patch).map(([fieldName, value]) => {
-              const field = this.collection.type.fields.get(fieldName)!
+              const field = this.collection.type.fields.get(fieldName)
+
+              if (!field)
+                throw new Error(`Cannot update field named '${fieldName}' because it does not exist in collection '${this.collection.name}'.`)
 
               // Use the actual name of the Postgres attribute when
               // comparing, not the field name which may be different.

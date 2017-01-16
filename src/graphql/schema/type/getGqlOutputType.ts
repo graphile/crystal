@@ -17,6 +17,7 @@ import {
 import {
   switchType,
   Type,
+  AdapterType,
   NullableType,
   ListType,
   AliasType,
@@ -55,6 +56,9 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
   // Switches on the type that we want to build and output type for and will
   // return a `GraphQLOutputType`.
   switchType<GetGqlOutputTypeReturn<TValue>>(_type, {
+    // Adapter types should try again with their base type.
+    adapter: <TValue>(type: AdapterType<TValue>) => getGqlOutputType(buildToken, type.baseType),
+
     // For nullable types we will just get the internal nullable instance of
     // the GraphQL output type and return it. This means stripping the
     // `GraphQLNonNull` wrapper that is around (almost) every type returned by

@@ -16,7 +16,7 @@ class PgAliasType<TValue> extends PgType<TValue> implements AliasType<TValue> {
   }
 
   public isTypeOf (value: mixed): value is TValue {
-    return this.isTypeOf(value)
+    return this.baseType.isTypeOf(value)
   }
 
   public transformPgValueIntoValue (pgValue: mixed): TValue {

@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection, CollectionKey } from '../../../interface'
+import { Collection, CollectionKey, NullableType } from '../../../interface'
 import { formatName, idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
@@ -80,7 +80,7 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
   if (collectionKey.read == null)
     return
 
-  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
+  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
 
   return {
     description: `Reads a single ${scrib.type(collectionGqlType)} using its globally unique ${scrib.type(GraphQLID)}.`,
@@ -117,7 +117,7 @@ function createCollectionKeyField <TValue, TKey>(
     return
 
   const { collection } = collectionKey
-  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, collection.type)
+  const { gqlType: collectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   const inputHelpers = createCollectionKeyInputHelpers<TValue, TKey>(buildToken, collectionKey)
 
   return {
