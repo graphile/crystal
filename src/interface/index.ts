@@ -17,6 +17,7 @@ import booleanType from './type/scalar/booleanType'
 import integerType from './type/scalar/integerType'
 import floatType from './type/scalar/floatType'
 import stringType from './type/scalar/stringType'
+import jsonType from './type/scalar/jsonType'
 import switchType from './type/switchType'
 import getNamedType from './type/getNamedType'
 import getNonNullableType from './type/getNonNullableType'
@@ -43,6 +44,7 @@ export {
   integerType,
   floatType,
   stringType,
+  jsonType,
   switchType,
   getNamedType,
   getNonNullableType,

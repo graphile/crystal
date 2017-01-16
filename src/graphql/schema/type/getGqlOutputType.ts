@@ -26,6 +26,7 @@ import {
   integerType,
   floatType,
   stringType,
+  jsonType,
 } from '../../../interface'
 
 import { formatName, memoize2, buildObject, parseGqlLiteralToValue } from '../../utils'
@@ -186,6 +187,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
         case integerType: return { gqlType: new GraphQLNonNull(GraphQLInt), intoGqlOutput: value => value }
         case floatType: return { gqlType: new GraphQLNonNull(GraphQLFloat), intoGqlOutput: value => value }
         case stringType: return { gqlType: new GraphQLNonNull(GraphQLString), intoGqlOutput: value => value }
+        case jsonType: return { gqlType: new GraphQLNonNull(createJsonGqlType(buildToken)), intoGqlOutput: value => value }
         default: { /* noop... */ }
       }
 
@@ -228,4 +230,58 @@ export default function getGqlOutputType <TValue>(buildToken: BuildToken, type: 
   }
 
   return _getGqlOutputType(buildToken, type)
+}
+
+/**
+ * The JSON type for our API. If the user set the `dynamicJSON` option to true,
+ * arbitrary JSON input and output will be enabled.
+ *
+ * @private
+ */
+function createJsonGqlType (buildToken: BuildToken): GraphQLScalarType {
+  return (
+    buildToken.options.dynamicJson ? (
+      new GraphQLScalarType({
+        name: 'Json',
+        description: jsonType.description,
+        serialize: value => value,
+        parseValue: value => value,
+        parseLiteral: ast => parseAstLiteralIntoValue(ast),
+      })
+    ) : (
+      new GraphQLScalarType({
+        name: 'Json',
+        description: jsonType.description,
+        serialize: value => JSON.stringify(value),
+        parseValue: value => typeof value === 'string' ? JSON.parse(value) : null,
+        parseLiteral: ast => (ast.kind === 'StringValue' ? JSON.parse(ast.value) : null),
+      })
+    )
+  )
+}
+
+/**
+ * Parses a GraphQL AST literal into a JavaScript value.
+ *
+ * @private
+ */
+function parseAstLiteralIntoValue (ast: ValueNode): mixed {
+  switch (ast.kind) {
+    case 'StringValue':
+    case 'BooleanValue':
+      return ast.value
+    case 'IntValue':
+    case 'FloatValue':
+      return parseFloat(ast.value)
+    case 'ObjectValue': {
+      return ast.fields.reduce((object, field) => {
+        object[field.name.value] = parseAstLiteralIntoValue(field.value)
+        return object
+      }, {})
+    }
+    case 'ListValue':
+      return ast.values.map(parseAstLiteralIntoValue)
+    default:
+      return null
+  }
 }
