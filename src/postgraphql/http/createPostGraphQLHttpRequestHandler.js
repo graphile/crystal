@@ -283,7 +283,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         pgPool,
         jwtToken,
       }, ({[$$pgClient]: pgClient, pgRole: _pgRole}) => {
-        pgRole = _pgRole;
+        pgRole = _pgRole
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,
@@ -291,8 +291,8 @@ export default function createPostGraphQLHttpRequestHandler (options) {
           { [$$pgClient]: pgClient },
           params.variables,
           params.operationName,
-        );
-      });
+        )
+      })
     }
     catch (error) {
       // Set our status code and send the client our results!
