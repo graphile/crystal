@@ -28,12 +28,13 @@ export default async function withPostGraphQLContext(options, {pgPool, jwtToken}
 
   // Begin our transaction and set it up.
   await pgClient.query('begin')
-  await setupPgClientTransaction(jwtToken, pgClient, options)
+  const pgRole = await setupPgClientTransaction(jwtToken, pgClient, options)
 
   // Run the function with a context object that can be passed through
   try {
     return await functionToRun({
       [$$pgClient]: pgClient,
+      pgRole,
     })
   }
   // Cleanup our Postgres client by ending the transaction and releasing

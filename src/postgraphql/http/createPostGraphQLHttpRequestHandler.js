@@ -15,6 +15,7 @@ import renderGraphiQL from './renderGraphiQL'
 import {getJWTToken} from './setupRequestPgClientTransaction'
 import debugPgClient from './debugPgClient'
 import setupPgClientTransaction from '../setupPgClientTransaction'
+import withPostGraphQLContext from '../withPostGraphQLContext'
 
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
@@ -276,37 +277,21 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
       const jwtToken = getJWTToken(req)
-      // Connect a new Postgres client and start a transaction.
-      const pgClient = await pgPool.connect()
 
-      // Enhance our Postgres client with debugging stuffs.
-      debugPgClient(pgClient)
-
-      // Begin our transaction and set it up.
-      await pgClient.query('begin')
-      pgRole = await setupPgClientTransaction(jwtToken, pgClient, {
-        jwtSecret: options.jwtSecret,
-        pgDefaultRole: options.pgDefaultRole,
-      })
-
-      try {
-        result = await executeGraphql(
+      result = await withPostGraphQLContext(options, {
+        pgPool,
+        jwtToken
+      }, ({[$$pgClient]: pgClient, pgRole: _pgRole}) => {
+        pgRole = _pgRole;
+        return executeGraphql(
           gqlSchema,
           queryDocumentAst,
           null,
           { [$$pgClient]: pgClient },
           params.variables,
           params.operationName,
-        )
-      }
-      // Cleanup our Postgres client by ending the transaction and releasing
-      // the client back to the pool. Always do this even if the query fails.
-      finally {
-        await pgClient.query('commit')
-        pgClient.release()
-
-        debugRequest('GraphQL query has been executed.')
-      }
+        );
+      });
     }
     catch (error) {
       // Set our status code and send the client our results!
@@ -320,6 +305,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     }
     // Finally, we send the client the contents of `result`.
     finally {
+      debugRequest('GraphQL query has been executed.')
       // Format our errors so the client doesn’t get the full thing.
       if (result && result.errors)
         result.errors = result.errors.map(formatError)
