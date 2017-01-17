@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http'
 import { Client } from 'pg'
-import setupPgClientTransaction from '../setupPgClientTransaction'
 
 const httpError = require('http-errors')
 
@@ -16,12 +15,6 @@ const httpError = require('http-errors')
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-export default async function setupRequestPgClientTransaction (request, pgClient, options = {}) {
-  // Get the JWT token string from our request.
-  const jwtToken = getJWTToken(request)
-  // Pass it onto the core logic
-  return await setupPgClientTransaction(jwtToken, pgClient, options)
-}
 
 /**
  * Parses the `Bearer` auth scheme token out of the `Authorization` header as
@@ -49,7 +42,7 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
  * @param {IncomingMessage} request
  * @returns {string | null}
  */
-function getJWTToken (request) {
+export function getJWTToken (request) {
   const { authorization } = request.headers
 
   // If there was no authorization header, just return null.
