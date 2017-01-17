@@ -12,7 +12,7 @@ import {
 } from 'graphql'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
-import {getJWTToken} from './setupRequestPgClientTransaction'
+import getJWTToken from './getJWTToken'
 import debugPgClient from './debugPgClient'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphQLContext from '../withPostGraphQLContext'

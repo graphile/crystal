@@ -4,19 +4,6 @@ import { Client } from 'pg'
 const httpError = require('http-errors')
 
 /**
- * Sets up the Postgres client transaction by decoding the JSON web token and
- * doing some other cool things.
- *
- * @param {IncomingMessage} request
- * @param {Client} pgClient
- */
-// THIS METHOD SHOULD NEVER RETURN EARLY. If this method returns early then it
-// may skip the super important step of setting the role on the Postgres
-// client. If this happens it’s a huge security vulnerability. Never using the
-// keyword `return` in this function is a good first step. You can still throw
-// errors, however, as this will stop the request execution.
-
-/**
  * Parses the `Bearer` auth scheme token out of the `Authorization` header as
  * defined by [RFC7235][1].
  *
@@ -42,7 +29,7 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
  * @param {IncomingMessage} request
  * @returns {string | null}
  */
-export function getJWTToken (request) {
+export default function getJWTToken (request) {
   const { authorization } = request.headers
 
   // If there was no authorization header, just return null.
