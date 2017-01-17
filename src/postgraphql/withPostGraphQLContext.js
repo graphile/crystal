@@ -6,7 +6,7 @@ import setupPgClientTransaction from './setupPgClientTransaction'
 
 This is intended to be called similar to this:
 
-    const result = await withPostGraphQLContext(options, { pgPool, jwtToken }, async context => (
+    const result = await withPostGraphQLContext({ ...options, pgPool, jwtToken }, async context => (
       await graphql(
         schema,
         query,
@@ -19,7 +19,7 @@ This is intended to be called similar to this:
 
 */
 
-export default async function withPostGraphQLContext(options, {pgPool, jwtToken}, functionToRun) {
+export default async function withPostGraphQLContext({pgPool, jwtToken, ...options}, functionToRun) {
   // Connect a new Postgres client and start a transaction.
   const pgClient = await pgPool.connect()
 
