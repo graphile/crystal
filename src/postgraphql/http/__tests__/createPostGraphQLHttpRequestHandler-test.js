@@ -1,8 +1,5 @@
-jest.mock('../setupRequestPgClientTransaction')
-
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext'
-import setupRequestPgClientTransaction from '../setupRequestPgClientTransaction'
 import createPostGraphQLHttpRequestHandler from '../createPostGraphQLHttpRequestHandler'
 
 const http = require('http')
@@ -255,7 +252,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
-      setupRequestPgClientTransaction.mockClear()
       const server = createServer()
       await (
         request(server)
@@ -268,17 +264,12 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       expect(pgPool.connect.mock.calls).toEqual([[]])
       expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
-      expect(setupRequestPgClientTransaction.mock.calls.length).toEqual(1)
-      expect(setupRequestPgClientTransaction.mock.calls[0].length).toEqual(3)
-      expect(setupRequestPgClientTransaction.mock.calls[0][1]).toBe(pgClient)
-      expect(setupRequestPgClientTransaction.mock.calls[0][2]).toEqual({})
     })
 
     test('will setup a transaction and pass down options for requests that use the Postgres client', async () => {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
-      setupRequestPgClientTransaction.mockClear()
       const jwtSecret = Symbol('jwtSecret')
       const pgDefaultRole = Symbol('pgDefaultRole')
       const server = createServer({ jwtSecret, pgDefaultRole })
@@ -293,10 +284,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       expect(pgPool.connect.mock.calls).toEqual([[]])
       expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
-      expect(setupRequestPgClientTransaction.mock.calls.length).toEqual(1)
-      expect(setupRequestPgClientTransaction.mock.calls[0].length).toEqual(3)
-      expect(setupRequestPgClientTransaction.mock.calls[0][1]).toBe(pgClient)
-      expect(setupRequestPgClientTransaction.mock.calls[0][2]).toEqual({ jwtSecret, pgDefaultRole })
     })
 
     test('will respect an operation name', async () => {
