@@ -308,7 +308,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     }
     catch (error) {
       // Set our status code and send the client our results!
-      if (res.statusCode === 200) res.statusCode = error.status || 500
+      if (res.statusCode === 200) res.statusCode = error.status || error.statusCode || 500
       result = { errors: [error] }
 
       // If the status code is 500, let’s log our error.
