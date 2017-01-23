@@ -17,7 +17,7 @@ const jwt = require('jsonwebtoken')
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-export default async function setupRequestPgClientTransaction (request, pgClient, { jwtSecret, pgDefaultRole } = {}) {
+export default async function setupRequestPgClientTransaction (request, pgClient, { jwtSecret, jwtAudience, pgDefaultRole } = {}) {
   // Get the JWT token string from our request.
   const jwtToken = getJWTToken(request)
 
@@ -36,12 +36,20 @@ export default async function setupRequestPgClientTransaction (request, pgClient
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: 'postgraphql' })
+      // Check optional JWT audience. if none provided, default to postgraphql.
+      if (jwtAudience === undefined)
+        jwtAudience = 'postgraphql'
+
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience })
 
       // If there is a `role` property in the claims, use that instead of our
-      // default role.
+      // default role. If no `role` property is found, check if there is a `roles`
+      // array. If so, use the first role inside of that array. The `roles`
+      // bring support for JWTs produced by Auth0.
       if (jwtClaims.role != null)
         role = jwtClaims.role
+      else if (jwtClaims.roles[0] != null)
+        role = jwtClaims.roles[0]
     }
     catch (error) {
       error.statusCode = 403
