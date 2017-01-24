@@ -76,7 +76,7 @@ class PgObjectType extends ObjectType {
 
     // Create our indexes of `fieldName` to `pgAttribute.name`. We can use
     // these indexes to rename keys where appropriate.
-    for (const [fieldName, { pgAttribute }] of this.fields) {
+    for (const [fieldName, { pgAttribute }] of Array.from(this.fields)) {
       if (this._pgAttributeNameToFieldName.has(pgAttribute.name))
         throw new Error('Cannot use a Postgres attribute with the same name twice in a single object type.')
 
@@ -91,7 +91,7 @@ class PgObjectType extends ObjectType {
   public [$$transformPgValueIntoValue] (row: { [key: string]: mixed }): PgObjectType.Value {
     const value = new Map<string, mixed>()
 
-    for (const [fieldName, { type: fieldType, pgAttribute }] of this.fields)
+    for (const [fieldName, { type: fieldType, pgAttribute }] of Array.from(this.fields))
       value.set(fieldName, transformPgValueIntoValue(fieldType, row[pgAttribute.name]))
 
     return value

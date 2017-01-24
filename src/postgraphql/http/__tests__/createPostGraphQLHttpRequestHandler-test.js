@@ -85,7 +85,7 @@ const serverCreators = new Map([
   }],
 ])
 
-for (const [name, createServerFromHandler] of serverCreators) {
+for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = options =>
     createServerFromHandler(createPostGraphQLHttpRequestHandler(Object.assign({}, defaultOptions, options)))
 

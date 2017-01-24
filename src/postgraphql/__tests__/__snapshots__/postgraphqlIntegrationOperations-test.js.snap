@@ -2298,6 +2298,7 @@ Object {
             },
             "bazBuz": 7,
           },
+          "nullableRange": null,
           "numrange": Object {
             "end": Object {
               "inclusive": false,

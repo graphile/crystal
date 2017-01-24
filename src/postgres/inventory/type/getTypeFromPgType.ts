@@ -69,7 +69,7 @@ function getTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType, _invent
   //
   // Note that this check is not memoized.
   if (_inventory && pgType.type === 'c') {
-    const collection = _inventory.getCollections().find(collection => collection instanceof PgCollection && collection.pgClass.typeId === pgType.id)
+    const collection = _inventory.getCollections().find(aCollection => aCollection instanceof PgCollection && aCollection.pgClass.typeId === pgType.id)
     if (collection)
       return new NullableType(collection.type)
   }
@@ -120,7 +120,7 @@ function createTypeFromPgType (pgCatalog: PgCatalog, pgType: PgCatalogType): Typ
     // If this type is a range type…
     // TODO: test
     case 'r':
-      return new PgRangeObjectType(pgCatalog, pgType)
+      return new NullableType(new PgRangeObjectType(pgCatalog, pgType))
     default: {
       /* noop */
     }

@@ -10,7 +10,7 @@ namespace sql {
    */
   export type SqlItem =
     { type: 'RAW', text: string } |
-    { type: 'IDENTIFIER', names: Array<string | Symbol> } |
+    { type: 'IDENTIFIER', names: Array<string | symbol> } |
     { type: 'VALUE', value: mixed }
 
   /**
@@ -52,7 +52,7 @@ namespace sql {
     // alias for it that shouldn’t be in the users schema. This helps maintain
     // sanity when constructing large Sql queries with many aliases.
     let nextSymbolId = 0
-    const symbolToIdentifier = new Map<Symbol, string>()
+    const symbolToIdentifier = new Map<symbol, string>()
 
     for (const item of Array.isArray(sql) ? sql : [sql]) {
       switch (item.type) {
@@ -115,7 +115,7 @@ namespace sql {
    * a table, schema, or column name. An identifier may also have a namespace,
    * thus why many names are accepted.
    */
-  export const identifier = (...names: Array<string | Symbol>): SqlItem => ({ type: 'IDENTIFIER', names })
+  export const identifier = (...names: Array<string | symbol>): SqlItem => ({ type: 'IDENTIFIER', names })
 
   /**
    * Creates a Sql item for a value that will be included in our final query.

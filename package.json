@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
@@ -48,7 +48,8 @@
     "pg-minify": "^0.4.1",
     "pluralize": "^3.0.0",
     "postgres-interval": "^1.0.2",
-    "send": "^0.14.1"
+    "send": "^0.14.1",
+    "tslib": "^1.5.0"
   },
   "devDependencies": {
     "@types/chalk": "^0.4.30",
@@ -61,9 +62,9 @@
     "@types/pluralize": "0.0.26",
     "connect": "^3.5.0",
     "express": "^4.14.0",
-    "graphql": "^0.8.2",
     "graphiql": "0.8.0",
-    "jest": "^17.0.3",
+    "graphql": "^0.8.2",
+    "jest": "^18.1.0",
     "koa": "^2.0.0",
     "nodemon": "^1.11.0",
     "react": "^15.3.2",
@@ -72,9 +73,9 @@
     "source-map-support": "^0.4.6",
     "supertest": "^2.0.0",
     "supertest-as-promised": "^4.0.2",
-    "ts-node": "^1.7.0",
-    "tslint": "^4.0.2",
-    "typescript": "^2.0.10"
+    "ts-node": "^2.0.0",
+    "tslint": "^4.2.0",
+    "typescript": "2.1.5"
   },
   "jest": {
     "transform": {
