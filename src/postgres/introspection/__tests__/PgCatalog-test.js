@@ -35,7 +35,7 @@ const mockConstraints = [
   { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '2', keyAttributeNums: [4], foreignKeyAttributeNums: [4] },
   { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '3', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
   { kind: 'constraint', type: 'f', classId: '2', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
-  { kind: 'constraint', type: 'a', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] }
+  { kind: 'constraint', type: 'a', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
 ]
 
 const mockObjects = [
@@ -183,7 +183,7 @@ test('getTypeByName will get a type by its name', () => {
 })
 
 test('getConstraints will get all unique constraints', () => {
-  var testConstraints = mockConstraints.concat()
+  const testConstraints = mockConstraints.concat()
   testConstraints.splice(1, 1)
   expect(catalog.getConstraints()).toEqual(testConstraints)
 })

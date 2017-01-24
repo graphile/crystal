@@ -20,7 +20,7 @@ class PgCatalog {
   private _procedures: Set<PgCatalogProcedure> = new Set()
 
   constructor (objects: Array<PgCatalogObject>) {
-    const foundConstraints:Set<String> = new Set()
+    const foundConstraints: Set<String> = new Set()
     // Build an in-memory index of all our objects for ease of use:
     for (const object of objects) {
       switch (object.kind) {
@@ -37,13 +37,13 @@ class PgCatalog {
           this._types.set(object.id, object)
           break
         case 'constraint':
-          var constraint: PgCatalogForeignKeyConstraint = object as PgCatalogForeignKeyConstraint
-          var constraintKey = JSON.stringify({
+          const constraint: PgCatalogForeignKeyConstraint = object as PgCatalogForeignKeyConstraint
+          const constraintKey = JSON.stringify({
             type: constraint.type,
             classId: constraint.classId,
             foreignClassId: constraint.foreignClassId,
             keyAttributeNums: constraint.keyAttributeNums,
-            foreignKeyAttributeNums: constraint.foreignKeyAttributeNums
+            foreignKeyAttributeNums: constraint.foreignKeyAttributeNums,
           })
           if (!foundConstraints.has(constraintKey)) {
             foundConstraints.add(constraintKey)
