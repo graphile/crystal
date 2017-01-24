@@ -29,9 +29,13 @@ const mockTypes = [
 ]
 
 const mockConstraints = [
-  { kind: 'constraint' },
-  { kind: 'constraint' },
-  { kind: 'constraint' },
+  { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
+  { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
+  { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [5] },
+  { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '2', keyAttributeNums: [4], foreignKeyAttributeNums: [4] },
+  { kind: 'constraint', type: 'f', classId: '1', foreignClassId: '3', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
+  { kind: 'constraint', type: 'f', classId: '2', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] },
+  { kind: 'constraint', type: 'a', classId: '1', foreignClassId: '2', keyAttributeNums: [3], foreignKeyAttributeNums: [4] }
 ]
 
 const mockObjects = [
@@ -178,6 +182,8 @@ test('getTypeByName will get a type by its name', () => {
   expect(catalog.getTypeByName('c', 'a')).toBe(undefined)
 })
 
-test('getConstraints will get all constraints', () => {
-  expect(catalog.getConstraints()).toEqual(mockConstraints)
+test('getConstraints will get all unique constraints', () => {
+  var testConstraints = mockConstraints.concat()
+  testConstraints.splice(1, 1)
+  expect(catalog.getConstraints()).toEqual(testConstraints)
 })
