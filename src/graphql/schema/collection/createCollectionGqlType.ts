@@ -20,6 +20,10 @@ export default function createCollectionGqlType<TValue> (
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
   const collectionTypeName = formatName.type(type.name)
+  let fields = Array.from(type.fields.entries())
+  if (primaryKey && !buildToken.options.primaryKeyAPI) {
+    fields = fields.filter(([ fieldName ]) => fieldName !== primaryKey.name)
+  }
 
   return new GraphQLObjectType({
     name: collectionTypeName,
@@ -42,7 +46,7 @@ export default function createCollectionGqlType<TValue> (
       ],
 
       // Add all of the basic fields to our type.
-      Array.from(type.fields).map(
+      fields.map(
         <TFieldValue>([fieldName, field]: [string, ObjectType.Field<TValue, TFieldValue>]) => {
           const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, field.type)
           return {

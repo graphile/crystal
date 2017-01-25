@@ -56,10 +56,12 @@ export default function createCollectionQueryFieldEntries <TValue>(
   // Add a field to select any value in the collection by any key. So all
   // unique keys of an object will be usable to select a single value.
   for (const collectionKey of (collection.keys || [])) {
-    const field = createCollectionKeyField(buildToken, collectionKey)
+    if (collectionKey !== primaryKey || buildToken.options.primaryKeyAPI) {
+      const field = createCollectionKeyField(buildToken, collectionKey)
 
-    // If we got a field back, add it.
-    if (field) entries.push([formatName.field(`${type.name}-by-${collectionKey.name}`), field])
+      // If we got a field back, add it.
+      if (field) entries.push([formatName.field(`${type.name}-by-${collectionKey.name}`), field])
+    }
   }
 
   return entries

@@ -21,6 +21,7 @@ type PostGraphQLOptions = {
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
+  primaryKeyAPI?: boolean,
 }
 
 /**
