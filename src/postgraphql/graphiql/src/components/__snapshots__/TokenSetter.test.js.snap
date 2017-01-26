@@ -1,0 +1,63 @@
+exports[`test will render component 1`] = `
+<TokenSetter
+  setToken={[Function]}
+  token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhxbCIsInJvbGUiOiJ0ZXN0X2p3dF9yb2xlIn0.26olvkrTeBD4UXTsKf15501wexCr47nx9AWgHIgi8a4">
+  <div
+    className="root">
+    <span
+      className="label">
+      JWT: 
+    </span>
+    <Token
+      clearToken={[Function]}
+      toggleInput={[Function]}
+      token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhxbCIsInJvbGUiOiJ0ZXN0X2p3dF9yb2xlIn0.26olvkrTeBD4UXTsKf15501wexCr47nx9AWgHIgi8a4">
+      <div
+        className="root">
+        <span
+          className="token"
+          id="token"
+          onClick={[Function]}>
+          eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhxbCIsInJvbGUiOiJ0ZXN0X2p3dF9yb2xlIn0.26olvkrTeBD4UXTsKf15501wexCr47nx9AWgHIgi8a4
+        </span>
+        <button
+          className="button"
+          onClick={[Function]}>
+          Clear
+        </button>
+      </div>
+    </Token>
+  </div>
+</TokenSetter>
+`;
+
+exports[`test will render component 2`] = `
+<TokenSetter
+  setToken={[Function]}
+  token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhxbCIsInJvbGUiOiJ0ZXN0X2p3dF9yb2xlIn0.26olvkrTeBD4UXTsKf15501wexCr47nx9AWgHIgi8a4">
+  <div
+    className="root">
+    <span
+      className="label">
+      JWT: 
+    </span>
+    <Input
+      handleSubmit={[Function]}
+      onInputChange={[Function]}
+      toggleInput={[Function]}
+      tokenInputValue="">
+      <form
+        className="form"
+        onSubmit={[Function]}>
+        <input
+          autoFocus={true}
+          className="input animated fadeIn"
+          onBlur={[Function]}
+          onChange={[Function]}
+          placeholder="Press enter to submit"
+          value="" />
+      </form>
+    </Input>
+  </div>
+</TokenSetter>
+`;

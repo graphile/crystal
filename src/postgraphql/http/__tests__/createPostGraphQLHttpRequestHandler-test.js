@@ -392,6 +392,25 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
     })
 
+    test('will serve the js for graphiql', async () => {
+      const server = createServer({ graphiql: true })
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql.js')
+        .expect(200)
+        .expect('Content-Type', 'text/javascript')
+      )
+    })
+
+    test('will not allow if no text/event-stream headers are set', async () => {
+      const server = createServer()
+      await (
+        request(server)
+        .get('/_postgraphql/stream')
+        .expect(405)
+      )
+    })
+
     test('will render GraphiQL if enabled', async () => {
       const server1 = createServer()
       const server2 = createServer({ graphiql: true })

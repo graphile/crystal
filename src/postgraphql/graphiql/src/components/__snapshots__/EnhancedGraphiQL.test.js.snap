@@ -1,0 +1,61 @@
+exports[`test will render component 1`] = `
+<div
+  className="root">
+  <div
+    className="graphiql">
+    <GraphiQL
+      fetcher={[Function]}
+      schema={undefined} />
+  </div>
+  <div
+    className="footer">
+    <TokenSetter
+      setToken={[Function]}
+      token={undefined} />
+  </div>
+  <ToastContainer
+    className="toast-top-right"
+    id="toast-container"
+    newestOnTop={true}
+    onClick={[Function]}
+    preventDuplicates={true}
+    toastMessageFactory={[Function]}
+    toastType={
+      Object {
+        "error": "error",
+        "info": "info",
+        "success": "success",
+        "warning": "warning",
+      }
+    } />
+</div>
+`;
+
+exports[`test will render component without TokenSetter 1`] = `
+<div
+  className="root">
+  <div
+    className="graphiql">
+    <GraphiQL
+      fetcher={[Function]}
+      schema={undefined} />
+  </div>
+  <div
+    className="footer" />
+  <ToastContainer
+    className="toast-top-right"
+    id="toast-container"
+    newestOnTop={true}
+    onClick={[Function]}
+    preventDuplicates={true}
+    toastMessageFactory={[Function]}
+    toastType={
+      Object {
+        "error": "error",
+        "info": "info",
+        "success": "success",
+        "warning": "warning",
+      }
+    } />
+</div>
+`;

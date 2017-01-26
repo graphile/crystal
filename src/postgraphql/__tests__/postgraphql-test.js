@@ -86,7 +86,7 @@ test('will use a created GraphQL schema to create the HTTP request handler and p
   await postgraphql(pgPool, [], options)
   expect(createPostGraphQLHttpRequestHandler.mock.calls.length).toBe(1)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0].length).toBe(1)
-  expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool'])
+  expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool', '_emitter'])
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].pgPool).toBe(pgPool)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].a).toBe(options.a)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].b).toBe(options.b)
