@@ -77,7 +77,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       // Also Relay 1 requires us to return the edge.
       //
       // We may deprecate this in the future if Relay 2 doesn’t need it.
-      pgCollection && pgCollection.paginator && [formatName.field(`${pgCollection.type.name}-edge`), {
+      pgCollection && pgCollection.paginator && [formatName.queryAllEdgeFieldName(pgCollection.type.name), {
         description: `An edge for the type. May be used by Relay 1.`,
         type: getEdgeGqlType(buildToken, pgCollection.paginator),
         args: { orderBy: createOrderByGqlArg(buildToken, pgCollection.paginator) },

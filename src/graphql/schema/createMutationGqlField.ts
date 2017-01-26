@@ -61,7 +61,7 @@ export default function createMutationGqlField <T>(
       input: {
         description: 'The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.',
         type: new GraphQLNonNull(new GraphQLInputObjectType({
-          name: formatName.type(`${config.name}-input`),
+          name: formatName.inputType(config.name),
           description: `All input for the \`${formatName.field(config.name)}\` mutation.`,
           fields: buildObject<GraphQLInputFieldConfig>(
             [

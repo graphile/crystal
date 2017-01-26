@@ -24,10 +24,10 @@ export default function createDeleteCollectionMutationFieldEntry <TValue>(
     return
 
   const { options, inventory } = buildToken
-  const name = `delete-${collection.type.name}`
   const formatName = buildToken.options.formatName
+  const name = formatName.deleteMethod(collection.type.name)
 
-  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
+  return [name, createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using its globally unique id.`,
     inputFields: [
@@ -65,7 +65,7 @@ function createDeleteCollectionPayloadGqlType <TValue>(
   const formatName = buildToken.options.formatName
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
-    name: `delete-${collection.type.name}`,
+    name: formatName.deleteType(collection.type.name),
     outputFields: [
       // Add the deleted value as an output field so the user can see the
       // object they just deleted.
@@ -75,7 +75,7 @@ function createDeleteCollectionPayloadGqlType <TValue>(
       }],
       // Add the deleted values globally unique id as well. This one is
       // especially useful for removing old nodes from the cache.
-      primaryKey ? [formatName.field(`deleted-${collection.type.name}-id`), {
+      primaryKey ? [formatName.deletedID(collection.type.name), {
         type: GraphQLID,
         resolve: value => idSerde.serialize(collection, value),
       }] : null,

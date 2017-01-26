@@ -17,7 +17,7 @@ export default function createMutationPayloadGqlType <TValue>(
 ): GraphQLObjectType {
   const formatName = buildToken.options.formatName
   return new GraphQLObjectType({
-    name: formatName.type(`${config.name}-payload`),
+    name: formatName.mutationPayload(config.name),
     description: `The output of our \`${formatName.field(config.name)}\` mutation.`,
     fields: buildObject<GraphQLFieldConfig<MutationValue<TValue>, mixed>>(
       [

@@ -19,11 +19,11 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TValue, TKe
     return
 
   const { collection } = collectionKey
-  const name = `delete-${collection.type.name}-by-${collectionKey.name}`
-  const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
   const formatName = buildToken.options.formatName
+  const name = formatName.deleteByKeyMethod(collection.type.name, collectionKey.name)
+  const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
 
-  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
+  return [name, createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using a unique key.`,
     inputFields: inputHelpers.fieldEntries,

@@ -35,7 +35,7 @@ function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectTyp
 
   // Creates our GraphQL condition type.
   const gqlType = new GraphQLInputObjectType({
-    name: formatName.type(`${type.name}-condition`),
+    name: formatName.queryAllConditionType(type.name),
     description: `A condition to be used against \`${formatName.type(type.name)}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
     fields: buildObject<GraphQLInputFieldConfig>(gqlConditionFieldEntries),
   })

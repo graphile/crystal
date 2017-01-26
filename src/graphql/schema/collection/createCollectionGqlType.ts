@@ -83,7 +83,7 @@ export default function createCollectionGqlType<TValue> (
 
           const { gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput } = getConditionGqlType(buildToken, tailCollection.type)
           return [
-            formatName.field(`${tailCollection.name}-by-${relation.name}`),
+            formatName.queryByKeyMethod(tailCollection.name, relation.name),
             createConnectionGqlField<TValue, Condition, TTailValue>(buildToken, tailPaginator, {
               // The one input arg we have for this connection is the `condition` arg.
               inputArgEntries: [

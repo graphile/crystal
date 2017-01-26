@@ -1,4 +1,5 @@
 import { camelCase, pascalCase, constantCase } from 'change-case'
+import FormatName from '../schema/FormatName'
 
 const formatInsideUnderscores = (formatter: (name: string) => string) => (fullName: string) => {
   const [, start, name, finish] = /^(_*)(.*?)(_*)$/.exec(fullName)!
@@ -9,26 +10,38 @@ const camelCaseInsideUnderscores = formatInsideUnderscores(name => camelCase(nam
 const pascalCaseInsideUnderscores = formatInsideUnderscores(name => pascalCase(name, undefined, true))
 const constantCaseInsideUnderscores = formatInsideUnderscores(constantCase)
 
-namespace formatName {
-  /**
-   * Formats a GraphQL type name using PascalCase.
-   */
-  export const type = pascalCaseInsideUnderscores
+const formatName: FormatName = {
+  type: pascalCaseInsideUnderscores,
+  field: camelCaseInsideUnderscores,
+  arg: camelCaseInsideUnderscores,
+  enumValue: constantCaseInsideUnderscores,
 
-  /**
-   * Formats a GraphQL field name using camelCase.
-   */
-  export const field = camelCaseInsideUnderscores
+  queryAllMethod: (collectionType: string): string => camelCaseInsideUnderscores(`all_${collectionType}`),
+  queryAllOrderByType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_order_by`),
+  queryAllEdgeType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_edge`),
+  queryAllRelationType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_connection`),
+  queryAllConditionType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_condition`),
+  queryAllEdgeFieldName: (collectionType: string): string =>  camelCaseInsideUnderscores(`${collectionType}_edge`),
 
-  /**
-   * Formats a GraphQL argument name using camelCase.
-   */
-  export const arg = camelCaseInsideUnderscores
+  queryMethod: camelCaseInsideUnderscores,
+  queryByKeyMethod: (collectionType: string, key: string): string =>  camelCaseInsideUnderscores(`${collectionType}_by_${key}`),
 
-  /**
-   * Formats a GraphQL enum value name using CONSTANT_CASE.
-   */
-  export const enumValue = constantCaseInsideUnderscores
+  deleteMethod: (collectionType: string): string => camelCaseInsideUnderscores(`delete_${collectionType}`),
+  deleteType: (collectionType: string): string => pascalCaseInsideUnderscores(`delete_${collectionType}`),
+  deleteByKeyMethod: (collectionType: string, key: string): string =>  camelCase(`delete_${collectionType}_by_${key}`),
+  deletedID: (collectionType: string): string =>  camelCaseInsideUnderscores(`deleted_${collectionType}_id`),
+
+  inputType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_input`),
+
+  mutationPayload: (collectionType: string): string =>  pascalCaseInsideUnderscores(`${collectionType}_payload`),
+
+  createMethod: (collectionType: string): string => camelCaseInsideUnderscores(`create_${collectionType}`),
+
+  updateMethod: (fieldName: string): string => camelCaseInsideUnderscores(`update_${fieldName}`),
+  updateType: (collectionType: string): string =>  pascalCaseInsideUnderscores(`update_${collectionType}`),
+  updateByKeyMethod: (collectionType: string, key: string): string =>  pascalCaseInsideUnderscores(`update_${collectionType}_by_${key}`),
+  updatePatchyType: (collectionType: string): string => pascalCaseInsideUnderscores(`${collectionType}_patch`),
+  updateFieldPatch: (fieldName: string): string => camelCaseInsideUnderscores(`${fieldName}_patch`),
 }
 
 export default formatName
