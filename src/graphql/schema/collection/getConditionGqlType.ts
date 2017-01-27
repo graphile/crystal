@@ -1,14 +1,27 @@
-import { GraphQLInputObjectType, GraphQLInputFieldConfig } from 'graphql'
-import { Condition, conditionHelpers, NullableType, ObjectType } from '../../../interface'
+import { GraphQLInputObjectType, GraphQLInputFieldConfig, GraphQLType } from 'graphql'
+import { Condition, conditionHelpers, NullableType, ObjectType, jsonType } from '../../../interface'
 import { formatName, buildObject, memoize2 } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlType from '../getGqlType'
 import transformGqlInputValue from '../transformGqlInputValue'
 
 export default memoize2(<TSource>(buildToken: BuildToken, type: ObjectType): {
-  gqlType: GraphQLInputObjectType<TSource>,
-  fromGqlInput: (condition?: { [key: string]: mixed }) => Condition,
+  gqlType: GraphQLInputObjectType<TSource> | GraphQLType<mixed>,
+  fromGqlInput: (condition?: { [key: string]: mixed } | mixed) => Condition,
 } => {
+  if (buildToken.options) {
+    const { pgRowMatcher } = buildToken.options
+
+    // In case custom row matching is used, the condition field becomes a JSON.
+    if (pgRowMatcher != null) {
+      return {
+        gqlType: getGqlType(buildToken, new NullableType(jsonType), true),
+        fromGqlInput: (condition?: string): Condition =>
+          condition ? conditionHelpers.customMatches(pgRowMatcher, condition) : true,
+      }
+    }
+  }
+
   // Creates the field entries for our paginator condition type.
   const gqlConditionFieldEntries =
     Array.from(type.fields).map<[string, GraphQLInputFieldConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>

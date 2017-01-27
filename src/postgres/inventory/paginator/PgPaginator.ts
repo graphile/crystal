@@ -32,7 +32,7 @@ abstract class PgPaginator<TInput, TItemValue> implements Paginator<TInput, TIte
     const client = pgClientFromContext(context)
     const fromSql = this.getFromEntrySql(input)
     const conditionSql = this.getConditionSql(input)
-    const aliasIdentifier = Symbol()
+    const aliasIdentifier = Symbol.for('mainSelect')
     const result = await client.query(sql.compile(sql.query`select count(${sql.identifier(aliasIdentifier)}) as count from ${fromSql} as ${sql.identifier(aliasIdentifier)} where ${conditionSql}`))
     return parseInt(result.rows[0]['count'], 10)
   }

@@ -20,6 +20,7 @@ type PostGraphQLOptions = {
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
+  pgRowMatcher?: string,
 }
 
 /**

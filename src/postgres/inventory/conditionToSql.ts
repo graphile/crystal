@@ -31,6 +31,10 @@ export default function conditionToSql (condition: Condition, path: Array<string
       if (!match) throw new Error('Invalid regular expression.')
       const [, pattern, flags] = match
       return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(pattern)}, ${sql.value(flags)})`
+    case 'CUSTOM_MATCHER':
+      // We use `sql.raw` (beware of its dangers!) since the matcher is provided by the (server-side) user
+      // Since it does not come from the GraphQL interface, it can be trusted
+      return sql.query`${sql.raw(condition.matcher)}(to_json(${sql.identifier(Symbol.for('mainSelect'))}), ${sql.value(condition.value)})`
     default:
       throw new Error(`Condition of type '${condition['type']}' is not recognized.`)
   }

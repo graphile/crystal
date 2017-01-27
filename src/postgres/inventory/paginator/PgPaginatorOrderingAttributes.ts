@@ -66,7 +66,7 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
     if (beforeCursor != null && beforeCursor.length !== pgAttributes.length)
       throw new Error('Before cursor must be a value tuple of the correct length.')
 
-    const aliasIdentifier = Symbol()
+    const aliasIdentifier = Symbol.for('mainSelect')
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
@@ -129,9 +129,10 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
         const lastCursor = lastValue ? lastValue.cursor : beforeCursor
         if (lastCursor == null) return false
 
+        const aliasIdentifier = Symbol.for('mainSelect')
         const { rowCount } = await client.query(sql.compile(sql.query`
           select null
-          from ${fromSql}
+          from ${fromSql} as ${sql.identifier(aliasIdentifier)}
           where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
           limit 1
         `))
@@ -146,9 +147,10 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
         const firstCursor = firstValue ? firstValue.cursor : afterCursor
         if (firstCursor == null) return false
 
+        const aliasIdentifier = Symbol.for('mainSelect')
         const { rowCount } = await client.query(sql.compile(sql.query`
           select null
-          from ${fromSql}
+          from ${fromSql} as ${sql.identifier(aliasIdentifier)}
           where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}
           limit 1
         `))

@@ -15,6 +15,11 @@ export type SchemaOptions = {
   // If true then the default mutations for tables (e.g. createMyTable) will
   // not be created
   disableDefaultMutations?: boolean,
+  // If specified then the corresponding Postgres function (polymorphic) will be used for
+  // connection filtering, instead of the default condition. It will also cause the `condition`
+  // field in the GraphQL schema to be of type Json (instead of the default,
+  // collection-dependent type)
+  pgRowMatcher?: string,
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
@@ -37,6 +42,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      pgRowMatcher: options.pgRowMatcher || null,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),
