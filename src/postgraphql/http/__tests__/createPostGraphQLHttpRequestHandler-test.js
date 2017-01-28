@@ -1,9 +1,5 @@
-jest.mock('send')
-jest.mock('../setupRequestPgClientTransaction')
-
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext'
-import setupRequestPgClientTransaction from '../setupRequestPgClientTransaction'
 import createPostGraphQLHttpRequestHandler, { graphiqlDirectory } from '../createPostGraphQLHttpRequestHandler'
 
 const path = require('path')
@@ -34,7 +30,7 @@ const gqlSchema = new GraphQLSchema({
       query: {
         type: GraphQLString,
         resolve: (source, args, context) =>
-          context[$$pgClient].query(),
+          context[$$pgClient].query('EXECUTE'),
       },
     },
   }),
@@ -260,7 +256,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
-      setupRequestPgClientTransaction.mockClear()
       const server = createServer()
       await (
         request(server)
@@ -271,21 +266,16 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect({ data: { query: null } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], ['EXECUTE'], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
-      expect(setupRequestPgClientTransaction.mock.calls.length).toEqual(1)
-      expect(setupRequestPgClientTransaction.mock.calls[0].length).toEqual(3)
-      expect(setupRequestPgClientTransaction.mock.calls[0][1]).toBe(pgClient)
-      expect(setupRequestPgClientTransaction.mock.calls[0][2]).toEqual({})
     })
 
     test('will setup a transaction and pass down options for requests that use the Postgres client', async () => {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
-      setupRequestPgClientTransaction.mockClear()
-      const jwtSecret = Symbol('jwtSecret')
-      const pgDefaultRole = Symbol('pgDefaultRole')
+      const jwtSecret = 'secret'
+      const pgDefaultRole = 'pg_default_role'
       const server = createServer({ jwtSecret, pgDefaultRole })
       await (
         request(server)
@@ -296,12 +286,13 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect({ data: { query: null } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [{ text: 'select set_config($1, $2, true)', values: ['role', 'pg_default_role'] }],
+        ['EXECUTE'],
+        ['commit'],
+      ])
       expect(pgClient.release.mock.calls).toEqual([[]])
-      expect(setupRequestPgClientTransaction.mock.calls.length).toEqual(1)
-      expect(setupRequestPgClientTransaction.mock.calls[0].length).toEqual(3)
-      expect(setupRequestPgClientTransaction.mock.calls[0][1]).toBe(pgClient)
-      expect(setupRequestPgClientTransaction.mock.calls[0][2]).toEqual({ jwtSecret, pgDefaultRole })
     })
 
     test('will respect an operation name', async () => {
