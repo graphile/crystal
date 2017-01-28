@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
+import { EventEmitter } from 'events'
 
 /**
  * A request handler for one of many different `http` frameworks.
@@ -25,6 +26,8 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool,
 
+  _emitter: EventEmitter,
+
   // The exact (and only) route our request handler will respond to.
   graphqlRoute?: string,
 
@@ -44,6 +47,10 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // headers. Make sure to keep this private, never let anyone else know its
   // value.
   jwtSecret?: string,
+
+  // Whether or not we are watching the PostGraphQL schema for changes. Should
+  // be associated with `_emitter`.
+  watchPg?: boolean,
 
   // The default Postgres role to use if no role is provided in a provided JWT
   // token. Also known as the “anonymous” role.

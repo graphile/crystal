@@ -13,7 +13,7 @@ import {
 } from 'graphql'
 import { Paginator } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
-import getGqlType from '../getGqlType'
+import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
 
 // TODO: doc
@@ -22,11 +22,11 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   paginator: Paginator<TInput, TItemValue>,
   config: {
     description?: string,
-    inputArgEntries?: Array<[string, GraphQLArgumentConfig<mixed>]>,
+    inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
-  const gqlType = getGqlType(buildToken, paginator.itemType, false)
+  const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
   // This is the type of all the connection arguments.
   type ConnectionArgs<TCursor> = {
@@ -41,7 +41,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   return {
     description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
-    args: buildObject<GraphQLArgumentConfig<mixed>>([
+    args: buildObject<GraphQLArgumentConfig>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
       paginator.orderings && paginator.orderings.size > 0 && ['orderBy', createOrderByGqlArg(buildToken, paginator)],
@@ -134,11 +134,11 @@ const getConnectionGqlType = memoize2(_createConnectionGqlType)
 export function _createConnectionGqlType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
-): GraphQLObjectType<Connection<TInput, TItemValue, mixed>> {
-  const gqlType = getGqlType(buildToken, paginator.itemType, false)
+): GraphQLObjectType {
+  const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
   const gqlEdgeType = getEdgeGqlType(buildToken, paginator)
 
-  return new GraphQLObjectType<Connection<TInput, TItemValue, mixed>>({
+  return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
     fields: () => ({
@@ -162,7 +162,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       nodes: {
         description: `A list of ${scrib.type(gqlType)} objects.`,
         type: new GraphQLList(gqlType),
-        resolve: ({ page }): Array<TItemValue> =>
+        resolve: ({ page }: Connection<TInput, TItemValue, mixed>): Array<TItemValue> =>
           page.values.map(({ value }) => value),
       },
     }),
@@ -177,10 +177,10 @@ export const getEdgeGqlType = memoize2(_createEdgeGqlType)
 export function _createEdgeGqlType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
-): GraphQLObjectType<Edge<TInput, TItemValue, mixed>> {
-  const gqlType = getGqlType(buildToken, paginator.itemType, false)
+): GraphQLObjectType {
+  const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
-  return new GraphQLObjectType<Edge<TInput, TItemValue, mixed>>({
+  return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
     fields: () => ({
@@ -206,9 +206,10 @@ export function _createEdgeGqlType <TInput, TItemValue>(
 export function createOrderByGqlArg <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
-): GraphQLArgumentConfig<string> {
-  const gqlType = getGqlType(buildToken, paginator.itemType, false)
+): GraphQLArgumentConfig {
+  const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
   const enumType = getOrderByGqlEnumType(buildToken, paginator)
+
   return {
     description: `The method to use when ordering ${scrib.type(gqlType)}.`,
     type: enumType,
@@ -223,7 +224,7 @@ const _getOrderByGqlEnumType = memoize2(_createOrderByGqlEnumType)
 function getOrderByGqlEnumType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
-): GraphQLEnumType<string> {
+): GraphQLEnumType {
   return _getOrderByGqlEnumType(buildToken, paginator)
 }
 
@@ -234,15 +235,15 @@ function getOrderByGqlEnumType <TInput, TItemValue>(
 export function _createOrderByGqlEnumType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
-): GraphQLEnumType<string> {
-  const gqlType = getGqlType(buildToken, paginator.itemType, false)
+): GraphQLEnumType {
+  const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
   return new GraphQLEnumType({
     name: formatName.type(`${paginator.name}-order-by`),
     description: `Methods to use when ordering ${scrib.type(gqlType)}.`,
     values: buildObject(
       Array.from(paginator.orderings)
-        .map<[string, GraphQLEnumValueConfig<string>]>(
+        .map<[string, GraphQLEnumValueConfig]>(
           ordering => [formatName.enumValue(ordering[0]), { value: ordering[0] }],
         ),
     ),
@@ -255,8 +256,8 @@ export function _createOrderByGqlEnumType <TInput, TItemValue>(
  *
  * @private
  */
-export const _cursorType: GraphQLScalarType<NamespacedCursor<mixed>> =
-  new GraphQLScalarType<NamespacedCursor<mixed>>({
+export const _cursorType: GraphQLScalarType =
+  new GraphQLScalarType({
     name: 'Cursor',
     description: 'A location in a connection that can be used for resuming pagination.',
     serialize: value => serializeCursor(value),
@@ -290,8 +291,8 @@ function deserializeCursor (serializedCursor: string): NamespacedCursor<mixed> {
  *
  * @private
  */
-export const _pageInfoType: GraphQLObjectType<Connection<mixed, mixed, mixed>> =
-  new GraphQLObjectType<Connection<mixed, mixed, mixed>>({
+export const _pageInfoType: GraphQLObjectType =
+  new GraphQLObjectType({
     name: 'PageInfo',
     description: 'Information about pagination in a connection.',
     fields: {

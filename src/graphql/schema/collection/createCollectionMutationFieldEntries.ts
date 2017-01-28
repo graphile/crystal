@@ -12,13 +12,13 @@ import createDeleteCollectionKeyMutationFieldEntry from './mutations/createDelet
  * includes the basic stuff: create, update, and delete. In the future
  * mutations like upsert may be added.
  */
-export default function createCollectionMutationFieldEntries (
+export default function createCollectionMutationFieldEntries <TValue>(
   buildToken: BuildToken,
-  collection: Collection,
-): Array<[string, GraphQLFieldConfig<mixed, mixed>]> {
+  collection: Collection<TValue>,
+): Array<[string, GraphQLFieldConfig<never, mixed>]> {
   // Create an array of entries that may be undefined. We will filter out the
   // undefined ones at the end.
-  const optionalEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>] | undefined> = [
+  const optionalEntries: Array<[string, GraphQLFieldConfig<never, mixed>] | undefined> = [
     // Add the create collection mutation.
     createCreateCollectionMutationFieldEntry(buildToken, collection),
     // Add the update collection mutation. Uses the collection’s primary key.
@@ -31,5 +31,5 @@ export default function createCollectionMutationFieldEntries (
     ...collection.keys.map(collectionKey => createDeleteCollectionKeyMutationFieldEntry(buildToken, collectionKey)),
   ]
 
-  return optionalEntries.filter(Boolean) as Array<[string, GraphQLFieldConfig<mixed, mixed>]>
+  return optionalEntries.filter(Boolean) as Array<[string, GraphQLFieldConfig<never, mixed>]>
 }

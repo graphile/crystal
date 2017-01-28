@@ -86,7 +86,7 @@ test('will use a created GraphQL schema to create the HTTP request handler and p
   await postgraphql(pgPool, [], options)
   expect(createPostGraphQLHttpRequestHandler.mock.calls.length).toBe(1)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0].length).toBe(1)
-  expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool'])
+  expect(Object.keys(createPostGraphQLHttpRequestHandler.mock.calls[0][0])).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool', '_emitter'])
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].pgPool).toBe(pgPool)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].a).toBe(options.a)
   expect(createPostGraphQLHttpRequestHandler.mock.calls[0][0].b).toBe(options.b)
@@ -133,8 +133,8 @@ test('will create a new PostGraphQL schema on when `watchPgSchemas` emits a chan
   expect(pgPool.connect.mock.calls).toEqual([[], [], []])
   expect(pgClient.release.mock.calls).toEqual([[], [], []])
   expect(mockLog.mock.calls).toEqual([
-    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('a')}, ${chalk.bold.cyan('b')}, ${chalk.bold.cyan('c')}`],
-    [`Restarting PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('d')}, ${chalk.bold.cyan('e')}`],
+    [`Rebuilding PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('a')}, ${chalk.bold.cyan('b')}, ${chalk.bold.cyan('c')}`],
+    [`Rebuilding PostGraphQL API after Postgres command(s): ️${chalk.bold.cyan('d')}, ${chalk.bold.cyan('e')}`],
   ])
   console.log = origLog
 })

@@ -1,37 +1,40 @@
-import NamedType from './NamedType'
-
 /**
- * Any type in our system.
+ * A type in our type system.
  *
- * Every type object has (in it’s type definition) an associated type, named
- * `TValue`. The difference between a `Type` and `TValue` (often expressed
- * together as `Type<TValue>`) is important to understand. A `Type` we can
- * statically introspect, getting the name, description, and more information.
- * `TValue` represents the compiler type of the `Type` object’s value.
- * So both `Type` and `TValue` represent the same thing, the difference is in
- * the usage. `TValue` is statically defined in code used by the compiler
- * whereas `Type` is defined at runtime.
+ * Every type will have a `TValue` which represents the internal value of this
+ * type.
  *
- * Note that although all types are classes, you could easily use the
- * Typescript `implements` feature to manually implement the interface. Even
- * though these are classes all branching logic is done with functions that
- * don’t require exact inheritance.
+ * All of the types in our interface represent *data access patterns*. They do
+ * not perscript how the data should be stored or fetched, but rather just how
+ * to expose that data. So for example, we could have a string type that was
+ * really an object. Or an object type that was actually an integer. The type
+ * system should not be perscriptive.
+ *
+ * Data producers can keep data however it is most performant, while data
+ * consumers will retrieve that data in a given shape.
  */
-abstract class Type<TValue> {
+interface Type<TValue> {
   /**
-   * Every type must implement an `isTypeOf` function which will completely
-   * validate that a value conforms to this type’s specifications. Often this
-   * method will not be implemented efficiently so it may not be suitable for
-   * hot code paths.
+   * Every type will have a constant `kind` string. This will tell our system
+   * how the type should be interacted with. This is mostly useful in the
+   * `switchType` function.
    */
-  public abstract isTypeOf (value: mixed): value is TValue
+  readonly kind: string
 
   /**
-   * Every type should have a named type at it’s “heart” as unnamed types are
-   * inherently abstract. As inventories will only let us register named types, we
-   * need to get the named type.
+   * Tests if a given value is of this type.
    */
-  public abstract getNamedType (): NamedType<mixed>
+  // TODO: Remove this.
+  isTypeOf (value: mixed): value is TValue
 }
 
 export default Type
+
+/**
+ * This user-defined type guard will check to see if the value being passed in
+ * is a type. We do this by checking the value is an object and has a string
+ * `kind` field.
+ */
+export function isType (value: mixed): value is Type<mixed> {
+  return value != null && typeof value === 'object' && typeof value['kind'] === 'string'
+}

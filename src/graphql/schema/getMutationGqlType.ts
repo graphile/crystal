@@ -17,11 +17,11 @@ export default getMutationGqlType
  *
  * @private
  */
-function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType<mixed> | undefined {
+function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType | undefined {
   const { inventory, options } = buildToken
 
   // A list of all the mutations we are able to run.
-  const mutationFieldEntries: Array<[string, GraphQLFieldConfig<mixed, mixed>]> = [
+  const mutationFieldEntries: Array<[string, GraphQLFieldConfig<never, mixed>]> = [
     // Add the mutation field entires from our build token hooks.
     ...(
       buildToken._hooks.mutationFieldEntries

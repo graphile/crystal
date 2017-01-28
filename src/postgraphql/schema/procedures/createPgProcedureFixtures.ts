@@ -1,9 +1,10 @@
 import { GraphQLOutputType, GraphQLInputType } from 'graphql'
-import { Type } from '../../../interface'
 import BuildToken from '../../../graphql/schema/BuildToken'
-import getGqlType from '../../../graphql/schema/getGqlType'
+import getGqlInputType from '../../../graphql/schema/type/getGqlInputType'
+import getGqlOutputType from '../../../graphql/schema/type/getGqlOutputType'
 import { PgCatalog, PgCatalogNamespace, PgCatalogType, PgCatalogProcedure } from '../../../postgres/introspection'
 import getTypeFromPgType from '../../../postgres/inventory/type/getTypeFromPgType'
+import PgType from '../../../postgres/inventory/type/PgType'
 
 export type PgProcedureFixtures =  {
   pgCatalog: PgCatalog,
@@ -12,13 +13,15 @@ export type PgProcedureFixtures =  {
   args: Array<{
     name: string,
     pgType: PgCatalogType,
-    type: Type<mixed>,
-    gqlType: GraphQLInputType<mixed>,
+    type: PgType<mixed>,
+    gqlType: GraphQLInputType,
+    fromGqlInput: (gqlInput: mixed) => mixed,
   }>,
   return: {
     pgType: PgCatalogType,
-    type: Type<mixed>,
-    gqlType: GraphQLOutputType<mixed>,
+    type: PgType<mixed>,
+    gqlType: GraphQLOutputType,
+    intoGqlOutput: (value: mixed) => mixed,
   },
 }
 
@@ -48,16 +51,14 @@ export default function createPgProcedureFixtures (
       const name = pgProcedure.argNames[i] || `arg-${i}`
       const pgType = pgCatalog.assertGetType(typeId)
       const type = getTypeFromPgType(pgCatalog, pgType, inventory)
-      const gqlType = getGqlType(buildToken, type, true)
-      return { name, pgType, type, gqlType }
+      return { name, pgType, type, ...getGqlInputType(buildToken, type) }
     }),
 
     return: (() => {
       // Convert our return type into its appropriate forms.
       const pgType = pgCatalog.assertGetType(pgProcedure.returnTypeId)
       const type = getTypeFromPgType(pgCatalog, pgType, inventory)
-      const gqlType = getGqlType(buildToken, type, false)
-      return { pgType, type, gqlType }
+      return { pgType, type, ...getGqlOutputType(buildToken, type) }
     })(),
   }
 }

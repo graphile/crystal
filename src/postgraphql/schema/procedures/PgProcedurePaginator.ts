@@ -1,7 +1,8 @@
-import { Type, Paginator } from '../../../interface'
+import { Paginator } from '../../../interface'
 import { sql } from '../../../postgres/utils'
 import PgPaginator from '../../../postgres/inventory/paginator/PgPaginator'
 import PgPaginatorOrderingOffset from '../../../postgres/inventory/paginator/PgPaginatorOrderingOffset'
+import PgType from '../../../postgres/inventory/type/PgType'
 import { PgProcedureFixtures } from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 
@@ -25,7 +26,7 @@ class PgProcedurePaginator<TItemValue> extends PgPaginator<ProcedureInput, TItem
   }
 
   public name: string = this._fixtures.pgProcedure.name
-  public itemType: Type<TItemValue> = this._fixtures.return.type as Type<TItemValue>
+  public itemType: PgType<TItemValue> = this._fixtures.return.type as PgType<TItemValue>
 
   /**
    * The different ways we can order our procedure. Of course we can order the

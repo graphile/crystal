@@ -30,7 +30,7 @@
  * ```
  */
 export default function buildObject <T>(
-  ...entriess: Array<Array<[string, T] | undefined | null | false>>,
+  ...entriess: Array<Array<[string, T] | { key: string, value: T } | undefined | null | false>>,
 ): { [key: string]: T } {
   const object = {}
 
@@ -38,7 +38,17 @@ export default function buildObject <T>(
     if (!entry)
       return
 
-    const [key, value] = entry
+    let key: string
+    let value: T
+
+    if (Array.isArray(entry)) {
+      key = entry[0]
+      value = entry[1]
+    }
+    else {
+      key = entry.key
+      value = entry.value
+    }
 
     if (object.hasOwnProperty(key))
       throw new Error(`Naming conflict when building object. Cannot have two definitions for property '${key}'.`)
