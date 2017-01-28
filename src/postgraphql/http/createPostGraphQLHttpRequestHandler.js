@@ -12,8 +12,9 @@ import {
 } from 'graphql'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
-import setupRequestPgClientTransaction from './setupRequestPgClientTransaction'
 import debugPgClient from './debugPgClient'
+import setupPgClientTransaction from '../setupPgClientTransaction'
+import withPostGraphQLContext from '../withPostGraphQLContext'
 
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
@@ -274,37 +275,24 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       if (debugGraphql.enabled)
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
-      // Connect a new Postgres client and start a transaction.
-      const pgClient = await pgPool.connect()
+      const jwtToken = getJwtToken(req)
 
-      // Enhance our Postgres client with debugging stuffs.
-      debugPgClient(pgClient)
-
-      // Begin our transaction and set it up.
-      await pgClient.query('begin')
-      pgRole = await setupRequestPgClientTransaction(req, pgClient, {
+      result = await withPostGraphQLContext({
+        pgPool,
+        jwtToken,
         jwtSecret: options.jwtSecret,
         pgDefaultRole: options.pgDefaultRole,
-      })
-
-      try {
-        result = await executeGraphql(
+      }, context => {
+        pgRole = context.pgRole
+        return executeGraphql(
           gqlSchema,
           queryDocumentAst,
           null,
-          { [$$pgClient]: pgClient },
+          context,
           params.variables,
           params.operationName,
         )
-      }
-      // Cleanup our Postgres client by ending the transaction and releasing
-      // the client back to the pool. Always do this even if the query fails.
-      finally {
-        await pgClient.query('commit')
-        pgClient.release()
-
-        debugRequest('GraphQL query has been executed.')
-      }
+      })
     }
     catch (error) {
       // Set our status code and send the client our results!
@@ -318,6 +306,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     }
     // Finally, we send the client the contents of `result`.
     finally {
+      debugRequest('GraphQL query has been executed.')
       // Format our errors so the client doesn’t get the full thing.
       if (result && result.errors)
         result.errors = result.errors.map(formatError)
@@ -412,4 +401,48 @@ function addCORSHeaders (res) {
     'Content-Type',
     'Content-Length',
   ].join(', '))
+}
+
+/**
+ * Parses the `Bearer` auth scheme token out of the `Authorization` header as
+ * defined by [RFC7235][1].
+ *
+ * ```
+ * Authorization = credentials
+ * credentials   = auth-scheme [ 1*SP ( token68 / #auth-param ) ]
+ * token68       = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" )*"="
+ * ```
+ *
+ * [1]: https://tools.ietf.org/html/rfc7235
+ *
+ * @private
+ */
+const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
+
+/**
+ * Gets the JWT token from the Http request’s headers. Specifically the
+ * `Authorization` header in the `Bearer` format. Will throw an error if the
+ * header is in the incorrect format, but will not throw an error if the header
+ * does not exist.
+ *
+ * @private
+ * @param {IncomingMessage} request
+ * @returns {string | null}
+ */
+function getJwtToken (request) {
+  const { authorization } = request.headers
+
+  // If there was no authorization header, just return null.
+  if (authorization == null)
+    return null
+
+  const match = authorizationBearerRex.exec(authorization)
+
+  // If we did not match the authorization header with our expected format,
+  // throw a 400 error.
+  if (!match)
+    throw httpError(400, 'Authorization header is not of the correct bearer scheme format.')
+
+  // Return the token from our match.
+  return match[1]
 }
