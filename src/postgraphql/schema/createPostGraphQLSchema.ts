@@ -22,6 +22,7 @@ export default async function createPostGraphQLSchema (
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
+    jwtSecret?: string,
     jwtPgTypeIdentifier?: string,
     disableDefaultMutations?: boolean,
   } = {},
@@ -57,6 +58,10 @@ export default async function createPostGraphQLSchema (
   const jwtPgType = options.jwtPgTypeIdentifier
     ? getPgTokenTypeFromIdentifier(pgCatalog, options.jwtPgTypeIdentifier)
     : undefined
+
+  // If a token type is defined, but the JWT secret is not. Throw an error.
+  if (jwtPgType && !options.jwtSecret)
+    throw new Error('Postgres token type is defined, but a JWT secret is not defined. Please provide a JWT secret.')
 
   // Add all of our Postgres constructs to that inventory.
   addPgCatalogToInventory(inventory, pgCatalog, {

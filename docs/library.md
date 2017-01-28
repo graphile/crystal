@@ -129,8 +129,9 @@ Arguments include:
 - **`options`**: An object containing other miscellaneous options. Most options are shared with the `postgraphql` middleware function. Options could be:
   - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `__id` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
   - `dynamicJson`: Setting this to `true` enables dynamic JSON which will allow you to use any JSON as input and get any arbitrary JSON as output. By default JSON types are just a JSON string.
-  - `disableDefaultMutations`: Setting this to `true` will prevent the creation of the default mutation types & fields. Database mutation will only be possible through Postgres functions.
+  - `jwtSecret`: The JWT secret that will be used to sign tokens returned by the type created with the `jwtPgTypeIdentifier` option.
   - `jwtPgTypeIdentifier`: The Postgres type identifier for the compound type which will be signed as a JWT token if ever found as the return type of a procedure. Can be of the form: `my_schema.my_type`. You may use quotes as needed: `"my-special-schema".my_type`.
+  - `disableDefaultMutations`: Setting this to `true` will prevent the creation of the default mutation types & fields. Database mutation will only be possible through Postgres functions.
 
 ### `withPostGraphQLContext(options, callback): Promise<GraphQLExecutionResult>`
 
