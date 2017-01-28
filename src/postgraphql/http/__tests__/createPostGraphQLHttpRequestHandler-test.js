@@ -1,3 +1,5 @@
+jest.mock('send')
+
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql'
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext'
 import createPostGraphQLHttpRequestHandler, { graphiqlDirectory } from '../createPostGraphQLHttpRequestHandler'
