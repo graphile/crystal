@@ -278,9 +278,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       const jwtToken = getJwtToken(req)
 
       result = await withPostGraphQLContext({
-        ...options,
         pgPool,
         jwtToken,
+        jwtSecret: options.jwtSecret,
+        pgDefaultRole: options.pgDefaultRole,
       }, context => {
         pgRole = context.pgRole
         return executeGraphql(
