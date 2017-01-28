@@ -1,27 +1,27 @@
 query {
   a: allPeople { nodes { ...node } }
   b: allCompoundKeys { nodes { ...node } }
-  c: node(__id: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
-  d: node(__id: "WyJwZW9wbGUiLDJd") { ...node }
-  e: node(__id: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
-  f: node(__id: "WyJwZW9wbGUiLDVd") { ...node }
-  g: node(__id: "WyJwZW9wbGUiLDUwMF0=") { ...node }
-  h: node(__id: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
-  i: person(__id: "WyJwZW9wbGUiLDJd") { ...node }
-  j: person(__id: "WyJwZW9wbGUiLDVd") { ...node }
-  k: person(__id: "WyJwZW9wbGUiLDUwMF0=") { ...node }
-  l: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
-  m: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
-  n: compoundKey(__id: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
-  o: node(__id: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
-  p: node(__id: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
-  q: similarTable1(__id: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
-  r: similarTable2(__id: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
+  c: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  d: node(nodeId: "WyJwZW9wbGUiLDJd") { ...node }
+  e: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  f: node(nodeId: "WyJwZW9wbGUiLDVd") { ...node }
+  g: node(nodeId: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  h: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+  i: person(nodeId: "WyJwZW9wbGUiLDJd") { ...node }
+  j: person(nodeId: "WyJwZW9wbGUiLDVd") { ...node }
+  k: person(nodeId: "WyJwZW9wbGUiLDUwMF0=") { ...node }
+  l: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") { ...node }
+  m: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd") { ...node }
+  n: compoundKey(nodeId: "WyJjb21wb3VuZF9rZXlzIiwxMDAsMjAwXQ==") { ...node }
+  o: node(nodeId: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
+  p: node(nodeId: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
+  q: similarTable1(nodeId: "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==") { ...node }
+  r: similarTable2(nodeId: "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==") { ...node }
 }
 
 fragment node on Node {
   __typename
-  __id
+  nodeId
   ... on Person {
     id
     name

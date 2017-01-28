@@ -5,9 +5,8 @@ import getQueryGqlType from './getQueryGqlType'
 import getMutationGqlType from './getMutationGqlType'
 
 export type SchemaOptions = {
-  // The exact name for the node id field. In the past Relay wanted this to
-  // be `id`, but there are some movements in the GraphQL standard to
-  // standardize an `__id` field.
+  // Changes the name of the node field id on the node interface. Relay 1,
+  // for example, wants the name to be `id`.
   nodeIdFieldName?: string,
   // If true then any literal will be accepted to this type and its output will
   // be plain JSON.
@@ -34,7 +33,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
   const buildToken: BuildToken = {
     inventory,
     options: {
-      nodeIdFieldName: options.nodeIdFieldName || '__id',
+      nodeIdFieldName: options.nodeIdFieldName || 'nodeId',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
     },
