@@ -42,11 +42,11 @@ function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectTyp
   const fromGqlInput = (condition?: { [key: string]: mixed }): Condition =>
     condition ? (
       conditionHelpers.and(
-        ...gqlConditionFieldEntries.map(({ key: fieldName, value: { internalName, fromGqlInput } }) =>
+        ...gqlConditionFieldEntries.map(({ key: fieldName, value: { internalName, fromGqlInput: fieldFromGqlInput } }) =>
           typeof condition![fieldName] !== 'undefined'
             // If the argument exists, create a condition and transform the
             // input value.
-            ? conditionHelpers.fieldEquals(internalName, fromGqlInput(condition![fieldName]))
+            ? conditionHelpers.fieldEquals(internalName, fieldFromGqlInput(condition![fieldName]))
             // If the argument does not exist, this condition should just be
             // true (which will get filtered out by `conditionHelpers.and`).
             : true,

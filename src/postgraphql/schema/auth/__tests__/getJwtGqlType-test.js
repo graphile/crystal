@@ -24,7 +24,7 @@ test('will sign a JWT when serialized', () => {
       ['b', { type: integerType }],
       ['c', { type: integerType }],
       ['exp', { type: new NullableType(integerType) }],
-    ])
+    ]),
   }), jwtSecret)
   expect(type.serialize({ a: 1, b: 2, c: 3 })).toEqual({ a: 1, b: 2, c: 3 })
   expect(type.serialize({ a: 1, b: 2, c: 3, exp: 5000 })).toEqual({ a: 1, b: 2, c: 3, exp: 5000 })

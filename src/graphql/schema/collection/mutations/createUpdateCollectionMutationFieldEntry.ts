@@ -97,7 +97,7 @@ function createCollectionPatchType <TValue>(buildToken: BuildToken, collection: 
           type: gqlType,
           internalName: fieldName,
           fromGqlInput,
-        }
+        },
       }
     })
 
