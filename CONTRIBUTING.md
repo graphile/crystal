@@ -13,7 +13,7 @@ scripts/run-kitchen-sink-sql
 scripts/dev
 ```
 
-The first script will install all dependencies of PostGraphQL project. The second script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The third script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server, just remember to refresh GraphiQL. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
+The first script will install all dependencies of PostGraphQL project. The second script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`) to your default Postgres database at `localhost:5432`. The third script will start PostGraphQL in watch mode and open GraphiQL in your default browser. Whenever you change the PostGraphQL source code, the `scripts/dev` command will restart the PostGraphQL server. To manually restart the server type in `rs` and hit enter while `scripts/dev` is running.
 
 If you want to use a different database (e.g. after `createdb postgraphql`), you can do so by passing the database URL to these commands, like this:
 
@@ -55,6 +55,11 @@ PostGraphQL makes use of the Jest snapshot feature. Even when you change small t
 ### Linting
 PostGraphQL uses [TSLint](http://palantir.github.io/tslint/) and Travis CI to test builds and enforce lint rules:
 [travis-ci.org/calebmer/postgraphql](https://travis-ci.org/calebmer/postgraphql).
+
+## GraphiQL
+The instance of GraphiQL used by PostGraphQL is a [`create-react-app`](https://github.com/facebookincubator/create-react-app) located in `src/postgraphql/graphiql`. When developing PostGraphQL (running `scripts/dev` only), GraphiQL will run on a different port to take advantage of the `create-react-app` developer experience.
+
+When we build PostGraphQL before publishing (with `scripts/build`), GraphiQL is built into a few JS, CSS, and HTML files then served by the PostGraphQL middleware people import into their projects.
 
 ## Commit messages
 PostGraphQL team use [karma-style](http://karma-runner.github.io/1.0/dev/git-commit-msg.html) commit messages: a type
