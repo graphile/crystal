@@ -53,15 +53,15 @@ export default async function withPostGraphQLContext(
   // Begin our transaction and set it up.
   await pgClient.query('begin')
 
-  const pgRole = await setupPgClientTransaction({
-    pgClient,
-    jwtToken,
-    jwtSecret,
-    pgDefaultRole,
-  })
-
   // Run the function with a context object that can be passed through
   try {
+    const pgRole = await setupPgClientTransaction({
+      pgClient,
+      jwtToken,
+      jwtSecret,
+      pgDefaultRole,
+    })
+
     return await callback({
       [$$pgClient]: pgClient,
       pgRole,
@@ -102,14 +102,14 @@ async function setupPgClientTransaction ({
   // If we were provided a JWT token, let us try to verify it. If verification
   // fails we want to throw an error.
   if (jwtToken) {
-    // If a JWT token was defined, but a secret was not procided to the server
-    // throw a 403 error.
-    if (typeof jwtSecret !== 'string')
-      throw new Error('Not allowed to provide a JWT token.')
-
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
+      // If a JWT token was defined, but a secret was not procided to the server
+      // throw a 403 error.
+      if (typeof jwtSecret !== 'string')
+        throw new Error('Not allowed to provide a JWT token.')
+
       jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: 'postgraphql' })
 
       const roleClaim = jwtClaims['role']
@@ -124,6 +124,8 @@ async function setupPgClientTransaction ({
       }
     }
     catch (error) {
+      // In case this error is thrown in an HTTP context, we want to add a 403
+      // status code.
       error.statusCode = 403
       throw error
     }
