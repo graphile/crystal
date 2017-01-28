@@ -281,13 +281,13 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         ...options,
         pgPool,
         jwtToken,
-      }, ({[$$pgClient]: pgClient, pgRole: _pgRole}) => {
-        pgRole = _pgRole
+      }, context => {
+        pgRole = context.pgRole
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,
           null,
-          { [$$pgClient]: pgClient },
+          context,
           params.variables,
           params.operationName,
         )
