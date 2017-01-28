@@ -4515,7 +4515,7 @@ type TableMutationPayload {
   clientMutationId: String
   post: Post
 
-  # An edge for our \`Post\`. May be used by Relay 1.
+  # An edge for the type. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC

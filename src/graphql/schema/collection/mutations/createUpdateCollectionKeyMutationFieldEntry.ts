@@ -1,9 +1,8 @@
 import { GraphQLNonNull, GraphQLFieldConfig } from 'graphql'
-import { CollectionKey, ObjectType } from '../../../../interface'
+import { CollectionKey } from '../../../../interface'
 import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
-import transformGqlInputValue from '../../transformGqlInputValue'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, getUpdateCollectionPayloadGqlType } from './createUpdateCollectionMutationFieldEntry'
 
@@ -12,9 +11,9 @@ import { getCollectionPatchType, getUpdateCollectionPayloadGqlType } from './cre
  * using a given collection key.
  */
 // TODO: test
-export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
+export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKey>(
   buildToken: BuildToken,
-  collectionKey: CollectionKey<TKey>,
+  collectionKey: CollectionKey<TValue, TKey>,
 ): [string, GraphQLFieldConfig<mixed, mixed>] | undefined {
   // If we can’t delete from the collection key, quit early.
   if (!collectionKey.update)
@@ -24,9 +23,9 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
   const name = `update-${collection.type.name}-by-${collectionKey.name}`
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
-  const patchGqlType = getCollectionPatchType(buildToken, collection)
+  const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
 
-  return [formatName.field(name), createMutationGqlField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using a unique key and a patch.`,
     inputFields: [
@@ -43,14 +42,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TKey>(
       }],
     ],
     payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
-    execute: (context, input) => {
-      // Get the patch from our input.
-      const patch = transformGqlInputValue(patchGqlType, input[patchFieldName])
-
-      if (!(patch instanceof Map))
-        throw new Error('Patch is not of the correct type. Expected a `Map`.')
-
-      return collectionKey.update!(context, inputHelpers.getKey(input), patch)
-    },
+    execute: (context, input) =>
+      collectionKey.update!(context, inputHelpers.getKeyFromInput(input), patchFromGqlInput(input[patchFieldName] as {})),
   })]
 }

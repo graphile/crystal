@@ -1,13 +1,13 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection, ObjectType } from '../../../interface'
+import { Collection, CollectionKey } from '../../../interface'
 import { idSerde, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import { $$isQuery } from '../getQueryGqlType'
-import getCollectionGqlType from '../collection/getCollectionGqlType'
+import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType, { $$nodeType } from './getNodeInterfaceType'
 
 // TODO: doc
-export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<mixed, mixed>] {
+export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<never, mixed>] {
   const { inventory, options } = buildToken
   return ['node', {
     description: `Fetches an object given its globally unique ${scrib.type(GraphQLID)}.`,
@@ -18,8 +18,8 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    async resolve (_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<ObjectType.Value | symbol | null> {
-      let deserializationResult: { collection: Collection, keyValue: mixed }
+    async resolve <TValue, TKey>(_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<TValue | symbol | null> {
+      let deserializationResult: { collection: Collection<TValue>, keyValue: TKey }
       const idString = args[options.nodeIdFieldName]
 
       if (typeof idString !== 'string')
@@ -34,14 +34,14 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       // Try to deserialize the id we got from our argument. If we fail to
       // deserialize the id, we should just return null and ignore the error.
       try {
-        deserializationResult = idSerde.deserialize(inventory, idString)
+        deserializationResult = idSerde.deserialize<TValue, TKey>(inventory, idString)
       }
       catch (error) {
         return null
       }
 
       const { collection, keyValue } = deserializationResult
-      const primaryKey = collection.primaryKey
+      const primaryKey = collection.primaryKey as CollectionKey<TValue, TKey> | undefined
 
       if (!primaryKey || !primaryKey.read)
         throw new Error(`Invalid id, no readable primary key on collection named '${collection.name}'.`)
@@ -55,7 +55,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       // Add the collection to the value so we can accurately determine the
       // type. This way we will know exactly which collection this is for and
       // can avoid ambiguous `isTypeOf` checks.
-      value[$$nodeType] = getCollectionGqlType(buildToken, collection)
+      value[$$nodeType] = getGqlOutputType(buildToken, collection.type).gqlType
 
       return value
     },

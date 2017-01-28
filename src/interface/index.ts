@@ -7,15 +7,21 @@ import Relation from './collection/Relation'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
 import ListType from './type/ListType'
-import NamedType, { isNamedType } from './type/NamedType'
+import NamedType from './type/NamedType'
 import AliasType from './type/AliasType'
 import EnumType from './type/EnumType'
 import ObjectType from './type/ObjectType'
-import booleanType from './type/primitive/booleanType'
-import integerType from './type/primitive/integerType'
-import floatType from './type/primitive/floatType'
-import stringType from './type/primitive/stringType'
-import jsonType from './type/primitive/jsonType'
+import ScalarType from './type/ScalarType'
+import AdapterType from './type/AdapterType'
+import booleanType from './type/scalar/booleanType'
+import integerType from './type/scalar/integerType'
+import floatType from './type/scalar/floatType'
+import stringType from './type/scalar/stringType'
+import jsonType from './type/scalar/jsonType'
+import switchType from './type/switchType'
+import getNamedType from './type/getNamedType'
+import getNonNullableType from './type/getNonNullableType'
+import BasicObjectType from './type/BasicObjectType'
 
 export {
   Inventory,
@@ -29,13 +35,18 @@ export {
   NullableType,
   ListType,
   NamedType,
-  isNamedType,
   AliasType,
   EnumType,
   ObjectType,
+  ScalarType,
+  AdapterType,
   booleanType,
   integerType,
   floatType,
   stringType,
   jsonType,
+  switchType,
+  getNamedType,
+  getNonNullableType,
+  BasicObjectType,
 }

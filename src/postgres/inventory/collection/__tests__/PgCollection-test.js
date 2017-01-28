@@ -39,9 +39,9 @@ test('name will be the plural form of the class name', () => {
 })
 
 test('type will have the correct null and non null fields', () => {
-  expect(Array.from(collection1.type.fields.values()).map(({ type }) => type instanceof NullableType))
+  expect(Array.from(collection1.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
     .toEqual([false, false, true, false, true])
-  expect(Array.from(collection2.type.fields.values()).map(({ type }) => type instanceof NullableType))
+  expect(Array.from(collection2.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
     .toEqual([true, true, true, true])
 })
 

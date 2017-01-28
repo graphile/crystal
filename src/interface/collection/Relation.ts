@@ -1,4 +1,3 @@
-import ObjectType from '../type/ObjectType'
 import Collection from './Collection'
 import CollectionKey from './CollectionKey'
 import Condition from './Condition'
@@ -30,7 +29,7 @@ import Condition from './Condition'
  *
  * @see https://en.wikipedia.org/wiki/Directed_graph#Basic_terminology
  */
-interface Relation<THeadKey> {
+interface Relation<TTailValue, THeadValue, THeadKey> {
   /**
    * The name of the relation.
    */
@@ -39,18 +38,18 @@ interface Relation<THeadKey> {
   /**
    * The tail collection in this relationship.
    */
-  readonly tailCollection: Collection
+  readonly tailCollection: Collection<TTailValue>
 
   /**
    * The head collection key in this relationship.
    */
-  readonly headCollectionKey: CollectionKey<THeadKey>
+  readonly headCollectionKey: CollectionKey<THeadValue, THeadKey>
 
   /**
    * Gets the key for a value in the head collection from the tail collection
    * value. This allows us to see the “one” in a many-to-one mental model.
    */
-  getHeadKeyFromTailValue (value: ObjectType.Value): THeadKey
+  getHeadKeyFromTailValue (value: TTailValue): THeadKey
 
   /**
    * Gets a condition that can be used with the tail collection’s paginator to
@@ -58,7 +57,7 @@ interface Relation<THeadKey> {
    * to see the “many” in a one-to-many model.
    */
   // TODO: REFACTOR
-  getTailConditionFromHeadValue? (value: ObjectType.Value): Condition
+  getTailConditionFromHeadValue? (value: THeadValue): Condition
 }
 
 export default Relation
