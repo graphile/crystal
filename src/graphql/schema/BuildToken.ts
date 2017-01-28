@@ -30,6 +30,11 @@ interface BuildToken {
     // If true then the default mutations for tables (e.g. createMyTable) will
     // not be created
     readonly disableDefaultMutations: boolean,
+    // If specified then the corresponding Postgres function (polymorphic) will be used for
+    // connection filtering, instead of the default condition. It will also cause the `condition`
+    // field in the GraphQL schema to be of type Json (instead of the default,
+    // collection-dependent type)
+    readonly pgRowMatcher: string | null,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,

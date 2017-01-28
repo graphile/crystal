@@ -121,7 +121,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       limit = last
     }
 
-    const aliasIdentifier = Symbol()
+    const aliasIdentifier = Symbol.for('mainSelect')
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
