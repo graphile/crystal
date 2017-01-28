@@ -12,7 +12,7 @@ import {
 } from 'graphql'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
-import getJWTToken from './getJWTToken'
+import getJwtToken from './getJwtToken'
 import debugPgClient from './debugPgClient'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphQLContext from '../withPostGraphQLContext'
@@ -276,7 +276,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       if (debugGraphql.enabled)
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
-      const jwtToken = getJWTToken(req)
+      const jwtToken = getJwtToken(req)
 
       result = await withPostGraphQLContext({
         ...options,

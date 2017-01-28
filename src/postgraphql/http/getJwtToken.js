@@ -29,7 +29,7 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
  * @param {IncomingMessage} request
  * @returns {string | null}
  */
-export default function getJWTToken (request) {
+export default function getJwtToken (request) {
   const { authorization } = request.headers
 
   // If there was no authorization header, just return null.
