@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* tslint:disable no-console */
-
 import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
@@ -9,6 +7,8 @@ import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from './postgraphql'
+
+// tslint:disable no-console
 
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null

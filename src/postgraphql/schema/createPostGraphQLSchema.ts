@@ -1,5 +1,5 @@
-import { Client, ClientConfig, connect as connectPgClient } from 'pg'
-import { GraphQLSchema, GraphQLOutputType } from 'graphql'
+import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
+import { GraphQLSchema, GraphQLInputType, GraphQLOutputType } from 'graphql'
 import { Inventory, Type, getNonNullableType } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
@@ -18,7 +18,7 @@ import getJwtGqlType from './auth/getJwtGqlType'
  * Creates a PostGraphQL schema by looking at a Postgres client.
  */
 export default async function createPostGraphQLSchema (
-  clientOrConfig?: Client | ClientConfig | string,
+  clientOrConfig?: Pool | Client | ClientConfig | string,
   schemaOrCatalog: string | Array<string> | PgCatalog = 'public',
   options: {
     classicIds?: boolean,
@@ -43,7 +43,7 @@ export default async function createPostGraphQLSchema (
     // Introspect our Postgres database to get a catalog. If we weren’t given a
     // client, we will just connect a default client from the `pg` module.
     // TODO: test
-    if (clientOrConfig instanceof Client) {
+    if (clientOrConfig instanceof Client || clientOrConfig instanceof Pool) {
       const pgClient = clientOrConfig
       pgCatalog = await introspectPgDatabase(pgClient, schemas)
     }
