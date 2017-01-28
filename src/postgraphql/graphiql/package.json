@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "name": "postgraphql-graphiql",
+  "version": "1.0.0",
+  "homepage": "https://postgraphql.com/_postgraphql/graphiql"
+}

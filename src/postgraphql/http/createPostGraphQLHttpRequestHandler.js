@@ -1,4 +1,4 @@
-import { resolve as resolvePath } from 'path'
+import { join as joinPath, resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { IncomingMessage, ServerResponse } from 'http'
 import {
@@ -13,6 +13,7 @@ import {
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import debugPgClient from './debugPgClient'
+import setupServerSentEvents from './setupServerSentEvents'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphQLContext from '../withPostGraphQLContext'
 
@@ -22,12 +23,36 @@ const httpError = require('http-errors')
 const parseUrl = require('parseurl')
 const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
+const sendFile = require('send')
+
+const { POSTGRAPHQL_ENV } = process.env
 
 const debugGraphql = new Debugger('postgraphql:graphql')
 const debugRequest = new Debugger('postgraphql:request')
 
+export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
+
+/**
+ * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
+ * client.
+ *
+ * @type {Promise<Buffer>}
+ */
 const favicon = new Promise((resolve, reject) => {
   readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
+    if (error) reject(error)
+    else resolve(data)
+  })
+})
+
+/**
+ * The GraphiQL HTML file as a string. We need it to be a string, because we
+ * will use a regular expression to replace some variables.
+ *
+ * @type {Promise<string>}
+ */
+const origGraphiqlHtml = new Promise((resolve, reject) => {
+  readFile(resolvePath(__dirname, '../graphiql/public/index.html'), 'utf8', (error, data) => {
     if (error) reject(error)
     else resolve(data)
   })
@@ -78,6 +103,12 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     bodyParser.text({ type: 'application/graphql' }),
   ]
 
+  // Takes the original GraphiQL HTML file and replaces the default config object.
+  const graphiqlHtml = origGraphiqlHtml.then(html => html.replace(
+    /window\.POSTGRAPHQL_CONFIG\s*=\s*\{[^]*\}/,
+    `window.POSTGRAPHQL_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${options.watchPg ? '\'/_postgraphql/stream\'' : 'null'}}`,
+  ))
+
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
@@ -87,66 +118,143 @@ export default function createPostGraphQLHttpRequestHandler (options) {
    * @param {ServerResponse} res
    */
   const requestHandler = async (req, res, next) => {
-    // If this is the favicon path and it has not yet been handled, let us
-    // serve our GraphQL favicon.
-    if (parseUrl(req).pathname === '/favicon.ico') {
-      // If this is the wrong method, we should let the client know.
-      if (!(req.method === 'GET' || req.method === 'HEAD')) {
-        res.statusCode = req.method === 'OPTIONS' ? 200 : 405
-        res.setHeader('Allow', 'GET, HEAD, OPTIONS')
-        res.end()
+    // Add our CORS headers to be good web citizens (there are perf
+    // implications though so be careful!)
+    //
+    // Always enable CORS when developing PostGraphQL because GraphiQL will be
+    // on port 5783.
+    if (options.enableCors || POSTGRAPHQL_ENV === 'development')
+      addCORSHeaders(res)
+
+    // ========================================================================
+    // Serve GraphiQL and Related Assets
+    // ========================================================================
+
+    if (options.graphiql) {
+      // ======================================================================
+      // Favicon
+      // ======================================================================
+
+      // If this is the favicon path and it has not yet been handled, let us
+      // serve our GraphQL favicon.
+      if (parseUrl(req).pathname === '/favicon.ico') {
+        // If this is the wrong method, we should let the client know.
+        if (!(req.method === 'GET' || req.method === 'HEAD')) {
+          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
+          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
+          res.end()
+          return
+        }
+
+        // Otherwise we are good and should pipe the favicon to the browser.
+        res.statusCode = 200
+        res.setHeader('Cache-Control', 'public, max-age=86400')
+        res.setHeader('Content-Type', 'image/x-icon')
+
+        // End early if the method is `HEAD`.
+        if (req.method === 'HEAD') {
+          res.end()
+          return
+        }
+
+        res.end(await favicon)
         return
       }
 
-      // Otherwise we are good and should pipe the favicon to the browser.
-      res.statusCode = 200
-      res.setHeader('Cache-Control', 'public, max-age=86400')
-      res.setHeader('Content-Type', 'image/x-icon')
+      // ======================================================================
+      // GraphiQL `create-react-app` Assets
+      // ======================================================================
 
-      // End early if the method is `HEAD`.
-      if (req.method === 'HEAD') {
-        res.end()
+      // Serve the assets for GraphiQL on a namespaced path. This will basically
+      // serve up the built GraphiQL directory.
+      if (parseUrl(req).pathname.startsWith('/_postgraphql/graphiql/')) {
+        // If using the incorrect method, let the user know.
+        if (!(req.method === 'GET' || req.method === 'HEAD')) {
+          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
+          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
+          res.end()
+          return
+        }
+
+        // Gets the asset path which is just the path name with the PostGraphQL
+        // prefix stripped off.
+        const assetPath = parseUrl(req).pathname.slice('/_postgraphql/graphiql/'.length)
+
+        // Don’t allow certain files generated by `create-react-app` to be
+        // inspected.
+        if (assetPath === 'index.html' || assetPath === 'asset-manifest.json') {
+          res.statusCode = 404
+          res.end()
+          return
+        }
+
+        // Sends the asset at this path. Defaults to a `statusCode` of 200.
+        res.statusCode = 200
+        sendFile(req, joinPath(graphiqlDirectory, assetPath), { index: false }).pipe(res)
         return
       }
 
-      res.end(await favicon)
-      return
-    }
+      // ======================================================================
+      // GraphiQL Watch Stream
+      // ======================================================================
 
-    // If this is the GraphiQL route, show GraphiQL and stop execution.
-    if (parseUrl(req).pathname === graphiqlRoute) {
-      if (!(req.method === 'GET' || req.method === 'HEAD')) {
-        res.statusCode = req.method === 'OPTIONS' ? 200 : 405
-        res.setHeader('Allow', 'GET, HEAD, OPTIONS')
-        res.end()
+      // Setup an event stream so we can broadcast events to graphiql, etc.
+      if (parseUrl(req).pathname === '/_postgraphql/stream') {
+        if (req.headers.accept !== 'text/event-stream') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
+        setupServerSentEvents(req, res, options)
         return
       }
 
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      // ======================================================================
+      // GraphiQL HTML
+      // ======================================================================
 
-      // End early if the method is `HEAD`.
-      if (req.method === 'HEAD') {
-        res.end()
+      // If this is the GraphiQL route, show GraphiQL and stop execution.
+      if (parseUrl(req).pathname === graphiqlRoute) {
+        // If we are developing PostGraphQL, instead just redirect.
+        if (POSTGRAPHQL_ENV === 'development') {
+          res.writeHead(302, { Location: 'http://localhost:5783' })
+          res.end()
+          return
+        }
+
+        // If using the incorrect method, let the user know.
+        if (!(req.method === 'GET' || req.method === 'HEAD')) {
+          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
+          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
+          res.end()
+          return
+        }
+
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+
+        // End early if the method is `HEAD`.
+        if (req.method === 'HEAD') {
+          res.end()
+          return
+        }
+
+        // Actually renders GraphiQL.
+        res.end(await graphiqlHtml)
         return
       }
-
-      // Actually renders GraphiQL.
-      res.end(renderGraphiQL(graphqlRoute))
-      return
     }
 
     // Don’t handle any requests if this is not the correct route.
     if (parseUrl(req).pathname !== graphqlRoute)
       return next()
 
+    // ========================================================================
+    // Execute GraphQL Queries
+    // ========================================================================
+
     // If we didn’t call `next` above, all requests will return 200 by default!
     res.statusCode = 200
-
-    // Add our CORS headers to be good web citizens (there are perf
-    // implications though so be careful!)
-    if (options.enableCors)
-      addCORSHeaders(res)
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
     if (req.method === 'OPTIONS') {
@@ -387,7 +495,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
  */
 function addCORSHeaders (res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Request-Method', 'POST')
+  res.setHeader('Access-Control-Request-Method', 'HEAD, GET, POST')
   res.setHeader('Access-Control-Allow-Headers', [
     'Origin',
     'X-Requested-With',
