@@ -5,12 +5,6 @@ import { ExecutionResult } from 'graphql'
 import { sql } from '../postgres/utils'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
-const $$pgClientOrigQuery = Symbol()
-
-const debugPg = createDebugger('postgraphql:postgres')
-const debugPgError = createDebugger('postgraphql:postgres:error')
-const debugPgExplain = createDebugger('postgraphql:postgres:explain')
-
 /**
  * Creates a PostGraphQL context object which should be passed into a GraphQL
  * execution. This function will also connect a client from a Postgres pool and
@@ -166,6 +160,12 @@ async function setupPgClientTransaction ({
 
   return role
 }
+
+const $$pgClientOrigQuery = Symbol()
+
+const debugPg = createDebugger('postgraphql:postgres')
+const debugPgError = createDebugger('postgraphql:postgres:error')
+const debugPgExplain = createDebugger('postgraphql:postgres:explain')
 
 /**
  * Adds debug logging funcionality to a Postgres client.
