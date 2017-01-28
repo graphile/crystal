@@ -1,3 +1,5 @@
+// tslint:disable no-empty
+
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import withPostGraphQLContext from '../withPostGraphQLContext'
 
