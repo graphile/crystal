@@ -73,7 +73,7 @@ Arguments include:
 
 The PostGraphQL middleware gives you a lot of excellent features for running your own GraphQL server. However, if you want to execute a PostGraphQL query in Node.js without having to go through HTTP you can use some other exported functions that PostGraphQL provides.
 
-The first function you will need is `createPostGraphQLSchema` who’s purpose is to create your PostGraphQL schema. This function is asynchronous as it will need to run the Postgres introspection query in your database.
+The first function you will need is `createPostGraphQLSchema` whose purpose is to create your PostGraphQL schema. This function is asynchronous as it will need to run the Postgres introspection query in your database.
 
 The function takes very similar arguments to the `postgraphql` middleware function we discussed above:
 
@@ -134,7 +134,7 @@ Arguments include:
 
 ### `withPostGraphQLContext(options, callback): Promise<GraphQLExecutionResult>`
 
-With this function you are required to provide some options and a callback. The callback is expected to return a GraphQL execution result. Whatever value is returned by the callback will then be returned by `withPostGraphQLContext`. The context you get as an argument to `callback` will be invalid anywhere outside of the `callback` function.
+This function sets up a PostGraphQL context, calls (and resolves) the callback function within this context, and then tears the context back down again finally resolving to the result of your function. The callback is expected to return a promise which resolves to a GraphQL execution result. The context you get as an argument to `callback` will be invalid anywhere outside of the `callback` function.
 
 - **`options`**: An object of options that are used to create the context object that gets passed into `callback`.
   - `pgPool`: A required instance of a Postgres pool from [`pg-pool`][]. A Postgres client will be connected from this pool.
