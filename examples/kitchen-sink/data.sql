@@ -40,7 +40,7 @@ insert into a.foreign_key (person_id, compound_key_1, compound_key_2) values
 insert into b.types values (
   12,
   50,
-  200,
+  467131188225,
   15.2,
   15.2,
   true,
