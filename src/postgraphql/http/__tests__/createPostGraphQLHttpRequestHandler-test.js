@@ -26,7 +26,7 @@ const gqlSchema = new GraphQLSchema({
       query: {
         type: GraphQLString,
         resolve: (source, args, context) =>
-          context[$$pgClient].query(),
+          context[$$pgClient].query('EXECUTE'),
       },
     },
   }),
@@ -262,7 +262,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect({ data: { query: null } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], ['EXECUTE'], ['commit']])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
@@ -270,8 +270,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
-      const jwtSecret = Symbol('jwtSecret')
-      const pgDefaultRole = Symbol('pgDefaultRole')
+      const jwtSecret = 'secret'
+      const pgDefaultRole = 'pg_default_role'
       const server = createServer({ jwtSecret, pgDefaultRole })
       await (
         request(server)
@@ -282,7 +282,12 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect({ data: { query: null } })
       )
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], [], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [{ text: 'select set_config($1, $2, true)', values: ['role', 'pg_default_role'] }],
+        ['EXECUTE'],
+        ['commit'],
+      ])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
