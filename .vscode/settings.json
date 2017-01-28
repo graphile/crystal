@@ -1,4 +1,9 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
-  "eslint.enable": false
+  "eslint.enable": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/build": true
+  }
 }

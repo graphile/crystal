@@ -1,12 +1,12 @@
 import { Condition, conditionHelpers, Relation } from '../../../interface'
 import { PgCatalog, PgCatalogAttribute, PgCatalogForeignKeyConstraint } from '../../introspection'
-import PgObjectType from '../type/PgObjectType'
+import PgClassType from '../type/PgClassType'
 import PgCollection from './PgCollection'
 import PgCollectionKey from './PgCollectionKey'
 
 // TODO: This implementation is sketchy. Implement it better!
 // TODO: Tests
-class PgRelation implements Relation<PgObjectType.Value> {
+class PgRelation implements Relation<PgClassType.Value, PgCollectionKey.Value, PgCollectionKey.Value> {
   constructor (
     public tailCollection: PgCollection,
     public headCollectionKey: PgCollectionKey,
@@ -15,7 +15,7 @@ class PgRelation implements Relation<PgObjectType.Value> {
 
   private _pgCatalog: PgCatalog = this.tailCollection._pgCatalog
   private _pgTailAttributes: Array<PgCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgConstraint.classId, this.pgConstraint.keyAttributeNums)
-  private _tailFieldNames: Array<string> = this._pgTailAttributes.map(pgAttribute => this.tailCollection.type.getFieldNameFromPgAttributeName(pgAttribute.name)!)
+  private _tailFieldNames: Array<string> = this._pgTailAttributes.map(pgAttribute => Array.from(this.tailCollection.type.fields).find(([, field]) => field.pgAttribute === pgAttribute)![0])
   private _headFieldNames: Array<string> = Array.from(this.headCollectionKey.keyType.fields.keys())
 
   /**
@@ -28,7 +28,7 @@ class PgRelation implements Relation<PgObjectType.Value> {
    * Gets an instance of the head collection’s key type by just extracting some
    * keys from the tail value.
    */
-  public getHeadKeyFromTailValue (tailValue: PgObjectType.Value): PgObjectType.Value {
+  public getHeadKeyFromTailValue (tailValue: PgClassType.Value): PgCollectionKey.Value {
     return this._tailFieldNames.reduce((headKey, tailFieldName, i) => {
       headKey.set(this._headFieldNames[i], tailValue.get(tailFieldName))
       return headKey
@@ -39,7 +39,7 @@ class PgRelation implements Relation<PgObjectType.Value> {
    * Gets a condition from the head value which basically just requires that
    * the fields equal the right things.
    */
-  public getTailConditionFromHeadValue (headValue: PgObjectType.Value): Condition {
+  public getTailConditionFromHeadValue (headValue: PgClassType.Value): Condition {
     return conditionHelpers.and(...this._headFieldNames.map((headFieldName, i) =>
       conditionHelpers.fieldEquals(this._tailFieldNames[i], headValue.get(headFieldName)),
     ))

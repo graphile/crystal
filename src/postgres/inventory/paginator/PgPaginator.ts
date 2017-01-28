@@ -1,5 +1,6 @@
-import { Type, Paginator } from '../../../interface'
+import { Paginator } from '../../../interface'
 import { sql } from '../../utils'
+import PgType from '../type/PgType'
 import pgClientFromContext from '../pgClientFromContext'
 
 /**
@@ -8,7 +9,7 @@ import pgClientFromContext from '../pgClientFromContext'
  */
 abstract class PgPaginator<TInput, TItemValue> implements Paginator<TInput, TItemValue> {
   public abstract name: string
-  public abstract itemType: Type<TItemValue>
+  public abstract itemType: PgType<TItemValue>
   public abstract orderings: Map<string, Paginator.Ordering<TInput, TItemValue, mixed>>
   public abstract defaultOrdering: Paginator.Ordering<TInput, TItemValue, mixed>
 

@@ -1,10 +1,10 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { Collection, ObjectType } from '../../../../interface'
+import { Collection, NullableType } from '../../../../interface'
 import { formatName, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
-import createMutationGqlField, { MutationValue } from '../../createMutationGqlField'
+import createMutationGqlField from '../../createMutationGqlField'
 import createMutationPayloadGqlType from '../../createMutationPayloadGqlType'
-import getCollectionGqlType from '../getCollectionGqlType'
+import getGqlOutputType from '../../type/getGqlOutputType'
 import createCollectionRelationTailGqlFieldEntries from '../createCollectionRelationTailGqlFieldEntries'
 
 /**
@@ -12,9 +12,9 @@ import createCollectionRelationTailGqlFieldEntries from '../createCollectionRela
  * object’s global GraphQL identifier to delete a value in the collection.
  */
 // TODO: test
-export default function createDeleteCollectionMutationFieldEntry (
+export default function createDeleteCollectionMutationFieldEntry <TValue>(
   buildToken: BuildToken,
-  collection: Collection,
+  collection: Collection<TValue>,
 ): [string, GraphQLFieldConfig<mixed, mixed>] | undefined {
   const { primaryKey } = collection
 
@@ -26,7 +26,7 @@ export default function createDeleteCollectionMutationFieldEntry (
   const { options, inventory } = buildToken
   const name = `delete-${collection.type.name}`
 
-  return [formatName.field(name), createMutationGqlField<ObjectType.Value>(buildToken, {
+  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using its globally unique id.`,
     inputFields: [
@@ -56,20 +56,20 @@ export const getDeleteCollectionPayloadGqlType = memoize2(createDeleteCollection
 /**
  * Creates the output fields returned by the collection delete mutation.
  */
-function createDeleteCollectionPayloadGqlType (
+function createDeleteCollectionPayloadGqlType <TValue>(
   buildToken: BuildToken,
-  collection: Collection,
-): GraphQLObjectType<MutationValue<ObjectType.Value>> {
+  collection: Collection<TValue>,
+): GraphQLObjectType {
   const { primaryKey } = collection
-
-  return createMutationPayloadGqlType<ObjectType.Value>(buildToken, {
+  const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
+  return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `delete-${collection.type.name}`,
     outputFields: [
       // Add the deleted value as an output field so the user can see the
       // object they just deleted.
       [formatName.field(collection.type.name), {
-        type: getCollectionGqlType(buildToken, collection),
-        resolve: value => value,
+        type: gqlType,
+        resolve: intoGqlOutput,
       }],
       // Add the deleted values globally unique id as well. This one is
       // especially useful for removing old nodes from the cache.
@@ -78,7 +78,7 @@ function createDeleteCollectionPayloadGqlType (
         resolve: value => idSerde.serialize(collection, value),
       }] : null,
       // Add related objects. This helps in Relay 1.
-      ...createCollectionRelationTailGqlFieldEntries(buildToken, collection),
+      ...createCollectionRelationTailGqlFieldEntries(buildToken, collection, { getCollectionValue: value => value }),
     ],
   })
 }

@@ -8,17 +8,17 @@ import getQueryGqlType, { $$isQuery } from './getQueryGqlType'
  * Creates the payload type for a GraphQL mutation. Uses the provided output
  * fields and adds a `clientMutationId` and `query` field.
  */
-export default function createMutationPayloadGqlType <T>(
+export default function createMutationPayloadGqlType <TValue>(
   buildToken: BuildToken,
   config: {
     name: string,
-    outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
+    outputFields?: Array<[string, GraphQLFieldConfig<TValue, mixed>] | false | null | undefined>,
   },
-): GraphQLObjectType<MutationValue<T>> {
-  return new GraphQLObjectType<MutationValue<T>>({
+): GraphQLObjectType {
+  return new GraphQLObjectType({
     name: formatName.type(`${config.name}-payload`),
     description: `The output of our \`${formatName.field(config.name)}\` mutation.`,
-    fields: buildObject<GraphQLFieldConfig<MutationValue<T>, mixed>>(
+    fields: buildObject<GraphQLFieldConfig<MutationValue<TValue>, mixed>>(
       [
         // Add the `clientMutationId` output field. This will be the exact
         // same value as the input `clientMutationId`.
@@ -34,20 +34,20 @@ export default function createMutationPayloadGqlType <T>(
       // `MutationValue#value` directly to the resolver.
       (config.outputFields || [])
         .filter(Boolean)
-        .map<[string, GraphQLFieldConfig<MutationValue<T>, mixed>]>(
-          ([fieldName, field]: [string, GraphQLFieldConfig<T, mixed>]) =>
+        .map<[string, GraphQLFieldConfig<MutationValue<TValue>, mixed>]>(
+          ([fieldName, field]: [string, GraphQLFieldConfig<TValue, mixed>]) =>
             [fieldName, {
               type: field.type,
               args: field.args,
               resolve:
                 field.resolve
-                  ? ({ value }: MutationValue<T>, ...rest: Array<mixed>) =>
+                  ? ({ value }: MutationValue<TValue>, ...rest: Array<mixed>) =>
                     // tslint:disable-next-line no-any
                     (field as any).resolve(value, ...rest)
                   : null,
               description: field.description,
               deprecationReason: field.deprecationReason,
-            } as GraphQLFieldConfig<MutationValue<T>, mixed>],
+            } as GraphQLFieldConfig<MutationValue<TValue>, mixed>],
         ),
       [
         // A reference to the root query type. Allows you to access even more

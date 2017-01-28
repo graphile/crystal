@@ -1,4 +1,4 @@
-import { GraphQLInputType, GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
+import { GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
 import { Inventory, Type, ObjectType } from '../../interface'
 
 /**
@@ -42,9 +42,9 @@ interface BuildToken {
  * Currently hooks are a private API. They will likely change in the future.
  */
 export type _BuildTokenHooks = {
-  readonly queryFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
-  readonly mutationFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
-  readonly objectTypeFieldEntries?: (type: ObjectType, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<ObjectType.Value, mixed>]>,
+  readonly queryFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<never, mixed>]>,
+  readonly mutationFieldEntries?: (_gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<never, mixed>]>,
+  readonly objectTypeFieldEntries?: <TValue>(type: ObjectType<TValue>, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<TValue, mixed>]>,
 }
 
 /**
@@ -53,8 +53,8 @@ export type _BuildTokenHooks = {
  * this is a private API.
  */
 export type _BuildTokenTypeOverrides = Map<Type<mixed>, {
-  input?: GraphQLInputType<mixed>,
-  output?: GraphQLOutputType<mixed>,
+  input?: true,
+  output?: GraphQLOutputType,
 }>
 
 export default BuildToken

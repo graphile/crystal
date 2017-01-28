@@ -2,8 +2,7 @@ import { Paginator } from '../../../interface'
 import { PgCatalogAttribute } from '../../introspection'
 import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
-import transformPgValueIntoValue from '../transformPgValueIntoValue'
-import PgObjectType from '../type/PgObjectType'
+import PgClassType from '../type/PgClassType'
 import PgPaginator from './PgPaginator'
 
 /**
@@ -21,13 +20,13 @@ type AttributesCursor = Array<mixed>
  * the before/after cursors and we also ordering using those operators.
  */
 class PgPaginatorOrderingAttributes<TInput>
-implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
-  public pgPaginator: PgPaginator<TInput, PgObjectType.Value>
+implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
+  public pgPaginator: PgPaginator<TInput, PgClassType.Value>
   public descending: boolean
   public pgAttributes: Array<PgCatalogAttribute>
 
   constructor (config: {
-    pgPaginator: PgPaginator<TInput, PgObjectType.Value>,
+    pgPaginator: PgPaginator<TInput, PgClassType.Value>,
     descending?: boolean,
     pgAttributes: Array<PgCatalogAttribute>,
   }) {
@@ -43,7 +42,7 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
     context: mixed,
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
-  ): Promise<Paginator.Page<PgObjectType.Value, AttributesCursor>> {
+  ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
     const client = pgClientFromContext(context)
     const { descending, pgAttributes } = this
     const { beforeCursor, afterCursor, first, last, _offset } = config
@@ -112,10 +111,9 @@ implements Paginator.Ordering<TInput, PgObjectType.Value, AttributesCursor> {
       rows = rows.reverse()
 
     // Convert our rows into usable values.
-    const values: Array<{ value: PgObjectType.Value, cursor: AttributesCursor }> =
+    const values: Array<{ value: PgClassType.Value, cursor: AttributesCursor }> =
       rows.map(({ value }) => ({
-        // tslint:disable-next-line no-any
-        value: transformPgValueIntoValue(this.pgPaginator.itemType, value) as any,
+        value: this.pgPaginator.itemType.transformPgValueIntoValue(value),
         cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name]),
       }))
 
