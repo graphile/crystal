@@ -2,7 +2,7 @@ import setupServerSentEvents from '../setupServerSentEvents'
 
 const http = require('http')
 const EventEmitter = require('events') // tslint:disable-line:variable-name
-const request = require('supertest-as-promised')
+const request = require('supertest')
 
 const _emitter = new EventEmitter()
 let connection

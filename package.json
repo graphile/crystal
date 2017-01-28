@@ -71,8 +71,7 @@
     "react-dom": "^15.3.2",
     "react-scripts": "0.7.0",
     "source-map-support": "^0.4.6",
-    "supertest": "^2.0.0",
-    "supertest-as-promised": "^4.0.2",
+    "supertest": "^2.0.1",
     "ts-node": "^2.0.0",
     "tslint": "^4.2.0",
     "typescript": "2.1.5"

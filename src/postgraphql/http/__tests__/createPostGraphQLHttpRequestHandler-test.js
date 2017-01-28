@@ -6,7 +6,7 @@ import createPostGraphQLHttpRequestHandler, { graphiqlDirectory } from '../creat
 
 const path = require('path')
 const http = require('http')
-const request = require('supertest-as-promised')
+const request = require('supertest')
 const connect = require('connect')
 const express = require('express')
 const Koa = require('koa') // tslint:disable-line variable-name
