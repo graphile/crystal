@@ -1,6 +1,6 @@
 import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
-import { Client } from 'pg'
+import { Pool, Client } from 'pg'
 import minify = require('pg-minify')
 import PgCatalog from './PgCatalog'
 
@@ -21,7 +21,7 @@ const introspectionQuery = new Promise<string>((resolve, reject) => {
  * `PgObjects` which can then be consumed. Note that some translation is done
  * from the raw Postgres catalog to the friendlier `PgObjects` interface.
  */
-export default async function introspectDatabase (client: Client, schemas: Array<string>): Promise<PgCatalog> {
+export default async function introspectDatabase (client: Pool | Client, schemas: Array<string>): Promise<PgCatalog> {
   // Run our single introspection query in the database.
   const result = await client.query({
     name: 'introspectionQuery',

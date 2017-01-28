@@ -57,6 +57,10 @@ export default function postgraphql (
     options = schemaOrOptions
   }
 
+  // If a token type is defined, but the JWT secret is not. Throw an error.
+  if (options.jwtPgTypeIdentifier && !options.jwtSecret)
+    throw new Error('Postgres token type is defined, but a JWT secret is not defined. Please provide a JWT secret.')
+
   // Creates the Postgres schemas array.
   const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
 

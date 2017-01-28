@@ -1,4 +1,4 @@
-import { Client, ClientConfig, connect as connectPgClient } from 'pg'
+import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLInputType, GraphQLOutputType } from 'graphql'
 import { Inventory, Type } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
@@ -17,12 +17,11 @@ import getJwtGqlType from './auth/getJwtGqlType'
  * Creates a PostGraphQL schema by looking at a Postgres client.
  */
 export default async function createPostGraphQLSchema (
-  clientOrConfig?: Client | ClientConfig | string,
+  clientOrConfig?: Pool | Client | ClientConfig | string,
   schemaOrCatalog: string | Array<string> | PgCatalog = 'public',
   options: {
     classicIds?: boolean,
     dynamicJson?: boolean,
-    jwtSecret?: string,
     jwtPgTypeIdentifier?: string,
     disableDefaultMutations?: boolean,
   } = {},
@@ -42,7 +41,7 @@ export default async function createPostGraphQLSchema (
     // Introspect our Postgres database to get a catalog. If we weren’t given a
     // client, we will just connect a default client from the `pg` module.
     // TODO: test
-    if (clientOrConfig instanceof Client) {
+    if (clientOrConfig instanceof Client || clientOrConfig instanceof Pool) {
       const pgClient = clientOrConfig
       pgCatalog = await introspectPgDatabase(pgClient, schemas)
     }
@@ -58,10 +57,6 @@ export default async function createPostGraphQLSchema (
   const jwtPgType = options.jwtPgTypeIdentifier
     ? getPgTokenTypeFromIdentifier(pgCatalog, options.jwtPgTypeIdentifier)
     : undefined
-
-  // If a token type is defined, but the JWT secret is not. Throw an error.
-  if (jwtPgType && !options.jwtSecret)
-    throw new Error('Postgres token type is defined, but a JWT secret is not defined. Please provide a JWT secret.')
 
   // Add all of our Postgres constructs to that inventory.
   addPgCatalogToInventory(inventory, pgCatalog, {
