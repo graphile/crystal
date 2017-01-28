@@ -14,7 +14,6 @@ import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import debugPgClient from './debugPgClient'
 import setupServerSentEvents from './setupServerSentEvents'
-import graphiqlFileTree from './graphiqlFileTree'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphQLContext from '../withPostGraphQLContext'
 
