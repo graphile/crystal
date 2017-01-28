@@ -17,7 +17,7 @@ const createServer = () => http.createServer(requestHandler)
 
 test('will set the appropriate headers', async () => {
   const server = createServer()
-  setTimeout(() => connection.emit('close'), 25)
+  setTimeout(() => connection.emit('close'), 5)
   await (
     request(server)
     .get('/')
@@ -32,7 +32,7 @@ test('will set the appropriate headers', async () => {
 
 test('will receive an initial event', async () => {
   const server = createServer()
-  setTimeout(() => connection.emit('close'), 25)
+  setTimeout(() => connection.emit('close'), 5)
   await (
     request(server)
     .get('/')
@@ -43,8 +43,8 @@ test('will receive an initial event', async () => {
 
 test('will send event if schema changes', async () => {
   const server = createServer()
-  setTimeout(() => _emitter.emit('schemas:changed'), 25)
-  setTimeout(() => connection.emit('close'), 50)
+  setTimeout(() => _emitter.emit('schemas:changed'), 5)
+  setTimeout(() => connection.emit('close'), 10)
   await (
     request(server)
     .get('/')
