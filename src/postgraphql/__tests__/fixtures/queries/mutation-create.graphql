@@ -3,7 +3,7 @@ mutation {
     type: {
       id: 201
       smallint: 30
-      bigint: 50
+      bigint: "50"
       numeric: 15.2
       decimal: 15.2
       boolean: false
