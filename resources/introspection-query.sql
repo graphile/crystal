@@ -206,7 +206,7 @@ with
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-constraint.html
   "constraint" as (
-    select
+    select distinct on (con.conrelid, con.conkey, con.confrelid, con.confkey)
       'constraint' as "kind",
       con.conname as "name",
       con.contype as "type",
@@ -231,7 +231,7 @@ with
       -- made add support for more constraints in the future.
       con.contype in ('f', 'p', 'u')
     order by
-      con.conrelid, con.conname
+      con.conrelid, con.conkey, con.confrelid, con.confkey, con.conname
   )
 select row_to_json(x) as object from namespace as x
 union all

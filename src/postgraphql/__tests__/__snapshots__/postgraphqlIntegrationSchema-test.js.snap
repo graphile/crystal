@@ -7,10 +7,10 @@ exports[`test prints a schema with Relay 1 style ids 1`] = `
   extra: Boolean
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 }
 
 # A condition to be used against \`CompoundKey\` object types. All fields are tested
@@ -102,10 +102,10 @@ type CreateCompoundKeyPayload {
   ): CompoundKeysEdge
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -204,10 +204,10 @@ type DeleteCompoundKeyPayload {
   deletedCompoundKeyId: ID
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -480,15 +480,15 @@ type Mutation {
   ): UpdatePersonPayload
 
   # Updates a single \`Person\` using a unique key and a patch.
-  updatePersonByEmail(
-    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    input: UpdatePersonByEmailInput!
-  ): UpdatePersonPayload
-
-  # Updates a single \`Person\` using a unique key and a patch.
   updatePersonByRowId(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: UpdatePersonByRowIdInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
   ): UpdatePersonPayload
 
   # Deletes a single \`Person\` using its globally unique id.
@@ -498,15 +498,15 @@ type Mutation {
   ): DeletePersonPayload
 
   # Deletes a single \`Person\` using a unique key.
-  deletePersonByEmail(
-    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    input: DeletePersonByEmailInput!
-  ): DeletePersonPayload
-
-  # Deletes a single \`Person\` using a unique key.
   deletePersonByRowId(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeletePersonByRowIdInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByEmailInput!
   ): DeletePersonPayload
 }
 
@@ -626,7 +626,7 @@ type Person implements Node {
   ): PersonFriendsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId1(
+  compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -651,7 +651,7 @@ type Person implements Node {
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId2(
+  compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -898,8 +898,8 @@ type Query implements Node {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     id: ID!
   ): Person
-  personByEmail(email: Email!): Person
   personByRowId(rowId: Int!): Person
+  personByEmail(email: Email!): Person
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
@@ -1032,10 +1032,10 @@ type UpdateCompoundKeyPayload {
   compoundKey: CompoundKey
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -2236,10 +2236,10 @@ type CompoundKey implements Node {
   extra: Boolean
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   foreignKeysByCompoundKey1AndCompoundKey2(
@@ -2394,10 +2394,10 @@ type CreateCompoundKeyPayload {
   ): CompoundKeysEdge
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -2457,11 +2457,11 @@ type CreateForeignKeyPayload {
     orderBy: ForeignKeysOrderBy = NATURAL
   ): ForeignKeysEdge
 
-  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
   # Reads a single \`Person\` that is related to this \`ForeignKey\`.
   personByPersonId: Person
+
+  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -2718,10 +2718,10 @@ type DeleteCompoundKeyPayload {
   deletedCompoundKeyId: ID
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -2992,11 +2992,11 @@ type ForeignKey {
   compoundKey1: Int
   compoundKey2: Int
 
-  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
-  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
   # Reads a single \`Person\` that is related to this \`ForeignKey\`.
   personByPersonId: Person
+
+  # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
 }
 
 # A condition to be used against \`ForeignKey\` object types. All fields are tested
@@ -3518,15 +3518,15 @@ type Mutation {
   ): UpdatePersonPayload
 
   # Updates a single \`Person\` using a unique key and a patch.
-  updatePersonByEmail(
-    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    input: UpdatePersonByEmailInput!
-  ): UpdatePersonPayload
-
-  # Updates a single \`Person\` using a unique key and a patch.
   updatePersonById(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
   ): UpdatePersonPayload
 
   # Deletes a single \`Person\` using its globally unique id.
@@ -3536,15 +3536,15 @@ type Mutation {
   ): DeletePersonPayload
 
   # Deletes a single \`Person\` using a unique key.
-  deletePersonByEmail(
-    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    input: DeletePersonByEmailInput!
-  ): DeletePersonPayload
-
-  # Deletes a single \`Person\` using a unique key.
   deletePersonById(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeletePersonByIdInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByEmailInput!
   ): DeletePersonPayload
 }
 
@@ -3743,7 +3743,7 @@ type Person implements Node {
   ): PostsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId1(
+  compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -3768,7 +3768,7 @@ type Person implements Node {
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId2(
+  compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -4331,8 +4331,8 @@ type Query implements Node {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     __id: ID!
   ): Person
-  personByEmail(email: Email!): Person
   personById(id: Int!): Person
+  personByEmail(email: Email!): Person
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
@@ -4962,10 +4962,10 @@ type UpdateCompoundKeyPayload {
   compoundKey: CompoundKey
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
@@ -5174,10 +5174,10 @@ exports[`test prints a schema without default mutations 1`] = `
   extra: Boolean
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person
+  personByPersonId1: Person
 }
 
 # A condition to be used against \`CompoundKey\` object types. All fields are tested
@@ -5528,7 +5528,7 @@ type Person implements Node {
   ): PersonFriendsConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId1(
+  compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -5553,7 +5553,7 @@ type Person implements Node {
   ): CompoundKeysConnection
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
-  compoundKeysByPersonId2(
+  compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
 
@@ -5778,8 +5778,8 @@ type Query implements Node {
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
     __id: ID!
   ): Person
-  personByEmail(email: Email!): Person
   personById(id: Int!): Person
+  personByEmail(email: Email!): Person
 
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
