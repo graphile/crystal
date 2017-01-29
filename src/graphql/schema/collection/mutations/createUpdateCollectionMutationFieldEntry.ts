@@ -34,7 +34,7 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
   const formatName = buildToken.options.formatName
   const { options, inventory } = buildToken
   const name = formatName.updateMethod(collection.type.name)
-  const patchFieldName = formatName.updateFieldPatch(collection.type.name)
+  const patchFieldName = formatName.updatePatchField(collection.type.name)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
 
   return [name, createMutationGqlField<TValue>(buildToken, {
@@ -105,7 +105,7 @@ function createCollectionPatchType <TValue>(buildToken: BuildToken, collection: 
 
   return {
     gqlType: new GraphQLInputObjectType({
-      name: formatName.type(`${type.name}-patch`),
+      name: formatName.updatePatchType(type.name),
       description: `Represents an update to a \`${formatName.type(type.name)}\`. Fields that are set will be updated.`,
       fields: () => buildObject<GraphQLInputFieldConfig>(fields),
     }),

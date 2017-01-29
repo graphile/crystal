@@ -22,7 +22,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
   const { collection } = collectionKey
   const name = formatName.updateByKeyMethod(collection.type.name, collectionKey.name)
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
-  const patchFieldName = formatName.updateFieldPatch(collection.type.name)
+  const patchFieldName = formatName.updatePatchField(collection.type.name)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {

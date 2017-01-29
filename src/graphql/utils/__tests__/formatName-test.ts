@@ -1,4 +1,4 @@
-import formatName from '../formatName'
+import formatName from '../formats/default'
 
 test('type will format in pascal case', () => {
   expect(formatName.type('hello_world')).toBe('HelloWorld')

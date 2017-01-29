@@ -44,7 +44,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
         return [
           options.getFieldName
             ? options.getFieldName(relation, collection)
-            : formatName.queryByKeyMethod(headCollection.type.name, relation.name),
+            : formatName.queryRelationFieldByKeyMethod(headCollection.type.name, relation.name),
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this ${scrib.type(collectionGqlType)}.`,
             type: headCollectionGqlType,
