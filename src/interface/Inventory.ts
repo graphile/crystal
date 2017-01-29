@@ -1,5 +1,6 @@
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
+import ObjectType from './type/ObjectType'
 
 /**
  * In order to build awesome tools from any database we need an abstract
