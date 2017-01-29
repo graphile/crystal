@@ -1,6 +1,6 @@
 import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLOutputType } from 'graphql'
-import { Inventory, Type, getNonNullableType } from '../../interface'
+import { Inventory, Type, ObjectType, getNonNullableType } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
 import getTypeFromPgType from '../../postgres/inventory/type/getTypeFromPgType'
