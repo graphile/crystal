@@ -1,6 +1,6 @@
 import DataLoader = require('dataloader')
 import { Client } from 'pg'
-import { CollectionKey, getNonNullableType } from '../../../interface'
+import { CollectionKey, ObjectType, getNonNullableType } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
 import { PgCatalog, PgCatalogNamespace, PgCatalogClass, PgCatalogAttribute, PgCatalogPrimaryKeyConstraint, PgCatalogUniqueConstraint } from '../../introspection'
 import Options from '../Options'

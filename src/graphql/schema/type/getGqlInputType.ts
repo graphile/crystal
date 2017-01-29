@@ -85,7 +85,7 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
     // correct value, the base type’s `fromGqlInput` is used without
     // modification.
     alias: (type: AliasType<TValue>): GetGqlInputReturn<TValue> => {
-      const { gqlType: baseGqlType, fromGqlInput } = getGqlInputType(buildToken, type.baseType)
+      const { gqlType: baseGqlType, fromGqlInput } = getGqlInputType<TValue>(buildToken, type.baseType)
 
       // If the base GraphQL type is an output type then we should return
       // whatever type `getGqlOutputType` creates to avoid creating two types
