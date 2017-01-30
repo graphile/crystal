@@ -4,4 +4,4 @@ npm_bin=$(npm bin)
 
 set -e
 
-$npm_bin/tslint $(find src -name "*.[tj]s" -a \! -wholename '*/node_modules/*') $@
+$npm_bin/tslint **/*.ts **/*.js $@
