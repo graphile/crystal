@@ -1,21 +1,19 @@
-jest.mock('../../../getGqlType')
 jest.mock('../../../createMutationGqlField')
-jest.mock('../../getCollectionGqlType')
-jest.mock('../../../transformGqlInputValue')
+jest.mock('../../../type/getGqlInputType')
+jest.mock('../../../type/getGqlOutputType')
 
-import getGqlType from '../../../getGqlType'
-import transformGqlInputValue from '../../../transformGqlInputValue'
+import getGqlInputType from '../../../type/getGqlInputType'
+import getGqlOutputType from '../../../type/getGqlOutputType'
 import createMutationGqlField from '../../../createMutationGqlField'
-import getCollectionGqlType from '../../getCollectionGqlType'
+
 import createCreateCollectionMutationFieldEntry from '../createCreateCollectionMutationFieldEntry'
 
 createMutationGqlField.mockImplementation((buildToken, config) => Object.assign(config, { buildToken }))
 
 beforeEach(() => {
-  getGqlType.mockClear()
-  transformGqlInputValue.mockClear()
   createMutationGqlField.mockClear()
-  getCollectionGqlType.mockClear()
+  getGqlOutputType.mockClear()
+  getGqlInputType.mockClear()
 })
 
 test('will return undefined if create is not defined', () => {
@@ -23,46 +21,61 @@ test('will return undefined if create is not defined', () => {
 })
 
 test('will create a field entry with the correct name', () => {
+  const gqlType = Symbol('gqlType')
   const buildToken = Symbol('buildToken')
-  const type = { name: 'person', getFields: () => ({}) }
+  const type = { name: 'person', fields: {} }
+  getGqlInputType.mockReturnValueOnce({ gqlType })
+  getGqlOutputType.mockReturnValueOnce({ gqlType })
   const collection = { name: 'people', type, create: true }
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[0]).toBe('createPerson')
   expect(fieldEntry[1].buildToken).toBe(buildToken)
-  expect(fieldEntry[1].name).toBe('create_person')
+  expect(fieldEntry[1].name).toBe('create-person')
 })
 
 test('will create a field entry with the correct input fields', () => {
   const gqlType = Symbol('gqlType')
-  getGqlType.mockReturnValueOnce(gqlType)
   const buildToken = Symbol('buildToken')
-  const type = { name: 'person', getFields: () => ({}) }
+  const type = { name: 'person', fields: {} }
+  getGqlInputType.mockReturnValueOnce({
+    gqlType: type,
+  })
+  getGqlOutputType.mockReturnValueOnce({
+    gqlType: type,
+  })
   const collection = { name: 'people', type, create: true }
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
-  expect(fieldEntry[1].inputFields).toEqual([['person', { type: gqlType, description: 'The `` to be created by this mutation.' }]])
-  expect(getGqlType.mock.calls).toEqual([[buildToken, type, true]])
+  expect(fieldEntry[1].inputFields).toEqual([['person', {
+    type,
+    description: 'The `person` to be created by this mutation.',
+  }]])
+  expect(getGqlInputType.mock.calls).toEqual([[buildToken, type]])
 })
 
 test('will create a field entry with output fields and no paginator', () => {
   const gqlCollectionType = Symbol('gqlCollectionType')
-  getCollectionGqlType.mockReturnValueOnce(gqlCollectionType)
   const value = Symbol('value')
   const buildToken = Symbol('buildToken')
-  const type = { name: 'person', getFields: () => ({}) }
+  const type = { name: 'person', fields: {} }
   const collection = { name: 'people', type, create: true }
+  getGqlInputType.mockReturnValueOnce({
+    gqlType: type,
+  })
+  getGqlOutputType.mockReturnValueOnce({
+    gqlType: type,
+  })
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   expect(fieldEntry[1].outputFields[0][0]).toBe('person')
-  expect(fieldEntry[1].outputFields[0][1].type).toBe(gqlCollectionType)
+  expect(fieldEntry[1].outputFields[0][1].type).toBe(type)
   expect(fieldEntry[1].outputFields[0][1].resolve(value)).toBe(value)
   expect(fieldEntry[1].outputFields[1]).toBeFalsy()
-  expect(getCollectionGqlType.mock.calls).toEqual([[buildToken, collection]])
 })
 
 const dateTest = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/
 
 test('will not create with timestamps if timestamps not in buildToken', () => {
   const expectedResult = new Map()
-  const type = { name: 'person', getFields: () => ({}) }
+  const type = { name: 'person', fields: {} }
   const value = Symbol('value')
   const buildToken = {
     options: {
@@ -73,8 +86,13 @@ test('will not create with timestamps if timestamps not in buildToken', () => {
     },
   }
   const collection = { name: 'people', type, create: (ctx, output) => output }
-  getCollectionGqlType.mockReturnValue(type)
-  transformGqlInputValue.mockReturnValue(expectedResult)
+  getGqlInputType.mockReturnValueOnce({
+    gqlType: type,
+    fromGqlInput: (x) => expectedResult,
+  })
+  getGqlOutputType.mockReturnValueOnce({
+    gqlType: type,
+  })
 
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   const [ fieldName, fieldSchema ] = fieldEntry
@@ -87,10 +105,10 @@ test('will not create with timestamps if timestamps not in buildToken', () => {
 
 test('will create with timestamps if timestamps are given in buildToken', () => {
   const expectedResult = new Map()
-  const type = { name: 'person', getFields: () => ({
+  const type = { name: 'person', fields: {
     fieldA: { type: 'string' },
     fieldB: { type: 'string' },
-  }) }
+  } }
   const value = Symbol('value')
   const buildToken = { options: {
     timestamps: {
@@ -99,8 +117,13 @@ test('will create with timestamps if timestamps are given in buildToken', () => 
     },
   } }
   const collection = { name: 'people', type, create: (ctx, output) => output }
-  getCollectionGqlType.mockReturnValue(type)
-  transformGqlInputValue.mockReturnValue(expectedResult)
+  getGqlInputType.mockReturnValueOnce({
+    gqlType: type,
+    fromGqlInput: () => expectedResult,
+  })
+  getGqlOutputType.mockReturnValueOnce({
+    gqlType: type,
+  })
 
   const fieldEntry = createCreateCollectionMutationFieldEntry(buildToken, collection)
   const [ fieldName, fieldSchema ] = fieldEntry
