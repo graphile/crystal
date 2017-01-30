@@ -17,4 +17,4 @@ echo "Building GraphiQL"
 
 echo "Moving GraphiQL build output"
 mkdir -p build/postgraphql/graphiql/public
-mv src/postgraphql/graphiql/build/* build/postgraphql/graphiql/public
+cp -Rv src/postgraphql/graphiql/build/* build/postgraphql/graphiql/public
