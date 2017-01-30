@@ -21,7 +21,7 @@ program
   .usage('[options...]')
   .description(manifest.description)
   // .option('-d, --demo', 'run PostGraphQL using the demo database connection')
-  .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment')
+  .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment, example: postgres://user:password@domain:port/db')
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
   .option('-w, --watch', 'watches the Postgres schema for changes and reruns introspection if a change was detected')
   .option('-n, --host <string>', 'the hostname to be used. Defaults to `localhost`')
@@ -119,7 +119,7 @@ server.listen(port, hostname, () => {
   console.log('')
   console.log(`PostGraphQL server listening on port ${chalk.underline(port.toString())} 🚀`)
   console.log('')
-  console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
+  console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
   console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
   console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
 
