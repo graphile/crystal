@@ -37,6 +37,7 @@ program
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('-C, --connection-filter <path>', 'path to connection filter hook, from process.cwd()')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
 
 program.on('--help', () => console.log(`
@@ -70,6 +71,7 @@ const {
   classicIds = false,
   dynamicJson = false,
   disableDefaultMutations = false,
+  connectionFilter: gqlConnectionFilterPath,
   showErrorStack,
 // tslint:disable-next-line no-any
 } = program as any
@@ -95,6 +97,10 @@ const pgConfig = Object.assign(
   { max: maxPoolSize },
 )
 
+// Load GraphQL connection filter, if the user specified one
+const gqlConnectionFilter = gqlConnectionFilterPath ?
+  require(resolvePath(process.cwd(), gqlConnectionFilterPath)) : undefined
+
 // Create’s our PostGraphQL server and provides all the appropriate
 // configuration options.
 const server = createServer(postgraphql(pgConfig, schemas, {
@@ -111,6 +117,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   showErrorStack,
   disableQueryLog: false,
   enableCors,
+  gqlConnectionFilter,
 }))
 
 // Start our server by listening to a specific port and host name. Also log
