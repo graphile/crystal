@@ -1,3 +1,5 @@
+import ConnectionFilter from './ConnectionFilter'
+
 /**
  * The condition type defines a set of constraints that we may apply to any
  * value that may be represented in our system. A condition must be defined
@@ -74,7 +76,7 @@ export namespace conditionHelpers {
    * Creates a custom matcher condition
    */
   // TODO: test
-  export function custom (filter: mixed, value: mixed): Condition {
+  export function custom (filter: ConnectionFilter, value: string): Condition {
     return { type: 'CUSTOM', filter, value }
   }
 }
@@ -166,8 +168,8 @@ type GreaterThanCondition = {
  */
 type CustomCondition = {
   type: 'CUSTOM',
-  filter: mixed,
-  value: mixed,
+  filter: ConnectionFilter,
+  value: string,
 }
 
 /**

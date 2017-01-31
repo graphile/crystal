@@ -6,11 +6,15 @@ type OtherSql = {
   groupBySql?: sql.Sql,
 }
 
+type Context = {
+  convertRowIdToId?: boolean,
+}
+
 /**
  * Converts a `Condition` object into a Sql query.
  * The `otherSql` arg is modified in place. Not a great API, but simplifies this recursive function quite a bit
  */
-export default function conditionToSql (condition: Condition, path: Array<string> = [], context = {}, otherSql: OtherSql = {}): sql.Sql {
+export default function conditionToSql (condition: Condition, path: Array<string> = [], context: Context = {}, otherSql: OtherSql = {}): sql.Sql {
   if (typeof condition === 'boolean')
     return condition ? sql.query`true` : sql.query`false`
 
@@ -26,7 +30,7 @@ export default function conditionToSql (condition: Condition, path: Array<string
       return conditionToSql(
         condition.condition,
         path.concat([context.convertRowIdToId && condition.name === 'row_id' ? 'id' : condition.name]),
-        false, context, otherSql,
+        context, otherSql,
       )
     case 'EQUAL':
       return sql.query`(${sql.identifier(...path)} = ${sql.value(condition.value)})`

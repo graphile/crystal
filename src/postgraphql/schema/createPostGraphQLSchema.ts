@@ -1,6 +1,6 @@
 import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLOutputType } from 'graphql'
-import { Inventory, Type, ObjectType, getNonNullableType } from '../../interface'
+import { Inventory, Type, ObjectType, getNonNullableType, ConnectionFilter } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
 import getTypeFromPgType from '../../postgres/inventory/type/getTypeFromPgType'
@@ -26,6 +26,7 @@ export default async function createPostGraphQLSchema (
     jwtSecret?: string,
     jwtPgTypeIdentifier?: string,
     disableDefaultMutations?: boolean,
+    gqlConnectionFilter?: ConnectionFilter,
   } = {},
 ): Promise<GraphQLSchema> {
   // Create our inventory.

@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType, GraphQLInputFieldConfig, GraphQLString } from 'graphql'
+import { GraphQLInputObjectType, GraphQLScalarType, GraphQLInputFieldConfig, GraphQLString } from 'graphql'
 import { Condition, conditionHelpers, NullableType, ObjectType } from '../../../interface'
 import { formatName, buildObject, memoize2 } from '../../utils'
 import getGqlInputType from '../type/getGqlInputType'
@@ -7,8 +7,8 @@ import BuildToken from '../BuildToken'
 export default memoize2(createConditionGqlType)
 
 function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectType<TValue>): {
-  gqlType: GraphQLInputObjectType,
-  fromGqlInput: (condition?: { [key: string]: mixed }) => Condition,
+  gqlType: GraphQLInputObjectType | GraphQLScalarType,
+  fromGqlInput: (condition?: { [key: string]: mixed } | string) => Condition,
 } {
   if (buildToken.options) {
     const { gqlConnectionFilter } = buildToken.options
