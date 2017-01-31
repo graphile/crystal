@@ -13,7 +13,7 @@ module.exports = (rawCondition, sql, context) => {
   const condition = JSON.parse(rawCondition)  // may throw
   const where = []
   const from = [{ table: initialTable, schema: initialSchema }]
-  if (!condition) return { from, where }
+  if (!condition) return { conditionSql: sql.query`true` }
   Object.keys(condition).forEach(attr => {
     const wherePartial = []
     processCondition(sql, context, initialTable, attr, condition[attr], from, wherePartial)
