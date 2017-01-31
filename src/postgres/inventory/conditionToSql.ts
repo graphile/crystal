@@ -1,11 +1,16 @@
 import { Condition } from '../../interface'
 import { sql } from '../utils'
 
+type OtherSql = {
+  fromSql?: sql.Sql,
+  groupBySql?: sql.Sql,
+}
+
 /**
  * Converts a `Condition` object into a Sql query.
  * The `otherSql` arg is modified in place. Not a great API, but simplifies this recursive function quite a bit
  */
-export default function conditionToSql (condition: Condition, path: Array<string> = [], context = {}, otherSql = {}): sql.Sql {
+export default function conditionToSql (condition: Condition, path: Array<string> = [], context = {}, otherSql: OtherSql = {}): sql.Sql {
   if (typeof condition === 'boolean')
     return condition ? sql.query`true` : sql.query`false`
 
@@ -21,7 +26,7 @@ export default function conditionToSql (condition: Condition, path: Array<string
       return conditionToSql(
         condition.condition,
         path.concat([context.convertRowIdToId && condition.name === 'row_id' ? 'id' : condition.name]),
-        false, context, otherSql
+        false, context, otherSql,
       )
     case 'EQUAL':
       return sql.query`(${sql.identifier(...path)} = ${sql.value(condition.value)})`
@@ -37,7 +42,7 @@ export default function conditionToSql (condition: Condition, path: Array<string
       const [, pattern, flags] = match
       return sql.query`regexp_matches(${sql.identifier(...path)}, ${sql.value(pattern)}, ${sql.value(flags)})`
     case 'CUSTOM':
-      const { conditionSql, fromSql, groupBySql } = condition.filter(condition.value, sql, context);
+      const { conditionSql, fromSql, groupBySql } = condition.filter(condition.value, sql, context)
       if (fromSql != null) otherSql.fromSql = fromSql
       if (groupBySql != null) otherSql.groupBySql = groupBySql
       return conditionSql

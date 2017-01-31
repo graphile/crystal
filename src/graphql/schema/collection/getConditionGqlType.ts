@@ -11,7 +11,7 @@ function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectTyp
   fromGqlInput: (condition?: { [key: string]: mixed }) => Condition,
 } {
   if (buildToken.options) {
-    const { gqlConnectionFilter } = buildToken.options;
+    const { gqlConnectionFilter } = buildToken.options
 
     // In case a custom connection filter is provided, use it; the condition arg then becomes a string
     if (gqlConnectionFilter) {

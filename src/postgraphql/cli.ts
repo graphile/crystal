@@ -99,6 +99,7 @@ const pgConfig = Object.assign(
 
 // Load GraphQL connection filter, if the user specified one
 const gqlConnectionFilter = gqlConnectionFilterPath ?
+  // tslint:disable-next-line no-var-requires
   require(resolvePath(process.cwd(), gqlConnectionFilterPath)) : undefined
 
 // Create’s our PostGraphQL server and provides all the appropriate

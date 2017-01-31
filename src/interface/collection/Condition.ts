@@ -74,7 +74,7 @@ export namespace conditionHelpers {
    * Creates a custom matcher condition
    */
   // TODO: test
-  export function custom (filter, value: mixed): Condition {
+  export function custom (filter: mixed, value: mixed): Condition {
     return { type: 'CUSTOM', filter, value }
   }
 }
@@ -166,7 +166,7 @@ type GreaterThanCondition = {
  */
 type CustomCondition = {
   type: 'CUSTOM',
-  filter: any,
+  filter: mixed,
   value: mixed,
 }
 
