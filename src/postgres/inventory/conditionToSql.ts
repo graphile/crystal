@@ -20,7 +20,7 @@ export default function conditionToSql (
   condition: Condition,
   path: Array<string> = [],
   context: Context = { initialTable: '', initialSchema: '', convertRowIdToId: false },
-  otherSql: OtherSql = {}
+  otherSql: OtherSql = {},
 ): sql.Sql {
   if (typeof condition === 'boolean')
     return condition ? sql.query`true` : sql.query`false`

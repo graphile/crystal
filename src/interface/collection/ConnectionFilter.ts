@@ -6,7 +6,7 @@ type ConnectionFilter = (
   context: {
     initialTable: string,  // the name of the connection's base table
     initialSchema: string,  // the schema for the connection's base table
-  }
+  },
 ) => {
   conditionSql: sql.Sql,  // part of the `where` clause
   fromSql: sql.Sql,  // `from` clause; leave `undefined` to use the default
