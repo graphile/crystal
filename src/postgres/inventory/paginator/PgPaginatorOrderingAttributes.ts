@@ -65,14 +65,14 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     if (beforeCursor != null && beforeCursor.length !== pgAttributes.length)
       throw new Error('Before cursor must be a value tuple of the correct length.')
 
-    const aliasIdentifier = Symbol()
-    const fromSql = this.pgPaginator.getFromEntrySql(input)
-    const conditionSql = this.pgPaginator.getConditionSql(input)
+    const { conditionSql, fromSql, groupBySql, initialTable } =
+      this.pgPaginator.getQuerySqlFragments(input)
+    const aliasIdentifier = Symbol.for(initialTable)
 
     const query = sql.compile(sql.query`
       -- The standard select/from clauses up top.
       select to_json(${sql.identifier(aliasIdentifier)}) as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+      from ${fromSql}
 
       -- Combine our cursors with the condition used for this page to
       -- implement a where condition which will filter what we want it to.
@@ -80,16 +80,19 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       -- We throw away nulls because there is a lot of wierdness when they
       -- get included.
       where
-        ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
-        ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
-        ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
+        ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(aliasIdentifier, pgAttribute.name)} is not null`), ' and ')} and
+        ${beforeCursor ? this._getCursorCondition(aliasIdentifier, pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
+        ${afterCursor ? this._getCursorCondition(aliasIdentifier, pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
         ${conditionSql}
+
+      -- Group by clase (might be needed when multiple tables are included)
+      ${groupBySql}
 
       -- Order using the same attributes used to construct the cursors. If
       -- a last property was defined we need to reverse our ordering so the
       -- limit will work. We will fix the order in JavaScript.
       order by ${sql.join(pgAttributes.map(pgAttribute =>
-        sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
+        sql.query`${sql.identifier(aliasIdentifier, pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
       ), ', ')}
 
       -- Finally, apply the appropriate limit.
@@ -130,7 +133,8 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         const { rowCount } = await client.query(sql.compile(sql.query`
           select null
           from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
+          where ${this._getCursorCondition(aliasIdentifier, pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
+          ${groupBySql}
           limit 1
         `))
 
@@ -147,7 +151,8 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         const { rowCount } = await client.query(sql.compile(sql.query`
           select null
           from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}
+          where ${this._getCursorCondition(aliasIdentifier, pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}
+          ${groupBySql}
           limit 1
         `))
 
@@ -161,9 +166,9 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
    *
    * @private
    */
-  private _getCursorCondition (pgAttributes: Array<PgCatalogAttribute>, cursor: Array<mixed>, operator: string): sql.Sql {
+  private _getCursorCondition (aliasIdentifier: symbol, pgAttributes: Array<PgCatalogAttribute>, cursor: Array<mixed>, operator: string): sql.Sql {
     return sql.query`
-      (${sql.join(pgAttributes.map(pgAttribute => sql.identifier(pgAttribute.name)), ', ')})
+      (${sql.join(pgAttributes.map(pgAttribute => sql.identifier(aliasIdentifier, pgAttribute.name)), ', ')})
       ${sql.raw(operator)}
       (${sql.join(cursor.map(sql.value), ', ')})
     `

@@ -14,28 +14,27 @@ abstract class PgPaginator<TInput, TItemValue> implements Paginator<TInput, TIte
   public abstract defaultOrdering: Paginator.Ordering<TInput, TItemValue, mixed>
 
   /**
-   * An abstract method to be implemented by inheritors that will get the Sql
-   * for the `from` entry we will use in our `select` queries.
+   * An abstract method to be implemented by inheritors that will get the Sql fragments
+   * for the `from`, `groupBy` and (part of the) `where` clauses,
+   * given some input.
    */
-  public abstract getFromEntrySql (input: TInput): sql.Sql
-
-  /**
-   * An abstract method that indicates what the condition is for this paginator
-   * given some input. For some paginators the input will contain a
-   * `Condition`.
-   */
-  public abstract getConditionSql (input: TInput): sql.Sql
+  public abstract getQuerySqlFragments (input: TInput): {
+    conditionSql: sql.Sql,
+    fromSql: sql.Sql,
+    groupBySql: sql.Sql,
+    initialTable: string,
+  }
 
   /**
    * Counts how many values are in our `from` entry total.
    */
   public async count (context: mixed, input: TInput): Promise<number> {
     const client = pgClientFromContext(context)
-    const fromSql = this.getFromEntrySql(input)
-    const conditionSql = this.getConditionSql(input)
-    const aliasIdentifier = Symbol()
-    const result = await client.query(sql.compile(sql.query`select count(${sql.identifier(aliasIdentifier)}) as count from ${fromSql} as ${sql.identifier(aliasIdentifier)} where ${conditionSql}`))
-    return parseInt(result.rows[0]['count'], 10)
+    const { conditionSql, fromSql, groupBySql } = this.getQuerySqlFragments(input)
+    const { rowCount } = await client.query(sql.compile(sql.query`
+      select null from ${fromSql} where ${conditionSql} ${groupBySql}
+    `))
+    return rowCount
   }
 }
 

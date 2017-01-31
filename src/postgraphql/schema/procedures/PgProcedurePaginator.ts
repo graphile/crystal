@@ -47,18 +47,25 @@ class PgProcedurePaginator<TItemValue> extends PgPaginator<ProcedureInput, TItem
   public defaultOrdering: Paginator.Ordering<ProcedureInput, TItemValue, mixed> = this.orderings.get('natural')!
 
   /**
-   * The from entry for this paginator is a Postgres function call where the
-   * procedure is the function being called.
-   */
-  public getFromEntrySql (input: ProcedureInput): sql.Sql {
-    return createPgProcedureSqlCall(this._fixtures, input)
-  }
-
-  /**
    * The condition when we are using a procedure will always be true.
    */
-  public getConditionSql (): sql.Sql {
-    return sql.query`true`
+  public getQuerySqlFragments (input: ProcedureInput): {
+    conditionSql: sql.Sql,
+    fromSql: sql.Sql,
+    groupBySql: sql.Sql,
+    initialTable: string,
+  } {
+    const initialTable = 'mainSelect'
+    const fromSql = sql.query`
+      ${createPgProcedureSqlCall(this._fixtures, input)}
+      as ${sql.identifier(Symbol.for(initialTable))}
+    `
+    return {
+      conditionSql: sql.query`true`,
+      fromSql,
+      groupBySql: sql.query``,
+      initialTable,
+    }
   }
 }
 
