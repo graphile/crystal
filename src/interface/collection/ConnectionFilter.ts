@@ -3,7 +3,11 @@ import { sql } from '../../postgres/utils'
 type ConnectionFilter = (
   rawCondition: string,
   sql: mixed,
-  context: mixed
+  context: {
+    initialTable: string,
+    initialSchema: string,
+    convertRowIdToId: boolean,
+  }
 ) => {
   conditionSql: sql.Sql,
   fromSql: sql.Sql,
