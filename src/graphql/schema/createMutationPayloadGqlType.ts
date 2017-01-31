@@ -1,5 +1,5 @@
 import { GraphQLString, GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
-import { formatName, buildObject } from '../utils'
+import { buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import { MutationValue } from './createMutationGqlField'
 import getQueryGqlType, { $$isQuery } from './getQueryGqlType'
@@ -15,6 +15,7 @@ export default function createMutationPayloadGqlType <TValue>(
     outputFields?: Array<[string, GraphQLFieldConfig<TValue, mixed>] | false | null | undefined>,
   },
 ): GraphQLObjectType {
+  const formatName = buildToken.options.formatName
   return new GraphQLObjectType({
     name: formatName.type(`${config.name}-payload`),
     description: `The output of our \`${formatName.field(config.name)}\` mutation.`,

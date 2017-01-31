@@ -7,7 +7,6 @@ import {
   getNullableType,
 } from 'graphql'
 import { Type, switchType } from '../../../interface'
-import { formatName } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import createMutationGqlField from '../../../graphql/schema/createMutationGqlField'
 import createCollectionRelationTailGqlFieldEntries from '../../../graphql/schema/collection/createCollectionRelationTailGqlFieldEntries'
@@ -31,6 +30,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
   const { inventory } = buildToken
   const fixtures = createPgProcedureFixtures(buildToken, pgCatalog, pgProcedure)
+  const formatName = buildToken.options.formatName
 
   // See if the output type of this procedure is a single object, try to find a
   // `PgCollection` which has the same type. If it exists we add some extra

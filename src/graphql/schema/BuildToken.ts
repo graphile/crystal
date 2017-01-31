@@ -1,5 +1,6 @@
 import { GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
 import { Inventory, Type, ObjectType } from '../../interface'
+import FormatName from './FormatName'
 
 /**
  * A `BuildToken` is a plain object that gets passed around to all of the
@@ -30,6 +31,8 @@ interface BuildToken {
     // If true then the default mutations for tables (e.g. createMyTable) will
     // not be created
     readonly disableDefaultMutations: boolean,
+    // Allow overriding the formatting of common names
+    readonly formatName: FormatName,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,
@@ -48,14 +51,21 @@ export type _BuildTokenHooks = {
   readonly objectTypeFieldEntries?: <TValue>(type: ObjectType<TValue>, _gqlBuildToken: BuildToken) => Array<[string, GraphQLFieldConfig<TValue, mixed>]>,
 }
 
+export type _BuildTokenTypeOverride = {
+  input?: true,
+  output?: GraphQLOutputType,
+}
+
+export type _BuildTokenTypeOverrideResolver = (_gqlBuildToken: BuildToken) => _BuildTokenTypeOverride
+
 /**
  * Overrides the GraphQL input and output of certain interface types. Can be
  * used for ‘special’ types that may be created from time to time. Currently
  * this is a private API.
  */
-export type _BuildTokenTypeOverrides = Map<Type<mixed>, {
-  input?: true,
-  output?: GraphQLOutputType,
-}>
+export type _BuildTokenTypeOverrides = Map<
+  Type<mixed>,
+  _BuildTokenTypeOverride | _BuildTokenTypeOverrideResolver
+>
 
 export default BuildToken

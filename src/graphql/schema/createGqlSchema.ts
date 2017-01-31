@@ -1,5 +1,7 @@
 import { GraphQLSchema } from 'graphql'
 import { Inventory } from '../../interface'
+import FormatName from './FormatName'
+import formatName from '../utils/formatName'
 import BuildToken, { _BuildTokenHooks, _BuildTokenTypeOverrides } from './BuildToken'
 import getQueryGqlType from './getQueryGqlType'
 import getMutationGqlType from './getMutationGqlType'
@@ -15,12 +17,16 @@ export type SchemaOptions = {
   // If true then the default mutations for tables (e.g. createMyTable) will
   // not be created
   disableDefaultMutations?: boolean,
+  // Allows hiding primary keys from the API
+  primaryKeyAPI?: boolean,
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
   // GraphQL types that override the default type generation. Currently this
   // API is private. Use at your own risk.
   _typeOverrides?: _BuildTokenTypeOverrides,
+  // Formatting of names for requests, properties, etc.
+  formatName?: FormatName,
 }
 
 /**
@@ -37,6 +43,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      formatName: options.formatName || formatName,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

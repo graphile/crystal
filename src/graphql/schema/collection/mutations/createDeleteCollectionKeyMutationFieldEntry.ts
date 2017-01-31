@@ -1,6 +1,5 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { CollectionKey } from '../../../../interface'
-import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
@@ -22,6 +21,7 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TValue, TKe
   const { collection } = collectionKey
   const name = `delete-${collection.type.name}-by-${collectionKey.name}`
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
+  const formatName = buildToken.options.formatName
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,

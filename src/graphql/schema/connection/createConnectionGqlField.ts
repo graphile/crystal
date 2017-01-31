@@ -12,7 +12,7 @@ import {
   Kind,
 } from 'graphql'
 import { Paginator } from '../../../interface'
-import { buildObject, formatName, memoize2, scrib } from '../../utils'
+import { buildObject, memoize2, scrib } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
 
@@ -137,6 +137,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
 ): GraphQLObjectType {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
   const gqlEdgeType = getEdgeGqlType(buildToken, paginator)
+  const formatName = buildToken.options.formatName
 
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
@@ -178,6 +179,7 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLObjectType {
+  const formatName = buildToken.options.formatName
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
   return new GraphQLObjectType({
@@ -237,6 +239,7 @@ export function _createOrderByGqlEnumType <TInput, TItemValue>(
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLEnumType {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
+  const formatName = buildToken.options.formatName
 
   return new GraphQLEnumType({
     name: formatName.type(`${paginator.name}-order-by`),

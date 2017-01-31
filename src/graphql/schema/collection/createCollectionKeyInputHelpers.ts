@@ -1,6 +1,6 @@
 import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphql'
 import { CollectionKey, Type, ObjectType, switchType } from '../../../interface'
-import { formatName, scrib } from '../../utils'
+import { scrib } from '../../utils'
 import getGqlInputType from '../type/getGqlInputType'
 import BuildToken from '../BuildToken'
 
@@ -24,6 +24,7 @@ export default function createCollectionKeyInputHelpers <TValue, TKey>(
   buildToken: BuildToken,
   collectionKey: CollectionKey<TValue, TKey>,
 ): CollectionKeyInputHelpers<TKey> {
+  const formatName = buildToken.options.formatName
   return switchType<CollectionKeyInputHelpers<TKey>>(collectionKey.keyType, {
     // If this is an object type, we want to flatten out the object’s fields into
     // field entries. This provides a nicer experience as it eliminates one level

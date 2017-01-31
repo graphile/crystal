@@ -6,7 +6,7 @@ import {
   GraphQLInputObjectType,
   GraphQLInputFieldConfig,
 } from 'graphql'
-import { formatName, buildObject } from '../utils'
+import { buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import createMutationPayloadGqlType from './createMutationPayloadGqlType'
 
@@ -48,6 +48,7 @@ export default function createMutationGqlField <T>(
 ): GraphQLFieldConfig<mixed, MutationValue<T>> {
   if (config.outputFields && config.payloadType)
     throw new Error('Mutation `outputFields` and `payloadType` may not be defiend at the same time.')
+  const formatName = buildToken.options.formatName
 
   return {
     description: config.description,

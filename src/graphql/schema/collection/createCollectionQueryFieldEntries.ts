@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, CollectionKey, NullableType } from '../../../interface'
-import { formatName, idSerde, buildObject, scrib } from '../../utils'
+import { idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
@@ -19,6 +19,7 @@ export default function createCollectionQueryFieldEntries <TValue>(
   const entries: Array<[string, GraphQLFieldConfig<never, never>]> = []
   const primaryKey = collection.primaryKey
   const paginator = collection.paginator
+  const formatName = buildToken.options.formatName
 
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.

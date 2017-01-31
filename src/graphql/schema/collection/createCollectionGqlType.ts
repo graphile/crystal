@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, Condition, ObjectType, Relation, conditionHelpers } from '../../../interface'
-import { formatName, buildObject, idSerde } from '../../utils'
+import { buildObject, idSerde } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
@@ -19,6 +19,7 @@ export default function createCollectionGqlType<TValue> (
 ): GraphQLObjectType {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
+  const formatName = buildToken.options.formatName
   const collectionTypeName = formatName.type(type.name)
 
   return new GraphQLObjectType({
