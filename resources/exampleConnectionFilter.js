@@ -42,6 +42,8 @@ const processCondition = (sql, context, curTable, attr, val, from, where) => {
 
   // Process attribute in a related table, with the FK in the current table (N-->1)
   // e.g. `person:author_id` (from post)
+  // ... or in the related table (1-->N)
+  // e.g. `post:author_id:rev` (from post)
   const [relatedTable, fk] = tokens
   if (from.find(({ table }) => table === relatedTable) == null) {
     from.push({ table: relatedTable, schema: context.initialSchema })
