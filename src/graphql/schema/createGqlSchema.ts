@@ -37,6 +37,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      gqlConnectionFilter: options.gqlConnectionFilter || null,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

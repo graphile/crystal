@@ -25,6 +25,7 @@ type Condition =
   EqualCondition |
   LessThanCondition |
   GreaterThanCondition |
+  CustomCondition |
   RegexpCondition
 
 export default Condition
@@ -67,6 +68,14 @@ export namespace conditionHelpers {
   // TODO: test
   export function fieldEquals (name: string, value: mixed): Condition {
     return { type: 'FIELD', name, condition: { type: 'EQUAL', value } }
+  }
+
+  /**
+   * Creates a custom matcher condition
+   */
+  // TODO: test
+  export function custom (filter, value: mixed): Condition {
+    return { type: 'CUSTOM', filter, value }
   }
 }
 
@@ -149,6 +158,15 @@ type LessThanCondition = {
  */
 type GreaterThanCondition = {
   type: 'GREATER_THAN',
+  value: mixed,
+}
+
+/**
+ * A condition to be used with a custom connection filter function.
+ */
+type CustomCondition = {
+  type: 'CUSTOM',
+  filter: any,
   value: mixed,
 }
 

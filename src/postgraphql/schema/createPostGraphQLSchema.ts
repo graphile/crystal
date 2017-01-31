@@ -109,6 +109,7 @@ export default async function createPostGraphQLSchema (
     nodeIdFieldName: options.classicIds ? 'id' : '__id',
     dynamicJson: options.dynamicJson,
     disableDefaultMutations: options.disableDefaultMutations,
+    gqlConnectionFilter: options.gqlConnectionFilter,
 
     // If we have a JWT Postgres type, let us override the GraphQL output type
     // with our own.
