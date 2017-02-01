@@ -5,7 +5,7 @@ As you navigate through the source code directory structure, you’ll see a numb
 
 ## Running/Contributing
 
-If you want to run this code locally, you should read the [CONTRIBUTING](../CONTRIBUTING.md) document for instructions.
+If you want to run this code locally, you should read the [contributing](../CONTRIBUTING.md) document for instructions.
 
 ## Top Level Modules
 The PostGraphQL source code is made up of three parts, represented by the three modules: `postgres`, `graphql`, and `interface`. Both `postgres` and `graphql` depend on `interface`, but code from the `postgres` folder *will never* touch code from the `graphql` folder. Currently these three modules are all part of PostGraphQL, but in the future we would like to make each of these module’s their own independent Node.js module.
