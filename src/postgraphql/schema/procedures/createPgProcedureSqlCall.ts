@@ -14,9 +14,10 @@ import { PgProcedureFixtures } from './createPgProcedureFixtures'
 // TODO: test
 export default function createPgProcedureSqlCall (
   fixtures: PgProcedureFixtures,
+  aliasIdentifier: mixed,
   values: Array<mixed>,
 ): sql.Sql {
-  if (values.length !== fixtures.args.length)
+  if (values.length !== fixtures.args.length - 1)
     throw new Error('Input tuple is of the incorrect length for procedure call.')
 
   // The last argument that is not null, excluding the value at this index.
@@ -38,5 +39,5 @@ export default function createPgProcedureSqlCall (
       .slice(0, Math.max(lastArgIdx, fixtures.args.length - fixtures.pgProcedure.argDefaultsNum))
       .map(({ type }, i) => type.transformValueIntoPgValue(values[i]))
 
-  return sql.query`${procedureName}(${sql.join(procedureArgs, ', ')})`
+  return sql.query`${procedureName}(${sql.identifier(aliasIdentifier)}, ${sql.join(procedureArgs, ', ')})`
 }

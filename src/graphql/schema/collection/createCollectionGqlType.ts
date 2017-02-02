@@ -7,6 +7,7 @@ import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
 import getConditionGqlType from './getConditionGqlType'
+import { sql } from '../../../postgres/utils'
 
 /**
  * Creates the output object type for a collection. This type will include all
@@ -50,6 +51,7 @@ export default function createCollectionGqlType<TValue> (
             value: {
               description: field.description,
               type: gqlType,
+              sqlExpression: () => sql.identifier(fieldName),
               resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
             },
           }
