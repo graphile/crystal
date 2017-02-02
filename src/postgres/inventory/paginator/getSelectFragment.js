@@ -19,8 +19,11 @@ export default (resolveInfo, aliasIdentifier) => {
       // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
     }
   );
-
-  return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
+  const buildArgs = [];
+  for (var k in fields) {
+    buildArgs.push(sql.value(k), fields[k]);
+  }
+  return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
 }
 
 function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlType, fragments, variableValues) {
@@ -29,9 +32,15 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
   }
   selectionsQueryAST.selectionSet.selections.forEach(
     selectionQueryAST => {
+      const fieldName = selectionQueryAST.name.value
+      if (fieldName.startsWith("__")) {
+        return
+      }
       if (selectionQueryAST.kind === 'Field') {
-        const fieldName = selectionQueryAST.name.value
         const field = gqlType._fields[fieldName]
+        if (!field) {
+          throw new Error(`Cannot find field named '${fieldName}'`)
+        }
         const fieldGqlType = stripNonNullType(field.type)
         const args = {}
         if (selectionQueryAST.arguments.length) {
@@ -56,11 +65,11 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
           addSelectionsToFields(fields, aliasIdentifier, selectionQueryAST.selectionSet.selections, gqlType, fragments, variableValues)
         }
       } else if (selectionQueryAST.kind === 'FragmentSpread') {
-        const fragmentName = selectionQueryAST.name.value
+        const fragmentName = fieldName;
         const fragment = fragments[fragmentName]
         const fragmentNameOfType = fragment.typeCondition.name.value
         const sameType = fragmentNameOfType === gqlType.name
-        const interfaceType = gqlType._interfaces.map(iface => iface.name).indexOf(fragmentNameOfType) >= 0
+        const interfaceType = gqlType._interfaces && gqlType._interfaces.map(iface => iface.name).indexOf(fragmentNameOfType) >= 0
         if (sameType || interfaceType) {
           addSelectionsToFields(fields, aliasIdentifier, fragment.selectionSet.selections, gqlType, fragments, variableValues)
         }
