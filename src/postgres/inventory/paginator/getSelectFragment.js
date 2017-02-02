@@ -1,6 +1,6 @@
 import { sql } from '../../utils'
 
-export default (resolveInfo, aliasIdentifier) => {
+export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
   if (!resolveInfo) {
     if (!process.env.WHATEVER) console.error("This won't work much longer! Just a hack to keep the tests working")
     return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
@@ -23,14 +23,20 @@ export default (resolveInfo, aliasIdentifier) => {
         console.log("DID NOT GET NODEGQLTYPE!!")
         console.dir(queryAst)
       }
-      // Get REQUESTED expressions (from the GQL query)
-      addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
+      if (collectionGqlType) {
+        // It's the Node type, resolve the fragment
+        nodeGqlType = stripNonNullType(collectionGqlType) // So we can pluck the REQUIRED fields, also so the correct fragments are resolved
+        addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
+      } else {
+        // Get REQUESTED expressions (from the GQL query)
+        addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
+      }
       // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
       if (true /* THIS IS A HACK, DO NOT USE THIS */) {
         Object.keys(nodeGqlType._fields).forEach(
           attrName =>  {
             const fld = nodeGqlType._fields[attrName]
-            if (attrName.endsWith("Id") && fld.sqlExpression) {
+            if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlExpression) {
               fields[attrName] = fld.sqlExpression(aliasIdentifier);
             }
           }
@@ -95,7 +101,7 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
         const sameType = fragmentNameOfType === gqlType.name
         const interfaceType = gqlType._interfaces && gqlType._interfaces.map(iface => iface.name).indexOf(fragmentNameOfType) >= 0
         if (sameType || interfaceType) {
-          addSelectionsToFields(fields, aliasIdentifier, fragment.selectionSet.selections, gqlType, fragments, variableValues)
+          addSelectionsToFields(fields, aliasIdentifier, fragment, gqlType, fragments, variableValues)
         }
       } else {
         throw new Error(`${selectionQueryAST.kind} not supported`);

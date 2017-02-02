@@ -60,8 +60,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     },
 
     async resolve (source, args, context): Promise<mixed> {
-      const value = source[fieldName]
-      return value;
+      return source.get(fieldName)
     },
   }]
 }

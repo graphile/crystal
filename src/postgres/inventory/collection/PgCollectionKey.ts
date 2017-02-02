@@ -9,6 +9,7 @@ import PgType from '../type/PgType'
 import PgClassType from '../type/PgClassType'
 import getTypeFromPgType from '../type/getTypeFromPgType'
 import PgCollection from './PgCollection'
+import getSelectFragment from '../paginator/getSelectFragment'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
@@ -123,8 +124,8 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
   public read: ((context: mixed, key: PgClassType.Value, resolveInfo: mixed) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PgClassType.Value, resolveInfo: mixed): Promise<PgClassType.Value | null> =>
-        this._getSelectLoader(pgClientFromContext(context)).load(key)
+      : (context: mixed, key: PgClassType.Value, resolveInfo: mixed, collectionGqlType: mixed): Promise<PgClassType.Value | null> =>
+        this._getSelectLoader(pgClientFromContext(context), resolveInfo, collectionGqlType).load(key)
   )
 
   /**
@@ -133,8 +134,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    *
    * @private
    */
-  @memoizeMethod
-  private _getSelectLoader (client: Client): DataLoader<PgClassType.Value, PgClassType.Value | null> {
+  private _getSelectLoader (client: Client, resolveInfo: mixed, collectionGqlType: mixed): DataLoader<PgClassType.Value, PgClassType.Value | null> {
     return new DataLoader<PgClassType.Value, PgClassType.Value | null>(
       async (keys: Array<PgClassType.Value>): Promise<Array<PgClassType.Value | null>> => {
         console.dir(keys)
@@ -160,7 +160,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
         // compiling.
         const query = sql.compile(sql.query`
           -- Select our rows as JSON objects.
-          select row_to_json(${sql.identifier(aliasIdentifier)}) as object
+          select ${getSelectFragment(resolveInfo, aliasIdentifier, collectionGqlType)} as object
           from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
 
           -- For all of our key attributes we need to test equality with a

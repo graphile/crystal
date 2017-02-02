@@ -46,7 +46,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
       if (!primaryKey || !primaryKey.read)
         throw new Error(`Invalid id, no readable primary key on collection named '${collection.name}'.`)
 
-      const value = await primaryKey.read(context, keyValue, resolveInfo)
+      const value = await primaryKey.read(context, keyValue, resolveInfo, getGqlOutputType(buildToken, collection.type).gqlType)
 
       // If the value is null, end early.
       if (value == null)

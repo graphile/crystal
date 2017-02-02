@@ -46,13 +46,16 @@ export default function createCollectionGqlType<TValue> (
       Array.from(type.fields).map(
         <TFieldValue>([fieldName, field]: [string, ObjectType.Field<TValue, TFieldValue>]) => {
           const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, field.type)
+          const formattedFieldName = formatName.field(fieldName)
           return {
-            key: formatName.field(fieldName),
+            key: formattedFieldName
             value: {
               description: field.description,
               type: gqlType,
               sqlExpression: (aliasIdentifier) => sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fieldName)}`,
-              resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
+              resolve: (value) => {
+                return value.get(formattedFieldName)
+              }
             },
           }
         },
