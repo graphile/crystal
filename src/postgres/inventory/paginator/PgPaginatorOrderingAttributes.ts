@@ -101,7 +101,22 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
     `)
 
-    let { rows } = await client.query(query)
+    console.log("ABOUT TO RUN QUERY")
+
+    let rows
+    try {
+      ({ rows } = await client.query(query))
+    } catch (e) {
+      console.log(__filename)
+      console.dir(e)
+      console.log("ERROR!!!")
+      console.log(query)
+      throw e
+    }
+    console.log("RAN QUERY!!!")
+    console.log(__filename)
+    console.dir(rows);
+    console.log("OUTPUT DONE")
 
     // If `last` was defined we reversed the order in Sql so our limit would
     // work. We need to reverse again when we get here.

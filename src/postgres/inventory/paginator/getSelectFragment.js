@@ -2,7 +2,7 @@ import { sql } from '../../utils'
 
 export default (resolveInfo, aliasIdentifier) => {
   if (!resolveInfo) {
-    console.error("This won't work much longer! Just a hack to keep the tests working")
+    if (!process.env.WHATEVER) console.error("This won't work much longer! Just a hack to keep the tests working")
     return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
   }
   const {parentType, variableValues, fragments} = resolveInfo
@@ -18,6 +18,10 @@ export default (resolveInfo, aliasIdentifier) => {
       if (nodeGqlType._fields.edges) {
         // It's Relay-like; lets dig in
         ({nodeGqlType, nodeQueryAST} = getNodeTypeFromRelayType(nodeGqlType, queryAST))
+      }
+      if (!nodeGqlType) {
+        console.log("DID NOT GET NODEGQLTYPE!!")
+        console.dir(queryAst)
       }
       // Get REQUESTED expressions (from the GQL query)
       addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
@@ -35,6 +39,7 @@ export default (resolveInfo, aliasIdentifier) => {
 
     }
   );
+  console.dir(fields);
   const buildArgs = [];
   for (var k in fields) {
     buildArgs.push(sql.query`${sql.value(k)}::text`, fields[k]);
@@ -58,6 +63,9 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
           throw new Error(`Cannot find field named '${fieldName}'`)
         }
         const fieldGqlType = stripNonNullType(field.type)
+        //console.log(fieldName, Object.keys(fieldGqlType).join(','));
+        //console.dir(field);
+        //console.log("----");
         const args = {}
         if (selectionQueryAST.arguments.length) {
           for (let arg of selectionQueryAST.arguments) {

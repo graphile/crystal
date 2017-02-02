@@ -163,6 +163,8 @@ class PgCollection implements Collection<PgClassType.Value> {
         `)
 
         const { rows } = await client.query(query)
+        console.log(__filename)
+        console.dir(rows);
         return rows.map(({ object }) => this.type.transformPgValueIntoValue(object))
       },
     )
