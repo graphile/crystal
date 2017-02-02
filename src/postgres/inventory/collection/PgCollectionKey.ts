@@ -137,7 +137,6 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
   private _getSelectLoader (client: Client, resolveInfo: mixed, collectionGqlType: mixed): DataLoader<PgClassType.Value, PgClassType.Value | null> {
     return new DataLoader<PgClassType.Value, PgClassType.Value | null>(
       async (keys: Array<PgClassType.Value>): Promise<Array<PgClassType.Value | null>> => {
-        console.dir(keys)
         const aliasIdentifier = Symbol()
 
         // For every key we have, generate a select statement then combine
@@ -188,16 +187,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           limit ${sql.value(keys.length)}
         `)
 
-        let rows
-        try {
-          ({ rows } = await client.query(query))
-        } catch (e) {
-          console.log(__filename)
-          console.dir(e)
-          console.log("ERROR!!!")
-          console.log(query)
-          throw e
-        }
+        const { rows } = await client.query(query)
 
         const values = new Map(rows.map<[string, PgClassType.Value]>(({ object }) => {
           const value = this.collection.type.transformPgValueIntoValue(object)

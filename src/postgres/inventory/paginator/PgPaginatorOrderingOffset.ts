@@ -138,8 +138,6 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     // Send our query to Postgres.
     const { rows } = await client.query(query)
-    console.log(__filename)
-    console.dir(rows);
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =

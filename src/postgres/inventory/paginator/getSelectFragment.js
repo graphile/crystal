@@ -19,10 +19,6 @@ export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
         // It's Relay-like; lets dig in
         ({nodeGqlType, nodeQueryAST} = getNodeTypeFromRelayType(nodeGqlType, queryAST))
       }
-      if (!nodeGqlType) {
-        console.log("DID NOT GET NODEGQLTYPE!!")
-        console.dir(queryAst)
-      }
       if (collectionGqlType) {
         // It's the Node type, resolve the fragment
         nodeGqlType = stripNonNullType(collectionGqlType) // So we can pluck the REQUIRED fields, also so the correct fragments are resolved
@@ -45,7 +41,6 @@ export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
 
     }
   );
-  console.dir(fields);
   const buildArgs = [];
   for (var k in fields) {
     buildArgs.push(sql.query`${sql.value(k)}::text`, fields[k]);
@@ -69,9 +64,6 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
           throw new Error(`Cannot find field named '${fieldName}'`)
         }
         const fieldGqlType = stripNonNullType(field.type)
-        //console.log(fieldName, Object.keys(fieldGqlType).join(','));
-        //console.dir(field);
-        //console.log("----");
         const args = {}
         if (selectionQueryAST.arguments.length) {
           for (let arg of selectionQueryAST.arguments) {
@@ -80,12 +72,10 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
         }
         if (field.sqlExpression) {
           if (fields[field.name]) {
-            console.error(`🔥 We need to alias multiple calls to the same field if it's a procedure (${field.name})`)
+            if (!process.env.WHATEVER) console.error(`🔥 We need to alias multiple calls to the same field if it's a procedure (${field.name})`)
             //throw new Error("Field name already specified!!")
           }
           fields[field.name] = field.sqlExpression(aliasIdentifier, args);
-        } else {
-          console.warn(`WARNING: no sqlExpression for '${fieldName}'`)
         }
       } else if (selectionQueryAST.kind === 'InlineFragment') {
         const selectionNameOfType = selectionQueryAST.typeCondition.name.value

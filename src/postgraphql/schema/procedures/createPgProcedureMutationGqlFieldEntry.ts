@@ -115,8 +115,6 @@ export default function createPgProcedureMutationGqlFieldEntry (
       )
 
       const { rows } = await client.query(query)
-      console.log(__filename)
-      console.dir(rows);
       const values = rows.map(({ value }) => fixtures.return.type.transformPgValueIntoValue(value))
 
       // If we selected a set of values, return the full set. Otherwise only

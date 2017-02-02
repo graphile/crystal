@@ -129,8 +129,6 @@ async function setupPgClientTransaction ({
       error.statusCode = 403
       throw error
     }
-  } else {
-    jwtClaims['user_id'] = 1;
   }
 
   // Instantiate a map of local settings. This map will be transformed into a
