@@ -91,7 +91,7 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
         const sameType = selectionNameOfType === gqlType.name
         const interfaceType = gqlType._interfaces.map(iface => iface.name).indexOf(selectionNameOfType) >= 0
         if (sameType || interfaceType) {
-          addSelectionsToFields(fields, aliasIdentifier, selectionQueryAST.selectionSet.selections, gqlType, fragments, variableValues)
+          addSelectionsToFields(fields, aliasIdentifier, selectionQueryAST, gqlType, fragments, variableValues)
         }
       } else if (selectionQueryAST.kind === 'FragmentSpread') {
         const fragmentName = fieldName;
