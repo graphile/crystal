@@ -120,10 +120,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * Reads a value if a user can select from this class. Batches requests to
    * the same client in the background.
    */
-  public read: ((context: mixed, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
+  public read: ((context: mixed, key: PgClassType.Value, resolveInfo: mixed) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PgClassType.Value): Promise<PgClassType.Value | null> =>
+      : (context: mixed, key: PgClassType.Value, resolveInfo: mixed): Promise<PgClassType.Value | null> =>
         this._getSelectLoader(pgClientFromContext(context)).load(key)
   )
 
