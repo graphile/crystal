@@ -75,6 +75,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       source: TSource,
       args: ConnectionArgs<TCursor>,
       context: mixed,
+      resolveInfo: mixed,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
       const {
         orderBy: orderingName,
@@ -114,7 +115,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
 
       // Finally, actually get the page data.
-      const page = await ordering.readPage(context, input, pageConfig)
+      const page = await ordering.readPage(context, input, pageConfig, resolveInfo)
 
       return {
         paginator,

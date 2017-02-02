@@ -2,6 +2,7 @@ import { Paginator } from '../../../interface'
 import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
 import PgPaginator from './PgPaginator'
+import getSelectFragment from './getSelectFragment'
 
 /**
  * The cursor in the offset strategy is just a simple integer.
@@ -46,6 +47,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     context: mixed,
     input: TInput,
     config: Paginator.PageConfig<OffsetCursor>,
+    resolveInfo: mixed,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
     const client = pgClientFromContext(context)
     const { first, last, beforeCursor, afterCursor, _offset } = config
@@ -126,7 +128,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
-      select to_json(${sql.identifier(aliasIdentifier)}) as value
+      select ${getSelectFragment(resolveInfo, aliasIdentifier)} as value
       from ${fromSql} as ${sql.identifier(aliasIdentifier)}
       where ${conditionSql}
       ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}

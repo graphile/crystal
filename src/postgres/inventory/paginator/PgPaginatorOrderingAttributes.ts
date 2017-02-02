@@ -4,6 +4,7 @@ import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
 import PgClassType from '../type/PgClassType'
 import PgPaginator from './PgPaginator'
+import getSelectFragment from './getSelectFragment'
 
 /**
  * The cursor type when we are ordering by attributes is just a fixed length
@@ -42,6 +43,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     context: mixed,
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
+    resolveInfo: mixed,
   ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
     const client = pgClientFromContext(context)
     const { descending, pgAttributes } = this
@@ -71,7 +73,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
     const query = sql.compile(sql.query`
       -- The standard select/from clauses up top.
-      select to_json(${sql.identifier(aliasIdentifier)}) as value
+      select ${getSelectFragment(resolveInfo, aliasIdentifier)} as value
       from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
       -- Combine our cursors with the condition used for this page to
