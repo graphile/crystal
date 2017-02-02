@@ -7,7 +7,7 @@ export default (resolveInfo, aliasIdentifier) => {
   }
   const {parentType, variableValues, fragments} = resolveInfo
   const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
-  const fields = [];
+  const fields = {}
   fieldNodes.forEach(
     queryAST => {
       const fieldName = queryAST.name.value
@@ -15,7 +15,7 @@ export default (resolveInfo, aliasIdentifier) => {
       if (!field) throw new Error("Couldn't fetch field!")
       const {nodeGqlType, nodeQueryAST} = getNodeTypeFromRelayType(stripNonNullType(field.type), queryAST)
       // Get REQUESTED expressions (from the GQL query)
-      addSelectionsToFields(fields, nodeQueryAST, nodeGqlType, fragments, variableValues)
+      addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
       // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
     }
   );
@@ -23,7 +23,7 @@ export default (resolveInfo, aliasIdentifier) => {
   return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
 }
 
-function addSelectionsToFields(fields, selectionsQueryAST, gqlType, fragments, variableValues) {
+function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlType, fragments, variableValues) {
   if (!selectionsQueryAST.selectionSet) {
     return;
   }
@@ -40,14 +40,20 @@ function addSelectionsToFields(fields, selectionsQueryAST, gqlType, fragments, v
           }
         }
         if (field.sqlExpression) {
-          fields.push(field.sqlExpression(args));
+          if (fields[field.name]) {
+            console.error(`🔥 We need to alias multiple calls to the same field if it's a procedure (${field.name})`)
+            //throw new Error("Field name already specified!!")
+          }
+          fields[field.name] = field.sqlExpression(aliasIdentifier, args);
+        } else {
+          console.warn(`WARNING: no sqlExpression for '${fieldName}'`)
         }
       } else if (selectionQueryAST.kind === 'InlineFragment') {
         const selectionNameOfType = selectionQueryAST.typeCondition.name.value
         const sameType = selectionNameOfType === gqlType.name
         const interfaceType = gqlType._interfaces.map(iface => iface.name).indexOf(selectionNameOfType) >= 0
         if (sameType || interfaceType) {
-          addSelectionsToFields(fields, selectionQueryAST.selectionSet.selections, gqlType, fragments, variableValues)
+          addSelectionsToFields(fields, aliasIdentifier, selectionQueryAST.selectionSet.selections, gqlType, fragments, variableValues)
         }
       } else if (selectionQueryAST.kind === 'FragmentSpread') {
         const fragmentName = selectionQueryAST.name.value
@@ -56,7 +62,7 @@ function addSelectionsToFields(fields, selectionsQueryAST, gqlType, fragments, v
         const sameType = fragmentNameOfType === gqlType.name
         const interfaceType = gqlType._interfaces.map(iface => iface.name).indexOf(fragmentNameOfType) >= 0
         if (sameType || interfaceType) {
-          addSelectionsToFields(fields, fragment.selectionSet.selections, gqlType, fragments, variableValues)
+          addSelectionsToFields(fields, aliasIdentifier, fragment.selectionSet.selections, gqlType, fragments, variableValues)
         }
       } else {
         throw new Error(`${selectionQueryAST.kind} not supported`);

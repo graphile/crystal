@@ -51,7 +51,7 @@ export default function createCollectionGqlType<TValue> (
             value: {
               description: field.description,
               type: gqlType,
-              sqlExpression: () => sql.identifier(fieldName),
+              sqlExpression: (aliasIdentifier) => sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fieldName)}`,
               resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
             },
           }
