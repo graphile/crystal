@@ -80,9 +80,9 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
     if (typeof pgValue !== 'object')
       throw new Error(`Postgres value of object type must be an object, not '${typeof pgValue}'.`)
 
-    return new Map(Array.from(this.fields).map<[string, mixed]>(([fieldName, field]) => {
-      return [fieldName, field.type.transformPgValueIntoValue(pgValue[field.pgAttribute.name])]
-    }))
+    return new Map(Array.from(pgValue).map<[string, mixed]>(
+      ([fieldName, field]) => [fieldName, this.fields[fieldName].type.transformPgValueIntoValue(pgValue[fieldName])]
+    )
   }
 
   /**

@@ -22,11 +22,22 @@ export default (resolveInfo, aliasIdentifier) => {
       // Get REQUESTED expressions (from the GQL query)
       addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
       // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
+      if (true /* THIS IS A HACK, DO NOT USE THIS */) {
+        Object.keys(nodeGqlType._fields).forEach(
+          attrName =>  {
+            const fld = nodeGqlType._fields[attrName]
+            if (attrName.endsWith("Id") && fld.sqlExpression) {
+              fields[attrName] = fld.sqlExpression(aliasIdentifier);
+            }
+          }
+        )
+      }
+
     }
   );
   const buildArgs = [];
   for (var k in fields) {
-    buildArgs.push(sql.value(k), fields[k]);
+    buildArgs.push(sql.query`${sql.value(k)}::text`, fields[k]);
   }
   return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
 }
