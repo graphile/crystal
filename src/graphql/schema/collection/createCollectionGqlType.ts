@@ -52,9 +52,10 @@ export default function createCollectionGqlType<TValue> (
             value: {
               description: field.description,
               type: gqlType,
+              sqlName: () => fieldName,
               sqlExpression: (aliasIdentifier) => sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fieldName)}`,
               resolve: (value) => {
-                return value.get(formattedFieldName)
+                return value.get(fieldName)
               }
             },
           }

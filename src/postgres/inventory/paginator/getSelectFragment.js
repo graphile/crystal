@@ -1,10 +1,6 @@
 import { sql } from '../../utils'
 
-export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
-  if (!resolveInfo) {
-    if (!process.env.WHATEVER) console.error("This won't work much longer! Just a hack to keep the tests working")
-    return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
-  }
+export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, collectionGqlType = null) {
   const {parentType, variableValues, fragments} = resolveInfo
   const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
   const fields = {}
@@ -33,7 +29,7 @@ export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
           attrName =>  {
             const fld = nodeGqlType._fields[attrName]
             if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlExpression) {
-              fields[attrName] = fld.sqlExpression(aliasIdentifier);
+              fields[fld.sqlName(aliasIdentifier)] = fld.sqlExpression(aliasIdentifier);
             }
           }
         )
@@ -41,11 +37,23 @@ export default (resolveInfo, aliasIdentifier, collectionGqlType = null) => {
 
     }
   );
+  return fields;
+}
+
+export function getSelectFragmentFromFields(fields) {
   const buildArgs = [];
   for (var k in fields) {
     buildArgs.push(sql.query`${sql.value(k)}::text`, fields[k]);
   }
   return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
+}
+
+export default function getSelectFragment(resolveInfo, aliasIdentifier, collectionGqlType = null) {
+  if (!resolveInfo) {
+    if (!process.env.WHATEVER) console.error("This won't work much longer! Just a hack to keep the tests working")
+    return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
+  }
+  return getSelectFragmentFromFields(getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, collectionGqlType))
 }
 
 function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlType, fragments, variableValues) {
@@ -71,11 +79,12 @@ function addSelectionsToFields(fields, aliasIdentifier, selectionsQueryAST, gqlT
           }
         }
         if (field.sqlExpression) {
-          if (fields[field.name]) {
+          const sqlName = field.sqlName(aliasIdentifier, args)
+          if (fields[sqlName]) {
             if (!process.env.WHATEVER) console.error(`🔥 We need to alias multiple calls to the same field if it's a procedure (${field.name})`)
             //throw new Error("Field name already specified!!")
           }
-          fields[field.name] = field.sqlExpression(aliasIdentifier, args);
+          fields[sqlName] = field.sqlExpression(aliasIdentifier, args);
         }
       } else if (selectionQueryAST.kind === 'InlineFragment') {
         const selectionNameOfType = selectionQueryAST.typeCondition.name.value
