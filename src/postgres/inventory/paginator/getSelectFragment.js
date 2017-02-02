@@ -13,7 +13,12 @@ export default (resolveInfo, aliasIdentifier) => {
       const fieldName = queryAST.name.value
       const field = parentType._fields[fieldName]
       if (!field) throw new Error("Couldn't fetch field!")
-      const {nodeGqlType, nodeQueryAST} = getNodeTypeFromRelayType(stripNonNullType(field.type), queryAST)
+      let nodeGqlType = stripNonNullType(field.type)
+      let nodeQueryAST = queryAST
+      if (nodeGqlType._fields.edges) {
+        // It's Relay-like; lets dig in
+        ({nodeGqlType, nodeQueryAST} = getNodeTypeFromRelayType(nodeGqlType, queryAST))
+      }
       // Get REQUESTED expressions (from the GQL query)
       addSelectionsToFields(fields, aliasIdentifier, nodeQueryAST, nodeGqlType, fragments, variableValues)
       // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
