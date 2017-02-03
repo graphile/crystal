@@ -1,5 +1,6 @@
 import { sql } from '../../utils'
 import { typeFromAST } from 'graphql'
+import { getArgumentValues } from 'graphql/execution/values'
 
 function getFieldFromNode(ast, parentGqlType) {
   if (ast.kind === 'Field') {
@@ -58,12 +59,7 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
     const field = getFieldFromNode(queryAST, parentGqlType)
     const fieldGqlType = stripNonNullType(field.type)
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
-      const args = {}
-      if (queryAST.arguments.length) {
-        for (let arg of queryAST.arguments) {
-          args[arg.name.value] = parseArgValue(arg.value, variableValues)
-        }
-      }
+      const args = getArgumentValues(field, queryAST, variableValues)
       const alias = queryAST.alias && queryAST.alias.value
       if (field.sqlExpression) {
         const sqlName = field.sqlName(aliasIdentifier, args, alias)
@@ -149,18 +145,4 @@ function stripNonNullType(type) {
 
 function stripListType(type) {
   return type.constructor.name === 'GraphQLList' ? type.ofType : type
-}
-
-function parseArgValue(value, variableValues) {
-  if (value.kind === 'Variable') {
-    const variableName = value.name.value
-    return variableValues[variableName]
-  }
-
-  let primitive = value.value
-  // TODO parse other kinds of variables
-  if (value.kind === 'IntValue') {
-    primitive = parseInt(primitive)
-  }
-  return primitive
 }
