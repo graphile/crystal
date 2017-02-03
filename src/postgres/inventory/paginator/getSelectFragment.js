@@ -2,14 +2,6 @@ import { sql } from '../../utils'
 import { typeFromAST } from 'graphql'
 import { getArgumentValues } from 'graphql/execution/values'
 
-function getFieldFromNode(ast, parentGqlType) {
-  if (ast.kind === 'Field') {
-    const fieldName = ast.name.value
-    return parentGqlType._fields[fieldName]
-  }
-  return
-}
-
 export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTargetGqlType) {
   const targetGqlType = stripNonNullType(rawTargetGqlType)
   const {parentType: parentGqlType, variableValues, fragments, schema} = resolveInfo
@@ -56,7 +48,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       // Introspection related
       return;
     }
-    const field = getFieldFromNode(queryAST, parentGqlType)
+    const field = getFieldFromAST(queryAST, parentGqlType)
     const fieldGqlType = stripNonNullType(field.type)
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
       const args = getArgumentValues(field, queryAST, variableValues)
@@ -112,6 +104,14 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       }
     }
   }
+}
+
+function getFieldFromAST(ast, parentGqlType) {
+  if (ast.kind === 'Field') {
+    const fieldName = ast.name.value
+    return parentGqlType._fields[fieldName]
+  }
+  return
 }
 
 function isRelated(targetGqlType, rawOtherType) {
