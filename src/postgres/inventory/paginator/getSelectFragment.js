@@ -17,7 +17,7 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
   const fields = {}
   fieldNodes.forEach(
     queryAST => {
-      addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
+      parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
     }
   );
   // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
@@ -50,7 +50,7 @@ export default function getSelectFragment(resolveInfo, aliasIdentifier, targetGq
   return getSelectFragmentFromFields(getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, targetGqlType))
 }
 
-function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST) {
+function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST) {
   if (queryAST.kind === 'Field') {
     if (queryAST.name.value.startsWith("__") && queryAST.name.value !== "__id") {
       // Introspection related
@@ -75,7 +75,7 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
     // It is related, so continue through it's selection sets
     queryAST.selectionSet.selections.forEach(
       ast => {
-        addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, stripNonNullType(stripListType(fieldGqlType)), ast)
+        parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, stripNonNullType(stripListType(fieldGqlType)), ast)
       }
     )
   } else if (queryAST.kind === 'InlineFragment') {
@@ -84,7 +84,7 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
     const sameType = selectionNameOfType === targetGqlType.name
     const interfaceType = targetGqlType._interfaces.map(iface => iface.name).indexOf(selectionNameOfType) >= 0
     if (sameType || interfaceType) {
-      addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
+      parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
     } else {
       console.log(`🔥 Skipping '${selectionNameOfType}'`)
     }
@@ -107,7 +107,7 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
     if (isRelated(targetGqlType, fragmentGqlType)) {
       if (fragment.selectionSet) {
         fragment.selectionSet.selections.forEach(
-          selection => addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, fragmentGqlType, selection)
+          selection => parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, fragmentGqlType, selection)
         );
       }
     }
