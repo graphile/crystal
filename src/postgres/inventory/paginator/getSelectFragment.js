@@ -74,7 +74,7 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
       return;
     }
     // Not a child of targetGqlType, but maybe we're the type itself; or related to it?
-    if (!isRelated(targetGqlType, field.relatedGqlType, fieldGqlType)) {
+    if (!isRelated(targetGqlType, fieldGqlType)) {
       // Not related so stop
       return
     }
@@ -120,13 +120,17 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
   }
 }
 
-function isRelated(targetGqlType, ...types) {
-  // XXX: Should we be adding interfaces here?
-  return types.filter(_ => _).some(
-    rawType => {
-      const type = stripNonNullType(rawType)
-      return type === targetGqlType || type.name === 'Node'
-    }
+function isRelated(targetGqlType, rawOtherType) {
+  // Think about interfaces?
+  // const interfaceType = targetGqlType._interfaces && targetGqlType._interfaces.map(iface => iface.name).indexOf(fragmentNameOfType) >= 0
+  const otherType = stripNonNullType(stripListType(stripNonNullType(rawOtherType)))
+  const otherRelatedType = (otherType.constructor.name === 'GraphQLObjectType') && otherType._typeConfig.relatedGqlType
+  const types = [
+    otherType,
+    otherRelatedType && stripNonNullType(otherRelatedType),
+  ].filter(_ => _)
+  return types.some(
+    type => type === targetGqlType || type.name === 'Node'
   )
 }
 

@@ -41,7 +41,6 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   return {
     description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
-    relatedGqlType: gqlType,
     args: buildObject<GraphQLArgumentConfig>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
@@ -158,14 +157,12 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
-        relatedGqlType: gqlType,
         type: new GraphQLList(gqlEdgeType),
         resolve: <TCursor>({ orderingName, page }: Connection<TInput, TItemValue, TCursor>): Array<Edge<TInput, TItemValue, TCursor>> =>
           page.values.map(({ cursor, value }) => ({ paginator, orderingName, cursor, value })),
       },
       nodes: {
         description: `A list of ${scrib.type(gqlType)} objects.`,
-        relatedGqlType: gqlType,
         type: new GraphQLList(gqlType),
         resolve: ({ page }: Connection<TInput, TItemValue, mixed>): Array<TItemValue> =>
           page.values.map(({ value }) => value),
@@ -188,6 +185,7 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
+    relatedGqlType: gqlType,
     fields: () => ({
       cursor: {
         description: 'A cursor for use in pagination.',
