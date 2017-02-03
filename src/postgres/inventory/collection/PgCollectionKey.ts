@@ -202,7 +202,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           return [keyString, value]
         }))
 
-        return keys.map(key => {
+        return keysAndStuff.map(({key}) => {
           const keyString = this._keyTypeFields.map(([fieldName]) => key.get(fieldName)).join('-')
           return values.get(keyString) || null
         })
