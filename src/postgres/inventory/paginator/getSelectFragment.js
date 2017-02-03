@@ -71,14 +71,12 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       }
     )
   } else if (queryAST.kind === 'InlineFragment') {
-    throw new Error("UNTESTED")
-    const selectionNameOfType = queryAST.typeCondition.name.value
-    const sameType = selectionNameOfType === targetGqlType.name
-    const interfaceType = targetGqlType._interfaces.map(iface => iface.name).indexOf(selectionNameOfType) >= 0
-    if (sameType || interfaceType) {
-      parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
+    if (queryAST.typeCondition) {
+      processFragment(queryAST);
     } else {
-      console.log(`🔥 Skipping '${selectionNameOfType}'`)
+      queryAST.selectionSet.selections.forEach(
+        selection => parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, selection)
+      );
     }
   } else if (queryAST.kind === 'FragmentSpread') {
     const fieldName = queryAST.name.value
@@ -92,8 +90,6 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
   }
 
   function processFragment(fragment) {
-    const fragmentNameOfType = fragment.typeCondition.name.value
-
     const fragmentGqlType = stripNonNullType(typeFromAST(schema, fragment.typeCondition))
 
     if (isRelated(targetGqlType, fragmentGqlType)) {
