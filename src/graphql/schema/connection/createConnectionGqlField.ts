@@ -41,6 +41,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   return {
     description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
+    relatedGqlType: gqlType,
     args: buildObject<GraphQLArgumentConfig>([
       // Only include an `orderBy` field if there are ways in which we can
       // order.
@@ -115,7 +116,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
 
       // Finally, actually get the page data.
-      const page = await ordering.readPage(context, input, pageConfig, resolveInfo)
+      const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
 
       return {
         paginator,
@@ -142,6 +143,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
+    relatedGqlType: gqlType,
     fields: () => ({
       pageInfo: {
         description: 'Information to aid in pagination.',
@@ -156,12 +158,14 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
+        relatedGqlType: gqlType,
         type: new GraphQLList(gqlEdgeType),
         resolve: <TCursor>({ orderingName, page }: Connection<TInput, TItemValue, TCursor>): Array<Edge<TInput, TItemValue, TCursor>> =>
           page.values.map(({ cursor, value }) => ({ paginator, orderingName, cursor, value })),
       },
       nodes: {
         description: `A list of ${scrib.type(gqlType)} objects.`,
+        relatedGqlType: gqlType,
         type: new GraphQLList(gqlType),
         resolve: ({ page }: Connection<TInput, TItemValue, mixed>): Array<TItemValue> =>
           page.values.map(({ value }) => value),

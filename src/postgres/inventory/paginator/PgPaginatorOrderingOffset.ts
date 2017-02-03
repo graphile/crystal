@@ -48,6 +48,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     input: TInput,
     config: Paginator.PageConfig<OffsetCursor>,
     resolveInfo: mixed,
+    gqlType: mixed,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
     const client = pgClientFromContext(context)
     const { first, last, beforeCursor, afterCursor, _offset } = config
@@ -128,7 +129,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
-      select ${getSelectFragment(resolveInfo, aliasIdentifier)} as value
+      select ${getSelectFragment(resolveInfo, aliasIdentifier, gqlType)} as value
       from ${fromSql} as ${sql.identifier(aliasIdentifier)}
       where ${conditionSql}
       ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}

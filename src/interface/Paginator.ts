@@ -91,6 +91,7 @@ namespace Paginator {
       input: TInput,
       config: Paginator.PageConfig<TCursor>,
       resolveInfo: mixed,
+      gqlType: mixed,
     ): Promise<Paginator.Page<TItemValue, TCursor>>
   }
 

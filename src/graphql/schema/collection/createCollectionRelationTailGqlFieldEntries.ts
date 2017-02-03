@@ -50,7 +50,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
             async resolve (source: TSource, _args: {}, context: mixed, resolveInfo: mixed): Promise<mixed> {
               const value = options.getCollectionValue(source)
               const key = relation.getHeadKeyFromTailValue(value)
-              const headValue = await headCollectionKey.read!(context, key, resolveInfo)
+              const headValue = await headCollectionKey.read!(context, key, resolveInfo, headCollectionGqlType)
 
               if (headValue == null)
                 return

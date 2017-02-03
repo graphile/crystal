@@ -44,6 +44,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
     resolveInfo: mixed,
+    gqlType: mixed,
   ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
     const client = pgClientFromContext(context)
     const { descending, pgAttributes } = this
@@ -73,7 +74,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
     const query = sql.compile(sql.query`
       -- The standard select/from clauses up top.
-      select ${getSelectFragment(resolveInfo, aliasIdentifier)} as value
+      select ${getSelectFragment(resolveInfo, aliasIdentifier, gqlType)} as value
       from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
       -- Combine our cursors with the condition used for this page to
