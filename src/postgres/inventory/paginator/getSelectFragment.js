@@ -64,11 +64,9 @@ function addSelectionsToFields(fields, aliasIdentifier, schema, targetGqlType, f
           args[arg.name.value] = parseArgValue(arg.value, variableValues)
         }
       }
+      const alias = queryAST.alias && queryAST.alias.value
       if (field.sqlExpression) {
-        const sqlName = field.sqlName(aliasIdentifier, args)
-        if (fields[sqlName]) {
-          if (!process.env.WHATEVER) console.error(`🔥 We need to alias multiple calls to the same field if it's a procedure (${field.name})`)
-        }
+        const sqlName = field.sqlName(aliasIdentifier, args, alias)
         fields[sqlName] = field.sqlExpression(aliasIdentifier, args);
       }
       return;
