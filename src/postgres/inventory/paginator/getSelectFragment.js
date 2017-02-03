@@ -128,17 +128,6 @@ function isRelated(targetGqlType, rawOtherType) {
   )
 }
 
-function getNodeTypeFromRelayType(type, queryASTNode) {
-  const nodeGqlType = stripNonNullType(type._fields.edges.type.ofType._fields.node.type)
-
-  const edges = queryASTNode.selectionSet.selections.find(selection => selection.name.value === 'edges')
-  const nodeQueryAST =
-    edges
-    ? edges.selectionSet.selections.find(selection => selection.name.value === 'node') || {}
-    : {}
-  return { nodeGqlType, nodeQueryAST }
-}
-
 function stripNonNullType(type) {
   return type.constructor.name === 'GraphQLNonNull' ? type.ofType : type
 }
