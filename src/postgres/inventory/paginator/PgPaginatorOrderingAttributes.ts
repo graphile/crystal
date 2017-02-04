@@ -36,17 +36,12 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     this.pgAttributes = config.pgAttributes
   }
 
-  /**
-   * Reads a single page for this ordering.
-   */
-  public async readPage (
-    context: mixed,
+  public generateQuery (
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
     resolveInfo: mixed,
     gqlType: mixed,
-  ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
-    const client = pgClientFromContext(context)
+  ) {
     const { descending, pgAttributes } = this
     const { beforeCursor, afterCursor, first, last, _offset } = config
 
@@ -115,7 +110,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
             `
           : sql.query`false`
           )
-    const query = sql.compile(sql.query`
+    const query = sql.query`
       with ${sql.identifier(matchingRowsIdentifier)} as (
         select *
         from ${fromSql} as ${sql.identifier(aliasIdentifier)}
@@ -156,9 +151,31 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       ${hasNextPageSql} as "hasNextPage",
       ${hasPreviousPageSql} as "hasPreviousPage"
     `)
+    return {query, last}
+  }
 
-    const { rows: [{rows, hasNextPage, hasPreviousPage}] } = await client.query(query)
+  /**
+   * Reads a single page for this ordering.
+   */
+  public async readPage (
+    context: mixed,
+    input: TInput,
+    config: Paginator.PageConfig<AttributesCursor>,
+    resolveInfo: mixed,
+    gqlType: mixed,
+  ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
+    const details = this.generateQuery(input, config, resolveInfo, gqlType);
+    const {query, last} = details
+    const compiledQuery = sql.compile(query)
 
+    const client = pgClientFromContext(context)
+    const { rows: [value] } = await client.query(compiledQuery)
+
+    return this.valueToPage(value, details)
+  }
+
+  public valueToPage (value, {last}) {
+    const {rows, hasNextPage, hasPreviousPage} = value
     // If `last` was defined we reversed the order in Sql so our limit would
     // work. We need to reverse again when we get here.
     // TODO: We could implement an `O(1)` reverse with iterators. Then we

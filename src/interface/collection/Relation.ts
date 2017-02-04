@@ -58,6 +58,7 @@ interface Relation<TTailValue, THeadValue, THeadKey> {
    */
   // TODO: REFACTOR
   getTailConditionFromHeadValue? (value: THeadValue): Condition
+  getTailConditionFromHeadAlias? (aliasIdentifier: mixed): Condition
 }
 
 export default Relation

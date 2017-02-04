@@ -99,12 +99,12 @@ export default function createCollectionGqlType<TValue> (
               ],
               // We use the config when creating a connection field to inject
               // a condition that limits what we select from the paginator.
-              getPaginatorInput: (headValue: TValue, args: { condition?: { [key: string]: mixed } }) =>
+              getPaginatorInput: (aliasIdentifier: mixed, args: { condition?: { [key: string]: mixed } }) =>
                 conditionHelpers.and(
-                  relation.getTailConditionFromHeadValue!(headValue),
+                  relation.getTailConditionFromHeadAlias!(aliasIdentifier),
                   conditionFromGqlInput(args.condition),
                 ),
-            }),
+            }, true),
           ]
         }),
     ),

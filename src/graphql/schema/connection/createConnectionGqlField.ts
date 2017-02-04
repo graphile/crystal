@@ -15,6 +15,7 @@ import { Paginator } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
+import { sql } from '../../../postgres/utils'
 
 // TODO: doc
 export default function createConnectionGqlField <TSource, TInput, TItemValue>(
@@ -118,25 +119,29 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       }
     }
   if (subquery) {
-    const sqlName = (_, args, alias) => `${fieldName}###${alias || ''}`,
+    const sqlName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
     Object.assign(result, {
       sqlName,
-      sqlExpression: (aliasIdentifier, args, resolveInfo) => {
+      sqlExpression: (aliasIdentifier, fieldName, args, resolveInfo) => {
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
-        const sql = ordering.getSQL(input, pageConfig, resolveInfo, gqlType)
+        const alias = Symbol();
+        const {query} = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
+        return sql.query`to_json((${)query})`
       },
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
-        const value = source.get(sqlName(null, args, resolveInfo.alias && resolveInfo.alias.value))
+        const value = source.get(sqlName(null, null, args, resolveInfo.alias && resolveInfo.alias.value))
         // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
         const {ordering, orderingName, input} = getOrdering(
           Symbol(), // <-- this doesn't matter during resolve
           args
         )
+        const details = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
+        const page = ordering.valueToPage(value, details)
         return {
           paginator,
           orderingName,
           input,
-          page: value,
+          page,
         }
       }
     })
