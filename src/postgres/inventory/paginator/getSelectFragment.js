@@ -56,7 +56,17 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       const alias = queryAST.alias && queryAST.alias.value
       if (field.sqlExpression) {
         const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
-        fields[sqlName] = field.sqlExpression(aliasIdentifier, fieldName, args);
+        // XXX: is this sufficient?
+        const resolveInfo = {
+          parentType: parentGqlType,
+          variableValues,
+          fragments,
+          schema,
+          fieldASTs: [
+            queryAST,
+          ],
+        }
+        fields[sqlName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo);
       }
       return;
     }
