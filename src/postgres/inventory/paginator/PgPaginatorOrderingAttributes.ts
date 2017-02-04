@@ -75,6 +75,46 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
+    const hasNextPageSql =
+      last != null
+        ? (
+          beforeCursor
+          ? sql.query`
+            exists(
+              select 1 from ${sql.identifier(matchingRowsIdentifier)}
+              where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
+            )
+            `
+          : sql.query`false`
+          )
+        : sql.query`
+          (
+            select count(*) from ${sql.identifier(matchingRowsIdentifier)}
+            where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
+          ) > (
+            select count(*) from ${sql.identifier(resultsIdentifier)}
+          )
+          `
+    const hasPreviousPageSql =
+      last != null
+        ? sql.query`
+          (
+            select count(*) from ${sql.identifier(matchingRowsIdentifier)}
+            where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
+          ) > (
+            select count(*) from ${sql.identifier(resultsIdentifier)}
+          )
+          `
+        : (
+          afterCursor
+          ? sql.query`
+            exists(
+              select 1 from ${sql.identifier(matchingRowsIdentifier)}
+              where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
+            )
+            `
+          : sql.query`false`
+          )
     const query = sql.compile(sql.query`
       with ${sql.identifier(matchingRowsIdentifier)} as (
         select *
@@ -87,8 +127,6 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         -- get included.
         where
           ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
-          ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
-          ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
           ${conditionSql}
       ), ${sql.identifier(resultsIdentifier)} as (
         select json_build_object(
@@ -96,6 +134,11 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
           'cursor', json_build_array(${sql.join(pgAttributes.map(pgAttribute => sql.identifier(pgAttribute.name)), ', ')})
         ) as ${sql.identifier(jsonIdentifier)}
         from ${sql.identifier(matchingRowsIdentifier)}
+
+        where
+          ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
+          ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')}
+
         -- Order using the same attributes used to construct the cursors. If
         -- a last property was defined we need to reverse our ordering so the
         -- limit will work. We will fix the order in JavaScript.
@@ -110,8 +153,8 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
       )
       select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
-      false as "hasNextPage",
-      false as "hasPreviousPage"
+      ${hasNextPageSql} as "hasNextPage",
+      ${hasPreviousPageSql} as "hasPreviousPage"
     `)
 
     const { rows: [{rows, hasNextPage, hasPreviousPage}] } = await client.query(query)
@@ -137,37 +180,8 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
       // Gets whether or not we have more values to paginate through by
       // running a simple, efficient Sql query to test.
-      hasNextPage: async (): Promise<boolean> => {
-        const lastValue = values[values.length - 1]
-        const lastCursor = lastValue ? lastValue.cursor : beforeCursor
-        if (lastCursor == null) return false
-
-        const { rowCount } = await client.query(sql.compile(sql.query`
-          select null
-          from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
-          limit 1
-        `))
-
-        return rowCount !== 0
-      },
-
-      // Gets whether or not we have more values to paginate through by
-      // running a simple, efficient Sql query to test.
-      hasPreviousPage: async (): Promise<boolean> => {
-        const firstValue = values[0]
-        const firstCursor = firstValue ? firstValue.cursor : afterCursor
-        if (firstCursor == null) return false
-
-        const { rowCount } = await client.query(sql.compile(sql.query`
-          select null
-          from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}
-          limit 1
-        `))
-
-        return rowCount !== 0
-      },
+      hasNextPage: () => Promise.resolve(hasNextPage),
+      hasPreviousPage: () => Promise.resolve(hasPreviousPage),
     }
   }
 
