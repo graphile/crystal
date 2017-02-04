@@ -160,18 +160,17 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         offset ${offsetSql}
         limit ${limit != null ? sql.value(limit) : sql.query`all`}
       )
-      select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "values",
+      select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
       (${hasNextPageSql})::boolean as "hasNextPage",
       (${offsetSql} > 0)  as "hasPreviousPage"
     `)
 
     // Send our query to Postgres.
-    const { rows } = await client.query(query)
-    const {values: rawValues, hasNextPage, hasPreviousPage} = rows[0]
+    const { rows: [{rows, hasNextPage, hasPreviousPage}] } = await client.query(query)
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =
-      rawValues.map(({ value, cursor}, i) => ({
+      rows.map(({ value, cursor}, i) => ({
         value: this.pgPaginator.itemType.transformPgValueIntoValue(value),
         cursor,
       }))
