@@ -129,7 +129,10 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage") from (${query}) as ${sql.identifier(alias)})`
       },
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
-        const value = source.get(sqlName(null, resolveInfo.fieldName, args, resolveInfo.alias && resolveInfo.alias.value))
+        // 🔥 Need to apply this to the other places that user alias too!
+        const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
+        const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
+        const value = source.get(sqlName(null, resolveInfo.fieldName, args, alias))
         // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
         const {ordering, orderingName, input, pageConfig} = getOrdering(
           Symbol(), // <-- this doesn't matter during resolve

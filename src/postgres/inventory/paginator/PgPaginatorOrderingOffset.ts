@@ -40,17 +40,12 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     this.orderBy = config.orderBy
   }
 
-  /**
-   * Reads a single page using the offset ordering strategy.
-   */
-  public async readPage (
-    context: mixed,
+  public generateQuery (
     input: TInput,
-    config: Paginator.PageConfig<OffsetCursor>,
+    config: Paginator.PageConfig<AttributesCursor>,
     resolveInfo: mixed,
     gqlType: mixed,
-  ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
-    const client = pgClientFromContext(context)
+  ) {
     const { first, last, beforeCursor, afterCursor, _offset } = config
 
     // Do not allow `first` and `last` to be defined at the same time. THERE
@@ -143,7 +138,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     const jsonIdentifier = Symbol()
     // Construct our Sql query that will actually do the selecting.
-    const query = sql.compile(sql.query`
+    const query = sql.query`
       with ${sql.identifier(matchingRowsIdentifier)} as (
         select *
         from ${fromSql} as ${sql.identifier(aliasIdentifier)}
@@ -163,10 +158,33 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
       (${hasNextPageSql})::boolean as "hasNextPage",
       (${offsetSql} > 0)  as "hasPreviousPage"
-    `)
+    `
 
+    return {query}
+  }
+
+  /**
+   * Reads a single page using the offset ordering strategy.
+   */
+  public async readPage (
+    context: mixed,
+    input: TInput,
+    config: Paginator.PageConfig<OffsetCursor>,
+    resolveInfo: mixed,
+    gqlType: mixed,
+  ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
+    const details = this.generateQuery(input, config, resolveInfo, gqlType);
+    const {query} = details
+    const compiledQuery = sql.compile(query)
+
+    const client = pgClientFromContext(context)
     // Send our query to Postgres.
-    const { rows: [{rows, hasNextPage, hasPreviousPage}] } = await client.query(query)
+    const { rows: [value] } = await client.query(compiledQuery)
+    return this.valueToPage(value, details)
+  }
+
+  public valueToPage (value, _details) {
+    const {rows, hasNextPage, hasPreviousPage} = value
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =
