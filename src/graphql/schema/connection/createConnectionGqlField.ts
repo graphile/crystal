@@ -25,6 +25,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
+  subquery?: boolean = false,
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
@@ -38,7 +39,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     offset?: number,
   }
 
-  return {
+  const result = {
     description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
     args: buildObject<GraphQLArgumentConfig>([
@@ -69,14 +70,9 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       // condition.
       ...(config.inputArgEntries ? config.inputArgEntries : []),
     ]),
-    // Note that this resolver is an arrow function. This is so that we can
-    // keep the correct `this` reference.
-    async resolve <TCursor>(
-      source: TSource,
-      args: ConnectionArgs<TCursor>,
-      context: mixed,
-      resolveInfo: mixed,
-    ): Promise<Connection<TInput, TItemValue, TCursor>> {
+  };
+  const getOrdering =
+    (sourceOrAliasIdentifier, args) => {
       const {
         orderBy: orderingName,
         before: beforeCursor,
@@ -100,7 +96,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         throw new Error('Cannot use `before`/`after` cursors with `offset`!')
 
       // Get our input.
-      const input = config.getPaginatorInput(source, args)
+      const input = config.getPaginatorInput(sourceOrAliasIdentifier, args)
 
       // Construct the page config.
       const pageConfig: Paginator.PageConfig<TCursor> = {
@@ -114,17 +110,58 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       // Get our ordering.
       const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
 
-      // Finally, actually get the page data.
-      const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
-
       return {
-        paginator,
         orderingName,
+        ordering,
         input,
-        page,
+        pageConfig,
       }
-    },
+    }
+  if (subquery) {
+    const sqlName = (_, args, alias) => `${fieldName}###${alias || ''}`,
+    Object.assign(result, {
+      sqlName,
+      sqlExpression: (aliasIdentifier, args, resolveInfo) => {
+        const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
+        const sql = ordering.getSQL(input, pageConfig, resolveInfo, gqlType)
+      },
+      async resolve (source, args, context, resolveInfo): Promise<mixed> {
+        const value = source.get(sqlName(null, args, resolveInfo.alias && resolveInfo.alias.value))
+        // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
+        const {ordering, orderingName, input} = getOrdering(
+          Symbol(), // <-- this doesn't matter during resolve
+          args
+        )
+        return {
+          paginator,
+          orderingName,
+          input,
+          page: value,
+        }
+      }
+    })
+  } else {
+    Object.assign(result, {
+      async resolve <TCursor>(
+        source: TSource,
+        args: ConnectionArgs<TCursor>,
+        context: mixed,
+        resolveInfo: mixed,
+      ): Promise<Connection<TInput, TItemValue, TCursor>> {
+        const {ordering, orderingName, input, pageConfig} = getOrdering(source, args)
+        // Finally, actually get the page data.
+        const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
+
+        return {
+          paginator,
+          orderingName,
+          input,
+          page,
+        }
+      },
+    })
   }
+  return result
 }
 
 const getConnectionGqlType = memoize2(_createConnectionGqlType)
