@@ -82,7 +82,6 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       return _count
     }
 
-    let offset: number
     let limit: number | null
 
     // If `last` is not defined (which means `first` might be defined), *or*
@@ -95,12 +94,16 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     // is *less* then the range defined in `last`.
     //
     // In this first block we can consider ourselves paginating *forwards*.
+    const aliasIdentifier = Symbol()
+    const matchingRowsIdentifier = Symbol()
+    const resultsIdentifier = Symbol()
+    let offsetSql
     if (last == null || (last != null && beforeCursor != null && beforeCursor - (afterCursor != null ? afterCursor : 0) <= last)) {
       // Start selecting at the offset specified by `after`. If there is no
       // after, we start selecting at the beginning (0).
       //
       // Also add our offset if given one.
-      offset = (afterCursor != null ? afterCursor : 0) + (_offset || 0)
+      const offset = (afterCursor != null ? afterCursor : 0) + (_offset || 0)
 
       // Next create our limit (what we will be selecting to relative to our
       // `offset`).
@@ -108,43 +111,69 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         beforeCursor != null ? Math.min((beforeCursor - 1) - offset, first != null ? first : Infinity) :
         first != null ? first :
         null
+      offsetSql = sql.value(offset)
     }
     // Otherwise in this block, we will be paginating *backwards*.
     else {
       // Calculate the `offset` by doing some maths. We may need to get the
       // count from the database on this one.
-      offset =
-        beforeCursor != null
-          ? beforeCursor - last - 1
-          : Math.max(await getCount() - last, afterCursor != null ? afterCursor : -Infinity)
+      if (beforeCursor != null) {
+        const offset = beforeCursor - last - 1
+        offsetSql = sql.value(offset)
+      } else {
+        const countSql = sql.query`(select count(*) from ${sql.identifier(matchingRowsIdentifier)})`
+        offsetSql =
+          afterCursor != null
+            ? sql.query`greatest(${countSql} - ${sql.value(last)}::integer, ${sql.value(afterCursor)}, 0)`
+            : sql.query`greatest(${countSql} - ${sql.value(last)}::integer, 0)`
+      }
 
       // The limit should always simply be `last`. Except in one case, but
       // that case is handled above.
       limit = last
     }
 
-    const aliasIdentifier = Symbol()
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
+    const hasNextPageSql =
+      limit != null
+        ? sql.query`${offsetSql} + ${sql.value(limit)} < (select count(*) from ${sql.identifier(matchingRowsIdentifier)})`
+        : sql.value(false)
+
+    const jsonIdentifier = Symbol()
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
-      select ${getSelectFragment(resolveInfo, aliasIdentifier, gqlType)} as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
-      where ${conditionSql}
-      ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
-      offset ${sql.value(offset)}
-      limit ${limit != null ? sql.value(limit) : sql.query`all`}
+      with ${sql.identifier(matchingRowsIdentifier)} as (
+        select *
+        from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+        where ${conditionSql}
+      ), ${sql.identifier(resultsIdentifier)} as (
+        select json_build_object(
+          'value', ${getSelectFragment(resolveInfo, matchingRowsIdentifier, gqlType)},
+          'cursor', ${offsetSql} + 1 + row_number() over (
+            ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query`order by 0`}
+          )
+        ) as ${sql.identifier(jsonIdentifier)}
+        from ${sql.identifier(matchingRowsIdentifier)}
+        ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
+        offset ${offsetSql}
+        limit ${limit != null ? sql.value(limit) : sql.query`all`}
+      )
+      select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "values",
+      (${hasNextPageSql})::boolean as "hasNextPage",
+      (${offsetSql} > 0)  as "hasPreviousPage"
     `)
 
     // Send our query to Postgres.
     const { rows } = await client.query(query)
+    const {values: rawValues, hasNextPage, hasPreviousPage} = rows[0]
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =
-      rows.map(({ value }, i) => ({
+      rawValues.map(({ value, cursor}, i) => ({
         value: this.pgPaginator.itemType.transformPgValueIntoValue(value),
-        cursor: offset + 1 + i,
+        cursor,
       }))
 
     // TODO: We get the count in this function (see `getCount`) to paginate
@@ -155,8 +184,8 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       // We have super simple implementations for `hasNextPage` and
       // `hasPreviousPage` thanks to the algebraic nature of ordering by
       // offset.
-      hasNextPage: async () => offset + (limit != null ? limit : Infinity) < await getCount(),
-      hasPreviousPage: () => Promise.resolve(offset > 0),
+      hasNextPage: () => Promise.resolve(hasNextPage),
+      hasPreviousPage: () => Promise.resolve(hasPreviousPage),
     }
   }
 }
