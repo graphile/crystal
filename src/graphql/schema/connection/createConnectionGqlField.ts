@@ -126,12 +126,12 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
         const alias = Symbol();
         const {query} = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
-        return sql.query`to_json((${)query})`
+        return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage") from (${query}) as ${sql.identifier(alias)})`
       },
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
-        const value = source.get(sqlName(null, null, args, resolveInfo.alias && resolveInfo.alias.value))
+        const value = source.get(sqlName(null, resolveInfo.fieldName, args, resolveInfo.alias && resolveInfo.alias.value))
         // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
-        const {ordering, orderingName, input} = getOrdering(
+        const {ordering, orderingName, input, pageConfig} = getOrdering(
           Symbol(), // <-- this doesn't matter during resolve
           args
         )

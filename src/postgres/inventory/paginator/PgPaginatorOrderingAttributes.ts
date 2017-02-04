@@ -70,48 +70,10 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
-    const hasNextPageSql =
-      last != null
-        ? (
-          beforeCursor
-          ? sql.query`
-            exists(
-              select 1 from ${sql.identifier(matchingRowsIdentifier)}
-              where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
-            )
-            `
-          : sql.query`false`
-          )
-        : sql.query`
-          (
-            select count(*) from ${sql.identifier(matchingRowsIdentifier)}
-            where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
-          ) > (
-            select count(*) from ${sql.identifier(resultsIdentifier)}
-          )
-          `
-    const hasPreviousPageSql =
-      last != null
-        ? sql.query`
-          (
-            select count(*) from ${sql.identifier(matchingRowsIdentifier)}
-            where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
-          ) > (
-            select count(*) from ${sql.identifier(resultsIdentifier)}
-          )
-          `
-        : (
-          afterCursor
-          ? sql.query`
-            exists(
-              select 1 from ${sql.identifier(matchingRowsIdentifier)}
-              where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
-            )
-            `
-          : sql.query`false`
-          )
-    const query = sql.query`
-      with ${sql.identifier(matchingRowsIdentifier)} as (
+    // Poor-man's WITH clause (because this needs to run in subqueries)
+    const matchingRowsSql =
+      sql.query`
+        (
         select *
         from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
@@ -123,12 +85,55 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         where
           ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
           ${conditionSql}
-      ), ${sql.identifier(resultsIdentifier)} as (
+        )
+        `;
+
+    const hasNextPageSql =
+      last != null
+        ? (
+          beforeCursor
+          ? sql.query`
+            exists(
+              select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+              where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
+            )
+            `
+          : sql.query`false`
+          )
+        : sql.query`
+          (
+            select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+            where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
+          ) > count(*)
+          `
+    const hasPreviousPageSql =
+      last != null
+        ? sql.query`
+          (
+            select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+            where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
+          ) > count(*)
+          `
+        : (
+          afterCursor
+          ? sql.query`
+            exists(
+              select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+              where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
+            )
+            `
+          : sql.query`false`
+          )
+    const query = sql.query`
+      select coalesce(json_agg(${sql.identifier(jsonIdentifier)}), '[]'::json) as "rows",
+      ${hasNextPageSql} as "hasNextPage",
+      ${hasPreviousPageSql} as "hasPreviousPage"
+      from (
         select json_build_object(
           'value', ${getSelectFragment(resolveInfo, matchingRowsIdentifier, gqlType)},
           'cursor', json_build_array(${sql.join(pgAttributes.map(pgAttribute => sql.identifier(pgAttribute.name)), ', ')})
         ) as ${sql.identifier(jsonIdentifier)}
-        from ${sql.identifier(matchingRowsIdentifier)}
+        from ${matchingRowsSql} as ${sql.identifier(matchingRowsIdentifier)}
 
         where
           ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
@@ -146,10 +151,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
         -- If we have an offset, add that as well.
         ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
-      )
-      select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
-      ${hasNextPageSql} as "hasNextPage",
-      ${hasPreviousPageSql} as "hasPreviousPage"
+      ) as ${sql.identifier(resultsIdentifier)}
     `)
     return {query, last}
   }
