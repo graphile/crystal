@@ -18,7 +18,7 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
       attrName =>  {
         const fld = targetGqlType._fields[attrName]
         if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlExpression) {
-          fields[fld.sqlName(aliasIdentifier)] = fld.sqlExpression(aliasIdentifier);
+          fields[fld.sqlName(aliasIdentifier, attrName)] = fld.sqlExpression(aliasIdentifier, attrName);
         }
       }
     )
@@ -48,14 +48,15 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       // Introspection related
       return;
     }
+    const fieldName = queryAST.name.value
     const field = getFieldFromAST(queryAST, parentGqlType)
     const fieldGqlType = stripNonNullType(field.type)
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
       const args = getArgumentValues(field, queryAST, variableValues)
       const alias = queryAST.alias && queryAST.alias.value
       if (field.sqlExpression) {
-        const sqlName = field.sqlName(aliasIdentifier, args, alias)
-        fields[sqlName] = field.sqlExpression(aliasIdentifier, args);
+        const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
+        fields[sqlName] = field.sqlExpression(aliasIdentifier, fieldName, args);
       }
       return;
     }
