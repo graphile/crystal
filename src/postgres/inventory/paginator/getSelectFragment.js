@@ -17,8 +17,8 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
     Object.keys(targetGqlType._fields).forEach(
       attrName =>  {
         const fld = targetGqlType._fields[attrName]
-        if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlExpression) {
-          fields[fld.sqlName(aliasIdentifier, attrName)] = fld.sqlExpression(aliasIdentifier, attrName);
+        if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlField) {
+          fields[fld.sqlName(aliasIdentifier, attrName)] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fld.sqlField)}`;
         }
       }
     )
@@ -54,7 +54,10 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
       const args = getArgumentValues(field, queryAST, variableValues)
       const alias = queryAST.alias && queryAST.alias.value
-      if (field.sqlExpression) {
+      if (field.sqlField) {
+        const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
+        fields[sqlName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.sqlField)}`;
+      } else if (field.sqlExpression) {
         const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
         // XXX: is this sufficient?
         const resolveInfo = {
