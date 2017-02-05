@@ -1,6 +1,6 @@
 # Command Line Interface
 
-The easiest way to get up and runnign with PostGraphQL is to use the Command Line Interface.
+The easiest way to get up and running with PostGraphQL is to use the Command Line Interface.
 
 Just install PostGraphQL globally with npm:
 
