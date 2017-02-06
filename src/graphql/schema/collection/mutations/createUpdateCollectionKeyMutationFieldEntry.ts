@@ -42,7 +42,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
       }],
     ],
     payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
-    execute: (context, input) =>
-      collectionKey.update!(context, inputHelpers.getKeyFromInput(input), patchFromGqlInput(input[patchFieldName] as {})),
+    execute: (context, input, resolveInfo) =>
+      collectionKey.update!(context, inputHelpers.getKeyFromInput(input), patchFromGqlInput(input[patchFieldName] as {}), resolveInfo),
   })]
 }

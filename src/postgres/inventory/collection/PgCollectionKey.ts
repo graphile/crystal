@@ -222,10 +222,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * This method, unlike many of the other asynchronous actions in Postgres
    * collections, is not batched.
    */
-  public update: ((context: mixed, key: PgClassType.Value, patch: Map<string, mixed>) => Promise<PgClassType.Value | null>) | null = (
+  public update: ((context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: mixed, key: PgClassType.Value, patch: Map<string, mixed>): Promise<PgClassType.Value> => {
+      : async (context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo): Promise<PgClassType.Value> => {
         const client = pgClientFromContext(context)
 
         const updatedIdentifier = Symbol()
@@ -270,10 +270,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    *
    * This method, unlike many others in Postgres collections, is not batched.
    */
-  public delete: ((context: mixed, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
+  public delete: ((context: mixed, key: PgClassType.Value, resolveInfo) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: mixed, key: PgClassType.Value): Promise<PgClassType.Value> => {
+      : async (context: mixed, key: PgClassType.Value, resolveInfo): Promise<PgClassType.Value> => {
         const client = pgClientFromContext(context)
 
         const deletedIdentifier = Symbol()

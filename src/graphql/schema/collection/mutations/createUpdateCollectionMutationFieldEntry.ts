@@ -58,13 +58,13 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
     payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
     // Execute by deserializing the id into its component parts and update a
     // value in the collection using that key.
-    execute: (context, input) => {
+    execute: (context, input, resolveInfo) => {
       const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
 
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.update!(context, result.keyValue, patchFromGqlInput(input[patchFieldName] as {}))
+      return primaryKey.update!(context, result.keyValue, patchFromGqlInput(input[patchFieldName] as {}), resolveInfo)
     },
   })]
 }

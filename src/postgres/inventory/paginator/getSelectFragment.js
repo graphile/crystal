@@ -35,8 +35,7 @@ export function getSelectFragmentFromFields(fields) {
 
 export default function getSelectFragment(resolveInfo, aliasIdentifier, targetGqlType) {
   if (!resolveInfo) {
-    if (!process.env.WHATEVER) console.error("This won't work much longer! Just a hack to keep the tests working")
-    return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
+    throw new Error("No resolve info!")
   }
   return getSelectFragmentFromFields(getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, targetGqlType))
 }
