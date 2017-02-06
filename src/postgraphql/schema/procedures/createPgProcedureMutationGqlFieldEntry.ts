@@ -108,10 +108,10 @@ export default function createPgProcedureMutationGqlFieldEntry (
       const aliasIdentifier = Symbol()
 
       const query = sql.compile(
-        // If the procedure returns a set, we must select a set of values.
-        pgProcedure.returnsSet
-          ? sql.query`select to_json(${sql.identifier(aliasIdentifier)}) as value from ${procedureCall} as ${sql.identifier(aliasIdentifier)}`
-          : sql.query`select to_json(${procedureCall}) as value`,
+        return sql.query`
+          select to_json(${sql.identifier(aliasIdentifier)}) as value
+          from ${procedureCall} as ${sql.identifier(aliasIdentifier)}
+        `
       )
 
       const { rows } = await client.query(query)
