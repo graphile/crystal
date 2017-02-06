@@ -122,7 +122,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     const hasNextPageSql =
       limit != null
-        ? sql.query`${offsetSql} + ${sql.value(limit)} < (select count(*) from ${sql.identifier(matchingRowsIdentifier)})`
+        ? sql.query`${offsetSql}::integer + ${sql.value(limit)}::integer < (select count(*) from ${sql.identifier(matchingRowsIdentifier)})`
         : sql.value(false)
 
     const totalCountSql =
@@ -138,9 +138,9 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       ), ${sql.identifier(resultsIdentifier)} as (
         select json_build_object(
           'value', ${getSelectFragment(resolveInfo, matchingRowsIdentifier, gqlType)},
-          'cursor', ${offsetSql} + row_number() over (
+          'cursor', ${offsetSql}::integer + (row_number() over (
             ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query`order by 0`}
-          )
+          ))::integer
         ) as ${sql.identifier(jsonIdentifier)}
         from ${sql.identifier(matchingRowsIdentifier)}
         ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
@@ -148,7 +148,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         limit ${limit != null ? sql.value(limit) : sql.query`all`}
       )
       select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
-      (${totalCountSql}) as "totalCount",
+      (${totalCountSql})::integer as "totalCount",
       (${hasNextPageSql})::boolean as "hasNextPage",
       (${offsetSql} > 0) as "hasPreviousPage"
     `

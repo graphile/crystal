@@ -134,7 +134,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     // hasNextPageSql/hasPreviousPageSql to the query unless they're requested
     const query = sql.query`
       select coalesce(json_agg(${sql.identifier(jsonIdentifier)}), '[]'::json) as "rows",
-      ${totalCountSql} as "totalCount",
+      ${totalCountSql}::integer as "totalCount",
       ${hasNextPageSql} as "hasNextPage",
       ${hasPreviousPageSql} as "hasPreviousPage"
       from (
