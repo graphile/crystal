@@ -57,11 +57,12 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       const input = argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))
       const aliasIdentifier = Symbol()
       const query = sql.compile(sql.query`
-        select ${getSelectFragment(resolveInfo, aliasIdentifier, fixtures.return.gqlType)} as value
+        select ${getSelectFragment(resolveInfo, aliasIdentifier, fixtures.return.gqlType)} as value,
+        (${sql.identifier(aliasIdentifier)} is null) as is_null
         from ${createPgProcedureSqlCall(fixtures, input)} as ${sql.identifier(aliasIdentifier)}
       `)
       const { rows: [row] } = await client.query(query)
-      return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
+      return row && !row['is_null'] ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
     },
   }]
 }
