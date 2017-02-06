@@ -2,6 +2,9 @@ import { sql } from '../../utils'
 import { typeFromAST } from 'graphql'
 import { getArgumentValues } from 'graphql/execution/values'
 
+const QUERY = "QUERY"
+const SQL_EXPRESSION = "SQL_EXPRESSION"
+
 export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTargetGqlType) {
   const targetGqlType = stripNonNullType(rawTargetGqlType)
   const {parentType: parentGqlType, variableValues, fragments, schema} = resolveInfo
@@ -18,7 +21,14 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
 export function getSelectFragmentFromFields(fields) {
   const buildArgs = [];
   for (var k in fields) {
-    buildArgs.push(sql.literal(k), fields[k]);
+    const field = fields[k];
+    const arg = {
+      QUERY: field => field.query,
+      SQL_EXPRESSION: field => {
+        return field.sqlExpression(field.aliasIdentifier, field.fieldName, field.args, field.resolveInfo)
+      },
+    }[field.type](field);
+    buildArgs.push(sql.literal(k), arg);
   }
   return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
 }
@@ -46,13 +56,19 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       if (field.externalFieldNameDependencies) {
         field.externalFieldNameDependencies.forEach(
           externalFieldName => {
-            fields[externalFieldName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(externalFieldName)}`
+            fields[externalFieldName] = {
+              type: QUERY,
+              query: sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(externalFieldName)}`,
+            }
           }
         )
       }
       if (field.externalFieldName) {
         const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : field.externalFieldName
-        fields[sourceName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`;
+        fields[sourceName] = {
+          type: QUERY,
+          query: sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`,
+        }
       } else if (field.sqlExpression) {
         const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : fieldName
         // XXX: is this sufficient?
@@ -65,7 +81,29 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
             queryAST,
           ],
         }
-        fields[sourceName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo)
+        if (fields[sourceName]) {
+          const existingEntry = fields[sourceName]
+          for (var k in resolveInfo) {
+            if (Object.prototype.hasOwnProperty.call(resolveInfo, k) && k !== 'fieldASTs' && (existingEntry.resolveInfo[k] !== resolveInfo[k])) {
+              throw new Error(`Inconsistency detected ${k}`)
+            }
+          }
+          if (existingEntry.sqlExpression !== field.sqlExpression
+            || existingEntry.aliasIdentifier !== aliasIdentifier
+            || existingEntry.fieldName !== fieldName) {
+            throw new Error("Inconsistency detected!")
+          }
+          existingEntry.resolveInfo.fieldASTs.push(...resolveInfo.fieldASTs)
+        } else {
+          fields[sourceName] = {
+            type: SQL_EXPRESSION,
+            sqlExpression: field.sqlExpression,
+            aliasIdentifier,
+            fieldName,
+            args,
+            resolveInfo,
+          };
+        }
       }
       return;
     }
