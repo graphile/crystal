@@ -62,7 +62,9 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     },
 
     async resolve (source, args, context, resolveInfo): Promise<mixed> {
-      const value = source.get(sourceName(null, null, args, resolveInfo.alias && resolveInfo.alias.value))
+      const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
+      const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
+      const value = source.get(sourceName(null, null, args, alias))
       return fixtures.return.intoGqlOutput(value)
     },
   }]

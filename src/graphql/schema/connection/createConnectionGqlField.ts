@@ -129,7 +129,6 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage", 'totalCount', "totalCount") from (${query}) as ${sql.identifier(alias)})`
       },
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
-        // 🔥 Need to apply this to the other places that user alias too!
         const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
         const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
         const value = source.get(sourceName(null, resolveInfo.fieldName, args, alias))
