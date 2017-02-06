@@ -50,8 +50,8 @@ class PgProcedurePaginator<TItemValue> extends PgPaginator<ProcedureInput, TItem
    * The from entry for this paginator is a Postgres function call where the
    * procedure is the function being called.
    */
-  public getFromEntrySql (input: ProcedureInput): sql.Sql {
-    return createPgProcedureSqlCall(this._fixtures, input)
+  public getFromEntrySql (input: ProcedureInput, firstArgumentIsTableName = false): sql.Sql {
+    return createPgProcedureSqlCall(this._fixtures, input, firstArgumentIsTableName)
   }
 
   /**

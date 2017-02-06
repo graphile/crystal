@@ -45,6 +45,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     config: Paginator.PageConfig<AttributesCursor>,
     resolveInfo: mixed,
     gqlType: mixed,
+    subquery?: boolean = true,
   ) {
     const { first, last, beforeCursor, afterCursor, _offset } = config
 
@@ -116,7 +117,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       limit = last
     }
 
-    const fromSql = this.pgPaginator.getFromEntrySql(input)
+    const fromSql = this.pgPaginator.getFromEntrySql(input, subquery)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
     const hasNextPageSql =
@@ -165,7 +166,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     resolveInfo: mixed,
     gqlType: mixed,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
-    const details = this.generateQuery(input, config, resolveInfo, gqlType);
+    const details = this.generateQuery(input, config, resolveInfo, gqlType, false);
     const {query} = details
     const compiledQuery = sql.compile(query)
 
