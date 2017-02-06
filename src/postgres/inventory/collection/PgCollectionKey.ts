@@ -207,6 +207,11 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           return values.get(keyString) || null
         })
       },
+      {
+        // If we come back later but requesting more fields, we may need to refetch so disable per-key results caching
+        cache: false,
+        // XXX: implement cacheKeyFn
+      },
     )
   }
 
