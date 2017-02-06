@@ -14,11 +14,13 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
   );
   // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
   if (true /* THIS IS A HACK, DO NOT USE THIS */) {
+    // 🔥 This is missing sort keys, and so cannot generate cursors in may cases
     Object.keys(targetGqlType._fields).forEach(
       attrName =>  {
-        const fld = targetGqlType._fields[attrName]
-        if ((attrName === "id" || attrName.endsWith("Id")) && fld.sqlField) {
-          fields[fld.sqlName(aliasIdentifier, attrName)] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fld.sqlField)}`;
+        const field = targetGqlType._fields[attrName]
+        if ((attrName === "id" || attrName.endsWith("Id")) && field.externalFieldName) {
+          const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, attrName) : field.externalFieldName
+          fields[sourceName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`
         }
       }
     )
@@ -54,11 +56,11 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
       const args = getArgumentValues(field, queryAST, variableValues)
       const alias = queryAST.alias && queryAST.alias.value
-      if (field.sqlField) {
-        const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
-        fields[sqlName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.sqlField)}`;
+      if (field.externalFieldName) {
+        const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : field.externalFieldName
+        fields[sourceName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`;
       } else if (field.sqlExpression) {
-        const sqlName = field.sqlName(aliasIdentifier, fieldName, args, alias)
+        const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : fieldName
         // XXX: is this sufficient?
         const resolveInfo = {
           parentType: parentGqlType,
@@ -69,7 +71,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
             queryAST,
           ],
         }
-        fields[sqlName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo);
+        fields[sourceName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo);
       }
       return;
     }

@@ -119,9 +119,9 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       }
     }
   if (subquery) {
-    const sqlName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
+    const sourceName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
     Object.assign(result, {
-      sqlName,
+      sourceName,
       sqlExpression: (aliasIdentifier, fieldName, args, resolveInfo) => {
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
         const alias = Symbol();
@@ -132,7 +132,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         // 🔥 Need to apply this to the other places that user alias too!
         const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
         const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
-        const value = source.get(sqlName(null, resolveInfo.fieldName, args, alias))
+        const value = source.get(sourceName(null, resolveInfo.fieldName, args, alias))
         // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
         const {ordering, orderingName, input, pageConfig} = getOrdering(
           Symbol(), // <-- this doesn't matter during resolve

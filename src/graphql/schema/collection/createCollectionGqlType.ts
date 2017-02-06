@@ -52,8 +52,7 @@ export default function createCollectionGqlType<TValue> (
             value: {
               description: field.description,
               type: gqlType,
-              sqlName: () => fieldName,
-              sqlField: fieldName,
+              externalFieldName: fieldName,
               resolve: (value) => {
                 return value.get(fieldName)
               }
