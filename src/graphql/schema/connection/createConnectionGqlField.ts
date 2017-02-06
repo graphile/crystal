@@ -187,6 +187,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
+    // When performing optimisations, this is useful when parsing the resolveInfo AST tree:
     relatedGqlType: gqlType,
     fields: () => ({
       pageInfo: {
@@ -230,6 +231,7 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
+    // When performing optimisations, this is useful when parsing the resolveInfo AST tree:
     relatedGqlType: gqlType,
     fields: () => ({
       cursor: {
