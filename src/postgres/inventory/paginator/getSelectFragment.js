@@ -12,19 +12,6 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
       parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
     }
   );
-  // XXX: Get REQUIRED expressions (e.g. for __id / pagination / etc)
-  if (true /* THIS IS A HACK, DO NOT USE THIS */) {
-    // 🔥 This is missing sort keys, and so cannot generate cursors in may cases
-    Object.keys(targetGqlType._fields).forEach(
-      attrName =>  {
-        const field = targetGqlType._fields[attrName]
-        if ((attrName === "id" || attrName.endsWith("Id")) && field.externalFieldName) {
-          const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, attrName) : field.externalFieldName
-          fields[sourceName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`
-        }
-      }
-    )
-  }
   return fields;
 }
 
@@ -56,6 +43,13 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
     if (parentGqlType === targetGqlType) { // We're a subfield of the target; HOORAY!
       const args = getArgumentValues(field, queryAST, variableValues)
       const alias = queryAST.alias && queryAST.alias.value
+      if (field.externalFieldNameDependencies) {
+        field.externalFieldNameDependencies.forEach(
+          externalFieldName => {
+            fields[externalFieldName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(externalFieldName)}`
+          }
+        )
+      }
       if (field.externalFieldName) {
         const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : field.externalFieldName
         fields[sourceName] = sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`;

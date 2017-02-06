@@ -37,6 +37,7 @@ export default function createCollectionGqlType<TValue> (
         primaryKey && [options.nodeIdFieldName, {
           description: 'A globally unique identifier. Can be used in various places throughout the system to identify this single value.',
           type: new GraphQLNonNull(GraphQLID),
+          externalFieldNameDependencies: primaryKey._keyTypeFields.map(([fieldName, field]) => fieldName),
           resolve: (value: TValue) => idSerde.serialize(collection, value),
         }],
       ],

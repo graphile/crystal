@@ -46,6 +46,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
             : formatName.field(`${headCollection.type.name}-by-${relation.name}`),
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this ${scrib.type(collectionGqlType)}.`,
+            externalFieldNameDependencies: relation._tailFieldNames,
             type: headCollectionGqlType,
             async resolve (source: TSource, _args: {}, context: mixed, resolveInfo: mixed): Promise<mixed> {
               const value = options.getCollectionValue(source)
