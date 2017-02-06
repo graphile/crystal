@@ -137,7 +137,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       ), ${sql.identifier(resultsIdentifier)} as (
         select json_build_object(
           'value', ${getSelectFragment(resolveInfo, matchingRowsIdentifier, gqlType)},
-          'cursor', ${offsetSql} + 1 + row_number() over (
+          'cursor', ${offsetSql} + row_number() over (
             ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query`order by 0`}
           )
         ) as ${sql.identifier(jsonIdentifier)}
