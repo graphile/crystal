@@ -80,21 +80,18 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
     if (typeof pgValue !== 'object')
       throw new Error(`Postgres value of object type must be an object, not '${typeof pgValue}'.`)
 
-    // Parse official pg fields
-    const obj = {};
-    Array.from(this.fields).filter<[string, mixed]>(([fieldName, field]) => pgValue.hasOwnProperty(field.pgAttribute.name)).map<[string, mixed]>(([fieldName, field]) => {
-      obj[fieldName] = field.type.transformPgValueIntoValue(pgValue[field.pgAttribute.name])
-    })
-    // Pass through other fields unchanged
+    const resultMap = new Map()
+    // Initially set all values verbatim
     for (const key in pgValue) {
-      obj[key] = pgValue[key];
+      if (Object.prototype.hasOwnProperty.call(pgValue, key)) {
+        resultMap.set(key, pgValue[key])
+      }
     }
-
-    const pairs = [];
-    for (const key in obj) {
-      pairs.push([key, obj[key]]);
-    }
-    return new Map(pairs)
+    // Now overwrite the official pg fields with parsed versions
+    Array.from(this.fields).filter<[string, mixed]>(([fieldName, field]) => pgValue.hasOwnProperty(field.pgAttribute.name)).forEach<[string, mixed]>(([fieldName, field]) => {
+      resultMap.set(fieldName, field.type.transformPgValueIntoValue(pgValue[field.pgAttribute.name]))
+    })
+    return resultMap;
   }
 
   /**
