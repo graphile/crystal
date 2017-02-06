@@ -5,6 +5,7 @@ import { EventEmitter } from 'events'
 import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
+import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
 
 type PostGraphQLOptions = {
@@ -130,6 +131,7 @@ export default function postgraphql (
     try {
       const pgClient = await pgPool.connect()
       const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
+      await exportPostGraphQLSchema(newGqlSchema, options)
 
       // If no release function exists, don’t release. This is just for tests.
       if (pgClient && pgClient.release)
