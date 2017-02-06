@@ -65,18 +65,6 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     if (beforeCursor != null && !Number.isInteger(beforeCursor))
       throw new Error('The before cursor must be an integer.')
 
-    // A private variable where we store the value returned by `getCount`.
-    let _count: number | undefined
-
-    // A local memoized implementation that gets the count of *all* values in
-    // the set we are paginating.
-    const getCount = async () => {
-      if (_count == null)
-        _count = await this.pgPaginator.count(context, input)
-
-      return _count
-    }
-
     let limit: number | null
 
     // If `last` is not defined (which means `first` might be defined), *or*
@@ -193,14 +181,8 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         cursor,
       }))
 
-    // TODO: We get the count in this function (see `getCount`) to paginate
-    // correctly. We should create an optimization that allows us to share
-    // what the count is instead of calling for the count again.
     return {
       values,
-      // We have super simple implementations for `hasNextPage` and
-      // `hasPreviousPage` thanks to the algebraic nature of ordering by
-      // offset.
       hasNextPage: () => Promise.resolve(hasNextPage),
       hasPreviousPage: () => Promise.resolve(hasPreviousPage),
     }

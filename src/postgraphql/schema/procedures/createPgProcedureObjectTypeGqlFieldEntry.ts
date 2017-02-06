@@ -57,8 +57,8 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     args: buildObject(argEntries),
     sourceName,
     sqlExpression: (aliasIdentifier, gqlFieldName, args, context) => {
-      const input = argEntries.map(([argName], i) => fixtures.args[i + 2].fromGqlInput(args[argName]))
-      return createPgProcedureSqlCall(fixtures, aliasIdentifier, input)
+      const input = [aliasIdentifier].concat(argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName])))
+      return createPgProcedureSqlCall(fixtures, input, true)
     },
 
     async resolve (source, args, context, resolveInfo): Promise<mixed> {
