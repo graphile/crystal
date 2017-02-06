@@ -124,8 +124,17 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
             `
           : sql.query`false`
           )
+    const totalCountSql =
+      sql.query`
+        (
+          select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+        )
+      `
+    // XXX: for performance, we should not add totalCountSql/
+    // hasNextPageSql/hasPreviousPageSql to the query unless they're requested
     const query = sql.query`
       select coalesce(json_agg(${sql.identifier(jsonIdentifier)}), '[]'::json) as "rows",
+      ${totalCountSql} as "totalCount",
       ${hasNextPageSql} as "hasNextPage",
       ${hasPreviousPageSql} as "hasPreviousPage"
       from (
@@ -177,7 +186,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
   }
 
   public valueToPage (value, {last}) {
-    const {rows, hasNextPage, hasPreviousPage} = value
+    const {rows, hasNextPage, hasPreviousPage, totalCount} = value
     // If `last` was defined we reversed the order in Sql so our limit would
     // work. We need to reverse again when we get here.
     // TODO: We could implement an `O(1)` reverse with iterators. Then we
@@ -201,6 +210,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       // running a simple, efficient Sql query to test.
       hasNextPage: () => Promise.resolve(hasNextPage),
       hasPreviousPage: () => Promise.resolve(hasPreviousPage),
+      totalCount: () => Promise.resolve(totalCount),
     }
   }
 

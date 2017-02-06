@@ -124,6 +124,9 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         ? sql.query`${offsetSql} + ${sql.value(limit)} < (select count(*) from ${sql.identifier(matchingRowsIdentifier)})`
         : sql.value(false)
 
+    const totalCountSql =
+      sql.query`select count(*) from ${sql.identifier(matchingRowsIdentifier)}`
+
     const jsonIdentifier = Symbol()
     // Construct our Sql query that will actually do the selecting.
     const query = sql.query`
@@ -144,8 +147,9 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
         limit ${limit != null ? sql.value(limit) : sql.query`all`}
       )
       select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
+      (${totalCountSql}) as "totalCount",
       (${hasNextPageSql})::boolean as "hasNextPage",
-      (${offsetSql} > 0)  as "hasPreviousPage"
+      (${offsetSql} > 0) as "hasPreviousPage"
     `
 
     return {query}
@@ -172,7 +176,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
   }
 
   public valueToPage (value, _details) {
-    const {rows, hasNextPage, hasPreviousPage} = value
+    const {rows, hasNextPage, hasPreviousPage, totalCount} = value
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =
@@ -185,6 +189,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       values,
       hasNextPage: () => Promise.resolve(hasNextPage),
       hasPreviousPage: () => Promise.resolve(hasPreviousPage),
+      totalCount: () => Promise.resolve(totalCount),
     }
   }
 }

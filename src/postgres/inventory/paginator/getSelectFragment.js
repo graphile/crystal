@@ -71,7 +71,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
             queryAST,
           ],
         }
-        fields[sourceName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo);
+        fields[sourceName] = field.sqlExpression(aliasIdentifier, fieldName, args, resolveInfo)
       }
       return;
     }

@@ -126,7 +126,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
         const alias = Symbol();
         const {query} = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
-        return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage") from (${query}) as ${sql.identifier(alias)})`
+        return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage", 'totalCount', "totalCount") from (${query}) as ${sql.identifier(alias)})`
       },
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
         // 🔥 Need to apply this to the other places that user alias too!
@@ -198,8 +198,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ input }, _args, context) =>
-          paginator.count(context, input),
+        resolve: async source => source.page.totalCount(),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
