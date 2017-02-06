@@ -26,7 +26,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
     subquery?: boolean = false,
-    relation: Relation,
+    relation?: Relation = null,
   },
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
@@ -123,7 +123,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     const sourceName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
     Object.assign(result, {
       sourceName,
-      externalFieldNameDependencies: config.relation._headFieldNames,
+      externalFieldNameDependencies: config.relation && config.relation._headFieldNames,
       sqlExpression: (aliasIdentifier, fieldName, args, resolveInfo) => {
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
         const alias = Symbol();

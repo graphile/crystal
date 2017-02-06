@@ -98,5 +98,6 @@ function createPgSetProcedureQueryGqlFieldEntry (
     inputArgEntries,
     getPaginatorInput: (source, args) =>
       [source, ...inputArgEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))],
-  }, true)]
+    subquery: true,
+  })]
 }
