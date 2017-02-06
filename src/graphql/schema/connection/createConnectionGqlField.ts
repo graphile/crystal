@@ -197,7 +197,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: async source => source.page.totalCount(),
+        resolve: source => source.page.totalCount(),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
