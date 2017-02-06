@@ -48,7 +48,7 @@ export default function createCollectionGqlType<TValue> (
           const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, field.type)
           const formattedFieldName = formatName.field(fieldName)
           return {
-            key: formattedFieldName
+            key: formattedFieldName,
             value: {
               description: field.description,
               type: gqlType,

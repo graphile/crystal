@@ -152,7 +152,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         -- If we have an offset, add that as well.
         ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
       ) as ${sql.identifier(resultsIdentifier)}
-    `)
+    `
     return {query, last}
   }
 
