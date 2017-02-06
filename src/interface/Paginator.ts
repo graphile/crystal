@@ -100,6 +100,11 @@ namespace Paginator {
       resolveInfo: mixed,
       gqlType: mixed,
     ): mixed
+
+    valueToPage (
+      value: mixed,
+      details: mixed,
+    ): mixed
   }
 
   /**
