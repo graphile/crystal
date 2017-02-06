@@ -100,7 +100,9 @@ export default function createCollectionGqlType<TValue> (
                   relation.getTailConditionFromHeadAlias!(aliasIdentifier),
                   conditionFromGqlInput(args.condition),
                 ),
-            }, true),
+              subquery: true,
+              relation,
+            }),
           ]
         }),
     ),
