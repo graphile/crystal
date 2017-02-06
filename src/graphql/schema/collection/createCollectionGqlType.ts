@@ -53,9 +53,7 @@ export default function createCollectionGqlType<TValue> (
               description: field.description,
               type: gqlType,
               externalFieldName: fieldName,
-              resolve: (value) => {
-                return value.get(fieldName)
-              }
+              resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value),
             },
           }
         },
