@@ -125,7 +125,7 @@ function createCollectionKeyField <TValue, TKey>(
     args: buildObject(inputHelpers.fieldEntries),
     async resolve (_source, args, context, resolveInfo): Promise<mixed> {
       const key = inputHelpers.getKeyFromInput(args)
-      const value = await collectionKey.read!(context, key, resolveInfo)
+      const value = await collectionKey.read!(context, key, resolveInfo, collectionGqlType)
       if (value == null) return
       return intoGqlOutput(value)
     },

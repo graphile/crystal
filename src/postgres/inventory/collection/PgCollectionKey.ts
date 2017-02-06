@@ -135,7 +135,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * @private
    */
   @memoizeMethod
-  private _getSelectLoader (client: Client, resolveInfo: mixed, collectionGqlType: mixed): DataLoader<PgClassType.Value, PgClassType.Value | null> {
+  private _getSelectLoader (client: Client): DataLoader<PgClassType.Value, PgClassType.Value | null> {
     return new DataLoader<PgClassType.Value, PgClassType.Value | null>(
       async (keysAndStuff: mixed): Promise<Array<PgClassType.Value | null>> => {
         const aliasIdentifier = Symbol()
