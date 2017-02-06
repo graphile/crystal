@@ -18,7 +18,7 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
 export function getSelectFragmentFromFields(fields) {
   const buildArgs = [];
   for (var k in fields) {
-    buildArgs.push(sql.query`${sql.value(k)}::text`, fields[k]);
+    buildArgs.push(sql.literal(k), fields[k]);
   }
   return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
 }
