@@ -8,6 +8,7 @@ import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import PgProcedurePaginator from './PgProcedurePaginator'
+import getSelectFragment from '../../../postgres/inventory/paginator/getSelectFragment'
 
 /**
  * Creates the fields for query procedures. Query procedures that return
@@ -51,10 +52,14 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
 
-    async resolve (_source, args, context): Promise<mixed> {
+    async resolve (_source, args, context, resolveInfo): Promise<mixed> {
       const client = pgClientFromContext(context)
       const input = argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))
-      const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
+      const aliasIdentifier = Symbol()
+      const query = sql.compile(sql.query`
+        select ${getSelectFragment(resolveInfo, aliasIdentifier, fixtures.return.gqlType)} as value
+        from ${createPgProcedureSqlCall(fixtures, input)} as ${sql.identifier(aliasIdentifier)}
+      `)
       const { rows: [row] } = await client.query(query)
       return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
     },

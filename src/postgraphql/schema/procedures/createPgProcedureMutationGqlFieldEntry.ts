@@ -18,6 +18,7 @@ import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import { getEdgeGqlType, createOrderByGqlArg } from '../../../graphql/schema/connection/createConnectionGqlField'
+import {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../paginator/getSelectFragment'
 
 /**
  * Creates a single mutation GraphQL field entry for our procedure. We use the
@@ -95,7 +96,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
     ],
 
     // Actually execute the procedure here.
-    async execute (context, gqlInput): Promise<mixed> {
+    async execute (context, gqlInput, resolveInfo): Promise<mixed> {
       const client = pgClientFromContext(context)
 
       // Turn our GraphQL input into an input tuple.
@@ -108,8 +109,8 @@ export default function createPgProcedureMutationGqlFieldEntry (
       const aliasIdentifier = Symbol()
 
       const query = sql.compile(
-        return sql.query`
-          select to_json(${sql.identifier(aliasIdentifier)}) as value
+        sql.query`
+          select ${getSelectFragment(resolveInfo, aliasIdentifier, fixtures.return.gqlType)} as value
           from ${procedureCall} as ${sql.identifier(aliasIdentifier)}
         `
       )
