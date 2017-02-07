@@ -161,6 +161,7 @@ const createGqlOutputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>
                   value: {
                     description: field.description,
                     type: gqlType,
+                    externalFieldName: fieldName,
                     resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
                   },
                 }
