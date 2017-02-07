@@ -133,19 +133,35 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       async resolve (source, args, context, resolveInfo): Promise<mixed> {
         const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
         const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
-        const value = source.get(sourceName(null, resolveInfo.fieldName, args, alias))
-        // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
-        const {ordering, orderingName, input, pageConfig} = getOrdering(
-          Symbol(), // <-- this doesn't matter during resolve
-          args
-        )
-        const details = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
-        const page = ordering.valueToPage(value, details)
-        return {
-          paginator,
-          orderingName,
-          input,
-          page,
+        const attrName = sourceName(null, resolveInfo.fieldName, args, alias)
+        if (source.has(attrName)) {
+          // Subquery successful
+          const value = source.get(attrName)
+          // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
+          const {ordering, orderingName, input, pageConfig} = getOrdering(
+            Symbol(), // <-- this doesn't matter during resolve
+            args
+          )
+          const details = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
+          const page = ordering.valueToPage(value, details)
+          return {
+            paginator,
+            orderingName,
+            input,
+            page,
+          }
+        } else {
+          // Subquery unsuccessful (e.g. computed column on a compound type); revert to direct select
+          const {ordering, orderingName, input, pageConfig} = getOrdering(source, args)
+          // Finally, actually get the page data.
+          const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
+
+          return {
+            paginator,
+            orderingName,
+            input,
+            page,
+          }
         }
       }
     })

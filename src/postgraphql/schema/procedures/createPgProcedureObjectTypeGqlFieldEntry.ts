@@ -64,8 +64,18 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     async resolve (source, args, context, resolveInfo): Promise<mixed> {
       const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
       const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
-      const value = source.get(sourceName(null, null, args, alias))
-      return value != null ? fixtures.return.intoGqlOutput(value) : null
+      const attrName = sourceName(null, null, args, alias)
+      if (source.has(attrName)) {
+        const value = source.get(attrName)
+        return value != null ? fixtures.return.intoGqlOutput(value) : null
+      } else {
+        // Subquery failed (e.g. computed function as subfield of compound type); fall back to old logic
+        const client = pgClientFromContext(context)
+        const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))]
+        const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
+        const { rows: [row] } = await client.query(query)
+        return row ? fixtures.return.intoGqlOutput(row['value']) : null
+      }
     },
   }]
 }
