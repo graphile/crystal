@@ -88,42 +88,49 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         )
         `;
 
-    const hasNextPageSql =
-      last != null
-        ? (
-          beforeCursor
-          ? sql.query`
-            exists(
-              select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-              where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
+    let hasNextPageSql, hasPreviousPageSql
+    if (first === 0 || last === 0) {
+      hasNextPageSql = sql.query`false`
+      hasPreviousPageSql = sql.query`false`
+    } else {
+      hasNextPageSql =
+        last != null
+          ? (
+            beforeCursor
+            ? sql.query`
+              exists(
+                select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
+              )
+              `
+            : sql.query`false`
             )
+          : sql.query`
+            (
+              select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+              where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
+            ) > count(*)
             `
-          : sql.query`false`
-          )
-        : sql.query`
-          (
-            select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-            where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
-          ) > count(*)
-          `
-    const hasPreviousPageSql =
-      last != null
-        ? sql.query`
-          (
-            select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-            where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
-          ) > count(*)
-          `
-        : (
-          afterCursor
+      hasPreviousPageSql =
+        last != null
           ? sql.query`
-            exists(
-              select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-              where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
-            )
+            (
+              select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+              where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
+            ) > count(*)
             `
-          : sql.query`false`
-          )
+          : (
+            afterCursor
+            ? sql.query`
+              exists(
+                select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
+              )
+              `
+            : sql.query`false`
+            )
+    }
+
     const totalCountSql =
       sql.query`
         (
