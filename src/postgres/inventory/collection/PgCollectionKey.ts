@@ -45,6 +45,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
       return [fieldName, {
         description: pgAttribute.description,
         type,
+        externalFieldName: pgAttribute.name,
         pgAttribute,
         getValue: value => value.get(fieldName),
       }]

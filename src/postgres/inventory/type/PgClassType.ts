@@ -33,6 +33,7 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
         const fieldName = config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name
         return [fieldName, {
           description: pgAttribute.description,
+          externalFieldName: pgAttribute.name,
 
           // Make sure that if our attribute specifies that it is non-null,
           // that we remove the types nullable wrapper if it exists.

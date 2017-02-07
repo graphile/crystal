@@ -123,7 +123,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     const sourceName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
     Object.assign(result, {
       sourceName,
-      externalFieldNameDependencies: config.relation && config.relation._headFieldNames,
+      externalFieldNameDependencies: config.relation && config.relation._headFieldNames, // 🔥 Needs to account for classicIds
       sqlExpression: (aliasIdentifier, fieldName, args, resolveInfo) => {
         const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
         const alias = Symbol();
