@@ -9,6 +9,7 @@ import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
 import PgCollectionPaginator from '../paginator/PgCollectionPaginator'
 import PgCollectionKey from './PgCollectionKey'
+import {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../paginator/getSelectFragment'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
@@ -113,11 +114,11 @@ class PgCollection implements Collection<PgClassType.Value> {
 
   // If we can’t insert into this class, there should be no `create`
   // function. Otherwise our `create` method is pretty basic.
-  public create: ((context: mixed, value: PgClassType.Value) => Promise<PgClassType.Value>) | null = (
+  public create: ((context: mixed, value: PgClassType.Value, resolveInfo: mixed, collectionGqlType: mixed) => Promise<PgClassType.Value>) | null = (
     !this.pgClass.isInsertable
       ? null
-      : (context: mixed, value: PgClassType.Value): Promise<PgClassType.Value> =>
-        this._getInsertLoader(pgClientFromContext(context)).load(value)
+      : (context: mixed, value: PgClassType.Value, resolveInfo: mixed, collectionGqlType: mixed): Promise<PgClassType.Value> =>
+        this._getInsertLoader(pgClientFromContext(context)).load({value, resolveInfo, collectionGqlType})
   )
 
   /**
@@ -130,8 +131,14 @@ class PgCollection implements Collection<PgClassType.Value> {
   @memoizeMethod
   private _getInsertLoader (client: Client): DataLoader<PgClassType.Value, PgClassType.Value> {
     return new DataLoader<PgClassType.Value, PgClassType.Value>(
-      async (values: Array<PgClassType.Value>): Promise<Array<PgClassType.Value>> => {
+      async (valuesAndStuff: Array<PgClassType.Value>): Promise<Array<PgClassType.Value>> => {
         const insertionIdentifier = Symbol()
+        const values = valuesAndStuff.map(({value}) => value)
+        const fieldses = valuesAndStuff.map(
+          ({resolveInfo, collectionGqlType}) =>
+            getFieldsFromResolveInfo(resolveInfo, insertionIdentifier, collectionGqlType)
+        )
+        const fields = Object.assign({}, ...fieldses)
 
         // Create our insert query.
         const query = sql.compile(sql.query`
@@ -159,7 +166,8 @@ class PgCollection implements Collection<PgClassType.Value> {
             returning *
           )
           -- We use a subquery with our insert so we can turn the result into JSON.
-          select row_to_json(${sql.identifier(insertionIdentifier)}) as object from ${sql.identifier(insertionIdentifier)}
+          select ${getSelectFragmentFromFields(fields)} as object
+          from ${sql.identifier(insertionIdentifier)}
         `)
 
         const { rows } = await client.query(query)

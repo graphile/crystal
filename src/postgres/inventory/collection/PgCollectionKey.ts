@@ -9,7 +9,7 @@ import PgType from '../type/PgType'
 import PgClassType from '../type/PgClassType'
 import getTypeFromPgType from '../type/getTypeFromPgType'
 import PgCollection from './PgCollection'
-import {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../paginator/getSelectFragment'
+import getSelectFragment, {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../paginator/getSelectFragment'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
@@ -222,10 +222,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * This method, unlike many of the other asynchronous actions in Postgres
    * collections, is not batched.
    */
-  public update: ((context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo) => Promise<PgClassType.Value | null>) | null = (
+  public update: ((context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo, gqlType) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo): Promise<PgClassType.Value> => {
+      : async (context: mixed, key: PgClassType.Value, patch: Map<string, mixed>, resolveInfo, gqlType): Promise<PgClassType.Value> => {
         const client = pgClientFromContext(context)
 
         const updatedIdentifier = Symbol()
@@ -252,7 +252,8 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
             where ${this._getSqlSingleKeyCondition(key)}
             returning *
           )
-          select row_to_json(${sql.identifier(updatedIdentifier)}) as object from ${sql.identifier(updatedIdentifier)}
+          select ${getSelectFragment(resolveInfo, updatedIdentifier, gqlType)} as object
+          from ${sql.identifier(updatedIdentifier)}
         `)
 
         const result = await client.query(query)
@@ -270,10 +271,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    *
    * This method, unlike many others in Postgres collections, is not batched.
    */
-  public delete: ((context: mixed, key: PgClassType.Value, resolveInfo) => Promise<PgClassType.Value | null>) | null = (
+  public delete: ((context: mixed, key: PgClassType.Value, resolveInfo, gqlType) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: mixed, key: PgClassType.Value, resolveInfo): Promise<PgClassType.Value> => {
+      : async (context: mixed, key: PgClassType.Value, resolveInfo, gqlType): Promise<PgClassType.Value> => {
         const client = pgClientFromContext(context)
 
         const deletedIdentifier = Symbol()
@@ -286,7 +287,8 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
             where ${this._getSqlSingleKeyCondition(key)}
             returning *
           )
-          select row_to_json(${sql.identifier(deletedIdentifier)}) as object from ${sql.identifier(deletedIdentifier)}
+          select ${getSelectFragment(resolveInfo, deletedIdentifier, gqlType)} as object
+          from ${sql.identifier(deletedIdentifier)}
         `)
 
         const result = await client.query(query)

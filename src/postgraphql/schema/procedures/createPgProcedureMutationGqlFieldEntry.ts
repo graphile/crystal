@@ -53,6 +53,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
   return [formatName.field(pgProcedure.name), createMutationGqlField<mixed>(buildToken, {
     name: pgProcedure.name,
     description: pgProcedure.description,
+    relatedGqlType: fixtures.return.gqlType,
 
     inputFields,
 

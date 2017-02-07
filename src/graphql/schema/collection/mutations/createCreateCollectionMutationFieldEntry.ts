@@ -75,6 +75,6 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
     // transforming the correct input field.
     // TODO: test
     execute: (context, input, resolveInfo) =>
-      collection.create!(context, inputFromGqlInput(input[inputFieldName]), resolveInfo),
+      collection.create!(context, inputFromGqlInput(input[inputFieldName]), resolveInfo, collectionGqlType),
   })]
 }

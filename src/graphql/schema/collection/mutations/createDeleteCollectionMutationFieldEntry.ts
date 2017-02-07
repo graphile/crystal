@@ -6,6 +6,7 @@ import createMutationGqlField from '../../createMutationGqlField'
 import createMutationPayloadGqlType from '../../createMutationPayloadGqlType'
 import getGqlOutputType from '../../type/getGqlOutputType'
 import createCollectionRelationTailGqlFieldEntries from '../createCollectionRelationTailGqlFieldEntries'
+import getGqlOutputType from '../../type/getGqlOutputType'
 
 /**
  * Creates a delete mutation that uses the primary key of a collection and an
@@ -43,10 +44,12 @@ export default function createDeleteCollectionMutationFieldEntry <TValue>(
     execute: (context, input, resolveInfo) => {
       const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
 
+      const { gqlType } = getGqlOutputType(buildToken, collection.type)
+
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.delete!(context, result.keyValue, resolveInfo)
+      return primaryKey.delete!(context, result.keyValue, resolveInfo, gqlType)
     },
   })]
 }
