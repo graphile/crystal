@@ -97,7 +97,7 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
       if (result.collection !== collection) throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
       if (!keyType.isTypeOf(result.keyValue)) throw new Error(`The provided id is not of the correct type.`)
-      const value = await collectionKey.read!(context, result.keyValue, resolveInfo)
+      const value = await collectionKey.read!(context, result.keyValue, resolveInfo, collectionGqlType)
       if (value == null) return
       return intoGqlOutput(value)
     },
