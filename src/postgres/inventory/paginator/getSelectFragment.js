@@ -10,6 +10,18 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
   const {parentType: parentGqlType, variableValues, fragments, schema} = resolveInfo
   const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
   const fields = {}
+  // ensure primary keys are present, otherwise PgCollectionKey cannot sort the rows back out again!
+  if (targetGqlType._fields && targetGqlType._fields.__id) {
+    targetGqlType._fields.__id.externalFieldNameDependencies.forEach(
+      externalFieldName => {
+        fields[externalFieldName] = {
+          type: QUERY,
+          query: sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(externalFieldName)}`,
+        }
+      }
+    )
+  }
+  // Parse the AST for fields we need to fetch
   fieldNodes.forEach(
     queryAST => {
       parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST)
