@@ -35,10 +35,12 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
   const name = `update-${collection.type.name}`
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using its globally unique id and a patch.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
@@ -139,6 +141,7 @@ function createUpdateCollectionPayloadGqlType <TValue>(
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `update-${collection.type.name}`,
+    relatedGqlType: gqlType,
     outputFields: [
       // Add the updated value as an output field so the user can see the
       // object they just updated.

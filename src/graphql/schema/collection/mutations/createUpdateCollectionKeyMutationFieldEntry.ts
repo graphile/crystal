@@ -30,6 +30,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using a unique key and a patch.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // Include all of the fields we need to construct the key value we will
       // use to find the single value to update.

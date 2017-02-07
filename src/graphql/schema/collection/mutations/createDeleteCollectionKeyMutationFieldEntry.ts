@@ -28,6 +28,7 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TValue, TKe
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using a unique key.`,
+    relatedGqlType: gqlType,
     inputFields: inputHelpers.fieldEntries,
     payloadType: getDeleteCollectionPayloadGqlType(buildToken, collection),
     execute: (context, input, resolveInfo) =>

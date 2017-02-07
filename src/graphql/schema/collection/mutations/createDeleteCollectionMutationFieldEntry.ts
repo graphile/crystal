@@ -27,9 +27,12 @@ export default function createDeleteCollectionMutationFieldEntry <TValue>(
   const { options, inventory } = buildToken
   const name = `delete-${collection.type.name}`
 
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
+
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using its globally unique id.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
@@ -67,6 +70,7 @@ function createDeleteCollectionPayloadGqlType <TValue>(
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `delete-${collection.type.name}`,
+    relatedGqlType: gqlType,
     outputFields: [
       // Add the deleted value as an output field so the user can see the
       // object they just deleted.
