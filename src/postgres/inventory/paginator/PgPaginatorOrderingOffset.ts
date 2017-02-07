@@ -149,8 +149,8 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       )
       select coalesce((select json_agg(${sql.identifier(jsonIdentifier)}) from ${sql.identifier(resultsIdentifier)}), '[]'::json) as "rows",
       (${totalCountSql})::integer as "totalCount",
-      (${hasNextPageSql})::boolean as "hasNextPage",
-      (${offsetSql} > 0) as "hasPreviousPage"
+      (${limit === 0 ? sql.query`false` : hasNextPageSql})::boolean as "hasNextPage",
+      (${limit === 0 ? sql.query`false` : sql.query`${offsetSql} > 0`}) as "hasPreviousPage"
     `
 
     return {query}

@@ -111,24 +111,28 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
               where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
             ) > count(*)
             `
-      hasPreviousPageSql =
-        last != null
-          ? sql.query`
-            (
-              select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-              where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
-            ) > count(*)
-            `
-          : (
-            afterCursor
+      if (_offset != null && _offset > 0) {
+        hasPreviousPageSql = sql.query`true`
+      } else {
+        hasPreviousPageSql =
+          last != null
             ? sql.query`
-              exists(
-                select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
-                where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
-              )
+              (
+                select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
+              ) > count(*)
               `
-            : sql.query`false`
-            )
+            : (
+              afterCursor
+              ? sql.query`
+                exists(
+                  select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                  where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
+                )
+                `
+              : sql.query`false`
+              )
+      }
     }
 
     const totalCountSql =
