@@ -113,7 +113,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
       return
     }
     // It is related, so continue through it's selection sets
-    queryAST.selectionSet.selections.forEach(
+    queryAST.selectionSet && queryAST.selectionSet.selections.forEach(
       ast => {
         parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, stripNonNullType(stripListType(fieldGqlType)), ast)
       }
@@ -122,7 +122,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
     if (queryAST.typeCondition) {
       processFragment(queryAST);
     } else {
-      queryAST.selectionSet.selections.forEach(
+      queryAST.selectionSet && queryAST.selectionSet.selections.forEach(
         selection => parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, selection)
       );
     }
