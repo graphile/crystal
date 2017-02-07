@@ -68,6 +68,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
           type: QUERY,
           query: sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(field.externalFieldName)}`,
         }
+        return;
       } else if (field.sqlExpression) {
         const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : fieldName
         // XXX: is this sufficient?
@@ -103,8 +104,8 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
             resolveInfo,
           };
         }
+        return;
       }
-      return;
     }
     // Not a child of targetGqlType, but maybe we're the type itself; or related to it?
     if (!isRelated(targetGqlType, fieldGqlType)) {
