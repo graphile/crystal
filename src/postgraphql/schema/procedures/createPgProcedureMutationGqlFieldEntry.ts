@@ -18,7 +18,7 @@ import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import { getEdgeGqlType, createOrderByGqlArg } from '../../../graphql/schema/connection/createConnectionGqlField'
-import getSelectFragment, {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../../../postgres/inventory/paginator/getSelectFragment'
+import getSelectFragment from '../../../postgres/inventory/paginator/getSelectFragment'
 
 /**
  * Creates a single mutation GraphQL field entry for our procedure. We use the

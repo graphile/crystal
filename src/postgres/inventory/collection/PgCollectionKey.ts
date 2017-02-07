@@ -166,7 +166,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
         // compiling.
         const query = sql.compile(sql.query`
           -- Select our rows as JSON objects.
-          select ${getSelectFragmentFromFields(fields)} as object
+          select ${getSelectFragmentFromFields(fields, aliasIdentifier)} as object
           from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
 
           -- For all of our key attributes we need to test equality with a

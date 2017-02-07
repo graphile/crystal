@@ -18,7 +18,7 @@ export function getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, rawTarget
   return fields;
 }
 
-export function getSelectFragmentFromFields(fields) {
+export function getSelectFragmentFromFields(fields, aliasIdentifier) {
   const buildArgs = [];
   for (var k in fields) {
     const field = fields[k];
@@ -30,14 +30,18 @@ export function getSelectFragmentFromFields(fields) {
     }[field.type](field);
     buildArgs.push(sql.literal(k), arg);
   }
-  return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
+  if (buildArgs.length === 0) {
+    return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
+  } else {
+    return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
+  }
 }
 
 export default function getSelectFragment(resolveInfo, aliasIdentifier, targetGqlType) {
   if (!resolveInfo) {
     throw new Error("No resolve info!")
   }
-  return getSelectFragmentFromFields(getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, targetGqlType))
+  return getSelectFragmentFromFields(getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, targetGqlType), aliasIdentifier)
 }
 
 function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, fragments, variableValues, parentGqlType, queryAST) {

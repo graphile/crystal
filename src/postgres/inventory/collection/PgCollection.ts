@@ -166,7 +166,7 @@ class PgCollection implements Collection<PgClassType.Value> {
             returning *
           )
           -- We use a subquery with our insert so we can turn the result into JSON.
-          select ${getSelectFragmentFromFields(fields)} as object
+          select ${getSelectFragmentFromFields(fields, insertionIdentifier)} as object
           from ${sql.identifier(insertionIdentifier)}
         `)
 
