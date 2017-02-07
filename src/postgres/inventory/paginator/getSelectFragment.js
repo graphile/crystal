@@ -77,13 +77,11 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
         const sourceName = field.sourceName ? field.sourceName(aliasIdentifier, fieldName, args, alias) : fieldName
         // XXX: is this sufficient?
         const resolveInfo = {
-          parentType: parentGqlType,
+          parentType: fieldGqlType,
           variableValues,
           fragments,
           schema,
-          fieldASTs: [
-            queryAST,
-          ],
+          fieldASTs: queryAST.selectionSet && queryAST.selectionSet.selections.slice(),
         }
         if (fields[sourceName]) {
           const existingEntry = fields[sourceName]
