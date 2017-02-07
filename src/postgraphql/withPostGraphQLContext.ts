@@ -175,7 +175,7 @@ const debugPgExplain = createDebugger('postgraphql:postgres:explain')
  * @private
  */
 // tslint:disable no-any
-function debugPgClient (pgClient: Client): Client {
+export function debugPgClient (pgClient: Client): Client {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (debugPg.enabled || debugPgExplain.enabled) {
