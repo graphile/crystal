@@ -37,6 +37,7 @@ program
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('-y, --primary-key-api', 'enable additional endpoints to primary-key apis')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
 
 program.on('--help', () => console.log(`
@@ -71,6 +72,7 @@ const {
   dynamicJson = false,
   disableDefaultMutations = false,
   showErrorStack,
+  primaryKeyApi,
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -111,6 +113,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   showErrorStack,
   disableQueryLog: false,
   enableCors,
+  primaryKeyAPI: primaryKeyApi,
 }))
 
 // Start our server by listening to a specific port and host name. Also log
