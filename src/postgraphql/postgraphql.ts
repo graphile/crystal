@@ -119,6 +119,16 @@ export default function postgraphql (
     _emitter,
   }))
 
+  async function handleFatalError (error: Error): Promise<void> {
+    // tslint:disable-next-line no-console
+    console.error(`${error.stack}\n`)
+    process.exit(1)
+
+    // This is just here to make TypeScript type check. `process.exit` will
+    // quit our program meaning we never execute this code.
+    return null as never
+  }
+
   /**
    * Creates a GraphQL schema by connecting a client from our pool which will
    * be used to introspect our Postgres database. If this function fails, we
@@ -131,7 +141,7 @@ export default function postgraphql (
     try {
       const pgClient = await pgPool.connect()
       const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
-      await exportPostGraphQLSchema(newGqlSchema, options)
+      exportGqlSchema(newGqlSchema, options)
 
       // If no release function exists, don’t release. This is just for tests.
       if (pgClient && pgClient.release)
@@ -141,13 +151,17 @@ export default function postgraphql (
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {
-      // tslint:disable no-console
-      console.error(`${error.stack}\n`)
-      process.exit(1)
+      return handleFatalError(error)
+    }
+  }
 
-      // This is just here to make TypeScript type check. `process.exit` will
-      // quit our program meaning we never execute this code.
-      return null as never
+  async function exportGqlSchema (newGqlSchema: GraphQLSchema): Promise<void> {
+    try {
+      await exportPostGraphQLSchema(newGqlSchema, options)
+    }
+    // If we fail to export our schema, log the error and exit the process.
+    catch (error) {
+      return handleFatalError(error)
     }
   }
 }
