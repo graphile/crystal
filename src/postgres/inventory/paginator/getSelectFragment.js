@@ -93,7 +93,7 @@ function parseASTIntoFields(fields, aliasIdentifier, schema, targetGqlType, frag
           variableValues,
           fragments,
           schema,
-          fieldASTs: queryAST.selectionSet && queryAST.selectionSet.selections.slice(),
+          fieldASTs: queryAST.selectionSet ? queryAST.selectionSet.selections.slice() : [],
         }
         if (fields[sourceName]) {
           const existingEntry = fields[sourceName]
