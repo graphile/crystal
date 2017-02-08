@@ -6,6 +6,7 @@ import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import watchPgSchemas from './watch/watchPgSchemas'
+import { ConnectionFilter } from '../interface'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -21,6 +22,7 @@ type PostGraphQLOptions = {
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
+  gqlConnectionFilter?: ConnectionFilter,
 }
 
 /**

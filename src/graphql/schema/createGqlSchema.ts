@@ -1,5 +1,5 @@
 import { GraphQLSchema } from 'graphql'
-import { Inventory } from '../../interface'
+import { Inventory, ConnectionFilter } from '../../interface'
 import BuildToken, { _BuildTokenHooks, _BuildTokenTypeOverrides } from './BuildToken'
 import getQueryGqlType from './getQueryGqlType'
 import getMutationGqlType from './getMutationGqlType'
@@ -15,6 +15,8 @@ export type SchemaOptions = {
   // If true then the default mutations for tables (e.g. createMyTable) will
   // not be created
   disableDefaultMutations?: boolean,
+  // If specified, this function will be used to customise the record set
+  gqlConnectionFilter?: ConnectionFilter | null,
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
@@ -37,6 +39,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      gqlConnectionFilter: options.gqlConnectionFilter || null,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

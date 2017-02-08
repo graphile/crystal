@@ -1,5 +1,5 @@
 import { GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
-import { Inventory, Type, ObjectType } from '../../interface'
+import { Inventory, Type, ObjectType, ConnectionFilter } from '../../interface'
 
 /**
  * A `BuildToken` is a plain object that gets passed around to all of the
@@ -30,6 +30,8 @@ interface BuildToken {
     // If true then the default mutations for tables (e.g. createMyTable) will
     // not be created
     readonly disableDefaultMutations: boolean,
+    // If specified, this function will be used to customise the record set
+    readonly gqlConnectionFilter: ConnectionFilter | null,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,

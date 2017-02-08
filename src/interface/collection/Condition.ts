@@ -1,3 +1,5 @@
+import ConnectionFilter from './ConnectionFilter'
+
 /**
  * The condition type defines a set of constraints that we may apply to any
  * value that may be represented in our system. A condition must be defined
@@ -25,6 +27,7 @@ type Condition =
   EqualCondition |
   LessThanCondition |
   GreaterThanCondition |
+  CustomCondition |
   RegexpCondition
 
 export default Condition
@@ -67,6 +70,14 @@ export namespace conditionHelpers {
   // TODO: test
   export function fieldEquals (name: string, value: mixed): Condition {
     return { type: 'FIELD', name, condition: { type: 'EQUAL', value } }
+  }
+
+  /**
+   * Creates a custom matcher condition
+   */
+  // TODO: test
+  export function custom (filter: ConnectionFilter, value: string): Condition {
+    return { type: 'CUSTOM', filter, value }
   }
 }
 
@@ -150,6 +161,15 @@ type LessThanCondition = {
 type GreaterThanCondition = {
   type: 'GREATER_THAN',
   value: mixed,
+}
+
+/**
+ * A condition to be used with a custom connection filter function.
+ */
+type CustomCondition = {
+  type: 'CUSTOM',
+  filter: ConnectionFilter,
+  value: string,
 }
 
 /**

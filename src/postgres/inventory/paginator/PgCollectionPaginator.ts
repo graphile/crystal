@@ -28,22 +28,34 @@ class PgCollectionPaginator extends PgPaginator<Condition, PgClassType.Value> {
 
   // Define some of the property stuffs that are easy property copies.
   public name: string = this.collection.name
+  public pgClassName: string = this.collection.pgClass.name
+  // public pgNamespaceName: string = this._pgCatalog.assertGetNamespace(this._pgClass.namespaceId).name
   public itemType: PgClassType = this.collection.type
-
-  /**
-   * The `from` entry for a collection paginator is simply the namespaced
-   * table name of its collection.
-   */
-  public getFromEntrySql (): sql.Sql {
-    return sql.query`${sql.identifier(this._pgNamespace.name, this._pgClass.name)}`
-  }
 
   /**
    * The condition for this paginator will simply be whatever condition was
    * the input value.
    */
-  public getConditionSql (condition: Condition): sql.Sql {
-    return conditionToSql(condition, [], Boolean(this.collection._options.renameIdToRowId && this.collection.primaryKey))
+  public getQuerySqlFragments (condition: Condition): {
+    conditionSql: sql.Sql,
+    fromSql: sql.Sql,
+    groupBySql: sql.Sql,
+    initialTable: string,
+  } {
+    const initialTable = this._pgClass.name
+    const initialSchema = this._pgNamespace.name
+    const context = {
+      convertRowIdToId: Boolean(this.collection._options.renameIdToRowId && this.collection.primaryKey),
+      initialTable,
+      initialSchema,
+    }
+    const otherSql = {
+      fromSql: sql.query`${sql.identifier(initialSchema, initialTable)} as ${sql.identifier(Symbol.for(initialTable))}`,
+      groupBySql: sql.query``,
+    }
+    const conditionSql = conditionToSql(condition, [], context, otherSql)
+    const { fromSql, groupBySql } = otherSql
+    return { conditionSql, fromSql, groupBySql, initialTable }
   }
 
   /**

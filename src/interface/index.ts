@@ -4,6 +4,7 @@ import Collection from './collection/Collection'
 import CollectionKey from './collection/CollectionKey'
 import Condition, { conditionHelpers } from './collection/Condition'
 import Relation from './collection/Relation'
+import ConnectionFilter from './collection/ConnectionFilter'
 import Type from './type/Type'
 import NullableType from './type/NullableType'
 import ListType from './type/ListType'
@@ -31,6 +32,7 @@ export {
   Condition,
   conditionHelpers,
   Relation,
+  ConnectionFilter,
   Type,
   NullableType,
   ListType,

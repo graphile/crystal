@@ -120,16 +120,17 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
       limit = last
     }
 
-    const aliasIdentifier = Symbol()
-    const fromSql = this.pgPaginator.getFromEntrySql(input)
-    const conditionSql = this.pgPaginator.getConditionSql(input)
+    const { conditionSql, fromSql, groupBySql, initialTable } =
+      this.pgPaginator.getQuerySqlFragments(input)
+    const aliasIdentifier = Symbol.for(initialTable)
 
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
       select to_json(${sql.identifier(aliasIdentifier)}) as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+      from ${fromSql}
       where ${conditionSql}
       ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
+      ${groupBySql}
       offset ${sql.value(offset)}
       limit ${limit != null ? sql.value(limit) : sql.query`all`}
     `)
