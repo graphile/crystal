@@ -1,7 +1,6 @@
 import { writeFile } from 'fs'
 import { graphql, GraphQLSchema } from 'graphql'
 import { introspectionQuery, printSchema } from 'graphql/utilities'
-import { graphql } from 'graphql'
 
 async function writeFileAsync (
   path: string,

@@ -6,6 +6,6 @@ const writeFile = jest.fn((path, contents, callback) => {
 })
 
 module.exports = {
-  ...fs
+  ...fs,
   writeFile,
 }

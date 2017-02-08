@@ -72,8 +72,8 @@ const {
   classicIds = false,
   dynamicJson = false,
   disableDefaultMutations = false,
-  exportSchemaJson: exportJsonSchemaPath = null,
-  exportSchemaGraphql: exportGqlSchemaPath = null,
+  exportSchemaJson: exportJsonSchemaPath,
+  exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
 // tslint:disable-next-line no-any
 } = program as any

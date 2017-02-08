@@ -38,6 +38,8 @@ The usage of the `postgraphql` binary is as follows. To pull up this documentati
     -a, --classic-ids                use classic global id field name. required to support Relay 1
     -j, --dynamic-json               enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default
     -M, --disable-default-mutations  disable default mutations, mutation will only be possible through Postgres functions
+    --export-schema-json [path]      enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten
+    --export-schema-graphql [path]   enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten
     --show-error-stack [setting]     show JavaScript error stacks in the GraphQL result errors
 
   Get Started:

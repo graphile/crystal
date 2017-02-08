@@ -22,6 +22,8 @@ type PostGraphQLOptions = {
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
+  exportJsonSchemaPath?: string,
+  exportGqlSchemaPath?: string,
 }
 
 /**
@@ -141,7 +143,7 @@ export default function postgraphql (
     try {
       const pgClient = await pgPool.connect()
       const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
-      exportGqlSchema(newGqlSchema, options)
+      exportGqlSchema(newGqlSchema)
 
       // If no release function exists, don’t release. This is just for tests.
       if (pgClient && pgClient.release)
@@ -151,7 +153,7 @@ export default function postgraphql (
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {
-      return handleFatalError(error)
+      return handleFatalError(error) as never
     }
   }
 
