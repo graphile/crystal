@@ -15,6 +15,14 @@ export type SchemaOptions = {
   // If true then the default mutations for tables (e.g. createMyTable) will
   // not be created
   disableDefaultMutations?: boolean,
+  // If timestamps are given the fields are excluded from create/modify
+  // queries and automatically filled
+  timestamps?: {
+    // Field name to be set on modification with the current timestamp
+    modified?: string,
+    // Field name to be set on creation with the current timestamp
+    created?: string,
+  },
   // Some hooks to allow extension of the schema. Currently this API is
   // private. Use at your own risk.
   _hooks?: _BuildTokenHooks,
@@ -37,6 +45,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || '__id',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      timestamps: options.timestamps,
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

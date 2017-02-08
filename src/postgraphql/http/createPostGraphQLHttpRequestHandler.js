@@ -30,7 +30,7 @@ const { POSTGRAPHQL_ENV } = process.env
 const debugGraphql = new Debugger('postgraphql:graphql')
 const debugRequest = new Debugger('postgraphql:request')
 
-export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
+export const graphiqlDirectory = resolvePath(__dirname, '../../public/graphiql/public')
 
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the

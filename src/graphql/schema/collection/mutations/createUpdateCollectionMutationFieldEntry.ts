@@ -7,7 +7,7 @@ import {
   GraphQLFieldConfig,
 } from 'graphql'
 import { Collection, NullableType } from '../../../../interface'
-import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
+import { formatName, buildObject, idSerde, memoize2, tsForCollection } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGqlInputType from '../../type/getGqlInputType'
 import getGqlOutputType from '../../type/getGqlOutputType'
@@ -35,6 +35,7 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
   const name = `update-${collection.type.name}`
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
+  const timestamps = tsForCollection(collection, buildToken.options ? buildToken.options.timestamps : undefined)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
@@ -64,7 +65,15 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.update!(context, result.keyValue, patchFromGqlInput(input[patchFieldName] as {}))
+      const patch = patchFromGqlInput(input[patchFieldName] as {})
+      if (timestamps && patch && patch instanceof Map) {
+        const map = patch as Map<string, mixed>
+        if (timestamps.modified) {
+          map.set(timestamps.modified, (new Date()).toISOString())
+        }
+      }
+
+      return primaryKey.update!(context, result.keyValue, patch)
     },
   })]
 }

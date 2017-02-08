@@ -1,6 +1,13 @@
 import { GraphQLOutputType, GraphQLFieldConfig } from 'graphql'
 import { Inventory, Type, ObjectType } from '../../interface'
 
+interface BuildTokenTimestamps {
+  // Field name to be set on modification with the current timestamp
+  modified?: string,
+  // Field name to be set on creation with the current timestamp
+  created?: string,
+}
+
 /**
  * A `BuildToken` is a plain object that gets passed around to all of the
  * functions used to create a GraphQL schema. The `BuildToken` contains a copy
@@ -30,6 +37,9 @@ interface BuildToken {
     // If true then the default mutations for tables (e.g. createMyTable) will
     // not be created
     readonly disableDefaultMutations: boolean,
+    // If timestamps are given the fields are excluded from create/modify
+    // queries and automatically filled
+    readonly timestamps?: BuildTokenTimestamps,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,

@@ -62,6 +62,7 @@ Arguments include:
   - `watchPg`: When true, PostGraphQL will watch your database schemas and re-create the GraphQL API whenever your schema changes, notifying you as it does. This feature requires an event trigger to be added to the database by a superuser. When enabled PostGraphQL will try to add this trigger, if you did not connect as a superuser you will get a warning and the trigger won’t be added.
   - `disableQueryLog`: Turns off GraphQL query logging. By default PostGraphQL will log every GraphQL query it processes along with some other information. Set this to `true` to disable that feature.
   - `enableCors`: Enables some generous CORS settings for the GraphQL endpoint. There are some costs associated when enabling this, if at all possible try to put your API behind a reverse proxy.
+  - `timestamps`: Enables automatic setting of timestamps to fields when editing/creating new rows. `null`, the default, indicates that no fields should be set. `{modified: 'lastMod'}` would indicate that the `lastMod` field is set on modification. `{created: 'init', modified: 'lastMod'}` would additionally sets `created` to the creation timestamp once a new row is created.  
 
 [connect]: https://www.npmjs.com/connect
 [express]: https://www.npmjs.com/express

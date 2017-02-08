@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Collection, NullableType } from '../../../../interface'
-import { formatName, scrib } from '../../../utils'
+import { formatName, scrib, tsForCollection } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGqlInputType from '../../type/getGqlInputType'
 import getGqlOutputType from '../../type/getGqlOutputType'
@@ -24,6 +24,7 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
   const inputFieldName = formatName.field(collection.type.name)
   const { gqlType: inputGqlType, fromGqlInput: inputFromGqlInput } = getGqlInputType(buildToken, collection.type)
   const { gqlType: collectionGqlType } = getGqlOutputType(buildToken, new NullableType(collection.type))
+  const timestamps = tsForCollection(collection, buildToken.options ? buildToken.options.timestamps : undefined)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
@@ -74,7 +75,19 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
     // When we execute we just create a value in the collection after
     // transforming the correct input field.
     // TODO: test
-    execute: (context, input) =>
-      collection.create!(context, inputFromGqlInput(input[inputFieldName])),
+    execute: (context, input) => {
+      const value: TValue = inputFromGqlInput(input[inputFieldName])
+      if (timestamps && value && value instanceof Map) {
+        const map = value as Map<string, mixed>
+        if (timestamps.created) {
+          map.set(timestamps.created, (new Date()).toISOString())
+        }
+        if (timestamps.modified) {
+          map.set(timestamps.modified, (new Date()).toISOString())
+        }
+      }
+
+      return collection.create!(context, value as TValue)
+    },
   })]
 }
