@@ -106,7 +106,7 @@ export default async function createPostGraphQLSchema (
 
   // Actually create our GraphQL schema.
   const gqlSchema = createGraphQLSchema(inventory, {
-    nodeIdFieldName: options.classicIds ? 'id' : '__id',
+    nodeIdFieldName: options.classicIds ? 'id' : 'nodeId',
     dynamicJson: options.dynamicJson,
     disableDefaultMutations: options.disableDefaultMutations,
 

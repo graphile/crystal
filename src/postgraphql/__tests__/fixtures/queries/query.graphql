@@ -9,26 +9,26 @@ query {
       }
     }
   }
-  a: node(__id: "hello") {
+  a: node(nodeId: "hello") {
     __typename
-    __id
+    nodeId
     ...query
   }
-  b: node(__id: "query") {
+  b: node(nodeId: "query") {
     __typename
-    __id
+    nodeId
     ...query
   }
 }
 
 fragment query on Query {
-  __id
-  a: node(__id: "hello") {
+  nodeId
+  a: node(nodeId: "hello") {
     __typename
-    __id
+    nodeId
   }
-  b: node(__id: "query") {
+  b: node(nodeId: "query") {
     __typename
-    __id
+    nodeId
   }
 }

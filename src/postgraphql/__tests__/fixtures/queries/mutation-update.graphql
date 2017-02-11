@@ -1,6 +1,6 @@
 mutation {
   a: updatePerson(input: {
-    __id: "WyJwZW9wbGUiLDFd",
+    nodeId: "WyJwZW9wbGUiLDFd",
     personPatch: {
       name: "John Smith Sr."
       about: "An older John Smith"
@@ -8,7 +8,7 @@ mutation {
   }) { ...updatePersonPayload }
   b: updatePerson(input: {
     clientMutationId: "hello"
-    __id: "WyJwZW9wbGUiLDJd",
+    nodeId: "WyJwZW9wbGUiLDJd",
     personPatch: {
       name: "Sarah Smith"
       email: "sarah.smith@email.com"
@@ -16,13 +16,13 @@ mutation {
   }) { ...updatePersonPayload }
   c: updatePerson(input: {
     clientMutationId: "world"
-    __id: "WyJwZW9wbGUiLDJd"
+    nodeId: "WyJwZW9wbGUiLDJd"
     personPatch: {
       about: "Now with an “H.”"
     }
   }) { ...updatePersonPayload }
   i: updatePerson(input: {
-    __id: "WyJwZW9wbGUiLDJd"
+    nodeId: "WyJwZW9wbGUiLDJd"
     personPatch: {
       about: null
     }
@@ -41,7 +41,7 @@ mutation {
     }
   }) { ...updatePersonPayload }
   f: updateCompoundKey(input: {
-    __id: "WyJjb21wb3VuZF9rZXlzIiwxLDJd"
+    nodeId: "WyJjb21wb3VuZF9rZXlzIiwxLDJd"
     compoundKeyPatch: {
       personId1: 2
       extra: true
@@ -69,19 +69,19 @@ mutation {
 fragment updatePersonPayload on UpdatePersonPayload {
   clientMutationId
   person {
-    __id
+    nodeId
     id
     name
     email
     about
   }
-  query { __id }
+  query { nodeId }
 }
 
 fragment updateCompoundKeyPayload on UpdateCompoundKeyPayload {
   clientMutationId
   compoundKey {
-    __id
+    nodeId
     personId1
     personId2
     extra
@@ -94,5 +94,5 @@ fragment updateCompoundKeyPayload on UpdateCompoundKeyPayload {
       name
     }
   }
-  query { __id }
+  query { nodeId }
 }
