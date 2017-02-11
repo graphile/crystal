@@ -162,7 +162,7 @@ function handleFatalError (error: Error): never {
   // tslint:disable-next-line no-console
   console.error(`${error.stack}\n`)
   process.exit(1)
-  
+
   // `process.exit` will mean all code below it will never get called.
   // However, we need to return a value with type `never` here for
   // TypeScript.
