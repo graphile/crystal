@@ -80,7 +80,7 @@ input DeletePersonInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deletePerson\` mutation.
@@ -112,7 +112,7 @@ input DeletePostInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Post\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deletePost\` mutation.
@@ -204,7 +204,7 @@ type Mutation {
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
 }
 
 # Information about pagination in a connection.
@@ -260,7 +260,7 @@ enum PeopleOrderBy {
 
 type Person implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   name: String!
   email: Email!
@@ -311,7 +311,7 @@ input PersonPatch {
 
 type Post implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   authorId: Int!
   status: PostStatus!
@@ -403,7 +403,7 @@ type Query implements Node {
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    __id: ID!
+    nodeId: ID!
   ): Node
 
   # Reads and enables paginatation through a set of \`Person\`.
@@ -434,7 +434,7 @@ type Query implements Node {
   # Reads a single \`Person\` using its globally unique \`ID\`.
   person(
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
-    __id: ID!
+    nodeId: ID!
   ): Person
   personById(
     # The \`Int\` to use when reading a single value.
@@ -477,7 +477,7 @@ type Query implements Node {
   # Reads a single \`Post\` using its globally unique \`ID\`.
   post(
     # The globally unique \`ID\` to be used in selecting a single \`Post\`.
-    __id: ID!
+    nodeId: ID!
   ): Post
   postById(
     # The \`Int\` to use when reading a single value.
@@ -489,7 +489,7 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  __id: ID!
+  nodeId: ID!
 }
 
 # All input for the \`updatePersonByEmail\` mutation.
@@ -525,7 +525,7 @@ input UpdatePersonInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Person\` identified by our globally unique \`ID\`.
   personPatch: PersonPatch!
@@ -562,7 +562,7 @@ input UpdatePostInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Post\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Post\` identified by our globally unique \`ID\`.
   postPatch: PostPatch!

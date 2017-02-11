@@ -66,7 +66,7 @@ mutation {
   }) {
     clientMutationId
     type {
-      __id
+      nodeId
       id
       smallint
       bigint
@@ -106,7 +106,7 @@ mutation {
         bazBuz
       }
     }
-    query { __id }
+    query { nodeId }
   }
   b: createPerson(input: {
     person: {
@@ -135,28 +135,28 @@ mutation {
   }) {
     clientMutationId
     compoundKey {
-      __id
+      nodeId
       personId1
       personId2
       extra
       personByPersonId1 {
-        __id
+        nodeId
         name
       }
       personByPersonId2 {
-        __id
+        nodeId
         name
       }
     }
     personByPersonId1 {
-      __id
+      nodeId
       name
     }
     personByPersonId2 {
-      __id
+      nodeId
       name
     }
-    query { __id }
+    query { nodeId }
   }
   e: createEdgeCase(input: {
     edgeCase: {
@@ -166,7 +166,7 @@ mutation {
     edgeCase {
       notNullHasDefault
     }
-    query { __id }
+    query { nodeId }
   }
   f: createEdgeCase(input: {
     edgeCase: {}
@@ -174,7 +174,7 @@ mutation {
     edgeCase {
       notNullHasDefault
     }
-    query { __id }
+    query { nodeId }
   }
   g: createPerson(input: {
     person: {
@@ -189,7 +189,7 @@ mutation {
 fragment createPersonPayload on CreatePersonPayload {
   clientMutationId
   person {
-    __id
+    nodeId
     id
     name
     email
@@ -202,13 +202,13 @@ fragment createPersonPayload on CreatePersonPayload {
   e: personEdge(orderBy: EMAIL_ASC) { ...peopleEdge }
   f: personEdge(orderBy: EMAIL_DESC) { ...peopleEdge }
   g: personEdge(orderBy: NATURAL) { ...peopleEdge }
-  query { __id }
+  query { nodeId }
 }
 
 fragment peopleEdge on PeopleEdge {
   cursor
   node {
-    __id
+    nodeId
     name
   }
 }
