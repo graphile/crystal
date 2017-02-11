@@ -10,6 +10,7 @@ import pgIntegerType from './scalar/pgIntegerType'
 import pgFloatType from './scalar/pgFloatType'
 import pgStringType from './scalar/pgStringType'
 import pgJsonType from './scalar/pgJsonType'
+import pgBigIntType from './custom/pgBigIntType'
 import pgUuidType from './custom/pgUuidType'
 import pgDatetimeType from './custom/pgDatetimeType'
 import pgDateType from './custom/pgDateType'
@@ -36,7 +37,7 @@ import PgListType from './PgListType'
  * @private
  */
 const pgTypeIdToType = new Map<string, PgType<mixed>>([
-  ['20', pgIntegerType],    // int8, bigint
+  ['20', pgBigIntType],     // int8, bigint
   ['21', pgIntegerType],    // int2, smallint
   ['23', pgIntegerType],    // int4, integer
   ['114', pgJsonType],      // json
