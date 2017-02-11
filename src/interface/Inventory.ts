@@ -1,5 +1,6 @@
 import Collection from './collection/Collection'
 import Relation from './collection/Relation'
+import ObjectType from './type/ObjectType'
 
 /**
  * In order to build awesome tools from any database we need an abstract
@@ -13,8 +14,8 @@ import Relation from './collection/Relation'
  * *mutable*. Scary, I know.
  */
 class Inventory {
-  private _collections: Map<string, Collection> = new Map()
-  private _relations: Map<string, Relation<mixed>> = new Map()
+  private _collections: Map<string, Collection<mixed>> = new Map()
+  private _relations: Map<string, Relation<mixed, mixed, mixed>> = new Map()
 
   /**
    * Adds a single collection to our inventory. If a collection with the same
@@ -23,7 +24,7 @@ class Inventory {
    *
    * We will also add the type for this collection to the inventory.
    */
-  public addCollection (collection: Collection): this {
+  public addCollection <TValue>(collection: Collection<TValue>): this {
     const { name } = collection
 
     if (this._collections.has(name))
@@ -40,14 +41,14 @@ class Inventory {
    *
    * Two collections in this set should not have the same name.
    */
-  public getCollections (): Array<Collection> {
+  public getCollections (): Array<Collection<mixed>> {
     return Array.from(this._collections.values())
   }
 
   /**
    * Gets a single collection by name.
    */
-  public getCollection (name: string): Collection | undefined {
+  public getCollection (name: string): Collection<mixed> | undefined {
     return this._collections.get(name)
   }
 
@@ -56,15 +57,24 @@ class Inventory {
    * the exact reference to the collection argument exists in the inventory this
    * method returns true, otherwise it returns false.
    */
-  public hasCollection (collection: Collection): boolean {
+  public hasCollection <TValue>(collection: Collection<TValue>): boolean {
     return this._collections.get(collection.name) === collection
+  }
+
+  /**
+   * Gets a collection in our inventory for the given type. If a collection in
+   * our inventory has this type it will be returned. Otherwise nothing will be
+   * returned.
+   */
+  public getCollectionForType <TValue>(type: ObjectType<TValue>): Collection<TValue> | undefined {
+    return this.getCollections().find(collection => collection.type === type) as Collection<TValue> | undefined
   }
 
   /**
    * Adds a single relation to our inventory. If the related collections are not
    * members of this inventory we fail with an error.
    */
-  public addRelation (relation: Relation<mixed>): this {
+  public addRelation (relation: Relation<mixed, mixed, mixed>): this {
     const { name, tailCollection, headCollectionKey } = relation
 
     const keyName = `${tailCollection.name}-${headCollectionKey.collection.name}-${name}`
@@ -91,7 +101,7 @@ class Inventory {
    * In a graph representation of our inventory, collections would be nodes and
    * relations would be directed edges.
    */
-  public getRelations (): Array<Relation<mixed>> {
+  public getRelations (): Array<Relation<mixed, mixed, mixed>> {
     return Array.from(this._relations.values())
   }
 }

@@ -13,11 +13,11 @@ const getGqlQueryType = memoize1(createGqlQueryType)
 export default getGqlQueryType
 
 // TODO: doc
-function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType<mixed> {
+function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType {
   const { options, inventory } = buildToken
-  let queryType: GraphQLObjectType<mixed>
+  let queryType: GraphQLObjectType
 
-  queryType = new GraphQLObjectType<mixed>({
+  queryType = new GraphQLObjectType({
     name: 'Query',
     description: 'The root query type which gives access points into the data universe.',
     interfaces: [getNodeInterfaceType(buildToken)],

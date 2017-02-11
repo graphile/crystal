@@ -1,11 +1,12 @@
-import { Client, ClientConfig, connect as connectPgClient } from 'pg'
-import { GraphQLSchema, GraphQLInputType, GraphQLOutputType } from 'graphql'
-import { Inventory, Type } from '../../interface'
+import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
+import { GraphQLSchema, GraphQLOutputType } from 'graphql'
+import { Inventory, Type, ObjectType, getNonNullableType } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
 import getTypeFromPgType from '../../postgres/inventory/type/getTypeFromPgType'
-import PgClassObjectType from '../../postgres/inventory/type/PgClassObjectType'
+import PgClassType from '../../postgres/inventory/type/PgClassType'
 import { createGraphQLSchema } from '../../graphql'
+import BuildToken from '../../graphql/schema/BuildToken'
 import createPgProcedureMutationGqlFieldEntry from './procedures/createPgProcedureMutationGqlFieldEntry'
 import createPgProcedureQueryGqlFieldEntry from './procedures/createPgProcedureQueryGqlFieldEntry'
 import createPgProcedureObjectTypeGqlFieldEntry from './procedures/createPgProcedureObjectTypeGqlFieldEntry'
@@ -17,7 +18,7 @@ import getJwtGqlType from './auth/getJwtGqlType'
  * Creates a PostGraphQL schema by looking at a Postgres client.
  */
 export default async function createPostGraphQLSchema (
-  clientOrConfig?: Client | ClientConfig | string,
+  clientOrConfig?: Pool | Client | ClientConfig | string,
   schemaOrCatalog: string | Array<string> | PgCatalog = 'public',
   options: {
     classicIds?: boolean,
@@ -42,7 +43,7 @@ export default async function createPostGraphQLSchema (
     // Introspect our Postgres database to get a catalog. If we weren’t given a
     // client, we will just connect a default client from the `pg` module.
     // TODO: test
-    if (clientOrConfig instanceof Client) {
+    if (clientOrConfig instanceof Client || clientOrConfig instanceof Pool) {
       const pgClient = clientOrConfig
       pgCatalog = await introspectPgDatabase(pgClient, schemas)
     }
@@ -111,12 +112,12 @@ export default async function createPostGraphQLSchema (
 
     // If we have a JWT Postgres type, let us override the GraphQL output type
     // with our own.
-    _typeOverrides: jwtPgType && new Map<Type<mixed>, { input?: GraphQLInputType<mixed>, output?: GraphQLOutputType<mixed> }>([
+    _typeOverrides: jwtPgType && new Map<Type<mixed>, { input?: true, output?: GraphQLOutputType }>([
       [getTypeFromPgType(pgCatalog, jwtPgType), {
         // Throw an error if the user tries to use this as input.
         get input (): never { throw new Error(`Using the JWT Token type '${options.jwtPgTypeIdentifier}' as input is not yet implemented.`) },
         // Use our JWT GraphQL type as the output.
-        output: getJwtGqlType(getTypeFromPgType(pgCatalog, jwtPgType), options.jwtSecret!),
+        output: getJwtGqlType(getNonNullableType(getTypeFromPgType(pgCatalog, jwtPgType)) as PgClassType, options.jwtSecret!),
       }],
     ]),
 
@@ -131,8 +132,8 @@ export default async function createPostGraphQLSchema (
 
       // Extra field entires to go on object types that also happen to be
       // classes.
-      objectTypeFieldEntries: (objectType, _buildToken) =>
-        objectType instanceof PgClassObjectType
+      objectTypeFieldEntries: <TValue>(objectType: ObjectType<TValue>, _buildToken: BuildToken) =>
+        objectType instanceof PgClassType
           ? (pgObjectTypeProcedures.get(objectType.pgClass) || []).map(pgProcedure => createPgProcedureObjectTypeGqlFieldEntry(_buildToken, pgCatalog, pgProcedure))
           : [],
     },

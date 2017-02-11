@@ -2,11 +2,9 @@ import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableT
 import { formatName, buildObject } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import createConnectionGqlField from '../../../graphql/schema/connection/createConnectionGqlField'
-import transformGqlInputValue from '../../../graphql/schema/transformGqlInputValue'
 import { sql } from '../../../postgres/utils'
 import { PgCatalog, PgCatalogProcedure } from '../../../postgres/introspection'
 import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
-import transformPgValueIntoValue from '../../../postgres/inventory/transformPgValueIntoValue'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import PgProcedurePaginator from './PgProcedurePaginator'
@@ -40,7 +38,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const argEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
+  const argEntries = fixtures.args.map<[string, GraphQLArgumentConfig]>(
     ({ name, gqlType }) =>
       [formatName.arg(name), {
         // No description…
@@ -55,10 +53,10 @@ function createPgSingleProcedureQueryGqlFieldEntry (
 
     async resolve (_source, args, context): Promise<mixed> {
       const client = pgClientFromContext(context)
-      const input = argEntries.map(([argName, { type }]) => transformGqlInputValue(type, args[argName]))
+      const input = argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
       const { rows: [row] } = await client.query(query)
-      return row ? transformPgValueIntoValue(fixtures.return.type, row['value']) : null
+      return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
     },
   }]
 }
@@ -77,7 +75,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
-  const inputArgEntries = fixtures.args.map<[string, GraphQLArgumentConfig<mixed>]>(
+  const inputArgEntries = fixtures.args.map<[string, GraphQLArgumentConfig]>(
     ({ name, gqlType }) =>
       [formatName.arg(name), {
         // No description…
@@ -91,7 +89,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
       description: pgProcedure.description,
       inputArgEntries,
       getPaginatorInput: (_source, args) =>
-        inputArgEntries.map(([argName, { type }]) => transformGqlInputValue(type, args[argName])),
+        inputArgEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName])),
     }),
   ]
 }

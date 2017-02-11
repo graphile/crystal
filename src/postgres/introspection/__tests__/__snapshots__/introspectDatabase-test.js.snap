@@ -866,17 +866,6 @@ Object {
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
-        4,
-      ],
-      "kind": "constraint",
-      "name": "person_email_key",
-      "type": "u",
-    },
-    Object {
-      "classId": "person",
-      "foreignClassId": null,
-      "foreignKeyAttributeNums": null,
-      "keyAttributeNums": Array [
         1,
       ],
       "kind": "constraint",
@@ -884,17 +873,15 @@ Object {
       "type": "p",
     },
     Object {
-      "classId": "post",
-      "foreignClassId": "person",
-      "foreignKeyAttributeNums": Array [
-        1,
-      ],
+      "classId": "person",
+      "foreignClassId": null,
+      "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
         4,
       ],
       "kind": "constraint",
-      "name": "post_author_id_fkey",
-      "type": "f",
+      "name": "person_email_key",
+      "type": "u",
     },
     Object {
       "classId": "post",
@@ -908,16 +895,16 @@ Object {
       "type": "p",
     },
     Object {
-      "classId": "compound_key",
+      "classId": "post",
       "foreignClassId": "person",
       "foreignKeyAttributeNums": Array [
         1,
       ],
       "keyAttributeNums": Array [
-        2,
+        4,
       ],
       "kind": "constraint",
-      "name": "compound_key_person_id_1_fkey",
+      "name": "post_author_id_fkey",
       "type": "f",
     },
     Object {
@@ -935,6 +922,19 @@ Object {
     },
     Object {
       "classId": "compound_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1,
+      ],
+      "keyAttributeNums": Array [
+        2,
+      ],
+      "kind": "constraint",
+      "name": "compound_key_person_id_1_fkey",
+      "type": "f",
+    },
+    Object {
+      "classId": "compound_key",
       "foreignClassId": null,
       "foreignKeyAttributeNums": null,
       "keyAttributeNums": Array [
@@ -944,6 +944,19 @@ Object {
       "kind": "constraint",
       "name": "compound_key_pkey",
       "type": "p",
+    },
+    Object {
+      "classId": "foreign_key",
+      "foreignClassId": "person",
+      "foreignKeyAttributeNums": Array [
+        1,
+      ],
+      "keyAttributeNums": Array [
+        1,
+      ],
+      "kind": "constraint",
+      "name": "foreign_key_person_id_fkey",
+      "type": "f",
     },
     Object {
       "classId": "foreign_key",
@@ -958,19 +971,6 @@ Object {
       ],
       "kind": "constraint",
       "name": "foreign_key_compound_key_1_fkey",
-      "type": "f",
-    },
-    Object {
-      "classId": "foreign_key",
-      "foreignClassId": "person",
-      "foreignKeyAttributeNums": Array [
-        1,
-      ],
-      "keyAttributeNums": Array [
-        1,
-      ],
-      "kind": "constraint",
-      "name": "foreign_key_person_id_fkey",
       "type": "f",
     },
     Object {

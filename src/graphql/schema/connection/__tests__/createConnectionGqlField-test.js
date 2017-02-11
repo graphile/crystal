@@ -1,9 +1,11 @@
-jest.mock('../../getGqlType')
+jest.mock('../../type/getGqlOutputType')
 
 import { Kind, GraphQLObjectType, GraphQLInterfaceType, GraphQLNonNull, GraphQLList, GraphQLString } from 'graphql'
 import { ObjectType, stringType } from '../../../../interface'
-import getGqlType from '../../getGqlType'
+import getGqlOutputType from '../../type/getGqlOutputType'
 import createConnectionGqlField, { _cursorType, _pageInfoType, _createEdgeGqlType, _createOrderByGqlEnumType, _createConnectionGqlType } from '../createConnectionGqlField'
+
+getGqlOutputType.mockImplementation(() => ({}))
 
 const expectPromiseToReject = (promise, matcher) => new Promise((resolve, reject) =>
   promise
@@ -95,7 +97,7 @@ test('_createEdgeGqlType will have the correct name', () => {
 })
 
 test('_createEdgeGqlType will correctly return a namespaced cursor', () => {
-  getGqlType.mockReturnValueOnce(GraphQLString)
+  getGqlOutputType.mockReturnValueOnce({ gqlType: GraphQLString })
   const paginator = { name: 'foo' }
   const edgeType = _createEdgeGqlType({}, paginator)
   expect(edgeType.getFields().cursor.resolve({ paginator, cursor: 'foobar' }))
@@ -111,7 +113,7 @@ test('_createEdgeGqlType will correctly return a namespaced cursor', () => {
 })
 
 test('_createEdgeGqlType will just return the value for the node field', () => {
-  getGqlType.mockReturnValueOnce(GraphQLString)
+  getGqlOutputType.mockReturnValueOnce({ gqlType: GraphQLString })
   const value = Symbol('value')
   const edgeType = _createEdgeGqlType({}, {})
   expect(edgeType.getFields().node.resolve({ value })).toBe(value)
@@ -147,7 +149,7 @@ test('_createConnectionGqlType will have the right name', () => {
 
 test('_createConnectionGqlType will resolve the source verbatim for pageInfo', () => {
   const source = Symbol('source')
-  getGqlType.mockReturnValueOnce(GraphQLString)
+  getGqlOutputType.mockReturnValueOnce({ gqlType: GraphQLString })
   const connectionType = _createConnectionGqlType({}, {})
   expect(connectionType.getFields().pageInfo.resolve(source)).toBe(source)
 })

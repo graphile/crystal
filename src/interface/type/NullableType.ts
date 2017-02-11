@@ -1,10 +1,16 @@
 import Type from './Type'
-import NamedType from './NamedType'
 
 /**
- * A nullable type is an unnamed wrapper around any other type that signifies
- * the value may be null *or* the wrapped type’s value. Similar to the monad
- * `Maybe` in Haskell, or `Option` in Rust.
+ * A nullable type is a type whose value may be null (realistically any
+ * constant value), or the value of a base type.
+ *
+ * You can think of a nullable like `Option` in Rust or `Maybe` in Haskell.
+ *
+ * A nullable type has two associated types, `TNullValue` and `TNonNullValue`.
+ * Nullable types do not expect the null value to be the JavaScript
+ * `null`/`undefined`. That is for data producers to decide.
+ *
+ * There should only ever be one value for `TNullValue`.
  *
  * Why did we choose to default to non-nullable when the two original
  * technologies (PostgreSql and GraphQL) have every type as nullable by
@@ -14,7 +20,7 @@ import NamedType from './NamedType'
  *    type includes `null`. However, if we specify that a type’s domain *must*
  *    include `null` through this nullable type, our programs are easier to
  *    think about.
- * 2. It’s easier to statically type. With Typescript we can easily *add* types
+ * 2. It’s easier to statically type. With TypeScript we can easily *add* types
  *    with a union, but we can’t take away a type. It would also be a pain to
  *    add `| null` to every `TValue`. Note that we are looking at this problem
  *    from the perspective of `strictNullTypes` on. Without `strictNullTypes`
@@ -22,39 +28,35 @@ import NamedType from './NamedType'
  * 3. Matches functional programming patterns. As mentioned before, this is a
  *    ubiquitous pattern in functional programming languages.
  *
- * Given the problem space of PostgreSql and GraphQL it makes sense they would
- * default to all types being nullable, however given the problem space of our
- * interface, it makes more sense to be non-nullable by default then wrap types
- * with an instance of this type.
- *
- * Also note that it is possible that a nullable type could wrap another
- * nullable type. This may lead to unexpected behavior.
+ * Also note that a nullable type may wrap another nullable type unlike in
+ * GraphQL where a non-null type may not wrap another non-null type.
  */
-class NullableType<TValue extends TNonNullValue | null | undefined, TNonNullValue> extends Type<TValue> {
+class NullableType<TNonNullValue> implements Type<TNonNullValue | null | undefined> {
+  // The unique type kind.
+  public readonly kind: 'NULLABLE' = 'NULLABLE'
+
+  /**
+   * The type for the non-null value.
+   */
+  public readonly nonNullType: Type<TNonNullValue>
+
   constructor (nonNullType: Type<TNonNullValue>) {
-    super()
     this.nonNullType = nonNullType
   }
 
   /**
-   * The non-null underlying type. This type cannot be null (unless it is a
-   * `NullableType` itself). However, when wrapped it can be null.
+   * Determines if the value passed in is the non-null variant.
    */
-  public readonly nonNullType: Type<TNonNullValue>
-
-  /**
-   * Checks if the value is null, or it is a type of the nullable types non
-   * null composite type.
-   */
-  public isTypeOf (value: mixed): value is TValue {
-    return value == null || this.nonNullType.isTypeOf(value)
+  public isNonNull (value: TNonNullValue | null | undefined): value is TNonNullValue {
+    return value != null
   }
 
   /**
-   * Returns the named type inside this nullable type’s non-null type.
+   * Checks if the value is null, if so returns true. Otherwise we run
+   * `nonNullType.isTypeOf` on the value.
    */
-  public getNamedType (): NamedType<mixed> {
-    return this.nonNullType.getNamedType()
+  public isTypeOf (value: mixed): value is TNonNullValue | null | undefined {
+    return value == null || this.nonNullType.isTypeOf(value)
   }
 }
 

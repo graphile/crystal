@@ -1,9 +1,11 @@
 import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
+import { EventEmitter } from 'events'
 import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
+import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
 
 type PostGraphQLOptions = {
@@ -20,6 +22,8 @@ type PostGraphQLOptions = {
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
+  exportJsonSchemaPath?: string,
+  exportGqlSchemaPath?: string,
 }
 
 /**
@@ -82,6 +86,8 @@ export default function postgraphql (
   // out the `gqlSchema`.
   let gqlSchema = createGqlSchema()
 
+  const _emitter = new EventEmitter()
+
   // If the user wants us to watch the schema, execute the following:
   if (options.watchPg) {
     watchPgSchemas({
@@ -89,7 +95,9 @@ export default function postgraphql (
       pgSchemas,
       onChange: ({ commands }) => {
         // tslint:disable-next-line no-console
-        console.log(`Restarting PostGraphQL API after Postgres command(s)${options.graphiql ? '. Make sure to reload GraphiQL' : ''}: ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
+        console.log(`Rebuilding PostGraphQL API after Postgres command(s): ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
+
+        _emitter.emit('schemas:changed')
 
         // Actually restart the GraphQL schema by creating a new one. Note that
         // `createGqlSchema` returns a promise and we aren’t ‘await’ing it.
@@ -110,6 +118,7 @@ export default function postgraphql (
   return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
     getGqlSchema: () => gqlSchema,
     pgPool,
+    _emitter,
   }))
 
   /**
@@ -124,6 +133,7 @@ export default function postgraphql (
     try {
       const pgClient = await pgPool.connect()
       const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
+      exportGqlSchema(newGqlSchema)
 
       // If no release function exists, don’t release. This is just for tests.
       if (pgClient && pgClient.release)
@@ -133,13 +143,28 @@ export default function postgraphql (
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {
-      // tslint:disable no-console
-      console.error(`${error.stack}\n`)
-      process.exit(1)
-
-      // This is just here to make TypeScript type check. `process.exit` will
-      // quit our program meaning we never execute this code.
-      return null as never
+      return handleFatalError(error)
     }
   }
+
+  async function exportGqlSchema (newGqlSchema: GraphQLSchema): Promise<void> {
+    try {
+      await exportPostGraphQLSchema(newGqlSchema, options)
+    }
+    // If we fail to export our schema, log the error and exit the process.
+    catch (error) {
+      handleFatalError(error)
+    }
+  }
+}
+
+function handleFatalError (error: Error): never {
+  // tslint:disable-next-line no-console
+  console.error(`${error.stack}\n`)
+  process.exit(1)
+
+  // `process.exit` will mean all code below it will never get called.
+  // However, we need to return a value with type `never` here for
+  // TypeScript.
+  return null as never
 }

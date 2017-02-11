@@ -1,9 +1,13 @@
 import { GraphQLInputFieldConfig, GraphQLNonNull, getNullableType } from 'graphql'
-import { CollectionKey, ObjectType } from '../../../interface'
+import { CollectionKey, Type, ObjectType, switchType } from '../../../interface'
 import { formatName, scrib } from '../../utils'
+import getGqlInputType from '../type/getGqlInputType'
 import BuildToken from '../BuildToken'
-import getGqlType from '../getGqlType'
-import transformGqlInputValue from '../transformGqlInputValue'
+
+type CollectionKeyInputHelpers<TKey> = {
+  fieldEntries: Array<[string, GraphQLInputFieldConfig]>,
+  getKeyFromInput: (input: { [key: string]: mixed }) => TKey,
+}
 
 /**
  * There are different ways to create the input for a collection key given the
@@ -16,67 +20,63 @@ import transformGqlInputValue from '../transformGqlInputValue'
  * For everything else we just have a single field.
  */
 // TODO: test
-export default function createCollectionKeyInputHelpers <T>(
+export default function createCollectionKeyInputHelpers <TValue, TKey>(
   buildToken: BuildToken,
-  collectionKey: CollectionKey<T>,
-): {
-  fieldEntries: Array<[string, GraphQLInputFieldConfig<mixed>]>
-  getKey: (input: { [key: string]: mixed }) => T,
-} {
-  const { keyType } = collectionKey
+  collectionKey: CollectionKey<TValue, TKey>,
+): CollectionKeyInputHelpers<TKey> {
+  return switchType<CollectionKeyInputHelpers<TKey>>(collectionKey.keyType, {
+    // If this is an object type, we want to flatten out the object’s fields into
+    // field entries. This provides a nicer experience as it eliminates one level
+    // of nesting.
+    object: <TKey>(keyType: ObjectType<TKey>): CollectionKeyInputHelpers<TKey> => {
+      // Create the definition of our fields. We will use this definition
+      // to correctly assemble the input later.
+      const fields =
+        Array.from(keyType.fields).map(([fieldName, field]) => {
+          const { gqlType, fromGqlInput } = getGqlInputType(buildToken, field.type)
+          return {
+            key: formatName.arg(fieldName),
+            value: {
+              description: field.description,
+              type: new GraphQLNonNull(getNullableType(gqlType)),
+              // We add an `internalName` so that we can use that name to
+              // reconstruct the correct object value.
+              internalName: fieldName,
+              // We also add this function so we can use it later on.
+              fromGqlInput,
+            },
+          }
+        })
 
-  // If this is an object type, we want to flatten out the object’s fields into
-  // field entries. This provides a nicer experience as it eliminates one level
-  // of nesting.
-  if (keyType instanceof ObjectType) {
-    // Create the definition of our fields. We will use this definition
-    // to correctly assemble the input later.
-    const fieldEntries =
-      Array.from(keyType.fields).map<[string, GraphQLInputFieldConfig<mixed> & { internalName: string }]>(([fieldName, field]) =>
-        [formatName.arg(fieldName), {
-          description: field.description,
-          type: new GraphQLNonNull(getNullableType(getGqlType(buildToken, field.type, true))),
-          // We add an `internalName` so that we can use that name to
-          // reconstruct the correct object value.
-          internalName: fieldName,
-        }],
-      )
+      return {
+        fieldEntries: fields.map<[string, GraphQLInputFieldConfig]>(({ key, value }) => [key, value]),
+        getKeyFromInput: (input: { [key: string]: mixed }): TKey =>
+          keyType.fromFields(new Map(fields.map<[string, mixed]>(({ key, value: { internalName, fromGqlInput } }) =>
+            [internalName, fromGqlInput(input[key])]))),
+      }
+    },
 
-    return {
-      fieldEntries,
-      getKey: input => {
-        const key = new Map(fieldEntries.map<[string, mixed]>(([fieldName, field]) => [
-          field.internalName,
-          transformGqlInputValue(field.type, input[fieldName] as mixed),
-        ]))
+    // Otherwise, we just put the type into a single field entry with the
+    // default case. Pretty boring.
+    nullable: defaultCase,
+    list: defaultCase,
+    alias: defaultCase,
+    enum: defaultCase,
+    scalar: defaultCase,
+  })
 
-        if (!keyType.isTypeOf(key))
-          throw new Error('The object key input is not of the correct type.')
-
-        return key
-      },
-    }
-  }
-  // Otherwise, we just put the type into a single field entry. Pretty boring.
-  else {
+  function defaultCase <TKey>(keyType: Type<TKey>): CollectionKeyInputHelpers<TKey> {
     const fieldName = formatName.arg(collectionKey.name)
-    const fieldType = getGqlType(buildToken, keyType, true)
+    const { gqlType, fromGqlInput } = getGqlInputType(buildToken, keyType)
 
     return {
       fieldEntries: [
         [fieldName, {
-          description: `The ${scrib.type(fieldType)} to use when reading a single value.`,
-          type: new GraphQLNonNull(getNullableType(fieldType)),
+          description: `The ${scrib.type(gqlType)} to use when reading a single value.`,
+          type: new GraphQLNonNull(getNullableType(gqlType)),
         }],
       ],
-      getKey: input => {
-        const key = transformGqlInputValue(fieldType, input[fieldName])
-
-        if (!keyType.isTypeOf(key))
-          throw new Error('The key input is not of the correct type.')
-
-        return key
-      },
+      getKeyFromInput: fromGqlInput,
     }
   }
 }
