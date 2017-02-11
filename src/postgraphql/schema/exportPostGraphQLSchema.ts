@@ -27,7 +27,7 @@ export default async function exportPostGraphQLSchema (
   // JSON version
   if (typeof options.exportJsonSchemaPath === 'string') {
     const result = await graphql(schema, introspectionQuery)
-    await writeFileAsync(options.exportJsonSchemaPath, JSON.stringify(result))
+    await writeFileAsync(options.exportJsonSchemaPath, JSON.stringify(result, null, 2))
   }
 
   // Schema language version

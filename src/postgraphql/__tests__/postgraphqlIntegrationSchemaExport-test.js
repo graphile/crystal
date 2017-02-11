@@ -8,11 +8,8 @@ import { writeFile } from 'fs'
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
-beforeEach(() => {
-  writeFile.mock.calls = []
-})
-
 test('exports a schema as JSON', withPgClient(async pgClient => {
+  writeFile.mockClear()
   const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
   await exportPostGraphQLSchema(gqlSchema, { exportJsonSchemaPath: '/schema.json' })
   expect(writeFile.mock.calls.length).toBe(1)
@@ -21,6 +18,7 @@ test('exports a schema as JSON', withPgClient(async pgClient => {
 }))
 
 test('exports a schema as GQL', withPgClient(async pgClient => {
+  writeFile.mockClear()
   const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
   await exportPostGraphQLSchema(gqlSchema, { exportGqlSchemaPath: '/schema.gql' })
   expect(writeFile.mock.calls.length).toBe(1)
@@ -29,6 +27,7 @@ test('exports a schema as GQL', withPgClient(async pgClient => {
 }))
 
 test('does not export a schema when not enabled', withPgClient(async pgClient => {
+  writeFile.mockClear()
   const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
   await exportPostGraphQLSchema(gqlSchema)
   expect(writeFile.mock.calls.length).toBe(0)
