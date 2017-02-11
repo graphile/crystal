@@ -121,16 +121,6 @@ export default function postgraphql (
     _emitter,
   }))
 
-  async function handleFatalError (error: Error): Promise<void> {
-    // tslint:disable-next-line no-console
-    console.error(`${error.stack}\n`)
-    process.exit(1)
-
-    // This is just here to make TypeScript type check. `process.exit` will
-    // quit our program meaning we never execute this code.
-    return null as never
-  }
-
   /**
    * Creates a GraphQL schema by connecting a client from our pool which will
    * be used to introspect our Postgres database. If this function fails, we
@@ -153,7 +143,7 @@ export default function postgraphql (
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {
-      return handleFatalError(error) as never
+      handleFatalError(error)
     }
   }
 
@@ -163,7 +153,13 @@ export default function postgraphql (
     }
     // If we fail to export our schema, log the error and exit the process.
     catch (error) {
-      return handleFatalError(error)
+      handleFatalError(error)
     }
   }
+}
+
+function handleFatalError (error: Error): never {
+  // tslint:disable-next-line no-console
+  console.error(`${error.stack}\n`)
+  process.exit(1)
 }
