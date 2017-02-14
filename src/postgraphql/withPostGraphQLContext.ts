@@ -167,7 +167,6 @@ const $$pgClientOrigQuery = Symbol()
 
 const debugPg = createDebugger('postgraphql:postgres')
 const debugPgError = createDebugger('postgraphql:postgres:error')
-const debugPgExplain = createDebugger('postgraphql:postgres:explain')
 
 /**
  * Adds debug logging funcionality to a Postgres client.
@@ -178,7 +177,7 @@ const debugPgExplain = createDebugger('postgraphql:postgres:explain')
 function debugPgClient (pgClient: Client): Client {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
-  if (debugPg.enabled || debugPgExplain.enabled) {
+  if (debugPg.enabled || debugPgError.enabled) {
     // Set the original query method to a key on our client. If that key is
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
@@ -195,28 +194,7 @@ function debugPgClient (pgClient: Client): Client {
       // Report the error with our Postgres debugger.
       promiseResult.catch((error: any) => debugPgError(error))
 
-      // Call the original query method.
-      return promiseResult.then((result: any) => {
-        // If we have enabled our explain debugger, we will log the
-        // explanation for any query that we get. This does mean making a
-        // Sql query though. We only want this to run if the query we are
-        // explaining was successful and it was a command we can explain.
-        if (debugPgExplain.enabled && ['SELECT'].indexOf(result.command) !== -1) {
-          pgClient[$$pgClientOrigQuery]
-            // Call the query function and prepend `explain analyze`.
-            // tslint:disable-next-line no-invalid-this
-            .call(this, {
-              text: `explain analyze ${args[0] && args[0].text ? args[0].text : args[0]}`,
-              values: args[0] && args[0].values ? args[0].values : args[1] || [],
-            })
-            .then((explainResult: any) =>
-              debugPgExplain(`\n${explainResult.rows.map((row: any) => row['QUERY PLAN']).join('\n')}`))
-            .catch((error: any) =>
-              debugPgExplain(error))
-        }
-
-        return result
-      })
+      return promiseResult
     }
   }
 
