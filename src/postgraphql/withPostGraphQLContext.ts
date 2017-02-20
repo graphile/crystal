@@ -36,11 +36,13 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
+    jwtAudience,
     pgDefaultRole,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
+    jwtAudience?: string,
     pgDefaultRole?: string,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
@@ -60,6 +62,7 @@ export default async function withPostGraphQLContext(
       pgClient,
       jwtToken,
       jwtSecret,
+      jwtAudience,
       pgDefaultRole,
     })
 
