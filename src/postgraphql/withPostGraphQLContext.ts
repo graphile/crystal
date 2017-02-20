@@ -17,6 +17,7 @@ import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
  *   pgPool,
  *   jwtToken,
  *   jwtSecret,
+ *   jwtAudience,
  *   pgDefaultRole,
  * }, async context => {
  *   return await graphql(
@@ -88,11 +89,13 @@ async function setupPgClientTransaction ({
   pgClient,
   jwtToken,
   jwtSecret,
+  jwtAudience,
   pgDefaultRole,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
+  jwtAudience?: string,
   pgDefaultRole?: string,
 }): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
@@ -105,12 +108,15 @@ async function setupPgClientTransaction ({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not procided to the server
+      // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: 'postgraphql' })
+      if (typeof jwtAudience === 'undefined')
+        jwtAudience = 'postgraphql'
+
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience })
 
       const roleClaim = jwtClaims['role']
 
