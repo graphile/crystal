@@ -123,7 +123,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
 // some instructions and other interesting information.
 server.listen(port, hostname, () => {
   console.log('')
-  console.log(`PostGraphQL server listening on port ${chalk.underline(port.toString())} 🚀`)
+  console.log(`PostGraphQL server listening on port ${chalk.underline(server.address().port.toString())} 🚀`)
   console.log('')
   console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
   console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
