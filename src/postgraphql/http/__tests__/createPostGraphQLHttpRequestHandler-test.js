@@ -15,7 +15,7 @@ const event = require('events')
 
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter()
-  stream.pipe = jest.fn(res => process.nextTick(() => res.end()));
+  stream.pipe = jest.fn(res => process.nextTick(() => res.end()))
   process.nextTick(() => stream.emit('end'))
   return stream
 })
