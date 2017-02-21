@@ -3,7 +3,7 @@ import DataLoader = require('dataloader')
 import { Client } from 'pg'
 import { Collection } from '../../../interface'
 import { sql, memoizeMethod } from '../../utils'
-import { PgCatalog, PgCatalogNamespace, PgCatalogClass, PgCatalogAttribute } from '../../introspection'
+import { PgCatalog, PgCatalogNamespace, PgCatalogClass } from '../../introspection'
 import PgClassType from '../type/PgClassType'
 import Options from '../Options'
 import pgClientFromContext from '../pgClientFromContext'
@@ -27,7 +27,6 @@ class PgCollection implements Collection<PgClassType.Value> {
    * of `PgCatalog`.
    */
   private _pgNamespace: PgCatalogNamespace = this._pgCatalog.assertGetNamespace(this.pgClass.namespaceId)
-  private _pgAttributes: Array<PgCatalogAttribute> = this._pgCatalog.getClassAttributes(this.pgClass.id)
 
   /**
    * The name of this collection. A pluralized version of the class name. We
@@ -133,6 +132,18 @@ class PgCollection implements Collection<PgClassType.Value> {
       async (values: Array<PgClassType.Value>): Promise<Array<PgClassType.Value>> => {
         const insertionIdentifier = Symbol()
 
+        // Get the fields that actually have been used in any of the values, so
+        // we can leave the rest out of the query completely to prevent
+        // permission issues
+        const fields = new Map()
+        values.forEach((map) => {
+          map.forEach((value, key) => {
+            if (typeof value !== 'undefined') {
+              fields.set(key, this.type.fields.get(key))
+            }
+          })
+        })
+
         // Create our insert query.
         const query = sql.compile(sql.query`
           with ${sql.identifier(insertionIdentifier)} as (
@@ -140,16 +151,16 @@ class PgCollection implements Collection<PgClassType.Value> {
             -- inserting into (prefixed by namespace of course).
             insert into ${sql.identifier(this._pgNamespace.name, this.pgClass.name)}
 
-            -- Add all of our attributes as columns to be inserted into. This is
-            -- helpful in case the columns differ from what we expect.
-            (${sql.join(this._pgAttributes.map(({ name }) => sql.identifier(name)), ', ')})
+            -- Add all of the attributes that we're going to use as columns to be inserted into.
+            -- This is helpful in case the columns differ from what we expect.
+            (${sql.join(Array.from(fields.values()).map(({ pgAttribute }) => sql.identifier(pgAttribute.name)), ', ')})
 
             -- Next, add all of our value tuples.
             values ${sql.join(values.map(value =>
               // Make sure we have one value for every attribute in the class,
               // if there was no such value defined, we should just use
               // `default` and use the user’s default value.
-              sql.query`(${sql.join(Array.from(this.type.fields.values()).map(field => {
+              sql.query`(${sql.join(Array.from(fields.values()).map(field => {
                 const fieldValue = field.getValue(value)
                 return typeof fieldValue === 'undefined' ? sql.query`default` : field.type.transformValueIntoPgValue(fieldValue)
               }), ', ')})`,
