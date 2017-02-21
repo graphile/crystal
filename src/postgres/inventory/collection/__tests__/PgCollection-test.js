@@ -80,6 +80,28 @@ test('create will insert new rows into the database', withPgClient(async client 
     .toEqual(values.map(mapToObject))
 }))
 
+test('create will only include relevant columns', withPgClient(async client => {
+  const context = { [$$pgClient]: client }
+
+  // Note how the about column is not used
+  const value1 = new Map([['name', 'John Smith'], ['email', 'john.smith@email.com']])
+  const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
+  const value3 = new Map([['name', 'Budd Deey'], ['email', 'budd.deey@email.com']])
+
+  client.query.mockClear()
+
+  await Promise.all([
+    collection1.create(context, value1),
+    collection1.create(context, value2),
+    collection1.create(context, value3),
+  ])
+
+  const query = client.query.mock.calls[0][0].text
+  expect(query).toMatch('"name"')
+  expect(query).toMatch('"email"')
+  expect(query).not.toMatch('"about"')
+}))
+
 // TODO: reimplement
 // test('paginator will have the same name and type', () => {
 //   expect(collection1.paginator.name).toBe(collection1.name)
