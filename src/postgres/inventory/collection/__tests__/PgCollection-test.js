@@ -96,10 +96,8 @@ test('create will only include relevant columns', withPgClient(async client => {
     collection1.create(context, value3),
   ])
 
-  const query = client.query.mock.calls[0][0].text
-  expect(query).toMatch('"name"')
-  expect(query).toMatch('"email"')
-  expect(query).not.toMatch('"about"')
+  expect(client.query.mock.calls.length).toBe(1)
+  expect(client.query.mock.calls[0][0].text).toMatchSnapshot()
 }))
 
 // TODO: reimplement
