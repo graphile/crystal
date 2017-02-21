@@ -34,12 +34,21 @@ export default async function watchPgSchemas ({ pgPool, pgSchemas, onChange }: {
   // back to the pool. We keep it forever to receive notifications.
   const pgClient = await pgPool.connect()
 
+  // If the watch fixtures query fails then we will need to rollback the
+  // database to an uncorrupted state, so make a savepoint here in the
+  // uncorrupted state.
+  await pgClient.query('savepoint postgraphql_pre_watch_fixtures')
+
   // Try to apply our watch fixtures to the database. If the query fails, fail
   // gracefully with a warning as the feature may still work.
   try {
     await pgClient.query(await _watchFixturesQuery)
   }
   catch (error) {
+    // The database state is corrupted because the watch fixtures query failed!
+    // Rollback to before we ran the watch fixtures query.
+    await pgClient.query('rollback to postgraphql_pre_watch_fixtures')
+
     // tslint:disable no-console
     console.warn(`${chalk.bold.yellow('Failed to setup watch fixtures in Postgres database')} ️️⚠️`)
     console.warn(chalk.yellow('This is likely because your Postgres user is not a superuser. If the'))
