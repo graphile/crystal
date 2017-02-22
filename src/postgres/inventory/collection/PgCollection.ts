@@ -135,6 +135,7 @@ class PgCollection implements Collection<PgClassType.Value> {
         // Get the fields that actually have been used in any of the values, so
         // we can leave the rest out of the query completely to prevent
         // permission issues
+        // TODO: Use field information from GraphQL instead of iterating through values
         const fields = new Map()
         values.forEach((map) => {
           map.forEach((value, key) => {
