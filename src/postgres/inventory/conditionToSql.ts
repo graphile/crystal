@@ -19,7 +19,7 @@ export default function conditionToSql (condition: Condition, path: Array<string
       // TODO: This is a hack fix. Do a proper fix asap!
       return conditionToSql(condition.condition, path.concat([convertRowIdToId && condition.name === 'row_id' ? 'id' : condition.name]), false)
     case 'EQUAL':
-      return sql.query`(${sql.identifier(...path)} = ${sql.value(condition.value)})`
+      return sql.query`(${sql.identifier(...path)} IS NOT DISTINCT FROM ${sql.value(condition.value)})`
     case 'LESS_THAN':
       return sql.query`(${sql.identifier(...path)} < ${sql.value(condition.value)})`
     case 'GREATER_THAN':
