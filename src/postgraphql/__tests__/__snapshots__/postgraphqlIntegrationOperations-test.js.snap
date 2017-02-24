@@ -617,6 +617,119 @@ Object {
 }
 `;
 
+exports[`test operation dynamic-json.graphql 2`] = `
+Object {
+  "data": Object {
+    "a": true,
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "json": Object {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": Object {
+              "e": 4,
+              "f": 5,
+              "g": Array [
+                6,
+                7,
+                8,
+                "x",
+                false,
+                null,
+              ],
+            },
+          },
+          "jsonb": Object {
+            "1": "a",
+            "2": "b",
+            "3": "c",
+            "4": Object {
+              "5": "d",
+              "6": "e",
+              "7": Array [
+                "f",
+                "g",
+                "h",
+                42,
+                true,
+                null,
+              ],
+            },
+          },
+        },
+      ],
+    },
+    "b": false,
+    "c": 42,
+    "d": 3.1415,
+    "e": "hello, world!",
+    "f": Object {
+      "a": 1,
+      "b": 2,
+      "c": 3,
+    },
+    "g": Array [
+      1,
+      2,
+      3,
+      4,
+    ],
+    "h": Object {
+      "array": Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+      "boolean": true,
+      "float": 3.1415,
+      "integer": 42,
+      "object": Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+    },
+    "i": Array [
+      true,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+    ],
+    "j": Array [
+      true,
+      null,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": null,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        null,
+        3,
+        4,
+      ],
+    ],
+  },
+}
+`;
+
 exports[`test operation mutation-create.graphql 1`] = `
 Object {
   "data": Object {
