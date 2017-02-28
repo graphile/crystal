@@ -1,4 +1,0 @@
-{
-  "sourceMaps": true,
-  "presets": [["modern-node", { "version": "4.0.0" }], "stage-1"]
-}
