@@ -7,6 +7,7 @@ import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
 import getConditionGqlType from './getConditionGqlType'
+import { isSymbol } from 'lodash'
 
 /**
  * Creates the output object type for a collection. This type will include all
@@ -95,9 +96,11 @@ export default function createCollectionGqlType<TValue> (
               ],
               // We use the config when creating a connection field to inject
               // a condition that limits what we select from the paginator.
-              getPaginatorInput: (aliasIdentifier: mixed, args: { condition?: { [key: string]: mixed } }) =>
+              getPaginatorInput: (sourceOrAliasIdentifier: mixed, args: { condition?: { [key: string]: mixed } }) =>
                 conditionHelpers.and(
-                  relation.getTailConditionFromHeadAlias!(aliasIdentifier),
+                  isSymbol(sourceOrAliasIdentifier)
+                    ? relation.getTailConditionFromHeadAlias!(sourceOrAliasIdentifier)
+                    : relation.getTailConditionFromHeadValue!(sourceOrAliasIdentifier),
                   conditionFromGqlInput(args.condition),
                 ),
               subquery: true,
