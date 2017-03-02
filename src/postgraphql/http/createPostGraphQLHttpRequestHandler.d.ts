@@ -68,4 +68,7 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // Enables some CORS rules. When enabled there may be some pre-flight
   // requests with negative performance impacts.
   enableCors?: boolean,
+  
+  // The maximum size of the JSON body accepted by bodyParser
+  sizeLimit?: string,
 }): HttpRequestHandler
