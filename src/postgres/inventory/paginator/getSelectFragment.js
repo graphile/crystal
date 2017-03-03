@@ -43,7 +43,7 @@ export function getSelectFragmentFromFields(fields, aliasIdentifier) {
     buildArgs.push(sql.literal(k), arg);
   }
   if (buildArgs.length === 0) {
-    return sql.query`to_json(${sql.identifier(aliasIdentifier)})`
+    return sql.query`${sql.identifier(aliasIdentifier)}`
   } else {
     return sql.query`json_build_object(${sql.join(buildArgs, ', ')})`
   }

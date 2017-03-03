@@ -124,7 +124,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
         // resolvers to check `source.has(attrName)` to fetch it using the old
         // method if it wasn't fetched via subquery.
         sql.query`
-          select to_json(${sql.identifier(aliasIdentifier)}) as value
+          select ${sql.identifier(aliasIdentifier)} as value
           from ${procedureCall} as ${sql.identifier(aliasIdentifier)}
         `
       )
