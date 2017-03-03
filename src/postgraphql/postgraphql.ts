@@ -8,7 +8,7 @@ import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
 
-type PostGraphQLOptions = {
+export type PostGraphQLOptions = {
   classicIds?: boolean,
   dynamicJson?: boolean,
   graphqlRoute?: string,

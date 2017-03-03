@@ -2,7 +2,7 @@ import { QueryConfig } from 'pg'
 import minify = require('pg-minify')
 
 namespace sql {
-  type NestedArray<T> = Array<T> | Array<Array<T>> | Array<Array<Array<T>>> | Array<Array<Array<Array<T>>>>
+  export type NestedArray<T> = Array<T> | Array<Array<T>> | Array<Array<Array<T>>> | Array<Array<Array<Array<T>>>>
 
   /**
    * Many `SqlItem`s make up a `Sql` query. Different types of items are used to

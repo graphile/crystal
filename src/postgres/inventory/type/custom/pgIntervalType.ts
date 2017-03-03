@@ -9,7 +9,7 @@ import pgIntegerType from '../scalar/pgIntegerType'
 import PgType from '../PgType'
 import PgNullableType from '../PgNullableType'
 
-interface PgInterval {
+export interface PgInterval {
   seconds?: number
   minutes?: number
   hours?: number

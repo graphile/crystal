@@ -5,7 +5,7 @@ import getTypeFromPgType from './getTypeFromPgType'
 import PgType from './PgType'
 
 // We use an interface here to hide the implementation destails.
-interface PgRow extends Map<string, mixed> {}
+export interface PgRow extends Map<string, mixed> {}
 
 class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
   public readonly kind: 'OBJECT' = 'OBJECT'

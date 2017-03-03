@@ -15,7 +15,7 @@ import createMutationPayloadGqlType from './createMutationPayloadGqlType'
  *
  * @private
  */
-type MutationFieldConfig<T> = {
+export type MutationFieldConfig<T> = {
   name: string,
   description?: string | undefined,
   inputFields?: Array<[string, GraphQLInputFieldConfig] | false | null | undefined>,

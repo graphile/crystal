@@ -4,7 +4,7 @@ import { formatName, scrib } from '../../utils'
 import getGqlInputType from '../type/getGqlInputType'
 import BuildToken from '../BuildToken'
 
-type CollectionKeyInputHelpers<TKey> = {
+export type CollectionKeyInputHelpers<TKey> = {
   fieldEntries: Array<[string, GraphQLInputFieldConfig]>,
   getKeyFromInput: (input: { [key: string]: mixed }) => TKey,
 }

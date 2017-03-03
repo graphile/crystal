@@ -16,7 +16,7 @@
 // TODO: Consider some geographic operators.
 // TODO: Consider some array operators.
 // TODO: REFACTOR!!!! The fact that this isn’t type safe is a little scary…
-type Condition =
+export type Condition =
   ConstantCondition |
   NotCondition |
   AndCondition |
@@ -77,13 +77,13 @@ export namespace conditionHelpers {
  *
  * As a bonus, this makes for a nice condition DSL experience.
  */
-type ConstantCondition = boolean
+export type ConstantCondition = boolean
 
 /**
  * Inverts the result of a condition. If a condition would be true, it is now
  * false.
  */
-type NotCondition = {
+export type NotCondition = {
   type: 'NOT',
   condition: Condition,
 }
@@ -91,7 +91,7 @@ type NotCondition = {
 /**
  * Ensures all child conditions must be true before this condition is true.
  */
-type AndCondition = {
+export type AndCondition = {
   type: 'AND',
   conditions: Array<Condition>,
 }
@@ -99,7 +99,7 @@ type AndCondition = {
 /**
  * If even one child condition is true, than this condition will be true.
  */
-type OrCondition = {
+export type OrCondition = {
   type: 'OR',
   conditions: Array<Condition>,
 }
@@ -107,7 +107,7 @@ type OrCondition = {
 /**
  * Checks that a named field of an object value passes a given condition.
  */
-type FieldCondition = {
+export type FieldCondition = {
   type: 'FIELD',
   name: string,
   condition: Condition,
@@ -123,7 +123,7 @@ type FieldCondition = {
  * To use an “is null” operator, set `value` to `null`, for “is not null” use a
  * `NotCondition` as well.
  */
-type EqualCondition = {
+export type EqualCondition = {
   type: 'EQUAL',
   value: mixed,
 }
@@ -135,7 +135,7 @@ type EqualCondition = {
  * For a less than or equal to condition, use the `OrCondition` with an
  * `EqualCondition`.
  */
-type LessThanCondition = {
+export type LessThanCondition = {
   type: 'LESS_THAN',
   value: mixed,
 }
@@ -147,7 +147,7 @@ type LessThanCondition = {
  * Use an `OrCondition` with an `EqualCondition` to get a condition for
  * greater than or equal to.
  */
-type GreaterThanCondition = {
+export type GreaterThanCondition = {
   type: 'GREATER_THAN',
   value: mixed,
 }
@@ -155,7 +155,7 @@ type GreaterThanCondition = {
 /**
  * Asserts that the actual value matches our provided regular expression.
  */
-type RegexpCondition = {
+export type RegexpCondition = {
   type: 'REGEXP',
   regexp: RegExp,
 }

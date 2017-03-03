@@ -4,7 +4,7 @@ import { PgCatalog, PgCatalogRangeType } from '../../introspection'
 import getTypeFromPgType from './getTypeFromPgType'
 import PgType from './PgType'
 
-interface PgRange<T> {
+export interface PgRange<T> {
   start?: { value: T, inclusive: boolean } | null
   end?: { value: T, inclusive: boolean } | null
 }

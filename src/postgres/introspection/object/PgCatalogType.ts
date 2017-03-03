@@ -62,7 +62,7 @@ export interface PgCatalogRangeType extends PgCatalogBaseType {
  *
  * @private
  */
-interface PgCatalogBaseType {
+export interface PgCatalogBaseType {
   readonly kind: 'type'
   readonly id: string
   readonly name: string
