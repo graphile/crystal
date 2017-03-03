@@ -1,7 +1,7 @@
 import { Paginator } from '../../../interface'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 import { sql } from '../../utils'
 import PgType from '../type/PgType'
-import pgClientFromContext from '../pgClientFromContext'
 
 /**
  * An abstract base paginator class for Postgres. This class also exposes a
@@ -29,12 +29,11 @@ abstract class PgPaginator<TInput, TItemValue> implements Paginator<TInput, TIte
   /**
    * Counts how many values are in our `from` entry total.
    */
-  public async count (context: mixed, input: TInput): Promise<number> {
-    const client = pgClientFromContext(context)
+  public async count (context: PostGraphQLContext, input: TInput): Promise<number> {
     const fromSql = this.getFromEntrySql(input)
     const conditionSql = this.getConditionSql(input)
     const aliasIdentifier = Symbol()
-    const result = await client.query(sql.compile(sql.query`select count(${sql.identifier(aliasIdentifier)}) as count from ${fromSql} as ${sql.identifier(aliasIdentifier)} where ${conditionSql}`))
+    const result = await context.pgClient.query(sql.compile(sql.query`select count(${sql.identifier(aliasIdentifier)}) as count from ${fromSql} as ${sql.identifier(aliasIdentifier)} where ${conditionSql}`))
     return parseInt(result.rows[0]['count'], 10)
   }
 }

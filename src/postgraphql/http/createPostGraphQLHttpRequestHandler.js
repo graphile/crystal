@@ -10,7 +10,6 @@ import {
   formatError as defaultFormatError,
   print as printGraphql,
 } from 'graphql'
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import debugPgClient from './debugPgClient'
 import setupServerSentEvents from './setupServerSentEvents'

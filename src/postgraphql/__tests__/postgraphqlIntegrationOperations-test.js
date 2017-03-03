@@ -2,7 +2,6 @@ import { resolve as resolvePath } from 'path'
 import { readFile, readdirSync } from 'fs'
 import { graphql } from 'graphql'
 import withPgClient from '../../postgres/__tests__/fixtures/withPgClient'
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 // This test suite can be flaky. Increase it’s timeout.
@@ -33,7 +32,7 @@ for (const file of readdirSync(queriesDir)) {
 
     await pgClient.query(await kitchenSinkData)
 
-    const result = await graphql(gqlSchema, query, null, { [$$pgClient]: pgClient })
+    const result = await graphql(gqlSchema, query, null, { pgClient })
 
     expect(result).toMatchSnapshot()
   }))

@@ -1,4 +1,5 @@
 import Type from './type/Type'
+import { PostGraphQLContext } from '../postgraphql/withPostGraphQLContext'
 
 /**
  * A collection paginator is an object that implements cursor based pagination
@@ -65,7 +66,7 @@ interface Paginator<TInput, TItemValue> {
    * supplied then we will get the total count of all values in the collection
    * that meet the specified condition.
    */
-  count (context: mixed, input: TInput): Promise<number>
+  count (context: PostGraphQLContext, input: TInput): Promise<number>
 }
 
 // We use a namespace so we only have to export one thing from this module
