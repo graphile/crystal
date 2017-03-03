@@ -153,10 +153,17 @@ const createGqlInputType = <TValue>(buildToken: BuildToken, _type: Type<TValue>)
             },
           }))),
         })),
-        fromGqlInput: gqlInput =>
-          gqlInput != null && typeof gqlInput === 'object'
-            ? type.fromFields(new Map(fieldFixtures.map(({ fieldName, key, fromGqlInput }) => [fieldName, fromGqlInput(gqlInput[key])] as [string, mixed])))
-            : (() => { throw new Error(`Input value must be an object, not '${typeof gqlInput}'.`) })(),
+        fromGqlInput: gqlInput => {
+          if (gqlInput === null || typeof gqlInput !== 'object') {
+            throw new Error(`Input value must be an object, not '${typeof gqlInput}'.`)
+          }
+
+          const entries = fieldFixtures
+            .filter(({ key }) => key in gqlInput)
+            .map(({ fieldName, key, fromGqlInput }) => [fieldName, fromGqlInput(gqlInput[key])] as [string, mixed])
+
+          return type.fromFields(new Map(entries))
+        },
       }
     },
 
