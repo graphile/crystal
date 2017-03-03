@@ -119,6 +119,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   enableCors,
   exportJsonSchemaPath,
   exportGqlSchemaPath,
+  sizeLimit,
 }))
 
 // Start our server by listening to a specific port and host name. Also log
