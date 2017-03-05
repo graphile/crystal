@@ -190,7 +190,12 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
         // Sends the asset at this path. Defaults to a `statusCode` of 200.
         res.statusCode = 200
-        sendFile(req, joinPath(graphiqlDirectory, assetPath), { index: false }).pipe(res)
+        await new Promise((resolve, reject) => {
+          const stream = sendFile(req, joinPath(graphiqlDirectory, assetPath), { index: false })
+            .on('end', resolve)
+            .on('error', reject)
+            .pipe(res)
+        })
         return
       }
 
