@@ -33,7 +33,11 @@ test('will log some stuff and continue if the watch fixtures query fails', async
   await watchPgSchemas({ pgPool })
   console.warn = origWarn
   expect(pgPool.connect.mock.calls).toEqual([[]])
-  expect(pgClient.query.mock.calls).toEqual([[await _watchFixturesQuery], ['listen postgraphql_watch']])
+  expect(pgClient.query.mock.calls).toEqual([
+    [await _watchFixturesQuery],
+    ['rollback'],
+    ['listen postgraphql_watch'],
+  ])
   expect(pgClient.on.mock.calls.length).toBe(1)
   expect(pgClient.on.mock.calls[0].length).toBe(2)
   expect(pgClient.on.mock.calls[0][0]).toBe('notification')
