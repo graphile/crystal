@@ -24,6 +24,7 @@ type PostGraphQLOptions = {
   enableCors?: boolean,
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
+  bodySizeLimit?: string,
 }
 
 /**
