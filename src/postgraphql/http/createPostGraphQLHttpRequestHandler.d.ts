@@ -69,6 +69,8 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // requests with negative performance impacts.
   enableCors?: boolean,
 
-  // The maximum size of the JSON body accepted by bodyParser
-  sizeLimit?: string,
+  // Set the maximum size of JSON bodies that can be parsed (default 100kB).
+  // The size can be given as a human-readable string, such as '200kB' or '5MB'
+  // (case insensitive).
+  bodySizeLimit?: string,
 }): HttpRequestHandler

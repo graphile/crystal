@@ -96,7 +96,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
   // want that.
   const bodyParserMiddlewares = [
     // Parse JSON bodies.
-    bodyParser.json({ limit: options.sizeLimit }),
+    bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
     bodyParser.urlencoded({ extended: false }),
     // Parse `application/graphql` content type bodies as text.
