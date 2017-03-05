@@ -50,7 +50,7 @@ Arguments include:
 - **`pgConfig`**: An object or string that will be passed to the [`pg`][] library and used to connect to a PostgreSQL backend.
 - **`schemaName`**: A string which specifies the PostgreSQL schema you will be serving with PostGraphQL. The default schema is the `public` schema. May be an array for multiple schemas.
 - **`options`**: An object containing other miscellaneous options. Options could be:
-  - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `__id` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
+  - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `nodeId` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
   - `dynamicJson`: Setting this to `true` enables dynamic JSON which will allow you to use any JSON as input and get any arbitrary JSON as output. By default JSON types are just a JSON string.
   - `disableDefaultMutations`: Setting this to `true` will prevent the creation of the default mutation types & fields. Database mutation will only be possible through Postgres functions.
   - `graphiql`: Set this to `true` to enable the GraphiQL interface.
@@ -129,7 +129,7 @@ Arguments include:
 - **`pgConfig`**: An object or string that will be passed to the [`pg`][] library and used to connect to a PostgreSQL backend. If you already have a client or pool instance, when using this function you may also pass a `pg` client or a `pg-pool` instance directly instead of a config.
 - **`schemaName`**: A string which specifies the PostgreSQL schema that PostGraphQL will use to create a GraphQL schema. The default schema is the `public` schema. May be an array for multiple schemas. For users who want to run the Postgres introspection query ahead of time, you may also pass in a `PgCatalog` instance directly.
 - **`options`**: An object containing other miscellaneous options. Most options are shared with the `postgraphql` middleware function. Options could be:
-  - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `__id` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
+  - `classicIds`: Enables classic ids for Relay 1 support. Instead of using the field name `nodeId` for globally unique ids, PostGraphQL will instead use the field name `id` for its globally unique ids. This means that table `id` columns will also get renamed to `rowId`.
   - `dynamicJson`: Setting this to `true` enables dynamic JSON which will allow you to use any JSON as input and get any arbitrary JSON as output. By default JSON types are just a JSON string.
   - `jwtSecret`: The JWT secret that will be used to sign tokens returned by the type created with the `jwtPgTypeIdentifier` option.
   - `jwtPgTypeIdentifier`: The Postgres type identifier for the compound type which will be signed as a JWT token if ever found as the return type of a procedure. Can be of the form: `my_schema.my_type`. You may use quotes as needed: `"my-special-schema".my_type`.
