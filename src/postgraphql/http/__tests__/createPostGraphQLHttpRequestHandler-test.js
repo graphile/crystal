@@ -11,8 +11,14 @@ const connect = require('connect')
 const express = require('express')
 const Koa = require('koa') // tslint:disable-line variable-name
 const sendFile = require('send')
+const event = require('events')
 
-sendFile.mockImplementation(() => ({ pipe: jest.fn(res => res.end()) }))
+sendFile.mockImplementation(() => {
+  const stream = new event.EventEmitter()
+  stream.pipe = jest.fn(res => process.nextTick(() => res.end()))
+  process.nextTick(() => stream.emit('end'))
+  return stream
+})
 
 const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
