@@ -80,7 +80,7 @@ test('create will insert new rows into the database', withPgClient(async client 
 }))
 
 test('create will only include relevant columns', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+  const context = { pgClient: client }
 
   // Note how the about column is not used
   const value1 = new Map([['name', 'John Smith'], ['email', 'john.smith@email.com']])
