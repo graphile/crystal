@@ -1,5 +1,6 @@
 import Type from '../type/Type'
 import Collection from './Collection'
+import { PostGraphQLContext } from '../../postgraphql/withPostGraphQLContext'
 
 /**
  * A collection key will uniquely identify any value in a collection. They key
@@ -54,7 +55,7 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  readonly read?: ((context: mixed, key: TKeyValue) => Promise<TValue | null>) | null
+  readonly read?: ((context: PostGraphQLContext, key: TKeyValue) => Promise<TValue | null>) | null
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is
@@ -67,7 +68,7 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was updated, an error should be thrown.
    */
   // TODO: Test this.
-  readonly update?: ((context: mixed, key: TKeyValue, patch: Map<string, mixed>) => Promise<TValue>) | null
+  readonly update?: ((context: PostGraphQLContext, key: TKeyValue, patch: Map<string, mixed>) => Promise<TValue>) | null
 
   /**
    * Delete a value from the collection by using the value’s key. Returned is
@@ -76,7 +77,7 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was deleted an error should be thrown.
    */
   // TODO: Test this.
-  readonly delete?: ((context: mixed, key: TKeyValue) => Promise<TValue>) | null
+  readonly delete?: ((context: PostGraphQLContext, key: TKeyValue) => Promise<TValue>) | null
 }
 
 export default CollectionKey

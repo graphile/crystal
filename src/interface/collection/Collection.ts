@@ -2,6 +2,7 @@ import ObjectType from '../type/ObjectType'
 import Paginator from '../Paginator'
 import CollectionKey from './CollectionKey'
 import Condition from './Condition'
+import { PostGraphQLContext } from '../../postgraphql/withPostGraphQLContext'
 
 /**
  * A collection represents a set of typed values that can be operated on in
@@ -63,7 +64,7 @@ interface Collection<TValue> {
   // TODO: Test that we can use this method on an empty collection and then
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
-  create?: ((context: mixed, value: TValue) => Promise<TValue>) | null
+  create?: ((context: PostGraphQLContext, value: TValue) => Promise<TValue>) | null
 }
 
 export default Collection

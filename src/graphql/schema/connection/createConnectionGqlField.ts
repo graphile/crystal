@@ -15,6 +15,7 @@ import { Paginator } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 // TODO: doc
 export default function createConnectionGqlField <TSource, TInput, TItemValue>(
@@ -25,7 +26,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
-): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
+): GraphQLFieldConfig<TSource, PostGraphQLContext> {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
   // This is the type of all the connection arguments.
@@ -74,7 +75,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     async resolve <TCursor>(
       source: TSource,
       args: ConnectionArgs<TCursor>,
-      context: mixed,
+      context: PostGraphQLContext,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
       const {
         orderBy: orderingName,

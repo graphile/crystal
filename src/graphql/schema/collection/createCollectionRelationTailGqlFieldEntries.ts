@@ -3,6 +3,7 @@ import { Collection, Relation, NullableType } from '../../../interface'
 import { formatName, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * Creates the fields for which the collection argument is the tail.
@@ -35,7 +36,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
         relation.headCollectionKey.read != null,
       )
       // Transform the relation into a field entry.
-      .map(<THeadValue, THeadKey>(relation: Relation<TValue, THeadValue, THeadKey>): [string, GraphQLFieldConfig<TSource, mixed>] => {
+      .map(<THeadValue, THeadKey>(relation: Relation<TValue, THeadValue, THeadKey>): [string, GraphQLFieldConfig<TSource, PostGraphQLContext>] => {
         const headCollectionKey = relation.headCollectionKey
         const headCollection = headCollectionKey.collection
         const { gqlType: headCollectionGqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(headCollection.type))
@@ -47,7 +48,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this ${scrib.type(collectionGqlType)}.`,
             type: headCollectionGqlType,
-            async resolve (source: TSource, _args: {}, context: mixed): Promise<mixed> {
+            async resolve (source: TSource, _args: {}, context: PostGraphQLContext): Promise<mixed> {
               const value = options.getCollectionValue(source)
               const key = relation.getHeadKeyFromTailValue(value)
               const headValue = await headCollectionKey.read!(context, key)

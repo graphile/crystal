@@ -88,7 +88,7 @@ namespace Paginator {
      * @see Paginator.PageConfig
      */
     readPage (
-      context: mixed,
+      context: PostGraphQLContext,
       input: TInput,
       config: Paginator.PageConfig<TCursor>,
     ): Promise<Paginator.Page<TItemValue, TCursor>>
