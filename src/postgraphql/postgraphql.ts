@@ -25,6 +25,7 @@ type PostGraphQLOptions = {
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
   bodySizeLimit?: string,
+  pgSettings?: { [key: string]: mixed },
 }
 
 /**

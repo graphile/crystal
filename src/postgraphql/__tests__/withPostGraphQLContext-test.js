@@ -107,7 +107,7 @@ test('will throw an error if the JWT token does not have an appropriate audience
   expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
 })
 
-test('will succeed with all the correct thigns', async () => {
+test('will succeed with all the correct things', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
   await withPostGraphQLContext({
@@ -136,6 +136,28 @@ test('will add extra claims as available', async () => {
       'jwt.claims.a', 1,
       'jwt.claims.b', 2,
       'jwt.claims.c', 3,
+    ],
+  }], ['commit']])
+})
+
+test('will add extra settings as available', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql' }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    pgSettings: {
+      'foo.bar': 'test1',
+      'some.other.var': 'hello world',
+    },
+  }, () => {})
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [{
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+    values: [
+      'foo.bar', 'test1',
+      'some.other.var', 'hello world',
+      'jwt.claims.aud', 'postgraphql',
     ],
   }], ['commit']])
 })
