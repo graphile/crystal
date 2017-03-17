@@ -7,7 +7,7 @@ import { PgCatalog, PgCatalogProcedure } from '../../../postgres/introspection'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import PgProcedurePaginator from './PgProcedurePaginator'
-import { PostGraphQLContext } from '../../withPostGraphQLContext';
+import { PostGraphQLContext } from '../../withPostGraphQLContext'
 
 /**
  * Creates the fields for query procedures. Query procedures that return

@@ -3,7 +3,7 @@ import { PgCatalogAttribute } from '../../introspection'
 import { sql } from '../../utils'
 import PgClassType from '../type/PgClassType'
 import PgPaginator from './PgPaginator'
-import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext';
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * The cursor type when we are ordering by attributes is just a fixed length

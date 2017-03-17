@@ -8,7 +8,7 @@ import PgType from '../type/PgType'
 import PgClassType from '../type/PgClassType'
 import getTypeFromPgType from '../type/getTypeFromPgType'
 import PgCollection from './PgCollection'
-import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext';
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
