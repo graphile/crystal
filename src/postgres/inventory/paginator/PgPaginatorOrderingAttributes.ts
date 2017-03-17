@@ -71,6 +71,9 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
     const query = sql.compile(sql.query`
+      -- The query is wrapped with a CTE on which the to_json function is
+      -- applied. This ensures the to_json function is only called on the final
+      -- results of the query.
       with ${sql.identifier(cteIdentifier)} as (
         -- The standard select/from clauses up top.
         select ${sql.identifier(aliasIdentifier)}.*

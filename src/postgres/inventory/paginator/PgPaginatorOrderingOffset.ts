@@ -127,6 +127,9 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
 
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
+      -- The query is wrapped with a CTE on which the to_json function is
+      -- applied. This ensures the to_json function is only called on the final
+      -- results of the query.
       with ${sql.identifier(cteIdentifier)} as (
         select ${sql.identifier(aliasIdentifier)}.*
         from ${fromSql} as ${sql.identifier(aliasIdentifier)}
