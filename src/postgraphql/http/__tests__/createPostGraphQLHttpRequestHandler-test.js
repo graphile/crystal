@@ -569,7 +569,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
             values: [
               'foo.string', 'test1',
               'foo.number', '42',
-              'foo.boolean', 'true'
+              'foo.boolean', 'true',
             ],
           },
         ],
