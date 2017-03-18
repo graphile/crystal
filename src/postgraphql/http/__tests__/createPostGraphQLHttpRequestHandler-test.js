@@ -547,7 +547,9 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.release.mockClear()
       const server = createServer({
         pgSettings: {
-          'foo.bar': 'test1',
+          'foo.string': 'test1',
+          'foo.number': 42,
+          'foo.boolean': true,
         },
       })
       await (
@@ -563,8 +565,12 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true)',
-            values: ['foo.bar', 'test1'],
+            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            values: [
+              'foo.string', 'test1',
+              'foo.number', '42',
+              'foo.boolean', 'true'
+            ],
           },
         ],
         ['commit'],
