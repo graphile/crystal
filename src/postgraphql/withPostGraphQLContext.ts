@@ -36,11 +36,13 @@ export default async function withPostGraphQLContext(
     jwtToken,
     jwtSecret,
     pgDefaultRole,
+    pgSettings,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
     pgDefaultRole?: string,
+    pgSettings?: { [key: string]: mixed },
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -60,6 +62,7 @@ export default async function withPostGraphQLContext(
       jwtToken,
       jwtSecret,
       pgDefaultRole,
+      pgSettings,
     })
 
     return await callback({
@@ -89,11 +92,13 @@ async function setupPgClientTransaction ({
   jwtToken,
   jwtSecret,
   pgDefaultRole,
+  pgSettings,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
   pgDefaultRole?: string,
+  pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
@@ -134,6 +139,14 @@ async function setupPgClientTransaction ({
   // Instantiate a map of local settings. This map will be transformed into a
   // Sql query.
   const localSettings = new Map<string, mixed>()
+
+  // Set the custom provided settings before jwt claims and role are set
+  // this prevents an accidentional overwriting
+  if (typeof pgSettings === 'object') {
+    for (const key of Object.keys(pgSettings)) {
+      localSettings.set(key, String(pgSettings[key]))
+    }
+  }
 
   // If there is a rule, we want to set the root `role` setting locally
   // to be our role. The role may only be null if we have no default role.
