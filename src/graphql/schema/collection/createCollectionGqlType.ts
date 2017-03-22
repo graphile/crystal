@@ -7,6 +7,7 @@ import createConnectionGqlField from '../connection/createConnectionGqlField'
 import BuildToken from '../BuildToken'
 import createCollectionRelationTailGqlFieldEntries from './createCollectionRelationTailGqlFieldEntries'
 import getConditionGqlType from './getConditionGqlType'
+import { sql } from '../../../postgres/utils'
 
 /**
  * Creates the output object type for a collection. This type will include all
@@ -45,12 +46,17 @@ export default function createCollectionGqlType<TValue> (
       Array.from(type.fields).map(
         <TFieldValue>([fieldName, field]: [string, ObjectType.Field<TValue, TFieldValue>]) => {
           const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, field.type)
+          const formattedFieldName = formatName.field(fieldName)
           return {
-            key: formatName.field(fieldName),
+            key: formattedFieldName
             value: {
               description: field.description,
               type: gqlType,
-              resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
+              sqlName: () => fieldName,
+              sqlExpression: (aliasIdentifier) => sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(fieldName)}`,
+              resolve: (value) => {
+                return value.get(fieldName)
+              }
             },
           }
         },

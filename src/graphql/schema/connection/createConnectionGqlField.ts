@@ -75,6 +75,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       source: TSource,
       args: ConnectionArgs<TCursor>,
       context: mixed,
+      resolveInfo: mixed,
     ): Promise<Connection<TInput, TItemValue, TCursor>> {
       const {
         orderBy: orderingName,
@@ -114,7 +115,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
 
       // Finally, actually get the page data.
-      const page = await ordering.readPage(context, input, pageConfig)
+      const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
 
       return {
         paginator,
@@ -141,6 +142,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
+    relatedGqlType: gqlType,
     fields: () => ({
       pageInfo: {
         description: 'Information to aid in pagination.',
@@ -183,6 +185,7 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
+    relatedGqlType: gqlType,
     fields: () => ({
       cursor: {
         description: 'A cursor for use in pagination.',

@@ -93,11 +93,11 @@ function createCollectionPrimaryKeyField <TValue, TKey>(
       },
     },
 
-    async resolve (_source, args, context): Promise<mixed> {
+    async resolve (_source, args, context, resolveInfo): Promise<mixed> {
       const result = idSerde.deserialize(inventory, args[options.nodeIdFieldName] as string)
       if (result.collection !== collection) throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
       if (!keyType.isTypeOf(result.keyValue)) throw new Error(`The provided id is not of the correct type.`)
-      const value = await collectionKey.read!(context, result.keyValue)
+      const value = await collectionKey.read!(context, result.keyValue, resolveInfo)
       if (value == null) return
       return intoGqlOutput(value)
     },
@@ -123,9 +123,9 @@ function createCollectionKeyField <TValue, TKey>(
   return {
     type: collectionGqlType,
     args: buildObject(inputHelpers.fieldEntries),
-    async resolve (_source, args, context): Promise<mixed> {
+    async resolve (_source, args, context, resolveInfo): Promise<mixed> {
       const key = inputHelpers.getKeyFromInput(args)
-      const value = await collectionKey.read!(context, key)
+      const value = await collectionKey.read!(context, key, resolveInfo)
       if (value == null) return
       return intoGqlOutput(value)
     },

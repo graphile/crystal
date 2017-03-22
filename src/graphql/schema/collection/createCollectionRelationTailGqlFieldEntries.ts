@@ -47,10 +47,10 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this ${scrib.type(collectionGqlType)}.`,
             type: headCollectionGqlType,
-            async resolve (source: TSource, _args: {}, context: mixed): Promise<mixed> {
+            async resolve (source: TSource, _args: {}, context: mixed, resolveInfo: mixed): Promise<mixed> {
               const value = options.getCollectionValue(source)
               const key = relation.getHeadKeyFromTailValue(value)
-              const headValue = await headCollectionKey.read!(context, key)
+              const headValue = await headCollectionKey.read!(context, key, resolveInfo, headCollectionGqlType)
 
               if (headValue == null)
                 return

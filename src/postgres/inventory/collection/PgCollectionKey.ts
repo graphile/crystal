@@ -9,6 +9,7 @@ import PgType from '../type/PgType'
 import PgClassType from '../type/PgClassType'
 import getTypeFromPgType from '../type/getTypeFromPgType'
 import PgCollection from './PgCollection'
+import {getFieldsFromResolveInfo, getSelectFragmentFromFields} from '../paginator/getSelectFragment'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
@@ -120,11 +121,11 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * Reads a value if a user can select from this class. Batches requests to
    * the same client in the background.
    */
-  public read: ((context: mixed, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
+  public read: ((context: mixed, key: PgClassType.Value, resolveInfo: mixed) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PgClassType.Value): Promise<PgClassType.Value | null> =>
-        this._getSelectLoader(pgClientFromContext(context)).load(key)
+      : (context: mixed, key: PgClassType.Value, resolveInfo: mixed, collectionGqlType: mixed): Promise<PgClassType.Value | null> =>
+        this._getSelectLoader(pgClientFromContext(context)).load({key, resolveInfo, collectionGqlType})
   )
 
   /**
@@ -134,10 +135,16 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * @private
    */
   @memoizeMethod
-  private _getSelectLoader (client: Client): DataLoader<PgClassType.Value, PgClassType.Value | null> {
+  private _getSelectLoader (client: Client, resolveInfo: mixed, collectionGqlType: mixed): DataLoader<PgClassType.Value, PgClassType.Value | null> {
     return new DataLoader<PgClassType.Value, PgClassType.Value | null>(
-      async (keys: Array<PgClassType.Value>): Promise<Array<PgClassType.Value | null>> => {
+      async (keysAndStuff: mixed): Promise<Array<PgClassType.Value | null>> => {
         const aliasIdentifier = Symbol()
+        const keys = keysAndStuff.map(({key}) => key)
+        const fieldses = keysAndStuff.map(
+          ({resolveInfo, collectionGqlType}) =>
+            getFieldsFromResolveInfo(resolveInfo, aliasIdentifier, collectionGqlType)
+        )
+        const fields = Object.assign({}, ...fieldses)
 
         // For every key we have, generate a select statement then combine
         // those select statements with `union all`. This approach has a
@@ -159,7 +166,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
         // compiling.
         const query = sql.compile(sql.query`
           -- Select our rows as JSON objects.
-          select row_to_json(${sql.identifier(aliasIdentifier)}) as object
+          select ${getSelectFragmentFromFields(fields)} as object
           from ${sql.identifier(this._pgNamespace.name, this._pgClass.name)} as ${sql.identifier(aliasIdentifier)}
 
           -- For all of our key attributes we need to test equality with a
@@ -195,7 +202,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           return [keyString, value]
         }))
 
-        return keys.map(key => {
+        return keysAndStuff.map(({key}) => {
           const keyString = this._keyTypeFields.map(([fieldName]) => key.get(fieldName)).join('-')
           return values.get(keyString) || null
         })

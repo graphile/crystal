@@ -49,17 +49,21 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       }],
   )
 
-  return [formatName.field(pgProcedure.name.substring(fixtures.args[0].pgType.name.length + 1)), {
+  const fieldName = formatName.field(pgProcedure.name.substring(fixtures.args[0].pgType.name.length + 1))
+  const sqlName = (_tbl, _fld, args, alias) => `${fieldName}###${alias || ''}`,
+  return [fieldName, {
     description: pgProcedure.description,
     type: fixtures.return.gqlType,
     args: buildObject(argEntries),
+    sqlName,
+    sqlExpression: (aliasIdentifier, gqlFieldName, args, context) => {
+      const input = argEntries.map(([argName], i) => fixtures.args[i + 2].fromGqlInput(args[argName]))
+      return createPgProcedureSqlCall(fixtures, aliasIdentifier, input)
+    },
 
-    async resolve (source, args, context): Promise<mixed> {
-      const client = pgClientFromContext(context)
-      const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))]
-      const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
-      const { rows: [row] } = await client.query(query)
-      return row ? fixtures.return.intoGqlOutput(row['value']) : null
+    async resolve (source, args, context, resolveInfo): Promise<mixed> {
+      const value = source.get(sqlName(null, null, args, resolveInfo.alias && resolveInfo.alias.value))
+      return fixtures.return.intoGqlOutput(value)
     },
   }]
 }
