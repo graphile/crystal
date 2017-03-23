@@ -3,6 +3,7 @@
 import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
+import jwt = require('jsonwebtoken')
 import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
@@ -40,6 +41,7 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
+  .option('--jwt-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
 
 program.on('--help', () => console.log(`
@@ -68,6 +70,7 @@ const {
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
   secret: jwtSecret,
+  jwtAudience = 'postgraphql',
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -79,6 +82,8 @@ const {
   bodySizeLimit,
 // tslint:disable-next-line no-any
 } = program as any
+
+const jwtOptions: jwt.VerifyOptions = { audience: jwtAudience.split(',') }
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
@@ -112,6 +117,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphiql: !disableGraphiql,
   jwtSecret,
   jwtPgTypeIdentifier,
+  jwtOptions,
   pgDefaultRole,
   watchPg,
   showErrorStack,

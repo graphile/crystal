@@ -65,7 +65,7 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool, pgSettings } = options
+  const { getGqlSchema, jwtOptions, pgPool, pgSettings } = options
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
@@ -394,6 +394,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         pgPool,
         jwtToken,
         jwtSecret: options.jwtSecret,
+        jwtOptions,
         pgDefaultRole: options.pgDefaultRole,
         pgSettings,
       }, context => {
