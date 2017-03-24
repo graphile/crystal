@@ -120,7 +120,6 @@ async function setupPgClientTransaction ({
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
-
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
         audience: 'postgraphql',
         ...jwtOptions,

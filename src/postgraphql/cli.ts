@@ -3,7 +3,7 @@
 import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
-import jwt = require('jsonwebtoken')
+import { VerifyOptions } from 'jsonwebtoken'
 import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
@@ -16,6 +16,7 @@ const DEMO_PG_URL = null
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString())
 const program = new Command('postgraphql')
+const jwtOptions: VerifyOptions = { audience: 'postgraphql' }
 
 program
   .version(manifest.version)
@@ -32,16 +33,17 @@ program
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-e, --secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens')
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
+  .option('--secret <string>', 'DEPRECATED: See jwt.secret')
+  .option('-e, --jwt.secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
+  .option('-A, --jwt.audience <list>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', assign('audience', list), jwtOptions)
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
-  .option('--jwt-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
 
 program.on('--help', () => console.log(`
@@ -69,8 +71,8 @@ const {
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
-  secret: jwtSecret,
-  jwtAudience = 'postgraphql',
+  secret: deprecatedJwtSecret,
+  'jwt.secret': jwtSecret,
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -82,8 +84,6 @@ const {
   bodySizeLimit,
 // tslint:disable-next-line no-any
 } = program as any
-
-const jwtOptions: jwt.VerifyOptions = { audience: jwtAudience.split(',') }
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
@@ -115,8 +115,8 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
-  jwtSecret,
   jwtPgTypeIdentifier,
+  jwtSecret: jwtSecret || deprecatedJwtSecret,
   jwtOptions,
   pgDefaultRole,
   watchPg,
@@ -145,3 +145,14 @@ server.listen(port, hostname, () => {
   console.log(chalk.gray('* * *'))
   console.log('')
 })
+
+function assign(key: string, fn?: (val: string) => mixed): (val: string, obj: { [key: string]: mixed }) => { [key: string]: mixed } {
+  return (val, obj) => {
+    obj[key] = fn && fn(val) || val
+    return obj
+  }
+}
+
+function list(val: string): Array<string> {
+  return val.split(',')
+}
