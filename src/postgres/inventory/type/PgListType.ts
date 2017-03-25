@@ -34,6 +34,9 @@ class PgListType<TItemValue> extends PgType<Array<TItemValue>> implements ListTy
   }
 
   public transformValueIntoPgValue (value: Array<TItemValue>): sql.Sql {
+    if (value.length === 0)
+      return sql.query`'{}'`
+
     return sql.query`array[${sql.join(value.map(item => this.itemType.transformValueIntoPgValue(item)), ', ')}]`
   }
 }
