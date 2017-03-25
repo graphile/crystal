@@ -2,7 +2,7 @@
 // these guys see, that would be great 👍
 
 import { printSchema } from 'graphql'
-import withPgClient from '../../postgres/__tests__/fixtures/withPgClient'
+import withPgClient from '../../../__tests__/utils/withPgClient'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 // This test suite can be flaky. Increase it’s timeout.
