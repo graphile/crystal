@@ -3,4 +3,3 @@
 npm_bin=$(npm bin)
 
 $npm_bin/jest --maxWorkers 3 $@
-a
