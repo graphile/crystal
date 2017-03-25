@@ -1,4 +1,3 @@
-import testInParallel from '../../../../__tests__/utils/testInParallel'
 import withPgClient from '../../../../__tests__/utils/withPgClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'

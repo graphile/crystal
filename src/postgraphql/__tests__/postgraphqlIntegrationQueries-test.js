@@ -1,7 +1,7 @@
 import { resolve as resolvePath } from 'path'
 import { readFile, readdirSync } from 'fs'
 import { graphql } from 'graphql'
-import withPgClient from '../../../__tests__/utils/withPgClient'
+import withPgClient from '../../__tests__/utils/withPgClient'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 

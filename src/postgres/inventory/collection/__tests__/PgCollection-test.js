@@ -1,5 +1,6 @@
 import { Client } from 'pg'
 import { NullableType } from '../../../../interface'
+import createTestInParallel from '../../../../__tests__/utils/createTestInParallel'
 import withPgClient from '../../../../__tests__/utils/withPgClient'
 import pgPool from '../../../../__tests__/utils/pgPool'
 import kitchenSinkSchemaSql from '../../../../__tests__/utils/kitchenSinkSchemaSql'
@@ -10,6 +11,8 @@ import PgCollection from '../PgCollection'
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
+
+const testInParallel = createTestInParallel();
 
 /** @type {PgCatalog} */
 let pgCatalog
@@ -33,19 +36,19 @@ beforeAll(withPgClient(async client => {
   collection3 = new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key'))
 }))
 
-test('name will be the plural form of the class name', () => {
+testInParallel('name will be the plural form of the class name', () => {
   expect(collection1.name).toBe('people')
   expect(collection2.name).toBe('updatable_views')
 })
 
-test('type will have the correct null and non null fields', () => {
+testInParallel('type will have the correct null and non null fields', () => {
   expect(Array.from(collection1.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
     .toEqual([false, false, true, false, true])
   expect(Array.from(collection2.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
     .toEqual([true, true, true, true])
 })
 
-test('create will insert new rows into the database', withPgClient(async client => {
+testInParallel('create will insert new rows into the database', withPgClient(async client => {
   const context = { [$$pgClient]: client }
 
   const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
@@ -80,7 +83,7 @@ test('create will insert new rows into the database', withPgClient(async client 
     .toEqual(values.map(mapToObject))
 }))
 
-test('create will only include relevant columns', withPgClient(async client => {
+testInParallel('create will only include relevant columns', withPgClient(async client => {
   const context = { [$$pgClient]: client }
 
   // Note how the about column is not used
@@ -156,7 +159,7 @@ test('create will only include relevant columns', withPgClient(async client => {
 //   expect(collection3.paginator.defaultOrdering).toBe(collection3.paginator.orderings[0])
 // })
 
-test('paginator `count` will count all of the values in a collection with a condition', withPgClient(async client => {
+testInParallel('paginator `count` will count all of the values in a collection with a condition', withPgClient(async client => {
   const context = { [$$pgClient]: client }
 
   expect(await collection1.paginator.count(context, true)).toBe(0)
@@ -373,19 +376,21 @@ paginatorFixtures.forEach(paginatorFixture => {
 
     paginatorFixture.orderingFixtures.forEach(orderingFixture => {
       describe(`ordering '${orderingFixture.name}'`, () => {
+        const testInParallel = createTestInParallel();
+
         const sortedValues = orderingFixture.compareValues ? [...allValues].sort(orderingFixture.compareValues) : [...allValues]
         const sortedValuesWithCursors = sortedValues.map((value, i) => ({ value, cursor: orderingFixture.getValueCursor(value, i) }))
 
         let ordering
         beforeAll(() => ordering = orderingFixture.getOrdering())
 
-        test('will read all of the values in the correct order', async () => {
+        testInParallel('will read all of the values in the correct order', async () => {
           const page = await ordering.readPage(context, true, {})
           expect(page.values).toEqual(sortedValuesWithCursors)
           expect(await Promise.all([page.hasNextPage(), page.hasPreviousPage()])).toEqual([false, false])
         })
 
-        test('will read all values after an `afterCursor`', async () => {
+        testInParallel('will read all values after an `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[2].cursor }),
@@ -398,7 +403,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will read all values before a `beforeCursor`', async () => {
+        testInParallel('will read all values before a `beforeCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[1].cursor }),
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[3].cursor }),
@@ -411,7 +416,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
+        testInParallel('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[1].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -424,7 +429,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('will read only the first few values when provided `first`', async () => {
+        testInParallel('will read only the first few values when provided `first`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1 }),
             ordering.readPage(context, true, { first: 3 }),
@@ -437,7 +442,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('will read only the last few values when provided `last`', async () => {
+        testInParallel('will read only the last few values when provided `last`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1 }),
             ordering.readPage(context, true, { last: 3 }),
@@ -450,7 +455,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will offset the results when provided an `offset`', async () => {
+        testInParallel('will offset the results when provided an `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { _offset: 1 }),
             ordering.readPage(context, true, { _offset: 3 }),
@@ -463,15 +468,15 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will fail when trying to use `first` and `last` together', async () => {
+        testInParallel('will fail when trying to use `first` and `last` together', async () => {
           expect((await ordering.readPage(context, true, { first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
         })
 
-        test('will fail when trying to use `last` and `offset` together', async () => {
+        testInParallel('will fail when trying to use `last` and `offset` together', async () => {
           expect((await ordering.readPage(context, true, { last: 1, _offset: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`offset` may not be used with `last`.')
         })
 
-        test('can use `beforeCursor` and `first` together', async () => {
+        testInParallel('can use `beforeCursor` and `first` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -484,7 +489,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('can use `afterCursor` and `first` together', async () => {
+        testInParallel('can use `afterCursor` and `first` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
@@ -497,7 +502,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
+        testInParallel('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -510,7 +515,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `beforeCursor` and `last` together', async () => {
+        testInParallel('can use `beforeCursor` and `last` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -523,7 +528,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, false])
         })
 
-        test('can use `afterCursor` and `last` together', async () => {
+        testInParallel('can use `afterCursor` and `last` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[sortedValuesWithCursors.length - 2].cursor }),
@@ -536,7 +541,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
+        testInParallel('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -549,7 +554,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `first` with `offset`', async () => {
+        testInParallel('can use `first` with `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, _offset: 1 }),
             ordering.readPage(context, true, { first: 2, _offset: 3 }),
@@ -562,7 +567,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, false, true])
         })
 
-        test('can use `afterCursor` with `offset`', async () => {
+        testInParallel('can use `afterCursor` with `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { _offset: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
@@ -575,7 +580,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('can use `first`, `afterCursor`, and `offset` together', async () => {
+        testInParallel('can use `first`, `afterCursor`, and `offset` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
