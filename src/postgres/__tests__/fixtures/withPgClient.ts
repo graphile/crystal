@@ -7,8 +7,10 @@ import kitchenSinkSchemaSql from './kitchenSinkSchemaSql'
  * client. The client will be connected from the pool at the start of the test,
  * and released back at the end. All changes will be rolled back.
  */
-export default function withPgClient (fn: (client: Client) => void | Promise<void>): () => Promise<void> {
-  return async (): Promise<void> => {
+export default function withPgClient <T>(fn: (client: Client) => T | Promise<T>): () => Promise<T> {
+  return async (): Promise<T> => {
+    let result: T | undefined
+
     // Connect a client from our pool and begin a transaction.
     const client = await pgPool.connect()
 
@@ -27,8 +29,11 @@ export default function withPgClient (fn: (client: Client) => void | Promise<voi
       await client.query(await kitchenSinkSchemaSql)
     }
     catch (error) {
-      // tslint:disable-next-line no-console
-      console.error(error.stack || error)
+      // Release the client if an error was thrown.
+      await client.query('rollback')
+      client.release()
+      // Log the error for debugging purposes.
+      console.error(error.stack || error) // tslint:disable-line no-console
       throw error
     }
 
@@ -37,7 +42,7 @@ export default function withPgClient (fn: (client: Client) => void | Promise<voi
 
     // Try to run our test, if it fails we still want to cleanup the client.
     try {
-      await fn(client)
+      result = await fn(client)
     }
     // Always rollback our changes and release the client, even if the test
     // fails.
@@ -45,5 +50,9 @@ export default function withPgClient (fn: (client: Client) => void | Promise<voi
       await client.query('rollback')
       client.release()
     }
+
+    // We will always define our result in the above block. It appears that
+    // TypeScript cannot detect that so we need to tell it with the bang.
+    return result!
   }
 }
