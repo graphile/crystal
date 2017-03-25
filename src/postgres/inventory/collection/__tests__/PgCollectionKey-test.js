@@ -1,4 +1,5 @@
-import withPgClient from '../../../__tests__/fixtures/withPgClient'
+import testInParallel from '../../../../__tests__/utils/testInParallel'
+import withPgClient from '../../../../__tests__/utils/withPgClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'
 import { $$pgClient } from '../../pgClientFromContext.ts'
@@ -8,60 +9,77 @@ import PgCollectionKey from '../PgCollectionKey'
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
-/** @type {PgCollectionKey} */
-let collectionKey1
-
-/** @type {PgCollectionKey} */
-let collectionKey2
+const pgCatalogPromise = withPgClient(async client => {
+  return await introspectDatabase(client, ['a', 'b', 'c'])
+})()
 
 const createContext = client => ({ [$$pgClient]: client })
 
-beforeEach(withPgClient(async client => {
-  const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])
+function withCollectionKeys(fn) {
+  return async () => {
+    const pgCatalog = await pgCatalogPromise
+    return await withPgClient(async client => {
+      const options = {
+        renameAttributes: new Map(),
+      }
 
-  const options = {
-    renameAttributes: new Map(),
+      const collectionKey1 = new PgCollectionKey(
+        new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key')),
+        {
+          kind: 'constraint',
+          name: 'compound_key_pkey',
+          type: 'p',
+          classId: pgCatalog.getClassByName('c', 'compound_key').id,
+          keyAttributeNums: [
+            pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1').num,
+            pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2').num,
+          ],
+        },
+      )
+
+      const collectionKey2 = new PgCollectionKey(
+        new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'person')),
+        {
+          kind: 'constraint',
+          name: 'person_unique_email',
+          type: 'u',
+          classId: pgCatalog.getClassByName('c', 'person').id,
+          keyAttributeNums: [
+            pgCatalog.getAttributeByName('c', 'person', 'email').num,
+          ],
+        },
+      )
+
+      return {
+        client,
+        collectionKey1,
+        collectionKey2,
+      }
+    })
   }
+}
 
-  collectionKey1 = new PgCollectionKey(
-    new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key')),
-    {
-      kind: 'constraint',
-      name: 'compound_key_pkey',
-      type: 'p',
-      classId: pgCatalog.getClassByName('c', 'compound_key').id,
-      keyAttributeNums: [
-        pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1').num,
-        pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2').num,
-      ],
-    },
-  )
-
-  collectionKey2 = new PgCollectionKey(
-    new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'person')),
-    {
-      kind: 'constraint',
-      name: 'person_unique_email',
-      type: 'u',
-      classId: pgCatalog.getClassByName('c', 'person').id,
-      keyAttributeNums: [
-        pgCatalog.getAttributeByName('c', 'person', 'email').num,
-      ],
-    },
-  )
-}))
-
-test('name will be a concatenation of the attribute names with “and”', () => {
+test('name will be a concatenation of the attribute names with “and”', withCollectionKeys(({
+  collectionKey1,
+  collectionKey2,
+}) => {
   expect(collectionKey1.name).toBe('person_id_1_and_person_id_2')
   expect(collectionKey2.name).toBe('email')
-})
+}))
 
-test('type will have fields for all of the respective attributes', () => {
+test('type will have fields for all of the respective attributes', withCollectionKeys(({
+  collectionKey1,
+  collectionKey2,
+}) => {
   expect(Array.from(collectionKey1.keyType.fields.keys())).toEqual(['person_id_1', 'person_id_2'])
   expect(Array.from(collectionKey2.keyType.fields.keys())).toEqual(['email'])
-})
+}))
 
-test('read will get single values from a table', withPgClient(async client => {
+test('read will get single values from a table', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   await client.query(`
@@ -112,7 +130,11 @@ test('read will get single values from a table', withPgClient(async client => {
   ])
 }))
 
-test('update will change values from a table', withPgClient(async client => {
+test('update will change values from a table', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   await client.query(`
@@ -152,7 +174,11 @@ test('update will change values from a table', withPgClient(async client => {
   expect(pgQueryResult.rows.map(({ object }) => object)).toEqual(expectedValues)
 }))
 
-test('update fails when trying to patch a field that does not exist', withPgClient(async client => {
+test('update fails when trying to patch a field that does not exist', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   try {
@@ -164,7 +190,11 @@ test('update fails when trying to patch a field that does not exist', withPgClie
   }
 }))
 
-test('update fails when trying to update a value that does not exist', withPgClient(async client => {
+test('update fails when trying to update a value that does not exist', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   try {
@@ -176,7 +206,11 @@ test('update fails when trying to update a value that does not exist', withPgCli
   }
 }))
 
-test('delete will delete things from the database', withPgClient(async client => {
+test('delete will delete things from the database', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   await client.query(`
@@ -219,7 +253,11 @@ test('delete will delete things from the database', withPgClient(async client =>
   expect((await client.query(selectQuery)).rows).toEqual([initialRows[2], initialRows[5], initialRows[6]])
 }))
 
-test('delete fails when trying to remove a value that does not exist', withPgClient(async client => {
+test('delete fails when trying to remove a value that does not exist', withCollectionKeys(async ({
+  client,
+  collectionKey1,
+  collectionKey2,
+}) => {
   const context = createContext(client)
 
   try {
