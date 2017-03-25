@@ -8,7 +8,7 @@ import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
-let testResults;
+let testResults
 
 const testFixtures = [
   {
@@ -38,5 +38,5 @@ beforeAll(() => {
 for (let i = 0; i < testFixtures.length; i++) {
   test(testFixtures[i].name, async () => {
     expect(printSchema(await testResults[i])).toMatchSnapshot()
-  });
+  })
 }
