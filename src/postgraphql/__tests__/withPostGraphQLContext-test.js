@@ -1,6 +1,5 @@
 // tslint:disable no-empty
 
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import withPostGraphQLContext from '../withPostGraphQLContext'
 
 const jwt = require('jsonwebtoken')
@@ -30,7 +29,7 @@ test('will pass in a context object with the client', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
   await withPostGraphQLContext({ pgPool }, client => {
-    expect(client[$$pgClient]).toBe(pgClient)
+    expect(client.pgClient).toBe(pgClient)
   })
 })
 
@@ -40,8 +39,8 @@ test('will record queries run inside the transaction', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
   await withPostGraphQLContext({ pgPool }, client => {
-    client[$$pgClient].query(query1)
-    client[$$pgClient].query(query2)
+    client.pgClient.query(query1)
+    client.pgClient.query(query2)
   })
   expect(pgClient.query.mock.calls).toEqual([['begin'], [query1], [query2], ['commit']])
 })

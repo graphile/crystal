@@ -5,9 +5,10 @@ import BuildToken from '../BuildToken'
 import { $$isQuery } from '../getQueryGqlType'
 import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType, { $$nodeType } from './getNodeInterfaceType'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 // TODO: doc
-export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<never, mixed>] {
+export default function createNodeFieldEntry (buildToken: BuildToken): [string, GraphQLFieldConfig<never, PostGraphQLContext>] {
   const { inventory, options } = buildToken
   return ['node', {
     description: `Fetches an object given its globally unique ${scrib.type(GraphQLID)}.`,
@@ -18,7 +19,7 @@ export default function createNodeFieldEntry (buildToken: BuildToken): [string, 
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    async resolve <TValue, TKey>(_source: mixed, args: { [key: string]: mixed }, context: mixed): Promise<TValue | symbol | null> {
+    async resolve <TValue, TKey>(_source: mixed, args: { [key: string]: mixed }, context: PostGraphQLContext): Promise<TValue | symbol | null> {
       let deserializationResult: { collection: Collection<TValue>, keyValue: TKey }
       const idString = args[options.nodeIdFieldName]
 

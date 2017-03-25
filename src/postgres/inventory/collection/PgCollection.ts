@@ -6,9 +6,9 @@ import { sql, memoizeMethod } from '../../utils'
 import { PgCatalog, PgCatalogNamespace, PgCatalogClass } from '../../introspection'
 import PgClassType from '../type/PgClassType'
 import Options from '../Options'
-import pgClientFromContext from '../pgClientFromContext'
 import PgCollectionPaginator from '../paginator/PgCollectionPaginator'
 import PgCollectionKey from './PgCollectionKey'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * Creates a collection object for Postgres that can be used to access the
@@ -112,11 +112,11 @@ class PgCollection implements Collection<PgClassType.Value> {
 
   // If we can’t insert into this class, there should be no `create`
   // function. Otherwise our `create` method is pretty basic.
-  public create: ((context: mixed, value: PgClassType.Value) => Promise<PgClassType.Value>) | null = (
+  public create: ((context: PostGraphQLContext, value: PgClassType.Value) => Promise<PgClassType.Value>) | null = (
     !this.pgClass.isInsertable
       ? null
-      : (context: mixed, value: PgClassType.Value): Promise<PgClassType.Value> =>
-        this._getInsertLoader(pgClientFromContext(context)).load(value)
+      : (context: PostGraphQLContext, value: PgClassType.Value): Promise<PgClassType.Value> =>
+        this._getInsertLoader(context.pgClient).load(value)
   )
 
   /**

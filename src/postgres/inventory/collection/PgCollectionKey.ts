@@ -4,11 +4,11 @@ import { CollectionKey, ObjectType, getNonNullableType } from '../../../interfac
 import { sql, memoizeMethod } from '../../utils'
 import { PgCatalog, PgCatalogNamespace, PgCatalogClass, PgCatalogAttribute, PgCatalogPrimaryKeyConstraint, PgCatalogUniqueConstraint } from '../../introspection'
 import Options from '../Options'
-import pgClientFromContext from '../pgClientFromContext'
 import PgType from '../type/PgType'
 import PgClassType from '../type/PgClassType'
 import getTypeFromPgType from '../type/getTypeFromPgType'
 import PgCollection from './PgCollection'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * Creates a key from some types of Postgres constraints including primary key
@@ -120,11 +120,11 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * Reads a value if a user can select from this class. Batches requests to
    * the same client in the background.
    */
-  public read: ((context: mixed, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
+  public read: ((context: PostGraphQLContext, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isSelectable
       ? null
-      : (context: mixed, key: PgClassType.Value): Promise<PgClassType.Value | null> =>
-        this._getSelectLoader(pgClientFromContext(context)).load(key)
+      : (context: PostGraphQLContext, key: PgClassType.Value): Promise<PgClassType.Value | null> =>
+        this._getSelectLoader(context.pgClient).load(key)
   )
 
   /**
@@ -210,12 +210,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    * This method, unlike many of the other asynchronous actions in Postgres
    * collections, is not batched.
    */
-  public update: ((context: mixed, key: PgClassType.Value, patch: Map<string, mixed>) => Promise<PgClassType.Value | null>) | null = (
+  public update: ((context: PostGraphQLContext, key: PgClassType.Value, patch: Map<string, mixed>) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isUpdatable
       ? null
-      : async (context: mixed, key: PgClassType.Value, patch: Map<string, mixed>): Promise<PgClassType.Value> => {
-        const client = pgClientFromContext(context)
-
+      : async (context: PostGraphQLContext, key: PgClassType.Value, patch: Map<string, mixed>): Promise<PgClassType.Value> => {
         const updatedIdentifier = Symbol()
 
         const query = sql.compile(sql.query`
@@ -243,7 +241,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           select row_to_json(${sql.identifier(updatedIdentifier)}) as object from ${sql.identifier(updatedIdentifier)}
         `)
 
-        const result = await client.query(query)
+        const result = await context.pgClient.query(query)
 
         if (result.rowCount < 1)
           throw new Error(`No values were updated in collection '${this.collection.name}' using key '${this.name}' because no values were found.`)
@@ -258,12 +256,10 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
    *
    * This method, unlike many others in Postgres collections, is not batched.
    */
-  public delete: ((context: mixed, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
+  public delete: ((context: PostGraphQLContext, key: PgClassType.Value) => Promise<PgClassType.Value | null>) | null = (
     !this._pgClass.isDeletable
       ? null
-      : async (context: mixed, key: PgClassType.Value): Promise<PgClassType.Value> => {
-        const client = pgClientFromContext(context)
-
+      : async (context: PostGraphQLContext, key: PgClassType.Value): Promise<PgClassType.Value> => {
         const deletedIdentifier = Symbol()
 
         // This is a pretty simple query. Delete the row that matches our key
@@ -277,7 +273,7 @@ class PgCollectionKey implements CollectionKey<PgClassType.Value, PgCollectionKe
           select row_to_json(${sql.identifier(deletedIdentifier)}) as object from ${sql.identifier(deletedIdentifier)}
         `)
 
-        const result = await client.query(query)
+        const result = await context.pgClient.query(query)
 
         if (result.rowCount < 1)
           throw new Error(`No values were deleted in collection '${this.collection.name}' because no values were found.`)

@@ -1,7 +1,6 @@
 import withPgClient from '../../../__tests__/fixtures/withPgClient'
 import { introspectDatabase } from '../../../introspection'
 import { mapToObject } from '../../../utils'
-import { $$pgClient } from '../../pgClientFromContext.ts'
 import PgCollection from '../PgCollection'
 import PgCollectionKey from '../PgCollectionKey'
 
@@ -14,7 +13,7 @@ let collectionKey1
 /** @type {PgCollectionKey} */
 let collectionKey2
 
-const createContext = client => ({ [$$pgClient]: client })
+const createContext = client => ({ pgClient: client })
 
 beforeEach(withPgClient(async client => {
   const pgCatalog = await introspectDatabase(client, ['a', 'b', 'c'])

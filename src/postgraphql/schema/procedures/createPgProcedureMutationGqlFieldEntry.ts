@@ -14,7 +14,6 @@ import createCollectionRelationTailGqlFieldEntries from '../../../graphql/schema
 import { sql } from '../../../postgres/utils'
 import { PgCatalog, PgCatalogProcedure } from '../../../postgres/introspection'
 import PgCollection from '../../../postgres/inventory/collection/PgCollection'
-import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import { getEdgeGqlType, createOrderByGqlArg } from '../../../graphql/schema/connection/createConnectionGqlField'
@@ -96,8 +95,6 @@ export default function createPgProcedureMutationGqlFieldEntry (
 
     // Actually execute the procedure here.
     async execute (context, gqlInput): Promise<mixed> {
-      const client = pgClientFromContext(context)
-
       // Turn our GraphQL input into an input tuple.
       const input = inputFields.map(([fieldName], i) => fixtures.args[i].fromGqlInput(gqlInput[fieldName]))
 
@@ -114,7 +111,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
           : sql.query`select to_json(${procedureCall}) as value`,
       )
 
-      const { rows } = await client.query(query)
+      const { rows } = await context.pgClient.query(query)
       const values = rows.map(({ value }) => fixtures.return.type.transformPgValueIntoValue(value))
 
       // If we selected a set of values, return the full set. Otherwise only

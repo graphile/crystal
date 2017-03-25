@@ -1,7 +1,7 @@
 import { Paginator } from '../../../interface'
 import { sql } from '../../utils'
-import pgClientFromContext from '../pgClientFromContext'
 import PgPaginator from './PgPaginator'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * The cursor in the offset strategy is just a simple integer.
@@ -43,11 +43,10 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
    * Reads a single page using the offset ordering strategy.
    */
   public async readPage (
-    context: mixed,
+    context: PostGraphQLContext,
     input: TInput,
     config: Paginator.PageConfig<OffsetCursor>,
   ): Promise<Paginator.Page<TItemValue, OffsetCursor>> {
-    const client = pgClientFromContext(context)
     const { first, last, beforeCursor, afterCursor, _offset } = config
 
     // Do not allow `first` and `last` to be defined at the same time. THERE
@@ -135,7 +134,7 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     `)
 
     // Send our query to Postgres.
-    const { rows } = await client.query(query)
+    const { rows } = await context.pgClient.query(query)
 
     // Transform our rows into the values our page expects.
     const values: Array<{ value: TItemValue, cursor: number }> =

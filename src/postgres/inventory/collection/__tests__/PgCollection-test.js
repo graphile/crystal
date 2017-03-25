@@ -5,7 +5,6 @@ import pgPool from '../../../__tests__/fixtures/pgPool'
 import kitchenSinkSchemaSql from '../../../__tests__/fixtures/kitchenSinkSchemaSql'
 import { mapToObject } from '../../../utils'
 import { PgCatalog, introspectDatabase } from '../../../introspection'
-import { $$pgClient } from '../../pgClientFromContext'
 import PgCollection from '../PgCollection'
 
 // This test suite can be flaky. Increase it’s timeout.
@@ -46,7 +45,7 @@ test('type will have the correct null and non null fields', () => {
 })
 
 test('create will insert new rows into the database', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+  const context = { pgClient: client }
 
   const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
   const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
@@ -81,7 +80,7 @@ test('create will insert new rows into the database', withPgClient(async client 
 }))
 
 test('create will only include relevant columns', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+  const context = { pgClient: client }
 
   // Note how the about column is not used
   const value1 = new Map([['name', 'John Smith'], ['email', 'john.smith@email.com']])
@@ -157,7 +156,7 @@ test('create will only include relevant columns', withPgClient(async client => {
 // })
 
 test('paginator `count` will count all of the values in a collection with a condition', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+  const context = { pgClient: client }
 
   expect(await collection1.paginator.count(context, true)).toBe(0)
   expect(await collection2.paginator.count(context, true)).toBe(0)
@@ -351,7 +350,7 @@ paginatorFixtures.forEach(paginatorFixture => {
 
     beforeAll(async () => {
       client = await pgPool.connect()
-      context = { [$$pgClient]: client }
+      context = { pgClient: client }
       await client.query('begin')
       await client.query(await kitchenSinkSchemaSql)
       await paginatorFixture.addValuesToClient(client)

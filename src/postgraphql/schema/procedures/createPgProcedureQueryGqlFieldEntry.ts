@@ -4,10 +4,10 @@ import BuildToken from '../../../graphql/schema/BuildToken'
 import createConnectionGqlField from '../../../graphql/schema/connection/createConnectionGqlField'
 import { sql } from '../../../postgres/utils'
 import { PgCatalog, PgCatalogProcedure } from '../../../postgres/introspection'
-import pgClientFromContext from '../../../postgres/inventory/pgClientFromContext'
 import createPgProcedureFixtures from './createPgProcedureFixtures'
 import createPgProcedureSqlCall from './createPgProcedureSqlCall'
 import PgProcedurePaginator from './PgProcedurePaginator'
+import { PostGraphQLContext } from '../../withPostGraphQLContext'
 
 /**
  * Creates the fields for query procedures. Query procedures that return
@@ -33,7 +33,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
   buildToken: BuildToken,
   pgCatalog: PgCatalog,
   pgProcedure: PgCatalogProcedure,
-): [string, GraphQLFieldConfig<mixed, mixed>] {
+): [string, GraphQLFieldConfig<mixed, PostGraphQLContext>] {
   const fixtures = createPgProcedureFixtures(buildToken, pgCatalog, pgProcedure)
 
   // Create our GraphQL input fields users will use to input data into our
@@ -52,10 +52,9 @@ function createPgSingleProcedureQueryGqlFieldEntry (
     args: buildObject(argEntries),
 
     async resolve (_source, args, context): Promise<mixed> {
-      const client = pgClientFromContext(context)
       const input = argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
-      const { rows: [row] } = await client.query(query)
+      const { rows: [row] } = await context.pgClient.query(query)
       return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
     },
   }]

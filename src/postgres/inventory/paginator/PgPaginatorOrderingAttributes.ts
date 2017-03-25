@@ -1,9 +1,9 @@
 import { Paginator } from '../../../interface'
 import { PgCatalogAttribute } from '../../introspection'
 import { sql } from '../../utils'
-import pgClientFromContext from '../pgClientFromContext'
 import PgClassType from '../type/PgClassType'
 import PgPaginator from './PgPaginator'
+import { PostGraphQLContext } from '../../../postgraphql/withPostGraphQLContext'
 
 /**
  * The cursor type when we are ordering by attributes is just a fixed length
@@ -39,11 +39,10 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
    * Reads a single page for this ordering.
    */
   public async readPage (
-    context: mixed,
+    context: PostGraphQLContext,
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
   ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
-    const client = pgClientFromContext(context)
     const { descending, pgAttributes } = this
     const { beforeCursor, afterCursor, first, last, _offset } = config
 
@@ -99,7 +98,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
     `)
 
-    let { rows } = await client.query(query)
+    let { rows } = await context.pgClient.query(query)
 
     // If `last` was defined we reversed the order in Sql so our limit would
     // work. We need to reverse again when we get here.
@@ -127,7 +126,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         const lastCursor = lastValue ? lastValue.cursor : beforeCursor
         if (lastCursor == null) return false
 
-        const { rowCount } = await client.query(sql.compile(sql.query`
+        const { rowCount } = await context.pgClient.query(sql.compile(sql.query`
           select null
           from ${fromSql}
           where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
@@ -144,7 +143,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
         const firstCursor = firstValue ? firstValue.cursor : afterCursor
         if (firstCursor == null) return false
 
-        const { rowCount } = await client.query(sql.compile(sql.query`
+        const { rowCount } = await context.pgClient.query(sql.compile(sql.query`
           select null
           from ${fromSql}
           where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}

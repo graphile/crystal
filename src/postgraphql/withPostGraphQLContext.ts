@@ -1,9 +1,13 @@
 import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
-import { Pool, Client } from 'pg'
+import { Pool, PoolClient, Client } from 'pg'
 import { ExecutionResult } from 'graphql'
 import { sql } from '../postgres/utils'
-import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
+
+export interface PostGraphQLContext {
+  pgClient: PoolClient
+  pgRole: string | undefined
+}
 
 /**
  * Creates a PostGraphQL context object which should be passed into a GraphQL
@@ -44,7 +48,7 @@ export default async function withPostGraphQLContext(
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
-  callback: (context: mixed) => Promise<ExecutionResult>,
+  callback: (context: PostGraphQLContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
   // Connect a new Postgres client and start a transaction.
   const pgClient = await pgPool.connect()
@@ -66,7 +70,7 @@ export default async function withPostGraphQLContext(
     })
 
     return await callback({
-      [$$pgClient]: pgClient,
+      pgClient,
       pgRole,
     })
   }

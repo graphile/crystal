@@ -9,6 +9,7 @@ import {
 import { formatName, buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import createMutationPayloadGqlType from './createMutationPayloadGqlType'
+import { PostGraphQLContext } from '../../postgraphql/withPostGraphQLContext'
 
 /**
  * The configuration for creating a mutation field.
@@ -21,7 +22,7 @@ type MutationFieldConfig<T> = {
   inputFields?: Array<[string, GraphQLInputFieldConfig] | false | null | undefined>,
   outputFields?: Array<[string, GraphQLFieldConfig<T, mixed>] | false | null | undefined>,
   payloadType?: GraphQLObjectType,
-  execute: (context: mixed, input: { [name: string]: mixed }) => Promise<T>,
+  execute: (context: PostGraphQLContext, input: { [name: string]: mixed }) => Promise<T>,
 }
 
 /**
@@ -45,7 +46,7 @@ export type MutationValue<T> = {
 export default function createMutationGqlField <T>(
   buildToken: BuildToken,
   config: MutationFieldConfig<T>,
-): GraphQLFieldConfig<mixed, MutationValue<T>> {
+): GraphQLFieldConfig<mixed, PostGraphQLContext> {
   if (config.outputFields && config.payloadType)
     throw new Error('Mutation `outputFields` and `payloadType` may not be defiend at the same time.')
 
