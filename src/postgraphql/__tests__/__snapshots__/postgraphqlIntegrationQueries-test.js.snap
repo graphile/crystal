@@ -1049,6 +1049,7 @@ Object {
       "d": null,
       "fooBar": 8,
     },
+    "empty": false,
     "intSetQuery": Object {
       "edges": Array [
         Object {
