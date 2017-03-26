@@ -59,7 +59,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))]
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
       const { rows: [row] } = await client.query(query)
-      return row ? fixtures.return.intoGqlOutput(row['value']) : null
+      return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
     },
   }]
 }
