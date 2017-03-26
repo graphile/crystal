@@ -1479,6 +1479,23 @@ Object {
       "isStable": true,
       "isStrict": false,
       "kind": "procedure",
+      "name": "person_first_post",
+      "namespaceId": "c",
+      "returnTypeId": "post",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
+      "argNames": Array [
+        "person",
+      ],
+      "argTypeIds": Array [
+        "person",
+      ],
+      "description": null,
+      "isStable": true,
+      "isStrict": false,
+      "kind": "procedure",
       "name": "person_friends",
       "namespaceId": "c",
       "returnTypeId": "person",
