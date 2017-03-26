@@ -6,6 +6,7 @@ import createMutationGqlField from '../../createMutationGqlField'
 import createMutationPayloadGqlType from '../../createMutationPayloadGqlType'
 import getGqlOutputType from '../../type/getGqlOutputType'
 import createCollectionRelationTailGqlFieldEntries from '../createCollectionRelationTailGqlFieldEntries'
+import getGqlOutputType from '../../type/getGqlOutputType'
 
 /**
  * Creates a delete mutation that uses the primary key of a collection and an
@@ -26,9 +27,12 @@ export default function createDeleteCollectionMutationFieldEntry <TValue>(
   const { options, inventory } = buildToken
   const name = `delete-${collection.type.name}`
 
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
+
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using its globally unique id.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
@@ -40,13 +44,15 @@ export default function createDeleteCollectionMutationFieldEntry <TValue>(
     payloadType: getDeleteCollectionPayloadGqlType(buildToken, collection),
     // Execute by deserializing the id into its component parts and delete a
     // value in the collection using that key.
-    execute: (context, input) => {
+    execute: (context, input, resolveInfo) => {
       const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
+
+      const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.delete!(context, result.keyValue)
+      return primaryKey.delete!(context, result.keyValue, resolveInfo, gqlType)
     },
   })]
 }
@@ -64,6 +70,7 @@ function createDeleteCollectionPayloadGqlType <TValue>(
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `delete-${collection.type.name}`,
+    relatedGqlType: gqlType,
     outputFields: [
       // Add the deleted value as an output field so the user can see the
       // object they just deleted.

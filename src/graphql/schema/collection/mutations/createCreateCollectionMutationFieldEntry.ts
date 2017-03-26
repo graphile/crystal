@@ -27,6 +27,7 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
+    relatedGqlType: collectionGqlType,
     description: `Creates a single ${scrib.type(collectionGqlType)}.`,
 
     inputFields: [
@@ -74,7 +75,7 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
     // When we execute we just create a value in the collection after
     // transforming the correct input field.
     // TODO: test
-    execute: (context, input) =>
-      collection.create!(context, inputFromGqlInput(input[inputFieldName])),
+    execute: (context, input, resolveInfo) =>
+      collection.create!(context, inputFromGqlInput(input[inputFieldName]), resolveInfo, collectionGqlType),
   })]
 }

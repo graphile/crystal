@@ -35,10 +35,12 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
   const name = `update-${collection.type.name}`
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using its globally unique id and a patch.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // The only input field we want is the globally unique id which
       // corresponds to the primary key of this collection.
@@ -58,13 +60,15 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
     payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
     // Execute by deserializing the id into its component parts and update a
     // value in the collection using that key.
-    execute: (context, input) => {
+    execute: (context, input, resolveInfo) => {
       const result = idSerde.deserialize(inventory, input[options.nodeIdFieldName] as string)
+
+      const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
       if (result.collection !== collection)
         throw new Error(`The provided id is for collection '${result.collection.name}', not the expected collection '${collection.name}'.`)
 
-      return primaryKey.update!(context, result.keyValue, patchFromGqlInput(input[patchFieldName] as {}))
+      return primaryKey.update!(context, result.keyValue, patchFromGqlInput(input[patchFieldName] as {}), resolveInfo, gqlType)
     },
   })]
 }
@@ -137,6 +141,7 @@ function createUpdateCollectionPayloadGqlType <TValue>(
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
     name: `update-${collection.type.name}`,
+    relatedGqlType: gqlType,
     outputFields: [
       // Add the updated value as an output field so the user can see the
       // object they just updated.

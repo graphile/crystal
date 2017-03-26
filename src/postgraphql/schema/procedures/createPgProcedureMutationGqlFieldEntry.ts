@@ -52,6 +52,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
   return [formatName.field(pgProcedure.name), createMutationGqlField<mixed>(buildToken, {
     name: pgProcedure.name,
     description: pgProcedure.description,
+    relatedGqlType: fixtures.return.gqlType,
 
     inputFields,
 
@@ -95,7 +96,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
     ],
 
     // Actually execute the procedure here.
-    async execute (context, gqlInput): Promise<mixed> {
+    async execute (context, gqlInput, resolveInfo): Promise<mixed> {
       const client = pgClientFromContext(context)
 
       // Turn our GraphQL input into an input tuple.
@@ -108,10 +109,24 @@ export default function createPgProcedureMutationGqlFieldEntry (
       const aliasIdentifier = Symbol()
 
       const query = sql.compile(
-        // If the procedure returns a set, we must select a set of values.
-        pgProcedure.returnsSet
-          ? sql.query`select to_json(${sql.identifier(aliasIdentifier)}) as value from ${procedureCall} as ${sql.identifier(aliasIdentifier)}`
-          : sql.query`select to_json(${procedureCall}) as value`,
+        // Though it's tempting to do our familiar:
+        //
+        //   select ${getSelectFragment(resolveInfo, aliasIdentifier, fixtures.return.gqlType)} as value
+        //
+        // we *cannot* do this because it will break computed columns.
+        // The reason is that computed columns are marked as STABLE, which
+        // means that "within a single table scan it will consistently return
+        // the same result for the same argument values". Postgresql docs also
+        // note: "It is inappropriate for AFTER triggers that wish to query
+        // rows modified by the current command."
+        //
+        // Instead we fall back to the traditional to_json(...) and rely on the
+        // resolvers to check `source.has(attrName)` to fetch it using the old
+        // method if it wasn't fetched via subquery.
+        sql.query`
+          select to_json(${sql.identifier(aliasIdentifier)}) as value
+          from ${procedureCall} as ${sql.identifier(aliasIdentifier)}
+        `
       )
 
       const { rows } = await client.query(query)

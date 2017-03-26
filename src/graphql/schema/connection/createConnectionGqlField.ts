@@ -15,6 +15,7 @@ import { Paginator } from '../../../interface'
 import { buildObject, formatName, memoize2, scrib } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
+import { sql } from '../../../postgres/utils'
 
 // TODO: doc
 export default function createConnectionGqlField <TSource, TInput, TItemValue>(
@@ -24,6 +25,8 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     description?: string,
     inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
+    subquery?: boolean = false,
+    relation?: Relation = null,
   },
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
@@ -38,7 +41,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
     offset?: number,
   }
 
-  return {
+  const result = {
     description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
     args: buildObject<GraphQLArgumentConfig>([
@@ -69,13 +72,9 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       // condition.
       ...(config.inputArgEntries ? config.inputArgEntries : []),
     ]),
-    // Note that this resolver is an arrow function. This is so that we can
-    // keep the correct `this` reference.
-    async resolve <TCursor>(
-      source: TSource,
-      args: ConnectionArgs<TCursor>,
-      context: mixed,
-    ): Promise<Connection<TInput, TItemValue, TCursor>> {
+  };
+  const getOrdering =
+    (sourceOrAliasIdentifier, args) => {
       const {
         orderBy: orderingName,
         before: beforeCursor,
@@ -99,7 +98,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
         throw new Error('Cannot use `before`/`after` cursors with `offset`!')
 
       // Get our input.
-      const input = config.getPaginatorInput(source, args)
+      const input = config.getPaginatorInput(sourceOrAliasIdentifier, args)
 
       // Construct the page config.
       const pageConfig: Paginator.PageConfig<TCursor> = {
@@ -113,17 +112,81 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       // Get our ordering.
       const ordering = paginator.orderings.get(orderingName) as Paginator.Ordering<TInput, TItemValue, TCursor>
 
-      // Finally, actually get the page data.
-      const page = await ordering.readPage(context, input, pageConfig)
-
       return {
-        paginator,
         orderingName,
+        ordering,
         input,
-        page,
+        pageConfig,
       }
-    },
+    }
+  if (config.subquery) {
+    const sourceName = (_, fieldName, args, alias) => `${fieldName}###${alias || ''}`
+    Object.assign(result, {
+      sourceName,
+      externalFieldNameDependencies: config.relation && config.relation._headFieldNames, // 🔥 Needs to account for classicIds
+      sqlExpression: (aliasIdentifier, fieldName, args, resolveInfo) => {
+        const {ordering, orderingName, input, pageConfig} = getOrdering(aliasIdentifier, args)
+        const alias = Symbol();
+        const {query} = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
+        return sql.query`(select json_build_object('rows', rows, 'hasNextPage', "hasNextPage", 'hasPreviousPage', "hasPreviousPage", 'totalCount', "totalCount") from (${query}) as ${sql.identifier(alias)})`
+      },
+      async resolve (source, args, context, resolveInfo): Promise<mixed> {
+        const fieldNodes = resolveInfo.fieldNodes || resolveInfo.fieldASTs
+        const alias = fieldNodes[0].alias && fieldNodes[0].alias.value
+        const attrName = sourceName(null, resolveInfo.fieldName, args, alias)
+        if (source.has(attrName)) {
+          // Subquery successful
+          const value = source.get(attrName)
+          // XXX: tweak value to be in same format as before, don't forget to re-order the rows if necessary!
+          const {ordering, orderingName, input, pageConfig} = getOrdering(
+            Symbol(), // <-- this doesn't matter during resolve
+            args
+          )
+          const details = ordering.generateQuery(input, pageConfig, resolveInfo, gqlType)
+          const page = ordering.valueToPage(value, details)
+          return {
+            paginator,
+            orderingName,
+            input,
+            page,
+          }
+        } else {
+          // Subquery unsuccessful (e.g. computed column on a compound type); revert to direct select
+          const {ordering, orderingName, input, pageConfig} = getOrdering(source, args)
+          // Finally, actually get the page data.
+          const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
+
+          return {
+            paginator,
+            orderingName,
+            input,
+            page,
+          }
+        }
+      }
+    })
+  } else {
+    Object.assign(result, {
+      async resolve <TCursor>(
+        source: TSource,
+        args: ConnectionArgs<TCursor>,
+        context: mixed,
+        resolveInfo: mixed,
+      ): Promise<Connection<TInput, TItemValue, TCursor>> {
+        const {ordering, orderingName, input, pageConfig} = getOrdering(source, args)
+        // Finally, actually get the page data.
+        const page = await ordering.readPage(context, input, pageConfig, resolveInfo, gqlType)
+
+        return {
+          paginator,
+          orderingName,
+          input,
+          page,
+        }
+      },
+    })
   }
+  return result
 }
 
 const getConnectionGqlType = memoize2(_createConnectionGqlType)
@@ -141,6 +204,8 @@ export function _createConnectionGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-connection`),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
+    // When performing optimisations, this is useful when parsing the resolveInfo AST tree:
+    relatedGqlType: gqlType,
     fields: () => ({
       pageInfo: {
         description: 'Information to aid in pagination.',
@@ -150,8 +215,7 @@ export function _createConnectionGqlType <TInput, TItemValue>(
       totalCount: {
         description: `The count of *all* ${scrib.type(gqlType)} you could get from the connection.`,
         type: GraphQLInt,
-        resolve: ({ input }, _args, context) =>
-          paginator.count(context, input),
+        resolve: source => source.page.totalCount(),
       },
       edges: {
         description: `A list of edges which contains the ${scrib.type(gqlType)} and cursor to aid in pagination.`,
@@ -183,6 +247,8 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${paginator.name}-edge`),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
+    // When performing optimisations, this is useful when parsing the resolveInfo AST tree:
+    relatedGqlType: gqlType,
     fields: () => ({
       cursor: {
         description: 'A cursor for use in pagination.',
