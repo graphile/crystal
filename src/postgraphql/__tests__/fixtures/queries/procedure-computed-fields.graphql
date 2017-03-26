@@ -32,6 +32,10 @@ query {
           }
         }
       }
+      firstPost {
+        id
+        headline
+      }
     }
   }
   allEdgeCases {
