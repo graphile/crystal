@@ -808,6 +808,10 @@ Object {
       "nodes": Array [
         Object {
           "firstName": "John",
+          "firstPost": Object {
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "id": 2,
+          },
           "friends": Object {
             "nodes": Array [
               Object {
@@ -840,6 +844,10 @@ Object {
         },
         Object {
           "firstName": "Sara",
+          "firstPost": Object {
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "id": 1,
+          },
           "friends": Object {
             "nodes": Array [
               Object {
@@ -872,6 +880,10 @@ Object {
         },
         Object {
           "firstName": "Budd",
+          "firstPost": Object {
+            "headline": "Stop talking, brain thinking. Hush.",
+            "id": 6,
+          },
           "friends": Object {
             "nodes": Array [
               Object {
@@ -899,6 +911,7 @@ Object {
         },
         Object {
           "firstName": "Kathryn",
+          "firstPost": null,
           "friends": Object {
             "nodes": Array [
               Object {
@@ -914,6 +927,10 @@ Object {
         },
         Object {
           "firstName": "Joe",
+          "firstPost": Object {
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            "id": 5,
+          },
           "friends": Object {
             "nodes": Array [],
           },
