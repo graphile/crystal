@@ -15,6 +15,11 @@ PostGraphQL holds a fundamental belief that a *well designed database schema sho
 
 For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read the [evaluating PostGraphQL for your project](#evaluating-postgraphql-for-your-project) section.
 
+## Introduction
+Watch a talk by the author at GraphQL summit for a fast 7 minute introduction to using PostGraphQL project.
+
+[![PostGraphQL at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
+
 ## Usage
 First install using npm:
 
@@ -49,11 +54,6 @@ Also make sure to check out the **[forum example][]** and especially **[step by 
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 [step by step tutorial]: https://github.com/calebmer/postgraphql/blob/master/examples/forum/TUTORIAL.md
-
-## Introduction
-Watch a talk by the author at GraphQL summit for a fast 7 minute introduction to using PostGraphQL project.
-
-[![PostGraphQL at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
 
 ## Benefits
 PostGraphQL uses the joint benefits of PostgreSQL and GraphQL to provide a number of key benefits.
