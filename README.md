@@ -1,5 +1,7 @@
 # PostGraphQL
 
+[![Backers on Open Collective](https://opencollective.com/postgraphql/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/postgraphql/sponsors/badge.svg)](#sponsors)
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Gitter chat room](https://badges.gitter.im/calebmer/postgraphql.svg)](https://gitter.im/calebmer/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -260,6 +262,79 @@ Still worried about a certain aspect of a schema driven API? Open an issue, conf
 
 * * *
 
+
+## Backers
+
+Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/postgraphql#backer)]
+
+<a href="https://opencollective.com/postgraphql/backer/0/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/1/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/2/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/3/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/4/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/5/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/6/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/6/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/7/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/7/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/8/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/8/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/9/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/9/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/10/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/10/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/11/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/11/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/12/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/12/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/13/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/13/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/14/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/14/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/15/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/15/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/16/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/16/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/17/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/17/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/18/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/18/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/19/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/19/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/20/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/20/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/21/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/21/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/22/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/22/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/23/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/23/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/24/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/24/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/25/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/25/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/26/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/26/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/27/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/27/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/28/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/28/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/backer/29/website" target="_blank"><img src="https://opencollective.com/postgraphql/backer/29/avatar.svg"></a>
+
+
+## Sponsors
+
+Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/postgraphql#sponsor)]
+
+<a href="https://opencollective.com/postgraphql/sponsor/0/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/1/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/2/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/3/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/4/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/5/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/6/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/7/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/8/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/9/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/9/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/10/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/10/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/11/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/11/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/12/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/12/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/13/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/13/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/14/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/14/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/15/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/15/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/16/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/16/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/17/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/17/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/18/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/18/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/19/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/19/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/20/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/20/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/21/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/21/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/22/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/22/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/23/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/23/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/24/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/24/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/25/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/25/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/26/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/26/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/27/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/27/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/28/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/28/avatar.svg"></a>
+<a href="https://opencollective.com/postgraphql/sponsor/29/website" target="_blank"><img src="https://opencollective.com/postgraphql/sponsor/29/avatar.svg"></a>
+
+
 ## Contributing
 Want to help testing and developing PostGraphQL? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!
 
@@ -269,3 +344,4 @@ Thanks so much to the people working on [PostgREST](https://github.com/begriffs/
 Enjoy this server? Want updates and seeing what I’m up to next? Follow me on Twitter [`@calebmer`](https://twitter.com/calebmer).
 
 Thanks and enjoy 👍
+
