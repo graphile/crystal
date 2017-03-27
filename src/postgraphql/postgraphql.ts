@@ -2,12 +2,12 @@ import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
-import { VerifyOptions } from 'jsonwebtoken'
 import chalk = require('chalk')
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
+import { JwtOptions } from './withPostGraphQLContext'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -17,7 +17,7 @@ type PostGraphQLOptions = {
   graphiql?: boolean,
   pgDefaultRole?: string,
   jwtSecret?: string,
-  jwtOptions?: VerifyOptions,
+  jwtOptions?: JwtOptions,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,

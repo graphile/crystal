@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { VerifyOptions } from 'jsonwebtoken'
 import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
 import { EventEmitter } from 'events'
+import { JwtOptions } from '../withPostGraphQLContext'
 
 /**
  * A request handler for one of many different `http` frameworks.
@@ -51,7 +51,7 @@ export default function createPostGraphQLHttpRequestHandler (config: {
 
   // Custom options given to jwt.verify function. When no custom options were given
   // the default audience will be set to 'postgraphql'
-  jwtOptions?: VerifyOptions,
+  jwtOptions?: JwtOptions,
 
   // Whether or not we are watching the PostGraphQL schema for changes. Should
   // be associated with `_emitter`.

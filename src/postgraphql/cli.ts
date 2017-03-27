@@ -3,7 +3,6 @@
 import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
-import { VerifyOptions } from 'jsonwebtoken'
 import chalk = require('chalk')
 import { Command } from 'commander'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
@@ -16,7 +15,6 @@ const DEMO_PG_URL = null
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString())
 const program = new Command('postgraphql')
-const jwtOptions: VerifyOptions = { audience: 'postgraphql' }
 
 program
   .version(manifest.version)
@@ -39,9 +37,9 @@ program
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
-  .option('--secret <string>', 'DEPRECATED: See jwt.secret')
-  .option('-e, --jwt.secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('-A, --jwt.audience <list>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', assign('audience', list), jwtOptions)
+  .option('secret <string>', 'DEPRECATED: Use jwt-secret instead')
+  .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
+  .option('-A, --jwt-audience <list>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
@@ -72,7 +70,8 @@ const {
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
-  'jwt.secret': jwtSecret,
+  'jwt-secret': jwtSecret,
+  'jwt-audience': jwtAudience = ['postgraphql'],
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -117,7 +116,9 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphiql: !disableGraphiql,
   jwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
-  jwtOptions,
+  jwtOptions: {
+    audience: jwtAudience,
+  },
   pgDefaultRole,
   watchPg,
   showErrorStack,
@@ -145,14 +146,3 @@ server.listen(port, hostname, () => {
   console.log(chalk.gray('* * *'))
   console.log('')
 })
-
-function assign(key: string, fn?: (val: string) => mixed): (val: string, obj: { [key: string]: mixed }) => { [key: string]: mixed } {
-  return (val, obj) => {
-    obj[key] = fn && fn(val) || val
-    return obj
-  }
-}
-
-function list(val: string): Array<string> {
-  return val.split(',')
-}

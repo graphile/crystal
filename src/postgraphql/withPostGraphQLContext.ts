@@ -5,6 +5,10 @@ import { ExecutionResult } from 'graphql'
 import { sql } from '../postgres/utils'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
+export type JwtOptions = {
+  audience?: Array<string>;
+}
+
 /**
  * Creates a PostGraphQL context object which should be passed into a GraphQL
  * execution. This function will also connect a client from a Postgres pool and
@@ -42,7 +46,7 @@ export default async function withPostGraphQLContext(
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
-    jwtOptions?: jwt.VerifyOptions,
+    jwtOptions?: JwtOptions,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -101,7 +105,7 @@ async function setupPgClientTransaction ({
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
-  jwtOptions?: jwt.VerifyOptions,
+  jwtOptions?: JwtOptions,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
