@@ -9,7 +9,6 @@ const http = require('http')
 const request = require('supertest')
 const connect = require('connect')
 const express = require('express')
-const Koa = require('koa') // tslint:disable-line variable-name
 const sendFile = require('send')
 const event = require('events')
 
@@ -82,12 +81,25 @@ const serverCreators = new Map([
     app.use(handler)
     return http.createServer(app)
   }],
-  ['koa', handler => {
+])
+
+// Parse out the Node.js version number. The version will be in a semantic
+// versioning format with maybe a `v` in front. We remove that `v`, split by
+// `.`, get the first item in the split array, and parse that as an integer to
+// get the Node.js major version number.
+const nodeMajorVersion = parseInt(process.version.replace(/^v/, '').split('.')[0], 10)
+
+// Only test Koa in version of Node.js greater than 4 because the Koa source
+// code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
+// not meant to be used in Node.js 4 anyway so this is fine.
+if (nodeMajorVersion > 4) {
+  const Koa = require('koa') // tslint:disable-line variable-name
+  serverCreators.set('koa', handler => {
     const app = new Koa()
     app.use(handler)
     return http.createServer(app.callback())
-  }],
-])
+  })
+}
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = options =>

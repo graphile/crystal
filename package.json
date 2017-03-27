@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "@types/pluralize": "0.0.26",
     "connect": "^3.5.0",
     "express": "^4.14.0",
-    "graphiql": "^0.9.1",
+    "graphiql": "0.9.1",
     "graphql": "^0.9.3",
     "jest": "^18.1.0",
     "koa": "^2.0.0",
