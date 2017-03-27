@@ -50,6 +50,11 @@ Also make sure to check out the **[forum example][]** and especially **[step by 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
 [step by step tutorial]: https://github.com/calebmer/postgraphql/blob/master/examples/forum/TUTORIAL.md
 
+## Introduction
+Watch a talk by the author at GraphQL summit for a fast 7 minute introduction to using PostGraphQL project.
+
+[![PostGraphQL at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
+
 ## Benefits
 PostGraphQL uses the joint benefits of PostgreSQL and GraphQL to provide a number of key benefits.
 
@@ -125,6 +130,15 @@ For more information, check out our [procedure documentation][] and our [advance
 
 [procedure documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md
 [advanced queries documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md
+
+### Advanced Watch Mode
+Running PostGraphQL in watch mode will get you the best experience for iterating on a GraphQL API in the whole GraphQL ecosystem.
+
+```
+postgraphql --watch
+```
+
+PostGraphQL will watch your Postgres database for changes. New tables, updated columns, new procedures, and more! When these changes are detected PostGraphQL will re-create your schema and will automatically update any opened GraphiQL windows with the new schema while preserving your navigation state in the documentation viewer.
 
 ### Fully Documented APIs
 Introspection of a GraphQL schema is powerful for developer tooling and one element of introspection is that every type in GraphQL has an associated `description` field. As PostgreSQL allows you to document your database objects, naturally PostGraphQL exposes these documentation comments through GraphQL.
