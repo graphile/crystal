@@ -5,10 +5,6 @@ import { ExecutionResult } from 'graphql'
 import { sql } from '../postgres/utils'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
-export type JwtOptions = {
-  audience?: Array<string>;
-}
-
 /**
  * Creates a PostGraphQL context object which should be passed into a GraphQL
  * execution. This function will also connect a client from a Postgres pool and
@@ -39,14 +35,14 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
-    jwtOptions,
+    jwtAudience = ['postgraphql'],
     pgDefaultRole,
     pgSettings,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
-    jwtOptions?: JwtOptions,
+    jwtAudience?: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -67,7 +63,7 @@ export default async function withPostGraphQLContext(
       pgClient,
       jwtToken,
       jwtSecret,
-      jwtOptions,
+      jwtAudience,
       pgDefaultRole,
       pgSettings,
     })
@@ -98,14 +94,14 @@ async function setupPgClientTransaction ({
   pgClient,
   jwtToken,
   jwtSecret,
-  jwtOptions,
+  jwtAudience,
   pgDefaultRole,
   pgSettings,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
-  jwtOptions?: JwtOptions,
+  jwtAudience?: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -125,8 +121,7 @@ async function setupPgClientTransaction ({
         throw new Error('Not allowed to provide a JWT token.')
 
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
-        audience: 'postgraphql',
-        ...jwtOptions,
+        audience: jwtAudience,
       })
 
       const roleClaim = jwtClaims['role']

@@ -116,9 +116,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphiql: !disableGraphiql,
   jwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
-  jwtOptions: {
-    audience: jwtAudience,
-  },
+  jwtAudience,
   pgDefaultRole,
   watchPg,
   showErrorStack,
