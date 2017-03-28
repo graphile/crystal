@@ -39,7 +39,7 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('-A, --jwt-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
@@ -71,7 +71,7 @@ const {
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   'jwt-secret': jwtSecret,
-  'jwt-audience': jwtAudience = ['postgraphql'],
+  'jwt-audiences': jwtAudiences = ['postgraphql'],
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -116,7 +116,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphiql: !disableGraphiql,
   jwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
-  jwtAudience,
+  jwtAudiences,
   pgDefaultRole,
   watchPg,
   showErrorStack,

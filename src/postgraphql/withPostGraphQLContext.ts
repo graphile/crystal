@@ -35,14 +35,14 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
-    jwtAudience = ['postgraphql'],
+    jwtAudiences = ['postgraphql'],
     pgDefaultRole,
     pgSettings,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
-    jwtAudience?: Array<string>,
+    jwtAudiences?: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -63,7 +63,7 @@ export default async function withPostGraphQLContext(
       pgClient,
       jwtToken,
       jwtSecret,
-      jwtAudience,
+      jwtAudiences,
       pgDefaultRole,
       pgSettings,
     })
@@ -94,14 +94,14 @@ async function setupPgClientTransaction ({
   pgClient,
   jwtToken,
   jwtSecret,
-  jwtAudience,
+  jwtAudiences,
   pgDefaultRole,
   pgSettings,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
-  jwtAudience?: Array<string>,
+  jwtAudiences?: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -121,7 +121,7 @@ async function setupPgClientTransaction ({
         throw new Error('Not allowed to provide a JWT token.')
 
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
-        audience: jwtAudience,
+        audience: jwtAudiences,
       })
 
       const roleClaim = jwtClaims['role']
