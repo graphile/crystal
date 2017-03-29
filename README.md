@@ -188,7 +188,7 @@ Just navigate with your browser to the URL printed to your console after startin
 [graphiql]: https://github.com/graphql/graphiql
 
 ### Token Based Authorization
-PostGraphQL let’s you use token based authentication with [JSON Web Tokens][jwt] (JWT) to secure your API. It doesn’t make sense to redefine your authentication in the API layer, instead just put your authorization logic in the database schema! With an advanced [grants][grants] system and [row level security][row-level-security], authorization in PostgreSQL is more than enough for your needs.
+PostGraphQL lets you use token based authentication with [JSON Web Tokens][jwt] (JWT) to secure your API. It doesn’t make sense to redefine your authentication in the API layer, instead just put your authorization logic in the database schema! With an advanced [grants][grants] system and [row level security][row-level-security], authorization in PostgreSQL is more than enough for your needs.
 
 PostGraphQL follows the [PostgreSQL JSON Web Token Serialization Specification][pg-jwt-spec] for serializing JWTs to the database for your use in authorization. The `role` claim of your JWT will become your PostgreSQL role and all other claims can be found under the `jwt.claims` namespace (see [retrieving claims in PostgreSQL][retrieving-claims]).
 
@@ -227,9 +227,9 @@ The specific specs PostGraphQL implements are:
 ## Evaluating PostGraphQL For Your Project
 Hopefully you’ve been convinced that PostGraphQL serves an awesome GraphQL API, but now let’s take a more critical look at whether or not you should adopt PostGraphQL for your project.
 
-PostGraphQL’s audience is for people who’s core business is not the API and want to prioritize their product. PostGraphQL allows you to define your content model in the database as you normally would, however instead of building the bindings to the database (your API) PostGraphQL takes care of it.
+PostGraphQL’s audience is for people whose core business is not the API and want to prioritize their product. PostGraphQL allows you to define your content model in the database as you normally would, however instead of building the bindings to the database (your API) PostGraphQL takes care of it.
 
-This takes a huge maintenance burden of your shoulders. Now you don’t have to worry about optimizing the API and the database, instead you can focus on just optimizing your database.
+This takes a huge maintenance burden off your shoulders. Now you don’t have to worry about optimizing the API and the database, instead you can focus on just optimizing your database.
 
 ### No Lock In
 PostGraphQL does not lock you into using PostGraphQL forever. Its purpose is to help your business in a transitory period. When you feel comfortable with the cost of building your API PostGraphQL is simple to switch with a custom solution.
