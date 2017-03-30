@@ -17,6 +17,7 @@ import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
  *   pgPool,
  *   jwtToken,
  *   jwtSecret,
+ *   jwtAudience,
  *   pgDefaultRole,
  * }, async context => {
  *   return await graphql(
@@ -35,12 +36,14 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
+    jwtAudience,
     pgDefaultRole,
     pgSettings,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
+    jwtAudience?: string,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -61,6 +64,7 @@ export default async function withPostGraphQLContext(
       pgClient,
       jwtToken,
       jwtSecret,
+      jwtAudience,
       pgDefaultRole,
       pgSettings,
     })
@@ -91,12 +95,14 @@ async function setupPgClientTransaction ({
   pgClient,
   jwtToken,
   jwtSecret,
+  jwtAudience,
   pgDefaultRole,
   pgSettings,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
+  jwtAudience?: string,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -110,12 +116,17 @@ async function setupPgClientTransaction ({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not procided to the server
+      // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: 'postgraphql' })
+      // If a JWT token was defined, but an audience was not provided to the server
+      // default to postgraphql audience.
+      if (typeof jwtAudience === 'undefined')
+        jwtAudience = 'postgraphql'
+
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: jwtAudience })
 
       const roleClaim = jwtClaims['role']
 
