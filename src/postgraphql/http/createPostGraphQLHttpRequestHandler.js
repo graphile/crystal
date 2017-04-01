@@ -394,6 +394,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         pgPool,
         jwtToken,
         jwtSecret: options.jwtSecret,
+        jwtAudiences: options.jwtAudiences,
         pgDefaultRole: options.pgDefaultRole,
         pgSettings,
       }, context => {
