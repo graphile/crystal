@@ -222,7 +222,7 @@ The specific specs PostGraphQL implements are:
 - [Using PostGraphQL as Express, Connect, or Koa middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
 - [Adding advanced queries to PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md)
 - [Using PostgreSQL functions to extend your PostGraphQL schema.](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md)
-- [A crash course in PostgreSQL roles for PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/anonymous-role.md)
+- [A crash course in PostgreSQL roles for PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/default-role.md)
 
 ## Evaluating PostGraphQL For Your Project
 Hopefully you’ve been convinced that PostGraphQL serves an awesome GraphQL API, but now let’s take a more critical look at whether or not you should adopt PostGraphQL for your project.
