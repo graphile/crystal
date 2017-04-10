@@ -1,3 +1,4 @@
+import ReadDependency from '../ReadDependency'
 import Collection from './Collection'
 import CollectionKey from './CollectionKey'
 import Condition from './Condition'
@@ -44,6 +45,18 @@ interface Relation<TTailValue, THeadValue, THeadKey> {
    * The head collection key in this relationship.
    */
   readonly headCollectionKey: CollectionKey<THeadValue, THeadKey>
+
+  /**
+   * The dependencies required for getting a `THeadKey` from a `TTailValue` to
+   * be used in `getHeadKeyFromTailValue`.
+   */
+  readonly tailDependencies?: Array<ReadDependency<TTailValue>>
+
+  /**
+   * The dependencies required for getting a `Condition` from a `THeadValue` to
+   * be used in `getTailConditionFromHeadValue`.
+   */
+  readonly headDependencies?: Array<ReadDependency<THeadValue>>
 
   /**
    * Gets the key for a value in the head collection from the tail collection

@@ -37,6 +37,7 @@ export default function createCollectionGqlType<TValue> (
         primaryKey && [options.nodeIdFieldName, {
           description: 'A globally unique identifier. Can be used in various places throughout the system to identify this single value.',
           type: new GraphQLNonNull(GraphQLID),
+          [$$dependencies]: primaryKey.keyDependencies,
           resolve: (value: TValue) => idSerde.serialize(collection, value),
         }],
       ],
@@ -50,6 +51,7 @@ export default function createCollectionGqlType<TValue> (
             value: {
               description: field.description,
               type: gqlType,
+              [$$dependencies]: field.dependencies,
               resolve: (value: TValue): mixed => intoGqlOutput(field.getValue(value)),
             },
           }
@@ -91,6 +93,8 @@ export default function createCollectionGqlType<TValue> (
                   type: gqlConditionType,
                 }],
               ],
+              // We want the tail dependencies when resolving this.
+              dependencies: relation.tailDependencies,
               // We use the config when creating a connection field to inject
               // a condition that limits what we select from the paginator.
               getPaginatorInput: (headValue: TValue, args: { condition?: { [key: string]: mixed } }) =>

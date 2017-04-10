@@ -1,4 +1,5 @@
 import Type from './type/Type'
+import ReadDependency from './collection/ReadDependency'
 
 /**
  * A collection paginator is an object that implements cursor based pagination
@@ -90,6 +91,7 @@ namespace Paginator {
       context: mixed,
       input: TInput,
       config: Paginator.PageConfig<TCursor>,
+      dependencies?: Array<ReadDependency>,
     ): Promise<Paginator.Page<TItemValue, TCursor>>
   }
 

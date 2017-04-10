@@ -23,6 +23,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   config: {
     description?: string,
     inputArgEntries?: Array<[string, GraphQLArgumentConfig]>,
+    dependencies?: Array<ReadDependency<TSource>>,
     getPaginatorInput: (source: TSource, args: { [key: string]: mixed }) => TInput,
   },
 ): GraphQLFieldConfig<TSource, Connection<TInput, TItemValue, mixed>> {
@@ -69,6 +70,8 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
       // condition.
       ...(config.inputArgEntries ? config.inputArgEntries : []),
     ]),
+    // Add the dependencies from our configuration.
+    [$$dependencies]: config.dependencies,
     // Note that this resolver is an arrow function. This is so that we can
     // keep the correct `this` reference.
     async resolve <TCursor>(

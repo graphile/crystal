@@ -1,5 +1,6 @@
 import ObjectType from '../type/ObjectType'
 import Paginator from '../Paginator'
+import ReadDependency from '../ReadDependency'
 import CollectionKey from './CollectionKey'
 import Condition from './Condition'
 
@@ -63,7 +64,11 @@ interface Collection<TValue> {
   // TODO: Test that we can use this method on an empty collection and then
   // use all the other methods to interact with our created objects.
   // TODO: Is there a better way to type `context`?
-  create?: ((context: mixed, value: TValue) => Promise<TValue>) | null
+  readonly create?: null | ((
+    context: mixed,
+    value: TValue,
+    dependencies?: Array<ReadDependency<TValue>>,
+  ) => Promise<TValue>)
 }
 
 export default Collection

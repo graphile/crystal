@@ -1,4 +1,5 @@
 import Type from '../type/Type'
+import ReadDependency from '../ReadDependency'
 import Collection from './Collection'
 
 /**
@@ -39,6 +40,14 @@ interface CollectionKey<TValue, TKeyValue> {
   readonly keyType: Type<TKeyValue>
 
   /**
+   * The dependencies against `TValue` that we need in the `getKeyFromValue`
+   * function to compute `TKeyValue`s. If this `CollectionKey` represents the
+   * primary key of a SQL database table, for instance, then this array will
+   * contain the columns in the primary key.
+   */
+  readonly keyDependencies?: Array<ReadDependency<TValue>>
+
+  /**
    * Gets the key directly from a value. Using this method we are able to get a
    * unique key identifier for our value. A key that we can use again to
    * operate on the value.
@@ -54,7 +63,11 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  readonly read?: ((context: mixed, key: TKeyValue) => Promise<TValue | null>) | null
+  readonly read?: null | ((
+    context: mixed,
+    key: TKeyValue,
+    dependencies?: Array<ReadDependency<TValue>>,
+  ) => Promise<TValue | null>)
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is
@@ -67,7 +80,12 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was updated, an error should be thrown.
    */
   // TODO: Test this.
-  readonly update?: ((context: mixed, key: TKeyValue, patch: Map<string, mixed>) => Promise<TValue>) | null
+  readonly update?: null | ((
+    context: mixed,
+    key: TKeyValue,
+    patch: Map<string, mixed>,
+    dependencies?: Array<ReadDependency<TValue>>,
+  ) => Promise<TValue>)
 
   /**
    * Delete a value from the collection by using the value’s key. Returned is
@@ -76,7 +94,11 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was deleted an error should be thrown.
    */
   // TODO: Test this.
-  readonly delete?: ((context: mixed, key: TKeyValue) => Promise<TValue>) | null
+  readonly delete?: null | ((
+    context: mixed,
+    key: TKeyValue,
+    dependencies?: Array<ReadDependency<TValue>>,
+  ) => Promise<TValue>)
 }
 
 export default CollectionKey

@@ -1,3 +1,4 @@
+import ReadDependency from '../ReadDependency'
 import Type from './Type'
 import NamedType from './NamedType'
 
@@ -41,6 +42,11 @@ namespace ObjectType {
      * The required type of the values for this field.
      */
     readonly type: Type<TValue>
+
+    /**
+     * The dependencies required for getting `TValue` from a `TObjectValue`.
+     */
+    readonly dependencies?: Array<ReadDependency<TObjectValue>>
 
     /**
      * Extracts the value for this field from the object value.
