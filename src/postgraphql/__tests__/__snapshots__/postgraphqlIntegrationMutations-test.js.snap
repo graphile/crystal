@@ -675,6 +675,9 @@ Object {
       "clientMutationId": "x",
       "integer": 2,
     },
+    "returnVoidMutation": Object {
+      "__typename": "ReturnVoidMutationPayload",
+    },
     "tableMutation": Object {
       "personByAuthorId": Object {
         "id": 5,

@@ -7,21 +7,23 @@ import getTypeFromPgType from '../../../postgres/inventory/type/getTypeFromPgTyp
 import PgType from '../../../postgres/inventory/type/PgType'
 
 export type PgProcedureFixtures =  {
-  pgCatalog: PgCatalog,
-  pgProcedure: PgCatalogProcedure,
-  pgNamespace: PgCatalogNamespace,
-  args: Array<{
-    name: string,
-    pgType: PgCatalogType,
-    type: PgType<mixed>,
-    gqlType: GraphQLInputType,
-    fromGqlInput: (gqlInput: mixed) => mixed,
+  readonly pgCatalog: PgCatalog,
+  readonly pgProcedure: PgCatalogProcedure,
+  readonly pgNamespace: PgCatalogNamespace,
+  readonly args: Array<{
+    readonly name: string,
+    readonly pgType: PgCatalogType,
+    readonly type: PgType<mixed>,
+    readonly gqlType: GraphQLInputType,
+    readonly fromGqlInput: (gqlInput: mixed) => mixed,
   }>,
-  return: {
-    pgType: PgCatalogType,
-    type: PgType<mixed>,
-    gqlType: GraphQLOutputType,
-    intoGqlOutput: (value: mixed) => mixed,
+  // The return type may be null if the procedure returns the special “void”
+  // type. Then we do not want to return anything.
+  readonly return: null | {
+    readonly pgType: PgCatalogType,
+    readonly type: PgType<mixed>,
+    readonly gqlType: GraphQLOutputType,
+    readonly intoGqlOutput: (value: mixed) => mixed,
   },
 }
 
@@ -55,6 +57,11 @@ export default function createPgProcedureFixtures (
     }),
 
     return: (() => {
+      // If this procedure returns the special “void” type then we do not want
+      // to return any fixtures for the return type.
+      if (pgProcedure.returnTypeId === '2278') {
+        return null
+      }
       // Convert our return type into its appropriate forms.
       const pgType = pgCatalog.assertGetType(pgProcedure.returnTypeId)
       const type = getTypeFromPgType(pgCatalog, pgType, inventory)

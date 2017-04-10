@@ -1524,6 +1524,19 @@ Object {
     },
     Object {
       "argDefaultsNum": 0,
+      "argNames": Array [],
+      "argTypeIds": Array [],
+      "description": null,
+      "isStable": false,
+      "isStrict": false,
+      "kind": "procedure",
+      "name": "return_void_mutation",
+      "namespaceId": "a",
+      "returnTypeId": "void",
+      "returnsSet": false,
+    },
+    Object {
+      "argDefaultsNum": 0,
       "argNames": Array [
         "id",
       ],
