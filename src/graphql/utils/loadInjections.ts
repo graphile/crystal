@@ -14,7 +14,7 @@ export default function loadInjections(dirToInject: string, type: string): Array
     cwd: process.cwd(),
 		reducer: function (options, tree, file) {
         if (!Array.isArray(tree)) tree = []
-        if (file.exports.type === type) tree.push([file.exports.name, file.exports.schema)
+        if (file.exports.type === type) tree.push([file.exports.name, file.exports.schema])
         return tree
       },
     })
