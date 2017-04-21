@@ -29,6 +29,8 @@ interface BuildToken {
     // If true then the default mutations for tables (e.g. createMyTable) will
     // not be created
     readonly disableDefaultMutations: boolean,
+    // Path to read shcema injections from
+    readonly schemaInjection: string,
   },
   // Hooks for adding custom fields/types into our schema.
   readonly _hooks: _BuildTokenHooks,

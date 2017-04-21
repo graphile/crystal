@@ -43,6 +43,7 @@ program
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
+  .option('--schema-injection [path]', 'requires the files in the specified path and injects them into the GraphQL schema (supports glob\'s)')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -81,6 +82,7 @@ const {
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
   bodySizeLimit,
+  schemaInjection,
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -125,6 +127,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   exportJsonSchemaPath,
   exportGqlSchemaPath,
   bodySizeLimit,
+  schemaInjection,
 }))
 
 // Start our server by listening to a specific port and host name. Also log
