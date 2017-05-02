@@ -30,11 +30,11 @@
  * ```
  */
 export default function buildObject <T>(
-  ...entriess: Array<Array<[string, T] | { key: string, value: T } | undefined | null | false>>,
+  ...entries: Array<Array<[string, T] | { key: string, value: T } | undefined | null | false>>,
 ): { [key: string]: T } {
   const object = {}
 
-  entriess.forEach(entries => entries.forEach(entry => {
+  entries.forEach(entries => entries.forEach(entry => {
     if (!entry)
       return
 
