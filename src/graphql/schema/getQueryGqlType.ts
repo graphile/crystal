@@ -36,6 +36,7 @@ function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType {
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
         .reduce((a, b) => a.concat(b), []),
+      // Load injections
       loadInjections(options.schemaInjection, 'query'),
       [
         // The root query type is useful for Relay 1 as it limits what fields
