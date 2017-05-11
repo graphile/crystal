@@ -97,3 +97,9 @@ Common scopes are as follows. You are not required to use any of the following s
 - `scripts`
 - `examples`
 - `ci`
+
+## Resources
+
+Here are some resources that will help you learn more about Postgres and GraphQL so that you may understand more of what is going on inside PostGraphQL.
+
+- [The Anatomy of a GraphQL Query.](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747) This article provides the vocabulary you need to talk about a GraphQL query technically.
