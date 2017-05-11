@@ -1,6 +1,8 @@
 import { ListType } from '../../../interface'
 import { sql } from '../../utils'
 import PgType from './PgType'
+import PgNullableType from './PgNullableType'
+import PgEnumType from './PgEnumType'
 
 class PgListType<TItemValue> extends PgType<Array<TItemValue>> implements ListType<Array<TItemValue>, TItemValue> {
   public readonly kind: 'LIST' = 'LIST'
@@ -36,11 +38,11 @@ class PgListType<TItemValue> extends PgType<Array<TItemValue>> implements ListTy
   public transformValueIntoPgValue (value: Array<TItemValue>): sql.Sql {
     if (value.length === 0)
       return sql.query`'{}'`
-      
+
     // a list of enums must be casted explicitly, otherwise it would be treated as text[]
-    const kind = this.itemType.nonNullType ? this.itemType.nonNullType.kind : this.itemType.kind
-    const listType = kind === 'ENUM' ? `::${this.itemType.nonNullType.name}[]` : ''
-    return sql.query`array[${sql.join(value.map(item => this.itemType.transformValueIntoPgValue(item)), ', ')}]${listType}`
+    const nonNullType = this.itemType instanceof PgNullableType ? this.itemType.nonNullType : this.itemType
+    const listTypeCast = sql.raw(`::${nonNullType instanceof PgEnumType ? nonNullType.name : 'text'}[]`)
+    return sql.query`array[${sql.join(value.map(item => this.itemType.transformValueIntoPgValue(item)), ', ')}]${listTypeCast}`
   }
 }
 
