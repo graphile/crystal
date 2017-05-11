@@ -34,7 +34,10 @@ class PgListType<TItemValue> extends PgType<Array<TItemValue>> implements ListTy
   }
 
   public transformValueIntoPgValue (value: Array<TItemValue>): sql.Sql {
-    return sql.query`array[${sql.join(value.map(item => this.itemType.transformValueIntoPgValue(item)), ', ')}]`
+     // a list of enums must be casted explicitly, otherwise it would be treated as text[]
+    const kind = this.itemType.nonNullType ? this.itemType.nonNullType.kind : this.itemType.kind;
+    const listType = kind === 'ENUM' ? `::${this.itemType.nonNullType.name}[]` : '';
+    return sql.query`array[${sql.join(value.map(item => this.itemType.transformValueIntoPgValue(item)), ', ')}]${listType}`
   }
 }
 
