@@ -62,7 +62,7 @@ class PostGraphiQL extends React.Component {
         'Authorization': `Bearer ${jwtToken}`,
       } : {}),
       body: JSON.stringify(graphQLParams),
-      credentials: 'include',
+      credentials: 'same-origin',
     })
 
     const result = await response.json()
