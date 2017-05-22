@@ -67,14 +67,14 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       const attrName = sourceName(null, null, args, alias)
       if (source.has(attrName)) {
         const value = source.get(attrName)
-        return value != null ? fixtures.return.intoGqlOutput(value) : null
+        return value != null ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(value)) : null
       } else {
         // Subquery failed (e.g. computed function as subfield of compound type); fall back to old logic
         const client = pgClientFromContext(context)
         const input = [source, ...argEntries.map(([argName], i) => fixtures.args[i + 1].fromGqlInput(args[argName]))]
         const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
         const { rows: [row] } = await client.query(query)
-        return row ? fixtures.return.intoGqlOutput(row['value']) : null
+        return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
       }
     },
   }]
