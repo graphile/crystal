@@ -18,6 +18,10 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true
   },
+  "include": [
+    "src",
+    "typings"
+  ],
   "exclude": [
     "index.js",
     "node_modules",
