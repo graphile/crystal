@@ -2,28 +2,41 @@
 // these guys see, that would be great 👍
 
 import { printSchema } from 'graphql'
-import withPgClient from '../../postgres/__tests__/fixtures/withPgClient'
+import withPgClient from '../../__tests__/utils/withPgClient'
 import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 
-test('prints a schema with the default options', withPgClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
-  expect(printSchema(gqlSchema)).toMatchSnapshot()
-}))
+let testResults
 
-test('prints a schema with Relay 1 style ids', withPgClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, 'c', { classicIds: true })
-  expect(printSchema(gqlSchema)).toMatchSnapshot()
-}))
+const testFixtures = [
+  {
+    name: 'prints a schema with the default options',
+    createSchema: client => createPostGraphQLSchema(client, ['a', 'b', 'c']),
+  },
+  {
+    name: 'prints a schema with Relay 1 style ids',
+    createSchema: client => createPostGraphQLSchema(client, 'c', { classicIds: true }),
+  },
+  {
+    name: 'prints a schema with a JWT generating mutation',
+    createSchema: client => createPostGraphQLSchema(client, 'b', { jwtSecret: 'secret', jwtPgTypeIdentifier: 'b.jwt_token' }),
+  },
+  {
+    name: 'prints a schema without default mutations',
+    createSchema: client => createPostGraphQLSchema(client, 'c', { disableDefaultMutations: true }),
+  },
+]
 
-test('prints a schema with a JWT generating mutation', withPgClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, 'b', { jwtSecret: 'secret', jwtPgTypeIdentifier: 'b.jwt_token' })
-  expect(printSchema(gqlSchema)).toMatchSnapshot()
-}))
+beforeAll(() => {
+  testResults = testFixtures.map(testFixture => withPgClient(async client => {
+    return await testFixture.createSchema(client)
+  })())
+})
 
-test('prints a schema without default mutations', withPgClient(async pgClient => {
-  const gqlSchema = await createPostGraphQLSchema(pgClient, 'c', { disableDefaultMutations: true })
-  expect(printSchema(gqlSchema)).toMatchSnapshot()
-}))
+for (let i = 0; i < testFixtures.length; i++) {
+  test(testFixtures[i].name, async () => {
+    expect(printSchema(await testResults[i])).toMatchSnapshot()
+  })
+}

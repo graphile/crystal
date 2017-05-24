@@ -48,6 +48,10 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // value.
   jwtSecret?: string,
 
+  // The audiences to use when verifing the JWT token. If not set the default
+  // audience will be ['postgraphql'].
+  jwtAudiences?: Array<string>,
+
   // Whether or not we are watching the PostGraphQL schema for changes. Should
   // be associated with `_emitter`.
   watchPg?: boolean,
@@ -73,4 +77,9 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // The size can be given as a human-readable string, such as '200kB' or '5MB'
   // (case insensitive).
   bodySizeLimit?: string,
+
+  // Allows the definition of custom postgres settings which get injected in
+  // each transaction via set_config. They can then be used via current_setting
+  // in postgres functions.
+  pgSettings?: { [key: string]: mixed },
 }): HttpRequestHandler

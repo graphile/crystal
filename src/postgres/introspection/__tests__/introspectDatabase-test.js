@@ -1,4 +1,4 @@
-import withPgClient from '../../__tests__/fixtures/withPgClient'
+import withPgClient from '../../../__tests__/utils/withPgClient'
 import createKitchenSinkPgSchema from '../../__tests__/fixtures/createKitchenSinkPgSchema'
 import introspectDatabase from '../introspectDatabase'
 

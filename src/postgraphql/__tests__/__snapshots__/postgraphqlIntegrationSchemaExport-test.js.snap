@@ -1636,6 +1636,7 @@ type Person implements Node {
   email: Email!
   createdAt: Datetime
   firstName: String
+  firstPost: Post
 
   # Reads and enables paginatation through a set of \`Person\`.
   friends(
@@ -5626,6 +5627,18 @@ exports[`test exports a schema as JSON 1`] = `
               \"type\": {
                 \"kind\": \"SCALAR\",
                 \"name\": \"String\",
+                \"ofType\": null
+              },
+              \"isDeprecated\": false,
+              \"deprecationReason\": null
+            },
+            {
+              \"name\": \"firstPost\",
+              \"description\": null,
+              \"args\": [],
+              \"type\": {
+                \"kind\": \"OBJECT\",
+                \"name\": \"Post\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
