@@ -4,7 +4,7 @@ import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
 import chalk = require('chalk')
-import { Command } from 'commander'
+import program = require('commander')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from './postgraphql'
 
@@ -14,7 +14,6 @@ import postgraphql from './postgraphql'
 const DEMO_PG_URL = null
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString())
-const program = new Command('postgraphql')
 
 program
   .version(manifest.version)
@@ -70,8 +69,8 @@ const {
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
-  'jwt-secret': jwtSecret,
-  'jwt-audiences': jwtAudiences = ['postgraphql'],
+  jwtSecret,
+  jwtAudiences = ['postgraphql'],
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
