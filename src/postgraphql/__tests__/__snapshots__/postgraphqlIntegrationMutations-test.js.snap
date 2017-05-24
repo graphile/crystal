@@ -1,0 +1,724 @@
+exports[`test mutation-create.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "query": Object {
+        "nodeId": "query",
+      },
+      "type": Object {
+        "anIntRange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": 500,
+          },
+          "start": null,
+        },
+        "bigint": "467131188225",
+        "boolean": false,
+        "compoundType": Object {
+          "a": 123,
+          "b": "abc",
+          "c": "GREEN",
+          "d": "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf",
+          "fooBar": 20,
+        },
+        "date": "2016-10-15",
+        "daterange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": "1927-11-07",
+          },
+          "start": Object {
+            "inclusive": true,
+            "value": "1927-11-06",
+          },
+        },
+        "decimal": 15.2,
+        "domain": 6,
+        "domain2": 5,
+        "enum": "RED",
+        "id": 201,
+        "interval": Object {
+          "days": 4,
+          "hours": 3,
+          "minutes": 2,
+          "months": 5,
+          "seconds": 1,
+          "years": 6,
+        },
+        "json": "{\"x\":1,\"y\":2,\"z\":3}",
+        "jsonb": "{\"a\":1,\"b\":2,\"c\":3}",
+        "money": 5000,
+        "nestedCompoundType": Object {
+          "a": Object {
+            "a": 456,
+            "b": "def",
+            "c": "BLUE",
+            "d": "79863dcf-0433-4c3d-bc51-978326d4546f",
+            "fooBar": 42,
+          },
+          "b": Object {
+            "a": 789,
+            "b": "ghi",
+            "c": "RED",
+            "d": "b687ee42-c515-4544-b742-525e39517e7d",
+            "fooBar": -8,
+          },
+          "bazBuz": 0,
+        },
+        "nodeId": "WyJ0eXBlcyIsMjAxXQ==",
+        "numeric": 15.2,
+        "numrange": Object {
+          "end": null,
+          "start": Object {
+            "inclusive": true,
+            "value": 50,
+          },
+        },
+        "smallint": 30,
+        "textArray": Array [
+          "have",
+          "you",
+          "ever",
+          "been",
+          "down",
+          "the",
+          "water",
+          "spout",
+          "?",
+        ],
+        "time": "19:13:18.625699",
+        "timestamp": "2016-10-07T16:12:21.747269",
+        "timestamptz": "2016-10-09T16:12:45.218676-04:00",
+        "timetz": "13:13:29.585176-04",
+        "varchar": "abc",
+      },
+    },
+    "b": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "person": Object {
+        "about": "Son of Sara and John Smith.",
+        "email": "johnny.boy.smith@email.com",
+        "id": 9000,
+        "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "c": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "clientMutationId": "hello",
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "person": Object {
+        "about": "My archnemisis is Budd Deey.",
+        "email": "best.pal@email.com",
+        "id": 20,
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "d": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
+        "personByPersonId1": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+        "personByPersonId2": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+        "personId1": 9000,
+        "personId2": 20,
+      },
+      "personByPersonId1": Object {
+        "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+      },
+      "personByPersonId2": Object {
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "e": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": true,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "f": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": false,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "g": Object {
+      "a": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "b": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "c": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "e": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "f": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "g": Object {
+        "cursor": null,
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "person": Object {
+        "about": null,
+        "email": "budd.deey.the.second@email.com",
+        "id": 1998,
+        "name": "Budd Deey",
+        "nodeId": "WyJwZW9wbGUiLDE5OThd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+  },
+}
+`;
+
+exports[`test mutation-delete.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "deletedPostId": "WyJwb3N0cyIsMV0=",
+      "post": Object {
+        "authorId": 2,
+        "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+        "id": 1,
+        "nodeId": "WyJwb3N0cyIsMV0=",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "b": Object {
+      "clientMutationId": "hello",
+      "deletedPostId": "WyJwb3N0cyIsMl0=",
+      "post": Object {
+        "authorId": 1,
+        "headline": "I hate yogurt. It’s just stuff with bits in.",
+        "id": 2,
+        "nodeId": "WyJwb3N0cyIsMl0=",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "c": null,
+    "d": Object {
+      "clientMutationId": "world",
+      "deletedPostId": "WyJwb3N0cyIsM10=",
+      "post": Object {
+        "authorId": 1,
+        "headline": "Is that a cooking show?",
+        "id": 3,
+        "nodeId": "WyJwb3N0cyIsM10=",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "e": Object {
+      "clientMutationId": null,
+      "deletedPostId": "WyJwb3N0cyIsNl0=",
+      "post": Object {
+        "authorId": 3,
+        "headline": "Stop talking, brain thinking. Hush.",
+        "id": 6,
+        "nodeId": "WyJwb3N0cyIsNl0=",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "f": Object {
+      "clientMutationId": "hello",
+      "deletedPostId": "WyJwb3N0cyIsOV0=",
+      "post": Object {
+        "authorId": 3,
+        "headline": "You know how I sometimes have really brilliant ideas?",
+        "id": 9,
+        "nodeId": "WyJwb3N0cyIsOV0=",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "g": null,
+    "h": Object {
+      "clientMutationId": "world",
+      "deletedPostId": "WyJwb3N0cyIsMTFd",
+      "post": Object {
+        "authorId": 3,
+        "headline": "They’re not aliens, they’re Earth…liens!",
+        "id": 11,
+        "nodeId": "WyJwb3N0cyIsMTFd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "i": Object {
+      "clientMutationId": null,
+      "compoundKey": Object {
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+        "personByPersonId1": Object {
+          "name": "Kathryn Ramirez",
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+        "personByPersonId2": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        "personId1": 4,
+        "personId2": 3,
+      },
+      "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "j": Object {
+      "clientMutationId": null,
+      "compoundKey": Object {
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+        "personByPersonId1": Object {
+          "name": "Sara Smith",
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+        "personByPersonId2": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        "personId1": 2,
+        "personId2": 3,
+      },
+      "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "k": Object {
+      "clientMutationId": null,
+      "deletedPersonId": "WyJwZW9wbGUiLDNd",
+      "person": Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+        "nodeId": "WyJwZW9wbGUiLDNd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+  },
+  "errors": Array [
+    [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+    [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+  ],
+}
+`;
+
+exports[`test mutation-update.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "An older John Smith",
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith Sr.",
+        "nodeId": "WyJwZW9wbGUiLDFd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "b": Object {
+      "clientMutationId": "hello",
+      "person": Object {
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "c": Object {
+      "clientMutationId": "world",
+      "person": Object {
+        "about": "Now with an “H.”",
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "d": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "I have taken over Budd’s account. Hehehe.",
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDNd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "e": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "Make art not friends.",
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+        "nodeId": "WyJwZW9wbGUiLDRd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "f": Object {
+      "clientMutationId": null,
+      "compoundKey": Object {
+        "extra": true,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
+        "personByPersonId1": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 2,
+        "personId2": 2,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "g": Object {
+      "clientMutationId": "hello",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
+        "personByPersonId1": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 3,
+        "personId2": 2,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "h": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+        "personByPersonId1": Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        "personByPersonId2": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personId1": 4,
+        "personId2": 3,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "i": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+  },
+}
+`;
+
+exports[`test procedure-mutation.graphql 1`] = `
+Object {
+  "data": Object {
+    "add1Mutation": Object {
+      "clientMutationId": null,
+      "integer": 3,
+    },
+    "add2Mutation": Object {
+      "clientMutationId": "hello",
+      "integer": 4,
+    },
+    "add3Mutation": Object {
+      "clientMutationId": "world",
+      "integer": null,
+    },
+    "add4Mutation": Object {
+      "integer": 4,
+    },
+    "compoundTypeMutation": Object {
+      "compoundType": Object {
+        "a": 420,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "fooBar": 8,
+      },
+    },
+    "intSetMutation": Object {
+      "integers": Array [
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        6,
+      ],
+    },
+    "jsonIdentityMutation": Object {
+      "json": "{\"a\":1,\"b\":2,\"c\":3}",
+    },
+    "mult1": Object {
+      "integer": 0,
+    },
+    "mult2": Object {
+      "integer": 1,
+    },
+    "mult3": Object {
+      "integer": 2,
+    },
+    "mult4": Object {
+      "integer": 10,
+    },
+    "noArgsMutation": Object {
+      "clientMutationId": "x",
+      "integer": 2,
+    },
+    "returnVoidMutation": Object {
+      "__typename": "ReturnVoidMutationPayload",
+    },
+    "tableMutation": Object {
+      "personByAuthorId": Object {
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      "post": Object {
+        "authorId": 5,
+        "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        "id": 5,
+        "nodeId": "WyJwb3N0cyIsNV0=",
+      },
+      "postEdge": Object {
+        "cursor": null,
+        "node": Object {
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          "id": 5,
+        },
+      },
+    },
+    "tableSetMutation": Object {
+      "people": Array [
+        Object {
+          "name": "John Smith",
+        },
+        Object {
+          "name": "Sara Smith",
+        },
+        Object {
+          "name": "Budd Deey",
+        },
+        Object {
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "name": "Joe Tucker",
+        },
+      ],
+    },
+    "typesMutation": Object {
+      "boolean": false,
+    },
+  },
+}
+`;

@@ -16,6 +16,7 @@ type PostGraphQLOptions = {
   graphiql?: boolean,
   pgDefaultRole?: string,
   jwtSecret?: string,
+  jwtAudiences?: Array<string>,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
@@ -24,6 +25,8 @@ type PostGraphQLOptions = {
   enableCors?: boolean,
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
+  bodySizeLimit?: string,
+  pgSettings?: { [key: string]: mixed },
 }
 
 /**

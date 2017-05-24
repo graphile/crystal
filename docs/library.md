@@ -58,12 +58,14 @@ Arguments include:
   - `graphiqlRoute`: The endpoint the GraphiQL query interface will listen on (**NOTE:** GraphiQL will not be enabled unless the `graphiql` option is set to `true`). Defaults to `/graphiql`.
   - `pgDefaultRole`: The default Postgres role to use. If no role was provided in a provided JWT token, this role will be used.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify tokens in the `Authorization` header, and signing JWT tokens you return in procedures.
+  - `jwtAudiences`: The audiences to use when verifing the JWT token. If not set the audience will be `['postgraphql']`.
   - `jwtPgTypeIdentifier`: The Postgres type identifier for the compound type which will be signed as a JWT token if ever found as the return type of a procedure. Can be of the form: `my_schema.my_type`. You may use quotes as needed: `"my-special-schema".my_type`.
   - `watchPg`: When true, PostGraphQL will watch your database schemas and re-create the GraphQL API whenever your schema changes, notifying you as it does. This feature requires an event trigger to be added to the database by a superuser. When enabled PostGraphQL will try to add this trigger, if you did not connect as a superuser you will get a warning and the trigger won’t be added.
   - `disableQueryLog`: Turns off GraphQL query logging. By default PostGraphQL will log every GraphQL query it processes along with some other information. Set this to `true` to disable that feature.
   - `enableCors`: Enables some generous CORS settings for the GraphQL endpoint. There are some costs associated when enabling this, if at all possible try to put your API behind a reverse proxy.
   - `exportJsonSchemaPath`: Enables saving the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.
   - `exportGqlSchemaPath`: Enables saving the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.
+  - `bodySizeLimit`: Set the maximum size of JSON bodies that can be parsed (default 100kB). The size can be given as a human-readable string, such as '200kB' or '5MB' (case insensitive).
 
 [connect]: https://www.npmjs.com/connect
 [express]: https://www.npmjs.com/express
@@ -144,6 +146,7 @@ This function sets up a PostGraphQL context, calls (and resolves) the callback f
   - `jwtToken`: An optional JWT token string. This JWT token represents the viewer of your PostGraphQL schema.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify the `jwtToken`.
   - `pgDefaultRole`: The default Postgres role that will be used if no role was found in `jwtToken`. It is a best security practice to always have a value for this option even though it is optional.
+  - `pgSettings`: Custom config values to set in PostgreSQL (accessed via `current_setting('my.custom.setting')`)
 - **`callback`**: The function which is called with the `context` object which was created. Whatever the return value of this function is will be the return value of `withPostGraphQLContext`.
 
 [GraphQL-js]: https://www.npmjs.com/package/graphql
