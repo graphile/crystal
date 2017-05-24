@@ -67,7 +67,7 @@ export default function postgraphql (
   // Check for a jwtSecret without a jwtPgTypeIdentifier
   // a secret without a token identifier prevents JWT creation
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
-    throw new Error(`jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.\n`);
+    throw new Error('jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.');
   }
 
   // Creates the Postgres schemas array.
