@@ -164,6 +164,7 @@ create function c.int_set_query(x int, y int, z int) returns setof integer as $$
 create function c.int_set_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
 create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
 create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;
+create function a.return_void_mutation() returns void as $$ begin return; end; $$ language plpgsql;
 
 create function c.person_first_name(person c.person) returns text as $$ select split_part(person.name, ' ', 1) $$ language sql stable;
 create function c.person_friends(person c.person) returns setof c.person as $$ select friend.* from c.person as friend where friend.id in (person.id + 1, person.id + 2) $$ language sql stable;
