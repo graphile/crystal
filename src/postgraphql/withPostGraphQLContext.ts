@@ -115,7 +115,7 @@ async function setupPgClientTransaction ({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not procided to the server
+      // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
@@ -136,9 +136,16 @@ async function setupPgClientTransaction ({
       }
     }
     catch (error) {
-      // In case this error is thrown in an HTTP context, we want to add a 403
-      // status code.
-      error.statusCode = 403
+      // In case this error is thrown in an HTTP context, we want to add status code
+      // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
+      if ( ('name' in error) && error.name === 'TokenExpiredError') {
+        // The correct status code for an expired ( but otherwise acceptable token is 401 )
+        error.statusCode = 401
+      } else {
+        // All other authentication errors should get a 403 status code.
+        error.statusCode = 403
+      }
+
       throw error
     }
   }
