@@ -46,6 +46,17 @@ class PgCatalog {
     }
   }
 
+  public toJSON (): string {
+    return JSON.stringify([
+      ...Array.from(this._namespaces.values()),
+      ...Array.from(this._classes.values()),
+      ...Array.from(this._attributes.values()),
+      ...Array.from(this._types.values()),
+      ...Array.from(this._constraints),
+      ...Array.from(this._procedures),
+    ])
+  }
+
   /**
    * Gets all of the namespace objects.
    */

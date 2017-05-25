@@ -1,5 +1,6 @@
 import { Pool, Client, ClientConfig, connect as connectPgClient } from 'pg'
 import { GraphQLSchema, GraphQLOutputType } from 'graphql'
+import { writeFile } from 'fs'
 import { Inventory, Type, ObjectType, getNonNullableType } from '../../interface'
 import { introspectPgDatabase, addPgCatalogToInventory } from '../../postgres'
 import { PgCatalog, PgCatalogClass, PgCatalogProcedure } from '../../postgres/introspection'
@@ -14,6 +15,18 @@ import getPgProcedureComputedClass from './procedures/getPgProcedureComputedClas
 import getPgTokenTypeFromIdentifier from './auth/getPgTokenTypeFromIdentifier'
 import getJwtGqlType from './auth/getJwtGqlType'
 
+async function writeFileAsync (
+  path: string,
+  contents: string,
+): Promise<void> {
+  await new Promise((resolve, reject) => {
+    writeFile(path, contents, error => {
+      if (error) reject(error)
+      else resolve()
+    })
+  })
+}
+
 /**
  * Creates a PostGraphQL schema by looking at a Postgres client.
  */
@@ -26,6 +39,7 @@ export default async function createPostGraphQLSchema (
     jwtSecret?: string,
     jwtPgTypeIdentifier?: string,
     disableDefaultMutations?: boolean,
+    exportIntrospectionResultPath?: string,
   } = {},
 ): Promise<GraphQLSchema> {
   // Create our inventory.
@@ -138,6 +152,10 @@ export default async function createPostGraphQLSchema (
           : [],
     },
   })
+
+  if (typeof options.exportIntrospectionResultPath === 'string') {
+    await writeFileAsync(options.exportIntrospectionResultPath, pgCatalog.toJSON())
+  }
 
   return gqlSchema
 }
