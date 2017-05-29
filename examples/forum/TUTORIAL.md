@@ -46,7 +46,7 @@ $ psql postgres://localhost:5432/testdb # Connects to the `testdb` database at `
 $ psql postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
 ```
 
-Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats.
+Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats (including using a password).
 
 After running `psql` with your database URL, you should be in a SQL prompt:
 
