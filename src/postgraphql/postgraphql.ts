@@ -3,6 +3,7 @@ import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
 import chalk = require('chalk')
+import PgCatalog from '../postgres/introspection/PgCatalog'
 import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
@@ -25,6 +26,8 @@ type PostGraphQLOptions = {
   enableCors?: boolean,
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
+  exportIntrospectionResultPath?: string,
+  introspectionResultPath?: string,
   bodySizeLimit?: string,
   pgSettings?: { [key: string]: mixed },
 }
@@ -62,6 +65,11 @@ export default function postgraphql (
   else {
     schema = 'public'
     options = schemaOrOptions
+  }
+
+  let pgCatalog: PgCatalog
+  if (options.introspectionResultPath) {
+    pgCatalog = new PgCatalog(require(process.cwd() + '/' + options.introspectionResultPath))
   }
 
   // Creates the Postgres schemas array.
@@ -135,7 +143,7 @@ export default function postgraphql (
   async function createGqlSchema (): Promise<GraphQLSchema> {
     try {
       const pgClient = await pgPool.connect()
-      const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
+      const newGqlSchema = await createPostGraphQLSchema(pgClient, pgCatalog || pgSchemas, options)
       exportGqlSchema(newGqlSchema)
 
       // If no release function exists, don’t release. This is just for tests.
