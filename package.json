@@ -29,7 +29,8 @@
     "build": "./scripts/build",
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
-    "test": "./scripts/test"
+    "test": "./scripts/test",
+    "postinstall": "./node_modules/.bin/opencollective-postinstall || exit 0"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -68,6 +69,7 @@
     "jest": "^18.1.0",
     "koa": "^2.0.0",
     "nodemon": "^1.11.0",
+    "opencollective-postinstall": "^1.0.14",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-scripts": "0.7.0",
@@ -94,5 +96,10 @@
       "<rootDir>/src"
     ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/postgraphql",
+    "logo": "https://opencollective.com/postgraphql/logo.txt?variant=variant3&reverse=true"
   }
 }
