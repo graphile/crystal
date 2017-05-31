@@ -36,6 +36,7 @@ export default async function withPostGraphQLContext(
     jwtToken,
     jwtSecret,
     jwtAudiences = ['postgraphql'],
+    jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
   }: {
@@ -43,6 +44,7 @@ export default async function withPostGraphQLContext(
     jwtToken?: string,
     jwtSecret?: string,
     jwtAudiences?: Array<string>,
+    jwtRole?: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -64,6 +66,7 @@ export default async function withPostGraphQLContext(
       jwtToken,
       jwtSecret,
       jwtAudiences,
+      jwtRole,
       pgDefaultRole,
       pgSettings,
     })
@@ -95,6 +98,7 @@ async function setupPgClientTransaction ({
   jwtToken,
   jwtSecret,
   jwtAudiences,
+  jwtRole,
   pgDefaultRole,
   pgSettings,
 }: {
@@ -102,6 +106,7 @@ async function setupPgClientTransaction ({
   jwtToken?: string,
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
+  jwtRole?: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -124,7 +129,16 @@ async function setupPgClientTransaction ({
         audience: jwtAudiences,
       })
 
-      const roleClaim = jwtClaims['role']
+      let roleClaim = jwtClaims ? jwtClaims : ''
+      const rolePath = jwtRole ? jwtRole : []
+      for (let i = 0; i < rolePath.length; i++) {
+        try {
+          roleClaim = roleClaim[rolePath[i]]
+        } catch (e) {
+          i = rolePath.length
+          roleClaim = ''
+        }
+      }
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
