@@ -17,6 +17,7 @@ type PostGraphQLOptions = {
   pgDefaultRole?: string,
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
+  jwtRole?: Array<string>,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
