@@ -1,5 +1,10 @@
 exports[`test prints a schema with Relay 1 style ids 1`] = `
-"type CompoundKey implements Node {
+"# A signed eight-byte integer. The upper big integer values are greater then the
+# max value for a JavaScript number. Therefore all big integers will be output as
+# strings and not numbers.
+scalar BigInt
+
+type CompoundKey implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   id: ID!
   personId2: Int!
@@ -809,7 +814,7 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   allCompoundKeys(
@@ -980,7 +985,7 @@ input TypesMutationInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
   # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
-  a: Int!
+  a: BigInt!
   b: Boolean!
   c: String!
   d: [Int]!
@@ -1170,6 +1175,11 @@ type AuthenticatePayload {
   query: Query
 }
 
+# A signed eight-byte integer. The upper big integer values are greater then the
+# max value for a JavaScript number. Therefore all big integers will be output as
+# strings and not numbers.
+scalar BigInt
+
 enum Color {
   RED
   GREEN
@@ -1332,7 +1342,7 @@ input DeleteTypeInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Type\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deleteType\` mutation.
@@ -1599,7 +1609,7 @@ input NestedCompoundTypeInput {
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
 }
 
 # Information about pagination in a connection.
@@ -1622,7 +1632,7 @@ type Query implements Node {
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    __id: ID!
+    nodeId: ID!
   ): Node
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
@@ -1654,7 +1664,7 @@ type Query implements Node {
   # Reads a single \`Type\` using its globally unique \`ID\`.
   type(
     # The globally unique \`ID\` to be used in selecting a single \`Type\`.
-    __id: ID!
+    nodeId: ID!
   ): Type
   typeById(id: Int!): Type
 
@@ -1688,7 +1698,7 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The exact time of day, does not include the date. May or may not have a timezone offset.
@@ -1696,10 +1706,10 @@ scalar Time
 
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   smallint: Int!
-  bigint: Int!
+  bigint: BigInt!
   numeric: Float!
   decimal: Float!
   boolean: Boolean!
@@ -1734,7 +1744,7 @@ input TypeCondition {
   smallint: Int
 
   # Checks for equality with the object’s \`bigint\` field.
-  bigint: Int
+  bigint: BigInt
 
   # Checks for equality with the object’s \`numeric\` field.
   numeric: Float
@@ -1809,7 +1819,7 @@ input TypeCondition {
 input TypeInput {
   id: Int
   smallint: Int!
-  bigint: Int!
+  bigint: BigInt!
   numeric: Float!
   decimal: Float!
   boolean: Boolean!
@@ -1839,7 +1849,7 @@ input TypeInput {
 input TypePatch {
   id: Int
   smallint: Int
-  bigint: Int
+  bigint: BigInt
   numeric: Float
   decimal: Float
   boolean: Boolean
@@ -2039,7 +2049,7 @@ input UpdateTypeInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Type\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Type\` identified by our globally unique \`ID\`.
   typePatch: TypePatch!
@@ -2222,6 +2232,11 @@ type AuthenticatePayload {
   query: Query
 }
 
+# A signed eight-byte integer. The upper big integer values are greater then the
+# max value for a JavaScript number. Therefore all big integers will be output as
+# strings and not numbers.
+scalar BigInt
+
 enum Color {
   RED
   GREEN
@@ -2230,7 +2245,7 @@ enum Color {
 
 type CompoundKey implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   personId2: Int!
   personId1: Int!
   extra: Boolean
@@ -2706,7 +2721,7 @@ input DeleteCompoundKeyInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deleteCompoundKey\` mutation.
@@ -2750,7 +2765,7 @@ input DeletePersonInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deletePerson\` mutation.
@@ -2780,7 +2795,7 @@ input DeletePostInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Post\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deletePost\` mutation.
@@ -2813,7 +2828,7 @@ input DeleteSimilarTable1Input {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`SimilarTable1\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deleteSimilarTable1\` mutation.
@@ -2843,7 +2858,7 @@ input DeleteSimilarTable2Input {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`SimilarTable2\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deleteSimilarTable2\` mutation.
@@ -2873,7 +2888,7 @@ input DeleteTypeInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Type\` to be deleted.
-  __id: ID!
+  nodeId: ID!
 }
 
 # The output of our \`deleteType\` mutation.
@@ -3581,7 +3596,7 @@ type NoArgsMutationPayload {
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
 }
 
 type NonUpdatableView {
@@ -3685,7 +3700,7 @@ enum PeopleOrderBy {
 # Person test comment
 type Person implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
 
   # The person’s name
@@ -3889,7 +3904,7 @@ input PersonPatch {
 
 type Post implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   headline: String!
   body: String
@@ -3974,7 +3989,7 @@ type Query implements Node {
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    __id: ID!
+    nodeId: ID!
   ): Node
 
   # lol, add some stuff 1 query
@@ -4039,7 +4054,7 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
   # Reads and enables paginatation through a set of \`ForeignKey\`.
   allForeignKeys(
@@ -4119,7 +4134,7 @@ type Query implements Node {
   # Reads a single \`Post\` using its globally unique \`ID\`.
   post(
     # The globally unique \`ID\` to be used in selecting a single \`Post\`.
-    __id: ID!
+    nodeId: ID!
   ): Post
   postById(id: Int!): Post
 
@@ -4151,7 +4166,7 @@ type Query implements Node {
   # Reads a single \`SimilarTable1\` using its globally unique \`ID\`.
   similarTable1(
     # The globally unique \`ID\` to be used in selecting a single \`SimilarTable1\`.
-    __id: ID!
+    nodeId: ID!
   ): SimilarTable1
   similarTable1ById(id: Int!): SimilarTable1
 
@@ -4183,7 +4198,7 @@ type Query implements Node {
   # Reads a single \`SimilarTable2\` using its globally unique \`ID\`.
   similarTable2(
     # The globally unique \`ID\` to be used in selecting a single \`SimilarTable2\`.
-    __id: ID!
+    nodeId: ID!
   ): SimilarTable2
   similarTable2ById(id: Int!): SimilarTable2
 
@@ -4215,7 +4230,7 @@ type Query implements Node {
   # Reads a single \`Type\` using its globally unique \`ID\`.
   type(
     # The globally unique \`ID\` to be used in selecting a single \`Type\`.
-    __id: ID!
+    nodeId: ID!
   ): Type
   typeById(id: Int!): Type
 
@@ -4272,7 +4287,7 @@ type Query implements Node {
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
   compoundKey(
     # The globally unique \`ID\` to be used in selecting a single \`CompoundKey\`.
-    __id: ID!
+    nodeId: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
@@ -4329,7 +4344,7 @@ type Query implements Node {
   # Reads a single \`Person\` using its globally unique \`ID\`.
   person(
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
-    __id: ID!
+    nodeId: ID!
   ): Person
   personById(id: Int!): Person
   personByEmail(email: Email!): Person
@@ -4339,12 +4354,12 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  __id: ID!
+  nodeId: ID!
 }
 
 type SimilarTable1 implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   col1: Int
   col2: Int
@@ -4423,7 +4438,7 @@ enum SimilarTable1SOrderBy {
 
 type SimilarTable2 implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   col3: Int!
   col4: Int
@@ -4580,10 +4595,10 @@ scalar Time
 
 type Type implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
   smallint: Int!
-  bigint: Int!
+  bigint: BigInt!
   numeric: Float!
   decimal: Float!
   boolean: Boolean!
@@ -4618,7 +4633,7 @@ input TypeCondition {
   smallint: Int
 
   # Checks for equality with the object’s \`bigint\` field.
-  bigint: Int
+  bigint: BigInt
 
   # Checks for equality with the object’s \`numeric\` field.
   numeric: Float
@@ -4693,7 +4708,7 @@ input TypeCondition {
 input TypeInput {
   id: Int
   smallint: Int!
-  bigint: Int!
+  bigint: BigInt!
   numeric: Float!
   decimal: Float!
   boolean: Boolean!
@@ -4723,7 +4738,7 @@ input TypeInput {
 input TypePatch {
   id: Int
   smallint: Int
-  bigint: Int
+  bigint: BigInt
   numeric: Float
   decimal: Float
   boolean: Boolean
@@ -4778,7 +4793,7 @@ input TypesMutationInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
   # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
-  a: Int!
+  a: BigInt!
   b: Boolean!
   c: String!
   d: [Int]!
@@ -4948,7 +4963,7 @@ input UpdateCompoundKeyInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`CompoundKey\` identified by our globally unique \`ID\`.
   compoundKeyPatch: CompoundKeyPatch!
@@ -5000,7 +5015,7 @@ input UpdatePersonInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Person\` identified by our globally unique \`ID\`.
   personPatch: PersonPatch!
@@ -5035,7 +5050,7 @@ input UpdatePostInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Post\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Post\` identified by our globally unique \`ID\`.
   postPatch: PostPatch!
@@ -5073,7 +5088,7 @@ input UpdateSimilarTable1Input {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`SimilarTable1\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`SimilarTable1\` identified by our globally unique \`ID\`.
   similarTable1Patch: SimilarTable1Patch!
@@ -5108,7 +5123,7 @@ input UpdateSimilarTable2Input {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`SimilarTable2\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`SimilarTable2\` identified by our globally unique \`ID\`.
   similarTable2Patch: SimilarTable2Patch!
@@ -5143,7 +5158,7 @@ input UpdateTypeInput {
   clientMutationId: String
 
   # The globally unique \`ID\` which will identify a single \`Type\` to be updated.
-  __id: ID!
+  nodeId: ID!
 
   # An object where the defined keys will be set on the \`Type\` identified by our globally unique \`ID\`.
   typePatch: TypePatch!
@@ -5166,9 +5181,14 @@ scalar Uuid
 `;
 
 exports[`test prints a schema without default mutations 1`] = `
-"type CompoundKey implements Node {
+"# A signed eight-byte integer. The upper big integer values are greater then the
+# max value for a JavaScript number. Therefore all big integers will be output as
+# strings and not numbers.
+scalar BigInt
+
+type CompoundKey implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   personId2: Int!
   personId1: Int!
   extra: Boolean
@@ -5433,7 +5453,7 @@ type NoArgsMutationPayload {
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
 }
 
 # Information about pagination in a connection.
@@ -5495,7 +5515,7 @@ enum PeopleOrderBy {
 # Person test comment
 type Person implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  __id: ID!
+  nodeId: ID!
   id: Int!
 
   # The person’s name
@@ -5637,7 +5657,7 @@ type Query implements Node {
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    __id: ID!
+    nodeId: ID!
   ): Node
 
   # Reads and enables paginatation through a set of \`Int\`.
@@ -5689,7 +5709,7 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): TableSetQueryConnection
-  typesQuery(a: Int!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
   # Reads and enables paginatation through a set of \`CompoundKey\`.
   allCompoundKeys(
@@ -5719,7 +5739,7 @@ type Query implements Node {
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
   compoundKey(
     # The globally unique \`ID\` to be used in selecting a single \`CompoundKey\`.
-    __id: ID!
+    nodeId: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
@@ -5776,7 +5796,7 @@ type Query implements Node {
   # Reads a single \`Person\` using its globally unique \`ID\`.
   person(
     # The globally unique \`ID\` to be used in selecting a single \`Person\`.
-    __id: ID!
+    nodeId: ID!
   ): Person
   personById(id: Int!): Person
   personByEmail(email: Email!): Person
@@ -5786,7 +5806,7 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  __id: ID!
+  nodeId: ID!
 }
 
 # All input for the \`tableMutation\` mutation.
@@ -5860,7 +5880,7 @@ input TypesMutationInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
   # payload verbatim. May be used to track mutations by the client.
   clientMutationId: String
-  a: Int!
+  a: BigInt!
   b: Boolean!
   c: String!
   d: [Int]!

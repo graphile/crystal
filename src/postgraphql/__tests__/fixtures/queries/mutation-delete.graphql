@@ -1,13 +1,13 @@
 mutation {
-  a: deletePost(input: { __id: "WyJwb3N0cyIsMV0=" }) { ...deletePostPayload }
-  b: deletePost(input: { __id: "WyJwb3N0cyIsMl0=", clientMutationId: "hello" }) { ...deletePostPayload }
-  c: deletePost(input: { __id: "WyJwb3N0cyIsMjAwMF0=" }) { ...deletePostPayload }
-  d: deletePost(input: { __id: "WyJwb3N0cyIsM10=", clientMutationId: "world" }) { ...deletePostPayload }
+  a: deletePost(input: { nodeId: "WyJwb3N0cyIsMV0=" }) { ...deletePostPayload }
+  b: deletePost(input: { nodeId: "WyJwb3N0cyIsMl0=", clientMutationId: "hello" }) { ...deletePostPayload }
+  c: deletePost(input: { nodeId: "WyJwb3N0cyIsMjAwMF0=" }) { ...deletePostPayload }
+  d: deletePost(input: { nodeId: "WyJwb3N0cyIsM10=", clientMutationId: "world" }) { ...deletePostPayload }
   e: deletePostById(input: { id: 6 }) { ...deletePostPayload }
   f: deletePostById(input: { id: 9, clientMutationId: "hello" }) { ...deletePostPayload }
   g: deletePostById(input: { id: 2000 }) { ...deletePostPayload }
   h: deletePostById(input: { id: 11, clientMutationId: "world" }) { ...deletePostPayload }
-  i: deleteCompoundKey(input: { __id: "WyJjb21wb3VuZF9rZXlzIiw0LDNd" }) { ...deleteCompoundKeyPayload }
+  i: deleteCompoundKey(input: { nodeId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd" }) { ...deleteCompoundKeyPayload }
   j: deleteCompoundKeyByPersonId1AndPersonId2(input: { personId1: 2, personId2:3 }) { ...deleteCompoundKeyPayload }
 	k: deletePersonByEmail(input: { email: "budd.deey@email.com" }) { ...deletePersonPayload }
 }
@@ -16,41 +16,41 @@ fragment deletePostPayload on DeletePostPayload {
   clientMutationId
   deletedPostId
   post {
-    __id
+    nodeId
     id
     headline
     authorId
   }
-  query { __id }
+  query { nodeId }
 }
 
 fragment deleteCompoundKeyPayload on DeleteCompoundKeyPayload {
   clientMutationId
   deletedCompoundKeyId
   compoundKey {
-    __id
+    nodeId
     personId1
     personId2
     personByPersonId1 {
-      __id
+      nodeId
       name
     }
     personByPersonId2 {
-      __id
+      nodeId
       name
     }
   }
-  query { __id }
+  query { nodeId }
 }
 
 fragment deletePersonPayload on DeletePersonPayload {
   clientMutationId
   deletedPersonId
   person {
-    __id
+    nodeId
     id
     name
     email
   }
-  query { __id }
+  query { nodeId }
 }

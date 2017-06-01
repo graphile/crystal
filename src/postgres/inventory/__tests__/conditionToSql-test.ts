@@ -27,9 +27,9 @@ test('will join multiple conditions with or', () => {
 test('will check equality', () => {
   const value = Symbol('value')
   expect(conditionToSql({ type: 'EQUAL', value }))
-    .toEqual(sql.query`(${sql.identifier()} = ${sql.value(value)})`)
+    .toEqual(sql.query`(${sql.identifier()} IS NOT DISTINCT FROM ${sql.value(value)})`)
   expect(conditionToSql({ type: 'EQUAL', value }, ['a', 'b', 'c']))
-    .toEqual(sql.query`(${sql.identifier('a', 'b', 'c')} = ${sql.value(value)})`)
+    .toEqual(sql.query`(${sql.identifier('a', 'b', 'c')} IS NOT DISTINCT FROM ${sql.value(value)})`)
 })
 
 test('will check less than', () => {
@@ -90,7 +90,7 @@ test('integration test 1', () => {
   }
   expect(sql.compile(conditionToSql(condition))).toEqual({
     name: undefined,
-    text: '(true and not(false) and ("a" = $1) and ("a"."b" < $2) and not((("c" > $3) or ("c" = $4))))',
+    text: '(true and not(false) and ("a" IS NOT DISTINCT FROM $1) and ("a"."b" < $2) and not((("c" > $3) or ("c" IS NOT DISTINCT FROM $4))))',
     values: [42, 45, 5, 5],
   })
 })

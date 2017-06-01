@@ -617,16 +617,128 @@ Object {
 }
 `;
 
+exports[`test operation dynamic-json.graphql 2`] = `
+Object {
+  "data": Object {
+    "a": true,
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "json": Object {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": Object {
+              "e": 4,
+              "f": 5,
+              "g": Array [
+                6,
+                7,
+                8,
+                "x",
+                false,
+                null,
+              ],
+            },
+          },
+          "jsonb": Object {
+            "1": "a",
+            "2": "b",
+            "3": "c",
+            "4": Object {
+              "5": "d",
+              "6": "e",
+              "7": Array [
+                "f",
+                "g",
+                "h",
+                42,
+                true,
+                null,
+              ],
+            },
+          },
+        },
+      ],
+    },
+    "b": false,
+    "c": 42,
+    "d": 3.1415,
+    "e": "hello, world!",
+    "f": Object {
+      "a": 1,
+      "b": 2,
+      "c": 3,
+    },
+    "g": Array [
+      1,
+      2,
+      3,
+      4,
+    ],
+    "h": Object {
+      "array": Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+      "boolean": true,
+      "float": 3.1415,
+      "integer": 42,
+      "object": Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+    },
+    "i": Array [
+      true,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+    ],
+    "j": Array [
+      true,
+      null,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": null,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        null,
+        3,
+        4,
+      ],
+    ],
+  },
+}
+`;
+
 exports[`test operation mutation-create.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
       "clientMutationId": null,
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
       "type": Object {
-        "__id": "WyJ0eXBlcyIsMjAxXQ==",
         "anIntRange": Object {
           "end": Object {
             "inclusive": false,
@@ -634,7 +746,7 @@ Object {
           },
           "start": null,
         },
-        "bigint": 50,
+        "bigint": "467131188225",
         "boolean": false,
         "compoundType": Object {
           "a": 123,
@@ -667,8 +779,8 @@ Object {
           "seconds": 1,
           "years": 6,
         },
-        "json": "{"x":1,"y":2,"z":3}",
-        "jsonb": "{"a":1,"b":2,"c":3}",
+        "json": "{\"x\":1,\"y\":2,\"z\":3}",
+        "jsonb": "{\"a\":1,\"b\":2,\"c\":3}",
         "money": 5000,
         "nestedCompoundType": Object {
           "a": Object {
@@ -687,6 +799,7 @@ Object {
           },
           "bazBuz": 0,
         },
+        "nodeId": "WyJ0eXBlcyIsMjAxXQ==",
         "numeric": 15.2,
         "numrange": Object {
           "end": null,
@@ -718,152 +831,152 @@ Object {
       "a": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "b": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "c": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "clientMutationId": null,
       "d": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "e": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "f": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "g": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDkwMDBd",
         "about": "Son of Sara and John Smith.",
         "email": "johnny.boy.smith@email.com",
         "id": 9000,
         "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "c": Object {
       "a": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "b": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "c": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "clientMutationId": "hello",
       "d": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "e": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "f": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "g": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDIwXQ==",
         "about": "My archnemisis is Budd Deey.",
         "email": "best.pal@email.com",
         "id": 20,
         "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "d": Object {
       "clientMutationId": "world",
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
         "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
         "personByPersonId1": Object {
-          "__id": "WyJwZW9wbGUiLDkwMDBd",
           "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
         "personByPersonId2": Object {
-          "__id": "WyJwZW9wbGUiLDIwXQ==",
           "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
         "personId1": 9000,
         "personId2": 20,
       },
       "personByPersonId1": Object {
-        "__id": "WyJwZW9wbGUiLDkwMDBd",
         "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
       },
       "personByPersonId2": Object {
-        "__id": "WyJwZW9wbGUiLDIwXQ==",
         "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "e": Object {
@@ -871,7 +984,7 @@ Object {
         "notNullHasDefault": true,
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "f": Object {
@@ -879,69 +992,69 @@ Object {
         "notNullHasDefault": false,
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "g": Object {
       "a": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "b": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "c": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "clientMutationId": null,
       "d": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "e": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "f": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "g": Object {
         "cursor": null,
         "node": Object {
-          "__id": "WyJwZW9wbGUiLDE5OThd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDE5OThd",
         "about": null,
         "email": "budd.deey.the.second@email.com",
         "id": 1998,
         "name": "Budd Deey",
+        "nodeId": "WyJwZW9wbGUiLDE5OThd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
   },
@@ -955,26 +1068,26 @@ Object {
       "clientMutationId": null,
       "deletedPostId": "WyJwb3N0cyIsMV0=",
       "post": Object {
-        "__id": "WyJwb3N0cyIsMV0=",
         "authorId": 2,
         "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
         "id": 1,
+        "nodeId": "WyJwb3N0cyIsMV0=",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "b": Object {
       "clientMutationId": "hello",
       "deletedPostId": "WyJwb3N0cyIsMl0=",
       "post": Object {
-        "__id": "WyJwb3N0cyIsMl0=",
         "authorId": 1,
         "headline": "I hate yogurt. It’s just stuff with bits in.",
         "id": 2,
+        "nodeId": "WyJwb3N0cyIsMl0=",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "c": null,
@@ -982,39 +1095,39 @@ Object {
       "clientMutationId": "world",
       "deletedPostId": "WyJwb3N0cyIsM10=",
       "post": Object {
-        "__id": "WyJwb3N0cyIsM10=",
         "authorId": 1,
         "headline": "Is that a cooking show?",
         "id": 3,
+        "nodeId": "WyJwb3N0cyIsM10=",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "e": Object {
       "clientMutationId": null,
       "deletedPostId": "WyJwb3N0cyIsNl0=",
       "post": Object {
-        "__id": "WyJwb3N0cyIsNl0=",
         "authorId": 3,
         "headline": "Stop talking, brain thinking. Hush.",
         "id": 6,
+        "nodeId": "WyJwb3N0cyIsNl0=",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "f": Object {
       "clientMutationId": "hello",
       "deletedPostId": "WyJwb3N0cyIsOV0=",
       "post": Object {
-        "__id": "WyJwb3N0cyIsOV0=",
         "authorId": 3,
         "headline": "You know how I sometimes have really brilliant ideas?",
         "id": 9,
+        "nodeId": "WyJwb3N0cyIsOV0=",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "g": null,
@@ -1022,66 +1135,66 @@ Object {
       "clientMutationId": "world",
       "deletedPostId": "WyJwb3N0cyIsMTFd",
       "post": Object {
-        "__id": "WyJwb3N0cyIsMTFd",
         "authorId": 3,
         "headline": "They’re not aliens, they’re Earth…liens!",
         "id": 11,
+        "nodeId": "WyJwb3N0cyIsMTFd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "i": Object {
       "clientMutationId": null,
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
         "personByPersonId1": Object {
-          "__id": "WyJwZW9wbGUiLDRd",
           "name": "Kathryn Ramirez",
+          "nodeId": "WyJwZW9wbGUiLDRd",
         },
         "personByPersonId2": Object {
-          "__id": "WyJwZW9wbGUiLDNd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
         },
         "personId1": 4,
         "personId2": 3,
       },
       "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "j": Object {
       "clientMutationId": null,
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
         "personByPersonId1": Object {
-          "__id": "WyJwZW9wbGUiLDJd",
           "name": "Sara Smith",
+          "nodeId": "WyJwZW9wbGUiLDJd",
         },
         "personByPersonId2": Object {
-          "__id": "WyJwZW9wbGUiLDNd",
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
         },
         "personId1": 2,
         "personId2": 3,
       },
       "deletedCompoundKeyId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "k": Object {
       "clientMutationId": null,
       "deletedPersonId": "WyJwZW9wbGUiLDNd",
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDNd",
         "email": "budd.deey@email.com",
         "id": 3,
         "name": "Budd Deey",
+        "nodeId": "WyJwZW9wbGUiLDNd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
   },
@@ -1098,73 +1211,73 @@ Object {
     "a": Object {
       "clientMutationId": null,
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDFd",
         "about": "An older John Smith",
         "email": "john.smith@email.com",
         "id": 1,
         "name": "John Smith Sr.",
+        "nodeId": "WyJwZW9wbGUiLDFd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "b": Object {
       "clientMutationId": "hello",
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDJd",
         "about": null,
         "email": "sarah.smith@email.com",
         "id": 2,
         "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "c": Object {
       "clientMutationId": "world",
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDJd",
         "about": "Now with an “H.”",
         "email": "sarah.smith@email.com",
         "id": 2,
         "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "d": Object {
       "clientMutationId": null,
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDNd",
         "about": "I have taken over Budd’s account. Hehehe.",
         "email": "budd.deey@email.com",
         "id": 3,
         "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDNd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "e": Object {
       "clientMutationId": null,
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDRd",
         "about": "Make art not friends.",
         "email": "kathryn.ramirez@email.com",
         "id": 4,
         "name": "Kathryn Ramirez",
+        "nodeId": "WyJwZW9wbGUiLDRd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "f": Object {
       "clientMutationId": null,
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
         "extra": true,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
         "personByPersonId1": Object {
           "id": 2,
           "name": "Sarah Smith",
@@ -1177,14 +1290,14 @@ Object {
         "personId2": 2,
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "g": Object {
       "clientMutationId": "hello",
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
         "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
         "personByPersonId1": Object {
           "id": 3,
           "name": "Best Pal",
@@ -1197,14 +1310,14 @@ Object {
         "personId2": 2,
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "h": Object {
       "clientMutationId": "world",
       "compoundKey": Object {
-        "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
         "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
         "personByPersonId1": Object {
           "id": 4,
           "name": "Kathryn Ramirez",
@@ -1217,20 +1330,20 @@ Object {
         "personId2": 3,
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
     "i": Object {
       "clientMutationId": null,
       "person": Object {
-        "__id": "WyJwZW9wbGUiLDJd",
         "about": null,
         "email": "sarah.smith@email.com",
         "id": 2,
         "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
       },
       "query": Object {
-        "__id": "query",
+        "nodeId": "query",
       },
     },
   },
@@ -1243,160 +1356,160 @@ Object {
     "a": Object {
       "nodes": Array [
         Object {
-          "__id": "WyJwZW9wbGUiLDFd",
           "__typename": "Person",
           "id": 1,
           "name": "John Smith",
+          "nodeId": "WyJwZW9wbGUiLDFd",
         },
         Object {
-          "__id": "WyJwZW9wbGUiLDJd",
           "__typename": "Person",
           "id": 2,
           "name": "Sara Smith",
+          "nodeId": "WyJwZW9wbGUiLDJd",
         },
         Object {
-          "__id": "WyJwZW9wbGUiLDNd",
           "__typename": "Person",
           "id": 3,
           "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
         },
         Object {
-          "__id": "WyJwZW9wbGUiLDRd",
           "__typename": "Person",
           "id": 4,
           "name": "Kathryn Ramirez",
+          "nodeId": "WyJwZW9wbGUiLDRd",
         },
         Object {
-          "__id": "WyJwZW9wbGUiLDVd",
           "__typename": "Person",
           "id": 5,
           "name": "Joe Tucker",
+          "nodeId": "WyJwZW9wbGUiLDVd",
         },
       ],
     },
     "b": Object {
       "nodes": Array [
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
           "personId1": 1,
           "personId2": 2,
         },
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
           "personId1": 2,
           "personId2": 1,
         },
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
           "personId1": 2,
           "personId2": 3,
         },
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
           "personId1": 2,
           "personId2": 5,
         },
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
           "personId1": 4,
           "personId2": 3,
         },
         Object {
-          "__id": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
           "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
           "personId1": 4,
           "personId2": 4,
         },
       ],
     },
     "c": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "personId1": 2,
       "personId2": 3,
     },
     "d": Object {
-      "__id": "WyJwZW9wbGUiLDJd",
       "__typename": "Person",
       "id": 2,
       "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
     },
     "e": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "personId1": 1,
       "personId2": 2,
     },
     "f": Object {
-      "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
       "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
     },
     "g": null,
     "h": null,
     "i": Object {
-      "__id": "WyJwZW9wbGUiLDJd",
       "__typename": "Person",
       "id": 2,
       "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
     },
     "j": Object {
-      "__id": "WyJwZW9wbGUiLDVd",
       "__typename": "Person",
       "id": 5,
       "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
     },
     "k": null,
     "l": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
       "personId1": 2,
       "personId2": 3,
     },
     "m": Object {
-      "__id": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
       "personId1": 1,
       "personId2": 2,
     },
     "n": null,
     "o": Object {
-      "__id": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
       "__typename": "SimilarTable1",
       "col1": null,
       "col2": null,
       "col3": -3,
       "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
     },
     "p": Object {
-      "__id": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
       "__typename": "SimilarTable2",
       "col3": -3,
       "col4": null,
       "col5": null,
       "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
     },
     "q": Object {
-      "__id": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
       "__typename": "SimilarTable1",
       "col1": null,
       "col2": null,
       "col3": -3,
       "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
     },
     "r": Object {
-      "__id": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
       "__typename": "SimilarTable2",
       "col3": -3,
       "col4": null,
       "col5": null,
       "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
     },
   },
 }
@@ -1677,7 +1790,7 @@ Object {
       ],
     },
     "jsonIdentityMutation": Object {
-      "json": "{"a":1,"b":2,"c":3}",
+      "json": "{\"a\":1,\"b\":2,\"c\":3}",
     },
     "mult1": Object {
       "integer": 0,
@@ -1701,10 +1814,10 @@ Object {
         "name": "Joe Tucker",
       },
       "post": Object {
-        "__id": "WyJwb3N0cyIsNV0=",
         "authorId": 5,
         "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
         "id": 5,
+        "nodeId": "WyJwb3N0cyIsNV0=",
       },
       "postEdge": Object {
         "cursor": null,
@@ -1788,10 +1901,10 @@ Object {
     },
     "noArgsQuery": 2,
     "tableQuery": Object {
-      "__id": "WyJwb3N0cyIsNV0=",
       "authorId": 5,
       "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
       "id": 5,
+      "nodeId": "WyJwb3N0cyIsNV0=",
     },
     "tableSetQuery": Object {
       "edges": Array [
@@ -1835,38 +1948,38 @@ Object {
 exports[`test operation query.graphql 1`] = `
 Object {
   "data": Object {
-    "__id": "query",
     "a": null,
     "b": Object {
-      "__id": "query",
       "__typename": "Query",
       "a": null,
       "b": Object {
-        "__id": "query",
         "__typename": "Query",
+        "nodeId": "query",
       },
+      "nodeId": "query",
     },
+    "nodeId": "query",
     "query": Object {
-      "__id": "query",
       "a": null,
       "b": Object {
-        "__id": "query",
         "__typename": "Query",
+        "nodeId": "query",
       },
+      "nodeId": "query",
       "query": Object {
-        "__id": "query",
         "a": null,
         "b": Object {
-          "__id": "query",
           "__typename": "Query",
+          "nodeId": "query",
         },
+        "nodeId": "query",
         "query": Object {
-          "__id": "query",
           "a": null,
           "b": Object {
-            "__id": "query",
             "__typename": "Query",
+            "nodeId": "query",
           },
+          "nodeId": "query",
         },
       },
     },
@@ -2266,7 +2379,7 @@ Object {
               "value": 20,
             },
           },
-          "bigint": 200,
+          "bigint": "467131188225",
           "boolean": true,
           "compoundType": Object {
             "a": 1,
@@ -2278,8 +2391,8 @@ Object {
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
-          "json": "{"a":1,"b":2,"c":3,"d":{"e":4,"f":5,"g":[6,7,8,"x",false,null]}}",
-          "jsonb": "{"1":"a","2":"b","3":"c","4":{"5":"d","6":"e","7":["f","g","h",42,true,null]}}",
+          "json": "{\"a\":1,\"b\":2,\"c\":3,\"d\":{\"e\":4,\"f\":5,\"g\":[6,7,8,\"x\",false,null]}}",
+          "jsonb": "{\"1\":\"a\",\"2\":\"b\",\"3\":\"c\",\"4\":{\"5\":\"d\",\"6\":\"e\",\"7\":[\"f\",\"g\",\"h\",42,true,null]}}",
           "money": 1000,
           "nestedCompoundType": Object {
             "a": Object {

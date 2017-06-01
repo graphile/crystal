@@ -20,9 +20,8 @@ interface BuildToken {
   readonly inventory: Inventory,
   // Some options we can use to configure how we build our GraphQL schema.
   readonly options: {
-    // Changes the name of the node field id on the `Node` interface. Relay 1,
-    // for example, wants the name to be `id`. Soon in the GraphQL spec, an
-    // `__id` field will be standardized.
+    // Changes the name of the node field id on the node interface. Relay 1,
+    // for example, wants the name to be `id`.
     readonly nodeIdFieldName: string,
     // By default, JSON is output as a string in our GraphQL queries. If true
     // then JSON will be output as a dynamic object.

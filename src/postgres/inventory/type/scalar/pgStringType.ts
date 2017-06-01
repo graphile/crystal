@@ -7,6 +7,9 @@ const pgStringType: PgType<string> & AdapterType<string> = {
   baseType: stringType,
   isTypeOf: stringType.isTypeOf,
   transformPgValueIntoValue: value => {
+    if (typeof value === 'number')
+      return value.toString(10)
+
     if (!stringType.isTypeOf(value))
       throw new Error(`Expected string. Not '${typeof value}'.`)
 
