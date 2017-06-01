@@ -18,6 +18,7 @@ export default function createMutationPayloadGqlType <TValue>(
   return new GraphQLObjectType({
     name: formatName.type(`${config.name}-payload`),
     description: `The output of our \`${formatName.field(config.name)}\` mutation.`,
+    relatedGqlType: config.relatedGqlType,
     fields: buildObject<GraphQLFieldConfig<MutationValue<TValue>, mixed>>(
       [
         // Add the `clientMutationId` output field. This will be the exact

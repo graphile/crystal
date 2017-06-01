@@ -4,6 +4,7 @@ import { sql } from '../../utils'
 import pgClientFromContext from '../pgClientFromContext'
 import PgClassType from '../type/PgClassType'
 import PgPaginator from './PgPaginator'
+import getSelectFragment from './getSelectFragment'
 
 /**
  * The cursor type when we are ordering by attributes is just a fixed length
@@ -35,15 +36,12 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     this.pgAttributes = config.pgAttributes
   }
 
-  /**
-   * Reads a single page for this ordering.
-   */
-  public async readPage (
-    context: mixed,
+  public generateQuery (
     input: TInput,
     config: Paginator.PageConfig<AttributesCursor>,
-  ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
-    const client = pgClientFromContext(context)
+    resolveInfo: mixed,
+    gqlType: mixed,
+  ) {
     const { descending, pgAttributes } = this
     const { beforeCursor, afterCursor, first, last, _offset } = config
 
@@ -66,41 +64,140 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       throw new Error('Before cursor must be a value tuple of the correct length.')
 
     const aliasIdentifier = Symbol()
+    const matchingRowsIdentifier = Symbol()
+    const resultsIdentifier = Symbol()
+    const jsonIdentifier = Symbol()
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
-    const query = sql.compile(sql.query`
-      -- The standard select/from clauses up top.
-      select to_json(${sql.identifier(aliasIdentifier)}) as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+    // Poor-man's WITH clause (because this needs to run in subqueries)
+    const matchingRowsSql =
+      sql.query`
+        (
+        select *
+        from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
-      -- Combine our cursors with the condition used for this page to
-      -- implement a where condition which will filter what we want it to.
-      --
-      -- We throw away nulls because there is a lot of wierdness when they
-      -- get included.
-      where
-        ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
-        ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
-        ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
-        ${conditionSql}
+        -- Combine our cursors with the condition used for this page to
+        -- implement a where condition which will filter what we want it to.
+        --
+        -- We throw away nulls because there is a lot of wierdness when they
+        -- get included.
+        where
+          ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
+          ${conditionSql}
+        )
+        `;
 
-      -- Order using the same attributes used to construct the cursors. If
-      -- a last property was defined we need to reverse our ordering so the
-      -- limit will work. We will fix the order in JavaScript.
-      order by ${sql.join(pgAttributes.map(pgAttribute =>
-        sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
-      ), ', ')}
+    let hasNextPageSql, hasPreviousPageSql
+    if (first === 0 || last === 0) {
+      hasNextPageSql = sql.query`false`
+      hasPreviousPageSql = sql.query`false`
+    } else {
+      hasNextPageSql =
+        last != null
+          ? (
+            beforeCursor
+            ? sql.query`
+              exists(
+                select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                where ${this._getCursorCondition(pgAttributes, beforeCursor, descending ? '<=' : '>=')}
+              )
+              `
+            : sql.query`false`
+            )
+          : sql.query`
+            (
+              select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+              where ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.query`true`}
+            ) > count(*)
+            `
+      if (_offset != null && _offset > 0) {
+        hasPreviousPageSql = sql.query`true`
+      } else {
+        hasPreviousPageSql =
+          last != null
+            ? sql.query`
+              (
+                select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                where ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')}
+              ) > count(*)
+              `
+            : (
+              afterCursor
+              ? sql.query`
+                exists(
+                  select 1 from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+                  where ${this._getCursorCondition(pgAttributes, afterCursor, descending ? '>=' : '<=')}
+                )
+                `
+              : sql.query`false`
+              )
+      }
+    }
 
-      -- Finally, apply the appropriate limit.
-      limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
+    const totalCountSql =
+      sql.query`
+        (
+          select count(*) from ${matchingRowsSql} as ${sql.identifier(Symbol())}
+        )
+      `
+    // XXX: for performance, we should not add totalCountSql/
+    // hasNextPageSql/hasPreviousPageSql to the query unless they're requested
+    const query = sql.query`
+      select coalesce(json_agg(${sql.identifier(jsonIdentifier)}), '[]'::json) as "rows",
+      ${totalCountSql}::integer as "totalCount",
+      ${hasNextPageSql} as "hasNextPage",
+      ${hasPreviousPageSql} as "hasPreviousPage"
+      from (
+        select json_build_object(
+          'value', ${getSelectFragment(resolveInfo, matchingRowsIdentifier, gqlType)},
+          'cursor', json_build_array(${sql.join(pgAttributes.map(pgAttribute => sql.identifier(pgAttribute.name)), ', ')})
+        ) as ${sql.identifier(jsonIdentifier)}
+        from ${matchingRowsSql} as ${sql.identifier(matchingRowsIdentifier)}
 
-      -- If we have an offset, add that as well.
-      ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
-    `)
+        where
+          ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
+          ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')}
 
-    let { rows } = await client.query(query)
+        -- Order using the same attributes used to construct the cursors. If
+        -- a last property was defined we need to reverse our ordering so the
+        -- limit will work. We will fix the order in JavaScript.
+        order by ${sql.join(pgAttributes.map(pgAttribute =>
+          sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
+        ), ', ')}
 
+        -- Finally, apply the appropriate limit.
+        limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
+
+        -- If we have an offset, add that as well.
+        ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
+      ) as ${sql.identifier(resultsIdentifier)}
+    `
+    return {query, last}
+  }
+
+  /**
+   * Reads a single page for this ordering.
+   */
+  public async readPage (
+    context: mixed,
+    input: TInput,
+    config: Paginator.PageConfig<AttributesCursor>,
+    resolveInfo: mixed,
+    gqlType: mixed,
+  ): Promise<Paginator.Page<PgClassType.Value, AttributesCursor>> {
+    const details = this.generateQuery(input, config, resolveInfo, gqlType);
+    const {query, last} = details
+    const compiledQuery = sql.compile(query)
+
+    const client = pgClientFromContext(context)
+    const { rows: [value] } = await client.query(compiledQuery)
+
+    return this.valueToPage(value, details)
+  }
+
+  public valueToPage (value, {last}) {
+    const {rows, hasNextPage, hasPreviousPage, totalCount} = value
     // If `last` was defined we reversed the order in Sql so our limit would
     // work. We need to reverse again when we get here.
     // TODO: We could implement an `O(1)` reverse with iterators. Then we
@@ -108,13 +205,13 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
     // back as an array. We know the final length and we could start
     // returning from the end instead of the beginning.
     if (last != null)
-      rows = rows.reverse()
+      rows.reverse()
 
     // Convert our rows into usable values.
     const values: Array<{ value: PgClassType.Value, cursor: AttributesCursor }> =
-      rows.map(({ value }) => ({
+      rows.map(({ value, cursor }) => ({
         value: this.pgPaginator.itemType.transformPgValueIntoValue(value),
-        cursor: pgAttributes.map(pgAttribute => value[pgAttribute.name]),
+        cursor,
       }))
 
     return {
@@ -122,37 +219,9 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
       // Gets whether or not we have more values to paginate through by
       // running a simple, efficient Sql query to test.
-      hasNextPage: async (): Promise<boolean> => {
-        const lastValue = values[values.length - 1]
-        const lastCursor = lastValue ? lastValue.cursor : beforeCursor
-        if (lastCursor == null) return false
-
-        const { rowCount } = await client.query(sql.compile(sql.query`
-          select null
-          from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, lastCursor, descending ? '<' : '>')} and ${conditionSql}
-          limit 1
-        `))
-
-        return rowCount !== 0
-      },
-
-      // Gets whether or not we have more values to paginate through by
-      // running a simple, efficient Sql query to test.
-      hasPreviousPage: async (): Promise<boolean> => {
-        const firstValue = values[0]
-        const firstCursor = firstValue ? firstValue.cursor : afterCursor
-        if (firstCursor == null) return false
-
-        const { rowCount } = await client.query(sql.compile(sql.query`
-          select null
-          from ${fromSql}
-          where ${this._getCursorCondition(pgAttributes, firstCursor, descending ? '>' : '<')} and ${conditionSql}
-          limit 1
-        `))
-
-        return rowCount !== 0
-      },
+      hasNextPage: () => Promise.resolve(hasNextPage),
+      hasPreviousPage: () => Promise.resolve(hasPreviousPage),
+      totalCount: () => Promise.resolve(totalCount),
     }
   }
 

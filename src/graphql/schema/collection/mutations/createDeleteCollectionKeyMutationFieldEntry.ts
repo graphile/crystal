@@ -5,6 +5,7 @@ import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getDeleteCollectionPayloadGqlType } from './createDeleteCollectionMutationFieldEntry'
+import getGqlOutputType from '../../type/getGqlOutputType'
 
 /**
  * Creates a delete mutation which will delete a single value from a collection
@@ -22,13 +23,15 @@ export default function createDeleteCollectionKeyMutationFieldEntry <TValue, TKe
   const { collection } = collectionKey
   const name = `delete-${collection.type.name}-by-${collectionKey.name}`
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Deletes a single \`${formatName.type(collection.type.name)}\` using a unique key.`,
+    relatedGqlType: gqlType,
     inputFields: inputHelpers.fieldEntries,
     payloadType: getDeleteCollectionPayloadGqlType(buildToken, collection),
-    execute: (context, input) =>
-      collectionKey.delete!(context, inputHelpers.getKeyFromInput(input)),
+    execute: (context, input, resolveInfo) =>
+      collectionKey.delete!(context, inputHelpers.getKeyFromInput(input), resolveInfo, gqlType),
   })]
 }

@@ -54,7 +54,7 @@ interface CollectionKey<TValue, TKeyValue> {
    * If nothing was found, return `null`.
    */
   // TODO: Test this.
-  readonly read?: ((context: mixed, key: TKeyValue) => Promise<TValue | null>) | null
+  readonly read?: ((context: mixed, key: TKeyValue, resolveInfo: mixed) => Promise<TValue | null>) | null
 
   /**
    * Updates a value in the collection by using that value’s key. Returned is

@@ -5,6 +5,7 @@ import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
 import { getCollectionPatchType, getUpdateCollectionPayloadGqlType } from './createUpdateCollectionMutationFieldEntry'
+import getGqlOutputType from '../../type/getGqlOutputType'
 
 /**
  * Creates a update mutation which will update a single value from a collection
@@ -24,10 +25,12 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
   const patchFieldName = formatName.field(`${collection.type.name}-patch`)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
+  const { gqlType } = getGqlOutputType(buildToken, collection.type)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using a unique key and a patch.`,
+    relatedGqlType: gqlType,
     inputFields: [
       // Include all of the fields we need to construct the key value we will
       // use to find the single value to update.
@@ -42,7 +45,7 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
       }],
     ],
     payloadType: getUpdateCollectionPayloadGqlType(buildToken, collection),
-    execute: (context, input) =>
-      collectionKey.update!(context, inputHelpers.getKeyFromInput(input), patchFromGqlInput(input[patchFieldName] as {})),
+    execute: (context, input, resolveInfo) =>
+      collectionKey.update!(context, inputHelpers.getKeyFromInput(input), patchFromGqlInput(input[patchFieldName] as {}), resolveInfo, gqlType),
   })]
 }

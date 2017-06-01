@@ -33,6 +33,7 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
         const fieldName = config.renameIdToRowId && pgAttribute.name === 'id' ? 'row_id' : pgAttribute.name
         return [fieldName, {
           description: pgAttribute.description,
+          externalFieldName: pgAttribute.name,
 
           // Make sure that if our attribute specifies that it is non-null,
           // that we remove the types nullable wrapper if it exists.
@@ -80,9 +81,18 @@ class PgClassType extends PgType<PgRow> implements ObjectType<PgRow> {
     if (typeof pgValue !== 'object')
       throw new Error(`Postgres value of object type must be an object, not '${typeof pgValue}'.`)
 
-    return new Map(Array.from(this.fields).map<[string, mixed]>(([fieldName, field]) => {
-      return [fieldName, field.type.transformPgValueIntoValue(pgValue[field.pgAttribute.name])]
-    }))
+    const resultMap = new Map()
+    // Initially set all values verbatim
+    for (const key in pgValue) {
+      if (Object.prototype.hasOwnProperty.call(pgValue, key)) {
+        resultMap.set(key, pgValue[key])
+      }
+    }
+    // Now overwrite the official pg fields with parsed versions
+    Array.from(this.fields).filter<[string, mixed]>(([fieldName, field]) => pgValue.hasOwnProperty(field.pgAttribute.name)).forEach<[string, mixed]>(([fieldName, field]) => {
+      resultMap.set(fieldName, field.type.transformPgValueIntoValue(pgValue[field.pgAttribute.name]))
+    })
+    return resultMap;
   }
 
   /**

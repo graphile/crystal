@@ -3,6 +3,7 @@ import { PgCatalog, PgCatalogAttribute, PgCatalogForeignKeyConstraint } from '..
 import PgClassType from '../type/PgClassType'
 import PgCollection from './PgCollection'
 import PgCollectionKey from './PgCollectionKey'
+import { sql } from '../../utils'
 
 // TODO: This implementation is sketchy. Implement it better!
 // TODO: Tests
@@ -42,6 +43,12 @@ class PgRelation implements Relation<PgClassType.Value, PgCollectionKey.Value, P
   public getTailConditionFromHeadValue (headValue: PgClassType.Value): Condition {
     return conditionHelpers.and(...this._headFieldNames.map((headFieldName, i) =>
       conditionHelpers.fieldEquals(this._tailFieldNames[i], headValue.get(headFieldName)),
+    ))
+  }
+
+  public getTailConditionFromHeadAlias (aliasIdentifier): Condition {
+    return conditionHelpers.and(...this._headFieldNames.map((headFieldName, i) =>
+      conditionHelpers.fieldEqualsQuery(this._tailFieldNames[i], sql.query`${sql.identifier(aliasIdentifier)}.${sql.identifier(headFieldName)}`),
     ))
   }
 }

@@ -68,6 +68,10 @@ export namespace conditionHelpers {
   export function fieldEquals (name: string, value: mixed): Condition {
     return { type: 'FIELD', name, condition: { type: 'EQUAL', value } }
   }
+
+  export function fieldEqualsQuery (name: string, value: mixed): Condition {
+    return { type: 'FIELD', name, condition: { type: 'EQUAL_QUERY', value } }
+  }
 }
 
 /**

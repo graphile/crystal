@@ -1,5 +1,6 @@
 import { QueryConfig } from 'pg'
 import minify = require('pg-minify')
+import Client = require('pg/lib/client')
 
 namespace sql {
   type NestedArray<T> = Array<T> | Array<Array<T>> | Array<Array<Array<T>>> | Array<Array<Array<Array<T>>>>
@@ -10,6 +11,7 @@ namespace sql {
    */
   export type SqlItem =
     { type: 'RAW', text: string } |
+    { type: 'LITERAL', text: string } |
     { type: 'IDENTIFIER', names: Array<string | symbol> } |
     { type: 'VALUE', value: mixed }
 
@@ -58,6 +60,9 @@ namespace sql {
       switch (item.type) {
         case 'RAW':
           text += item.text
+          break
+        case 'LITERAL':
+          text += escapeSqlLiteral(item.text)
           break
         // TODO: Identifier escaping? I know `pg-promise` does some of this.
         // Most of the time identifiers are trusted, but this could be a source
@@ -111,6 +116,12 @@ namespace sql {
   export const raw = (text: string): SqlItem => ({ type: 'RAW', text })
 
   /**
+   * Creates a Sql item for a string that will be escaped so it is safe against
+   * Sql injection
+   */
+  export const literal = (text: string): SqlItem => ({ type: 'LITERAL', text })
+
+  /**
    * Creates a Sql item for a Sql identifier. A Sql identifier is anything like
    * a table, schema, or column name. An identifier may also have a namespace,
    * thus why many names are accepted.
@@ -153,22 +164,20 @@ namespace sql {
   }
 
   /**
-   * Escapes a Sql identifier. Adapted from the `pg` module.
+   * Escapes a Sql identifier. From the `pg` module.
    *
    * @private
    * @see https://github.com/brianc/node-postgres/blob/a536afb1a8baa6d584bd460e7c1286d75bb36fe3/lib/client.js#L255-L272
    */
   function escapeSqlIdentifier (str: string): string {
-    let escaped = '"'
+    return Client.prototype.escapeIdentifier(str)
+  }
 
-    for (const c of str) {
-      if (c === '"') escaped += c + c
-      else escaped += c
-    }
-
-    escaped += '"'
-
-    return escaped
+  /**
+   * Escapes a string. From the `pg` module.
+   */
+  function escapeSqlLiteral (str: string): string {
+    return Client.prototype.escapeLiteral(str)
   }
 }
 
