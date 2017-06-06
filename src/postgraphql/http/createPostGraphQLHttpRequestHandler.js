@@ -515,6 +515,8 @@ function addCORSHeaders (res) {
     // like in a POST request.
     'Content-Type',
     'Content-Length',
+    // Allow meteor-login-token that is sent from the client of a meteor app
+    'meteor-login-token',
   ].join(', '))
 }
 
