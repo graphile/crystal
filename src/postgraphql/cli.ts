@@ -39,6 +39,7 @@ program
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('--jwt-role <string>', 'a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
@@ -71,6 +72,7 @@ const {
   secret: deprecatedJwtSecret,
   jwtSecret,
   jwtAudiences = ['postgraphql'],
+  jwtRole = ['role'],
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -116,6 +118,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   jwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
   jwtAudiences,
+  jwtRole,
   pgDefaultRole,
   watchPg,
   showErrorStack,
