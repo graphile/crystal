@@ -44,7 +44,7 @@ export default async function withPostGraphQLContext(
     jwtToken?: string,
     jwtSecret?: string,
     jwtAudiences?: Array<string>,
-    jwtRole?: Array<string>,
+    jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -106,7 +106,7 @@ async function setupPgClientTransaction ({
   jwtToken?: string,
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
-  jwtRole?: Array<string>,
+  jwtRole: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -234,12 +234,11 @@ function debugPgClient (pgClient: Client): Client {
 }
 
 /**
- * Safely extract a nested object or undefined where inObject is any object and path is
- * an array of indexes into an object
+ * Safely gets the value at `path` (array of keys) of `inObject`.
  *
  * @private
  */
-function getPath(inObject: any, path: any): any {
+function getPath(inObject: mixed, path: Array<string>): any {
   let object = inObject
   // From https://github.com/lodash/lodash/blob/master/.internal/baseGet.js
   let index = 0
