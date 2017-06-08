@@ -129,7 +129,7 @@ async function setupPgClientTransaction ({
         audience: jwtAudiences,
       })
 
-      const roleClaim = getPath(jwtClaims, jwtRole);
+      const roleClaim = getPath(jwtClaims, jwtRole)
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
