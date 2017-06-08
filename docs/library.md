@@ -59,7 +59,7 @@ Arguments include:
   - `pgDefaultRole`: The default Postgres role to use. If no role was provided in a provided JWT token, this role will be used.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify tokens in the `Authorization` header, and signing JWT tokens you return in procedures.
   - `jwtAudiences`: The audiences to use when verifing the JWT token. If not set the audience will be `['postgraphql']`.
-  - `jwtRole`: a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.
+  - `jwtRole`: a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. If none is provided it will use the key `role` on the root of the jwt.
   - `jwtPgTypeIdentifier`: The Postgres type identifier for the compound type which will be signed as a JWT token if ever found as the return type of a procedure. Can be of the form: `my_schema.my_type`. You may use quotes as needed: `"my-special-schema".my_type`.
   - `watchPg`: When true, PostGraphQL will watch your database schemas and re-create the GraphQL API whenever your schema changes, notifying you as it does. This feature requires an event trigger to be added to the database by a superuser. When enabled PostGraphQL will try to add this trigger, if you did not connect as a superuser you will get a warning and the trigger won’t be added.
   - `disableQueryLog`: Turns off GraphQL query logging. By default PostGraphQL will log every GraphQL query it processes along with some other information. Set this to `true` to disable that feature.
