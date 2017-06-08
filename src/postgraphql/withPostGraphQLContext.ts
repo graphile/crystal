@@ -36,6 +36,7 @@ export default async function withPostGraphQLContext(
     jwtToken,
     jwtSecret,
     jwtAudiences = ['postgraphql'],
+    jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
   }: {
@@ -43,6 +44,7 @@ export default async function withPostGraphQLContext(
     jwtToken?: string,
     jwtSecret?: string,
     jwtAudiences?: Array<string>,
+    jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -64,6 +66,7 @@ export default async function withPostGraphQLContext(
       jwtToken,
       jwtSecret,
       jwtAudiences,
+      jwtRole,
       pgDefaultRole,
       pgSettings,
     })
@@ -95,6 +98,7 @@ async function setupPgClientTransaction ({
   jwtToken,
   jwtSecret,
   jwtAudiences,
+  jwtRole,
   pgDefaultRole,
   pgSettings,
 }: {
@@ -102,6 +106,7 @@ async function setupPgClientTransaction ({
   jwtToken?: string,
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
+  jwtRole: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -124,7 +129,7 @@ async function setupPgClientTransaction ({
         audience: jwtAudiences,
       })
 
-      const roleClaim = jwtClaims['role']
+      const roleClaim = getPath(jwtClaims, jwtRole)
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
@@ -226,5 +231,22 @@ function debugPgClient (pgClient: Client): Client {
   }
 
   return pgClient
+}
+
+/**
+ * Safely gets the value at `path` (array of keys) of `inObject`.
+ *
+ * @private
+ */
+function getPath(inObject: mixed, path: Array<string>): any {
+  let object = inObject
+  // From https://github.com/lodash/lodash/blob/master/.internal/baseGet.js
+  let index = 0
+  const length = path.length
+
+  while (object && index < length) {
+    object = object[path[index++]]
+  }
+  return (index && index === length) ? object : undefined
 }
 // tslint:enable no-any
