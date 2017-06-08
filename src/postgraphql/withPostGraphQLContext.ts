@@ -129,16 +129,7 @@ async function setupPgClientTransaction ({
         audience: jwtAudiences,
       })
 
-      let roleClaim = jwtClaims ? jwtClaims : ''
-      const rolePath = jwtRole ? jwtRole : []
-      for (let i = 0; i < rolePath.length; i++) {
-        try {
-          roleClaim = roleClaim[rolePath[i]]
-        } catch (e) {
-          i = rolePath.length
-          roleClaim = ''
-        }
-      }
+      const roleClaim = getPath(jwtClaims, jwtRole);
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
@@ -240,5 +231,23 @@ function debugPgClient (pgClient: Client): Client {
   }
 
   return pgClient
+}
+
+/**
+ * Safely extract a nested object or undefined where inObject is any object and path is
+ * an array of indexes into an object
+ *
+ * @private
+ */
+function getPath(inObject: any, path: any): any {
+  let object = inObject
+  // From https://github.com/lodash/lodash/blob/master/.internal/baseGet.js
+  let index = 0
+  const length = path.length
+
+  while (object && index < length) {
+    object = object[path[index++]]
+  }
+  return (index && index === length) ? object : undefined
 }
 // tslint:enable no-any
