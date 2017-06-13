@@ -58,7 +58,7 @@
     "@types/debug": "0.0.29",
     "@types/graphql": "^0.8.2",
     "@types/jest": "^16.0.4",
-    "@types/jsonwebtoken": "^7.1.33",
+    "@types/jsonwebtoken": "<7.2.1",
     "@types/node": "^7.0.4",
     "@types/pluralize": "0.0.27",
     "connect": "^3.5.0",
