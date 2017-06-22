@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Build a GraphQL schema from plugins",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/benjie/graphql-build.git"
@@ -30,5 +32,8 @@
   "engines": {
     "node": ">=8",
     "yarn": "^0.24.5"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4"
   }
 }

@@ -1,4 +1,5 @@
 const SchemaBuilder = require("./SchemaBuilder");
+const { StandardTypesPlugin, QueryPlugin } = require("./plugins");
 
 const getBuilder = async (plugins, options) => {
   const builder = new SchemaBuilder();
@@ -14,4 +15,9 @@ const buildSchema = async (plugins, options) => {
   return build.buildRoot();
 };
 
+const defaultPlugins = [StandardTypesPlugin, QueryPlugin];
+
 exports.buildSchema = buildSchema;
+exports.QueryPlugin = QueryPlugin;
+exports.StandardTypesPlugin = StandardTypesPlugin;
+exports.defaultPlugins = defaultPlugins;

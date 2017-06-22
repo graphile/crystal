@@ -96,6 +96,7 @@ class SchemaBuilder {
       build,
       Object.keys(build).filter(key => typeof build[key] === "function")
     );
+    Object.freeze(build);
     return build;
   }
 }

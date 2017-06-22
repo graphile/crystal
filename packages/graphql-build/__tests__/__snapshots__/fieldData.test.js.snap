@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generated schema 1`] = `
+"scalar Cursor
+
+type Dummy {
+  id: String!
+  caps: String!
+}
+
+type DummyConnection {
+  edges: [DummyEdge!]
+  nodes: [Dummy!]
+}
+
+enum DummyConnectionSortBy {
+  id
+  caps
+}
+
+type DummyEdge {
+  cursor: Cursor
+  node: Dummy
+}
+
+type Query {
+  dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection
+}
+"
+`;
+
+exports[`parse data 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "BAR",
+            "id": "bar",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "BAR",
+          "id": "bar",
+        },
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
