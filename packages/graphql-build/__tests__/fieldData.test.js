@@ -18,10 +18,11 @@ const dummyData = [
 ];
 
 const compare = (a, b, ascending) => {
+  if (a === b) return 0;
   if (ascending) {
-    return a > b;
+    return a > b ? 1 : -1;
   } else {
-    return a < b;
+    return a < b ? 1 : -1;
   }
 };
 
@@ -62,20 +63,33 @@ const DummyConnectionPlugin = async builder => {
             });
             addArgDataGenerator(function connectionAfter({ after }, data) {
               const sorts = data.sort || [];
-              if (sorts.length) {
-                let filter = () => false;
-                // a > b || (a == b && (next))
-                for (let i = sorts.length - 1; i >= 0; i--) {
-                  const [field, ascending] = sorts[i];
-                  const oldFilter = filter;
-                  filter = obj =>
-                    after[i] == null ||
-                    compare(obj[field], after[i], ascending) ||
-                    (obj[field] === after[i] && oldFilter(obj));
+              if (after) {
+                if (sorts.length) {
+                  let filter = () => false;
+                  // a > b || (a == b && (next))
+                  for (let i = sorts.length - 1; i >= 0; i--) {
+                    const [field, ascending] = sorts[i];
+                    const oldFilter = filter;
+                    filter = obj => {
+                      if (!after[i]) return true;
+                      const comparison = compare(
+                        after[i],
+                        obj[field],
+                        ascending
+                      );
+                      return (
+                        comparison > 0 || (comparison === 0 && oldFilter(obj))
+                      );
+                    };
+                  }
+                  return {
+                    filter: [filter],
+                  };
+                } else {
+                  return {
+                    filter: [(val, idx) => idx > after],
+                  };
                 }
-                return {
-                  filter: [filter],
-                };
               }
             });
             return {
@@ -145,10 +159,24 @@ const DummyConnectionPlugin = async builder => {
                 },
               },
               resolve(data, args, context, resolveInfo) {
+                const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
                 const resolveData = getDataFromParsedResolveInfoFragment(
-                  parseResolveInfo(resolveInfo)
+                  parsedResolveInfoFragment
                 );
-                return dummyData;
+                let result = dummyData;
+                for (const filter of resolveData.filter || []) {
+                  result = result.filter(filter);
+                }
+                const sorts = resolveData.sort || [];
+                if (sorts.length) {
+                  for (let i = sorts.length - 1; i >= 0; i--) {
+                    const [field, ascending] = sorts[i];
+                    result.sort((a, b) =>
+                      compare(a[field], b[field], ascending)
+                    );
+                  }
+                }
+                return result;
               },
             };
           }
@@ -187,6 +215,35 @@ test("no arguments", async () => {
     "foo",
     "bar",
     "baz",
+    "qux",
+  ]);
+  expect(result).toMatchSnapshot();
+});
+
+test("sort", async () => {
+  const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
+  const result = await graphql(
+    schema,
+    `query {
+      dummyConnection(sortBy: ID_ASC) {
+        edges {
+          cursor
+          node {
+            id
+            caps
+          }
+        }
+        nodes {
+          id
+          caps
+        }
+      }
+    }`
+  );
+  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+    "bar",
+    "baz",
+    "foo",
     "qux",
   ]);
   expect(result).toMatchSnapshot();

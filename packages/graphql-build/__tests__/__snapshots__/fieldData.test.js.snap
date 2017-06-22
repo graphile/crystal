@@ -87,3 +87,60 @@ Object {
   },
 }
 `;
+
+exports[`sort 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "BAR",
+            "id": "bar",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": null,
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "BAR",
+          "id": "bar",
+        },
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
