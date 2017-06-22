@@ -1,5 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`after 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "2",
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": "3",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`generated schema 1`] = `
 "scalar Cursor
 
@@ -132,6 +167,41 @@ Object {
           "caps": "BAZ",
           "id": "baz",
         },
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`sort, after 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJmb28iXQ==",
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": "WyJxdXgiXQ==",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
         Object {
           "caps": "FOO",
           "id": "foo",

@@ -97,20 +97,21 @@ const DummyConnectionPlugin = async builder => {
               const sorts = data.sort || [];
               if (after) {
                 if (sorts.length) {
+                  const afterValues = JSON.parse(base64Decode(after));
                   let filter = () => false;
                   // a > b || (a == b && (next))
                   for (let i = sorts.length - 1; i >= 0; i--) {
                     const [field, ascending] = sorts[i];
                     const oldFilter = filter;
                     filter = obj => {
-                      if (!after[i]) return true;
+                      if (!afterValues[i]) return true;
                       const comparison = compare(
-                        after[i],
+                        afterValues[i],
                         obj[field],
                         ascending
                       );
                       return (
-                        comparison > 0 || (comparison === 0 && oldFilter(obj))
+                        comparison < 0 || (comparison === 0 && oldFilter(obj))
                       );
                     };
                   }
@@ -118,8 +119,9 @@ const DummyConnectionPlugin = async builder => {
                     filter: [filter],
                   };
                 } else {
+                  const afterIdx = parseInt(after, 10);
                   return {
-                    filter: [(val, idx) => idx > after],
+                    filter: [(val, idx) => idx > afterIdx],
                   };
                 }
               }
@@ -230,7 +232,7 @@ const DummyConnectionPlugin = async builder => {
                 const resolveData = getDataFromParsedResolveInfoFragment(
                   parsedResolveInfoFragment
                 );
-                let result = dummyData;
+                let result = dummyData.slice();
                 for (const filter of resolveData.filter || []) {
                   result = result.filter(filter);
                 }
@@ -243,13 +245,14 @@ const DummyConnectionPlugin = async builder => {
                     );
                   }
                 }
-                const ret = result.map((entry, idx) =>
-                  (resolveData.map || [])
+                const ret = result.map(entry => {
+                  const idx = dummyData.indexOf(entry);
+                  return (resolveData.map || [])
                     .reduce(
                       (memo, map) => Object.assign(memo, map(entry, idx)),
                       {}
-                    )
-                );
+                    );
+                });
                 return ret;
               },
             };
@@ -328,5 +331,67 @@ test("sort", async () => {
       .map(({ cursor }) => cursor)
       .map(base64Decode)
   ).toEqual(['["bar"]', '["baz"]', '["foo"]', '["qux"]']);
+  expect(result).toMatchSnapshot();
+});
+
+test("after", async () => {
+  const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
+  const result = await graphql(
+    schema,
+    `query {
+      dummyConnection(after: "1") {
+        edges {
+          cursor
+          node {
+            id
+            caps
+          }
+        }
+        nodes {
+          id
+          caps
+        }
+      }
+    }`
+  );
+  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+    "baz",
+    "qux",
+  ]);
+  expect(
+    result.data.dummyConnection.edges.map(({ cursor }) => cursor)
+  ).toEqual(["2", "3"]);
+  expect(result).toMatchSnapshot();
+});
+
+test("sort, after", async () => {
+  const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
+  const result = await graphql(
+    schema,
+    `query {
+      dummyConnection(sortBy: ID_ASC, after: "WyJiYXoiXQ==") {
+        edges {
+          cursor
+          node {
+            id
+            caps
+          }
+        }
+        nodes {
+          id
+          caps
+        }
+      }
+    }`
+  );
+  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+    "foo",
+    "qux",
+  ]);
+  expect(
+    result.data.dummyConnection.edges
+      .map(({ cursor }) => cursor)
+      .map(base64Decode)
+  ).toEqual(['["foo"]', '["qux"]']);
   expect(result).toMatchSnapshot();
 });
