@@ -1,4 +1,5 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
+const parseResolveInfo = require("./parseResolveInfo");
 
 module.exports = function makeNewBuild(builder) {
   const allTypes = {};
@@ -18,6 +19,7 @@ module.exports = function makeNewBuild(builder) {
   const fieldDataGeneratorsByType = new Map();
 
   return {
+    parseResolveInfo,
     addType(type) {
       allTypes[type.name] = type;
     },
@@ -69,6 +71,15 @@ module.exports = function makeNewBuild(builder) {
                     return addDataGeneratorForField(fieldName, fn);
                   },
                   addArgDataGenerator(fn) {
+                    if (
+                      ["development", "test"].includes(process.env.NODE_ENV)
+                    ) {
+                      if (!fn.displayName && !fn.name) {
+                        console.trace(
+                          "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
+                        );
+                      }
+                    }
                     argDataGenerators.push(fn);
                   },
                   getDataFromParsedResolveInfoFragment(
@@ -76,6 +87,9 @@ module.exports = function makeNewBuild(builder) {
                   ) {
                     const data = {};
                     const mergeData = results => {
+                      if (!results) {
+                        return;
+                      }
                       if (!Array.isArray(results)) {
                         results = [results];
                       }
@@ -94,7 +108,16 @@ module.exports = function makeNewBuild(builder) {
 
                     // Args -> argDataGenerators
                     for (const gen of argDataGenerators) {
-                      mergeData(gen(args, data));
+                      try {
+                        mergeData(gen(args, data));
+                      } catch (e) {
+                        console.error(
+                          `Failed to execute argDataGenerator '${gen.displayName ||
+                            gen.name ||
+                            "anonymous"}' on ${fieldName} of ${Self.name}`
+                        );
+                        throw e;
+                      }
                     }
 
                     // finalSpec.type -> fieldData
@@ -107,8 +130,9 @@ module.exports = function makeNewBuild(builder) {
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );
-                    if (fieldData) {
-                      for (const field of fields) {
+                    if (fieldDataGenerators) {
+                      for (const alias of Object.keys(fields)) {
+                        const field = fields[alias];
                         const gens = fieldDataGenerators[field.name];
                         if (gens) {
                           for (const gen of gens) {

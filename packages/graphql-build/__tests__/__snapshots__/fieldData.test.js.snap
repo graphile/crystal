@@ -14,8 +14,10 @@ type DummyConnection {
 }
 
 enum DummyConnectionSortBy {
-  id
-  caps
+  ID_ASC
+  ID_DESC
+  CAPS_ASC
+  CAPS_DESC
 }
 
 type DummyEdge {
@@ -29,7 +31,7 @@ type Query {
 "
 `;
 
-exports[`parse data 1`] = `
+exports[`no arguments 1`] = `
 Object {
   "data": Object {
     "dummyConnection": Object {

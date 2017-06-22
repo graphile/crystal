@@ -30,7 +30,7 @@ const DummyConnectionPlugin = async builder => {
     "objectType:fields",
     (
       fields,
-      { extend, getTypeByName, buildObjectWithHooks },
+      { extend, getTypeByName, buildObjectWithHooks, parseResolveInfo },
       { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
       if (!isRootQuery) return fields;
@@ -38,39 +38,29 @@ const DummyConnectionPlugin = async builder => {
       const Dummy = buildObjectWithHooks(GraphQLObjectType, {
         name: "Dummy",
         fields: {
-          ID_ASC: {
+          id: {
             type: new GraphQLNonNull(GraphQLString),
-            value: ["id", true],
           },
-          ID_DESC: {
+          caps: {
             type: new GraphQLNonNull(GraphQLString),
-            value: ["id", false],
-          },
-          CAPS_ASC: {
-            type: new GraphQLNonNull(GraphQLString),
-            value: ["caps", true],
-          },
-          CAPS_DESC: {
-            type: new GraphQLNonNull(GraphQLString),
-            value: ["caps", false],
           },
         },
       });
       return extend(fields, {
         dummyConnection: buildFieldWithHooks(
           "dummyConnection",
-          ({ addArgDataGenerator }) => {
-            addArgDataGenerator(({ first }) => {
+          ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+            addArgDataGenerator(function connectionFirst({ first }) {
               if (first) {
                 return { limit: [first] };
               }
             });
-            addArgDataGenerator(({ sortBy }) => {
+            addArgDataGenerator(function connectionSortBy({ sortBy }) {
               if (sortBy) {
                 return { sort: [sortBy] };
               }
             });
-            addArgDataGenerator(({ after }, data) => {
+            addArgDataGenerator(function connectionAfter({ after }, data) {
               const sorts = data.sort || [];
               if (sorts.length) {
                 let filter = () => false;
@@ -134,17 +124,30 @@ const DummyConnectionPlugin = async builder => {
                   type: new GraphQLEnumType({
                     name: "DummyConnectionSortBy",
                     values: {
-                      id: {
-                        name: "id",
+                      ID_ASC: {
+                        name: "ID_ASC",
+                        value: ["id", true],
                       },
-                      caps: {
-                        name: "caps",
+                      ID_DESC: {
+                        name: "ID_DESC",
+                        value: ["id", false],
+                      },
+                      CAPS_ASC: {
+                        name: "CAPS_ASC",
+                        value: ["caps", true],
+                      },
+                      CAPS_DESC: {
+                        name: "CAPS_DESC",
+                        value: ["caps", false],
                       },
                     },
                   }),
                 },
               },
-              resolve(data, args, resolveInfo) {
+              resolve(data, args, context, resolveInfo) {
+                const resolveData = getDataFromParsedResolveInfoFragment(
+                  parseResolveInfo(resolveInfo)
+                );
                 return dummyData;
               },
             };
@@ -160,7 +163,7 @@ test("generated schema", async () => {
   expect(printSchema(schema)).toMatchSnapshot();
 });
 
-test("parse data", async () => {
+test("no arguments", async () => {
   const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
   const result = await graphql(
     schema,
@@ -180,5 +183,11 @@ test("parse data", async () => {
       }
     }`
   );
+  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+    "foo",
+    "bar",
+    "baz",
+    "qux",
+  ]);
   expect(result).toMatchSnapshot();
 });
