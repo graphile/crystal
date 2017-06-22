@@ -1,11 +1,54 @@
 const debug = require("debug")("graphql-builder");
+const { GraphQLSchema, GraphQLObjectType } = require("graphql");
+
 const INDENT = "  ";
 
 class SchemaBuilder {
   constructor() {
     // this.context will be replaced by the 'context' hooks, do not store
     // copies of it!
-    this.context = {};
+    this.context = {
+      buildObjectWithHooks(Type, spec, scope = {}) {
+        let newSpec = spec;
+        if (Type === GraphQLSchema) {
+          newSpec = this.applyHooks("schema", newSpec, {
+            spec: newSpec,
+            scope,
+          });
+        } else if (Type === GraphQLObjectType) {
+          newSpec = this.applyHooks("objectType", newSpec, {
+            scope,
+          });
+          const rawSpec = newSpec;
+          newSpec = Object.assign({}, newSpec, {
+            fields: () => {
+              const fields = this.applyHooks(
+                "objectType:fields",
+                rawSpec.fields,
+                {
+                  scope,
+                  Self,
+                }
+              );
+              return Object.keys(fields).reduce((memo, fieldName) => {
+                const field = this.applyHooks(
+                  "objectType:field",
+                  fields[fieldName],
+                  {
+                    scope,
+                    Self,
+                  }
+                );
+                memo[fieldName] = field;
+                return memo;
+              }, {});
+            },
+          });
+        }
+        const Self = new Type(newSpec);
+        return Self;
+      },
+    };
 
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
@@ -74,9 +117,17 @@ class SchemaBuilder {
   }
 }
 
-const buildSchema = async (plugins, options) => {
+const getBuilder = async (plugins, options) => {
   const builder = new SchemaBuilder();
   for (const plugin of plugins) {
     await plugin(builder, options);
   }
+  return builder;
 };
+
+const buildSchema = async (plugins, options) => {
+  const builder = await getBuilder(plugins, options);
+  return builder.context.buildObjectWithHooks(GraphQLSchema, {});
+};
+
+exports.buildSchema = buildSchema;
