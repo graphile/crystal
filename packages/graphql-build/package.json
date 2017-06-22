@@ -1,0 +1,34 @@
+{
+  "name": "graphql-build",
+  "version": "0.0.0",
+  "description": "Build a GraphQL schema from plugins",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjie/graphql-build.git"
+  },
+  "keywords": [
+    "graphql",
+    "apollo",
+    "graphqljs",
+    "plugin",
+    "build",
+    "extension"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjie/graphql-build/issues"
+  },
+  "homepage": "https://github.com/benjie/graphql-build#readme",
+  "dependencies": {
+    "dataloader": "^1.3.0",
+    "debug": ">=2",
+    "graphql": ">=0.9"
+  },
+  "engines": {
+    "node": ">=8",
+    "yarn": "^0.24.5"
+  }
+}

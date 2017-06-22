@@ -1,5 +1,15 @@
 {
   "devDependencies": {
-    "lerna": "^2.0.0-rc.5"
+    "babel-eslint": "^7.2.3",
+    "eslint": "^4.0.0",
+    "eslint-config-prettier": "^2.1.1",
+    "eslint-plugin-jest": "^20.0.3",
+    "eslint-plugin-prettier": "^2.1.2",
+    "jest": "^20.0.4",
+    "lerna": "^2.0.0-rc.5",
+    "prettier": "^1.4.4"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
   }
 }
