@@ -1,58 +1,94 @@
 const debug = require("debug")("graphql-builder");
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 
+const bindAll = (obj, keys) => {
+  keys.forEach(key => {
+    obj[key] = obj[key].bind(obj);
+  });
+  return obj;
+};
+
 const INDENT = "  ";
+
+const makeNewBuild = builder => {
+  const allTypes = {};
+
+  // Every object type gets fieldData associated with each of its
+  // fields.
+
+  // When a field is defined, it may add to this field data.
+
+  // When something resolves referencing this type, the resolver may
+  // request the fieldData, e.g. to perform optimisations.
+
+  // fieldData is an object whose keys are the fields on this
+  // objectType and whose values are an object (whose keys are
+  // arbitrary namespaced keys and whose values are arrays of
+  // information of this kind)
+  const fieldDataByType = new Map();
+
+  return {
+    buildObjectWithHooks(Type, spec, scope = {}) {
+      const fieldData = {};
+      let newSpec = spec;
+      if (Type === GraphQLSchema) {
+        newSpec = builder.applyHooks("schema", newSpec, {
+          scope,
+        });
+      } else if (Type === GraphQLObjectType) {
+        const addDataForField = (fieldName, key, value) => {
+          fieldData[key] = fieldData[key] || [];
+          fieldData[key].push(value);
+        };
+
+        newSpec = builder.applyHooks("objectType", newSpec, {
+          scope,
+          addDataForField,
+        });
+
+        const rawSpec = newSpec;
+        newSpec = Object.assign({}, newSpec, {
+          fields: () =>
+            builder.applyHooks("objectType:fields", rawSpec.fields, {
+              scope,
+              Self,
+              objectType: rawSpec,
+              buildFieldWithHooks: (spec, scope = {}) => {
+                let newSpec = spec;
+                newSpec = builder.applyHooks("field", newSpec, {
+                  scope,
+                });
+                newSpec = Object.assign({}, newSpec, {
+                  args: builder.applyHooks("field:args", newSpec.args, {
+                    scope,
+                    field: newSpec,
+                  }),
+                });
+                return newSpec;
+              },
+            }),
+        });
+      }
+
+      const Self = new Type(newSpec);
+      if (newSpec.name) {
+        allTypes[newSpec.name] = Self;
+      }
+      fieldDataByType.set(Self, fieldData);
+      return Self;
+    },
+  };
+};
 
 class SchemaBuilder {
   constructor() {
-    // this.utils will be replaced by the 'utils' hooks, do not store
-    // copies of it!
-    this.utils = {
-      buildObjectWithHooks: (Type, spec, scope = {}) => {
-        let newSpec = spec;
-        if (Type === GraphQLSchema) {
-          newSpec = this.applyHooks("schema", newSpec, {
-            scope,
-          });
-        } else if (Type === GraphQLObjectType) {
-          newSpec = this.applyHooks("objectType", newSpec, {
-            scope,
-          });
-          const rawSpec = newSpec;
-          newSpec = Object.assign({}, newSpec, {
-            fields: () =>
-              this.applyHooks("objectType:fields", rawSpec.fields, {
-                scope,
-                Self,
-                objectType: rawSpec,
-              }),
-          });
-        }
-        const Self = new Type(newSpec);
-        return Self;
-      },
-      buildFieldWithHooks: (spec, scope = {}) => {
-        let newSpec = spec;
-        newSpec = this.applyHooks("field", newSpec, {
-          scope,
-        });
-        newSpec = Object.assign({}, newSpec, {
-          args: this.applyHooks("field:args", newSpec.args, {
-            scope,
-            field: newSpec,
-          }),
-        });
-        return newSpec;
-      },
-    };
-
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
 
     this.hooks = {
-      // The utils object is passed to all hooks, hook the 'utils' event to
-      // extend this object:
-      utils: [],
+      // The build object represents the current schema build and is passed to
+      // all hooks, hook the 'build' event to extend this object:
+      build: [],
 
       // Add 'query', 'mutation' or 'subscription' types in this hook:
       schema: [],
@@ -76,7 +112,7 @@ class SchemaBuilder {
   /*
    * Every hook `fn` takes three arguments:
    * - obj - the object currently being inspected
-   * - utils - the global utils object (which contains a number of utilities)
+   * - build - the current build object (which contains a number of utilities and the context of the build)
    * - context - information specific to the current invocation of the hook
    *
    * The function must either return a replacement object for `obj` or `obj` itself
@@ -88,10 +124,7 @@ class SchemaBuilder {
     this.hooks[hookName].push(fn);
   }
 
-  applyHooks(hookName, oldObj, context) {
-    const isContext = hookName === "utils";
-    if (isContext) this.utils = oldObj;
-
+  applyHooks(build, hookName, oldObj, context) {
     this.depth++;
     try {
       debug(`${INDENT.repeat(this.depth)}[${hookName}]: Running...`);
@@ -111,12 +144,9 @@ class SchemaBuilder {
               this.depth
             )}[${hookName}]:   Executing '${hookDisplayName}'`
           );
-          newObj = hook(newObj, this.utils, context);
+          newObj = hook(newObj, build, context);
           if (!newObj) {
             throw new Error(`Hook for '${hookName}' returned falsy value`);
-          }
-          if (isContext) {
-            this.utils = newObj;
           }
           debug(
             `${INDENT.repeat(
@@ -135,6 +165,16 @@ class SchemaBuilder {
       this.depth--;
     }
   }
+
+  createBuild() {
+    const build = this.applyHooks(null, "build", makeNewBuild(this));
+    // Bind all functions so they can be dereferenced
+    bindAll(
+      build,
+      Object.keys(build).filter(key => typeof build[key] === "function")
+    );
+    return build;
+  }
 }
 
 const getBuilder = async (plugins, options) => {
@@ -147,7 +187,8 @@ const getBuilder = async (plugins, options) => {
 
 const buildSchema = async (plugins, options) => {
   const builder = await getBuilder(plugins, options);
-  return builder.utils.buildObjectWithHooks(GraphQLSchema, {});
+  const build = builder.createBuild();
+  return build.buildObjectWithHooks(GraphQLSchema, {});
 };
 
 exports.buildSchema = buildSchema;
