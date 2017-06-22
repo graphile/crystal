@@ -15,7 +15,7 @@ module.exports = function makeNewBuild(builder) {
   // objectType and whose values are an object (whose keys are
   // arbitrary namespaced keys and whose values are arrays of
   // information of this kind)
-  const fieldDataByType = new Map();
+  const fieldDataGeneratorsByType = new Map();
 
   return {
     addType(type) {
@@ -35,21 +35,22 @@ module.exports = function makeNewBuild(builder) {
       return Object.assign({}, obj, obj2);
     },
     buildObjectWithHooks(Type, spec, scope = {}) {
-      const fieldData = {};
+      const fieldDataGeneratorsByFieldName = {};
       let newSpec = spec;
       if (Type === GraphQLSchema) {
         newSpec = builder.applyHooks(this, "schema", newSpec, {
           scope,
         });
       } else if (Type === GraphQLObjectType) {
-        const addDataForField = (fieldName, key, value) => {
-          fieldData[key] = fieldData[key] || [];
-          fieldData[key].push(value);
+        const addDataGeneratorForField = (fieldName, key, value) => {
+          fieldDataGeneratorsByFieldName[key] =
+            fieldDataGeneratorsByFieldName[key] || [];
+          fieldDataGeneratorsByFieldName[key].push(value);
         };
 
         newSpec = builder.applyHooks(this, "objectType", newSpec, {
           scope,
-          addDataForField,
+          addDataGeneratorForField,
         });
 
         const rawSpec = newSpec;
@@ -59,18 +60,83 @@ module.exports = function makeNewBuild(builder) {
               scope,
               Self,
               objectType: rawSpec,
-              buildFieldWithHooks: (spec, scope = {}) => {
+              buildFieldWithHooks: (fieldName, spec, scope = {}) => {
+                let argDataGenerators = [];
+
                 let newSpec = spec;
-                newSpec = builder.applyHooks(this, "field", newSpec, {
+                let context = {
+                  addDataGenerator(fn) {
+                    return addDataGeneratorForField(fieldName, fn);
+                  },
+                  addArgDataGenerator(fn) {
+                    argDataGenerators.push(fn);
+                  },
+                  getDataFromParsedResolveInfoFragment(
+                    parsedResolveInfoFragment
+                  ) {
+                    const data = {};
+                    const mergeData = results => {
+                      if (!Array.isArray(results)) {
+                        results = [results];
+                      }
+                      for (const result of results) {
+                        for (const k of Object.keys(result)) {
+                          data[k] = data[k] || [];
+                          if (!Array.isArray(result[k])) {
+                            throw new Error("Data must be an array");
+                          }
+                          data[k].push(...result[k]);
+                        }
+                      }
+                    };
+
+                    const { fields, args } = parsedResolveInfoFragment;
+
+                    // Args -> argDataGenerators
+                    for (const gen of argDataGenerators) {
+                      mergeData(gen(args, data));
+                    }
+
+                    // finalSpec.type -> fieldData
+                    if (!finalSpec) {
+                      throw new Error(
+                        "It's too early to call this! Call from within resolve"
+                      );
+                    }
+                    const Type = finalSpec.type;
+                    const fieldDataGenerators = fieldDataGeneratorsByType.get(
+                      Type
+                    );
+                    if (fieldData) {
+                      for (const field of fields) {
+                        const gens = fieldDataGenerators[field.name];
+                        if (gens) {
+                          for (const gen of gens) {
+                            mergeData(gen(field));
+                          }
+                        }
+                      }
+                    }
+                    return data;
+                  },
                   scope,
-                });
+                };
+                if (typeof newSpec === "function") {
+                  newSpec = newSpec(context);
+                }
+                newSpec = builder.applyHooks(this, "field", newSpec, context);
                 newSpec = Object.assign({}, newSpec, {
-                  args: builder.applyHooks(this, "field:args", newSpec.args, {
-                    scope,
-                    field: newSpec,
-                  }),
+                  args: builder.applyHooks(
+                    this,
+                    "field:args",
+                    newSpec.args,
+                    Object.assign({}, context, {
+                      field: newSpec,
+                    })
+                  ),
                 });
-                return newSpec;
+                const finalSpec = newSpec;
+                return finalSpec;
               },
             }),
         });
@@ -85,7 +151,7 @@ module.exports = function makeNewBuild(builder) {
         }
         allTypes[newSpec.name] = Self;
       }
-      fieldDataByType.set(Self, fieldData);
+      fieldDataGeneratorsByType.set(Self, fieldDataGeneratorsByFieldName);
       return Self;
     },
     buildRoot() {
