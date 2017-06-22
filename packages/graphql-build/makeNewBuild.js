@@ -1,5 +1,20 @@
 const { GraphQLSchema, GraphQLObjectType } = require("graphql");
 const parseResolveInfo = require("./parseResolveInfo");
+const { stripNonNullType, stripListType } = parseResolveInfo;
+
+const ensureArray = val =>
+  val == null ? val : Array.isArray(val) ? val : [val];
+
+let ensureName = () => {};
+if (["development", "test"].includes(process.env.NODE_ENV)) {
+  ensureName = fn => {
+    if (!fn.displayName && !fn.name) {
+      console.trace(
+        "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
+      );
+    }
+  };
+}
 
 module.exports = function makeNewBuild(builder) {
   const allTypes = {};
@@ -20,6 +35,10 @@ module.exports = function makeNewBuild(builder) {
 
   return {
     parseResolveInfo,
+    resolveAlias(data, _args, _context, resolveInfo) {
+      const { alias } = parseResolveInfo(resolveInfo, { deep: false });
+      return data[alias];
+    },
     addType(type) {
       allTypes[type.name] = type;
     },
@@ -44,22 +63,67 @@ module.exports = function makeNewBuild(builder) {
           scope,
         });
       } else if (Type === GraphQLObjectType) {
-        const addDataGeneratorForField = (fieldName, key, value) => {
-          fieldDataGeneratorsByFieldName[key] =
-            fieldDataGeneratorsByFieldName[key] || [];
-          fieldDataGeneratorsByFieldName[key].push(value);
+        const addDataGeneratorForField = (fieldName, fn) => {
+          fn.displayName =
+            fn.displayName ||
+            `${Self.name}:${fieldName}[${fn.name || "anonymous"}]`;
+          fieldDataGeneratorsByFieldName[fieldName] =
+            fieldDataGeneratorsByFieldName[fieldName] || [];
+          fieldDataGeneratorsByFieldName[fieldName].push(fn);
+        };
+        const recurseDataGeneratorsForField = fieldName => {
+          const fn = (parsedResolveInfoFragment, ...rest) => {
+            const { fields } = parsedResolveInfoFragment;
+            const results = [];
+            for (const alias of Object.keys(fields)) {
+              const field = fields[alias];
+              // 1. XXX: Get the type for this field
+              const Type = Self._fields[fieldName].type;
+              const StrippedType = stripNonNullType(
+                stripListType(stripNonNullType(Type))
+              );
+              if (!Type) {
+                throw new Error(
+                  `Could not find type for field '${field.name}' of '${finalSpec.name}'`
+                );
+              }
+              // 2. Get the generators for that type
+              const fieldDataGenerators =
+                fieldDataGeneratorsByType.get(StrippedType) || {};
+              // 3. Run them with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
+              if (fieldDataGenerators) {
+                for (const alias of Object.keys(fields)) {
+                  const field = fields[alias];
+                  const gens = fieldDataGenerators[field.name];
+                  if (gens) {
+                    for (const gen of gens) {
+                      const local = ensureArray(gen(field, ...rest));
+                      results.push(...local);
+                    }
+                  }
+                }
+              }
+            }
+            return results;
+          };
+          fn.displayName = `recurseDataGeneratorsForField(${Self.name}:${fieldName})`;
+          addDataGeneratorForField(fieldName, fn);
+          // get type from field, get
         };
 
         newSpec = builder.applyHooks(this, "objectType", newSpec, {
           scope,
           addDataGeneratorForField,
+          recurseDataGeneratorsForField,
         });
 
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
-          fields: () =>
-            builder.applyHooks(this, "objectType:fields", rawSpec.fields, {
+          fields: () => {
+            const fieldsContext = {
               scope,
+              addDataGeneratorForField,
+              recurseDataGeneratorsForField,
               Self,
               objectType: rawSpec,
               buildFieldWithHooks: (fieldName, spec, scope = {}) => {
@@ -71,35 +135,22 @@ module.exports = function makeNewBuild(builder) {
                     return addDataGeneratorForField(fieldName, fn);
                   },
                   addArgDataGenerator(fn) {
-                    if (
-                      ["development", "test"].includes(process.env.NODE_ENV)
-                    ) {
-                      if (!fn.displayName && !fn.name) {
-                        console.trace(
-                          "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
-                        );
-                      }
-                    }
+                    ensureName(fn);
                     argDataGenerators.push(fn);
                   },
                   getDataFromParsedResolveInfoFragment(
                     parsedResolveInfoFragment
                   ) {
                     const data = {};
-                    const mergeData = results => {
+                    const mergeData = (gen, arg) => {
+                      const results = ensureArray(gen(arg, data));
                       if (!results) {
                         return;
-                      }
-                      if (!Array.isArray(results)) {
-                        results = [results];
                       }
                       for (const result of results) {
                         for (const k of Object.keys(result)) {
                           data[k] = data[k] || [];
-                          if (!Array.isArray(result[k])) {
-                            throw new Error("Data must be an array");
-                          }
-                          data[k].push(...result[k]);
+                          data[k].push(...ensureArray(result[k]));
                         }
                       }
                     };
@@ -109,7 +160,7 @@ module.exports = function makeNewBuild(builder) {
                     // Args -> argDataGenerators
                     for (const gen of argDataGenerators) {
                       try {
-                        mergeData(gen(args, data));
+                        mergeData(gen, args);
                       } catch (e) {
                         console.error(
                           `Failed to execute argDataGenerator '${gen.displayName ||
@@ -136,7 +187,7 @@ module.exports = function makeNewBuild(builder) {
                         const gens = fieldDataGenerators[field.name];
                         if (gens) {
                           for (const gen of gens) {
-                            mergeData(gen(field));
+                            mergeData(gen, field);
                           }
                         }
                       }
@@ -162,18 +213,30 @@ module.exports = function makeNewBuild(builder) {
                 const finalSpec = newSpec;
                 return finalSpec;
               },
-            }),
+            };
+            let rawFields = rawSpec.fields;
+            if (typeof rawFields === "function") {
+              rawFields = rawFields(fieldsContext);
+            }
+            return builder.applyHooks(
+              this,
+              "objectType:fields",
+              rawFields,
+              fieldsContext
+            );
+          },
         });
       }
+      const finalSpec = newSpec;
 
       const Self = new Type(newSpec);
-      if (newSpec.name) {
-        if (allTypes[newSpec.name]) {
+      if (finalSpec.name) {
+        if (allTypes[finalSpec.name]) {
           throw new Error(
-            `Type '${newSpec.name}' has already been registered!`
+            `Type '${finalSpec.name}' has already been registered!`
           );
         }
-        allTypes[newSpec.name] = Self;
+        allTypes[finalSpec.name] = Self;
       }
       fieldDataGeneratorsByType.set(Self, fieldDataGeneratorsByFieldName);
       return Self;

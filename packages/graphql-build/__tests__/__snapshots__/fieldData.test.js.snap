@@ -6,6 +6,7 @@ exports[`generated schema 1`] = `
 type Dummy {
   id: String!
   caps: String!
+  random: Int!
 }
 
 type DummyConnection {
@@ -37,28 +38,28 @@ Object {
     "dummyConnection": Object {
       "edges": Array [
         Object {
-          "cursor": null,
+          "cursor": "0",
           "node": Object {
             "caps": "FOO",
             "id": "foo",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "1",
           "node": Object {
             "caps": "BAR",
             "id": "bar",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "2",
           "node": Object {
             "caps": "BAZ",
             "id": "baz",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "3",
           "node": Object {
             "caps": "QUX",
             "id": "qux",
@@ -94,28 +95,28 @@ Object {
     "dummyConnection": Object {
       "edges": Array [
         Object {
-          "cursor": null,
+          "cursor": "WyJiYXIiXQ==",
           "node": Object {
             "caps": "BAR",
             "id": "bar",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "WyJiYXoiXQ==",
           "node": Object {
             "caps": "BAZ",
             "id": "baz",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "WyJmb28iXQ==",
           "node": Object {
             "caps": "FOO",
             "id": "foo",
           },
         },
         Object {
-          "cursor": null,
+          "cursor": "WyJxdXgiXQ==",
           "node": Object {
             "caps": "QUX",
             "id": "qux",

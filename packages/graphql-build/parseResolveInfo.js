@@ -115,3 +115,5 @@ function firstKey(obj) {
 }
 
 module.exports = parseFields;
+parseFields.stripNonNullType = stripNonNullType;
+parseFields.stripListType = stripListType;
