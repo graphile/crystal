@@ -65,6 +65,11 @@ module.exports = function makeNewBuild(builder) {
       return Object.assign({}, obj, obj2);
     },
     buildObjectWithHooks(Type, spec, scope = {}) {
+      if (!this.buildObjectWithHooks || !Object.isFrozen(this)) {
+        throw new Error(
+          "Please do not generate the schema during the build building phase, use 'init' instead"
+        );
+      }
       const fieldDataGeneratorsByFieldName = {};
       let newSpec = spec;
       if (!knownTypes.includes(Type) && knownTypeNames.includes(Type.name)) {

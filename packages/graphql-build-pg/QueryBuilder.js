@@ -49,6 +49,10 @@ class QueryBuilder {
 
   // ----------------------------------------
 
+  getTableAlias() {
+    this.lock("from");
+    this.from[1];
+  }
   getOrderByExpressionsAndDirections() {
     this.lockedOrderBy = true;
     return this.orderBy;

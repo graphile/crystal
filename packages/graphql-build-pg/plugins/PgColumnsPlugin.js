@@ -1,29 +1,29 @@
-module.exports = function PgColumnsPlugin(listener) {
-  listener.on(
+const { GraphQLNonNull, GraphQLString } = require("graphql");
+const nullableIf = (condition, Type) =>
+  condition ? Type : new GraphQLNonNull(Type);
+module.exports = function PgColumnsPlugin(
+  builder,
+  { pgInflection: inflection }
+) {
+  builder.hook(
     "objectType:fields",
     (
       fields,
       {
-        inflection,
         extend,
-        pg: {
-          gqlTypeByTypeId,
-          introspectionResultsByKind,
-          sqlFragmentGeneratorsByClassIdAndFieldName,
-          sql,
-        },
+        pgGqlTypeByTypeId: gqlTypeByTypeId,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
+        parseResolveInfo,
       },
-      { scope }
-    ) => {
-      if (
-        !scope.pg ||
-        !scope.pg.isRowType ||
-        !scope.pg.introspection ||
-        scope.pg.introspection.kind !== "class"
-      ) {
-        return;
+      {
+        scope: { isPgRowType, pgIntrospection: table },
+        addDataGeneratorForField,
       }
-      const table = scope.pg.introspection;
+    ) => {
+      if (!isPgRowType || !table || table.kind !== "class") {
+        return fields;
+      }
       return extend(
         fields,
         introspectionResultsByKind.attribute
@@ -40,16 +40,21 @@ module.exports = function PgColumnsPlugin(listener) {
                 isNotNull: false,
                 hasDefault: false }
             */
-            const fieldName = inflection.field(`${attr.name}`);
-            sqlFragmentGeneratorsByClassIdAndFieldName[table.id][fieldName] = (
-              resolveInfoFragment,
-              { tableAlias }
-            ) => [
-              {
-                alias: resolveInfoFragment.alias,
-                sqlFragment: sql.identifier(tableAlias, attr.name),
-              },
-            ];
+            const fieldName = inflection.column(
+              attr.name,
+              table.name,
+              table.namespace.name
+            );
+            addDataGeneratorForField(fieldName, ({ alias }) => {
+              return {
+                pgQuery: queryBuilder => {
+                  queryBuilder.select(
+                    sql.identifier(queryBuilder.getTableAlias(), attr.name),
+                    alias
+                  );
+                },
+              };
+            });
             memo[fieldName] = {
               type: nullableIf(
                 !attr.isNotNull,

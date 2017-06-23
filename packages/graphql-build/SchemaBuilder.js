@@ -13,6 +13,11 @@ class SchemaBuilder {
       // all hooks, hook the 'build' event to extend this object:
       build: [],
 
+      // 'build' phase should not generate any GraphQL objects (because the
+      // build object isn't finalised yet so it risks weirdness occurring); so
+      // if you need to set up any global types you can do so here.
+      init: [],
+
       // Add 'query', 'mutation' or 'subscription' types in this hook:
       schema: [],
 
@@ -97,6 +102,7 @@ class SchemaBuilder {
       Object.keys(build).filter(key => typeof build[key] === "function")
     );
     Object.freeze(build);
+    this.applyHooks(build, "init", null);
     return build;
   }
 }
