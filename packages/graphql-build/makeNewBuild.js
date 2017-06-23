@@ -1,6 +1,15 @@
-const { GraphQLSchema, GraphQLObjectType } = require("graphql");
+const {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLEnumType,
+} = require("graphql");
 const parseResolveInfo = require("./parseResolveInfo");
 const { stripNonNullType, stripListType } = parseResolveInfo;
+const isString = require("lodash/isString");
+
+const knownTypes = [GraphQLSchema, GraphQLObjectType, GraphQLEnumType];
+const knownTypeNames = knownTypes.map(k => k.name);
 
 const ensureArray = val =>
   val == null ? val : Array.isArray(val) ? val : [val];
@@ -58,6 +67,11 @@ module.exports = function makeNewBuild(builder) {
     buildObjectWithHooks(Type, spec, scope = {}) {
       const fieldDataGeneratorsByFieldName = {};
       let newSpec = spec;
+      if (!knownTypes.includes(Type) && knownTypeNames.includes(Type.name)) {
+        throw new Error(
+          `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
+        );
+      }
       if (Type === GraphQLSchema) {
         newSpec = builder.applyHooks(this, "schema", newSpec, {
           scope,
