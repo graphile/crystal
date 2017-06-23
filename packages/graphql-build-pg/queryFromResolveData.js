@@ -1,6 +1,6 @@
 const QueryBuilder = require("./QueryBuilder");
 
-module.exports = (from, fromAlias, resolveData) => {
+module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
   const { pgQuery } = resolveData;
 
   const queryBuilder = new QueryBuilder();
@@ -8,6 +8,9 @@ module.exports = (from, fromAlias, resolveData) => {
   for (const fn of pgQuery || []) {
     fn(queryBuilder);
   }
-  const query = queryBuilder.build();
+  if (withBuilder) {
+    withBuilder(queryBuilder);
+  }
+  const query = queryBuilder.build(options);
   return query;
 };

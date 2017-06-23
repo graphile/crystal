@@ -29,6 +29,15 @@ exports.defaultInflection = {
         .join("-and-")}`
     );
   },
+  manyRelationByKeys(detailedKeys, table, schema) {
+    return camelcase(
+      `${this.pluralize(
+        this.tableName(schema, table)
+      )}-by-${detailedKeys
+        .map(key => this.column(key.schema, key.table, key.column))
+        .join("-and-")}`
+    );
+  },
   edge(typeName) {
     return upperFirst(camelcase(`${typeName}-edge`));
   },

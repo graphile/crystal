@@ -4,9 +4,9 @@ exports.defaultPlugins = [
   require("./plugins/PgTablesPlugin"),
   require("./plugins/PgAllRows"),
   require("./plugins/PgColumnsPlugin"),
+  require("./plugins/PgForwardRelationPlugin"),
   //require("./plugins/PgRowByUniqueConstraint"),
   //require("./plugins/PgComputedColumnsPlugin"),
-  //require("./plugins/PgForwardRelationPlugin"),
   //require("./plugins/PgBackwardRelationPlugin"),
   //require("./plugins/PgConnectionArgs"),
 ];
