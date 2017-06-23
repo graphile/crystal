@@ -77,11 +77,6 @@ module.exports = function PgForwardRelationPlugin(
             throw new Error("Could not find key columns!");
           }
 
-          /*
-          const fieldName = inflection.field(
-            `${foreignTable.name}-by-${keys.map(k => k.name).join("-and-")}`
-          );
-          */
           const simpleKeys = keys.map(k => ({
             column: k.name,
             table: k.class.name,
@@ -96,7 +91,7 @@ module.exports = function PgForwardRelationPlugin(
           memo[
             fieldName
           ] = buildFieldWithHooks(
-            "fieldName",
+            fieldName,
             ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
               addDataGenerator(parsedResolveInfoFragment => {
                 return {

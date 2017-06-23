@@ -1,30 +1,22 @@
-module.exports = function PgComputedColumnsPlugin(listener) {
-  listener.on(
+module.exports = function PgComputedColumnsPlugin(
+  builder,
+  { pgInflection: inflection }
+) {
+  builder.hook(
     "objectType:fields",
     (
       fields,
       {
-        inflection,
         extend,
-        pg: {
-          introspectionResultsByKind,
-          sqlFragmentGeneratorsByClassIdAndFieldName,
-          sql,
-          gqlTypeByTypeId,
-          generateFieldFragments,
-        },
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
+        pgGqlTypeByTypeId: gqlTypeByTypeId,
       },
-      { scope }
+      { scope: { isPgRowType, pgIntrospection: table } }
     ) => {
-      if (
-        !scope.pg ||
-        !scope.pg.isRowType ||
-        !scope.pg.introspection ||
-        scope.pg.introspection.kind !== "class"
-      ) {
-        return;
+      if (!isPgRowType || !table || table.kind !== "class") {
+        return fields;
       }
-      const table = scope.pg.introspection;
       const tableType = introspectionResultsByKind.type.filter(
         type =>
           type.type === "c" &&
@@ -35,6 +27,8 @@ module.exports = function PgComputedColumnsPlugin(listener) {
       if (!tableType) {
         throw new Error("Could not determine the type for this table");
       }
+      // NOT FINISHED!!!
+---------------------------------------
       return extend(
         fields,
         introspectionResultsByKind.procedure

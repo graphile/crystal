@@ -1,34 +1,33 @@
-module.exports = function PgBackwardRelationPlugin(listener) {
-  listener.on(
+const debug = require("debug")("graphql-build-pg");
+const queryFromResolveData = require("../queryFromResolveData");
+const nullableIf = (condition, Type) =>
+  condition ? Type : new GraphQLNonNull(Type);
+const { GraphQLNonNull } = require("graphql");
+
+module.exports = function PgBackwardRelationPlugin(
+  builder,
+  { pgInflection: inflection }
+) {
+  builder.hook(
     "objectType:fields",
     (
       fields,
       {
-        inflection,
         extend,
-        pg: {
-          gqlTypeByTypeId,
-          gqlTypeByClassId,
-          gqlConnectionTypeByClassId,
-          introspectionResultsByKind,
-          sqlFragmentGeneratorsByClassIdAndFieldName,
-          sql,
-          generateFieldFragments,
-        },
+        getTypeByName,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
+        parseResolveInfo,
       },
-      { scope }
+      {
+        scope: { isPgRowType, pgIntrospection: foreignTable },
+        buildFieldWithHooks,
+      }
     ) => {
-      if (
-        !scope.pg ||
-        !scope.pg.isRowType ||
-        !scope.pg.introspection ||
-        scope.pg.introspection.kind !== "class"
-      ) {
-        return;
+      if (!isPgRowType || !foreignTable || foreignTable.kind !== "class") {
+        return fields;
       }
       // This is a relation in which WE are foreign
-      const foreignTable = scope.pg.introspection;
-
       const foreignKeyConstraints = introspectionResultsByKind.constraint
         .filter(con => ["f"].includes(con.type))
         .filter(con => con.foreignClassId === foreignTable.id);
@@ -39,36 +38,38 @@ module.exports = function PgBackwardRelationPlugin(listener) {
       return extend(
         fields,
         foreignKeyConstraints.reduce((memo, constraint) => {
-          const gqlTableType = gqlTypeByClassId[constraint.classId];
+          const table =
+            introspectionResultsByKind.classById[constraint.classId];
+          const gqlTableType = getTypeByName(
+            inflection.tableType(table.name, table.namespace.name)
+          );
           if (!gqlTableType) {
-            console.warn(
+            debug(
               `Could not determine type for table with id ${constraint.classId}`
             );
             return memo;
           }
-          const gqlForeignTableType =
-            gqlTypeByClassId[constraint.foreignClassId];
+          const foreignTable =
+            introspectionResultsByKind.classById[constraint.foreignClassId];
+          const gqlForeignTableType = getTypeByName(
+            inflection.tableType(foreignTable.name, foreignTable.namespace.name)
+          );
           if (!gqlForeignTableType) {
-            console.warn(
+            debug(
               `Could not determine type for foreign table with id ${constraint.foreignClassId}`
             );
             return memo;
           }
-          const table = introspectionResultsByKind.class.filter(
-            cls => cls.id === constraint.classId
-          )[0];
           if (!table) {
             throw new Error(
               `Could not find the table that referenced us (constraint: ${constraint.name})`
             );
           }
-          const schema = introspectionResultsByKind.namespace.filter(
-            n => n.id === table.namespaceId
-          )[0];
+          const schema = table.namespace;
 
-          const attributes = introspectionResultsByKind.attribute
-            .filter(attr => attr.classId === constraint.classId)
-            .sort((a, b) => a.num - b.num);
+          const attributes = introspectionResultsByKind.attribute.filter(
+            attr => attr.classId === constraint.classId
+          );
 
           const keys = constraint.keyAttributeNums.map(
             num => attributes.filter(attr => attr.num === num)[0]
@@ -80,82 +81,72 @@ module.exports = function PgBackwardRelationPlugin(listener) {
             throw new Error("Could not find key columns!");
           }
 
-          const fieldName = inflection.field(
-            `${pluralize(table.name)}-by-${keys.map(k => k.name).join("-and-")}`
+          const simpleKeys = keys.map(k => ({
+            column: k.name,
+            table: k.class.name,
+            schema: k.class.namespace.name,
+          }));
+          const fieldName = inflection.manyRelationByKeys(
+            simpleKeys,
+            table.name,
+            table.namespace.name
           );
 
-          sqlFragmentGeneratorsByClassIdAndFieldName[foreignTable.id][
+          memo[
             fieldName
-          ] = (
-            parsedResolveInfoFragment,
-            { tableAlias: foreignTableAlias }
-          ) => {
-            const tableAlias = Symbol();
-            const conditions = keys.map(
-              (key, i) =>
-                sql.fragment`${sql.identifier(
-                  tableAlias,
-                  key.name
-                )} = ${sql.identifier(foreignTableAlias, foreignKeys[i].name)}`
-            );
-            const fragments = generateFieldFragments(
-              parsedResolveInfoFragment,
-              sqlFragmentGeneratorsByClassIdAndFieldName[table.id],
-              { tableAlias }
-            );
-            const primaryKeyConstraint = introspectionResultsByKind.constraint
-              .filter(con => con.classId === table.id)
-              .filter(con => ["p"].includes(con.type))[0];
-            const attributes = introspectionResultsByKind.attribute
-              .filter(attr => attr.classId === table.id)
-              .sort((a, b) => a.num - b.num);
-            const primaryKeys =
-              primaryKeyConstraint &&
-              primaryKeyConstraint.keyAttributeNums.map(
-                num => attributes.filter(attr => attr.num === num)[0]
-              );
-            return [
-              {
-                alias: parsedResolveInfoFragment.alias,
-                sqlFragment: sql.fragment`
-                  (
-                    select json_agg(${sqlJsonBuildObjectFromFragments(
-                      fragments
-                    )})
-                    from ${sql.identifier(
-                      schema.name,
-                      table.name
-                    )} as ${sql.identifier(tableAlias)}
-                    where (${sql.join(conditions, ") and (")})
-                    order by ${primaryKeys
-                      ? sql.join(
-                          primaryKeys.map(
-                            key =>
+          ] = buildFieldWithHooks(
+            fieldName,
+            ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+              addDataGenerator(parsedResolveInfoFragment => {
+                return {
+                  pgQuery: queryBuilder => {
+                    queryBuilder.select(() => {
+                      const resolveData = getDataFromParsedResolveInfoFragment(
+                        parsedResolveInfoFragment
+                      );
+                      const tableAlias = Symbol();
+                      const foreignTableAlias = queryBuilder.getTableAlias();
+                      const query = queryFromResolveData(
+                        sql.identifier(schema.name, table.name),
+                        tableAlias,
+                        resolveData,
+                        { asJsonAggregate: true },
+                        innerQueryBuilder => {
+                          keys.forEach((key, i) => {
+                            innerQueryBuilder.where(
                               sql.fragment`${sql.identifier(
                                 tableAlias,
                                 key.name
-                              )} asc`
-                          ),
-                          ", "
-                        )
-                      : sql.literal(1)}
-                  )
-                `,
-              },
-            ];
-          };
-          memo[fieldName] = {
-            type: nullableIf(
-              !keys.every(key => key.isNotNull),
-              gqlConnectionTypeByClassId[table.id]
-            ),
-            resolve: (data, _args, _context, resolveInfo) => {
-              const { alias } = parseResolveInfo(resolveInfo, {
-                deep: false,
+                              )} = ${sql.identifier(
+                                foreignTableAlias,
+                                foreignKeys[i].name
+                              )}`
+                            );
+                          });
+                        }
+                      );
+                      return sql.fragment`(${query})`;
+                    }, parsedResolveInfoFragment.alias);
+                  },
+                };
               });
-              return data[alias];
-            },
-          };
+              const ConnectionType = getTypeByName(
+                inflection.connection(gqlTableType.name)
+              );
+              return {
+                type: nullableIf(
+                  !keys.every(key => key.isNotNull),
+                  ConnectionType
+                ),
+                resolve: (data, _args, _context, resolveInfo) => {
+                  const { alias } = parseResolveInfo(resolveInfo, {
+                    deep: false,
+                  });
+                  return data[alias];
+                },
+              };
+            }
+          );
           return memo;
         }, {})
       );

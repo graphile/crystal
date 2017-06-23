@@ -66,19 +66,26 @@ class QueryBuilder {
       ", "
     );
   }
-  buildSelectJson() {
-    return sql.fragment`json_build_object(${sql.join(
+  buildSelectJson(aggregate = false) {
+    const buildObject = sql.fragment`json_build_object(${sql.join(
       this.select.map(
         ({ sqlFragment, alias }) =>
           sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
       ),
       ", "
     )})`;
+    if (aggregate) {
+      return sql.fragment`json_agg(${buildObject})`;
+    } else {
+      return buildObject;
+    }
   }
-  build({ asJson = false } = {}) {
+  build({ asJson = false, asJsonAggregate = false } = {}) {
     this.lockEverything();
     return sql.fragment`
-      select ${asJson ? this.buildSelectJson() : this.buildSelectFields()}
+      select ${asJson || asJsonAggregate
+        ? this.buildSelectJson(asJsonAggregate)
+        : this.buildSelectFields()}
       ${this.from &&
         sql.fragment`from ${this.from[0]} as ${sql.identifier(this.from[1])}`}
       ${this.join && sql.join(this.join, " ")}
