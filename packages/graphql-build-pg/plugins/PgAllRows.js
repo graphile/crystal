@@ -1,5 +1,6 @@
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 const { GraphQLInt, GraphQLEnumType } = require("graphql");
+const queryFromResolveData = require("../queryFromResolveData");
 
 module.exports = async function PgAllRows(
   builder,
@@ -48,7 +49,11 @@ module.exports = async function PgAllRows(
             const fieldName = inflection.allRows(table.name, schema.name);
             memo[fieldName] = buildFieldWithHooks(
               fieldName,
-              ({ addArgDataGenerator }) => {
+              ({
+                addArgDataGenerator,
+                getDataFromParsedResolveInfoFragment,
+                parseResolveInfo,
+              }) => {
                 addArgDataGenerator(function connectionDefaultArgs({
                   first,
                   sortBy,
@@ -151,52 +156,6 @@ module.exports = async function PgAllRows(
                       Symbol(),
                       resolveData
                     );
-
-                    /*
-                    const { alias, fields } = parsedResolveInfoFragment;
-                    const tableAlias = Symbol();
-                    const fragments = generateFieldFragments(
-                      parsedResolveInfoFragment,
-                      sqlFragmentGeneratorsForConnectionByClassId[table.id],
-                      { tableAlias }
-                    );
-                    const sqlFields = sql.join(
-                      fragments.map(
-                        ({ sqlFragment, alias }) =>
-                          sql.fragment`${sqlFragment} as ${sql.identifier(
-                            alias
-                          )}`
-                      ),
-                      ", "
-                    );
-                    const primaryKeyConstraint = introspectionResultsByKind.constraint
-                      .filter(con => con.classId === table.id)
-                      .filter(con => ["p"].includes(con.type))[0];
-                    const attributes = introspectionResultsByKind.attribute
-                      .filter(attr => attr.classId === table.id)
-                      .sort((a, b) => a.num - b.num);
-                    const primaryKeys =
-                      primaryKeyConstraint &&
-                      primaryKeyConstraint.keyAttributeNums.map(
-                        num => attributes.filter(attr => attr.num === num)[0]
-                      );
-                    const query = sql.query`
-                    select ${sqlFields}
-                    from ${sqlFullTableName} as ${sql.identifier(tableAlias)}
-                    order by ${primaryKeys
-                      ? sql.join(
-                          primaryKeys.map(
-                            key =>
-                              sql.fragment`${sql.identifier(
-                                tableAlias,
-                                key.name
-                              )} asc`
-                          ),
-                          ", "
-                        )
-                      : sql.literal(1)}
-                  `;
-                  */
                     const { text, values } = sql.compile(query);
                     console.log(text);
                     const { rows } = await pgClient.query(text, values);
@@ -207,11 +166,6 @@ module.exports = async function PgAllRows(
               {
                 pg: {
                   isConnection: true,
-                  addClauseForArg: (arg, clauseType, fragGen) => {
-                    clauses[arg] = clauses[arg] || {};
-                    clauses[arg][clauseType] = clauses[arg][clauseType] || [];
-                    clauses[arg][clauseType].push(fragGen);
-                  },
                 },
               }
             );

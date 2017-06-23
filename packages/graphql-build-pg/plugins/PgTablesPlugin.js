@@ -36,14 +36,7 @@ module.exports = function PgTablesPlugin(
         GraphQLObjectType,
         {
           name: inflection.tableType(table.name, schema.name),
-          fields: {
-            placeholder: {
-              type: GraphQLString,
-              resolve() {
-                return "REMOVE ME";
-              },
-            },
-          },
+          fields: {},
         },
         {
           pgIntrospection: table,
