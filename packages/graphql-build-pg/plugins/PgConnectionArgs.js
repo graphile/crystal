@@ -23,9 +23,11 @@ module.exports = function PgConnectionArgs(
         inflection.tableType(table.name, table.namespace.name)
       );
       const TableOrderByType = inflection.orderByType(TableType.name);
+      const TableConditionType = inflection.conditionType(TableType.name);
 
       addArgDataGenerator(function connectionDefaultArgs({
         first,
+        last,
         orderBy,
         after,
       }) {
@@ -33,6 +35,9 @@ module.exports = function PgConnectionArgs(
           pgQuery: queryBuilder => {
             if (first != null) {
               queryBuilder.limit(first);
+            }
+            if (last != null) {
+              throw new Error("We don't support last yet");
             }
             if (orderBy != null) {
               queryBuilder.orderBy(...orderBy);
@@ -88,10 +93,16 @@ module.exports = function PgConnectionArgs(
         first: {
           type: GraphQLInt,
         },
+        last: {
+          type: GraphQLInt,
+        },
         after: {
           type: Cursor,
         },
         /*
+        condition: {
+          type: TableConditionType,
+        },
         orderBy: {
           type: TableOrderByType,
         },

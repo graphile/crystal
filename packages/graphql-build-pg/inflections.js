@@ -7,6 +7,9 @@ exports.defaultInflection = {
   orderByType(typeName) {
     return upperFirst(camelcase(`${typeName}-order-by`));
   },
+  conditionType(typeName) {
+    return upperFirst(camelcase(`${typeName}-condition`));
+  },
   tableName(name, _schema) {
     return camelcase(name);
   },
