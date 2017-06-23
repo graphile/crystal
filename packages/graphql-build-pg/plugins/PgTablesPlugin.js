@@ -1,4 +1,9 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLList } = require("graphql");
+const {
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLEnumType,
+} = require("graphql");
 
 module.exports = function PgTablesPlugin(
   builder,
@@ -41,6 +46,24 @@ module.exports = function PgTablesPlugin(
           {
             pgIntrospection: table,
             isPgRowType: true,
+          }
+        );
+        /* const TableOrderByType = */
+        buildObjectWithHooks(
+          GraphQLEnumType,
+          {
+            name: inflection.orderByType(TableType.name),
+            values: {
+              NATURAL: {
+                name: "NATURAL",
+                value: null,
+              },
+              // XXX: add the (indexed?) columns
+            },
+          },
+          {
+            pgIntrospection: table,
+            isPgRowSortEnum: true,
           }
         );
 

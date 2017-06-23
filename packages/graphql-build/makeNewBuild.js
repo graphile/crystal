@@ -224,6 +224,7 @@ module.exports = function makeNewBuild(builder) {
                   newSpec = newSpec(context);
                 }
                 newSpec = builder.applyHooks(this, "field", newSpec, context);
+                newSpec.args = newSpec.args || {};
                 newSpec = Object.assign({}, newSpec, {
                   args: builder.applyHooks(
                     this,
@@ -231,6 +232,7 @@ module.exports = function makeNewBuild(builder) {
                     newSpec.args,
                     Object.assign({}, context, {
                       field: newSpec,
+                      resultType: newSpec.type,
                     })
                   ),
                 });

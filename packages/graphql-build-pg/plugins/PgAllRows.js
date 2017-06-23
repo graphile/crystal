@@ -1,4 +1,3 @@
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 const { GraphQLInt, GraphQLEnumType } = require("graphql");
 const queryFromResolveData = require("../queryFromResolveData");
 
@@ -22,7 +21,6 @@ module.exports = async function PgAllRows(
       if (!isRootQuery) {
         return fields;
       }
-      const Cursor = getTypeByName("Cursor");
       return extend(
         fields,
         introspectionResultsByKind.class.reduce((memo, table) => {
@@ -54,96 +52,9 @@ module.exports = async function PgAllRows(
                 getDataFromParsedResolveInfoFragment,
                 parseResolveInfo,
               }) => {
-                addArgDataGenerator(function connectionDefaultArgs({
-                  first,
-                  sortBy,
-                  after,
-                }) {
-                  return {
-                    pgQuery: queryBuilder => {
-                      if (first != null) {
-                        queryBuilder.limit(first);
-                      }
-                      if (sortBy != null) {
-                        queryBuilder.orderBy(...sortBy);
-                      }
-                      if (after != null) {
-                        const cursor = after;
-                        const cursorValues = JSON.parse(base64Decode(cursor));
-                        queryBuilder.where(() => {
-                          const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
-                          if (
-                            cursorValues.length !=
-                            orderByExpressionsAndDirections.length
-                          ) {
-                            throw new Error("Invalid cursor");
-                          }
-                          let sqlFilter = sql.fragment`false`;
-                          for (
-                            let i = orderByExpressionsAndDirections.length - 1;
-                            i >= 0;
-                            i--
-                          ) {
-                            const [
-                              sqlExpression,
-                              ascending,
-                            ] = orderByExpressionsAndDirections[i];
-                            const cursorValue = cursorValues[i];
-                            const comparison = ascending
-                              ? sql.fragment`>`
-                              : sql.fragment`<`;
-
-                            const sqlOldFilter = sqlFilter;
-                            sqlFilter = sql.fragment`
-                              (
-                                (${sqlExpression} ${comparison} ${sql.value(
-                              cursorValue
-                            )})
-                              OR
-                                (
-                                  (${sqlExpression} = ${sql.value(cursorValue)})
-                                AND
-                                  ${sqlOldFilter}
-                                )
-                              )
-                              `;
-                          }
-                          return sqlFilter;
-                        });
-                      }
-                    },
-                  };
-                });
                 return {
                   type: ConnectionType,
-                  args: {
-                    first: {
-                      type: GraphQLInt,
-                    },
-                    after: {
-                      type: Cursor,
-                    },
-                    // XXX: move me to my own plugin
-                    sortBy: {
-                      type: buildObjectWithHooks(
-                        GraphQLEnumType,
-                        {
-                          name: inflection.sort(TableType.name),
-                          values: {
-                            NATURAL: {
-                              name: "NATURAL",
-                              value: null,
-                            },
-                            // XXX: add the (indexed?) columns
-                          },
-                        },
-                        {
-                          pgIntrospection: table,
-                          isPgRowSortEnum: true,
-                        }
-                      ),
-                    },
-                  },
+                  args: {},
                   async resolve(parent, args, { pgClient }, resolveInfo) {
                     const parsedResolveInfoFragment = parseResolveInfo(
                       resolveInfo
@@ -164,9 +75,8 @@ module.exports = async function PgAllRows(
                 };
               },
               {
-                pg: {
-                  isConnection: true,
-                },
+                isPgConnectionField: true,
+                pgIntrospection: table,
               }
             );
           }

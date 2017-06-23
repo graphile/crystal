@@ -4,8 +4,8 @@ const pluralize = require("pluralize");
 
 exports.defaultInflection = {
   pluralize,
-  sort(typeName) {
-    return upperFirst(camelcase(`${typeName}-sort-by`));
+  orderByType(typeName) {
+    return upperFirst(camelcase(`${typeName}-order-by`));
   },
   tableName(name, _schema) {
     return camelcase(name);
