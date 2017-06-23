@@ -1,10 +1,14 @@
 const withPgClient = require("../withPgClient");
+const promisify = require("util").promisify;
+const readFile = promisify(require("fs").readFile);
+const INTROSPECTION_PATH = `${__dirname}/../res/introspection-query.sql`;
+const sql = require("../sql");
 
 module.exports = async function PgIntrospectionPlugin(
-  listener,
+  builder,
   { pgConfig, pgSchemas: schemas }
 ) {
-  process.stdout.write(require("util").inspect(pgConfig));
+  //process.stdout.write(require("util").inspect(pgConfig));
   return withPgClient(pgConfig, async pgClient => {
     // Perform introspection
     if (!Array.isArray(schemas)) {
@@ -27,42 +31,61 @@ module.exports = async function PgIntrospectionPlugin(
         procedure: [],
       }
     );
+    const xByY = (arrayOfX, attrKey) =>
+      arrayOfX.reduce((memo, x) => {
+        memo[x[attrKey]] = x;
+        return memo;
+      }, {});
+    const xByYAndZ = (arrayOfX, attrKey, attrKey2) =>
+      arrayOfX.reduce((memo, x) => {
+        memo[x[attrKey]] = memo[x[attrKey]] || {};
+        memo[x[attrKey]][x[attrKey2]] = x;
+        return memo;
+      }, {});
+    introspectionResultsByKind.namespaceById = xByY(
+      introspectionResultsByKind.namespace,
+      "id"
+    );
+    introspectionResultsByKind.classById = xByY(
+      introspectionResultsByKind.class,
+      "id"
+    );
+    introspectionResultsByKind.typeById = xByY(
+      introspectionResultsByKind.type,
+      "id"
+    );
+    introspectionResultsByKind.attributeByClassIdAndNum = xByYAndZ(
+      introspectionResultsByKind.type,
+      "classId",
+      "num"
+    );
 
-    listener.on("context", (context, { extend }) => {
-      const sql = pgSQLBuilder;
-      return extend(context, {
-        pg: {
-          introspectionResultsByKind,
-          gqlTypeByClassId: {},
-          gqlEdgeTypeByClassId: {},
-          gqlConnectionTypeByClassId: {},
-          gqlTypeByTypeId: {},
-          sqlFragmentGeneratorsByClassIdAndFieldName: {},
-          sqlFragmentGeneratorsForConnectionByClassId: {},
-          sql,
-          generateFieldFragments(
-            parsedResolveInfoFragment,
-            sqlFragmentGenerators,
-            scope
-          ) {
-            const { fields } = parsedResolveInfoFragment;
-            const fragments = [];
-            for (const alias in fields) {
-              const spec = fields[alias];
-              const generator = sqlFragmentGenerators[spec.name];
-              if (generator) {
-                const generatedFrags = generator(spec, scope);
-                if (!Array.isArray(generatedFrags)) {
-                  throw new Error(
-                    "sqlFragmentGeneratorsByClassIdAndFieldName generators must generate arrays"
-                  );
-                }
-                fragments.push(...generatedFrags);
-              }
-            }
-            return fragments;
-          },
-        },
+    const relate = (array, newAttr, lookupAttr, lookup) => {
+      array.forEach(entry => {
+        const key = entry[lookupAttr];
+        const result = lookup[key];
+        entry[newAttr] = result;
+      });
+    };
+
+    relate(
+      introspectionResultsByKind.class,
+      "namespace",
+      "namespaceId",
+      introspectionResultsByKind.namespaceById
+    );
+
+    relate(
+      introspectionResultsByKind.class,
+      "type",
+      "typeId",
+      introspectionResultsByKind.typeById
+    );
+
+    builder.hook("build", build => {
+      return build.extend(build, {
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
       });
     });
   });

@@ -12,7 +12,9 @@ const withPgClient = async (url, fn) => {
   let client;
   try {
     client = await pgPool.connect();
-    return fn(client);
+    // MUST await here, otherwise the release happens too early!
+    const result = await fn(client);
+    return result;
   } finally {
     try {
       await client.release();
