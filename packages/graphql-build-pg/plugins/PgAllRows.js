@@ -1,4 +1,3 @@
-const { GraphQLInt, GraphQLEnumType } = require("graphql");
 const queryFromResolveData = require("../queryFromResolveData");
 
 module.exports = async function PgAllRows(
@@ -10,7 +9,7 @@ module.exports = async function PgAllRows(
     (
       fields,
       {
-        buildObjectWithHooks,
+        parseResolveInfo,
         extend,
         getTypeByName,
         pgSql: sql,
@@ -43,15 +42,10 @@ module.exports = async function PgAllRows(
           const schema = table.namespace;
           const sqlFullTableName = sql.identifier(schema.name, table.name);
           if (TableType && ConnectionType) {
-            const clauses = {};
             const fieldName = inflection.allRows(table.name, schema.name);
             memo[fieldName] = buildFieldWithHooks(
               fieldName,
-              ({
-                addArgDataGenerator,
-                getDataFromParsedResolveInfoFragment,
-                parseResolveInfo,
-              }) => {
+              ({ getDataFromParsedResolveInfoFragment }) => {
                 return {
                   type: ConnectionType,
                   args: {},

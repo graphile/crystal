@@ -108,9 +108,7 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
       return gqlTypeByTypeId[type.id];
     };
 
-    build.pgIntrospectionResultsByKind.type
-      .filter(type => true)
-      .forEach(enforceGqlTypeByPgType);
+    build.pgIntrospectionResultsByKind.type.forEach(enforceGqlTypeByPgType);
 
     return build.extend(build, {
       pgGqlTypeByTypeId: gqlTypeByTypeId,

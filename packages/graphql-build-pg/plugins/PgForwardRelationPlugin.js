@@ -15,6 +15,7 @@ module.exports = function PgForwardRelationPlugin(
       {
         extend,
         getTypeByName,
+        parseResolveInfo,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
       },
