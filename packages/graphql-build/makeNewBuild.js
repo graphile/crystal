@@ -141,6 +141,11 @@ module.exports = function makeNewBuild(builder) {
               Self,
               objectType: rawSpec,
               buildFieldWithHooks: (fieldName, spec, scope = {}) => {
+                if (!isString(fieldName)) {
+                  throw new Error(
+                    "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
+                  );
+                }
                 let argDataGenerators = [];
 
                 let newSpec = spec;
