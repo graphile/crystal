@@ -2,7 +2,7 @@ exports.defaultPlugins = [
   require("./plugins/PgIntrospectionPlugin"),
   require("./plugins/PgTypesPlugin"),
   require("./plugins/PgTablesPlugin"),
-  //require("./plugins/PgAllRows"),
+  require("./plugins/PgAllRows"),
   //require("./plugins/PgRowByUniqueConstraint"),
   //require("./plugins/PgColumnsPlugin"),
   //require("./plugins/PgComputedColumnsPlugin"),

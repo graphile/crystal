@@ -1,4 +1,9 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLList } = require("graphql");
+const {
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLString,
+} = require("graphql");
 
 module.exports = function PgTablesPlugin(
   builder,
@@ -31,7 +36,14 @@ module.exports = function PgTablesPlugin(
         GraphQLObjectType,
         {
           name: inflection.tableType(table.name, schema.name),
-          fields: {},
+          fields: {
+            placeholder: {
+              type: GraphQLString,
+              resolve() {
+                return "REMOVE ME";
+              },
+            },
+          },
         },
         {
           pgIntrospection: table,
@@ -62,16 +74,17 @@ module.exports = function PgTablesPlugin(
             recurseDataGeneratorsForField("node");
             addDataGeneratorForField("cursor", () => {
               return {
-                pgSelect: ({ sortFields }) => {
-                  return [
-                    {
-                      sqlFragment: sql.fragment`encode(json_build_array(${sql.join(
-                        sortFields,
+                pgQuery: queryBuilder => {
+                  queryBuilder.select(
+                    () =>
+                      sql.fragment`encode(json_build_array(${sql.join(
+                        queryBuilder
+                          .getOrderByExpressionsAndDirections()
+                          .map(([field]) => field),
                         ","
                       )})::bytea, 'base64')`,
-                      alias: "__cursor",
-                    },
-                  ];
+                    "__cursor"
+                  );
                 },
               };
             });
@@ -98,7 +111,8 @@ module.exports = function PgTablesPlugin(
           pgIntrospection: table,
         }
       );
-      const ConnectionType = buildObjectWithHooks(
+      /*const ConnectionType = */
+      buildObjectWithHooks(
         GraphQLObjectType,
         {
           name: inflection.connection(TableType.name),

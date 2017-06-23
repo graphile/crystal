@@ -64,6 +64,11 @@ module.exports = async function PgIntrospectionPlugin(
       array.forEach(entry => {
         const key = entry[lookupAttr];
         const result = lookup[key];
+        if (key && !result) {
+          throw new Error(
+            `Could not look up '${newAttr}' by '${lookupAttr}' on '${entry}'`
+          );
+        }
         entry[newAttr] = result;
       });
     };

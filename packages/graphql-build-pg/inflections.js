@@ -1,9 +1,17 @@
 const upperFirst = require("lodash/upperFirst");
 const camelcase = require("lodash/camelcase");
+const pluralize = require("pluralize");
 
 exports.defaultInflection = {
+  pluralize,
+  sort(typeName) {
+    return upperFirst(camelcase(`${typeName}-sort-by`));
+  },
   tableName(name, _schema) {
     return camelcase(name);
+  },
+  allRows(name, schema) {
+    return camelcase(`all-${this.pluralize(this.tableName(name, schema))}`);
   },
   functionName(name, _schema) {
     return camelcase(name);
