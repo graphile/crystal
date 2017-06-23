@@ -24,17 +24,17 @@ exports.defaultInflection = {
   },
   singleRelationByKeys(detailedKeys, table, schema) {
     return camelcase(
-      `${this.tableName(schema, table)}-by-${detailedKeys
-        .map(key => this.column(key.schema, key.table, key.column))
+      `${this.tableName(table, schema)}-by-${detailedKeys
+        .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
   },
   manyRelationByKeys(detailedKeys, table, schema) {
     return camelcase(
       `${this.pluralize(
-        this.tableName(schema, table)
+        this.tableName(table, schema)
       )}-by-${detailedKeys
-        .map(key => this.column(key.schema, key.table, key.column))
+        .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
   },
