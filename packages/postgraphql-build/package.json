@@ -1,0 +1,16 @@
+{
+  "name": "postgraphql-build",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "scripts/test"
+  },
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "dependencies": {
+    "graphql-build": "0.0.0",
+    "graphql-build-pg": "0.0.0",
+    "jest": "20.0.4"
+  }
+}

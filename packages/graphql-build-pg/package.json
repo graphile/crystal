@@ -1,0 +1,43 @@
+{
+  "name": "graphql-build-pg",
+  "version": "0.0.0",
+  "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphql-build",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjie/graphql-build.git"
+  },
+  "keywords": [
+    "graphql",
+    "pg",
+    "postgres",
+    "postgresql",
+    "gql",
+    "generate",
+    "reflection",
+    "build",
+    "schema",
+    "apollo",
+    "relay",
+    "plugins",
+    "extensible"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjie/graphql-build/issues"
+  },
+  "homepage": "https://github.com/benjie/graphql-build#readme",
+  "dependencies": {
+    "debug": "^2.6.8",
+    "graphql-iso-date": "^3.2.0",
+    "graphql-type-json": "^0.1.4",
+    "pluralize": "^5.0.0"
+  },
+  "peerDependencies": {
+    "pg": ">=6 <7"
+  }
+}

@@ -1,0 +1,22 @@
+query {
+  a: personByEmail(email: "sara.smith@email.com") {
+    name
+    email
+  }
+  b: personByEmail(email: "does.not.exist@email.com") {
+    name
+    email
+  }
+  c: compoundKeyByPersonId1AndPersonId2(personId1: 1, personId2: 2) {
+    personId1
+    personId2
+  }
+  d: compoundKeyByPersonId1AndPersonId2(personId1: 4, personId2: 4) {
+    personId1
+    personId2
+  }
+  e: compoundKeyByPersonId1AndPersonId2(personId1: 1, personId2: 100) {
+    personId1
+    personId2
+  }
+}

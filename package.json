@@ -9,7 +9,14 @@
     "lerna": "^2.0.0-rc.5",
     "prettier": "^1.4.4"
   },
+  "scripts": {
+    "test": "jest"
+  },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
+  },
+  "dependencies": {
+    "graphql": "^0.10.3",
+    "pg": ">=6 < 7"
   }
 }
