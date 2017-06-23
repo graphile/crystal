@@ -4,7 +4,9 @@ const { StandardTypesPlugin, QueryPlugin } = require("./plugins");
 const getBuilder = async (plugins, options) => {
   const builder = new SchemaBuilder();
   for (const plugin of plugins) {
+    builder._setPluginName(plugin.displayName || plugin.name);
     await plugin(builder, options);
+    builder._setPluginName(null);
   }
   return builder;
 };

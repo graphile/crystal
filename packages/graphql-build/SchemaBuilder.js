@@ -37,6 +37,10 @@ class SchemaBuilder {
     };
   }
 
+  _setPluginName(name) {
+    this.currentPluginName = name;
+  }
+
   /*
    * Every hook `fn` takes three arguments:
    * - obj - the object currently being inspected
@@ -48,6 +52,12 @@ class SchemaBuilder {
   hook(hookName, fn) {
     if (!this.hooks[hookName]) {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
+    }
+    if (this.currentPluginName && !fn.displayName) {
+      fn.displayName = `${this
+        .currentPluginName}/${hookName}/${fn.displayName ||
+        fn.name ||
+        "anonymous"}`;
     }
     this.hooks[hookName].push(fn);
   }
@@ -74,7 +84,11 @@ class SchemaBuilder {
           );
           newObj = hook(newObj, build, context);
           if (!newObj) {
-            throw new Error(`Hook for '${hookName}' returned falsy value`);
+            throw new Error(
+              `Hook '${hook.displayName ||
+                hook.name ||
+                "anonymous"}' for '${hookName}' returned falsy value`
+            );
           }
           debug(
             `${INDENT.repeat(
