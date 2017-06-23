@@ -26,8 +26,7 @@
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "dependencies": {
     "dataloader": "^1.3.0",
-    "debug": ">=2",
-    "graphql": ">=0.9"
+    "debug": ">=2"
   },
   "engines": {
     "node": ">=8",
@@ -35,5 +34,8 @@
   },
   "devDependencies": {
     "jest": "^20.0.4"
+  },
+  "peerDependencies": {
+    "graphql": ">=0.9"
   }
 }
