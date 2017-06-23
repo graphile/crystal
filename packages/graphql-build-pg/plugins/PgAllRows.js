@@ -109,11 +109,6 @@ module.exports = async function PgAllRows(
                     },
                   };
                 });
-                process.stdout.write("======\n\n");
-                process.stdout.write(
-                  require("util").inspect(ConnectionType._typeConfig.fields())
-                );
-                process.stdout.write("======\n\n");
                 return {
                   type: ConnectionType,
                   args: {

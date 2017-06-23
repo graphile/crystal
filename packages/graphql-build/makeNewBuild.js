@@ -52,20 +52,6 @@ module.exports = function makeNewBuild(builder) {
       allTypes[type.name] = type;
     },
     getTypeByName(typeName) {
-      process.stdout.write(
-        require("util").inspect(allTypes[typeName], { showHidden: true })
-      );
-      process.stdout.write("\n^ getTypeByName\n");
-      process.stdout.write(
-        require("util").inspect(
-          new GraphQLObjectType({
-            name: "Foo",
-            fields: { hi: { type: GraphQLString } },
-          }).name,
-          { showHidden: true }
-        )
-      );
-      process.stdout.write("\n^ new object type\n");
       return allTypes[typeName];
     },
     extend(obj, obj2) {

@@ -8,7 +8,6 @@ module.exports = async function PgIntrospectionPlugin(
   builder,
   { pgConfig, pgSchemas: schemas }
 ) {
-  //process.stdout.write(require("util").inspect(pgConfig));
   return withPgClient(pgConfig, async pgClient => {
     // Perform introspection
     if (!Array.isArray(schemas)) {
