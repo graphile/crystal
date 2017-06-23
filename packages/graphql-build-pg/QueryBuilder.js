@@ -12,38 +12,40 @@ const callIfNecessary = o => {
 
 class QueryBuilder {
   constructor() {
-    this.select = [];
-    this.from = null;
-    this.join = [];
-    this.where = [];
-    this.orderBy = [];
-    this.limit = null;
-    this.offset = null;
+    this.data = {
+      select: [],
+      from: null,
+      join: [],
+      where: [],
+      orderBy: [],
+      limit: null,
+      offset: null,
+    };
   }
 
   // ----------------------------------------
 
   select(exprGen, alias) {
     this.checkLock("select");
-    this.select.push([exprGen, alias]);
+    this.data.select.push([exprGen, alias]);
   }
   from(expr, alias) {
     this.checkLock("from");
-    this.from = [expr, alias];
+    this.data.from = [expr, alias];
     this.lock("from");
   }
   // XXX: join
   where(exprGen) {
     this.checkLock("where");
-    this.where.push(exprGen);
+    this.data.where.push(exprGen);
   }
   orderBy(exprGen, ascending) {
     this.checkLock("orderBy");
-    this.orderBy.push([exprGen, ascending]);
+    this.data.orderBy.push([exprGen, ascending]);
   }
   limit(limit) {
     this.checkLock("limit");
-    this.limit = limit;
+    this.data.limit = limit;
     this.lock("limit");
   }
 
@@ -51,15 +53,15 @@ class QueryBuilder {
 
   getTableAlias() {
     this.lock("from");
-    this.from[1];
+    this.data.from[1];
   }
   getOrderByExpressionsAndDirections() {
-    this.lockedOrderBy = true;
-    return this.orderBy;
+    this.lock("orderBy");
+    return this.data.orderBy;
   }
   buildSelectFields() {
     return sql.join(
-      this.select.map(
+      this.data.select.map(
         ({ sqlFragment, alias }) =>
           sql.fragment`${sqlFragment} as ${sql.identifier(alias)}`
       ),
@@ -68,7 +70,7 @@ class QueryBuilder {
   }
   buildSelectJson(aggregate = false) {
     const buildObject = sql.fragment`json_build_object(${sql.join(
-      this.select.map(
+      this.data.select.map(
         ({ sqlFragment, alias }) =>
           sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
       ),
@@ -86,13 +88,15 @@ class QueryBuilder {
       select ${asJson || asJsonAggregate
         ? this.buildSelectJson(asJsonAggregate)
         : this.buildSelectFields()}
-      ${this.from &&
-        sql.fragment`from ${this.from[0]} as ${sql.identifier(this.from[1])}`}
-      ${this.join && sql.join(this.join, " ")}
-      where true and (${sql.join(this.where, " AND ")})
-      ${this.orderBy.length
+      ${this.data.from &&
+        sql.fragment`from ${this.data.from[0]} as ${sql.identifier(
+          this.data.from[1]
+        )}`}
+      ${this.data.join && sql.join(this.data.join, " ")}
+      where true and (${sql.join(this.data.where, " AND ")})
+      ${this.data.orderBy.length
         ? `order by ${sql.join(
-            this.orderBy.map(
+            this.data.orderBy.map(
               ([expr, ascending]) =>
                 sql.fragment`${expr} ${ascending
                   ? sql.fragment`ASC`
@@ -101,8 +105,8 @@ class QueryBuilder {
             ","
           )}`
         : ""}
-      ${this.limit && `limit ${this.limit}`}
-      ${this.offset && `offset ${this.offset}`}
+      ${this.data.limit && `limit ${this.data.limit}`}
+      ${this.data.offset && `offset ${this.data.offset}`}
     `;
   }
 
@@ -111,7 +115,7 @@ class QueryBuilder {
   lock(type) {
     if (this[`${type}Locked`]) return;
     this[`${type}Locked`] = true;
-    this[type] = callIfNecessary(this[type]);
+    this.data[type] = callIfNecessary(this.data[type]);
   }
   checkLock(type) {
     if (this[`${type}Locked`]) {
