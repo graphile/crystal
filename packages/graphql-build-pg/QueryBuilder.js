@@ -62,7 +62,7 @@ class QueryBuilder {
   buildSelectFields() {
     return sql.join(
       this.data.select.map(
-        ({ sqlFragment, alias }) =>
+        ([sqlFragment, alias]) =>
           sql.fragment`${sqlFragment} as ${sql.identifier(alias)}`
       ),
       ", "
@@ -71,7 +71,7 @@ class QueryBuilder {
   buildSelectJson(aggregate = false) {
     const buildObject = sql.fragment`json_build_object(${sql.join(
       this.data.select.map(
-        ({ sqlFragment, alias }) =>
+        ([sqlFragment, alias]) =>
           sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
       ),
       ", "
@@ -93,7 +93,8 @@ class QueryBuilder {
           this.data.from[1]
         )}`}
       ${this.data.join && sql.join(this.data.join, " ")}
-      where true and (${sql.join(this.data.where, " AND ")})
+      ${this.data.where.length &&
+        sql.fragment`where ${sql.join(this.data.where, " AND ")}`}
       ${this.data.orderBy.length
         ? `order by ${sql.join(
             this.data.orderBy.map(
