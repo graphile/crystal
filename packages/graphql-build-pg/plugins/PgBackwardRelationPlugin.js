@@ -86,7 +86,6 @@ module.exports = function PgBackwardRelationPlugin(
             table: k.class.name,
             schema: k.class.namespace.name,
           }));
-          console.log(table, simpleKeys);
           const fieldName = inflection.manyRelationByKeys(
             simpleKeys,
             table.name,
