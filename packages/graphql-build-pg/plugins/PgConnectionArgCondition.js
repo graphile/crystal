@@ -12,7 +12,7 @@ module.exports = function PgConnectionArgCondition(
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
+        pgGqlInputTypeByTypeId: gqlTypeByTypeId,
       }
     ) => {
       introspectionResultsByKind.class.map(table => {

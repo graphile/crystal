@@ -6,6 +6,7 @@ const {
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
+  isInputType,
 } = require("graphql");
 
 const {
@@ -19,6 +20,10 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
     const GraphQLJSON = build.getTypeByName("JSON");
     const GraphQLUUID = build.getTypeByName("UUID");
     const gqlTypeByTypeId = Object.assign({}, build.pgGqlTypeByTypeId);
+    const gqlInputTypeByTypeId = Object.assign(
+      {},
+      build.pgGqlInputTypeByTypeId
+    );
     /*
       type =
         { kind: 'type',
@@ -105,6 +110,12 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
       if (!gqlTypeByTypeId[type.id]) {
         gqlTypeByTypeId[type.id] = GraphQLString;
       }
+      // Now for input types, fall back to output types if possible
+      if (!gqlInputTypeByTypeId[type.id]) {
+        if (isInputType(gqlTypeByTypeId[type.id])) {
+          gqlInputTypeByTypeId[type.id] = gqlTypeByTypeId[type.id];
+        }
+      }
       return gqlTypeByTypeId[type.id];
     };
 
@@ -112,6 +123,7 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
 
     return build.extend(build, {
       pgGqlTypeByTypeId: gqlTypeByTypeId,
+      pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
     });
   });
 };
