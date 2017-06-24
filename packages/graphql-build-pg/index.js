@@ -9,7 +9,7 @@ exports.defaultPlugins = [
   require("./plugins/PgColumnsPlugin"),
   require("./plugins/PgForwardRelationPlugin"),
   require("./plugins/PgBackwardRelationPlugin"),
-  //require("./plugins/PgRowByUniqueConstraint"),
+  require("./plugins/PgRowByUniqueConstraint"),
   //require("./plugins/PgComputedColumnsPlugin"),
 ];
 exports.inflections = require("./inflections");

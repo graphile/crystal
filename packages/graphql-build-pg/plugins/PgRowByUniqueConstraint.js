@@ -1,40 +1,37 @@
-module.exports = async function PgRowByUniqueConstraint(listener) {
-  listener.on(
+const queryFromResolveData = require("../queryFromResolveData");
+const { GraphQLNonNull } = require("graphql");
+module.exports = async function PgRowByUniqueConstraint(
+  builder,
+  { pgInflection: inflection }
+) {
+  builder.hook(
     "objectType:fields",
     (
-      spec,
+      fields,
       {
-        inflection,
         extend,
-        pg: {
-          gqlTypeByClassId,
-          gqlTypeByTypeId,
-          introspectionResultsByKind,
-          sqlFragmentGeneratorsByClassIdAndFieldName,
-          sql,
-          generateFieldFragments,
-        },
+        parseResolveInfo,
+        getTypeByName,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
+        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
       },
-      { scope: { isRootQuery } }
+      { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
       if (!isRootQuery) {
-        return;
+        return fields;
       }
       return extend(
-        spec,
+        fields,
         introspectionResultsByKind.class.reduce((memo, table) => {
-          const type = gqlTypeByClassId[table.id];
-          const schema = introspectionResultsByKind.namespace.filter(
-            n => n.id === table.namespaceId
-          )[0];
-          if (!schema) {
-            console.warn(
-              `Could not find the schema for table '${table.name}'; skipping`
-            );
-            return memo;
-          }
-          const sqlFullTableName = sql.identifier(schema.name, table.name);
-          if (type) {
+          const TableType = getTypeByName(
+            inflection.tableType(table.name, table.namespace.name)
+          );
+          const sqlFullTableName = sql.identifier(
+            table.namespace.name,
+            table.name
+          );
+          if (TableType) {
             const uniqueConstraints = introspectionResultsByKind.constraint
               .filter(con => con.classId === table.id)
               .filter(con => ["u", "p"].includes(con.type));
@@ -50,77 +47,79 @@ module.exports = async function PgRowByUniqueConstraint(listener) {
                   "Consistency error: could not find an attribute!"
                 );
               }
+              const simpleKeys = keys.map(k => ({
+                column: k.name,
+                table: k.class.name,
+                schema: k.class.namespace.name,
+              }));
+              const fieldName = inflection.singleRelationByKeys(
+                simpleKeys,
+                table.name,
+                table.namespace.name
+              );
               memo[
-                inflection.field(
-                  `${table.name}-by-${keys.map(key => key.name).join("-and-")}`
-                )
-              ] = {
-                type: type,
-                args: keys.reduce((memo, key) => {
-                  memo[inflection.field(key.name)] = {
-                    type: gqlTypeByTypeId[key.typeId],
+                fieldName
+              ] = buildFieldWithHooks(
+                fieldName,
+                ({ getDataFromParsedResolveInfoFragment }) => {
+                  return {
+                    type: TableType,
+                    args: keys.reduce((memo, key) => {
+                      memo[
+                        inflection.column(
+                          key.name,
+                          key.class.name,
+                          key.class.namespace.name
+                        )
+                      ] = {
+                        type: new GraphQLNonNull(
+                          gqlInputTypeByTypeId[key.typeId]
+                        ),
+                      };
+                      return memo;
+                    }, {}),
+                    async resolve(parent, args, { pgClient }, resolveInfo) {
+                      const parsedResolveInfoFragment = parseResolveInfo(
+                        resolveInfo
+                      );
+                      const resolveData = getDataFromParsedResolveInfoFragment(
+                        parsedResolveInfoFragment
+                      );
+                      const query = queryFromResolveData(
+                        sqlFullTableName,
+                        Symbol(),
+                        resolveData,
+                        {},
+                        builder => {
+                          keys.forEach(key => {
+                            builder.where(
+                              sql.fragment`${sql.identifier(
+                                builder.getTableAlias(),
+                                key.name
+                              )} = ${sql.value(
+                                args[
+                                  inflection.column(
+                                    key.name,
+                                    key.class.name,
+                                    key.class.namespace.name
+                                  )
+                                ]
+                              )}`
+                            );
+                          });
+                        }
+                      );
+                      const { text, values } = sql.compile(query);
+                      console.log(require("sql-formatter").format(text));
+                      const { rows: [row] } = await pgClient.query(
+                        text,
+                        values
+                      );
+                      return row;
+                    },
                   };
-                  return memo;
-                }, {}),
-                async resolve(parent, args, { pgClient }, resolveInfo) {
-                  const parsedResolveInfoFragment = parseResolveInfo(
-                    resolveInfo
-                  );
-                  const { alias, fields } = parsedResolveInfoFragment;
-                  const tableAlias = Symbol();
-                  const conditions = keys.map(
-                    key =>
-                      sql.fragment`${sql.identifier(
-                        tableAlias,
-                        key.name
-                      )} = ${sql.value(args[inflection.field(key.name)])}`
-                  );
-                  const fragments = generateFieldFragments(
-                    parsedResolveInfoFragment,
-                    sqlFragmentGeneratorsByClassIdAndFieldName[table.id],
-                    { tableAlias }
-                  );
-                  const sqlFields = sql.join(
-                    fragments.map(
-                      ({ sqlFragment, alias }) =>
-                        sql.fragment`${sqlFragment} as ${sql.identifier(alias)}`
-                    ),
-                    ", "
-                  );
-                  const primaryKeyConstraint = introspectionResultsByKind.constraint
-                    .filter(con => con.classId === table.id)
-                    .filter(con => ["p"].includes(con.type))[0];
-                  const attributes = introspectionResultsByKind.attribute
-                    .filter(attr => attr.classId === table.id)
-                    .sort((a, b) => a.num - b.num);
-                  const primaryKeys =
-                    primaryKeyConstraint &&
-                    primaryKeyConstraint.keyAttributeNums.map(
-                      num => attributes.filter(attr => attr.num === num)[0]
-                    );
-                  const query = sql.query`
-                      select ${sqlFields}
-                      from ${sqlFullTableName} as ${sql.identifier(tableAlias)} 
-                      where (${sql.join(conditions, ") and (")})
-                      order by ${primaryKeys
-                        ? sql.join(
-                            primaryKeys.map(
-                              key =>
-                                sql.fragment`${sql.identifier(
-                                  tableAlias,
-                                  key.name
-                                )} asc`
-                            ),
-                            ", "
-                          )
-                        : sql.literal(1)}
-                    `;
-                  const { text, values } = sql.compile(query);
-                  console.log(text);
-                  const { rows: [row] } = await pgClient.query(text, values);
-                  return row;
-                },
-              };
+                }
+              );
             });
           }
           return memo;
