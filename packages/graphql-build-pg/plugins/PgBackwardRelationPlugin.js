@@ -132,10 +132,7 @@ module.exports = function PgBackwardRelationPlugin(
                 inflection.connection(gqlTableType.name)
               );
               return {
-                type: nullableIf(
-                  !keys.every(key => key.isNotNull),
-                  ConnectionType
-                ),
+                type: new GraphQLNonNull(ConnectionType),
                 args: {},
                 resolve: (data, _args, _context, resolveInfo) => {
                   const { alias } = parseResolveInfo(resolveInfo, {

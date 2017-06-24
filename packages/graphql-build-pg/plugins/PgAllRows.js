@@ -64,7 +64,7 @@ module.exports = async function PgAllRows(
                     const { text, values } = sql.compile(query);
                     console.log(text);
                     const { rows } = await pgClient.query(text, values);
-                    return rows;
+                    return rows || [];
                   },
                 };
               },

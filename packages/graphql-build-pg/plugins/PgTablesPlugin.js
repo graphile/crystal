@@ -121,13 +121,15 @@ module.exports = function PgTablesPlugin(
                 // XXX: pageInfo
                 // XXX: totalCount
                 nodes: {
-                  type: new GraphQLList(TableType),
+                  type: new GraphQLNonNull(new GraphQLList(TableType)),
                   resolve(data) {
                     return data;
                   },
                 },
                 edges: {
-                  type: new GraphQLList(new GraphQLNonNull(EdgeType)),
+                  type: new GraphQLNonNull(
+                    new GraphQLList(new GraphQLNonNull(EdgeType))
+                  ),
                   resolve(data) {
                     return data;
                   },

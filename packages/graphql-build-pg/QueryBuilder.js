@@ -96,7 +96,7 @@ class QueryBuilder {
   }
   build({ asJson = false, asJsonAggregate = false } = {}) {
     this.lockEverything();
-    const fragment = sql.fragment`
+    let fragment = sql.fragment`
       select ${asJson || asJsonAggregate
         ? this.buildSelectJson(asJsonAggregate)
         : this.buildSelectFields()}
@@ -123,18 +123,20 @@ class QueryBuilder {
         sql.fragment`offset ${sql.literal(this.data.offset)}`}
     `;
     if (this.data.flip) {
-      const alias = Symbol();
-      return sql.fragment`
-        with ${sql.identifier(alias)} as (
+      const flipAlias = Symbol();
+      fragment = sql.fragment`
+        with ${sql.identifier(flipAlias)} as (
           ${fragment}
         )
         select *
-        from ${sql.identifier(alias)}
+        from ${sql.identifier(flipAlias)}
         order by (row_number() over (partition by 1)) desc
         `;
-    } else {
-      return fragment;
     }
+    if (asJsonAggregate) {
+      fragment = sql.fragment`select coalesce((${fragment}), '[]'::json)`;
+    }
+    return fragment;
   }
 
   // ----------------------------------------
