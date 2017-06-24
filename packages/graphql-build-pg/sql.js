@@ -1,8 +1,12 @@
 // Full credit: https://raw.githubusercontent.com/postgraphql/postgraphql/master/src/postgres/utils/sql.ts
 const isString = require("lodash/isString");
+const isNumber = require("lodash/isNumber");
 const isSymbol = require("lodash/isSymbol");
+const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
 const debug = require("debug")("graphql-build-pg");
+
+const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 
 const debugError = err => {
   debug(err);
@@ -81,7 +85,9 @@ function compile(sql) {
         sqlFragments.push(`$${values.length}`);
         break;
       default:
-        throw new Error(`Unexpected Sql item type '${item["type"]}'.`);
+        throw new Error(
+          `Unexpected Sql item type '${item["type"]}' (full item: '${item}').`
+        );
     }
   }
 
@@ -101,13 +107,30 @@ function compile(sql) {
  * raw text. This makes a SQL injection vulnerability harder to create.
  */
 const query = (strings, ...values) =>
-  strings.reduce(
-    (items, text, i) =>
-      !values[i]
-        ? [...items, { type: "RAW", text }]
-        : [...items, { type: "RAW", text }, ...flatten(values[i])],
-    []
-  );
+  strings.reduce((items, text, i) => {
+    if (!values[i]) {
+      return [...items, { type: "RAW", text }];
+    } else {
+      const value = values[i];
+      if (isDev) {
+        // These errors don't give you additional safety, they just catch
+        // mistakes earlier to aid debugging, so they're fine to disable in
+        // production
+        if (!Array.isArray(value) && !isPlainObject(value)) {
+          if (isString(value)) {
+            throw new Error(`Raw string passed into SQL query: '${value}'.`);
+          } else if (isNumber(value)) {
+            throw new Error(`Raw number passed into SQL query: '${value}'.`);
+          } else {
+            throw new Error(
+              `Invalid raw value passed into SQL query: '${value}'.`
+            );
+          }
+        }
+      }
+      return [...items, { type: "RAW", text }, ...flatten(value)];
+    }
+  }, []);
 
 /**
  * Creates a Sql item for some raw Sql text. Just plain ol‘ raw Sql. This
