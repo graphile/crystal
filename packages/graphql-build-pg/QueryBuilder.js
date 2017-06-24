@@ -30,7 +30,7 @@ class QueryBuilder {
     this.checkLock("select");
     this.data.select.push([exprGen, alias]);
   }
-  from(expr, alias) {
+  from(expr, alias = Symbol()) {
     this.checkLock("from");
     this.data.from = [expr, alias];
     this.lock("from");
