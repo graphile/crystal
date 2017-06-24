@@ -4,6 +4,7 @@ exports.defaultPlugins = [
   require("./plugins/PgTablesPlugin"),
   require("./plugins/PgConnectionArgFirstLastBeforeAfter"),
   require("./plugins/PgConnectionArgOrderBy"),
+  require("./plugins/PgConnectionArgCondition"),
   require("./plugins/PgAllRows"),
   require("./plugins/PgColumnsPlugin"),
   require("./plugins/PgForwardRelationPlugin"),

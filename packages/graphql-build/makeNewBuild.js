@@ -1,6 +1,7 @@
 const {
   GraphQLSchema,
   GraphQLObjectType,
+  GraphQLInputObjectType,
   GraphQLString,
   GraphQLEnumType,
 } = require("graphql");
@@ -8,7 +9,12 @@ const parseResolveInfo = require("./parseResolveInfo");
 const { stripNonNullType, stripListType } = parseResolveInfo;
 const isString = require("lodash/isString");
 
-const knownTypes = [GraphQLSchema, GraphQLObjectType, GraphQLEnumType];
+const knownTypes = [
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+  GraphQLEnumType,
+];
 const knownTypeNames = knownTypes.map(k => k.name);
 
 const ensureArray = val =>
@@ -247,6 +253,53 @@ module.exports = function makeNewBuild(builder) {
             return builder.applyHooks(
               this,
               "objectType:fields",
+              rawFields,
+              fieldsContext
+            );
+          },
+        });
+      } else if (Type === GraphQLInputObjectType) {
+        newSpec = builder.applyHooks(this, "inputObjectType", newSpec, {
+          scope,
+        });
+
+        const rawSpec = newSpec;
+        newSpec = Object.assign({}, newSpec, {
+          fields: () => {
+            const fieldsContext = {
+              scope,
+              Self,
+              objectType: rawSpec,
+              buildFieldWithHooks: (fieldName, spec, scope = {}) => {
+                if (!isString(fieldName)) {
+                  throw new Error(
+                    "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
+                  );
+                }
+                let context = {
+                  scope,
+                };
+                let newSpec = spec;
+                if (typeof newSpec === "function") {
+                  newSpec = newSpec(context);
+                }
+                newSpec = builder.applyHooks(
+                  this,
+                  "inputField",
+                  newSpec,
+                  context
+                );
+                const finalSpec = newSpec;
+                return finalSpec;
+              },
+            };
+            let rawFields = rawSpec.fields;
+            if (typeof rawFields === "function") {
+              rawFields = rawFields(fieldsContext);
+            }
+            return builder.applyHooks(
+              this,
+              "inputObjectType:fields",
               rawFields,
               fieldsContext
             );

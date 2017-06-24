@@ -30,10 +30,23 @@ class SchemaBuilder {
       objectType: [],
       "objectType:fields": [],
 
-      // When you add a field to an object, wrap the call with
+      // When creating a GraphQLInputObjectType via `buildObjectWithHooks`, we'll
+      // execute, the following hooks:
+      // - 'inputObjectType' to add any root-level attributes, e.g. add a description
+      // - 'inputObjectType:fields' to add additional fields to this object type (is
+      //   ran asynchronously and gets a reference to the final GraphQL Object as
+      //   `Self` in the context)
+      inputObjectType: [],
+      "inputObjectType:fields": [],
+
+      // When you add a field to a GraphQLObjectType, wrap the call with
       // `buildFieldWithHooks` in order to fire these hooks:
       field: [],
       "field:args": [],
+
+      // When you add a field to a GraphQLInputObjectType, wrap the call with
+      // `buildFieldWithHooks` in order to fire this hook:
+      inputField: [],
     };
   }
 
