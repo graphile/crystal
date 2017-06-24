@@ -108,7 +108,7 @@ class QueryBuilder {
       ${this.data.where.length &&
         sql.fragment`where ${sql.join(this.data.where, " AND ")}`}
       ${this.data.orderBy.length
-        ? `order by ${sql.join(
+        ? sql.fragment`order by ${sql.join(
             this.data.orderBy.map(
               ([expr, ascending]) =>
                 sql.fragment`${expr} ${ascending ^ this.data.flip
@@ -118,8 +118,9 @@ class QueryBuilder {
             ","
           )}`
         : ""}
-      ${this.data.limit && `limit ${this.data.limit}`}
-      ${this.data.offset && `offset ${this.data.offset}`}
+      ${this.data.limit && sql.fragment`limit ${sql.literal(this.data.limit)}`}
+      ${this.data.offset &&
+        sql.fragment`offset ${sql.literal(this.data.offset)}`}
     `;
     if (this.data.flip) {
       const alias = Symbol();

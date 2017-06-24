@@ -57,7 +57,13 @@ module.exports = function PgConnectionArgCondition(
     "field:args",
     (
       args,
-      { extend, getTypeByName, buildObjectWithHooks },
+      {
+        pgSql: sql,
+        extend,
+        getTypeByName,
+        buildObjectWithHooks,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+      },
       {
         scope: { isPgConnectionField, pgIntrospection: table },
         addArgDataGenerator,
@@ -76,7 +82,24 @@ module.exports = function PgConnectionArgCondition(
         return {
           pgQuery: queryBuilder => {
             if (condition != null) {
-              queryBuilder.condition(...condition);
+              introspectionResultsByKind.attribute
+                .filter(attr => attr.classId === table.id)
+                .reduce((memo, attr) => {
+                  const fieldName = inflection.column(
+                    attr.name,
+                    table.name,
+                    table.namespace.name
+                  );
+                  const val = condition[fieldName];
+                  if (val != null) {
+                    queryBuilder.where(
+                      sql.fragment`${sql.identifier(
+                        queryBuilder.getTableAlias(),
+                        attr.name
+                      )} = ${sql.value(val)}`
+                    );
+                  }
+                });
             }
           },
         };
