@@ -32,6 +32,12 @@ class QueryBuilder {
   }
   from(expr, alias = Symbol()) {
     this.checkLock("from");
+    if (!expr) {
+      throw new Error("No from table source!");
+    }
+    if (!alias) {
+      throw new Error("No from alias!");
+    }
     this.data.from = [expr, alias];
     this.lock("from");
   }

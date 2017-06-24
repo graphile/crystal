@@ -1,6 +1,28 @@
 // Full credit: https://raw.githubusercontent.com/postgraphql/postgraphql/master/src/postgres/utils/sql.ts
 const isString = require("lodash/isString");
+const isSymbol = require("lodash/isSymbol");
 const lodashIsFinite = require("lodash/isFinite");
+const debug = require("debug")("graphql-build-pg");
+
+const debugError = err => {
+  debug(err);
+  return err;
+};
+
+const ensureNonEmptyArray = (array, allowZeroLength = false) => {
+  if (!Array.isArray(array)) {
+    throw debugError(new Error("Expected array"));
+  }
+  if (array.length < 1 && !allowZeroLength) {
+    throw debugError(new Error("Expected non-empty array"));
+  }
+  array.forEach((entry, idx) => {
+    if (entry == null) {
+      throw debugError(new Error(`Array index ${idx} is ${entry}`));
+    }
+  });
+  return array;
+};
 
 function compile(sql) {
   // Join this to generate the SQL query
@@ -32,6 +54,11 @@ function compile(sql) {
           item.names
             .map(name => {
               if (typeof name === "string") return escapeSqlIdentifier(name);
+              if (!isSymbol(name)) {
+                throw debugError(
+                  new Error(`Expected string or symbol, received '${name}'`)
+                );
+              }
 
               // Get the correct identifier string for this symbol.
               let identifier = symbolToIdentifier.get(name);
@@ -94,7 +121,10 @@ const raw = text => ({ type: "RAW", text });
  * a table, schema, or column name. An identifier may also have a namespace,
  * thus why many names are accepted.
  */
-const identifier = (...names) => ({ type: "IDENTIFIER", names });
+const identifier = (...names) => ({
+  type: "IDENTIFIER",
+  names: ensureNonEmptyArray(names),
+});
 
 /**
  * Creates a Sql item for a value that will be included in our final query.
@@ -125,7 +155,7 @@ const literal = val => {
  * with lists of Sql items that doesn’t make sense as a Sql query.
  */
 const join = (items, seperator = "") =>
-  items.reduce(
+  ensureNonEmptyArray(items, true).reduce(
     (currentItems, item, i) =>
       i === 0 || !seperator
         ? [...currentItems, ...flatten(item)]
