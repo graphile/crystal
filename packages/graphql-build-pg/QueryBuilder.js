@@ -98,7 +98,7 @@ class QueryBuilder {
         sql.fragment`from ${this.data.from[0]} as ${sql.identifier(
           this.data.from[1]
         )}`}
-      ${this.data.join && sql.join(this.data.join, " ")}
+      ${this.data.join.length && sql.join(this.data.join, " ")}
       ${this.data.where.length &&
         sql.fragment`where ${sql.join(this.data.where, " AND ")}`}
       ${this.data.orderBy.length
