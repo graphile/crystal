@@ -59,7 +59,7 @@ class QueryBuilder {
 
   getTableAlias() {
     this.lock("from");
-    this.data.from[1];
+    return this.data.from[1];
   }
   getOrderByExpressionsAndDirections() {
     this.lock("orderBy");
