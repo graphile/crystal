@@ -84,7 +84,7 @@ class QueryBuilder {
       ", "
     );
   }
-  buildSelectJson(aggregate = false) {
+  buildSelectJson() {
     const buildObject = sql.fragment`json_build_object(${sql.join(
       this.data.select.map(
         ([sqlFragment, alias]) =>
@@ -92,17 +92,13 @@ class QueryBuilder {
       ),
       ", "
     )})`;
-    if (aggregate) {
-      return sql.fragment`json_agg(${buildObject})`;
-    } else {
-      return buildObject;
-    }
+    return buildObject;
   }
   build({ asJson = false, asJsonAggregate = false } = {}) {
     this.lockEverything();
     let fragment = sql.fragment`
       select ${asJson || asJsonAggregate
-        ? this.buildSelectJson(asJsonAggregate)
+        ? this.buildSelectJson()
         : this.buildSelectFields()}
       ${this.data.from &&
         sql.fragment`from ${this.data.from[0]} as ${sql.identifier(
@@ -138,6 +134,11 @@ class QueryBuilder {
         `;
     }
     if (asJsonAggregate) {
+      const aggAlias = Symbol();
+      fragment = sql.fragment`select json_agg(${sql.identifier(
+        aggAlias,
+        "json_build_object"
+      )}) from (${fragment}) as ${sql.identifier(aggAlias)}`;
       fragment = sql.fragment`select coalesce((${fragment}), '[]'::json)`;
     }
     return fragment;
