@@ -30,6 +30,7 @@ module.exports = function PgConnectionArgs(
         last,
         orderBy,
         after,
+        before,
       }) {
         return {
           pgQuery: queryBuilder => {
@@ -43,7 +44,12 @@ module.exports = function PgConnectionArgs(
               queryBuilder.orderBy(...orderBy);
             }
             if (after != null) {
-              const cursor = after;
+              addCursorConstraint(after, true);
+            }
+            if (before != null) {
+              addCursorConstraint(before, false);
+            }
+            function addCursorConstraint(cursor, isAfter) {
               const cursorValues = JSON.parse(base64Decode(cursor));
               queryBuilder.where(() => {
                 const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
@@ -63,24 +69,26 @@ module.exports = function PgConnectionArgs(
                     ascending,
                   ] = orderByExpressionsAndDirections[i];
                   const cursorValue = cursorValues[i];
-                  const comparison = ascending
+                  // If ascending and isAfter then >
+                  // If ascending and isBefore then <
+                  const comparison = ascending ^ !isAfter
                     ? sql.fragment`>`
                     : sql.fragment`<`;
 
                   const sqlOldFilter = sqlFilter;
                   sqlFilter = sql.fragment`
-                              (
-                                (${sqlExpression} ${comparison} ${sql.value(
-                    cursorValue
-                  )})
-                              OR
-                                (
-                                  (${sqlExpression} = ${sql.value(cursorValue)})
-                                AND
-                                  ${sqlOldFilter}
-                                )
-                              )
-                              `;
+                  (
+                    (
+                      ${sqlExpression} ${comparison} ${sql.value(cursorValue)}
+                    )
+                  OR
+                    (
+                      (${sqlExpression} = ${sql.value(cursorValue)})
+                    AND
+                      ${sqlOldFilter}
+                    )
+                  )
+                  `;
                 }
                 return sqlFilter;
               });
@@ -95,6 +103,9 @@ module.exports = function PgConnectionArgs(
         },
         last: {
           type: GraphQLInt,
+        },
+        before: {
+          type: Cursor,
         },
         after: {
           type: Cursor,

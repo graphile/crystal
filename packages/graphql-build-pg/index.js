@@ -2,7 +2,7 @@ exports.defaultPlugins = [
   require("./plugins/PgIntrospectionPlugin"),
   require("./plugins/PgTypesPlugin"),
   require("./plugins/PgTablesPlugin"),
-  require("./plugins/PgConnectionArgs"),
+  require("./plugins/PgConnectionArgFirstLastBeforeAfter"),
   require("./plugins/PgAllRows"),
   require("./plugins/PgColumnsPlugin"),
   require("./plugins/PgForwardRelationPlugin"),
