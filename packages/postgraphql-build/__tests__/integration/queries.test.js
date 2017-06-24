@@ -69,9 +69,13 @@ beforeAll(() => {
               ? gqlSchemas.dynamicJson
               : gqlSchemas.normal;
           // Return the result of our GraphQL query.
-          return await graphql(gqlSchema, query, null, {
+          const result = await graphql(gqlSchema, query, null, {
             pgClient: pgClient,
           });
+          if (result.errors) {
+            console.log(result.errors.map(e => e.originalError));
+          }
+          return result;
         })
       );
     });
