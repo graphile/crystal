@@ -147,7 +147,7 @@ module.exports = function PgBackwardRelationPlugin(
             },
             {
               isPgConnectionField: true,
-              pgIntrospection: foreignTable,
+              pgIntrospection: table,
             }
           );
           return memo;
