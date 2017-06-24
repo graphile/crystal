@@ -7,7 +7,11 @@ const QueryPlugin = async builder => {
       GraphQLObjectType,
       {
         name: "Query",
-        fields: {},
+        fields: ({ Self }) => ({
+          query: {
+            type: Self,
+          },
+        }),
       },
       { isRootQuery: true }
     );
