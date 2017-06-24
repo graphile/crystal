@@ -20,6 +20,7 @@ class QueryBuilder {
       orderBy: [],
       limit: null,
       offset: null,
+      flip: false,
     };
   }
 
@@ -47,6 +48,11 @@ class QueryBuilder {
     this.checkLock("limit");
     this.data.limit = limit;
     this.lock("limit");
+  }
+  flip() {
+    this.checkLock("flip");
+    this.data.flip = true;
+    this.lock("flip");
   }
 
   // ----------------------------------------
@@ -84,7 +90,7 @@ class QueryBuilder {
   }
   build({ asJson = false, asJsonAggregate = false } = {}) {
     this.lockEverything();
-    return sql.fragment`
+    const fragment = sql.fragment`
       select ${asJson || asJsonAggregate
         ? this.buildSelectJson(asJsonAggregate)
         : this.buildSelectFields()}
@@ -99,7 +105,7 @@ class QueryBuilder {
         ? `order by ${sql.join(
             this.data.orderBy.map(
               ([expr, ascending]) =>
-                sql.fragment`${expr} ${ascending
+                sql.fragment`${expr} ${ascending ^ this.data.flip
                   ? sql.fragment`ASC`
                   : sql.fragment`DESC`}`
             ),
@@ -109,6 +115,19 @@ class QueryBuilder {
       ${this.data.limit && `limit ${this.data.limit}`}
       ${this.data.offset && `offset ${this.data.offset}`}
     `;
+    if (this.data.flip) {
+      const alias = Symbol();
+      return sql.fragment`
+        with ${sql.identifier(alias)} as (
+          ${fragment}
+        )
+        select *
+        from ${sql.identifier(alias)}
+        order by (row_number() over (partition by 1)) desc
+        `;
+    } else {
+      return fragment;
+    }
   }
 
   // ----------------------------------------
@@ -126,6 +145,7 @@ class QueryBuilder {
   lockEverything() {
     // We must execute everything after `from` so we have the alias to reference
     this.lock("from");
+    this.lock("flip");
     this.lock("join");
     this.lock("offset");
     this.lock("limit");

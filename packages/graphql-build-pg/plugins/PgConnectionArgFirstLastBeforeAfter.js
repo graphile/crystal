@@ -37,8 +37,12 @@ module.exports = function PgConnectionArgs(
             if (first != null) {
               queryBuilder.limit(first);
             }
+            if (first != null && last != null) {
+              throw new Error("We don't support setting both first and last");
+            }
             if (last != null) {
-              throw new Error("We don't support last yet");
+              queryBuilder.limit(last);
+              queryBuilder.flip();
             }
             if (orderBy != null) {
               queryBuilder.orderBy(...orderBy);
@@ -111,9 +115,6 @@ module.exports = function PgConnectionArgs(
           type: Cursor,
         },
         /*
-        condition: {
-          type: TableConditionType,
-        },
         orderBy: {
           type: TableOrderByType,
         },
