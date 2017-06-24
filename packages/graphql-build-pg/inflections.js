@@ -45,7 +45,7 @@ exports.defaultInflection = {
     return upperFirst(camelcase(`${typeName}-edge`));
   },
   connection(typeName) {
-    return upperFirst(camelcase(`${typeName}-connection`));
+    return upperFirst(camelcase(`${this.pluralize(typeName)}-connection`));
   },
 };
 
