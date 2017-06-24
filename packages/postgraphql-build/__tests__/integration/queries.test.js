@@ -9,7 +9,7 @@ const { printSchema } = require("graphql/utilities");
 const readFile = promisify(rawReadFile);
 
 const queriesDir = `${__dirname}/../fixtures/queries`;
-const queryFileNames = ["relation-head-tail.graphql"]; //readdirSync(queriesDir);
+const queryFileNames = readdirSync(queriesDir);
 let queryResults = [];
 
 const kitchenSinkData = () =>
