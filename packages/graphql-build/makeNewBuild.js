@@ -31,6 +31,9 @@ if (["development", "test"].includes(process.env.NODE_ENV)) {
   };
 }
 
+const simplify = type =>
+  stripNonNullType(stripListType(stripNonNullType(type)));
+
 module.exports = function makeNewBuild(builder) {
   const allTypes = {};
 
@@ -104,9 +107,7 @@ module.exports = function makeNewBuild(builder) {
               const field = fields[alias];
               // 1. XXX: Get the type for this field
               const Type = Self._fields[fieldName].type;
-              const StrippedType = stripNonNullType(
-                stripListType(stripNonNullType(Type))
-              );
+              const StrippedType = simplify(Type);
               if (!Type) {
                 throw new Error(
                   `Could not find type for field '${field.name}' of '${finalSpec.name}'`
@@ -207,7 +208,7 @@ module.exports = function makeNewBuild(builder) {
                         "It's too early to call this! Call from within resolve"
                       );
                     }
-                    const Type = finalSpec.type;
+                    const Type = simplify(finalSpec.type);
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );
