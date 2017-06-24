@@ -1,5 +1,5 @@
 const SchemaBuilder = require("./SchemaBuilder");
-const { StandardTypesPlugin, QueryPlugin } = require("./plugins");
+const localPlugins = require("./plugins");
 
 const getBuilder = async (plugins, options) => {
   const builder = new SchemaBuilder();
@@ -17,9 +17,10 @@ const buildSchema = async (plugins, options) => {
   return build.buildRoot();
 };
 
-const defaultPlugins = [StandardTypesPlugin, QueryPlugin];
+const defaultPlugins = Object.values(localPlugins).filter(
+  fn => typeof fn === "function"
+);
 
+Object.assign(exports, localPlugins);
 exports.buildSchema = buildSchema;
-exports.QueryPlugin = QueryPlugin;
-exports.StandardTypesPlugin = StandardTypesPlugin;
 exports.defaultPlugins = defaultPlugins;
