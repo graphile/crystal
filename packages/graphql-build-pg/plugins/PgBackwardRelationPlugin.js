@@ -68,7 +68,7 @@ module.exports = function PgBackwardRelationPlugin(
           const schema = table.namespace;
 
           const attributes = introspectionResultsByKind.attribute.filter(
-            attr => attr.classId === constraint.classId
+            attr => attr.classId === table.id
           );
 
           const keys = constraint.keyAttributeNums.map(
@@ -91,6 +91,14 @@ module.exports = function PgBackwardRelationPlugin(
             table.name,
             table.namespace.name
           );
+          const primaryKeyConstraint = introspectionResultsByKind.constraint
+            .filter(con => con.classId === table.id)
+            .filter(con => ["p"].includes(con.type))[0];
+          const primaryKeys =
+            primaryKeyConstraint &&
+            primaryKeyConstraint.keyAttributeNums.map(
+              num => attributes.filter(attr => attr.num === num)[0]
+            );
 
           memo[fieldName] = buildFieldWithHooks(
             fieldName,
@@ -110,6 +118,21 @@ module.exports = function PgBackwardRelationPlugin(
                         resolveData,
                         { asJsonAggregate: true },
                         innerQueryBuilder => {
+                          if (primaryKeys) {
+                            builder.beforeFinalize(() => {
+                              // append order by primary key to the list of orders
+                              primaryKeys.forEach(key => {
+                                builder.orderBy(
+                                  sql.fragment`${sql.identifier(
+                                    builder.getTableAlias(),
+                                    key.name
+                                  )}`,
+                                  true
+                                );
+                              });
+                            });
+                          }
+
                           keys.forEach((key, i) => {
                             innerQueryBuilder.where(
                               sql.fragment`${sql.identifier(

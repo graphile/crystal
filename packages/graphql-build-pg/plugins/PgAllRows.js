@@ -34,6 +34,17 @@ module.exports = async function PgAllRows(
               `Could not find GraphQL type for table '${table.name}'`
             );
           }
+          const attributes = introspectionResultsByKind.attribute.filter(
+            attr => attr.classId === table.id
+          );
+          const primaryKeyConstraint = introspectionResultsByKind.constraint
+            .filter(con => con.classId === table.id)
+            .filter(con => ["p"].includes(con.type))[0];
+          const primaryKeys =
+            primaryKeyConstraint &&
+            primaryKeyConstraint.keyAttributeNums.map(
+              num => attributes.filter(attr => attr.num === num)[0]
+            );
           if (!ConnectionType) {
             throw new Error(
               `Could not find GraphQL connection type for table '${table.name}'`
@@ -59,7 +70,24 @@ module.exports = async function PgAllRows(
                     const query = queryFromResolveData(
                       sqlFullTableName,
                       Symbol(),
-                      resolveData
+                      resolveData,
+                      {},
+                      builder => {
+                        if (primaryKeys) {
+                          builder.beforeFinalize(() => {
+                            // append order by primary key to the list of orders
+                            primaryKeys.forEach(key => {
+                              builder.orderBy(
+                                sql.fragment`${sql.identifier(
+                                  builder.getTableAlias(),
+                                  key.name
+                                )}`,
+                                true
+                              );
+                            });
+                          });
+                        }
+                      }
                     );
                     const { text, values } = sql.compile(query);
                     console.log(text);

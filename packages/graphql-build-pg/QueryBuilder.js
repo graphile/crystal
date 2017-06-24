@@ -21,11 +21,15 @@ class QueryBuilder {
       limit: null,
       offset: null,
       flip: false,
+      beforeFinalize: [],
     };
   }
 
   // ----------------------------------------
 
+  beforeFinalize(fn) {
+    this.data.beforeFinalize.push(fn);
+  }
   select(exprGen, alias) {
     this.checkLock("select");
     this.data.select.push([exprGen, alias]);
@@ -141,6 +145,14 @@ class QueryBuilder {
 
   // ----------------------------------------
 
+  finalize() {
+    if (!this.finalized) {
+      for (const fn of this.data.beforeFinalize) {
+        fn();
+      }
+      this.finalized = true;
+    }
+  }
   lock(type) {
     if (this[`${type}Locked`]) return;
     this[`${type}Locked`] = true;
@@ -152,6 +164,7 @@ class QueryBuilder {
     }
   }
   lockEverything() {
+    this.finalize();
     // We must execute everything after `from` so we have the alias to reference
     this.lock("from");
     this.lock("flip");
