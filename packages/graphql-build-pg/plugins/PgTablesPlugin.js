@@ -48,24 +48,6 @@ module.exports = function PgTablesPlugin(
             isPgRowType: true,
           }
         );
-        /* const TableOrderByType = */
-        buildObjectWithHooks(
-          GraphQLEnumType,
-          {
-            name: inflection.orderByType(TableType.name),
-            values: {
-              NATURAL: {
-                name: "NATURAL",
-                value: null,
-              },
-              // XXX: add the (indexed?) columns
-            },
-          },
-          {
-            pgIntrospection: table,
-            isPgRowSortEnum: true,
-          }
-        );
 
         /*
       const primaryKeyConstraint = introspectionResultsByKind.constraint

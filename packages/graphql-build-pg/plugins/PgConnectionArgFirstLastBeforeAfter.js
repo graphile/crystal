@@ -1,10 +1,7 @@
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 const { GraphQLInt } = require("graphql");
 
-module.exports = function PgConnectionArgs(
-  builder,
-  { pgInflection: inflection }
-) {
+module.exports = function PgConnectionArgs(builder) {
   builder.hook(
     "field:args",
     (
@@ -19,16 +16,10 @@ module.exports = function PgConnectionArgs(
         return args;
       }
       const Cursor = getTypeByName("Cursor");
-      const TableType = getTypeByName(
-        inflection.tableType(table.name, table.namespace.name)
-      );
-      const TableOrderByType = inflection.orderByType(TableType.name);
-      const TableConditionType = inflection.conditionType(TableType.name);
 
-      addArgDataGenerator(function connectionDefaultArgs({
+      addArgDataGenerator(function connectionFirstLastBeforeAfter({
         first,
         last,
-        orderBy,
         after,
         before,
       }) {
@@ -43,9 +34,6 @@ module.exports = function PgConnectionArgs(
             if (last != null) {
               queryBuilder.limit(last);
               queryBuilder.flip();
-            }
-            if (orderBy != null) {
-              queryBuilder.orderBy(...orderBy);
             }
             if (after != null) {
               addCursorConstraint(after, true);
@@ -114,11 +102,6 @@ module.exports = function PgConnectionArgs(
         after: {
           type: Cursor,
         },
-        /*
-        orderBy: {
-          type: TableOrderByType,
-        },
-        */
       });
     }
   );

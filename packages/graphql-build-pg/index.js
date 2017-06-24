@@ -3,6 +3,7 @@ exports.defaultPlugins = [
   require("./plugins/PgTypesPlugin"),
   require("./plugins/PgTablesPlugin"),
   require("./plugins/PgConnectionArgFirstLastBeforeAfter"),
+  require("./plugins/PgConnectionArgOrderBy"),
   require("./plugins/PgAllRows"),
   require("./plugins/PgColumnsPlugin"),
   require("./plugins/PgForwardRelationPlugin"),
