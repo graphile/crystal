@@ -4,9 +4,9 @@ const {
   GraphQLInputObjectType,
   GraphQLString,
   GraphQLEnumType,
+  getNamedType,
 } = require("graphql");
 const parseResolveInfo = require("./parseResolveInfo");
-const { stripNonNullType, stripListType } = parseResolveInfo;
 const isString = require("lodash/isString");
 
 const knownTypes = [
@@ -30,9 +30,6 @@ if (["development", "test"].includes(process.env.NODE_ENV)) {
     }
   };
 }
-
-const simplify = type =>
-  stripNonNullType(stripListType(stripNonNullType(type)));
 
 module.exports = function makeNewBuild(builder) {
   const allTypes = {};
@@ -107,7 +104,7 @@ module.exports = function makeNewBuild(builder) {
               const field = fields[alias];
               // 1. XXX: Get the type for this field
               const Type = Self._fields[fieldName].type;
-              const StrippedType = simplify(Type);
+              const StrippedType = getNamedType(Type);
               if (!Type) {
                 throw new Error(
                   `Could not find type for field '${field.name}' of '${finalSpec.name}'`
@@ -225,7 +222,7 @@ module.exports = function makeNewBuild(builder) {
                         "It's too early to call this! Call from within resolve"
                       );
                     }
-                    const Type = simplify(finalSpec.type);
+                    const Type = getNamedType(finalSpec.type);
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );

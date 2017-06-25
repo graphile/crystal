@@ -2,6 +2,7 @@
 const assert = require("assert");
 const defaults = require("lodash/defaults");
 const { getArgumentValues } = require("graphql/execution/values");
+const { getNamedType } = require("graphql");
 
 // Based on https://github.com/tjmehta/graphql-parse-fields
 
@@ -38,14 +39,6 @@ function getFieldFromAST(ast, parentType) {
   return;
 }
 
-function stripNonNullType(type) {
-  return type.constructor.name === "GraphQLNonNull" ? type.ofType : type;
-}
-
-function stripListType(type) {
-  return type.constructor.name === "GraphQLList" ? type.ofType : type;
-}
-
 function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
   let { fragments, variableValues } = resolveInfo;
   fragments = fragments || {};
@@ -57,9 +50,7 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
     const name = val.name && val.name.value;
     const alias = val.alias ? val.alias.value : name;
     const field = getFieldFromAST(val, parentType);
-    const fieldGqlType = stripNonNullType(
-      stripListType(stripNonNullType(field.type))
-    );
+    const fieldGqlType = getNamedType(field.type);
     const args = getArgumentValues(field, val, variableValues) || {};
     if (kind === "Field") {
       if (!tree[alias]) {
@@ -115,5 +106,3 @@ function firstKey(obj) {
 }
 
 module.exports = parseFields;
-parseFields.stripNonNullType = stripNonNullType;
-parseFields.stripListType = stripListType;
