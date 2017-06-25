@@ -1,5 +1,6 @@
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
+const GraphQLJSON = require("graphql-type-json");
 
 const stringType = name =>
   new GraphQLScalarType({
@@ -20,6 +21,7 @@ module.exports = function StandardTypesPlugin(builder) {
     build.addType(Cursor);
     const UUID = stringType("UUID");
     build.addType(UUID);
+    build.addType(GraphQLJSON);
     return build;
   });
 };
