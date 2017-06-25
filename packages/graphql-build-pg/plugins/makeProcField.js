@@ -1,48 +1,5 @@
 const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
 
-function makeQuery(
-  proc,
-  parsedResolveInfoFragment,
-  { implicitArgs, inflection }
-) {
-  const resolveData = getDataFromParsedResolveInfoFragment(
-    parsedResolveInfoFragment
-  );
-  const { args } = parsedResolveInfoFragment;
-  const argValues = argNames.map((argName, argIndex) => {
-    const gqlArgName = inflection.argument(argName);
-    return args[gqlArgName];
-  });
-  while (
-    argValues.length > requiredArgs &&
-    argValues[argValues.length - 1] == null
-  ) {
-    argValues.pop();
-  }
-  const functionAlias = Symbol();
-  return queryFromResolveData(
-    sql.fragment`${sql.identifier(proc.namespace.name, proc.name)}(${sql.join(
-      [...implicitArgs, ...argValues.map(sql.value)],
-      ","
-    )})`,
-    functionAlias,
-    resolveData,
-    { asJsonAggregate: true },
-    innerQueryBuilder => {
-      if (returnTypeTablePrimaryKeys) {
-        innerQueryBuilder.beforeFinalize(() => {
-          // append order by primary key to the list of orders
-          returnTypeTablePrimaryKeys.forEach(key => {
-            innerQueryBuilder.orderBy(
-              sql.fragment`${sql.identifier(functionAlias, key.name)}`,
-              true
-            );
-          });
-        });
-      }
-    }
-  );
-}
 module.exports = function makeProcField(
   proc,
   {
@@ -56,9 +13,9 @@ module.exports = function makeProcField(
   }
 ) {
   const sliceAmount = computed ? 1 : 0;
-  const argNames = proc.argNames
-    .slice(sliceAmount)
-    .map((name, index) => name || `arg${index}`);
+  const argNames = proc.argTypeIds
+    .map((_, idx) => proc.argNames[idx] || "")
+    .slice(sliceAmount);
   const argTypes = proc.argTypeIds
     .slice(sliceAmount)
     .map(typeId => introspectionResultsByKind.typeById[typeId]);
@@ -104,6 +61,48 @@ module.exports = function makeProcField(
     );
 
   return ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+    function makeQuery(
+      parsedResolveInfoFragment,
+      { implicitArgs, inflection }
+    ) {
+      const resolveData = getDataFromParsedResolveInfoFragment(
+        parsedResolveInfoFragment
+      );
+      const { args } = parsedResolveInfoFragment;
+      const argValues = argNames.map((argName, argIndex) => {
+        const gqlArgName = inflection.argument(argName, argIndex);
+        return args[gqlArgName];
+      });
+      while (
+        argValues.length > requiredArgs &&
+        argValues[argValues.length - 1] == null
+      ) {
+        argValues.pop();
+      }
+      const functionAlias = Symbol();
+      return queryFromResolveData(
+        sql.fragment`${sql.identifier(
+          proc.namespace.name,
+          proc.name
+        )}(${sql.join([...implicitArgs, ...argValues.map(sql.value)], ",")})`,
+        functionAlias,
+        resolveData,
+        { asJsonAggregate: true },
+        innerQueryBuilder => {
+          if (returnTypeTablePrimaryKeys) {
+            innerQueryBuilder.beforeFinalize(() => {
+              // append order by primary key to the list of orders
+              returnTypeTablePrimaryKeys.forEach(key => {
+                innerQueryBuilder.orderBy(
+                  sql.fragment`${sql.identifier(functionAlias, key.name)}`,
+                  true
+                );
+              });
+            });
+          }
+        }
+      );
+    }
     if (computed) {
       addDataGenerator(() => {
         return {
@@ -147,7 +146,7 @@ module.exports = function makeProcField(
     return {
       type: type,
       args: argNames.reduce((memo, argName, argIndex) => {
-        const gqlArgName = inflection.argument(argName);
+        const gqlArgName = inflection.argument(argName, argIndex);
         memo[gqlArgName] = {
           type: argGqlTypes[argIndex],
         };

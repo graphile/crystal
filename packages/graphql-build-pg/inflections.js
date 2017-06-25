@@ -4,8 +4,8 @@ const pluralize = require("pluralize");
 
 exports.defaultInflection = {
   pluralize,
-  argument(name) {
-    return camelcase(name);
+  argument(name, index) {
+    return camelcase(name || `arg${index}`);
   },
   orderByType(typeName) {
     return upperFirst(camelcase(`${typeName}-order-by`));

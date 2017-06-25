@@ -1,6 +1,6 @@
 const makeProcField = require("./makeProcField");
 
-module.exports = function PgComputedColumnsPlugin(
+module.exports = function PgQueryProceduresPlugin(
   builder,
   { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
 ) {
@@ -16,29 +16,15 @@ module.exports = function PgComputedColumnsPlugin(
         pgGqlTypeByTypeId: gqlTypeByTypeId,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
       },
-      { scope: { isPgRowType, pgIntrospection: table }, buildFieldWithHooks }
+      { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
-      if (!isPgRowType || !table || table.kind !== "class") {
+      if (!isRootQuery) {
         return fields;
-      }
-      const tableType = introspectionResultsByKind.type.filter(
-        type =>
-          type.type === "c" &&
-          type.category === "C" &&
-          type.namespaceId === table.namespaceId &&
-          type.classId === table.id
-      )[0];
-      if (!tableType) {
-        throw new Error("Could not determine the type for this table");
       }
       return extend(
         fields,
         introspectionResultsByKind.procedure
           .filter(proc => proc.isStable)
-          .filter(proc => proc.namespaceId === table.namespaceId)
-          .filter(proc => proc.name.startsWith(`${table.name}_`))
-          .filter(proc => proc.argTypeIds.length > 0)
-          .filter(proc => proc.argTypeIds[0] === tableType.id)
           .reduce((memo, proc) => {
             /*
             proc =
@@ -54,17 +40,21 @@ module.exports = function PgComputedColumnsPlugin(
                 argNames: [ 'integration' ],
                 argDefaultsNum: 0 }
             */
+            const argTypes = proc.argTypeIds.map(
+              typeId => introspectionResultsByKind.typeById[typeId]
+            );
+            if (argTypes.some(type => type.type === "c")) {
+              // It operates on classes, skip (maybe it's a computed function?)
+              return memo;
+            }
 
-            const pseudoColumnName = proc.name.substr(table.name.length + 1);
-            const fieldName = inflection.column(
-              pseudoColumnName,
-              table.name,
-              table.namespace.name
+            const fieldName = inflection.functionName(
+              proc.name,
+              proc.namespace.name
             );
             memo[fieldName] = buildFieldWithHooks(
               fieldName,
               makeProcField(proc, {
-                computed: true,
                 introspectionResultsByKind,
                 strictFunctions,
                 gqlTypeByTypeId,
