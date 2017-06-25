@@ -178,7 +178,7 @@ module.exports = function makeProcField(
                 if (proc.returnsSet) {
                   return value.map(firstValue);
                 } else {
-                  return value != null ? firstValue(value) : value;
+                  return value;
                 }
               } else {
                 return value;
