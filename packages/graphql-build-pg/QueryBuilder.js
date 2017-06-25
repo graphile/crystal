@@ -90,13 +90,17 @@ class QueryBuilder {
     );
   }
   buildSelectJson() {
-    const buildObject = sql.fragment`json_build_object(${sql.join(
-      this.data.select.map(
-        ([sqlFragment, alias]) =>
-          sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
-      ),
-      ", "
-    )})`;
+    const buildObject = this.data.select.length
+      ? sql.fragment`json_build_object(${sql.join(
+          this.data.select.map(
+            ([sqlFragment, alias]) =>
+              sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
+          ),
+          ", "
+        )}) as object`
+      : sql.fragment`to_json(${sql.identifier(
+          this.getTableAlias()
+        )}.*) as object`;
     return buildObject;
   }
   build({ asJson = false, asJsonAggregate = false } = {}) {
@@ -142,7 +146,7 @@ class QueryBuilder {
       const aggAlias = Symbol();
       fragment = sql.fragment`select json_agg(${sql.identifier(
         aggAlias,
-        "json_build_object"
+        "object"
       )}) from (${fragment}) as ${sql.identifier(aggAlias)}`;
       fragment = sql.fragment`select coalesce((${fragment}), '[]'::json)`;
     }

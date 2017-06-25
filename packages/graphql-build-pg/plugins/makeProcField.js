@@ -1,5 +1,12 @@
 const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
 const queryFromResolveData = require("../queryFromResolveData");
+const firstValue = obj => {
+  let firstKey;
+  for (const k in obj) {
+    firstKey = k;
+  }
+  return obj[firstKey];
+};
 
 module.exports = function makeProcField(
   fieldName,
@@ -67,6 +74,7 @@ module.exports = function makeProcField(
 
   let type;
   const scope = {};
+  let returnFirstValueAsValue = false;
   if (returnTypeTable) {
     const TableType = getTypeByName(
       inflection.tableType(returnTypeTable.name, returnTypeTable.namespace.name)
@@ -83,6 +91,7 @@ module.exports = function makeProcField(
       scope.pgIntrospection = returnTypeTable;
     }
   } else {
+    returnFirstValueAsValue = true;
     const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
     if (proc.returnsSet) {
       type = new GraphQLList(new GraphQLNonNull(Type));
@@ -164,7 +173,16 @@ module.exports = function makeProcField(
               const { alias } = parseResolveInfo(resolveInfo, {
                 deep: false,
               });
-              return data[alias];
+              const value = data[alias];
+              if (returnFirstValueAsValue) {
+                if (proc.returnsSet) {
+                  return value.map(firstValue);
+                } else {
+                  return value != null ? firstValue(value) : value;
+                }
+              } else {
+                return value;
+              }
             }
           : async (data, args, { pgClient }, resolveInfo) => {
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
@@ -172,8 +190,24 @@ module.exports = function makeProcField(
 
               const { text, values } = sql.compile(query);
               console.log(require("sql-formatter").format(text));
-              const { rows } = await pgClient.query(text, values);
-              return rows || [];
+              const { rows: r } = await pgClient.query(text, values);
+              const rows = r || [];
+              if (rows.length === 0) {
+                return proc.returnsSet ? [] : null;
+              }
+              if (returnFirstValueAsValue) {
+                if (proc.returnsSet) {
+                  return rows.map(firstValue);
+                } else {
+                  return firstValue(rows[0]);
+                }
+              } else {
+                if (proc.returnsSet) {
+                  return rows;
+                } else {
+                  return rows[0];
+                }
+              }
             },
       };
     },
