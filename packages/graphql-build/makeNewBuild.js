@@ -145,6 +145,23 @@ module.exports = function makeNewBuild(builder) {
 
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
+          interfaces: () => {
+            const interfacesContext = {
+              scope,
+              Self,
+              objectType: rawSpec,
+            };
+            let rawInterfaces = rawSpec.interfaces || [];
+            if (typeof rawInterfaces === "function") {
+              rawInterfaces = rawInterfaces(interfacesContext);
+            }
+            return builder.applyHooks(
+              this,
+              "objectType:interfaces",
+              rawInterfaces,
+              interfacesContext
+            );
+          },
           fields: () => {
             const fieldsContext = {
               scope,
@@ -247,7 +264,7 @@ module.exports = function makeNewBuild(builder) {
                 return finalSpec;
               },
             };
-            let rawFields = rawSpec.fields;
+            let rawFields = rawSpec.fields || {};
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
             }

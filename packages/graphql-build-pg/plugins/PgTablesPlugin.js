@@ -1,6 +1,7 @@
 const {
   GraphQLObjectType,
   GraphQLNonNull,
+  GraphQLID,
   GraphQLList,
   GraphQLEnumType,
 } = require("graphql");
@@ -14,6 +15,8 @@ module.exports = function PgTablesPlugin(
     (
       _,
       {
+        getNodeIdForTypeAndIdentifiers,
+        nodeIdFieldName,
         buildObjectWithHooks,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
@@ -41,7 +44,47 @@ module.exports = function PgTablesPlugin(
           GraphQLObjectType,
           {
             name: inflection.tableType(table.name, schema.name),
-            fields: {},
+            interfaces: () => {
+              if (nodeIdFieldName) {
+                return [getTypeByName("Node")];
+              } else {
+                return [];
+              }
+            },
+            fields: ({ addDataGeneratorForField, Self }) => {
+              const fields = {};
+              if (nodeIdFieldName) {
+                // Enable nodeId interface
+                addDataGeneratorForField(nodeIdFieldName, () => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(
+                        sql.fragment`json_build_array(${sql.join(
+                          primaryKeys.map(key =>
+                            sql.identifier(
+                              queryBuilder.getTableAlias(),
+                              key.name
+                            )
+                          ),
+                          ", "
+                        )})`,
+                        "__identifiers"
+                      );
+                    },
+                  };
+                });
+                fields[nodeIdFieldName] = {
+                  type: new GraphQLNonNull(GraphQLID),
+                  resolve(data) {
+                    return getNodeIdForTypeAndIdentifiers(
+                      Self,
+                      ...data.__identifiers
+                    );
+                  },
+                };
+              }
+              return fields;
+            },
           },
           {
             pgIntrospection: table,

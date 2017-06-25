@@ -24,10 +24,12 @@ class SchemaBuilder {
       // When creating a GraphQLObjectType via `buildObjectWithHooks`, we'll
       // execute, the following hooks:
       // - 'objectType' to add any root-level attributes, e.g. add a description
+      // - 'objectType:interfaces' to add additional interfaces to this object type
       // - 'objectType:fields' to add additional fields to this object type (is
       //   ran asynchronously and gets a reference to the final GraphQL Object as
       //   `Self` in the context)
       objectType: [],
+      "objectType:interfaces": [],
       "objectType:fields": [],
 
       // When creating a GraphQLInputObjectType via `buildObjectWithHooks`, we'll
