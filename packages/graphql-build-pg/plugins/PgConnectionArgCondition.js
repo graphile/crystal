@@ -84,7 +84,7 @@ module.exports = function PgConnectionArgCondition(
             if (condition != null) {
               introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
-                .reduce((memo, attr) => {
+                .forEach(attr => {
                   const fieldName = inflection.column(
                     attr.name,
                     table.name,
