@@ -95,12 +95,12 @@ module.exports = function makeProcField(
     ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
       function makeQuery(
         parsedResolveInfoFragment,
-        { implicitArgs, inflection }
+        { implicitArgs = [] } = {}
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment
         );
-        const { args } = parsedResolveInfoFragment;
+        const { args = {} } = parsedResolveInfoFragment;
         const argValues = argNames.map((argName, argIndex) => {
           const gqlArgName = inflection.argument(argName, argIndex);
           return args[gqlArgName];
@@ -141,9 +141,8 @@ module.exports = function makeProcField(
             pgQuery: queryBuilder => {
               queryBuilder.select(() => {
                 const parentTableAlias = queryBuilder.getTableAlias();
-                const query = makeQuery(proc, parsedResolveInfoFragment, {
+                const query = makeQuery(parsedResolveInfoFragment, {
                   implicitArgs: [sql.identifier(parentTableAlias)],
-                  inflection,
                 });
                 return sql.fragment`(${query})`;
               }, parsedResolveInfoFragment.alias);
@@ -169,9 +168,7 @@ module.exports = function makeProcField(
             }
           : async (data, args, { pgClient }, resolveInfo) => {
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-              const query = makeQuery(proc, parsedResolveInfoFragment, {
-                inflection,
-              });
+              const query = makeQuery(parsedResolveInfoFragment, {});
 
               const { text, values } = sql.compile(query);
               console.log(require("sql-formatter").format(text));

@@ -2,17 +2,14 @@ const makeProcField = require("./makeProcField");
 
 module.exports = function PgComputedColumnsPlugin(
   builder,
-  {
-    pgInflection: inflection,
-    pgStrictFunctions: strictFunctions = false,
-    parseResolveInfo,
-  }
+  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
 ) {
   builder.hook(
     "objectType:fields",
     (
       fields,
       {
+        parseResolveInfo,
         getTypeByName,
         extend,
         pgIntrospectionResultsByKind: introspectionResultsByKind,

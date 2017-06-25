@@ -60,7 +60,7 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
     const fieldGqlType = stripNonNullType(
       stripListType(stripNonNullType(field.type))
     );
-    const args = getArgumentValues(field, val, variableValues);
+    const args = getArgumentValues(field, val, variableValues) || {};
     if (kind === "Field") {
       if (!tree[alias]) {
         tree[alias] = {
