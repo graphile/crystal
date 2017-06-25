@@ -54,7 +54,7 @@ module.exports = async function PgIntrospectionPlugin(
       "id"
     );
     introspectionResultsByKind.attributeByClassIdAndNum = xByYAndZ(
-      introspectionResultsByKind.type,
+      introspectionResultsByKind.attribute,
       "classId",
       "num"
     );
