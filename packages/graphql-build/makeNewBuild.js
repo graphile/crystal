@@ -323,6 +323,19 @@ module.exports = function makeNewBuild(builder) {
             );
           },
         });
+      } else if (Type === GraphQLEnumType) {
+        newSpec = builder.applyHooks(this, "enumType", newSpec, {
+          scope,
+        });
+
+        newSpec.values = builder.applyHooks(
+          this,
+          "enumType:values",
+          newSpec.values,
+          {
+            scope,
+          }
+        );
       }
       const finalSpec = newSpec;
 

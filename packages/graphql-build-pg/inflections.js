@@ -1,5 +1,6 @@
 const upperFirst = require("lodash/upperFirst");
 const camelcase = require("lodash/camelcase");
+const snakeCase = require("lodash/snakeCase");
 const pluralize = require("pluralize");
 
 exports.defaultInflection = {
@@ -9,6 +10,9 @@ exports.defaultInflection = {
   },
   orderByType(typeName) {
     return upperFirst(camelcase(`${typeName}-order-by`));
+  },
+  orderByEnum(name, ascending, _table, _schema) {
+    return snakeCase(`${name}_${ascending ? "ASC" : "DESC"}`).toUpperCase();
   },
   conditionType(typeName) {
     return upperFirst(camelcase(`${typeName}-condition`));

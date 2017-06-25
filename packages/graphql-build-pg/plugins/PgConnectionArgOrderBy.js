@@ -26,7 +26,6 @@ module.exports = function PgConnectionArgOrderBy(
             ),
             values: {
               NATURAL: {
-                name: "NATURAL",
                 value: null,
               },
               // XXX: add the (indexed?) columns
