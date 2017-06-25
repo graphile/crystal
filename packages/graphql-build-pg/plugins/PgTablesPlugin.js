@@ -40,6 +40,15 @@ module.exports = function PgTablesPlugin(
             isDeletable: true }
         */
         const schema = table.namespace;
+        const primaryKeyConstraint = introspectionResultsByKind.constraint
+          .filter(con => con.classId === table.id)
+          .filter(con => ["p"].includes(con.type))[0];
+        const primaryKeys =
+          primaryKeyConstraint &&
+          primaryKeyConstraint.keyAttributeNums.map(
+            num =>
+              introspectionResultsByKind.attributeByClassIdAndNum[table.id][num]
+          );
         const TableType = buildObjectWithHooks(
           GraphQLObjectType,
           {
@@ -91,18 +100,6 @@ module.exports = function PgTablesPlugin(
             isPgRowType: true,
           }
         );
-
-        /*
-      const primaryKeyConstraint = introspectionResultsByKind.constraint
-        .filter(con => con.classId === table.id)
-        .filter(con => ["p"].includes(con.type))[0];
-      const primaryKeys =
-        primaryKeyConstraint &&
-        primaryKeyConstraint.keyAttributeNums.map(
-          num =>
-            introspectionResultsByKind.attributeByClassIdAndNum[table.id][num]
-        );
-      */
 
         const EdgeType = buildObjectWithHooks(
           GraphQLObjectType,
