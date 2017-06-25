@@ -13,5 +13,6 @@ exports.defaultPlugins = [
   require("./plugins/PgComputedColumnsPlugin"),
   require("./plugins/PgQueryProceduresPlugin"),
   require("./plugins/PgOrderAllColumnsPlugin"),
+  require("./plugins/PgOrderByPrimaryKeyPlugin"),
 ];
 exports.inflections = require("./inflections");

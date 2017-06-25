@@ -1,4 +1,5 @@
 const { GraphQLEnumType } = require("graphql");
+const isString = require("lodash/isString");
 
 module.exports = function PgConnectionArgOrderBy(
   builder,
@@ -63,7 +64,13 @@ module.exports = function PgConnectionArgOrderBy(
         return {
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              queryBuilder.orderBy(...orderBy);
+              const orders = Array.isArray(orderBy[0]) ? orderBy : [orderBy];
+              orders.forEach(([col, ascending]) => {
+                const expr = isString(col)
+                  ? sql.identifier(queryBuilder.getTableAlias(), col)
+                  : col;
+                queryBuilder.orderBy(expr, ascending);
+              });
             }
           },
         };
