@@ -14,5 +14,6 @@ exports.defaultPlugins = [
   require("./plugins/PgQueryProceduresPlugin"),
   require("./plugins/PgOrderAllColumnsPlugin"),
   require("./plugins/PgOrderByPrimaryKeyPlugin"),
+  require("./plugins/PgRowNode"),
 ];
 exports.inflections = require("./inflections");

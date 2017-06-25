@@ -20,6 +20,9 @@ exports.defaultInflection = {
   tableName(name, _schema) {
     return camelcase(name);
   },
+  tableNode(name, _schema) {
+    return camelcase(name);
+  },
   allRows(name, schema) {
     return camelcase(`all-${this.pluralize(this.tableName(name, schema))}`);
   },
