@@ -1,8 +1,11 @@
 const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
+const queryFromResolveData = require("../queryFromResolveData");
 
 module.exports = function makeProcField(
+  fieldName,
   proc,
   {
+    buildFieldWithHooks,
     computed,
     strictFunctions,
     introspectionResultsByKind,
@@ -10,6 +13,8 @@ module.exports = function makeProcField(
     gqlInputTypeByTypeId,
     getTypeByName,
     inflection,
+    sql,
+    parseResolveInfo,
   }
 ) {
   const sliceAmount = computed ? 1 : 0;
@@ -60,117 +65,121 @@ module.exports = function makeProcField(
       num => returnTypeTableAttributes.filter(attr => attr.num === num)[0]
     );
 
-  return ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
-    function makeQuery(
-      parsedResolveInfoFragment,
-      { implicitArgs, inflection }
-    ) {
-      const resolveData = getDataFromParsedResolveInfoFragment(
-        parsedResolveInfoFragment
+  let type;
+  const scope = {};
+  if (returnTypeTable) {
+    const TableType = getTypeByName(
+      inflection.tableType(returnTypeTable.name, returnTypeTable.namespace.name)
+    );
+    if (proc.returnsSet) {
+      const ConnectionType = getTypeByName(
+        inflection.connection(TableType.name)
       );
-      const { args } = parsedResolveInfoFragment;
-      const argValues = argNames.map((argName, argIndex) => {
-        const gqlArgName = inflection.argument(argName, argIndex);
-        return args[gqlArgName];
-      });
-      while (
-        argValues.length > requiredArgs &&
-        argValues[argValues.length - 1] == null
-      ) {
-        argValues.pop();
-      }
-      const functionAlias = Symbol();
-      return queryFromResolveData(
-        sql.fragment`${sql.identifier(
-          proc.namespace.name,
-          proc.name
-        )}(${sql.join([...implicitArgs, ...argValues.map(sql.value)], ",")})`,
-        functionAlias,
-        resolveData,
-        { asJsonAggregate: true },
-        innerQueryBuilder => {
-          if (returnTypeTablePrimaryKeys) {
-            innerQueryBuilder.beforeFinalize(() => {
-              // append order by primary key to the list of orders
-              returnTypeTablePrimaryKeys.forEach(key => {
-                innerQueryBuilder.orderBy(
-                  sql.fragment`${sql.identifier(functionAlias, key.name)}`,
-                  true
-                );
-              });
-            });
-          }
-        }
-      );
+      type = new GraphQLNonNull(ConnectionType);
+      scope.isPgConnectionField = true;
+      scope.pgIntrospection = returnTypeTable;
+    } else {
+      type = TableType;
+      scope.pgIntrospection = returnTypeTable;
     }
-    if (computed) {
-      addDataGenerator(() => {
-        return {
-          pgQuery: queryBuilder => {
-            queryBuilder.select(() => {
-              const parentTableAlias = queryBuilder.getTableAlias();
+  } else {
+    const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
+    if (proc.returnsSet) {
+      type = new GraphQLList(new GraphQLNonNull(Type));
+    } else {
+      type = Type;
+    }
+  }
+  return buildFieldWithHooks(
+    fieldName,
+    ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+      function makeQuery(
+        parsedResolveInfoFragment,
+        { implicitArgs, inflection }
+      ) {
+        const resolveData = getDataFromParsedResolveInfoFragment(
+          parsedResolveInfoFragment
+        );
+        const { args } = parsedResolveInfoFragment;
+        const argValues = argNames.map((argName, argIndex) => {
+          const gqlArgName = inflection.argument(argName, argIndex);
+          return args[gqlArgName];
+        });
+        while (
+          argValues.length > requiredArgs &&
+          argValues[argValues.length - 1] == null
+        ) {
+          argValues.pop();
+        }
+        const functionAlias = Symbol();
+        return queryFromResolveData(
+          sql.fragment`${sql.identifier(
+            proc.namespace.name,
+            proc.name
+          )}(${sql.join([...implicitArgs, ...argValues.map(sql.value)], ",")})`,
+          functionAlias,
+          resolveData,
+          { asJsonAggregate: true },
+          innerQueryBuilder => {
+            if (returnTypeTablePrimaryKeys) {
+              innerQueryBuilder.beforeFinalize(() => {
+                // append order by primary key to the list of orders
+                returnTypeTablePrimaryKeys.forEach(key => {
+                  innerQueryBuilder.orderBy(
+                    sql.fragment`${sql.identifier(functionAlias, key.name)}`,
+                    true
+                  );
+                });
+              });
+            }
+          }
+        );
+      }
+      if (computed) {
+        addDataGenerator(parsedResolveInfoFragment => {
+          return {
+            pgQuery: queryBuilder => {
+              queryBuilder.select(() => {
+                const parentTableAlias = queryBuilder.getTableAlias();
+                const query = makeQuery(proc, parsedResolveInfoFragment, {
+                  implicitArgs: [sql.identifier(parentTableAlias)],
+                  inflection,
+                });
+                return sql.fragment`(${query})`;
+              }, parsedResolveInfoFragment.alias);
+            },
+          };
+        });
+      }
+      return {
+        type: type,
+        args: argNames.reduce((memo, argName, argIndex) => {
+          const gqlArgName = inflection.argument(argName, argIndex);
+          memo[gqlArgName] = {
+            type: argGqlTypes[argIndex],
+          };
+          return memo;
+        }, {}),
+        resolve: computed
+          ? (data, _args, _context, resolveInfo) => {
+              const { alias } = parseResolveInfo(resolveInfo, {
+                deep: false,
+              });
+              return data[alias];
+            }
+          : async (data, args, { pgClient }, resolveInfo) => {
+              const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
               const query = makeQuery(proc, parsedResolveInfoFragment, {
-                implicitArgs: [sql.identifier(parentTableAlias)],
                 inflection,
               });
-              return sql.fragment`(${query})`;
-            }, parsedResolveInfoFragment.alias);
-          },
-        };
-      });
-    }
-    let type;
-    if (returnTypeTable) {
-      const TableType = getTypeByName(
-        inflection.tableType(
-          returnTypeTable.name,
-          returnTypeTable.namespace.name
-        )
-      );
-      if (proc.returnsSet) {
-        const ConnectionType = getTypeByName(
-          inflection.connection(TableType.name)
-        );
-        type = new GraphQLNonNull(ConnectionType);
-      } else {
-        type = TableType;
-      }
-    } else {
-      const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
-      if (proc.returnsSet) {
-        type = new GraphQLList(new GraphQLNonNull(Type));
-      } else {
-        type = Type;
-      }
-    }
-    return {
-      type: type,
-      args: argNames.reduce((memo, argName, argIndex) => {
-        const gqlArgName = inflection.argument(argName, argIndex);
-        memo[gqlArgName] = {
-          type: argGqlTypes[argIndex],
-        };
-        return memo;
-      }, {}),
-      resolve: computed
-        ? (data, _args, _context, resolveInfo) => {
-            const { alias } = parseResolveInfo(resolveInfo, {
-              deep: false,
-            });
-            return data[alias];
-          }
-        : async (data, args, { pgClient }, resolveInfo) => {
-            const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-            const query = makeQuery(proc, parsedResolveInfoFragment, {
-              implicitArgs: [sql.identifier(parentTableAlias)],
-              inflection,
-            });
 
-            const { text, values } = sql.compile(query);
-            console.log(require("sql-formatter").format(text));
-            const { rows } = await pgClient.query(text, values);
-            return rows || [];
-          },
-    };
-  };
+              const { text, values } = sql.compile(query);
+              console.log(require("sql-formatter").format(text));
+              const { rows } = await pgClient.query(text, values);
+              return rows || [];
+            },
+      };
+    },
+    scope
+  );
 };

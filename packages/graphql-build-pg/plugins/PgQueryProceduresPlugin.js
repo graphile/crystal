@@ -2,7 +2,11 @@ const makeProcField = require("./makeProcField");
 
 module.exports = function PgQueryProceduresPlugin(
   builder,
-  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
+  {
+    pgInflection: inflection,
+    pgStrictFunctions: strictFunctions = false,
+    parseResolveInfo,
+  }
 ) {
   builder.hook(
     "objectType:fields",
@@ -52,17 +56,17 @@ module.exports = function PgQueryProceduresPlugin(
               proc.name,
               proc.namespace.name
             );
-            memo[fieldName] = buildFieldWithHooks(
-              fieldName,
-              makeProcField(proc, {
-                introspectionResultsByKind,
-                strictFunctions,
-                gqlTypeByTypeId,
-                gqlInputTypeByTypeId,
-                getTypeByName,
-                inflection,
-              })
-            );
+            memo[fieldName] = makeProcField(fieldName, proc, {
+              buildFieldWithHooks,
+              introspectionResultsByKind,
+              strictFunctions,
+              gqlTypeByTypeId,
+              gqlInputTypeByTypeId,
+              getTypeByName,
+              inflection,
+              sql,
+              parseResolveInfo,
+            });
             return memo;
           }, {})
       );
