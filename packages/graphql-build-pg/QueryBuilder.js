@@ -59,6 +59,11 @@ class QueryBuilder {
     this.data.limit = limit;
     this.lock("limit");
   }
+  offset(offset) {
+    this.checkLock("offset");
+    this.data.offset = offset;
+    this.lock("offset");
+  }
   flip() {
     this.checkLock("flip");
     this.data.flip = true;

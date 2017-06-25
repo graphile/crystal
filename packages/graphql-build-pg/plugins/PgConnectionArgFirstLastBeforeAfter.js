@@ -19,6 +19,7 @@ module.exports = function PgConnectionArgs(builder) {
 
       addArgDataGenerator(function connectionFirstLastBeforeAfter({
         first,
+        offset,
         last,
         after,
         before,
@@ -27,6 +28,9 @@ module.exports = function PgConnectionArgs(builder) {
           pgQuery: queryBuilder => {
             if (first != null) {
               queryBuilder.limit(first);
+            }
+            if (offset != null) {
+              queryBuilder.offset(offset);
             }
             if (first != null && last != null) {
               throw new Error("We don't support setting both first and last");
@@ -94,6 +98,9 @@ module.exports = function PgConnectionArgs(builder) {
           type: GraphQLInt,
         },
         last: {
+          type: GraphQLInt,
+        },
+        offset: {
           type: GraphQLInt,
         },
         before: {
