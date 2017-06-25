@@ -1,7 +1,7 @@
 const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
 module.exports = function PgComputedColumnsPlugin(
   builder,
-  { pgInflection: inflection }
+  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
 ) {
   builder.hook(
     "objectType:fields",
@@ -13,6 +13,7 @@ module.exports = function PgComputedColumnsPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
+        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
       },
       { scope: { isPgRowType, pgIntrospection: table }, buildFieldWithHooks }
     ) => {
@@ -53,7 +54,29 @@ module.exports = function PgComputedColumnsPlugin(
                 argDefaultsNum: 0 }
             */
 
-            // XXX: add args!
+            const sliceAmount = 1;
+            const argNames = proc.argNames
+              .slice(sliceAmount)
+              .map((name, index) => name || `arg${index}`);
+            const argTypes = proc.argTypeIds
+              .slice(sliceAmount)
+              .map(typeId => introspectionResultsByKind.typeById[typeId]);
+            const requiredArgs = Math.max(
+              0,
+              proc.isStrict
+                ? proc.argNames.length - sliceAmount
+                : strictFunctions
+                  ? proc.argNames.length - sliceAmount - proc.argDefaultsNum
+                  : 0
+            );
+            const argGqlTypes = argTypes.map((type, idx) => {
+              const Type = gqlInputTypeByTypeId[type.id] || GraphQLString;
+              if (idx >= requiredArgs) {
+                return Type;
+              } else {
+                return new GraphQLNonNull(Type);
+              }
+            });
 
             const pseudoColumnName = proc.name.substr(table.name.length + 1);
             const fieldName = inflection.column(
@@ -72,6 +95,22 @@ module.exports = function PgComputedColumnsPlugin(
                 `Could not determine return type for function '${proc.name}'`
               );
             }
+            const returnTypeTableAttributes =
+              returnTypeTable &&
+              introspectionResultsByKind.attribute.filter(
+                attr => attr.classId === returnTypeTable.id
+              );
+            const returnTypeTablePrimaryKeyConstraint =
+              returnTypeTable &&
+              introspectionResultsByKind.constraint
+                .filter(con => con.classId === returnTypeTable.id)
+                .filter(con => ["p"].includes(con.type))[0];
+            const returnTypeTablePrimaryKeys =
+              returnTypeTablePrimaryKeyConstraint &&
+              returnTypeTablePrimaryKeyConstraint.keyAttributeNums.map(
+                num =>
+                  returnTypeTableAttributes.filter(attr => attr.num === num)[0]
+              );
 
             memo[
               fieldName
@@ -85,22 +124,36 @@ module.exports = function PgComputedColumnsPlugin(
                         const resolveData = getDataFromParsedResolveInfoFragment(
                           parsedResolveInfoFragment
                         );
+                        const { args } = parsedResolveInfoFragment;
                         const functionAlias = Symbol();
                         const parentTableAlias = queryBuilder.getTableAlias();
-                        // XXX: add args
+                        const argValues = argNames.map((argName, argIndex) => {
+                          const gqlArgName = inflection.argument(argName);
+                          return args[gqlArgName];
+                        });
+                        while (
+                          argValues.length > requiredArgs &&
+                          argValues[argValues.length - 1] == null
+                        ) {
+                          argValues.pop();
+                        }
                         const query = queryFromResolveData(
                           sql.fragment`${sql.identifier(
                             proc.namespace.name,
                             proc.name
-                          )}(${sql.identifier(parentTableAlias)})`,
+                          )}(${sql.identifier(
+                            parentTableAlias
+                          )}${argValues.length
+                            ? `, ${sql.join(argValues.map(sql.value), ", ")}`
+                            : ""})`,
                           functionAlias,
                           resolveData,
                           { asJsonAggregate: true },
                           innerQueryBuilder => {
-                            if (primaryKeys) {
+                            if (returnTypeTablePrimaryKeys) {
                               innerQueryBuilder.beforeFinalize(() => {
                                 // append order by primary key to the list of orders
-                                primaryKeys.forEach(key => {
+                                returnTypeTablePrimaryKeys.forEach(key => {
                                   innerQueryBuilder.orderBy(
                                     sql.fragment`${sql.identifier(
                                       functionAlias,
@@ -144,6 +197,13 @@ module.exports = function PgComputedColumnsPlugin(
                 }
                 return {
                   type: type,
+                  args: argNames.reduce((memo, argName, argIndex) => {
+                    const gqlArgName = inflection.argument(argName);
+                    memo[gqlArgName] = {
+                      type: argGqlTypes[argIndex],
+                    };
+                    return memo;
+                  }, {}),
                   resolve: (data, _args, _context, resolveInfo) => {
                     const { alias } = parseResolveInfo(resolveInfo, {
                       deep: false,
