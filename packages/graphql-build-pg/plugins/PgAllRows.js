@@ -90,7 +90,7 @@ module.exports = async function PgAllRows(
                       }
                     );
                     const { text, values } = sql.compile(query);
-                    console.log(text);
+                    console.log(require("sql-formatter").format(text));
                     const { rows } = await pgClient.query(text, values);
                     return rows || [];
                   },
