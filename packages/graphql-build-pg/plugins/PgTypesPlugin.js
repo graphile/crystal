@@ -67,7 +67,7 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
       */
     const oidLookup = Object.assign(
       {
-        20: GraphQLFloat, // Even though this is int8, it's too big for JS int, so cast to float (or string?).
+        20: GraphQLString, // Even though this is int8, it's too big for JS int, so cast to string.
         21: GraphQLInt,
         23: GraphQLInt,
       },
