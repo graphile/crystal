@@ -10,6 +10,6 @@ exports.defaultPlugins = [
   require("./plugins/PgForwardRelationPlugin"),
   require("./plugins/PgBackwardRelationPlugin"),
   require("./plugins/PgRowByUniqueConstraint"),
-  //require("./plugins/PgComputedColumnsPlugin"),
+  require("./plugins/PgComputedColumnsPlugin"),
 ];
 exports.inflections = require("./inflections");

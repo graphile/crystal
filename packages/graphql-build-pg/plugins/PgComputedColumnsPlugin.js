@@ -1,3 +1,4 @@
+const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
 module.exports = function PgComputedColumnsPlugin(
   builder,
   { pgInflection: inflection }
@@ -7,12 +8,13 @@ module.exports = function PgComputedColumnsPlugin(
     (
       fields,
       {
+        getTypeByName,
         extend,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
       },
-      { scope: { isPgRowType, pgIntrospection: table } }
+      { scope: { isPgRowType, pgIntrospection: table }, buildFieldWithHooks }
     ) => {
       if (!isPgRowType || !table || table.kind !== "class") {
         return fields;
@@ -27,8 +29,6 @@ module.exports = function PgComputedColumnsPlugin(
       if (!tableType) {
         throw new Error("Could not determine the type for this table");
       }
-      // NOT FINISHED!!!
----------------------------------------
       return extend(
         fields,
         introspectionResultsByKind.procedure
@@ -38,10 +38,6 @@ module.exports = function PgComputedColumnsPlugin(
           .filter(proc => proc.argTypeIds.length > 0)
           .filter(proc => proc.argTypeIds[0] === tableType.id)
           .reduce((memo, proc) => {
-            if (proc.returnsSet) {
-              // XXX: TODO!
-              return memo;
-            }
             /*
             proc =
               { kind: 'procedure',
@@ -59,75 +55,104 @@ module.exports = function PgComputedColumnsPlugin(
 
             // XXX: add args!
 
-            const fieldName = inflection.field(
-              proc.name.substr(table.name.length + 1)
+            const pseudoColumnName = proc.name.substr(table.name.length + 1);
+            const fieldName = inflection.column(
+              pseudoColumnName,
+              table.name,
+              table.namespace.name
             );
-            const schema = introspectionResultsByKind.namespace.filter(
-              n => n.id === proc.namespaceId
-            )[0];
-            if (
-              sqlFragmentGeneratorsByClassIdAndFieldName[table.id][fieldName]
-            ) {
-              console.warn(
-                `WARNING: did not add dynamic column '${fieldName}' from function '${proc.name}' because field already exists`
-              );
-              return memo;
-            }
+            const schema = table.namespace;
 
-            const returnType = introspectionResultsByKind.type.filter(
-              type => type.id === proc.returnTypeId
-            )[0];
-            const returnTypeTable = introspectionResultsByKind.class.filter(
-              cls => cls.id === returnType.classId
-            )[0];
+            const returnType =
+              introspectionResultsByKind.typeById[proc.returnTypeId];
+            const returnTypeTable =
+              introspectionResultsByKind.classById[returnType.classId];
             if (!returnType) {
               throw new Error(
                 `Could not determine return type for function '${proc.name}'`
               );
             }
 
-            sqlFragmentGeneratorsByClassIdAndFieldName[table.id][fieldName] = (
-              parsedResolveInfoFragment,
-              { tableAlias: foreignTableAlias }
-            ) => {
-              const sqlCall = sql.fragment`${sql.identifier(
-                schema.name,
-                proc.name
-              )}(${sql.identifier(foreignTableAlias)})`;
-
-              const isTable = returnType.type === "c" && returnTypeTable;
-
-              const functionAlias = Symbol();
-              const getFragments = () =>
-                generateFieldFragments(
-                  parsedResolveInfoFragment,
-                  sqlFragmentGeneratorsByClassIdAndFieldName[
-                    returnTypeTable.id
-                  ],
-                  { tableAlias: functionAlias }
-                );
-              const sqlFragment = isTable
-                ? sql.query`(
-                  select ${sqlJsonBuildObjectFromFragments(getFragments())}
-                  from ${sqlCall} as ${sql.identifier(functionAlias)}
-                )`
-                : sqlCall;
-              return [
-                {
-                  alias: parsedResolveInfoFragment.alias,
-                  sqlFragment,
-                },
-              ];
-            };
-            memo[fieldName] = {
-              type: gqlTypeByTypeId[proc.returnTypeId] || GraphQLString,
-              resolve: (data, _args, _context, resolveInfo) => {
-                const { alias } = parseResolveInfo(resolveInfo, {
-                  deep: false,
+            memo[
+              fieldName
+            ] = buildFieldWithHooks(
+              fieldName,
+              ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+                addDataGenerator(() => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(() => {
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment
+                        );
+                        const functionAlias = Symbol();
+                        const parentTableAlias = queryBuilder.getTableAlias();
+                        // XXX: add args
+                        const query = queryFromResolveData(
+                          sql.fragment`${sql.identifier(
+                            proc.namespace.name,
+                            proc.name
+                          )}(${sql.identifier(parentTableAlias)})`,
+                          functionAlias,
+                          resolveData,
+                          { asJsonAggregate: true },
+                          innerQueryBuilder => {
+                            if (primaryKeys) {
+                              innerQueryBuilder.beforeFinalize(() => {
+                                // append order by primary key to the list of orders
+                                primaryKeys.forEach(key => {
+                                  innerQueryBuilder.orderBy(
+                                    sql.fragment`${sql.identifier(
+                                      functionAlias,
+                                      key.name
+                                    )}`,
+                                    true
+                                  );
+                                });
+                              });
+                            }
+                          }
+                        );
+                        return sql.fragment`(${query})`;
+                      }, parsedResolveInfoFragment.alias);
+                    },
+                  };
                 });
-                return data[alias];
-              },
-            };
+                let type;
+                if (returnTypeTable) {
+                  const TableType = getTypeByName(
+                    inflection.tableType(
+                      returnTypeTable.name,
+                      returnTypeTable.namespace.name
+                    )
+                  );
+                  if (proc.returnsSet) {
+                    const ConnectionType = getTypeByName(
+                      inflection.connection(TableType.name)
+                    );
+                    type = new GraphQLNonNull(ConnectionType);
+                  } else {
+                    type = TableType;
+                  }
+                } else {
+                  const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
+                  if (proc.returnsSet) {
+                    type = new GraphQLList(new GraphQLNonNull(Type));
+                  } else {
+                    type = Type;
+                  }
+                }
+                return {
+                  type: type,
+                  resolve: (data, _args, _context, resolveInfo) => {
+                    const { alias } = parseResolveInfo(resolveInfo, {
+                      deep: false,
+                    });
+                    return data[alias];
+                  },
+                };
+              }
+            );
             return memo;
           }, {})
       );
