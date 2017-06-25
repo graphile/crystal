@@ -17,5 +17,6 @@ module.exports = function createPostGraphQLSchema(
     pgInflection: classicIds
       ? inflections.postGraphQLClassicIdsInflection
       : inflections.postGraphQLInflection,
+    nodeIdFieldName: classicIds ? "id" : "nodeId",
   });
 };
