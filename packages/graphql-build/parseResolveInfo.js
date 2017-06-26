@@ -77,13 +77,22 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
     } else if (kind === "FragmentSpread" && options.deep) {
       const fragment = fragments[name];
       assert(fragment, 'unknown fragment "' + name + '"');
-      fieldTreeFromAST(
-        fragment.selectionSet.selections,
-        resolveInfo,
-        tree,
-        options,
-        parentType
-      );
+      let shouldContinue = true;
+      if (fragment.typeCondition) {
+        const { kind, name } = fragment.typeCondition;
+        if (kind === "NamedType") {
+          shouldContinue = name.value === parentType.name;
+        }
+      }
+      if (shouldContinue) {
+        fieldTreeFromAST(
+          fragment.selectionSet.selections,
+          resolveInfo,
+          tree,
+          options,
+          parentType
+        );
+      }
     } else if (kind === "InlineFragment" && options.deep) {
       const fragment = val;
       fieldTreeFromAST(
