@@ -48,11 +48,12 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
   return asts.reduce(function(tree, val) {
     const kind = val.kind;
     const name = val.name && val.name.value;
-    const alias = val.alias ? val.alias.value : name;
-    const field = getFieldFromAST(val, parentType);
-    const fieldGqlType = getNamedType(field.type);
-    const args = getArgumentValues(field, val, variableValues) || {};
-    if (kind === "Field") {
+    const isReserved = name && name.substr(0, 2) === "__";
+    if (kind === "Field" && !isReserved) {
+      const alias = val.alias ? val.alias.value : name;
+      const field = getFieldFromAST(val, parentType);
+      const fieldGqlType = getNamedType(field.type);
+      const args = getArgumentValues(field, val, variableValues) || {};
       if (!tree[alias]) {
         tree[alias] = {
           ast: val,
