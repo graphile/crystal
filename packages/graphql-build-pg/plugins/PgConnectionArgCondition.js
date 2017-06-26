@@ -59,6 +59,7 @@ module.exports = function PgConnectionArgCondition(
       args,
       {
         pgSql: sql,
+        gql2pg,
         extend,
         getTypeByName,
         buildObjectWithHooks,
@@ -96,7 +97,7 @@ module.exports = function PgConnectionArgCondition(
                       sql.fragment`${sql.identifier(
                         queryBuilder.getTableAlias(),
                         attr.name
-                      )} = ${sql.value(val)}`
+                      )} = ${sql.value(gql2pg(val, attr.type))}`
                     );
                   }
                 });

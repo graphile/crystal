@@ -94,6 +94,13 @@ module.exports = async function PgIntrospectionPlugin(
     );
 
     relate(
+      introspectionResultsByKind.attribute,
+      "type",
+      "typeId",
+      introspectionResultsByKind.typeById
+    );
+
+    relate(
       introspectionResultsByKind.procedure,
       "namespace",
       "namespaceId",

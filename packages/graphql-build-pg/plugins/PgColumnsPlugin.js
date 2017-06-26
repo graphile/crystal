@@ -14,6 +14,7 @@ module.exports = function PgColumnsPlugin(
         pgGqlTypeByTypeId: gqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
+        pg2gql,
         parseResolveInfo,
       },
       {
@@ -64,7 +65,7 @@ module.exports = function PgColumnsPlugin(
                 const { alias } = parseResolveInfo(resolveInfo, {
                   deep: false,
                 });
-                return data[alias];
+                return pg2gql(data[alias], attr.type);
               },
             };
             return memo;

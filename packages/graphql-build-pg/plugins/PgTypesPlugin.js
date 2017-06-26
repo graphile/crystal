@@ -24,6 +24,7 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
       {},
       build.pgGqlInputTypeByTypeId
     );
+    const pg2GqlMapper = {};
     /*
       type =
         { kind: 'type',
@@ -83,6 +84,13 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
         // 1186 interval
       }
     );
+    const identity = _ => _;
+    const jsonStringify = o => JSON.stringify(o);
+    pg2GqlMapper[114] = {
+      map: identity,
+      unmap: jsonStringify,
+    };
+    pg2GqlMapper[3802] = pg2GqlMapper[114];
     const enforceGqlTypeByPgType = type => {
       // Explicit overrides
       if (!gqlTypeByTypeId[type.id]) {
@@ -124,6 +132,27 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
     return build.extend(build, {
       pgGqlTypeByTypeId: gqlTypeByTypeId,
       pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+      pg2GqlMapper,
+      pg2gql(val, type) {
+        if (val == null) {
+          return val;
+        }
+        if (pg2GqlMapper[type.id]) {
+          return pg2GqlMapper[type.id].map(val);
+        } else {
+          return val;
+        }
+      },
+      gql2pg(val, type) {
+        if (val == null) {
+          return val;
+        }
+        if (pg2GqlMapper[type.id]) {
+          return pg2GqlMapper[type.id].unmap(val);
+        } else {
+          return val;
+        }
+      },
     });
   });
 };

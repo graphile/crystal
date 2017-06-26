@@ -22,6 +22,8 @@ module.exports = function makeProcField(
     inflection,
     sql,
     parseResolveInfo,
+    gql2pg,
+    pg2gql,
   }
 ) {
   const sliceAmount = computed ? 1 : 0;
@@ -112,7 +114,7 @@ module.exports = function makeProcField(
         const { args = {} } = parsedResolveInfoFragment;
         const argValues = argNames.map((argName, argIndex) => {
           const gqlArgName = inflection.argument(argName, argIndex);
-          return args[gqlArgName];
+          return gql2pg(args[gqlArgName], argTypes[argIndex]);
         });
         while (
           argValues.length > requiredArgs &&
@@ -176,9 +178,9 @@ module.exports = function makeProcField(
               const value = data[alias];
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {
-                  return value.map(firstValue);
+                  return value.map(firstValue).map(v => pg2gql(v, returnType));
                 } else {
-                  return value;
+                  return pg2gql(value, returnType);
                 }
               } else {
                 return value;
@@ -197,9 +199,9 @@ module.exports = function makeProcField(
               }
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {
-                  return rows.map(firstValue);
+                  return rows.map(firstValue).map(v => pg2gql(v, returnType));
                 } else {
-                  return firstValue(rows[0]);
+                  return pg2gql(firstValue(rows[0]), returnType);
                 }
               } else {
                 if (proc.returnsSet) {

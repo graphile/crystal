@@ -12,6 +12,7 @@ module.exports = async function PgRowByUniqueConstraint(
         extend,
         parseResolveInfo,
         getTypeByName,
+        gql2pg,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
@@ -97,13 +98,16 @@ module.exports = async function PgRowByUniqueConstraint(
                                 builder.getTableAlias(),
                                 key.name
                               )} = ${sql.value(
-                                args[
-                                  inflection.column(
-                                    key.name,
-                                    key.class.name,
-                                    key.class.namespace.name
-                                  )
-                                ]
+                                gql2pg(
+                                  args[
+                                    inflection.column(
+                                      key.name,
+                                      key.class.name,
+                                      key.class.namespace.name
+                                    )
+                                  ],
+                                  key.type
+                                )
                               )}`
                             );
                           });
