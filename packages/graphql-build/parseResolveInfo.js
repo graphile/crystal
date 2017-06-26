@@ -79,10 +79,7 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
       assert(fragment, 'unknown fragment "' + name + '"');
       let shouldContinue = true;
       if (fragment.typeCondition) {
-        const { kind, name } = fragment.typeCondition;
-        if (kind === "NamedType") {
-          shouldContinue = name.value === parentType.name;
-        }
+        shouldContinue = isCompatible(parentType, fragment.typeCondition);
       }
       if (shouldContinue) {
         fieldTreeFromAST(
@@ -95,13 +92,19 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
       }
     } else if (kind === "InlineFragment" && options.deep) {
       const fragment = val;
-      fieldTreeFromAST(
-        fragment.selectionSet.selections,
-        resolveInfo,
-        tree,
-        options,
-        parentType
-      );
+      let shouldContinue = true;
+      if (fragment.typeCondition) {
+        shouldContinue = isCompatible(parentType, fragment.typeCondition);
+      }
+      if (shouldContinue) {
+        fieldTreeFromAST(
+          fragment.selectionSet.selections,
+          resolveInfo,
+          tree,
+          options,
+          parentType
+        );
+      }
     } // else ignore
     // XXX: need to process FragmentDefinition?
     // Ref: https://github.com/postgraphql/postgraphql/pull/342/files#diff-d6702ec9fed755c88b9d70b430fda4d8R148
@@ -113,6 +116,22 @@ function firstKey(obj) {
   for (const key in obj) {
     return key;
   }
+}
+
+function isCompatible(type, typeCondition) {
+  let isCompatible = false;
+  const { kind, name } = typeCondition;
+  if (kind === "NamedType") {
+    const otherTypeName = name.value;
+    isCompatible = otherTypeName === type.name;
+    if (!isCompatible) {
+      // Maybe it implements an interface?
+      const interfaces = type.getInterfaces();
+      const interfaceNames = interfaces.map(({ name }) => name);
+      isCompatible = interfaceNames.includes(otherTypeName);
+    }
+  }
+  return isCompatible;
 }
 
 module.exports = parseFields;
