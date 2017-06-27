@@ -39,6 +39,14 @@ For information about how to change these defaults, just run:
 postgraphql --help
 ```
 
+There is also a docker image for running PostGraphQL, simply pass the same options to the docker container:
+```bash
+docker pull postgraphql\postgraphql
+docker run postgraphql --help
+# or
+docker run -p 5000:5000 postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_SCHEMA
+```
+
 You can also use PostGraphQL as native HTTP, Connect, Express, or Koa middleware. Just import `postgraphql`:
 
 ```js
