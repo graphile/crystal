@@ -34,7 +34,7 @@ function parseFields(resolveInfo, options = {}) {
 function getFieldFromAST(ast, parentType) {
   if (ast.kind === "Field") {
     const fieldName = ast.name.value;
-    return parentType._fields[fieldName];
+    return parentType.getFields()[fieldName];
   }
   return;
 }
