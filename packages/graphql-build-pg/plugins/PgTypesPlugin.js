@@ -15,6 +15,9 @@ const {
   GraphQLDateTime,
 } = require("graphql-iso-date");
 
+const upperFirst = require("lodash/upperFirst");
+const camelcase = require("lodash/camelcase");
+
 module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
   builder.hook("build", build => {
     const GraphQLJSON = build.getTypeByName("JSON");
@@ -102,6 +105,7 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
       // Enums
       if (!gqlTypeByTypeId[type.id] && type.typtype === "e") {
         gqlTypeByTypeId[type.id] = new GraphQLEnumType({
+          // XXX: use inflection
           name: upperFirst(camelcase(`${type.name}-enum`)),
           values: type.enumVariants,
           description: type.description,
