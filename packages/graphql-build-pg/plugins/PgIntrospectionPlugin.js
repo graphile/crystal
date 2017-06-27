@@ -107,6 +107,13 @@ module.exports = async function PgIntrospectionPlugin(
       introspectionResultsByKind.namespaceById
     );
 
+    relate(
+      introspectionResultsByKind.type,
+      "class",
+      "classId",
+      introspectionResultsByKind.classById
+    );
+
     builder.hook("build", build => {
       return build.extend(build, {
         pgIntrospectionResultsByKind: introspectionResultsByKind,
