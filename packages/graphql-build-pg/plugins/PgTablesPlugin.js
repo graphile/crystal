@@ -150,7 +150,10 @@ module.exports = function PgTablesPlugin(
                 const v = obj[k];
                 // XXX: nest
                 const { name, type } = pgInputFields[k];
-                return sql.fragment`${sql.literal(name)}, ${gql2pg(v, type)}`;
+                return sql.fragment`${sql.literal(name)}, ${gql2pg(
+                  v,
+                  type
+                )}::${sql.identifier(type.namespaceName, type.name)}`;
               }),
               ","
             )}))`;
