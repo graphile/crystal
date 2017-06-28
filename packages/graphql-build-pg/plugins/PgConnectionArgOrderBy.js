@@ -27,7 +27,10 @@ module.exports = function PgConnectionArgOrderBy(
             ),
             values: {
               NATURAL: {
-                value: null,
+                value: {
+                  alias: "natural",
+                  specs: [],
+                },
               },
               // XXX: add the (indexed?) columns
             },
@@ -64,7 +67,8 @@ module.exports = function PgConnectionArgOrderBy(
         return {
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              const orders = Array.isArray(orderBy[0]) ? orderBy : [orderBy];
+              const { _alias, specs } = orderBy;
+              const orders = Array.isArray(specs[0]) ? specs : [specs];
               orders.forEach(([col, ascending]) => {
                 const expr = isString(col)
                   ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(

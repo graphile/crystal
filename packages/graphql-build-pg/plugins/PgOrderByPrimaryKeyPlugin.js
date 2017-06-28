@@ -37,10 +37,16 @@ module.exports = function PgOrderByPrimaryKeyPlugin(
         );
       return extend(values, {
         PRIMARY_KEY_ASC: {
-          value: primaryKeys.map(key => [key.name, true]),
+          value: {
+            alias: "primary_key_asc",
+            specs: primaryKeys.map(key => [key.name, true]),
+          },
         },
         PRIMARY_KEY_DESC: {
-          value: primaryKeys.map(key => [key.name, false]),
+          value: {
+            alias: "primary_key_desc",
+            specs: primaryKeys.map(key => [key.name, false]),
+          },
         },
       });
     }

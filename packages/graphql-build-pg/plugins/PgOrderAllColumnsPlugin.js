@@ -55,10 +55,16 @@ module.exports = function PgOrderAllColumnsPlugin(
               table.namespace.name
             );
             memo[ascFieldName] = {
-              value: [attr.name, true],
+              value: {
+                alias: ascFieldName,
+                specs: [[attr.name, true]],
+              },
             };
             memo[descFieldName] = {
-              value: [attr.name, false],
+              value: {
+                alias: descFieldName,
+                specs: [[attr.name, false]],
+              },
             };
             return memo;
           }, {})
