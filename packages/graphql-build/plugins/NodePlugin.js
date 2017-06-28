@@ -10,8 +10,8 @@ const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   builder.hook("build", build => {
     const nodeFetcherByType = new Map();
-    const nodeAliasByType = new Map();
-    const nodeTypeByAlias = new Map();
+    const nodeAliasByTypeName = {};
+    const nodeTypeNameByAlias = {};
     return build.extend(build, {
       nodeIdFieldName,
       $$nodeType: Symbol("nodeType"),
@@ -27,15 +27,15 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
         }
         nodeFetcherByType.set(Type, fetcher);
       },
-      getNodeAlias(Type) {
-        return nodeAliasByType.get(Type) || Type.name;
+      getNodeAlias(typeName) {
+        return nodeAliasByTypeName[typeName] || typeName;
       },
       getNodeType(alias) {
-        return nodeTypeByAlias.get(alias) || this.getTypeByName(alias);
+        return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
       },
-      setNodeAlias(Type, alias) {
-        nodeAliasByType.set(Type, alias);
-        nodeTypeByAlias.set(alias, Type);
+      setNodeAlias(typeName, alias) {
+        nodeAliasByTypeName[typeName] = alias;
+        nodeTypeNameByAlias[alias] = typeName;
       },
     });
   });

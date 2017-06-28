@@ -19,6 +19,7 @@ module.exports = async function PgRowByUniqueConstraint(
         pgSql: sql,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         gql2pg,
+        getNodeType,
       },
       { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
@@ -69,10 +70,11 @@ module.exports = async function PgRowByUniqueConstraint(
                   async resolve(parent, args, { pgClient }, resolveInfo) {
                     const nodeId = args[nodeIdFieldName];
                     try {
-                      const [typeName, ...identifiers] = JSON.parse(
+                      const [alias, ...identifiers] = JSON.parse(
                         base64Decode(nodeId)
                       );
-                      if (typeName !== TableType.name) {
+                      const NodeTypeByAlias = getNodeType(alias);
+                      if (NodeTypeByAlias !== TableType) {
                         throw new Error("Mismatched type");
                       }
                       if (identifiers.length !== primaryKeys.length) {
