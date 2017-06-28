@@ -285,8 +285,8 @@ module.exports = function makeNewBuild(builder) {
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );
-                    const typeFields = Type.getFields();
                     if (fieldDataGenerators) {
+                      const typeFields = Type.getFields();
                       for (const alias of Object.keys(fields)) {
                         const field = fields[alias];
                         const gens = fieldDataGenerators[field.name];
@@ -314,7 +314,7 @@ module.exports = function makeNewBuild(builder) {
                     newSpec.args,
                     Object.assign({}, context, {
                       field: newSpec,
-                      resultType: newSpec.type,
+                      returnType: newSpec.type,
                     })
                   ),
                 });

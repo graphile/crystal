@@ -202,7 +202,7 @@ module.exports = function makeProcField(
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
               const query = makeQuery(
                 parsedResolveInfoFragment,
-                resolveInfo.resultType,
+                resolveInfo.returnType,
                 {}
               );
 
