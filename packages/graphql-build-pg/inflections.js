@@ -14,6 +14,9 @@ exports.defaultInflection = {
   orderByEnum(name, ascending, _table, _schema) {
     return snakeCase(`${name}_${ascending ? "ASC" : "DESC"}`).toUpperCase();
   },
+  enumName(value) {
+    return value;
+  },
   conditionType(typeName) {
     return upperFirst(camelcase(`${typeName}-condition`));
   },
@@ -65,7 +68,11 @@ exports.defaultInflection = {
   },
 };
 
-exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection);
+exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection, {
+  enumName(value) {
+    return snakeCase(value).toUpperCase();
+  },
+});
 
 exports.postGraphQLClassicIdsInflection = Object.assign(
   {},

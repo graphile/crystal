@@ -18,7 +18,10 @@ const {
 const upperFirst = require("lodash/upperFirst");
 const camelcase = require("lodash/camelcase");
 
-module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
+module.exports = function PgTypesPlugin(
+  builder,
+  { pgExtendedTypes = true, pgInflection: inflection }
+) {
   builder.hook("build", build => {
     const GraphQLJSON = build.getTypeByName("JSON");
     const GraphQLUUID = build.getTypeByName("UUID");
@@ -103,11 +106,17 @@ module.exports = function PgTypesPlugin(builder, { pgExtendedTypes = true }) {
         }
       }
       // Enums
-      if (!gqlTypeByTypeId[type.id] && type.typtype === "e") {
+      if (!gqlTypeByTypeId[type.id] && type.type === "e") {
         gqlTypeByTypeId[type.id] = new GraphQLEnumType({
           // XXX: use inflection
           name: upperFirst(camelcase(`${type.name}-enum`)),
-          values: type.enumVariants,
+          values: type.enumVariants.reduce((memo, value) => {
+            memo[inflection.enumName(value)] = {
+              name: value,
+              value: value,
+            };
+            return memo;
+          }, {}),
           description: type.description,
         });
       }
