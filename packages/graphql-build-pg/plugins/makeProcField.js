@@ -97,7 +97,7 @@ module.exports = function makeProcField(
     returnFirstValueAsValue = true;
     const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
     if (proc.returnsSet) {
-      type = new GraphQLList(new GraphQLNonNull(Type));
+      type = new GraphQLList(Type);
     } else {
       type = Type;
     }
