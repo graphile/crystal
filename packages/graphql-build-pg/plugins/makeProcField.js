@@ -133,7 +133,12 @@ module.exports = function makeProcField(
           resolveData,
           { asJsonAggregate: computed && proc.returnsSet, asJson: computed },
           innerQueryBuilder => {
-            if (returnTypeTablePrimaryKeys) {
+            if (!returnTypeTable) {
+              innerQueryBuilder.select(
+                sql.fragment`${functionAlias}.${functionAlias}`,
+                "value"
+              );
+            } else if (returnTypeTablePrimaryKeys) {
               innerQueryBuilder.beforeFinalize(() => {
                 // append order by primary key to the list of orders
                 returnTypeTablePrimaryKeys.forEach(key => {
