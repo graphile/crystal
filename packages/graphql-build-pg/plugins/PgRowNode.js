@@ -18,6 +18,7 @@ module.exports = async function PgRowByUniqueConstraint(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+        gql2pg,
       },
       { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
@@ -94,7 +95,10 @@ module.exports = async function PgRowByUniqueConstraint(
                             builder.where(
                               sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                                 key.name
-                              )} = ${sql.value(identifiers[idx])}`
+                              )} = ${gql2pg(
+                                identifiers[idx],
+                                primaryKeys[idx].type
+                              )}`
                             );
                           });
                         }

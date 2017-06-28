@@ -87,7 +87,7 @@ module.exports = function PgTablesPlugin(
                             key =>
                               sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                 key.name
-                              )} || ''`
+                              )}`
                           ),
                           ", "
                         )})`,
