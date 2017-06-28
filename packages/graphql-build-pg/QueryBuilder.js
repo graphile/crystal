@@ -97,18 +97,20 @@ class QueryBuilder {
               sql.fragment`${sql.literal(alias)}, ${sqlFragment}`
           ),
           ", "
-        )}) as object`
-      : sql.fragment`to_json(${sql.identifier(
-          this.getTableAlias()
-        )}.*) as object`;
+        )})`
+      : sql.fragment`to_json(${sql.identifier(this.getTableAlias())}.*)`;
     return buildObject;
   }
-  build({ asJson = false, asJsonAggregate = false } = {}) {
+  build({ asJson = false, asJsonAggregate = false, justFields = false } = {}) {
     this.lockEverything();
+    const fields = asJson || asJsonAggregate
+      ? sql.fragment`${this.buildSelectJson()} as object`
+      : this.buildSelectFields();
+    if (justFields) {
+      return fields;
+    }
     let fragment = sql.fragment`
-      select ${asJson || asJsonAggregate
-        ? this.buildSelectJson()
-        : this.buildSelectFields()}
+      select ${fields}
       ${this.data.from &&
         sql.fragment`from ${this.data.from[0]} as ${sql.identifier(
           this.data.from[1]

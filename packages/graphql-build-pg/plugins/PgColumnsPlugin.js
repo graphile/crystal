@@ -1,6 +1,9 @@
 const { GraphQLNonNull, GraphQLString } = require("graphql");
+const queryFromResolveData = require("../queryFromResolveData");
+
 const nullableIf = (condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
+
 module.exports = function PgColumnsPlugin(
   builder,
   { pgInflection: inflection }
@@ -19,7 +22,7 @@ module.exports = function PgColumnsPlugin(
       },
       {
         scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
-        addDataGeneratorForField,
+        buildFieldWithHooks,
       }
     ) => {
       if (
@@ -50,28 +53,66 @@ module.exports = function PgColumnsPlugin(
               table.name,
               table.namespace.name
             );
-            addDataGeneratorForField(fieldName, ({ alias }) => {
-              return {
-                pgQuery: queryBuilder => {
-                  queryBuilder.select(
-                    sql.identifier(queryBuilder.getTableAlias(), attr.name),
-                    alias
-                  );
-                },
-              };
-            });
-            memo[fieldName] = {
-              type: nullableIf(
-                !attr.isNotNull,
-                gqlTypeByTypeId[attr.typeId] || GraphQLString
-              ),
-              resolve: (data, _args, _context, resolveInfo) => {
-                const { alias } = parseResolveInfo(resolveInfo, {
-                  deep: false,
+            memo[
+              fieldName
+            ] = buildFieldWithHooks(
+              fieldName,
+              ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+                addDataGenerator(parsedResolveInfoFragment => {
+                  const { alias } = parsedResolveInfoFragment;
+                  if (attr.type.type === "c") {
+                    return {
+                      pgQuery: queryBuilder => {
+                        // json_build_object
+                        /*
+                        queryBuilder.select(
+                          sql.identifier(queryBuilder.getTableAlias(), attr.name),
+                          alias
+                        );
+                        */
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment
+                        );
+                        const jsonBuildObject = queryFromResolveData(
+                          Symbol(), // Ignore!
+                          sql.fragment`(${sql.identifier(
+                            queryBuilder.getTableAlias(),
+                            attr.name
+                          )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
+                          resolveData,
+                          { asJson: true, justFields: true }
+                        );
+                        queryBuilder.select(jsonBuildObject, alias);
+                      },
+                    };
+                  } else {
+                    return {
+                      pgQuery: queryBuilder => {
+                        queryBuilder.select(
+                          sql.identifier(
+                            queryBuilder.getTableAlias(),
+                            attr.name
+                          ),
+                          alias
+                        );
+                      },
+                    };
+                  }
                 });
-                return pg2gql(data[alias], attr.type);
-              },
-            };
+                return {
+                  type: nullableIf(
+                    !attr.isNotNull,
+                    gqlTypeByTypeId[attr.typeId] || GraphQLString
+                  ),
+                  resolve: (data, _args, _context, resolveInfo) => {
+                    const { alias } = parseResolveInfo(resolveInfo, {
+                      deep: false,
+                    });
+                    return pg2gql(data[alias], attr.type);
+                  },
+                };
+              }
+            );
             return memo;
           }, {})
       );
