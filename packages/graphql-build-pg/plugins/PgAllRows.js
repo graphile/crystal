@@ -71,7 +71,7 @@ module.exports = async function PgAllRows(
                       );
                       const query = queryFromResolveData(
                         sqlFullTableName,
-                        Symbol(),
+                        undefined,
                         resolveData,
                         {},
                         builder => {
@@ -80,8 +80,7 @@ module.exports = async function PgAllRows(
                               // append order by primary key to the list of orders
                               primaryKeys.forEach(key => {
                                 builder.orderBy(
-                                  sql.fragment`${sql.identifier(
-                                    builder.getTableAlias(),
+                                  sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                                     key.name
                                   )}`,
                                   true

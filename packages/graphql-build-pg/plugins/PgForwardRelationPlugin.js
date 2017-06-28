@@ -101,7 +101,7 @@ module.exports = function PgForwardRelationPlugin(
                       const resolveData = getDataFromParsedResolveInfoFragment(
                         parsedResolveInfoFragment
                       );
-                      const foreignTableAlias = Symbol();
+                      const foreignTableAlias = sql.identifier(Symbol());
                       const query = queryFromResolveData(
                         sql.identifier(foreignSchema.name, foreignTable.name),
                         foreignTableAlias,
@@ -110,11 +110,9 @@ module.exports = function PgForwardRelationPlugin(
                         innerQueryBuilder => {
                           keys.forEach((key, i) => {
                             innerQueryBuilder.where(
-                              sql.fragment`${sql.identifier(
-                                queryBuilder.getTableAlias(),
+                              sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                 key.name
-                              )} = ${sql.identifier(
-                                foreignTableAlias,
+                              )} = ${foreignTableAlias}.${sql.identifier(
                                 foreignKeys[i].name
                               )}`
                             );

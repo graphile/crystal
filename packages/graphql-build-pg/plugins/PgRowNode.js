@@ -86,14 +86,13 @@ module.exports = async function PgRowByUniqueConstraint(
                       );
                       const query = queryFromResolveData(
                         sqlFullTableName,
-                        Symbol(),
+                        undefined,
                         resolveData,
                         {},
                         builder => {
                           primaryKeys.forEach((key, idx) => {
                             builder.where(
-                              sql.fragment`${sql.identifier(
-                                builder.getTableAlias(),
+                              sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                                 key.name
                               )} = ${sql.value(identifiers[idx])}`
                             );

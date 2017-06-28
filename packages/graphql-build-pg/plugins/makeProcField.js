@@ -122,7 +122,7 @@ module.exports = function makeProcField(
         ) {
           argValues.pop();
         }
-        const functionAlias = Symbol();
+        const functionAlias = sql.identifier(Symbol());
         return queryFromResolveData(
           sql.fragment`${sql.identifier(
             proc.namespace.name,
@@ -137,7 +137,7 @@ module.exports = function makeProcField(
                 // append order by primary key to the list of orders
                 returnTypeTablePrimaryKeys.forEach(key => {
                   innerQueryBuilder.orderBy(
-                    sql.fragment`${sql.identifier(functionAlias, key.name)}`,
+                    sql.fragment`${functionAlias}.${sql.identifier(key.name)}`,
                     true
                   );
                 });
@@ -153,7 +153,7 @@ module.exports = function makeProcField(
               queryBuilder.select(() => {
                 const parentTableAlias = queryBuilder.getTableAlias();
                 const query = makeQuery(parsedResolveInfoFragment, {
-                  implicitArgs: [sql.identifier(parentTableAlias)],
+                  implicitArgs: [parentTableAlias],
                 });
                 return sql.fragment`(${query})`;
               }, parsedResolveInfoFragment.alias);

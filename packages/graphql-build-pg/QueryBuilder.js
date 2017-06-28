@@ -34,7 +34,7 @@ class QueryBuilder {
     this.checkLock("select");
     this.data.select.push([exprGen, alias]);
   }
-  from(expr, alias = Symbol()) {
+  from(expr, alias = sql.identifier(Symbol())) {
     this.checkLock("from");
     if (!expr) {
       throw new Error("No from table source!");
@@ -98,23 +98,23 @@ class QueryBuilder {
           ),
           ", "
         )})`
-      : sql.fragment`to_json(${sql.identifier(this.getTableAlias())}.*)`;
+      : sql.fragment`to_json(${this.getTableAlias()}.*)`;
     return buildObject;
   }
-  build({ asJson = false, asJsonAggregate = false, justFields = false } = {}) {
+  build(
+    { asJson = false, asJsonAggregate = false, onlyJsonField = false } = {}
+  ) {
     this.lockEverything();
+    if (onlyJsonField) {
+      return this.buildSelectJson();
+    }
     const fields = asJson || asJsonAggregate
       ? sql.fragment`${this.buildSelectJson()} as object`
       : this.buildSelectFields();
-    if (justFields) {
-      return fields;
-    }
     let fragment = sql.fragment`
       select ${fields}
       ${this.data.from &&
-        sql.fragment`from ${this.data.from[0]} as ${sql.identifier(
-          this.data.from[1]
-        )}`}
+        sql.fragment`from ${this.data.from[0]} as ${this.getTableAlias()}`}
       ${this.data.join.length && sql.join(this.data.join, " ")}
       ${this.data.where.length &&
         sql.fragment`where ${sql.join(this.data.where, " AND ")}`}

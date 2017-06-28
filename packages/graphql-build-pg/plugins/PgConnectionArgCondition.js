@@ -94,8 +94,7 @@ module.exports = function PgConnectionArgCondition(
                   const val = condition[fieldName];
                   if (val != null) {
                     queryBuilder.where(
-                      sql.fragment`${sql.identifier(
-                        queryBuilder.getTableAlias(),
+                      sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                         attr.name
                       )} = ${sql.value(gql2pg(val, attr.type))}`
                     );

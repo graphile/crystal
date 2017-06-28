@@ -73,8 +73,7 @@ module.exports = function PgTablesPlugin(
                         sql.fragment`json_build_array(${sql.join(
                           primaryKeys.map(
                             key =>
-                              sql.fragment`${sql.identifier(
-                                queryBuilder.getTableAlias(),
+                              sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                 key.name
                               )} || ''`
                           ),

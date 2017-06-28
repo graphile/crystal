@@ -45,7 +45,7 @@ module.exports = function PgConnectionArgOrderBy(
     "field:args",
     (
       args,
-      { extend, getTypeByName, buildObjectWithHooks },
+      { extend, getTypeByName, buildObjectWithHooks, pgSql: sql },
       {
         scope: { isPgConnectionField, pgIntrospection: table },
         addArgDataGenerator,
@@ -67,7 +67,9 @@ module.exports = function PgConnectionArgOrderBy(
               const orders = Array.isArray(orderBy[0]) ? orderBy : [orderBy];
               orders.forEach(([col, ascending]) => {
                 const expr = isString(col)
-                  ? sql.identifier(queryBuilder.getTableAlias(), col)
+                  ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                      col
+                    )}`
                   : col;
                 queryBuilder.orderBy(expr, ascending);
               });

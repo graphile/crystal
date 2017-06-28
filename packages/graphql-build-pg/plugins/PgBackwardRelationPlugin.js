@@ -110,7 +110,7 @@ module.exports = function PgBackwardRelationPlugin(
                       const resolveData = getDataFromParsedResolveInfoFragment(
                         parsedResolveInfoFragment
                       );
-                      const tableAlias = Symbol();
+                      const tableAlias = sql.identifier(Symbol());
                       const foreignTableAlias = queryBuilder.getTableAlias();
                       const query = queryFromResolveData(
                         sql.identifier(schema.name, table.name),
@@ -123,8 +123,7 @@ module.exports = function PgBackwardRelationPlugin(
                               // append order by primary key to the list of orders
                               primaryKeys.forEach(key => {
                                 innerQueryBuilder.orderBy(
-                                  sql.fragment`${sql.identifier(
-                                    innerQueryBuilder.getTableAlias(),
+                                  sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name
                                   )}`,
                                   true
@@ -135,11 +134,9 @@ module.exports = function PgBackwardRelationPlugin(
 
                           keys.forEach((key, i) => {
                             innerQueryBuilder.where(
-                              sql.fragment`${sql.identifier(
-                                tableAlias,
+                              sql.fragment`${tableAlias}.${sql.identifier(
                                 key.name
-                              )} = ${sql.identifier(
-                                foreignTableAlias,
+                              )} = ${foreignTableAlias}.${sql.identifier(
                                 foreignKeys[i].name
                               )}`
                             );
