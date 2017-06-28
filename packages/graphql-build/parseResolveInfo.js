@@ -6,10 +6,11 @@ const { getNamedType } = require("graphql");
 
 // Based on https://github.com/tjmehta/graphql-parse-fields
 
-function parseFields(resolveInfo, options = {}) {
+function parseFields(resolveInfo, options = {}, TypeHint = null) {
   const fieldNodes =
     resolveInfo && (resolveInfo.fieldASTs || resolveInfo.fieldNodes);
   const { parentType } = resolveInfo;
+  const targetType = TypeHint || parentType;
   if (!fieldNodes) {
     throw new Error("No fieldNodes provided!");
   }
@@ -22,7 +23,8 @@ function parseFields(resolveInfo, options = {}) {
     resolveInfo,
     undefined,
     options,
-    parentType
+    parentType,
+    targetType
   );
   if (!options.keepRoot) {
     const key = firstKey(tree);
@@ -39,7 +41,14 @@ function getFieldFromAST(ast, parentType) {
   return;
 }
 
-function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
+function fieldTreeFromAST(
+  inASTs,
+  resolveInfo,
+  init,
+  options,
+  parentType,
+  targetType
+) {
   let { fragments, variableValues } = resolveInfo;
   fragments = fragments || {};
   init = init || {};
@@ -68,7 +77,8 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
             resolveInfo,
             tree[alias].fields,
             options,
-            fieldGqlType
+            fieldGqlType,
+            targetType
           );
         } else {
           // No fields to add
@@ -77,32 +87,38 @@ function fieldTreeFromAST(inASTs, resolveInfo, init, options, parentType) {
     } else if (kind === "FragmentSpread" && options.deep) {
       const fragment = fragments[name];
       assert(fragment, 'unknown fragment "' + name + '"');
-      let shouldContinue = true;
+      let fragmentType = parentType;
       if (fragment.typeCondition) {
-        shouldContinue = isCompatible(parentType, fragment.typeCondition);
+        fragmentType =
+          findCompatibleType(parentType, fragment.typeCondition) ||
+          findCompatibleType(targetType, fragment.typeCondition);
       }
-      if (shouldContinue) {
+      if (fragmentType) {
         fieldTreeFromAST(
           fragment.selectionSet.selections,
           resolveInfo,
           tree,
           options,
-          parentType
+          fragmentType,
+          targetType
         );
       }
     } else if (kind === "InlineFragment" && options.deep) {
       const fragment = val;
-      let shouldContinue = true;
+      let fragmentType = parentType;
       if (fragment.typeCondition) {
-        shouldContinue = isCompatible(parentType, fragment.typeCondition);
+        fragmentType =
+          findCompatibleType(parentType, fragment.typeCondition) ||
+          findCompatibleType(targetType, fragment.typeCondition);
       }
-      if (shouldContinue) {
+      if (fragmentType) {
         fieldTreeFromAST(
           fragment.selectionSet.selections,
           resolveInfo,
           tree,
           options,
-          parentType
+          fragmentType,
+          targetType
         );
       }
     } // else ignore
@@ -118,20 +134,19 @@ function firstKey(obj) {
   }
 }
 
-function isCompatible(type, typeCondition) {
-  let isCompatible = false;
+function findCompatibleType(type, typeCondition) {
+  let compatibleType = null;
   const { kind, name } = typeCondition;
   if (kind === "NamedType") {
     const otherTypeName = name.value;
-    isCompatible = otherTypeName === type.name;
-    if (!isCompatible) {
+    compatibleType = otherTypeName === type.name ? type : null;
+    if (!compatibleType && type.getInterfaces) {
       // Maybe it implements an interface?
       const interfaces = type.getInterfaces();
-      const interfaceNames = interfaces.map(({ name }) => name);
-      isCompatible = interfaceNames.includes(otherTypeName);
+      compatibleType = interfaces.find(({ name }) => name === otherTypeName);
     }
   }
-  return isCompatible;
+  return compatibleType;
 }
 
 module.exports = parseFields;
