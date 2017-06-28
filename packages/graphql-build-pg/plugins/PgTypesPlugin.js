@@ -10,7 +10,42 @@ const {
   GraphQLInputObjectType,
   isInputType,
 } = require("graphql");
-const pgRangeParser = require("pg-range-parser");
+
+const pgRangeParser = {
+  parse(str) {
+    const parts = str.split(",");
+    if (parts.length !== 2) {
+      throw new Error("Invalid daterange");
+    }
+
+    return {
+      start: parts[0]
+        ? {
+            inclusive: parts[0][0] === "[",
+            value: parts[0].slice(1),
+          }
+        : null,
+      end: parts[1]
+        ? {
+            inclusive: parts[1][parts[1].length - 1] === "]",
+            value: parts[1].slice(0, -1),
+          }
+        : null,
+    };
+  },
+
+  serialize({ start, end }) {
+    const inclusivity = {
+      true: "[]",
+      false: "()",
+    };
+
+    return [
+      start ? inclusivity[start.inclusive][0] + start.value : "[",
+      end ? end.value + inclusivity[end.inclusive][1] : "]",
+    ].join(",");
+  },
+};
 
 const {
   GraphQLDate,
@@ -236,11 +271,11 @@ module.exports = function PgTypesPlugin(
           map: pgRange => {
             const parsed = pgRangeParser.parse(pgRange);
             return {
-              start: {
+              start: parsed.start && {
                 value: pg2gql(parsed.start.value, subtype),
                 inclusive: parsed.start.inclusive,
               },
-              end: {
+              end: parsed.end && {
                 value: pg2gql(parsed.end.value, subtype),
                 inclusive: parsed.end.inclusive,
               },
@@ -248,11 +283,11 @@ module.exports = function PgTypesPlugin(
           },
           unmap: ({ start, end }) => {
             const input = {
-              start: {
+              start: start && {
                 value: gql2pg(start.value, subtype),
                 inclusive: start.inclusive,
               },
-              end: {
+              end: end && {
                 value: gql2pg(end.value, subtype),
                 inclusive: end.inclusive,
               },
