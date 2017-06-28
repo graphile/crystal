@@ -10,18 +10,32 @@ const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   builder.hook("build", build => {
     const nodeFetcherByType = new Map();
+    const nodeAliasByType = new Map();
+    const nodeTypeByAlias = new Map();
     return build.extend(build, {
       nodeIdFieldName,
       $$nodeType: Symbol("nodeType"),
       nodeFetcherByType,
       getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
-        return base64(JSON.stringify([Type.name, ...identifiers]));
+        return base64(
+          JSON.stringify([this.getNodeAlias(Type), ...identifiers])
+        );
       },
       addNodeFetcherForType(Type, fetcher) {
         if (nodeFetcherByType.get(Type)) {
           throw new Error("There's already a fetcher for this type");
         }
         nodeFetcherByType.set(Type, fetcher);
+      },
+      getNodeAlias(Type) {
+        return nodeAliasByType.get(Type) || Type.name;
+      },
+      getNodeType(alias) {
+        return nodeTypeByAlias.get(alias) || this.getTypeByName(alias);
+      },
+      setNodeAlias(Type, alias) {
+        nodeAliasByType.set(Type, alias);
+        nodeTypeByAlias.set(alias, Type);
       },
     });
   });
