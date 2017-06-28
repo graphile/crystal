@@ -57,6 +57,20 @@ module.exports = function PgComputedColumnsPlugin(
                 argNames: [ 'integration' ],
                 argDefaultsNum: 0 }
             */
+            const argTypes = proc.argTypeIds.map(
+              typeId => introspectionResultsByKind.typeById[typeId]
+            );
+            if (
+              argTypes
+                .slice(1)
+                .some(
+                  type =>
+                    type.type === "c" && type.class && type.class.isSelectable
+                )
+            ) {
+              // Accepts two input tables? Skip.
+              return memo;
+            }
 
             const pseudoColumnName = proc.name.substr(table.name.length + 1);
             const fieldName = inflection.column(

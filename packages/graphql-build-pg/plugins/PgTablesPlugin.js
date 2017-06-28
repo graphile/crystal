@@ -4,6 +4,7 @@ const {
   GraphQLID,
   GraphQLList,
   GraphQLEnumType,
+  GraphQLInputObjectType,
 } = require("graphql");
 
 module.exports = function PgTablesPlugin(
@@ -22,10 +23,11 @@ module.exports = function PgTablesPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
         pgGqlTypeByTypeId,
+        pgGqlInputTypeByTypeId,
       }
     ) => {
       const Cursor = getTypeByName("Cursor");
-      introspectionResultsByKind.class.map(table => {
+      introspectionResultsByKind.class.forEach(table => {
         /*
         table =
           { kind: 'class',
@@ -54,7 +56,7 @@ module.exports = function PgTablesPlugin(
           {
             name: inflection.tableType(table.name, schema.name),
             interfaces: () => {
-              if (nodeIdFieldName) {
+              if (nodeIdFieldName && table.isSelectable) {
                 return [getTypeByName("Node")];
               } else {
                 return [];
@@ -62,7 +64,7 @@ module.exports = function PgTablesPlugin(
             },
             fields: ({ addDataGeneratorForField, Self }) => {
               const fields = {};
-              if (nodeIdFieldName) {
+              if (nodeIdFieldName && table.isSelectable) {
                 // Enable nodeId interface
                 addDataGeneratorForField(nodeIdFieldName, () => {
                   return {
@@ -98,94 +100,121 @@ module.exports = function PgTablesPlugin(
           },
           {
             pgIntrospection: table,
-            isPgRowType: true,
+            isPgRowType: table.isSelectable,
+            isPgCompoundType: !table.isSelectable,
+          }
+        );
+        const TableInputType = buildObjectWithHooks(
+          GraphQLInputObjectType,
+          {
+            name: inflection.inputType(TableType),
+          },
+          {
+            pgIntrospection: table,
+            isPgRowType: table.isSelectable,
+            isPgCompoundType: !table.isSelectable,
           }
         );
 
-        const EdgeType = buildObjectWithHooks(
-          GraphQLObjectType,
-          {
-            name: inflection.edge(TableType.name),
-            fields: ({
-              addDataGeneratorForField,
-              recurseDataGeneratorsForField,
-            }) => {
-              recurseDataGeneratorsForField("node");
-              addDataGeneratorForField("cursor", () => {
+        if (table.isSelectable) {
+          /* const TablePatchType = */
+          buildObjectWithHooks(
+            GraphQLInputObjectType,
+            {
+              name: inflection.patchType(TableType),
+            },
+            {
+              pgIntrospection: table,
+              isPgRowType: table.isSelectable,
+              isPgCompoundType: !table.isSelectable,
+              isPgPatch: true,
+            }
+          );
+          const EdgeType = buildObjectWithHooks(
+            GraphQLObjectType,
+            {
+              name: inflection.edge(TableType.name),
+              fields: ({
+                addDataGeneratorForField,
+                recurseDataGeneratorsForField,
+              }) => {
+                recurseDataGeneratorsForField("node");
+                addDataGeneratorForField("cursor", () => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(
+                        () =>
+                          sql.fragment`encode(json_build_array(${sql.join(
+                            queryBuilder
+                              .getOrderByExpressionsAndDirections()
+                              .map(([field]) => field),
+                            ","
+                          )})::bytea, 'base64')`,
+                        "__cursor"
+                      );
+                    },
+                  };
+                });
                 return {
-                  pgQuery: queryBuilder => {
-                    queryBuilder.select(
-                      () =>
-                        sql.fragment`encode(json_build_array(${sql.join(
-                          queryBuilder
-                            .getOrderByExpressionsAndDirections()
-                            .map(([field]) => field),
-                          ","
-                        )})::bytea, 'base64')`,
-                      "__cursor"
-                    );
+                  cursor: {
+                    type: Cursor,
+                    resolve(data) {
+                      return data.__cursor;
+                    },
+                  },
+                  node: {
+                    type: new GraphQLNonNull(TableType),
+                    resolve(data) {
+                      return data;
+                    },
                   },
                 };
-              });
-              return {
-                cursor: {
-                  type: Cursor,
-                  resolve(data) {
-                    return data.__cursor;
-                  },
-                },
-                node: {
-                  type: new GraphQLNonNull(TableType),
-                  resolve(data) {
-                    return data;
-                  },
-                },
-              };
+              },
             },
-          },
-          {
-            isEdgeType: true,
-            isPgRowEdgeType: true,
-            nodeType: TableType,
-            pgIntrospection: table,
-          }
-        );
-        /*const ConnectionType = */
-        buildObjectWithHooks(
-          GraphQLObjectType,
-          {
-            name: inflection.connection(TableType.name),
-            fields: ({ recurseDataGeneratorsForField }) => {
-              recurseDataGeneratorsForField("edges");
-              recurseDataGeneratorsForField("nodes");
-              return {
-                // XXX: pageInfo
-                // XXX: totalCount
-                nodes: {
-                  type: new GraphQLNonNull(new GraphQLList(TableType)),
-                  resolve(data) {
-                    return data;
+            {
+              isEdgeType: true,
+              isPgRowEdgeType: true,
+              nodeType: TableType,
+              pgIntrospection: table,
+            }
+          );
+          /*const ConnectionType = */
+          buildObjectWithHooks(
+            GraphQLObjectType,
+            {
+              name: inflection.connection(TableType.name),
+              fields: ({ recurseDataGeneratorsForField }) => {
+                recurseDataGeneratorsForField("edges");
+                recurseDataGeneratorsForField("nodes");
+                return {
+                  // XXX: pageInfo
+                  // XXX: totalCount
+                  nodes: {
+                    type: new GraphQLNonNull(new GraphQLList(TableType)),
+                    resolve(data) {
+                      return data;
+                    },
                   },
-                },
-                edges: {
-                  type: new GraphQLNonNull(
-                    new GraphQLList(new GraphQLNonNull(EdgeType))
-                  ),
-                  resolve(data) {
-                    return data;
+                  edges: {
+                    type: new GraphQLNonNull(
+                      new GraphQLList(new GraphQLNonNull(EdgeType))
+                    ),
+                    resolve(data) {
+                      return data;
+                    },
                   },
-                },
-              };
+                };
+              },
             },
-          },
-          {
-            isConnectionType: true,
-            isPgRowConnectionType: true,
-            edgeType: EdgeType,
-            nodeType: TableType,
-            pgIntrospection: table,
-          }
-        );
+            {
+              isConnectionType: true,
+              isPgRowConnectionType: true,
+              edgeType: EdgeType,
+              nodeType: TableType,
+              pgIntrospection: table,
+            }
+          );
+        }
         const tablePgType = introspectionResultsByKind.type.filter(
           type =>
             type.type === "c" &&
@@ -197,6 +226,7 @@ module.exports = function PgTablesPlugin(
           throw new Error("Could not determine the type for this table");
         }
         pgGqlTypeByTypeId[tablePgType.id] = TableType;
+        pgGqlInputTypeByTypeId[tablePgType.id] = TableInputType;
       });
       return _;
     }

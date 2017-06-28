@@ -17,6 +17,12 @@ exports.defaultInflection = {
   conditionType(typeName) {
     return upperFirst(camelcase(`${typeName}-condition`));
   },
+  inputType(typeName) {
+    return upperFirst(camelcase(`${typeName}-input`));
+  },
+  patchType(typeName) {
+    return upperFirst(camelcase(`${typeName}-patch`));
+  },
   tableName(name, _schema) {
     return camelcase(name);
   },

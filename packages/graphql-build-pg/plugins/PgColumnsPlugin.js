@@ -18,11 +18,15 @@ module.exports = function PgColumnsPlugin(
         parseResolveInfo,
       },
       {
-        scope: { isPgRowType, pgIntrospection: table },
+        scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
         addDataGeneratorForField,
       }
     ) => {
-      if (!isPgRowType || !table || table.kind !== "class") {
+      if (
+        !(isPgRowType || isPgCompoundType) ||
+        !table ||
+        table.kind !== "class"
+      ) {
         return fields;
       }
       return extend(
@@ -67,6 +71,52 @@ module.exports = function PgColumnsPlugin(
                 });
                 return pg2gql(data[alias], attr.type);
               },
+            };
+            return memo;
+          }, {})
+      );
+    }
+  );
+  builder.hook(
+    "inputObjectType:fields",
+    (
+      fields,
+      {
+        extend,
+        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+      },
+      {
+        scope: {
+          isPgRowType,
+          isPgCompoundType,
+          isPgPatch,
+          pgIntrospection: table,
+        },
+      }
+    ) => {
+      if (
+        !(isPgRowType || isPgCompoundType) ||
+        !table ||
+        table.kind !== "class"
+      ) {
+        return fields;
+      }
+      return extend(
+        fields,
+        introspectionResultsByKind.attribute
+          .filter(attr => attr.classId === table.id)
+          .reduce((memo, attr) => {
+            const fieldName = inflection.column(
+              attr.name,
+              table.name,
+              table.namespace.name
+            );
+            memo[fieldName] = {
+              type: nullableIf(
+                isPgPatch || !attr.isNotNull,
+                gqlInputTypeByTypeId[attr.typeId] || GraphQLString
+              ),
             };
             return memo;
           }, {})

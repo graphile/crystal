@@ -22,88 +22,90 @@ module.exports = async function PgAllRows(
       }
       return extend(
         fields,
-        introspectionResultsByKind.class.reduce((memo, table) => {
-          const TableType = getTypeByName(
-            inflection.tableType(table.name, table.namespace.name)
-          );
-          const ConnectionType = getTypeByName(
-            inflection.connection(TableType.name)
-          );
-          if (!TableType) {
-            throw new Error(
-              `Could not find GraphQL type for table '${table.name}'`
+        introspectionResultsByKind.class
+          .filter(table => table.isSelectable)
+          .reduce((memo, table) => {
+            const TableType = getTypeByName(
+              inflection.tableType(table.name, table.namespace.name)
             );
-          }
-          const attributes = introspectionResultsByKind.attribute.filter(
-            attr => attr.classId === table.id
-          );
-          const primaryKeyConstraint = introspectionResultsByKind.constraint
-            .filter(con => con.classId === table.id)
-            .filter(con => ["p"].includes(con.type))[0];
-          const primaryKeys =
-            primaryKeyConstraint &&
-            primaryKeyConstraint.keyAttributeNums.map(
-              num => attributes.filter(attr => attr.num === num)[0]
+            const ConnectionType = getTypeByName(
+              inflection.connection(TableType.name)
             );
-          if (!ConnectionType) {
-            throw new Error(
-              `Could not find GraphQL connection type for table '${table.name}'`
+            if (!TableType) {
+              throw new Error(
+                `Could not find GraphQL type for table '${table.name}'`
+              );
+            }
+            const attributes = introspectionResultsByKind.attribute.filter(
+              attr => attr.classId === table.id
             );
-          }
-          const schema = table.namespace;
-          const sqlFullTableName = sql.identifier(schema.name, table.name);
-          if (TableType && ConnectionType) {
-            const fieldName = inflection.allRows(table.name, schema.name);
-            memo[fieldName] = buildFieldWithHooks(
-              fieldName,
-              ({ getDataFromParsedResolveInfoFragment }) => {
-                return {
-                  type: ConnectionType,
-                  args: {},
-                  async resolve(parent, args, { pgClient }, resolveInfo) {
-                    const parsedResolveInfoFragment = parseResolveInfo(
-                      resolveInfo
-                    );
-                    const resolveData = getDataFromParsedResolveInfoFragment(
-                      parsedResolveInfoFragment
-                    );
-                    const query = queryFromResolveData(
-                      sqlFullTableName,
-                      Symbol(),
-                      resolveData,
-                      {},
-                      builder => {
-                        if (primaryKeys) {
-                          builder.beforeFinalize(() => {
-                            // append order by primary key to the list of orders
-                            primaryKeys.forEach(key => {
-                              builder.orderBy(
-                                sql.fragment`${sql.identifier(
-                                  builder.getTableAlias(),
-                                  key.name
-                                )}`,
-                                true
-                              );
+            const primaryKeyConstraint = introspectionResultsByKind.constraint
+              .filter(con => con.classId === table.id)
+              .filter(con => ["p"].includes(con.type))[0];
+            const primaryKeys =
+              primaryKeyConstraint &&
+              primaryKeyConstraint.keyAttributeNums.map(
+                num => attributes.filter(attr => attr.num === num)[0]
+              );
+            if (!ConnectionType) {
+              throw new Error(
+                `Could not find GraphQL connection type for table '${table.name}'`
+              );
+            }
+            const schema = table.namespace;
+            const sqlFullTableName = sql.identifier(schema.name, table.name);
+            if (TableType && ConnectionType) {
+              const fieldName = inflection.allRows(table.name, schema.name);
+              memo[fieldName] = buildFieldWithHooks(
+                fieldName,
+                ({ getDataFromParsedResolveInfoFragment }) => {
+                  return {
+                    type: ConnectionType,
+                    args: {},
+                    async resolve(parent, args, { pgClient }, resolveInfo) {
+                      const parsedResolveInfoFragment = parseResolveInfo(
+                        resolveInfo
+                      );
+                      const resolveData = getDataFromParsedResolveInfoFragment(
+                        parsedResolveInfoFragment
+                      );
+                      const query = queryFromResolveData(
+                        sqlFullTableName,
+                        Symbol(),
+                        resolveData,
+                        {},
+                        builder => {
+                          if (primaryKeys) {
+                            builder.beforeFinalize(() => {
+                              // append order by primary key to the list of orders
+                              primaryKeys.forEach(key => {
+                                builder.orderBy(
+                                  sql.fragment`${sql.identifier(
+                                    builder.getTableAlias(),
+                                    key.name
+                                  )}`,
+                                  true
+                                );
+                              });
                             });
-                          });
+                          }
                         }
-                      }
-                    );
-                    const { text, values } = sql.compile(query);
-                    console.log(require("sql-formatter").format(text));
-                    const { rows } = await pgClient.query(text, values);
-                    return rows || [];
-                  },
-                };
-              },
-              {
-                isPgConnectionField: true,
-                pgIntrospection: table,
-              }
-            );
-          }
-          return memo;
-        }, {})
+                      );
+                      const { text, values } = sql.compile(query);
+                      console.log(require("sql-formatter").format(text));
+                      const { rows } = await pgClient.query(text, values);
+                      return rows || [];
+                    },
+                  };
+                },
+                {
+                  isPgConnectionField: true,
+                  pgIntrospection: table,
+                }
+              );
+            }
+            return memo;
+          }, {})
       );
     }
   );
