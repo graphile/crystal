@@ -1,6 +1,7 @@
 FROM node
 LABEL description="A GraphQL API created by reflection over a PostgreSQL schmea https://github.com/postgraphql/postgraphql"
 
+COPY .
 RUN npm install
 RUN scripts/build
 RUN npm pack
