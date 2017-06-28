@@ -10,6 +10,7 @@ const {
   GraphQLInputObjectType,
   isInputType,
 } = require("graphql");
+const pgRangeParser = require("pg-range-parser");
 
 const {
   GraphQLDate,
@@ -39,6 +40,26 @@ module.exports = function PgTypesPlugin(
       build.pgGqlInputTypeByTypeId
     );
     const pg2GqlMapper = {};
+    const pg2gql = (val, type) => {
+      if (val == null) {
+        return val;
+      }
+      if (pg2GqlMapper[type.id]) {
+        return pg2GqlMapper[type.id].map(val);
+      } else {
+        return val;
+      }
+    };
+    const gql2pg = (val, type) => {
+      if (val == null) {
+        return val;
+      }
+      if (pg2GqlMapper[type.id]) {
+        return pg2GqlMapper[type.id].unmap(val);
+      } else {
+        return val;
+      }
+    };
     /*
       type =
         { kind: 'type',
@@ -98,11 +119,19 @@ module.exports = function PgTypesPlugin(
     );
     const identity = _ => _;
     const jsonStringify = o => JSON.stringify(o);
-    pg2GqlMapper[114] = {
-      map: identity,
-      unmap: jsonStringify,
-    };
-    pg2GqlMapper[3802] = pg2GqlMapper[114];
+    if (pgExtendedTypes) {
+      pg2GqlMapper[114] = {
+        map: identity,
+        unmap: jsonStringify,
+      };
+    } else {
+      pg2GqlMapper[114] = {
+        map: jsonStringify,
+        unmap: jsonStringify,
+      };
+    }
+    pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
+
     const parseMoney = str => {
       const numerical = str.replace(/[^0-9.,]/g, "");
       const lastCommaIndex = numerical.lastIndexOf(",");
@@ -143,9 +172,9 @@ module.exports = function PgTypesPlugin(
       }
       // Ranges
       if (!gqlTypeByTypeId[type.id] && type.type === "r") {
-        const gqlRangeSubType = enforceGqlTypeByPgType(
-          introspectionResultsByKind.typeById[type.rangeSubTypeId]
-        );
+        const subtype =
+          introspectionResultsByKind.typeById[type.rangeSubTypeId];
+        const gqlRangeSubType = enforceGqlTypeByPgType(subtype);
         if (!gqlRangeSubType) {
           throw new Error("Range of unsupported");
         }
@@ -203,6 +232,34 @@ module.exports = function PgTypesPlugin(
         }
         gqlTypeByTypeId[type.id] = Range;
         gqlInputTypeByTypeId[type.id] = RangeInput;
+        pg2GqlMapper[type.id] = {
+          map: pgRange => {
+            const parsed = pgRangeParser.parse(pgRange);
+            return {
+              start: {
+                value: pg2gql(parsed.start.value, subtype),
+                inclusive: parsed.start.inclusive,
+              },
+              end: {
+                value: pg2gql(parsed.end.value, subtype),
+                inclusive: parsed.end.inclusive,
+              },
+            };
+          },
+          unmap: ({ start, end }) => {
+            const input = {
+              start: {
+                value: gql2pg(start.value, subtype),
+                inclusive: start.inclusive,
+              },
+              end: {
+                value: gql2pg(end.value, subtype),
+                inclusive: end.inclusive,
+              },
+            };
+            return pgRangeParser.serialize(input);
+          },
+        };
       }
       // Fall back to categories
       if (!gqlTypeByTypeId[type.id]) {
@@ -230,26 +287,8 @@ module.exports = function PgTypesPlugin(
       pgGqlTypeByTypeId: gqlTypeByTypeId,
       pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
       pg2GqlMapper,
-      pg2gql(val, type) {
-        if (val == null) {
-          return val;
-        }
-        if (pg2GqlMapper[type.id]) {
-          return pg2GqlMapper[type.id].map(val);
-        } else {
-          return val;
-        }
-      },
-      gql2pg(val, type) {
-        if (val == null) {
-          return val;
-        }
-        if (pg2GqlMapper[type.id]) {
-          return pg2GqlMapper[type.id].unmap(val);
-        } else {
-          return val;
-        }
-      },
+      pg2gql,
+      gql2pg,
     });
   });
 };
