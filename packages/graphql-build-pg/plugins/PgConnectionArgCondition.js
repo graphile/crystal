@@ -1,4 +1,4 @@
-const { GraphQLInputObjectType } = require("graphql");
+const { GraphQLInputObjectType, GraphQLString } = require("graphql");
 module.exports = function PgConnectionArgCondition(
   builder,
   { pgInflection: inflection }

@@ -23,6 +23,12 @@ exports.defaultInflection = {
   inputType(typeName) {
     return upperFirst(camelcase(`${typeName}-input`));
   },
+  rangeBoundType(typeName) {
+    return upperFirst(camelcase(`${typeName}-range-bound`));
+  },
+  rangeType(typeName) {
+    return upperFirst(camelcase(`${typeName}-range`));
+  },
   patchType(typeName) {
     return upperFirst(camelcase(`${typeName}-patch`));
   },

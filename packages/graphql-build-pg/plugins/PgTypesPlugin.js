@@ -6,6 +6,8 @@ const {
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
   isInputType,
 } = require("graphql");
 
@@ -23,8 +25,14 @@ module.exports = function PgTypesPlugin(
   { pgExtendedTypes = true, pgInflection: inflection }
 ) {
   builder.hook("build", build => {
-    const GraphQLJSON = build.getTypeByName("JSON");
-    const GraphQLUUID = build.getTypeByName("UUID");
+    const {
+      pgIntrospectionResultsByKind: introspectionResultsByKind,
+      getTypeByName,
+      addType,
+    } = build;
+
+    const GraphQLJSON = getTypeByName("JSON");
+    const GraphQLUUID = getTypeByName("UUID");
     const gqlTypeByTypeId = Object.assign({}, build.pgGqlTypeByTypeId);
     const gqlInputTypeByTypeId = Object.assign(
       {},
@@ -48,13 +56,10 @@ module.exports = function PgTypesPlugin(
           enumVariants: null,
           rangeSubTypeId: null }
       */
-    const pgTypeById = build.pgIntrospectionResultsByKind.type.reduce(
-      (memo, type) => {
-        memo[type.id] = type;
-        return memo;
-      },
-      {}
-    );
+    const pgTypeById = introspectionResultsByKind.type.reduce((memo, type) => {
+      memo[type.id] = type;
+      return memo;
+    }, {});
     const categoryLookup = {
       B: () => GraphQLBoolean,
       N: () => GraphQLFloat,
@@ -120,6 +125,69 @@ module.exports = function PgTypesPlugin(
           description: type.description,
         });
       }
+      // Ranges
+      if (!gqlTypeByTypeId[type.id] && type.type === "r") {
+        const gqlRangeSubType = enforceGqlTypeByPgType(
+          introspectionResultsByKind.typeById[type.rangeSubTypeId]
+        );
+        if (!gqlRangeSubType) {
+          throw new Error("Range of unsupported");
+        }
+        let Range = getTypeByName(inflection.rangeType(gqlRangeSubType.name));
+        let RangeInput;
+        if (!Range) {
+          const RangeBound = new GraphQLObjectType({
+            name: inflection.rangeBoundType(gqlRangeSubType.name),
+            fields: {
+              value: {
+                type: new GraphQLNonNull(gqlRangeSubType),
+              },
+              inclusive: {
+                type: new GraphQLNonNull(GraphQLBoolean),
+              },
+            },
+          });
+          const RangeBoundInput = new GraphQLInputObjectType({
+            name: inflection.inputType(RangeBound.name),
+            fields: {
+              value: {
+                type: new GraphQLNonNull(gqlRangeSubType),
+              },
+              inclusive: {
+                type: new GraphQLNonNull(GraphQLBoolean),
+              },
+            },
+          });
+          Range = new GraphQLObjectType({
+            name: inflection.rangeType(gqlRangeSubType.name),
+            fields: {
+              start: {
+                type: RangeBound,
+              },
+              end: {
+                type: RangeBound,
+              },
+            },
+          });
+          RangeInput = new GraphQLInputObjectType({
+            name: inflection.inputType(Range.name),
+            fields: {
+              start: {
+                type: RangeBoundInput,
+              },
+              end: {
+                type: RangeBoundInput,
+              },
+            },
+          });
+          addType(Range);
+          addType(RangeInput);
+        } else {
+          RangeInput = getTypeByName(inflection.inputType(Range.name));
+        }
+        gqlTypeByTypeId[type.id] = Range;
+        gqlInputTypeByTypeId[type.id] = RangeInput;
+      }
       // Fall back to categories
       if (!gqlTypeByTypeId[type.id]) {
         const gen = categoryLookup[type.category];
@@ -140,7 +208,7 @@ module.exports = function PgTypesPlugin(
       return gqlTypeByTypeId[type.id];
     };
 
-    build.pgIntrospectionResultsByKind.type.forEach(enforceGqlTypeByPgType);
+    introspectionResultsByKind.type.forEach(enforceGqlTypeByPgType);
 
     return build.extend(build, {
       pgGqlTypeByTypeId: gqlTypeByTypeId,
