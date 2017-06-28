@@ -7,6 +7,74 @@ module.exports = async function PgRowByUniqueConstraint(
   { pgInflection: inflection }
 ) {
   builder.hook(
+    "objectType",
+    (
+      object,
+      {
+        addNodeFetcherForTypeName,
+        getTypeByName,
+        generateDataForType,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgSql: sql,
+        gql2pg,
+      },
+      { scope: { isPgRowType, pgIntrospection: table } }
+    ) => {
+      if (!isPgRowType) {
+        return object;
+      }
+      const sqlFullTableName = sql.identifier(table.namespace.name, table.name);
+      const attributes = introspectionResultsByKind.attribute.filter(
+        attr => attr.classId === table.id
+      );
+      const primaryKeyConstraint = introspectionResultsByKind.constraint
+        .filter(con => con.classId === table.id)
+        .filter(con => ["p"].includes(con.type))[0];
+      if (!primaryKeyConstraint) {
+        return object;
+      }
+      const primaryKeys =
+        primaryKeyConstraint &&
+        primaryKeyConstraint.keyAttributeNums.map(
+          num => attributes.filter(attr => attr.num === num)[0]
+        );
+      addNodeFetcherForTypeName(
+        object.name,
+        async (data, identifiers, { pgClient }, parsedResolveInfoFragment) => {
+          if (identifiers.length !== primaryKeys.length) {
+            throw new Error("Invalid ID");
+          }
+          const Type = getTypeByName(object.name);
+          const resolveData = generateDataForType(
+            Type,
+            parsedResolveInfoFragment
+          );
+          const query = queryFromResolveData(
+            sqlFullTableName,
+            undefined,
+            resolveData,
+            {},
+            builder => {
+              primaryKeys.forEach((key, idx) => {
+                builder.where(
+                  sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                    key.name
+                  )} = ${gql2pg(identifiers[idx], primaryKeys[idx].type)}`
+                );
+              });
+            }
+          );
+          const { text, values } = sql.compile(query);
+          console.log(require("sql-formatter").format(text));
+          const { rows: [row] } = await pgClient.query(text, values);
+          return row;
+        }
+      );
+      return object;
+    }
+  );
+
+  builder.hook(
     "objectType:fields",
     (
       fields,

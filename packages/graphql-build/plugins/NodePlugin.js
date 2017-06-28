@@ -9,23 +9,26 @@ const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 
 module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   builder.hook("build", build => {
-    const nodeFetcherByType = new Map();
+    const nodeFetcherByTypeName = {};
     const nodeAliasByTypeName = {};
     const nodeTypeNameByAlias = {};
     return build.extend(build, {
       nodeIdFieldName,
       $$nodeType: Symbol("nodeType"),
-      nodeFetcherByType,
+      nodeFetcherByTypeName,
       getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
         return base64(
           JSON.stringify([this.getNodeAlias(Type), ...identifiers])
         );
       },
-      addNodeFetcherForType(Type, fetcher) {
-        if (nodeFetcherByType.get(Type)) {
+      addNodeFetcherForTypeName(typeName, fetcher) {
+        if (nodeFetcherByTypeName[typeName]) {
           throw new Error("There's already a fetcher for this type");
         }
-        nodeFetcherByType.set(Type, fetcher);
+        if (!fetcher) {
+          throw new Error("No fetcher specified");
+        }
+        nodeFetcherByTypeName[typeName] = fetcher;
       },
       getNodeAlias(typeName) {
         return nodeAliasByTypeName[typeName] || typeName;
@@ -64,7 +67,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
 
   builder.hook("objectType:interfaces", function addNodeIdToQuery(
     interfaces,
-    { parseResolveInfo, getTypeByName, extend, nodeFetcherByType },
+    { parseResolveInfo, getTypeByName, extend, nodeFetcherByTypeName },
     { scope: { isRootQuery } }
   ) {
     if (!isRootQuery) {
@@ -75,7 +78,15 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
 
   builder.hook("objectType:fields", function addNodeIdToQuery(
     fields,
-    { $$isQuery, parseResolveInfo, getTypeByName, extend, nodeFetcherByType },
+    {
+      $$isQuery,
+      $$nodeType,
+      parseResolveInfo,
+      getTypeByName,
+      extend,
+      nodeFetcherByTypeName,
+      getNodeType,
+    },
     { scope: { isRootQuery } }
   ) {
     if (!isRootQuery) {
@@ -95,25 +106,28 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
             type: new GraphQLNonNull(GraphQLID),
           },
         },
-        resolve(data, args, context, resolveInfo) {
+        async resolve(data, args, context, resolveInfo) {
           const nodeId = args[nodeIdFieldName];
           if (nodeId === "query") {
             return $$isQuery;
           }
           try {
-            const [typeName, ...identifiers] = JSON.parse(base64Decode(nodeId));
-            const Type = getTypeByName(typeName);
-            const resolver = nodeFetcherByType.get(Type);
+            const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
+            const Type = getNodeType(alias);
+            const resolver = nodeFetcherByTypeName[Type.name];
             const parsedResolveInfoFragment = parseResolveInfo(
               resolveInfo,
+              {},
               Type
             );
-            return resolver(
+            const node = await resolver(
               data,
               identifiers,
               context,
               parsedResolveInfoFragment
             );
+            node[$$nodeType] = Type;
+            return node;
           } catch (e) {
             return null;
           }

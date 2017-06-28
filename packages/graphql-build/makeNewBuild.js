@@ -9,6 +9,19 @@ const {
 const parseResolveInfo = require("./parseResolveInfo");
 const isString = require("lodash/isString");
 
+const mergeData = (data, gen, arg) => {
+  const results = ensureArray(gen(arg, data));
+  if (!results) {
+    return;
+  }
+  for (const result of results) {
+    for (const k of Object.keys(result)) {
+      data[k] = data[k] || [];
+      data[k].push(...ensureArray(result[k]));
+    }
+  }
+};
+
 const knownTypes = [
   GraphQLSchema,
   GraphQLObjectType,
@@ -50,6 +63,30 @@ module.exports = function makeNewBuild(builder) {
 
   return {
     parseResolveInfo,
+
+    generateDataForType(Type, parsedResolveInfoFragment) {
+      const StrippedType = getNamedType(Type);
+      if (!StrippedType) {
+        throw new Error(`Invalid type`);
+      }
+      const { fields } = parsedResolveInfoFragment;
+      const fieldDataGenerators =
+        fieldDataGeneratorsByType.get(StrippedType) || {};
+      const data = {};
+      if (fieldDataGenerators) {
+        for (const alias of Object.keys(fields)) {
+          const field = fields[alias];
+          const gens = fieldDataGenerators[field.name];
+          if (gens) {
+            for (const gen of gens) {
+              mergeData(data, gen, field);
+            }
+          }
+        }
+      }
+      return data;
+    },
+
     resolveAlias(data, _args, _context, resolveInfo) {
       const { alias } = parseResolveInfo(resolveInfo, { deep: false });
       return data[alias];
@@ -103,7 +140,7 @@ module.exports = function makeNewBuild(builder) {
             for (const alias of Object.keys(fields)) {
               const field = fields[alias];
               // 1. XXX: Get the type for this field
-              const Type = Self._fields[fieldName].type;
+              const Type = Self.getFields()[fieldName].type;
               const StrippedType = getNamedType(Type);
               if (!Type) {
                 throw new Error(
@@ -187,25 +224,13 @@ module.exports = function makeNewBuild(builder) {
                     parsedResolveInfoFragment
                   ) {
                     const data = {};
-                    const mergeData = (gen, arg) => {
-                      const results = ensureArray(gen(arg, data));
-                      if (!results) {
-                        return;
-                      }
-                      for (const result of results) {
-                        for (const k of Object.keys(result)) {
-                          data[k] = data[k] || [];
-                          data[k].push(...ensureArray(result[k]));
-                        }
-                      }
-                    };
 
                     const { fields, args } = parsedResolveInfoFragment;
 
                     // Args -> argDataGenerators
                     for (const gen of argDataGenerators) {
                       try {
-                        mergeData(gen, args);
+                        mergeData(data, gen, args);
                       } catch (e) {
                         console.error(
                           `Failed to execute argDataGenerator '${gen.displayName ||
@@ -232,7 +257,7 @@ module.exports = function makeNewBuild(builder) {
                         const gens = fieldDataGenerators[field.name];
                         if (gens) {
                           for (const gen of gens) {
-                            mergeData(gen, field);
+                            mergeData(data, gen, field);
                           }
                         }
                       }
