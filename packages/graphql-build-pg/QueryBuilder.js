@@ -89,8 +89,8 @@ class QueryBuilder {
       ", "
     );
   }
-  buildSelectJson() {
-    const buildObject = this.data.select.length
+  buildSelectJson({ addNullCase }) {
+    let buildObject = this.data.select.length
       ? sql.fragment`json_build_object(${sql.join(
           this.data.select.map(
             ([sqlFragment, alias]) =>
@@ -99,17 +99,25 @@ class QueryBuilder {
           ", "
         )})`
       : sql.fragment`to_json(${this.getTableAlias()}.*)`;
+    if (addNullCase) {
+      buildObject = sql.fragment`(case when ${this.getTableAlias()} is null then null else ${buildObject} end)`;
+    }
     return buildObject;
   }
   build(
-    { asJson = false, asJsonAggregate = false, onlyJsonField = false } = {}
+    {
+      asJson = false,
+      asJsonAggregate = false,
+      onlyJsonField = false,
+      addNullCase = false,
+    } = {}
   ) {
     this.lockEverything();
     if (onlyJsonField) {
-      return this.buildSelectJson();
+      return this.buildSelectJson({ addNullCase });
     }
     const fields = asJson || asJsonAggregate
-      ? sql.fragment`${this.buildSelectJson()} as object`
+      ? sql.fragment`${this.buildSelectJson({ addNullCase })} as object`
       : this.buildSelectFields();
     let fragment = sql.fragment`
       select ${fields}
