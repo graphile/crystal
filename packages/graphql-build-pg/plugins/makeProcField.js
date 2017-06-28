@@ -33,17 +33,18 @@ module.exports = function makeProcField(
   const argTypes = proc.argTypeIds
     .slice(sliceAmount)
     .map(typeId => introspectionResultsByKind.typeById[typeId]);
-  const requiredArgs = Math.max(
+  const requiredArgCount = Math.max(
     0,
     proc.isStrict
-      ? proc.argNames.length - sliceAmount
-      : strictFunctions
-        ? proc.argNames.length - sliceAmount - proc.argDefaultsNum
-        : 0
+      ? argNames.length - sliceAmount
+      : argNames.length - sliceAmount - proc.argDefaultsNum
   );
+  const notNullArgCount = proc.isStrict || strictFunctions
+    ? requiredArgCount
+    : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     const Type = gqlInputTypeByTypeId[type.id] || GraphQLString;
-    if (idx >= requiredArgs) {
+    if (idx >= notNullArgCount) {
       return Type;
     } else {
       return new GraphQLNonNull(Type);
@@ -117,7 +118,7 @@ module.exports = function makeProcField(
           return gql2pg(args[gqlArgName], argTypes[argIndex]);
         });
         while (
-          argValues.length > requiredArgs &&
+          argValues.length > requiredArgCount &&
           argValues[argValues.length - 1] == null
         ) {
           argValues.pop();
