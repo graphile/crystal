@@ -1,9 +1,6 @@
 FROM node
-LABEL description="A simple container for running postgraphql postgraphq://github.com/postgraphql/postgraphql.git"
+LABEL description="A GraphQL API created by reflection over a PostgreSQL schmea https://github.com/postgraphql/postgraphql"
 
-WORKDIR /
-RUN git clone https://github.com/postgraphql/postgraphql.git
-WORKDIR /postgraphql
 RUN npm install
 RUN scripts/build
 RUN npm pack
