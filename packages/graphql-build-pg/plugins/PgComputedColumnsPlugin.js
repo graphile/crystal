@@ -19,9 +19,16 @@ module.exports = function PgComputedColumnsPlugin(
         pgGqlTypeByTypeId: gqlTypeByTypeId,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
       },
-      { scope: { isPgRowType, pgIntrospection: table }, buildFieldWithHooks }
+      {
+        scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
+        buildFieldWithHooks,
+      }
     ) => {
-      if (!isPgRowType || !table || table.kind !== "class") {
+      if (
+        !(isPgRowType || isPgCompoundType) ||
+        !table ||
+        table.kind !== "class"
+      ) {
         return fields;
       }
       const tableType = introspectionResultsByKind.type.filter(
