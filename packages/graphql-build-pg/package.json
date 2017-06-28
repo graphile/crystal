@@ -40,5 +40,8 @@
   },
   "peerDependencies": {
     "pg": ">=6 <7"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
   }
 }

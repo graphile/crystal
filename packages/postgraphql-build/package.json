@@ -12,5 +12,8 @@
     "graphql-build": "0.0.0",
     "graphql-build-pg": "0.0.0",
     "jest": "20.0.4"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
   }
 }
