@@ -82,6 +82,7 @@ module.exports = function PgTypesPlugin(
         20: GraphQLString, // Even though this is int8, it's too big for JS int, so cast to string.
         21: GraphQLInt,
         23: GraphQLInt,
+        790: GraphQLFloat, // money
       },
       pgExtendedTypes && {
         114: GraphQLJSON,
@@ -102,6 +103,21 @@ module.exports = function PgTypesPlugin(
       unmap: jsonStringify,
     };
     pg2GqlMapper[3802] = pg2GqlMapper[114];
+    const parseMoney = str => {
+      const numerical = str.replace(/[^0-9.,]/g, "");
+      const lastCommaIndex = numerical.lastIndexOf(",");
+      if (lastCommaIndex >= 0 && lastCommaIndex === numerical.length - 3) {
+        // Assume string is of the form '123.456,78'
+        return parseFloat(numerical.replace(/\./g, "").replace(",", "."));
+      } else {
+        // Assume string is of the form '123,456.78'
+        return parseFloat(numerical.replace(/,/g, ""));
+      }
+    };
+    pg2GqlMapper[790] = {
+      map: parseMoney,
+      unmap: identity,
+    };
     const enforceGqlTypeByPgType = type => {
       // Explicit overrides
       if (!gqlTypeByTypeId[type.id]) {
