@@ -99,7 +99,8 @@ module.exports = function PgForwardRelationPlugin(
                   pgQuery: queryBuilder => {
                     queryBuilder.select(() => {
                       const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment
+                        parsedResolveInfoFragment,
+                        gqlForeignTableType
                       );
                       const foreignTableAlias = sql.identifier(Symbol());
                       const query = queryFromResolveData(

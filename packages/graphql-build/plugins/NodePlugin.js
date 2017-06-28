@@ -124,7 +124,8 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
               data,
               identifiers,
               context,
-              parsedResolveInfoFragment
+              parsedResolveInfoFragment,
+              resolveInfo.returnType
             );
             node[$$nodeType] = Type;
             return node;

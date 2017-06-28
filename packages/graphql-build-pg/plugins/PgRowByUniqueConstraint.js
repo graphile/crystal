@@ -84,7 +84,8 @@ module.exports = async function PgRowByUniqueConstraint(
                         resolveInfo
                       );
                       const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment
+                        parsedResolveInfoFragment,
+                        TableType
                       );
                       const query = queryFromResolveData(
                         sqlFullTableName,

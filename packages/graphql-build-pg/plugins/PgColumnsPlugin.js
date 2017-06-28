@@ -58,6 +58,8 @@ module.exports = function PgColumnsPlugin(
             ] = buildFieldWithHooks(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+                const ReturnType =
+                  gqlTypeByTypeId[attr.typeId] || GraphQLString;
                 addDataGenerator(parsedResolveInfoFragment => {
                   const { alias } = parsedResolveInfoFragment;
                   if (attr.type.type === "c") {
@@ -71,7 +73,8 @@ module.exports = function PgColumnsPlugin(
                         );
                         */
                         const resolveData = getDataFromParsedResolveInfoFragment(
-                          parsedResolveInfoFragment
+                          parsedResolveInfoFragment,
+                          ReturnType
                         );
                         const jsonBuildObject = queryFromResolveData(
                           Symbol(), // Ignore!
@@ -98,10 +101,7 @@ module.exports = function PgColumnsPlugin(
                   }
                 });
                 return {
-                  type: nullableIf(
-                    !attr.isNotNull,
-                    gqlTypeByTypeId[attr.typeId] || GraphQLString
-                  ),
+                  type: nullableIf(!attr.isNotNull, ReturnType),
                   resolve: (data, _args, _context, resolveInfo) => {
                     const { alias } = parseResolveInfo(resolveInfo, {
                       deep: false,

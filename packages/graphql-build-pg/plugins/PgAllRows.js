@@ -67,7 +67,8 @@ module.exports = async function PgAllRows(
                         resolveInfo
                       );
                       const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment
+                        parsedResolveInfoFragment,
+                        resolveInfo.returnType
                       );
                       const query = queryFromResolveData(
                         sqlFullTableName,

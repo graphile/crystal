@@ -61,7 +61,14 @@ type DummyEdge {
   node: Dummy
 }
 
-type Query {
+interface Node {
+  nodeId: ID!
+}
+
+type Query implements Node {
+  query: Query
+  nodeId: ID!
+  node(nodeId: ID!): Node
   dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection
 }
 "

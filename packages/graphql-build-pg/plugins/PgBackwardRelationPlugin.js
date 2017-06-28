@@ -108,7 +108,8 @@ module.exports = function PgBackwardRelationPlugin(
                   pgQuery: queryBuilder => {
                     queryBuilder.select(() => {
                       const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment
+                        parsedResolveInfoFragment,
+                        ConnectionType
                       );
                       const tableAlias = sql.identifier(Symbol());
                       const foreignTableAlias = queryBuilder.getTableAlias();

@@ -9,8 +9,8 @@ const {
 const parseResolveInfo = require("./parseResolveInfo");
 const isString = require("lodash/isString");
 
-const mergeData = (data, gen, arg) => {
-  const results = ensureArray(gen(arg, data));
+const mergeData = (data, gen, ReturnType, arg) => {
+  const results = ensureArray(gen(arg, ReturnType, data));
   if (!results) {
     return;
   }
@@ -63,13 +63,34 @@ module.exports = function makeNewBuild(builder) {
 
   return {
     parseResolveInfo,
+    simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, Type) {
+      if (!Type) {
+        throw new Error("No type!!");
+      }
+      const { fieldsByTypeName } = parsedResolveInfoFragment;
+      const fields = {};
+      const StrippedType = getNamedType(Type);
+      Object.assign(fields, fieldsByTypeName[StrippedType.name]);
+      if (StrippedType.getInterfaces) {
+        // GraphQL ensures that the subfields cannot clash, so it's safe to simply overwrite them
+        for (const Interface of StrippedType.getInterfaces()) {
+          Object.assign(fields, fieldsByTypeName[Interface.name]);
+        }
+      }
+      return Object.assign({}, parsedResolveInfoFragment, {
+        fields,
+      });
+    },
 
     generateDataForType(Type, parsedResolveInfoFragment) {
       const StrippedType = getNamedType(Type);
       if (!StrippedType) {
         throw new Error(`Invalid type`);
       }
-      const { fields } = parsedResolveInfoFragment;
+      const { fields } = this.simplifyParsedResolveInfoFragmentWithType(
+        parsedResolveInfoFragment,
+        StrippedType
+      );
       const fieldDataGenerators =
         fieldDataGeneratorsByType.get(StrippedType) || {};
       const data = {};
@@ -79,7 +100,7 @@ module.exports = function makeNewBuild(builder) {
           const gens = fieldDataGenerators[field.name];
           if (gens) {
             for (const gen of gens) {
-              mergeData(data, gen, field);
+              mergeData(data, gen, StrippedType, field);
             }
           }
         }
@@ -134,13 +155,16 @@ module.exports = function makeNewBuild(builder) {
           fieldDataGeneratorsByFieldName[fieldName].push(fn);
         };
         const recurseDataGeneratorsForField = fieldName => {
-          const fn = (parsedResolveInfoFragment, ...rest) => {
-            const { fields } = parsedResolveInfoFragment;
+          const fn = (parsedResolveInfoFragment, ReturnType, ...rest) => {
+            const { fields } = this.simplifyParsedResolveInfoFragmentWithType(
+              parsedResolveInfoFragment,
+              ReturnType
+            );
             const results = [];
             for (const alias of Object.keys(fields)) {
               const field = fields[alias];
               // 1. XXX: Get the type for this field
-              const Type = Self.getFields()[fieldName].type;
+              const Type = getNamedType(ReturnType);
               const StrippedType = getNamedType(Type);
               if (!Type) {
                 throw new Error(
@@ -152,12 +176,15 @@ module.exports = function makeNewBuild(builder) {
                 fieldDataGeneratorsByType.get(StrippedType) || {};
               // 3. Run them with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
               if (fieldDataGenerators) {
+                const typeFields = Type.getFields();
                 for (const alias of Object.keys(fields)) {
                   const field = fields[alias];
                   const gens = fieldDataGenerators[field.name];
                   if (gens) {
                     for (const gen of gens) {
-                      const local = ensureArray(gen(field, ...rest));
+                      const local = ensureArray(
+                        gen(field, typeFields[field.name].type, ...rest)
+                      );
                       results.push(...local);
                     }
                   }
@@ -220,17 +247,24 @@ module.exports = function makeNewBuild(builder) {
                     ensureName(fn);
                     argDataGenerators.push(fn);
                   },
-                  getDataFromParsedResolveInfoFragment(
-                    parsedResolveInfoFragment
-                  ) {
+                  getDataFromParsedResolveInfoFragment: (
+                    parsedResolveInfoFragment,
+                    ReturnType
+                  ) => {
                     const data = {};
 
-                    const { fields, args } = parsedResolveInfoFragment;
+                    const {
+                      fields,
+                      args,
+                    } = this.simplifyParsedResolveInfoFragmentWithType(
+                      parsedResolveInfoFragment,
+                      ReturnType
+                    );
 
                     // Args -> argDataGenerators
                     for (const gen of argDataGenerators) {
                       try {
-                        mergeData(data, gen, args);
+                        mergeData(data, gen, ReturnType, args);
                       } catch (e) {
                         console.error(
                           `Failed to execute argDataGenerator '${gen.displayName ||
@@ -251,13 +285,15 @@ module.exports = function makeNewBuild(builder) {
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );
+                    const typeFields = Type.getFields();
                     if (fieldDataGenerators) {
                       for (const alias of Object.keys(fields)) {
                         const field = fields[alias];
                         const gens = fieldDataGenerators[field.name];
                         if (gens) {
+                          const FieldReturnType = typeFields[field.name].type;
                           for (const gen of gens) {
-                            mergeData(data, gen, field);
+                            mergeData(data, gen, FieldReturnType, field);
                           }
                         }
                       }

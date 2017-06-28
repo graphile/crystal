@@ -107,10 +107,12 @@ module.exports = function makeProcField(
     ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
       function makeQuery(
         parsedResolveInfoFragment,
+        ReturnType,
         { implicitArgs = [] } = {}
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
-          parsedResolveInfoFragment
+          parsedResolveInfoFragment,
+          ReturnType
         );
         const { args = {} } = parsedResolveInfoFragment;
         const sqlArgValues = argNames.map((argName, argIndex) => {
@@ -157,12 +159,12 @@ module.exports = function makeProcField(
         );
       }
       if (computed) {
-        addDataGenerator(parsedResolveInfoFragment => {
+        addDataGenerator((parsedResolveInfoFragment, ReturnType) => {
           return {
             pgQuery: queryBuilder => {
               queryBuilder.select(() => {
                 const parentTableAlias = queryBuilder.getTableAlias();
-                const query = makeQuery(parsedResolveInfoFragment, {
+                const query = makeQuery(parsedResolveInfoFragment, ReturnType, {
                   implicitArgs: [parentTableAlias],
                 });
                 return sql.fragment`(${query})`;
@@ -198,7 +200,11 @@ module.exports = function makeProcField(
             }
           : async (data, args, { pgClient }, resolveInfo) => {
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-              const query = makeQuery(parsedResolveInfoFragment, {});
+              const query = makeQuery(
+                parsedResolveInfoFragment,
+                resolveInfo.resultType,
+                {}
+              );
 
               const { text, values } = sql.compile(query);
               console.log(require("sql-formatter").format(text));

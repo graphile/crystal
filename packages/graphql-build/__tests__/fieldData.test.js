@@ -93,7 +93,11 @@ const DummyConnectionPlugin = async builder => {
                 return { sort: [sortBy] };
               }
             });
-            addArgDataGenerator(function connectionAfter({ after }, data) {
+            addArgDataGenerator(function connectionAfter(
+              { after },
+              ReturnType,
+              data
+            ) {
               const sorts = data.sort || [];
               if (after) {
                 if (sorts.length) {
@@ -145,7 +149,11 @@ const DummyConnectionPlugin = async builder => {
                               recurseDataGeneratorsForField("node");
                               addDataGeneratorForField(
                                 "cursor",
-                                (parsedResolveInfoFragment, data) => {
+                                (
+                                  parsedResolveInfoFragment,
+                                  ReturnType,
+                                  data
+                                ) => {
                                   if (data.sort) {
                                     return {
                                       map: obj => ({
@@ -230,7 +238,8 @@ const DummyConnectionPlugin = async builder => {
               resolve(data, args, context, resolveInfo) {
                 const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
                 const resolveData = getDataFromParsedResolveInfoFragment(
-                  parsedResolveInfoFragment
+                  parsedResolveInfoFragment,
+                  resolveInfo.returnType
                 );
                 let result = dummyData.slice();
                 for (const filter of resolveData.filter || []) {
@@ -288,6 +297,10 @@ test("no arguments", async () => {
       }
     }`
   );
+  if (result.errors) {
+    console.log(result.errors.map(e => e.originalError));
+  }
+  expect(result.errors).toBeFalsy();
   expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
     "foo",
     "bar",

@@ -189,6 +189,7 @@ module.exports = function PgTablesPlugin(
               fields: ({
                 addDataGeneratorForField,
                 recurseDataGeneratorsForField,
+                buildFieldWithHooks,
               }) => {
                 recurseDataGeneratorsForField("node");
                 addDataGeneratorForField("cursor", () => {
