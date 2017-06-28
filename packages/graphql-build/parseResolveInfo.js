@@ -6,11 +6,14 @@ const { getNamedType } = require("graphql");
 
 // Based on https://github.com/tjmehta/graphql-parse-fields
 
-function parseFields(resolveInfo, options = {}, TypeHint = null) {
+function parseFields(resolveInfo, options = {}, targetType = null) {
+  if (!targetType) {
+    throw new Error("You must specify a target type");
+  }
   const fieldNodes =
     resolveInfo && (resolveInfo.fieldASTs || resolveInfo.fieldNodes);
   const { parentType } = resolveInfo;
-  const targetType = TypeHint || parentType;
+  console.log("Target Type", targetType);
   if (!fieldNodes) {
     throw new Error("No fieldNodes provided!");
   }
@@ -71,18 +74,18 @@ function fieldTreeFromAST(
           args,
           fields: {},
         };
-        if (val.selectionSet && options.deep) {
-          fieldTreeFromAST(
-            val.selectionSet.selections,
-            resolveInfo,
-            tree[alias].fields,
-            options,
-            fieldGqlType,
-            targetType
-          );
-        } else {
-          // No fields to add
-        }
+      }
+      if (val.selectionSet && options.deep) {
+        fieldTreeFromAST(
+          val.selectionSet.selections,
+          resolveInfo,
+          tree[alias].fields,
+          options,
+          fieldGqlType,
+          targetType
+        );
+      } else {
+        // No fields to add
       }
     } else if (kind === "FragmentSpread" && options.deep) {
       const fragment = fragments[name];
