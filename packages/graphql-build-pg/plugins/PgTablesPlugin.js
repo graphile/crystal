@@ -28,6 +28,16 @@ module.exports = function PgTablesPlugin(
     ) => {
       const Cursor = getTypeByName("Cursor");
       introspectionResultsByKind.class.forEach(table => {
+        const tablePgType = introspectionResultsByKind.type.filter(
+          type =>
+            type.type === "c" &&
+            type.category === "C" &&
+            type.namespaceId === table.namespaceId &&
+            type.classId === table.id
+        )[0];
+        if (!tablePgType) {
+          throw new Error("Could not determine the type for this table");
+        }
         /*
         table =
           { kind: 'class',
@@ -213,16 +223,6 @@ module.exports = function PgTablesPlugin(
               pgIntrospection: table,
             }
           );
-        }
-        const tablePgType = introspectionResultsByKind.type.filter(
-          type =>
-            type.type === "c" &&
-            type.category === "C" &&
-            type.namespaceId === table.namespaceId &&
-            type.classId === table.id
-        )[0];
-        if (!tablePgType) {
-          throw new Error("Could not determine the type for this table");
         }
         pgGqlTypeByTypeId[tablePgType.id] = TableType;
         pgGqlInputTypeByTypeId[tablePgType.id] = TableInputType;
