@@ -13,7 +13,7 @@ module.exports = function createPostGraphQLSchema(
   return buildSchema([...defaultPlugins, ...pgDefaultPlugins], {
     pgConfig: client,
     pgSchemas: schemas,
-    pgExtendedTypes: dynamicJson,
+    pgExtendedTypes: !!dynamicJson,
     pgInflection: classicIds
       ? inflections.postGraphQLClassicIdsInflection
       : inflections.postGraphQLInflection,
