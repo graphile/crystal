@@ -10,6 +10,7 @@ const {
   GraphQLInputObjectType,
   isInputType,
 } = require("graphql");
+const { types: pgTypes } = require("pg");
 
 const pgRangeParser = {
   parse(str) {
@@ -65,6 +66,7 @@ module.exports = function PgTypesPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
       addType,
+      pgSql: sql,
     } = build;
 
     const GraphQLJSON = getTypeByName("JSON");
@@ -87,12 +89,12 @@ module.exports = function PgTypesPlugin(
     };
     const gql2pg = (val, type) => {
       if (val == null) {
-        return val;
+        return sql.null;
       }
       if (pg2GqlMapper[type.id]) {
         return pg2GqlMapper[type.id].unmap(val);
       } else {
-        return val;
+        return sql.value(val);
       }
     };
     /*
@@ -157,12 +159,12 @@ module.exports = function PgTypesPlugin(
     if (pgExtendedTypes) {
       pg2GqlMapper[114] = {
         map: identity,
-        unmap: jsonStringify,
+        unmap: o => sql.value(jsonStringify(o)),
       };
     } else {
       pg2GqlMapper[114] = {
         map: jsonStringify,
-        unmap: jsonStringify,
+        unmap: o => sql.value(jsonStringify(o)),
       };
     }
     pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
@@ -180,7 +182,7 @@ module.exports = function PgTypesPlugin(
     };
     pg2GqlMapper[790] = {
       map: parseMoney,
-      unmap: identity,
+      unmap: val => sql.value(val),
     };
     const enforceGqlTypeByPgType = type => {
       // Explicit overrides
@@ -270,29 +272,33 @@ module.exports = function PgTypesPlugin(
         pg2GqlMapper[type.id] = {
           map: pgRange => {
             const parsed = pgRangeParser.parse(pgRange);
+            // Since the value we will get from `parsed.(start|end).value` is a
+            // string but our code will expect it to be the value after `pg`
+            // parsed it, we pass through to `pg-types` for parsing.
+            const pgParse = pgTypes.getTypeParser(subtype.id);
             return {
               start: parsed.start && {
-                value: pg2gql(parsed.start.value, subtype),
+                value: pg2gql(pgParse(parsed.start.value), subtype),
                 inclusive: parsed.start.inclusive,
               },
               end: parsed.end && {
-                value: pg2gql(parsed.end.value, subtype),
+                value: pg2gql(pgParse(parsed.end.value), subtype),
                 inclusive: parsed.end.inclusive,
               },
             };
           },
           unmap: ({ start, end }) => {
-            const input = {
-              start: start && {
-                value: gql2pg(start.value, subtype),
-                inclusive: start.inclusive,
-              },
-              end: end && {
-                value: gql2pg(end.value, subtype),
-                inclusive: end.inclusive,
-              },
-            };
-            return pgRangeParser.serialize(input);
+            // Ref: https://www.postgresql.org/docs/9.6/static/rangetypes.html#RANGETYPES-CONSTRUCT
+            const lower = (start && gql2pg(start.value, subtype)) || sql.null;
+            const upper = (end && gql2pg(end.value, subtype)) || sql.null;
+            const lowerInclusive = start && !start.inclusive ? "(" : "[";
+            const upperInclusive = end && !end.inclusive ? ")" : "]";
+            return sql.fragment`${sql.identifier(
+              type.namespaceName,
+              type.name
+            )}(${lower}, ${upper}, ${sql.literal(
+              lowerInclusive + upperInclusive
+            )})`;
           },
         };
       }

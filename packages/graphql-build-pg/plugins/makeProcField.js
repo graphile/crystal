@@ -113,22 +113,22 @@ module.exports = function makeProcField(
           parsedResolveInfoFragment
         );
         const { args = {} } = parsedResolveInfoFragment;
-        const argValues = argNames.map((argName, argIndex) => {
+        const sqlArgValues = argNames.map((argName, argIndex) => {
           const gqlArgName = inflection.argument(argName, argIndex);
           return gql2pg(args[gqlArgName], argTypes[argIndex]);
         });
         while (
-          argValues.length > requiredArgCount &&
-          argValues[argValues.length - 1] == null
+          sqlArgValues.length > requiredArgCount &&
+          args[argNames[sqlArgValues.length - 1]] == null
         ) {
-          argValues.pop();
+          sqlArgValues.pop();
         }
         const functionAlias = sql.identifier(Symbol());
         return queryFromResolveData(
           sql.fragment`${sql.identifier(
             proc.namespace.name,
             proc.name
-          )}(${sql.join([...implicitArgs, ...argValues.map(sql.value)], ",")})`,
+          )}(${sql.join([...implicitArgs, ...sqlArgValues], ",")})`,
           functionAlias,
           resolveData,
           { asJsonAggregate: computed && proc.returnsSet, asJson: computed },

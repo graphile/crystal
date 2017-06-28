@@ -131,6 +131,7 @@ module.exports = function PgColumnsPlugin(
           isPgCompoundType,
           isPgPatch,
           pgIntrospection: table,
+          pgAddSubfield,
         },
       }
     ) => {
@@ -151,12 +152,12 @@ module.exports = function PgColumnsPlugin(
               table.name,
               table.namespace.name
             );
-            memo[fieldName] = {
+            memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
               type: nullableIf(
                 isPgPatch || !attr.isNotNull,
                 gqlInputTypeByTypeId[attr.typeId] || GraphQLString
               ),
-            };
+            });
             return memo;
           }, {})
       );

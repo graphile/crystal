@@ -96,17 +96,15 @@ module.exports = async function PgRowByUniqueConstraint(
                             builder.where(
                               sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                                 key.name
-                              )} = ${sql.value(
-                                gql2pg(
-                                  args[
-                                    inflection.column(
-                                      key.name,
-                                      key.class.name,
-                                      key.class.namespace.name
-                                    )
-                                  ],
-                                  key.type
-                                )
+                              )} = ${gql2pg(
+                                args[
+                                  inflection.column(
+                                    key.name,
+                                    key.class.name,
+                                    key.class.namespace.name
+                                  )
+                                ],
+                                key.type
                               )}`
                             );
                           });

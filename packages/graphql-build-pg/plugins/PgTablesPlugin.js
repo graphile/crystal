@@ -24,6 +24,8 @@ module.exports = function PgTablesPlugin(
         getTypeByName,
         pgGqlTypeByTypeId,
         pgGqlInputTypeByTypeId,
+        pg2GqlMapper,
+        gql2pg,
       }
     ) => {
       const Cursor = getTypeByName("Cursor");
@@ -113,6 +115,7 @@ module.exports = function PgTablesPlugin(
             isPgCompoundType: !table.isSelectable,
           }
         );
+        const pgInputFields = {};
         const TableInputType = buildObjectWithHooks(
           GraphQLInputObjectType,
           {
@@ -122,8 +125,37 @@ module.exports = function PgTablesPlugin(
             pgIntrospection: table,
             isPgRowType: table.isSelectable,
             isPgCompoundType: !table.isSelectable,
+            pgAddSubfield(fieldName, attrName, pgType, spec) {
+              pgInputFields[fieldName] = {
+                name: attrName,
+                type: pgType,
+              };
+              return spec;
+            },
           }
         );
+
+        pg2GqlMapper[tablePgType.id] = {
+          map: _ => _,
+          unmap: obj => {
+            // We use json_populate_record here rather than casting directly
+            // because a direct cast could result in weirdness if the table is
+            // modified between being introspected and this code being
+            // executed.
+            return sql.fragment`json_populate_record(null::${sql.identifier(
+              tablePgType.namespaceName,
+              tablePgType.name
+            )}, json_build_object(${sql.join(
+              Object.keys(obj).filter(k => pgInputFields[k]).map(k => {
+                const v = obj[k];
+                // XXX: nest
+                const { name, type } = pgInputFields[k];
+                return sql.fragment`${sql.literal(name)}, ${gql2pg(v, type)}`;
+              }),
+              ","
+            )}))`;
+          },
+        };
 
         if (table.isSelectable) {
           /* const TablePatchType = */
@@ -137,6 +169,14 @@ module.exports = function PgTablesPlugin(
               isPgRowType: table.isSelectable,
               isPgCompoundType: !table.isSelectable,
               isPgPatch: true,
+              pgAddSubfield(fieldName, _attrName, _type, spec) {
+                if (!pgInputFields[fieldName]) {
+                  throw new Error(
+                    "Patch and Input types share the same subfield specs currently"
+                  );
+                }
+                return spec;
+              },
             }
           );
           const EdgeType = buildObjectWithHooks(

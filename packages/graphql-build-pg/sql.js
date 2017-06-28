@@ -215,3 +215,4 @@ exports.value = value;
 exports.literal = literal;
 exports.join = join;
 exports.compile = compile;
+exports.null = value(null);

@@ -96,7 +96,7 @@ module.exports = function PgConnectionArgCondition(
                     queryBuilder.where(
                       sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                         attr.name
-                      )} = ${sql.value(gql2pg(val, attr.type))}`
+                      )} = ${gql2pg(val, attr.type)}`
                     );
                   }
                 });
