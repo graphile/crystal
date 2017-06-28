@@ -130,7 +130,7 @@ module.exports = function makeProcField(
           )}(${sql.join([...implicitArgs, ...argValues.map(sql.value)], ",")})`,
           functionAlias,
           resolveData,
-          { asJsonAggregate: proc.returnsSet, asJson: true },
+          { asJsonAggregate: computed && proc.returnsSet, asJson: computed },
           innerQueryBuilder => {
             if (returnTypeTablePrimaryKeys) {
               innerQueryBuilder.beforeFinalize(() => {
