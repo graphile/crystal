@@ -201,7 +201,7 @@ module.exports = function PgTablesPlugin(
                               .getOrderByExpressionsAndDirections()
                               .map(([field]) => field),
                             ","
-                          )})::bytea, 'base64')`,
+                          )})::text::bytea, 'base64')`,
                         "__cursor"
                       );
                     },
