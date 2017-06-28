@@ -277,6 +277,7 @@ module.exports = function makeNewBuild(builder) {
         newSpec = builder.applyHooks(this, "inputObjectType", newSpec, {
           scope,
         });
+        newSpec.fields = newSpec.fields || {};
 
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
