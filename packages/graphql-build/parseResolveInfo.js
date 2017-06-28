@@ -3,6 +3,7 @@ const assert = require("assert");
 const defaults = require("lodash/defaults");
 const { getArgumentValues } = require("graphql/execution/values");
 const { getNamedType } = require("graphql");
+const debug = require("debug")("parse-resolve-info");
 
 // Based on https://github.com/tjmehta/graphql-parse-fields
 
@@ -42,23 +43,44 @@ function getFieldFromAST(ast, parentType) {
 }
 
 let iNum = 1;
-function fieldTreeFromAST(inASTs, resolveInfo, initTree, options, parentType) {
+function fieldTreeFromAST(
+  inASTs,
+  resolveInfo,
+  initTree,
+  options,
+  parentType,
+  depth = ""
+) {
   const instance = iNum++;
-  console.log(instance, "Field tree from AST");
+  debug(
+    "%s[%d] Entering fieldTreeFromAST with parent type '%s'",
+    depth,
+    instance,
+    parentType
+  );
   let { fragments, variableValues } = resolveInfo;
   fragments = fragments || {};
   initTree = initTree || {};
   options = options || {};
   const asts = Array.isArray(inASTs) ? inASTs : [inASTs];
   initTree[parentType.name] = initTree[parentType.name] || {};
+  const outerDepth = depth;
   return asts.reduce(function(tree, val, idx) {
-    console.log(instance, "AST", idx + 1, "/", asts.length);
+    const depth = `${outerDepth}  `;
     const kind = val.kind;
+    debug(
+      "%s[%d] Processing AST %d of %d; kind = %s",
+      depth,
+      instance,
+      idx + 1,
+      asts.length,
+      kind
+    );
     const name = val.name && val.name.value;
     const isReserved = name && name.substr(0, 2) === "__";
     if (kind === "Field" && !isReserved) {
       const alias = val.alias ? val.alias.value : name;
-      console.log(instance, "Field", alias, name);
+      debug("%s[%d] Field '%s' (alias = '%s')", depth, instance, name, alias);
       const field = getFieldFromAST(val, parentType);
       const fieldGqlType = getNamedType(field.type);
       const args = getArgumentValues(field, val, variableValues) || {};
@@ -73,20 +95,22 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree, options, parentType) {
           },
         };
         if (val.selectionSet && options.deep) {
+          debug("%s[%d] Recursing into subfields", depth, instance);
           fieldTreeFromAST(
             val.selectionSet.selections,
             resolveInfo,
             tree[parentType.name][alias].fieldsByTypeName,
             options,
-            fieldGqlType
+            fieldGqlType,
+            `${depth}  `
           );
         } else {
           // No fields to add
-          console.log(instance, "EXITING!", val);
+          debug("%s[%d] Exiting (no fields to add)", depth, instance);
         }
       }
     } else if (kind === "FragmentSpread" && options.deep) {
-      console.log(instance, "Fragment spread", name);
+      debug("%s[%d] Fragment spread '%s'", depth, instance, name);
       const fragment = fragments[name];
       assert(fragment, 'unknown fragment "' + name + '"');
       let fragmentType = parentType;
@@ -99,7 +123,8 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree, options, parentType) {
           resolveInfo,
           tree,
           options,
-          fragmentType
+          fragmentType,
+          `${depth}  `
         );
       }
     } else if (kind === "InlineFragment" && options.deep) {
@@ -108,17 +133,38 @@ function fieldTreeFromAST(inASTs, resolveInfo, initTree, options, parentType) {
       if (fragment.typeCondition) {
         fragmentType = getType(resolveInfo, fragment.typeCondition);
       }
+      debug(
+        "%s[%d] Inline fragment (parent = '%s', type = '%s')",
+        depth,
+        instance,
+        parentType,
+        fragmentType
+      );
       if (fragmentType) {
         fieldTreeFromAST(
           fragment.selectionSet.selections,
           resolveInfo,
           tree,
           options,
-          fragmentType
+          fragmentType,
+          `${depth}  `
         );
       }
-    } // else ignore
-    // XXX: need to process FragmentDefinition?
+    } else if (isReserved) {
+      debug(
+        "%s[%d] IGNORING because field '%s' is reserved",
+        depth,
+        instance,
+        name
+      );
+    } else {
+      debug(
+        "%s[%d] IGNORING because kind '%s' not understood",
+        depth,
+        instance,
+        kind
+      );
+    }
     // Ref: https://github.com/postgraphql/postgraphql/pull/342/files#diff-d6702ec9fed755c88b9d70b430fda4d8R148
     return tree;
   }, initTree);
@@ -128,21 +174,6 @@ function firstKey(obj) {
   for (const key in obj) {
     return key;
   }
-}
-
-function findCompatibleType(type, typeCondition) {
-  let compatibleType = null;
-  const { kind, name } = typeCondition;
-  if (kind === "NamedType") {
-    const otherTypeName = name.value;
-    compatibleType = otherTypeName === type.name ? type : null;
-    if (!compatibleType && type.getInterfaces) {
-      // Maybe it implements an interface?
-      const interfaces = type.getInterfaces();
-      compatibleType = interfaces.find(({ name }) => name === otherTypeName);
-    }
-  }
-  return compatibleType;
 }
 
 function getType(resolveInfo, typeCondition) {
