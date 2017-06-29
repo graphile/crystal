@@ -159,16 +159,6 @@ module.exports = function makeProcField(
                 sql.fragment`${functionAlias}.${functionAlias}`,
                 "value"
               );
-            } else if (returnTypeTablePrimaryKeys) {
-              innerQueryBuilder.beforeFinalize(() => {
-                // append order by primary key to the list of orders
-                returnTypeTablePrimaryKeys.forEach(key => {
-                  innerQueryBuilder.orderBy(
-                    sql.fragment`${functionAlias}.${sql.identifier(key.name)}`,
-                    true
-                  );
-                });
-              });
             }
           }
         );
