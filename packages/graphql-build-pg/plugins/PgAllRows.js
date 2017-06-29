@@ -1,5 +1,6 @@
 const queryFromResolveData = require("../queryFromResolveData");
 const debugSql = require("debug")("graphql-build-pg:sql");
+const addStartEndCursor = require("./addStartEndCursor");
 
 module.exports = async function PgAllRows(
   builder,
@@ -109,7 +110,7 @@ module.exports = async function PgAllRows(
                         text,
                         values
                       );
-                      return row;
+                      return addStartEndCursor(row);
                     },
                   };
                 },

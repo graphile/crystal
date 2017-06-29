@@ -3,6 +3,7 @@ const queryFromResolveData = require("../queryFromResolveData");
 const nullableIf = (condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 const { GraphQLNonNull } = require("graphql");
+const addStartEndCursor = require("./addStartEndCursor");
 
 module.exports = function PgBackwardRelationPlugin(
   builder,
@@ -165,7 +166,7 @@ module.exports = function PgBackwardRelationPlugin(
                   const alias = parseResolveInfo(resolveInfo, {
                     aliasOnly: true,
                   });
-                  return data[alias];
+                  return addStartEndCursor(data[alias]);
                 },
               };
             },

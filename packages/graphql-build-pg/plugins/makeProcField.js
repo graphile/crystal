@@ -8,6 +8,7 @@ const firstValue = obj => {
   }
   return obj[firstKey];
 };
+const addStartEndCursor = require("./addStartEndCursor");
 
 module.exports = function makeProcField(
   fieldName,
@@ -216,7 +217,11 @@ module.exports = function makeProcField(
                   return pg2gql(value, returnType);
                 }
               } else {
-                return value;
+                if (proc.returnsSet) {
+                  return addStartEndCursor(value);
+                } else {
+                  return value;
+                }
               }
             }
           : async (data, args, { pgClient }, resolveInfo) => {
@@ -242,7 +247,7 @@ module.exports = function makeProcField(
               } else {
                 if (proc.returnsSet) {
                   // Connection
-                  return row;
+                  return addStartEndCursor(row);
                 } else {
                   return row;
                 }
