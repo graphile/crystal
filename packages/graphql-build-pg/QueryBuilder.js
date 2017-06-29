@@ -76,6 +76,10 @@ class QueryBuilder {
     this.lock("from");
     return this.data.from[1];
   }
+  getOffset() {
+    this.lock("offset");
+    return this.data.offset || 0;
+  }
   getOrderByExpressionsAndDirections() {
     this.lock("orderBy");
     return this.data.orderBy;

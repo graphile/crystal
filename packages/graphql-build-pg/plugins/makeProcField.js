@@ -95,7 +95,6 @@ module.exports = function makeProcField(
       scope.pgIntrospection = returnTypeTable;
     }
   } else {
-    returnFirstValueAsValue = true;
     const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(
@@ -108,9 +107,11 @@ module.exports = function makeProcField(
         scope.isPgConnectionField = true;
         scope.pgIntrospection = proc;
       } else {
+        returnFirstValueAsValue = true;
         type = new GraphQLList(Type);
       }
     } else {
+      returnFirstValueAsValue = true;
       type = Type;
     }
   }
