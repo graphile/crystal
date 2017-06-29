@@ -5,6 +5,7 @@ const { readdirSync, readFile: rawReadFile } = require("fs");
 const { promisify } = require("util");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
+const debug = require("debug")("graphql-build:schema");
 
 const readFile = promisify(rawReadFile);
 
@@ -26,7 +27,7 @@ beforeAll(() => {
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { dynamicJson: true }),
     ]);
-    console.log(printSchema(normal));
+    debug(printSchema(normal));
     return {
       normal,
       classicIds,
