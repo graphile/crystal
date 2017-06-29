@@ -6,7 +6,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
   const queryBuilder = new QueryBuilder();
   queryBuilder.from(from, fromAlias);
   for (const fn of pgQuery || []) {
-    fn(queryBuilder);
+    fn(queryBuilder, resolveData);
   }
   if (withBuilder) {
     withBuilder(queryBuilder);

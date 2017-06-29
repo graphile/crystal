@@ -65,9 +65,12 @@ module.exports = function PgConnectionArgOrderBy(
 
       addArgDataGenerator(function connectionOrderBy({ orderBy }) {
         return {
+          pgCursorPrefix: sql.literal(
+            (orderBy && orderBy[0] && orderBy[0].alias) || "natural"
+          ),
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              const { _alias, specs } = orderBy;
+              const { alias: _alias, specs } = orderBy;
               const orders = Array.isArray(specs[0]) ? specs : [specs];
               orders.forEach(([col, ascending]) => {
                 const expr = isString(col)

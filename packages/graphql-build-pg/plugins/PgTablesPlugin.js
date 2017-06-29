@@ -7,6 +7,8 @@ const {
   GraphQLInputObjectType,
 } = require("graphql");
 
+const base64 = str => Buffer.from(String(str)).toString("base64");
+
 module.exports = function PgTablesPlugin(
   builder,
   { pgInflection: inflection }
@@ -194,15 +196,18 @@ module.exports = function PgTablesPlugin(
                 recurseDataGeneratorsForField("node");
                 addDataGeneratorForField("cursor", () => {
                   return {
-                    pgQuery: queryBuilder => {
+                    pgQuery: (queryBuilder, resolveData) => {
                       queryBuilder.select(
                         () =>
-                          sql.fragment`encode(json_build_array(${sql.join(
-                            queryBuilder
-                              .getOrderByExpressionsAndDirections()
-                              .map(([field]) => field),
+                          sql.fragment`json_build_array(${sql.join(
+                            [
+                              ...(resolveData.pgCursorPrefix || []),
+                              ...queryBuilder
+                                .getOrderByExpressionsAndDirections()
+                                .map(([field]) => field),
+                            ],
                             ","
-                          )})::text::bytea, 'base64')`,
+                          )})`,
                         "__cursor"
                       );
                     },
@@ -212,7 +217,7 @@ module.exports = function PgTablesPlugin(
                   cursor: {
                     type: Cursor,
                     resolve(data) {
-                      return data.__cursor;
+                      return base64(JSON.stringify(data.__cursor));
                     },
                   },
                   node: {

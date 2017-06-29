@@ -17,7 +17,10 @@ const mergeData = (data, gen, ReturnType, arg) => {
   for (const result of results) {
     for (const k of Object.keys(result)) {
       data[k] = data[k] || [];
-      data[k].push(...ensureArray(result[k]));
+      const newData = ensureArray(result[k]);
+      if (newData) {
+        data[k].push(...newData);
+      }
     }
   }
 };
