@@ -1,4 +1,5 @@
 const sql = require("./sql");
+const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 
 const callIfNecessary = o => {
   if (typeof o === "function") {
@@ -190,13 +191,22 @@ class QueryBuilder {
     for (const fn of this.data.beforeLock[type] || []) {
       fn();
     }
-    this[`${type}Locked`] = true;
+    this[`${type}Locked`] = isDev
+      ? new Error("Initally locked here").stack
+      : true;
     if (type !== "cursorComparator") {
       this.data[type] = callIfNecessary(this.data[type]);
     }
   }
   checkLock(type) {
     if (this[`${type}Locked`]) {
+      if (isDev) {
+        throw new Error(
+          "orderBy has already been locked\n    " +
+            this[`${type}Locked`].replace(/\n/g, "\n    ") +
+            "\n"
+        );
+      }
       throw new Error("orderBy has already been locked");
     }
   }
