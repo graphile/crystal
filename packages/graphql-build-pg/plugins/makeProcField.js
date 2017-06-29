@@ -1,4 +1,5 @@
 const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
+const debugSql = require("debug")("graphql-build-pg:sql");
 const queryFromResolveData = require("../queryFromResolveData");
 const firstValue = obj => {
   let firstKey;
@@ -207,7 +208,8 @@ module.exports = function makeProcField(
               );
 
               const { text, values } = sql.compile(query);
-              console.log(require("sql-formatter").format(text));
+              if (debugSql.enabled)
+                debugSql(require("sql-formatter").format(text));
               const { rows: r } = await pgClient.query(text, values);
               const rows = r || [];
               if (rows.length === 0) {

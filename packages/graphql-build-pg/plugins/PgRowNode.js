@@ -1,6 +1,7 @@
 const queryFromResolveData = require("../queryFromResolveData");
 const { GraphQLNonNull, GraphQLID } = require("graphql");
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const debugSql = require("debug")("graphql-build-pg:sql");
 
 module.exports = async function PgRowByUniqueConstraint(
   builder,
@@ -65,7 +66,7 @@ module.exports = async function PgRowByUniqueConstraint(
             }
           );
           const { text, values } = sql.compile(query);
-          console.log(require("sql-formatter").format(text));
+          if (debugSql.enabled) debugSql(require("sql-formatter").format(text));
           const { rows: [row] } = await pgClient.query(text, values);
           return row;
         }
@@ -175,7 +176,8 @@ module.exports = async function PgRowByUniqueConstraint(
                         }
                       );
                       const { text, values } = sql.compile(query);
-                      console.log(require("sql-formatter").format(text));
+                      if (debugSql.enabled)
+                        debugSql(require("sql-formatter").format(text));
                       const { rows: [row] } = await pgClient.query(
                         text,
                         values

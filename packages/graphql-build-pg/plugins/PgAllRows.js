@@ -1,4 +1,5 @@
 const queryFromResolveData = require("../queryFromResolveData");
+const debugSql = require("debug")("graphql-build-pg:sql");
 
 module.exports = async function PgAllRows(
   builder,
@@ -92,7 +93,8 @@ module.exports = async function PgAllRows(
                         }
                       );
                       const { text, values } = sql.compile(query);
-                      console.log(require("sql-formatter").format(text));
+                      if (debugSql.enabled)
+                        debugSql(require("sql-formatter").format(text));
                       const { rows } = await pgClient.query(text, values);
                       return rows || [];
                     },
