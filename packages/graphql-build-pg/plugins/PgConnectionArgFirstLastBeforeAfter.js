@@ -45,49 +45,12 @@ module.exports = function PgConnectionArgs(builder) {
             if (before != null) {
               addCursorConstraint(before, false);
             }
+
             function addCursorConstraint(cursor, isAfter) {
               const cursorValues = JSON.parse(base64Decode(cursor));
-              queryBuilder.where(() => {
-                const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
-                if (
-                  cursorValues.length != orderByExpressionsAndDirections.length
-                ) {
-                  throw new Error("Invalid cursor");
-                }
-                let sqlFilter = sql.fragment`false`;
-                for (
-                  let i = orderByExpressionsAndDirections.length - 1;
-                  i >= 0;
-                  i--
-                ) {
-                  const [
-                    sqlExpression,
-                    ascending,
-                  ] = orderByExpressionsAndDirections[i];
-                  const cursorValue = cursorValues[i];
-                  // If ascending and isAfter then >
-                  // If ascending and isBefore then <
-                  const comparison = ascending ^ !isAfter
-                    ? sql.fragment`>`
-                    : sql.fragment`<`;
-
-                  const sqlOldFilter = sqlFilter;
-                  sqlFilter = sql.fragment`
-                  (
-                    (
-                      ${sqlExpression} ${comparison} ${sql.value(cursorValue)}
-                    )
-                  OR
-                    (
-                      (${sqlExpression} = ${sql.value(cursorValue)})
-                    AND
-                      ${sqlOldFilter}
-                    )
-                  )
-                  `;
-                }
-                return sqlFilter;
-              });
+              queryBuilder.wherePage(
+                queryBuilder.cursorCondition(sql.value(cursorValues), isAfter)
+              );
             }
           },
         };

@@ -122,7 +122,7 @@ module.exports = function PgBackwardRelationPlugin(
                         { asJsonAggregate: true },
                         innerQueryBuilder => {
                           if (primaryKeys) {
-                            innerQueryBuilder.beforeFinalize(() => {
+                            innerQueryBuilder.beforeLock("orderBy", () => {
                               // append order by primary key to the list of orders
                               primaryKeys.forEach(key => {
                                 innerQueryBuilder.orderBy(

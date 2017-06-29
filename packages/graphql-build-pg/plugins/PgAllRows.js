@@ -82,7 +82,7 @@ module.exports = async function PgAllRows(
                         },
                         builder => {
                           if (primaryKeys) {
-                            builder.beforeFinalize(() => {
+                            builder.beforeLock("orderBy", () => {
                               // append order by primary key to the list of orders
                               primaryKeys.forEach(key => {
                                 builder.orderBy(

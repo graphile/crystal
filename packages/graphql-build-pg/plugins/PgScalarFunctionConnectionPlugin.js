@@ -51,7 +51,12 @@ module.exports = function PgTablesPlugin(
             }) => {
               addDataGeneratorForField("cursor", () => {
                 return {
-                  pgQuery: (queryBuilder, resolveData) => {
+                  pgQuery: queryBuilder => {
+                    queryBuilder.setCursorComparator((sqlCursor, isAfter) => {
+                      return sql.fragment`(row_number() over (order by 1)) ${isAfter
+                        ? sql.fragment`>`
+                        : sql.fragment`<`} (${sqlCursor})[2]`;
+                    });
                     queryBuilder.select(
                       () =>
                         sql.fragment`json_build_array(${sql.join(

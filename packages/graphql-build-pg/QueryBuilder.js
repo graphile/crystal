@@ -21,14 +21,25 @@ class QueryBuilder {
       limit: null,
       offset: null,
       flip: false,
-      beforeFinalize: [],
+      beforeLock: {},
+      cursorComparator: null,
     };
   }
 
   // ----------------------------------------
 
-  beforeFinalize(fn) {
-    this.data.beforeFinalize.push(fn);
+  beforeLock(field, fn) {
+    this.checkLock(field);
+    this.data.beforeLock[field] = this.data.beforeLock[field] || [];
+    this.data.beforeLock[field].push(fn);
+  }
+  setCursorComparator(fn) {
+    this.checkLock("cursorComparator");
+    this.data.cursorComparator = fn;
+    this.lock("cursorComparator");
+  }
+  cursorCondition(sqlCursorValue, isAfter) {
+    return this.data.cursorComparator(sqlCursorValue, isAfter);
   }
   select(exprGen, alias) {
     this.checkLock("select");
@@ -50,7 +61,7 @@ class QueryBuilder {
     this.checkLock("where");
     this.data.where.push(exprGen);
   }
-  orderBy(exprGen, ascending) {
+  orderBy(exprGen, ascending = true) {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending]);
   }
@@ -85,6 +96,7 @@ class QueryBuilder {
     return this.data.orderBy;
   }
   buildSelectFields() {
+    this.lockEverything();
     return sql.join(
       this.data.select.map(
         ([sqlFragment, alias]) =>
@@ -94,6 +106,7 @@ class QueryBuilder {
     );
   }
   buildSelectJson({ addNullCase }) {
+    this.lockEverything();
     let buildObject = this.data.select.length
       ? sql.fragment`json_build_object(${sql.join(
           this.data.select.map(
@@ -169,18 +182,18 @@ class QueryBuilder {
 
   // ----------------------------------------
 
-  finalize() {
-    if (!this.finalized) {
-      for (const fn of this.data.beforeFinalize) {
-        fn();
-      }
-      this.finalized = true;
-    }
+  _finalize() {
+    this.finalized = true;
   }
   lock(type) {
     if (this[`${type}Locked`]) return;
+    for (const fn of this.data.beforeLock[type] || []) {
+      fn();
+    }
     this[`${type}Locked`] = true;
-    this.data[type] = callIfNecessary(this.data[type]);
+    if (type !== "cursorComparator") {
+      this.data[type] = callIfNecessary(this.data[type]);
+    }
   }
   checkLock(type) {
     if (this[`${type}Locked`]) {
@@ -188,7 +201,7 @@ class QueryBuilder {
     }
   }
   lockEverything() {
-    this.finalize();
+    this._finalize();
     // We must execute everything after `from` so we have the alias to reference
     this.lock("from");
     this.lock("flip");
@@ -197,6 +210,7 @@ class QueryBuilder {
     this.lock("limit");
     this.lock("orderBy");
     // We must execute where after orderBy because cursor queries require all orderBy columns
+    this.lock("cursorComparator");
     this.lock("where");
     // We must execute select after orderBy otherwise we cannot generate a cursor
     this.lock("select");

@@ -197,19 +197,65 @@ module.exports = function PgTablesPlugin(
                 addDataGeneratorForField("cursor", () => {
                   return {
                     pgQuery: (queryBuilder, resolveData) => {
-                      queryBuilder.select(
-                        () =>
-                          sql.fragment`json_build_array(${sql.join(
-                            [
-                              ...(resolveData.pgCursorPrefix || []),
-                              ...queryBuilder
-                                .getOrderByExpressionsAndDirections()
-                                .map(([field]) => field),
-                            ],
-                            ","
-                          )})`,
-                        "__cursor"
-                      );
+                      const prefixes = resolveData.pgCursorPrefix || [];
+                      queryBuilder.beforeLock("orderBy", () => {
+                        if (queryBuilder.data.orderBy.length === 0) {
+                          // Fall back to rowNumber ordering
+                          queryBuilder.orderBy(
+                            sql.fragment`(row_number() over (partition by 1))`
+                          );
+                        }
+                      });
+                      queryBuilder.setCursorComparator((sqlCursor, isAfter) => {
+                        const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
+                        let sqlFilter = sql.fragment`false`;
+                        for (
+                          let i = orderByExpressionsAndDirections.length - 1;
+                          i >= 0;
+                          i--
+                        ) {
+                          const [
+                            sqlExpression,
+                            ascending,
+                          ] = orderByExpressionsAndDirections[i];
+                          // If ascending and isAfter then >
+                          // If ascending and isBefore then <
+                          const comparison = ascending ^ !isAfter
+                            ? sql.fragment`>`
+                            : sql.fragment`<`;
+
+                          const sqlOldFilter = sqlFilter;
+                          sqlFilter = sql.fragment`
+                          (
+                            (
+                              ${sqlExpression} ${comparison} (${sqlCursor})[${sql.literal(
+                            i + 1 + prefixes.length
+                          )}]
+                            )
+                          OR
+                            (
+                              (${sqlExpression} = (${sqlCursor})[${sql.literal(
+                            i + 1 + prefixes.length
+                          )}]
+                            AND
+                              ${sqlOldFilter}
+                            )
+                          )
+                          `;
+                        }
+                        return sqlFilter;
+                      });
+                      queryBuilder.select(() => {
+                        return sql.fragment`json_build_array(${sql.join(
+                          [
+                            ...prefixes,
+                            ...queryBuilder
+                              .getOrderByExpressionsAndDirections()
+                              .map(([expr]) => expr),
+                          ],
+                          ","
+                        )})`;
+                      }, "__cursor");
                     },
                   };
                 });
