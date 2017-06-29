@@ -19,5 +19,6 @@ exports.defaultPlugins = [
   require("./plugins/PgNodeAliasPostGraphQL"),
   require("./plugins/PgScalarFunctionConnectionPlugin"), // For PostGraphQL compatibility
   require("./plugins/PageInfoStartEndCursor"), // For PostGraphQL compatibility
+  require("./plugins/PgConnectionTotalCount"),
 ];
 exports.inflections = require("./inflections");
