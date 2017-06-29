@@ -78,7 +78,6 @@ module.exports = function PgTablesPlugin(
                 node: {
                   type: NodeType,
                   resolve(data) {
-                    console.dir(data);
                     return data.value;
                   },
                 },
