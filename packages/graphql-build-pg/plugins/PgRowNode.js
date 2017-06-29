@@ -86,7 +86,6 @@ module.exports = async function PgRowByUniqueConstraint(
         getTypeByName,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         gql2pg,
         getNodeType,
       },

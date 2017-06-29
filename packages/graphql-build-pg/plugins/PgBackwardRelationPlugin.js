@@ -1,7 +1,5 @@
 const debug = require("debug")("graphql-build-pg");
 const queryFromResolveData = require("../queryFromResolveData");
-const nullableIf = (condition, Type) =>
-  condition ? Type : new GraphQLNonNull(Type);
 const { GraphQLNonNull } = require("graphql");
 const addStartEndCursor = require("./addStartEndCursor");
 

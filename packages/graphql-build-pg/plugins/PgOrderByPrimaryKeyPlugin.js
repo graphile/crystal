@@ -1,22 +1,10 @@
-module.exports = function PgOrderByPrimaryKeyPlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+module.exports = function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
     "enumType:values",
     (
       values,
-      {
-        extend,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
-        parseResolveInfo,
-      },
-      {
-        scope: { isPgRowSortEnum, pgIntrospection: table },
-        addDataGeneratorForField,
-      }
+      { extend, pgIntrospectionResultsByKind: introspectionResultsByKind },
+      { scope: { isPgRowSortEnum, pgIntrospection: table } }
     ) => {
       if (!isPgRowSortEnum || !table || table.kind !== "class") {
         return values;

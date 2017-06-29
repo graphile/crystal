@@ -1,4 +1,4 @@
-const { GraphQLNonNull, GraphQLString, GraphQLObjectType } = require("graphql");
+const { GraphQLObjectType } = require("graphql");
 
 module.exports = async function QueryPlugin(builder) {
   builder.hook("build", build =>

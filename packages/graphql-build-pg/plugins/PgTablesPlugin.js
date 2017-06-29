@@ -3,7 +3,6 @@ const {
   GraphQLNonNull,
   GraphQLID,
   GraphQLList,
-  GraphQLEnumType,
   GraphQLInputObjectType,
 } = require("graphql");
 
@@ -188,11 +187,7 @@ module.exports = function PgTablesPlugin(
             GraphQLObjectType,
             {
               name: inflection.edge(TableType.name),
-              fields: ({
-                addDataGeneratorForField,
-                recurseDataGeneratorsForField,
-                buildFieldWithHooks,
-              }) => {
+              fields: ({ recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("node");
                 return {
                   cursor: {

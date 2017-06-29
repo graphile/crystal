@@ -62,22 +62,6 @@ module.exports = function makeProcField(
       `Could not determine return type for function '${proc.name}'`
     );
   }
-  const returnTypeTableAttributes =
-    returnTypeTable &&
-    introspectionResultsByKind.attribute.filter(
-      attr => attr.classId === returnTypeTable.id
-    );
-  const returnTypeTablePrimaryKeyConstraint =
-    returnTypeTable &&
-    introspectionResultsByKind.constraint
-      .filter(con => con.classId === returnTypeTable.id)
-      .filter(con => ["p"].includes(con.type))[0];
-  const returnTypeTablePrimaryKeys =
-    returnTypeTablePrimaryKeyConstraint &&
-    returnTypeTablePrimaryKeyConstraint.keyAttributeNums.map(
-      num => returnTypeTableAttributes.filter(attr => attr.num === num)[0]
-    );
-
   let type;
   const scope = {};
   let returnFirstValueAsValue = false;

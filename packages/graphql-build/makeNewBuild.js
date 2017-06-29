@@ -2,12 +2,13 @@ const {
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLInputObjectType,
-  GraphQLString,
   GraphQLEnumType,
   getNamedType,
 } = require("graphql");
 const parseResolveInfo = require("./parseResolveInfo");
 const isString = require("lodash/isString");
+const isDev = ["test", "development"].includes(process.env.NODE_ENV);
+const debug = require("debug")("graphql-build");
 
 const mergeData = (data, gen, ReturnType, arg) => {
   const results = ensureArray(gen(arg, ReturnType, data));
@@ -39,7 +40,8 @@ const ensureArray = val =>
 let ensureName = () => {};
 if (["development", "test"].includes(process.env.NODE_ENV)) {
   ensureName = fn => {
-    if (!fn.displayName && !fn.name) {
+    if (isDev && !fn.displayName && !fn.name) {
+      // eslint-disable-next-line no-console
       console.trace(
         "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
       );
@@ -258,10 +260,11 @@ module.exports = function makeNewBuild(builder) {
                       try {
                         mergeData(data, gen, ReturnType, args);
                       } catch (e) {
-                        console.error(
-                          `Failed to execute argDataGenerator '${gen.displayName ||
-                            gen.name ||
-                            "anonymous"}' on ${fieldName} of ${Self.name}`
+                        debug(
+                          "Failed to execute argDataGenerator '%s' on %s of %s",
+                          gen.displayName || gen.name || "anonymous",
+                          fieldName,
+                          Self.name
                         );
                         throw e;
                       }

@@ -6,17 +6,8 @@ module.exports = function PgOrderAllColumnsPlugin(
     "enumType:values",
     (
       values,
-      {
-        extend,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
-        parseResolveInfo,
-      },
-      {
-        scope: { isPgRowSortEnum, pgIntrospection: table },
-        addDataGeneratorForField,
-      }
+      { extend, pgIntrospectionResultsByKind: introspectionResultsByKind },
+      { scope: { isPgRowSortEnum, pgIntrospection: table } }
     ) => {
       if (!isPgRowSortEnum || !table || table.kind !== "class") {
         return values;
@@ -26,22 +17,6 @@ module.exports = function PgOrderAllColumnsPlugin(
         introspectionResultsByKind.attribute
           .filter(attr => attr.classId === table.id)
           .reduce((memo, attr) => {
-            /*
-            attr =
-              { kind: 'attribute',
-                classId: '6546809',
-                num: 21,
-                name: 'upstreamName',
-                description: null,
-                typeId: '6484393',
-                isNotNull: false,
-                hasDefault: false }
-            */
-            const fieldName = inflection.column(
-              attr.name,
-              table.name,
-              table.namespace.name
-            );
             const ascFieldName = inflection.orderByEnum(
               attr.name,
               true,

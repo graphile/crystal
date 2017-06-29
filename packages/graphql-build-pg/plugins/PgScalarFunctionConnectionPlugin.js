@@ -1,10 +1,8 @@
 const {
   GraphQLObjectType,
   GraphQLNonNull,
-  GraphQLID,
   GraphQLList,
-  GraphQLEnumType,
-  GraphQLInputObjectType,
+  GraphQLString,
 } = require("graphql");
 
 const base64 = str => Buffer.from(String(str)).toString("base64");
@@ -18,15 +16,10 @@ module.exports = function PgTablesPlugin(
     (
       _,
       {
-        getNodeIdForTypeAndIdentifiers,
-        nodeIdFieldName,
         buildObjectWithHooks,
-        pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pg2GqlMapper,
-        gql2pg,
       }
     ) => {
       const Cursor = getTypeByName("Cursor");
@@ -44,11 +37,7 @@ module.exports = function PgTablesPlugin(
           GraphQLObjectType,
           {
             name: inflection.scalarFunctionEdge(proc.name, proc.namespace.name),
-            fields: ({
-              addDataGeneratorForField,
-              recurseDataGeneratorsForField,
-              buildFieldWithHooks,
-            }) => {
+            fields: () => {
               return {
                 cursor: {
                   type: Cursor,

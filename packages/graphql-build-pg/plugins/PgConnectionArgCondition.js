@@ -9,9 +9,7 @@ module.exports = function PgConnectionArgCondition(
       schema,
       {
         buildObjectWithHooks,
-        pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        getTypeByName,
         pgGqlInputTypeByTypeId: gqlTypeByTypeId,
       }
     ) => {
@@ -62,7 +60,6 @@ module.exports = function PgConnectionArgCondition(
         gql2pg,
         extend,
         getTypeByName,
-        buildObjectWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       },
       {

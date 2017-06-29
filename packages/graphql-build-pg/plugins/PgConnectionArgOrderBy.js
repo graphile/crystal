@@ -11,10 +11,7 @@ module.exports = function PgConnectionArgOrderBy(
       schema,
       {
         buildObjectWithHooks,
-        pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        getTypeByName,
-        pgGqlTypeByTypeId,
       }
     ) => {
       introspectionResultsByKind.class.map(table => {
@@ -48,7 +45,7 @@ module.exports = function PgConnectionArgOrderBy(
     "field:args",
     (
       args,
-      { extend, getTypeByName, buildObjectWithHooks, pgSql: sql },
+      { extend, getTypeByName, pgSql: sql },
       {
         scope: { isPgConnectionField, pgIntrospection: table },
         addArgDataGenerator,
@@ -70,7 +67,7 @@ module.exports = function PgConnectionArgOrderBy(
           ),
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              const { alias: _alias, specs } = orderBy;
+              const { specs } = orderBy;
               const orders = Array.isArray(specs[0]) ? specs : [specs];
               orders.forEach(([col, ascending]) => {
                 const expr = isString(col)

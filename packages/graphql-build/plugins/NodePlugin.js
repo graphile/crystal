@@ -44,10 +44,10 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   });
 
   builder.hook("init", function defineNodeInterfaceType(
-    schema,
+    _,
     { $$isQuery, $$nodeType, getTypeByName, buildObjectWithHooks }
   ) {
-    return buildObjectWithHooks(GraphQLInterfaceType, {
+    buildObjectWithHooks(GraphQLInterfaceType, {
       name: "Node",
       resolveType: value => {
         if (value === $$isQuery) {
@@ -62,12 +62,12 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
         },
       },
     });
-    return schema;
+    return _;
   });
 
   builder.hook("objectType:interfaces", function addNodeIdToQuery(
     interfaces,
-    { parseResolveInfo, getTypeByName, extend, nodeFetcherByTypeName },
+    { getTypeByName },
     { scope: { isRootQuery } }
   ) {
     if (!isRootQuery) {
