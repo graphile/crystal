@@ -164,32 +164,21 @@ module.exports = function makeNewBuild(builder) {
               ReturnType
             );
             const results = [];
-            for (const alias of Object.keys(fields)) {
-              const field = fields[alias];
-              // 1. XXX: Get the type for this field
-              const Type = getNamedType(ReturnType);
-              const StrippedType = getNamedType(Type);
-              if (!Type) {
-                throw new Error(
-                  `Could not find type for field '${field.name}' of '${finalSpec.name}'`
-                );
-              }
-              // 2. Get the generators for that type
-              const fieldDataGenerators =
-                fieldDataGeneratorsByType.get(StrippedType) || {};
-              // 3. Run them with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
-              if (fieldDataGenerators) {
-                const typeFields = Type.getFields();
-                for (const alias of Object.keys(fields)) {
-                  const field = fields[alias];
-                  const gens = fieldDataGenerators[field.name];
-                  if (gens) {
-                    for (const gen of gens) {
-                      const local = ensureArray(
-                        gen(field, typeFields[field.name].type, ...rest)
-                      );
-                      results.push(...local);
-                    }
+            const StrippedType = getNamedType(ReturnType);
+            const fieldDataGenerators =
+              fieldDataGeneratorsByType.get(StrippedType) || {};
+            if (fieldDataGenerators) {
+              const typeFields = StrippedType.getFields();
+              for (const alias of Object.keys(fields)) {
+                const field = fields[alias];
+                // Run generators with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
+                const gens = fieldDataGenerators[field.name];
+                if (gens) {
+                  for (const gen of gens) {
+                    const local = ensureArray(
+                      gen(field, typeFields[field.name].type, ...rest)
+                    );
+                    results.push(...local);
                   }
                 }
               }
