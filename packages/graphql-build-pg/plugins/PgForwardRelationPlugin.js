@@ -131,8 +131,8 @@ module.exports = function PgForwardRelationPlugin(
                   gqlForeignTableType
                 ),
                 resolve: (data, _args, _context, resolveInfo) => {
-                  const { alias } = parseResolveInfo(resolveInfo, {
-                    deep: false,
+                  const alias = parseResolveInfo(resolveInfo, {
+                    aliasOnly: true,
                   });
                   return data[alias];
                 },

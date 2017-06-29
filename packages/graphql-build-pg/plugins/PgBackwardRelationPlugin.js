@@ -162,8 +162,8 @@ module.exports = function PgBackwardRelationPlugin(
                 type: new GraphQLNonNull(ConnectionType),
                 args: {},
                 resolve: (data, _args, _context, resolveInfo) => {
-                  const { alias } = parseResolveInfo(resolveInfo, {
-                    deep: false,
+                  const alias = parseResolveInfo(resolveInfo, {
+                    aliasOnly: true,
                   });
                   return data[alias];
                 },

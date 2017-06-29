@@ -205,9 +205,7 @@ module.exports = function makeProcField(
         }, {}),
         resolve: computed
           ? (data, _args, _context, resolveInfo) => {
-              const { alias } = parseResolveInfo(resolveInfo, {
-                deep: false,
-              });
+              const alias = parseResolveInfo(resolveInfo, { aliasOnly: true });
               const value = data[alias];
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {

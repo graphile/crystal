@@ -7,9 +7,23 @@ const debug = require("debug")("parse-resolve-info");
 
 // Based on https://github.com/tjmehta/graphql-parse-fields
 
+function getAlias(resolveInfo) {
+  const asts = resolveInfo.fieldASTs || resolveInfo.fieldNodes;
+  return asts.reduce(function(alias, val) {
+    if (!alias) {
+      if (val.kind === "Field") {
+        alias = val.alias ? val.alias.value : val.name && val.name.value;
+      }
+    }
+    return alias;
+  }, null);
+}
+
 function parseFields(resolveInfo, options = {}) {
-  const fieldNodes =
-    resolveInfo && (resolveInfo.fieldASTs || resolveInfo.fieldNodes);
+  if (options.aliasOnly) {
+    return getAlias(resolveInfo);
+  }
+  const fieldNodes = resolveInfo.fieldASTs || resolveInfo.fieldNodes;
   const { parentType } = resolveInfo;
   if (!fieldNodes) {
     throw new Error("No fieldNodes provided!");
@@ -184,5 +198,7 @@ function getType(resolveInfo, typeCondition) {
     return schema.getType(typeName);
   }
 }
+
+parseFields.getAlias = getAlias;
 
 module.exports = parseFields;

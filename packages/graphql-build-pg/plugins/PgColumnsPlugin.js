@@ -103,8 +103,8 @@ module.exports = function PgColumnsPlugin(
                 return {
                   type: nullableIf(!attr.isNotNull, ReturnType),
                   resolve: (data, _args, _context, resolveInfo) => {
-                    const { alias } = parseResolveInfo(resolveInfo, {
-                      deep: false,
+                    const alias = parseResolveInfo(resolveInfo, {
+                      aliasOnly: true,
                     });
                     return pg2gql(data[alias], attr.type);
                   },
