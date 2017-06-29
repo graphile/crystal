@@ -25,6 +25,7 @@ module.exports = function makeProcField(
     parseResolveInfo,
     gql2pg,
     pg2gql,
+    pgAddPaginationToQuery,
   }
 ) {
   const sliceAmount = computed ? 1 : 0;
@@ -139,7 +140,7 @@ module.exports = function makeProcField(
           sqlArgValues.pop();
         }
         const functionAlias = sql.identifier(Symbol());
-        return queryFromResolveData(
+        const query = queryFromResolveData(
           sql.fragment`${sql.identifier(
             proc.namespace.name,
             proc.name
@@ -147,7 +148,7 @@ module.exports = function makeProcField(
           functionAlias,
           resolveData,
           {
-            asJsonAggregate: computed && proc.returnsSet,
+            asJsonAggregate: proc.returnsSet,
             asJson: computed && returnTypeTable,
             addNullCase: true,
           },
@@ -170,6 +171,13 @@ module.exports = function makeProcField(
             }
           }
         );
+        if (proc.returnsSet) {
+          return pgAddPaginationToQuery(query, resolveData, {
+            asFields: !computed,
+          });
+        } else {
+          return query;
+        }
       }
       if (computed) {
         addDataGenerator((parsedResolveInfoFragment, ReturnType) => {
@@ -203,7 +211,9 @@ module.exports = function makeProcField(
               const value = data[alias];
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {
-                  return value.map(firstValue).map(v => pg2gql(v, returnType));
+                  return value.data
+                    .map(firstValue)
+                    .map(v => pg2gql(v, returnType));
                 } else {
                   return pg2gql(value, returnType);
                 }
@@ -222,22 +232,21 @@ module.exports = function makeProcField(
               const { text, values } = sql.compile(query);
               if (debugSql.enabled)
                 debugSql(require("sql-formatter").format(text));
-              const { rows: r } = await pgClient.query(text, values);
-              const rows = r || [];
-              if (rows.length === 0) {
-                return proc.returnsSet ? [] : null;
-              }
+              const { rows: [row] } = await pgClient.query(text, values);
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {
-                  return rows.map(firstValue).map(v => pg2gql(v, returnType));
+                  return row.data
+                    .map(firstValue)
+                    .map(v => pg2gql(v, returnType));
                 } else {
-                  return pg2gql(firstValue(rows[0]), returnType);
+                  return pg2gql(firstValue(row), returnType);
                 }
               } else {
                 if (proc.returnsSet) {
-                  return rows;
+                  // Connection
+                  return row;
                 } else {
-                  return rows[0];
+                  return row;
                 }
               }
             },

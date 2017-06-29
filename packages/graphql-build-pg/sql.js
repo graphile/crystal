@@ -1,6 +1,7 @@
 // Full credit: https://raw.githubusercontent.com/postgraphql/postgraphql/master/src/postgres/utils/sql.ts
 const isString = require("lodash/isString");
 const isNumber = require("lodash/isNumber");
+const isBoolean = require("lodash/isBoolean");
 const isSymbol = require("lodash/isSymbol");
 const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
@@ -167,6 +168,12 @@ const literal = val => {
       return raw(String(val));
     } else {
       return raw(`'${val}'::float`);
+    }
+  } else if (isBoolean(val)) {
+    if (val) {
+      return raw(`TRUE`);
+    } else {
+      return raw(`FALSE`);
     }
   } else {
     return { type: "VALUE", value: val };

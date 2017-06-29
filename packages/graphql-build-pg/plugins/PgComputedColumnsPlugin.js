@@ -18,6 +18,7 @@ module.exports = function PgComputedColumnsPlugin(
         pgSql: sql,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+        pgAddPaginationToQuery,
       },
       {
         scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -86,6 +87,7 @@ module.exports = function PgComputedColumnsPlugin(
               table.namespace.name
             );
             memo[fieldName] = makeProcField(fieldName, proc, {
+              pgAddPaginationToQuery,
               buildFieldWithHooks,
               computed: true,
               introspectionResultsByKind,

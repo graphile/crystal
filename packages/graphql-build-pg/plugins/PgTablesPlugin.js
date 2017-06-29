@@ -237,6 +237,7 @@ module.exports = function PgTablesPlugin(
             }
           );
           /*const ConnectionType = */
+          const PageInfo = getTypeByName("PageInfo");
           buildObjectWithHooks(
             GraphQLObjectType,
             {
@@ -250,13 +251,19 @@ module.exports = function PgTablesPlugin(
                   nodes: {
                     type: new GraphQLNonNull(new GraphQLList(TableType)),
                     resolve(data) {
-                      return data;
+                      return data.data;
                     },
                   },
                   edges: {
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),
+                    resolve(data) {
+                      return data.data;
+                    },
+                  },
+                  pageInfo: PageInfo && {
+                    type: new GraphQLNonNull(PageInfo),
                     resolve(data) {
                       return data;
                     },

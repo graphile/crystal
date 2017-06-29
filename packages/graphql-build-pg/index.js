@@ -1,4 +1,5 @@
 exports.defaultPlugins = [
+  require("./plugins/PgBasicsPlugin"),
   require("./plugins/PgIntrospectionPlugin"),
   require("./plugins/PgTypesPlugin"),
   require("./plugins/PgTablesPlugin"),

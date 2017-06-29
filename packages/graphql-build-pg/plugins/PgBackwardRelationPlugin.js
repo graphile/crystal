@@ -18,6 +18,7 @@ module.exports = function PgBackwardRelationPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         parseResolveInfo,
+        pgAddPaginationToQuery,
       },
       {
         scope: { isPgRowType, pgIntrospection: foreignTable },
@@ -144,7 +145,12 @@ module.exports = function PgBackwardRelationPlugin(
                           });
                         }
                       );
-                      return sql.fragment`(${query})`;
+                      const queryWithPagination = pgAddPaginationToQuery(
+                        query,
+                        resolveData,
+                        { asFields: false }
+                      );
+                      return sql.fragment`(${queryWithPagination})`;
                     }, parsedResolveInfoFragment.alias);
                   },
                 };

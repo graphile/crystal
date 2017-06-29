@@ -2,7 +2,6 @@ const withPgClient = require("../withPgClient");
 const promisify = require("util").promisify;
 const readFile = promisify(require("fs").readFile);
 const INTROSPECTION_PATH = `${__dirname}/../res/introspection-query.sql`;
-const sql = require("../sql");
 
 module.exports = async function PgIntrospectionPlugin(
   builder,
@@ -117,7 +116,6 @@ module.exports = async function PgIntrospectionPlugin(
     builder.hook("build", build => {
       return build.extend(build, {
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
       });
     });
   });

@@ -15,6 +15,7 @@ module.exports = async function PgAllRows(
         getTypeByName,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgAddPaginationToQuery,
       },
       { buildFieldWithHooks, scope: { isRootQuery } }
     ) => {
@@ -75,7 +76,9 @@ module.exports = async function PgAllRows(
                         sqlFullTableName,
                         undefined,
                         resolveData,
-                        {},
+                        {
+                          asJsonAggregate: true,
+                        },
                         builder => {
                           if (primaryKeys) {
                             builder.beforeFinalize(() => {
@@ -92,11 +95,21 @@ module.exports = async function PgAllRows(
                           }
                         }
                       );
-                      const { text, values } = sql.compile(query);
+                      const queryWithPagination = pgAddPaginationToQuery(
+                        query,
+                        resolveData,
+                        {
+                          asFields: true,
+                        }
+                      );
+                      const { text, values } = sql.compile(queryWithPagination);
                       if (debugSql.enabled)
                         debugSql(require("sql-formatter").format(text));
-                      const { rows } = await pgClient.query(text, values);
-                      return rows || [];
+                      const { rows: [row] } = await pgClient.query(
+                        text,
+                        values
+                      );
+                      return row;
                     },
                   };
                 },

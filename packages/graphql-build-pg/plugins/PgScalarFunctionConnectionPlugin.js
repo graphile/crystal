@@ -108,7 +108,7 @@ module.exports = function PgTablesPlugin(
                 nodes: {
                   type: new GraphQLNonNull(new GraphQLList(NodeType)),
                   resolve(data) {
-                    return data.map(entry => entry.value);
+                    return data.data.map(entry => entry.value);
                   },
                 },
                 edges: {
@@ -116,7 +116,7 @@ module.exports = function PgTablesPlugin(
                     new GraphQLList(new GraphQLNonNull(EdgeType))
                   ),
                   resolve(data) {
-                    return data;
+                    return data.data;
                   },
                 },
               };
