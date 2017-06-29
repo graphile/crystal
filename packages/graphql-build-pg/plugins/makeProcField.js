@@ -98,7 +98,18 @@ module.exports = function makeProcField(
     returnFirstValueAsValue = true;
     const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
     if (proc.returnsSet) {
-      type = new GraphQLList(Type);
+      const connectionTypeName = inflection.scalarFunctionConnection(
+        proc.name,
+        proc.namespace.name
+      );
+      const ConnectionType = getTypeByName(connectionTypeName);
+      if (ConnectionType) {
+        type = new GraphQLNonNull(ConnectionType);
+        scope.isPgConnectionField = true;
+        scope.pgIntrospection = proc;
+      } else {
+        type = new GraphQLList(Type);
+      }
     } else {
       type = Type;
     }

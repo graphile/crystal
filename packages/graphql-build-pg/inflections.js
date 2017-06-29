@@ -72,6 +72,12 @@ exports.defaultInflection = {
   connection(typeName) {
     return upperFirst(camelcase(`${this.pluralize(typeName)}-connection`));
   },
+  scalarFunctionConnection(procName, _procSchema) {
+    return upperFirst(camelcase(`${procName}-connection`));
+  },
+  scalarFunctionEdge(procName, _procSchema) {
+    return upperFirst(camelcase(`${procName}-edge`));
+  },
 };
 
 exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection, {
