@@ -1,4 +1,9 @@
-const { GraphQLScalarType } = require("graphql");
+const {
+  GraphQLScalarType,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLBoolean,
+} = require("graphql");
 const { Kind } = require("graphql/language");
 const GraphQLJSON = require("graphql-type-json");
 
@@ -23,5 +28,21 @@ module.exports = function StandardTypesPlugin(builder) {
     build.addType(UUID);
     build.addType(GraphQLJSON);
     return build;
+  });
+  builder.hook("init", (_, { buildObjectWithHooks }) => {
+    // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+    /* const PageInfo = */
+    buildObjectWithHooks(GraphQLObjectType, {
+      name: "PageInfo",
+      fields: {
+        hasNextPage: {
+          type: new GraphQLNonNull(GraphQLBoolean),
+        },
+        hasPreviousPage: {
+          type: new GraphQLNonNull(GraphQLBoolean),
+        },
+      },
+    });
+    return _;
   });
 };
