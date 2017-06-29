@@ -10,6 +10,7 @@
     "prettier": "^1.4.4"
   },
   "scripts": {
+    "lint": "eslint .",
     "test": "jest"
   },
   "jest": {
