@@ -150,7 +150,7 @@ module.exports = function makeProcField(
           {
             asJsonAggregate: proc.returnsSet,
             asJson: computed && returnTypeTable,
-            addNullCase: true,
+            addNullCase: returnTypeTable,
           },
           innerQueryBuilder => {
             if (!returnTypeTable) {
