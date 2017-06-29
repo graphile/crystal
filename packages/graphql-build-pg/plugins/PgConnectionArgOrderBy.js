@@ -54,7 +54,7 @@ module.exports = function PgConnectionArgOrderBy(
         addArgDataGenerator,
       }
     ) => {
-      if (!isPgConnectionField || !table || !table.kind === "class") {
+      if (!isPgConnectionField || !table || table.kind !== "class") {
         return args;
       }
       const TableOrderByType = getTypeByName(

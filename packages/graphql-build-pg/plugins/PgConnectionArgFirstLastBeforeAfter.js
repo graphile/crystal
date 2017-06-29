@@ -12,7 +12,7 @@ module.exports = function PgConnectionArgs(builder) {
         addArgDataGenerator,
       }
     ) => {
-      if (!isPgConnectionField || !table || !table.kind === "class") {
+      if (!isPgConnectionField || !table || table.kind !== "class") {
         return args;
       }
       const Cursor = getTypeByName("Cursor");

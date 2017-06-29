@@ -70,7 +70,7 @@ module.exports = function PgConnectionArgCondition(
         addArgDataGenerator,
       }
     ) => {
-      if (!isPgConnectionField || !table || !table.kind === "class") {
+      if (!isPgConnectionField || !table || table.kind !== "class") {
         return args;
       }
       const TableConditionType = getTypeByName(
