@@ -49,30 +49,6 @@ module.exports = function PgTablesPlugin(
               recurseDataGeneratorsForField,
               buildFieldWithHooks,
             }) => {
-              addDataGeneratorForField("cursor", () => {
-                return {
-                  pgQuery: queryBuilder => {
-                    queryBuilder.setCursorComparator((sqlCursor, isAfter) => {
-                      return sql.fragment`(row_number() over (order by 1)) ${isAfter
-                        ? sql.fragment`>`
-                        : sql.fragment`<`} (${sqlCursor})[2]`;
-                    });
-                    queryBuilder.select(
-                      () =>
-                        sql.fragment`json_build_array(${sql.join(
-                          [
-                            sql.literal("natural"),
-                            sql.fragment`${sql.literal(
-                              queryBuilder.getOffset()
-                            )} + (row_number() over (order by 1))`,
-                          ],
-                          ","
-                        )})`,
-                      "__cursor"
-                    );
-                  },
-                };
-              });
               return {
                 cursor: {
                   type: Cursor,

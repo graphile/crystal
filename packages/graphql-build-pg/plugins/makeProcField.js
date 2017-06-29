@@ -119,7 +119,18 @@ module.exports = function makeProcField(
   }
   return buildFieldWithHooks(
     fieldName,
-    ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+    ({
+      addDataGenerator,
+      getDataFromParsedResolveInfoFragment,
+      addArgDataGenerator,
+    }) => {
+      if (proc.returnsSet && !returnTypeTable && !returnFirstValueAsValue) {
+        addArgDataGenerator(function addPgCursorPrefix() {
+          return {
+            pgCursorPrefix: sql.literal("natural"),
+          };
+        });
+      }
       function makeQuery(
         parsedResolveInfoFragment,
         ReturnType,
@@ -150,7 +161,7 @@ module.exports = function makeProcField(
           resolveData,
           {
             asJsonAggregate: proc.returnsSet,
-            asJson: computed && returnTypeTable,
+            asJson: computed && !returnFirstValueAsValue,
             addNullCase: returnTypeTable,
           },
           innerQueryBuilder => {
