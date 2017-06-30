@@ -6,15 +6,28 @@ module.exports = function PgConnectionTotalCount(builder) {
     (
       fields,
       { extend },
-      { scope: { isPgRowConnectionType, pgIntrospection: table } }
+      {
+        scope: { isPgRowConnectionType, pgIntrospection: table },
+        buildFieldWithHooks,
+      }
     ) => {
       if (!isPgRowConnectionType || !table || table.kind !== "class") {
         return fields;
       }
       return extend(fields, {
-        totalCount: {
-          type: GraphQLInt,
-        },
+        totalCount: buildFieldWithHooks(
+          "totalCount",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => {
+              return {
+                pgCalculateTotalCount: true,
+              };
+            });
+            return {
+              type: GraphQLInt,
+            };
+          }
+        ),
       });
     }
   );

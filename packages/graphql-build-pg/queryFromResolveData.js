@@ -6,6 +6,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
   const {
     pgQuery,
     pgCursorPrefix: reallyRawCursorPrefix,
+    pgCalculateTotalCount,
     calculateHasNextPage,
     calculateHasPreviousPage,
   } = resolveData;
@@ -162,6 +163,11 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       true
     );
 
+    const totalCount = sql.fragment`(
+      select count(*)
+      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+      where ${queryBuilder.buildWhereClause(false, false)}
+    )`;
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
     const sqlFrom = sql.fragment``;
     const fields = [
@@ -171,6 +177,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       ],
       calculateHasNextPage && [hasNextPage, "hasNextPage"],
       calculateHasPreviousPage && [hasPreviousPage, "hasPreviousPage"],
+      pgCalculateTotalCount && [totalCount, "totalCount"],
     ].filter(_ => _);
     if (options.withPaginationAsFields) {
       return sql.fragment`${sqlWith} select ${sql.join(
