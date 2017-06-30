@@ -15,6 +15,37 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     withBuilder(queryBuilder);
   }
 
+  function generateNextPrevPageSql(
+    sqlQueryAlias,
+    queryHasBefore,
+    queryHasFirst,
+    invert
+  ) {
+    // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
+    const sqlCommon = sql.fragment`
+      select 1
+      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+      where ${queryBuilder.buildWhereClause(!invert, invert)}
+    `;
+    if (!queryHasBefore && !queryHasFirst) {
+      // There can be no next page since there's no upper bound
+      return sql.literal(false);
+    } else if (queryHasBefore) {
+      // Simply see if there are any records after the before cursor
+      return sql.fragment`exists(
+        ${sqlCommon}
+        and not (${queryBuilder.buildWhereBoundClause(invert)})
+      )`;
+    } else {
+      // Query must have "first"
+      // Drop the limit, see if there are any records that aren't already in the list we've fetched
+      return sql.fragment`exists(
+        ${sqlCommon}
+        and (${queryBuilder.data
+          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+      )`;
+    }
+  }
   if (options.withPagination || options.withPaginationAsFields) {
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
@@ -91,14 +122,6 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         )})`;
       }
     });
-    queryBuilder.beforeLock("orderBy", () => {
-      if (queryBuilder.data.orderBy.length === 0) {
-        // Fall back to rowNumber ordering
-        queryBuilder.orderBy(
-          sql.fragment`(row_number() over (partition by 1))`
-        );
-      }
-    });
     const query = queryBuilder.build(options);
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
@@ -107,54 +130,17 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const queryHasAfter = queryBuilder.data.whereBound.lower.length > 0;
     const queryHasFirst = queryBuilder.data.limit && !queryBuilder.data.flip;
     const queryHasLast = queryBuilder.data.limit && queryBuilder.data.flip;
-
-    let hasNextPage;
-    if (!queryHasBefore && !queryHasFirst) {
-      // There can be no next page since there's no upper bound
-      hasNextPage = sql.literal(false);
-    } else if (queryHasBefore) {
-      // Simply see if there are any records after the before cursor
-      hasNextPage = sql.fragment`exists(
-        select 1
-        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-        where ${queryBuilder.buildWhereClause(true, false)}
-        and not (${queryBuilder.buildWhereBoundClause(false)})
-      )`;
-    } else {
-      // Query must have "first"
-      // Drop the limit, see if there are any records that aren't already in the list we've fetched
-      hasNextPage = sql.fragment`exists(
-        select 1
-        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-        where ${queryBuilder.buildWhereClause(true, false)}
-        and (${queryBuilder.data
-          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
-      )`;
-    }
-
-    let hasPreviousPage;
-    if (!queryHasAfter && !queryHasLast) {
-      // There can be no next page since there's no lower bound
-      hasPreviousPage = sql.literal(false);
-    } else if (queryHasAfter) {
-      // Simply see if there are any records before the after cursor
-      hasPreviousPage = sql.fragment`exists(
-        select 1
-        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-        where ${queryBuilder.buildWhereClause(false, true)}
-        and not (${queryBuilder.buildWhereBoundClause(true)})
-      )`;
-    } else {
-      // Query must have "last"
-      // Drop the limit, see if there are any records that aren't already in the list we've fetched
-      hasPreviousPage = sql.fragment`exists(
-        select 1
-        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-        where ${queryBuilder.buildWhereClause(false, true)}
-        and (${queryBuilder.data
-          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
-      )`;
-    }
+    const hasNextPage = generateNextPrevPageSql(
+      sqlQueryAlias,
+      queryHasBefore,
+      queryHasFirst
+    );
+    const hasPreviousPage = generateNextPrevPageSql(
+      sqlQueryAlias,
+      queryHasAfter,
+      queryHasLast,
+      true
+    );
 
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
     const sqlFrom = sql.fragment``;
@@ -181,7 +167,6 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         ", "
       )}) ${sqlFrom}`;
     }
-    return queryWithPagination;
   } else {
     const query = queryBuilder.build(options);
     return query;
