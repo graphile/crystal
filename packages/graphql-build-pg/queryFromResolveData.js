@@ -28,6 +28,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     canHaveCursorInWhere,
     queryHasBefore,
     queryHasFirst,
+    offset = 0,
     invert
   ) {
     // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
@@ -36,29 +37,41 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
       where ${queryBuilder.buildWhereClause(!invert, invert)}
     `;
-    if (!queryHasBefore && !queryHasFirst) {
+    if (!queryHasBefore && !queryHasFirst && (!invert || offset === 0)) {
       // There can be no next page since there's no upper bound
       return sql.literal(false);
-    } else if (queryHasBefore) {
+    } else if (queryHasBefore && (!invert || offset === 0)) {
       // Simply see if there are any records after the before cursor
       return sql.fragment`exists(
         ${sqlCommon}
         and not (${queryBuilder.buildWhereBoundClause(invert)})
       )`;
-    } else if (canHaveCursorInWhere) {
+    } else if (canHaveCursorInWhere && (!invert || offset === 0)) {
       // Query must have "first"
       // Drop the limit, see if there are any records that aren't already in the list we've fetched
       return sql.fragment`exists(
         ${sqlCommon}
         and (${queryBuilder.data
           .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+        offset ${sql.value(offset)}
       )`;
     } else {
-      // Skip over the already known entries, are there any left?
-      return sql.fragment`exists(
-        ${sqlCommon}
-        offset (select count(*) from ${sqlQueryAlias})
-      )`;
+      if (!invert) {
+        // Skip over the already known entries, are there any left?
+        return sql.fragment`exists(
+          ${sqlCommon}
+          offset (select coalesce((select count(*) from ${sqlQueryAlias}), 0) + ${sql.value(
+          offset
+        )})
+        )`;
+      } else {
+        // Things get somewhat more complex here... Let's just assume if offset > 0 there's a previous page.
+        if (offset > 0) {
+          return sql.literal(true);
+        }
+        // And here (offset === 0 && invert) so we'd have hit an earlier case; since we haven't there must be no previous page.
+        return sql.literal(false);
+      }
     }
   }
   if (options.withPagination || options.withPaginationAsFields) {
@@ -156,7 +169,8 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
           sqlQueryAlias,
           canHaveCursorInWhere,
           queryHasBefore,
-          queryHasFirst
+          queryHasFirst,
+          queryBuilder.data.offset || 0
         );
     const hasPreviousPage = queryHasZeroLimit
       ? sql.literal(false)
@@ -165,6 +179,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
           canHaveCursorInWhere,
           queryHasAfter,
           queryHasLast,
+          queryBuilder.data.offset || 0,
           true
         );
 

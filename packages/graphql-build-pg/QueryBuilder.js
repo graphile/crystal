@@ -100,12 +100,12 @@ class QueryBuilder {
   }
   limit(limit) {
     this.checkLock("limit");
-    this.data.limit = limit;
+    this.data.limit = Math.max(0, limit);
     this.lock("limit");
   }
   offset(offset) {
     this.checkLock("offset");
-    this.data.offset = offset;
+    this.data.offset = Math.max(0, offset);
     this.lock("offset");
   }
   flip() {
