@@ -116,14 +116,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         }
         return sqlFilter;
       } else {
-        const rowNumber = cursorValue[getPgCursorPrefix().length];
-        if (!isSafeInteger(rowNumber)) {
-          return sql.literal(false);
-        }
-        const comparison = isAfter ? sql.fragment`>` : sql.fragment`<`;
-        return sql.fragment`(row_number() over (partition by 1)) ${comparison} ${sql.value(
-          rowNumber
-        )}`;
+        throw new Error("Cannot use cursors without orderBy");
       }
     });
 
