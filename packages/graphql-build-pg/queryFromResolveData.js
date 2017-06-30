@@ -102,10 +102,15 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const query = queryBuilder.build(options);
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
-    //const hasNextPage = sql.fragment`exists(
-    //      select 1 from ... where ... and not(${cursor} in (select __cursor from ${sqlQueryAlias}))
-    //    )`;
-    const hasNextPage = sql.literal(true);
+    // XXX: if last then hasNextPage = false
+    const hasNextPage = sql.fragment`exists(
+      select 1
+      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+      ${queryBuilder.data.where.length &&
+        sql.fragment`where ${sql.join(queryBuilder.data.where, " AND ")}`}
+      and (${queryBuilder.data
+        .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+    )`;
     const hasPreviousPage = sql.literal(false);
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
     const sqlFrom = sql.fragment``;
