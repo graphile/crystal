@@ -1,5 +1,6 @@
 const sql = require("./sql");
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
+const isSafeInteger = require("lodash/isSafeInteger");
 
 const callIfNecessary = o => {
   if (typeof o === "function") {
@@ -208,7 +209,8 @@ class QueryBuilder {
             ","
           )}`
         : ""}
-      ${this.data.limit && sql.fragment`limit ${sql.literal(this.data.limit)}`}
+      ${isSafeInteger(this.data.limit) &&
+        sql.fragment`limit ${sql.literal(this.data.limit)}`}
       ${this.data.offset &&
         sql.fragment`offset ${sql.literal(this.data.offset)}`}
     `;
