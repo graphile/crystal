@@ -72,8 +72,6 @@ module.exports = function PgTablesPlugin(
               recurseDataGeneratorsForField("edges");
               recurseDataGeneratorsForField("nodes");
               return {
-                // XXX: pageInfo
-                // XXX: totalCount
                 nodes: {
                   type: new GraphQLNonNull(new GraphQLList(NodeType)),
                   resolve(data) {

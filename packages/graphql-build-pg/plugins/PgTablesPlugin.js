@@ -149,7 +149,6 @@ module.exports = function PgTablesPlugin(
             )}, json_build_object(${sql.join(
               Object.keys(obj).filter(k => pgInputFields[k]).map(k => {
                 const v = obj[k];
-                // XXX: nest
                 const { name, type } = pgInputFields[k];
                 return sql.fragment`${sql.literal(name)}, ${gql2pg(
                   v,
@@ -223,8 +222,6 @@ module.exports = function PgTablesPlugin(
                 recurseDataGeneratorsForField("nodes");
                 recurseDataGeneratorsForField("pageInfo");
                 return {
-                  // XXX: pageInfo
-                  // XXX: totalCount
                   nodes: {
                     type: new GraphQLNonNull(new GraphQLList(TableType)),
                     resolve(data) {

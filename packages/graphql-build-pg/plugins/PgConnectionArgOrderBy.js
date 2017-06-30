@@ -29,7 +29,6 @@ module.exports = function PgConnectionArgOrderBy(
                   specs: [],
                 },
               },
-              // XXX: add the (indexed?) columns
             },
           },
           {
