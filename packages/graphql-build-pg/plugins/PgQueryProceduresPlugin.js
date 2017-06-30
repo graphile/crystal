@@ -18,7 +18,6 @@ module.exports = function PgQueryProceduresPlugin(
         pgSql: sql,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
-        pgAddPaginationToQuery,
       },
       { scope: { isRootQuery }, buildFieldWithHooks }
     ) => {
@@ -73,7 +72,6 @@ module.exports = function PgQueryProceduresPlugin(
               inflection,
               sql,
               parseResolveInfo,
-              pgAddPaginationToQuery,
             });
             return memo;
           }, {})

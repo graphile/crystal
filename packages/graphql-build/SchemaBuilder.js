@@ -138,7 +138,7 @@ class SchemaBuilder {
       Object.keys(build).filter(key => typeof build[key] === "function")
     );
     Object.freeze(build);
-    this.applyHooks(build, "init", null);
+    this.applyHooks(build, "init", {});
     return build;
   }
 }

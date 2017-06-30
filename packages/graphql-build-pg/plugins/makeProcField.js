@@ -26,7 +26,6 @@ module.exports = function makeProcField(
     parseResolveInfo,
     gql2pg,
     pg2gql,
-    pgAddPaginationToQuery,
   }
 ) {
   const sliceAmount = computed ? 1 : 0;
@@ -144,9 +143,10 @@ module.exports = function makeProcField(
           functionAlias,
           resolveData,
           {
-            asJsonAggregate: proc.returnsSet,
-            asJson: computed && !returnFirstValueAsValue,
-            addNullCase: returnTypeTable,
+            withPagination: proc.returnsSet,
+            withPaginationAsFields: proc.returnsSet && !computed,
+            asJson: !proc.returnsSet && computed && !returnFirstValueAsValue,
+            addNullCase: !proc.returnsSet && returnTypeTable,
           },
           innerQueryBuilder => {
             if (!returnTypeTable) {
@@ -157,13 +157,7 @@ module.exports = function makeProcField(
             }
           }
         );
-        if (proc.returnsSet) {
-          return pgAddPaginationToQuery(query, resolveData, {
-            asFields: !computed,
-          });
-        } else {
-          return query;
-        }
+        return query;
       }
       if (computed) {
         addDataGenerator((parsedResolveInfoFragment, ReturnType) => {

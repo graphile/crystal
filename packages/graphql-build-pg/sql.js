@@ -3,6 +3,7 @@ const isString = require("lodash/isString");
 const isNumber = require("lodash/isNumber");
 const isBoolean = require("lodash/isBoolean");
 const isSymbol = require("lodash/isSymbol");
+const isNil = require("lodash/isNil");
 const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
 const debug = require("debug")("graphql-build-pg");
@@ -175,6 +176,8 @@ const literal = val => {
     } else {
       return raw(`FALSE`);
     }
+  } else if (isNil(val)) {
+    return raw(`NULL`);
   } else {
     return { type: "VALUE", value: val };
   }
@@ -222,4 +225,4 @@ exports.value = value;
 exports.literal = literal;
 exports.join = join;
 exports.compile = compile;
-exports.null = value(null);
+exports.null = literal(null);

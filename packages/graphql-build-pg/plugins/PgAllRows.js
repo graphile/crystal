@@ -16,7 +16,6 @@ module.exports = async function PgAllRows(
         getTypeByName,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgAddPaginationToQuery,
       },
       { buildFieldWithHooks, scope: { isRootQuery } }
     ) => {
@@ -78,32 +77,27 @@ module.exports = async function PgAllRows(
                         undefined,
                         resolveData,
                         {
-                          asJsonAggregate: true,
+                          withPaginationAsFields: true,
                         },
                         builder => {
                           if (primaryKeys) {
                             builder.beforeLock("orderBy", () => {
-                              // append order by primary key to the list of orders
-                              primaryKeys.forEach(key => {
-                                builder.orderBy(
-                                  sql.fragment`${builder.getTableAlias()}.${sql.identifier(
-                                    key.name
-                                  )}`,
-                                  true
-                                );
-                              });
+                              if (builder.data.orderBy.length === 0) {
+                                // Order by PK if no order specified
+                                primaryKeys.forEach(key => {
+                                  builder.orderBy(
+                                    sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                                      key.name
+                                    )}`,
+                                    true
+                                  );
+                                });
+                              }
                             });
                           }
                         }
                       );
-                      const queryWithPagination = pgAddPaginationToQuery(
-                        query,
-                        resolveData,
-                        {
-                          asFields: true,
-                        }
-                      );
-                      const { text, values } = sql.compile(queryWithPagination);
+                      const { text, values } = sql.compile(query);
                       if (debugSql.enabled)
                         debugSql(require("sql-formatter").format(text));
                       const { rows: [row] } = await pgClient.query(

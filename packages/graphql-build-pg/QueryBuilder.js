@@ -15,9 +15,11 @@ class QueryBuilder {
   constructor() {
     this.data = {
       select: [],
+      selectCursor: null,
       from: null,
       join: [],
       where: [],
+      wherePage: [],
       orderBy: [],
       limit: null,
       offset: null,
@@ -25,6 +27,12 @@ class QueryBuilder {
       beforeLock: {},
       cursorComparator: null,
     };
+    this.beforeLock("select", () => {
+      this.lock("selectCursor");
+      if (this.data.selectCursor) {
+        this.select(this.data.selectCursor, "__cursor");
+      }
+    });
   }
 
   // ----------------------------------------
@@ -39,12 +47,16 @@ class QueryBuilder {
     this.data.cursorComparator = fn;
     this.lock("cursorComparator");
   }
-  cursorCondition(sqlCursorValue, isAfter) {
-    return this.data.cursorComparator(sqlCursorValue, isAfter);
+  cursorCondition(cursorValue, isAfter) {
+    return this.data.cursorComparator(cursorValue, isAfter);
   }
   select(exprGen, alias) {
     this.checkLock("select");
     this.data.select.push([exprGen, alias]);
+  }
+  selectCursor(exprGen) {
+    this.checkLock("selectCursor");
+    this.data.selectCursor = exprGen;
   }
   from(expr, alias = sql.identifier(Symbol())) {
     this.checkLock("from");
@@ -59,6 +71,11 @@ class QueryBuilder {
   }
   // XXX: join
   where(exprGen) {
+    this.checkLock("where");
+    this.data.where.push(exprGen);
+  }
+  wherePage(exprGen) {
+    // XXX: think about
     this.checkLock("where");
     this.data.where.push(exprGen);
   }
@@ -223,6 +240,7 @@ class QueryBuilder {
     this.lock("cursorComparator");
     this.lock("where");
     // We must execute select after orderBy otherwise we cannot generate a cursor
+    this.lock("selectCursor");
     this.lock("select");
   }
 }

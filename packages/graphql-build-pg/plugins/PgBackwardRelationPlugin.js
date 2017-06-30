@@ -17,7 +17,6 @@ module.exports = function PgBackwardRelationPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         parseResolveInfo,
-        pgAddPaginationToQuery,
       },
       {
         scope: { isPgRowType, pgIntrospection: foreignTable },
@@ -117,7 +116,10 @@ module.exports = function PgBackwardRelationPlugin(
                         sql.identifier(schema.name, table.name),
                         tableAlias,
                         resolveData,
-                        { asJsonAggregate: true },
+                        {
+                          withPagination: true,
+                          withPaginationAsFields: false,
+                        },
                         innerQueryBuilder => {
                           if (primaryKeys) {
                             innerQueryBuilder.beforeLock("orderBy", () => {
@@ -144,12 +146,7 @@ module.exports = function PgBackwardRelationPlugin(
                           });
                         }
                       );
-                      const queryWithPagination = pgAddPaginationToQuery(
-                        query,
-                        resolveData,
-                        { asFields: false }
-                      );
-                      return sql.fragment`(${queryWithPagination})`;
+                      return sql.fragment`(${query})`;
                     }, parsedResolveInfoFragment.alias);
                   },
                 };
