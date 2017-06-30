@@ -29,7 +29,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     queryHasBefore,
     queryHasFirst,
     offset = 0,
-    invert
+    invert = false
   ) {
     // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
     const sqlCommon = sql.fragment`

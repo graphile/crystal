@@ -166,7 +166,7 @@ class QueryBuilder {
       return sql.literal(true);
     }
   }
-  buildWhereClause(includeLowerBound = true, includeUpperBound = true) {
+  buildWhereClause(includeLowerBound, includeUpperBound) {
     this.lock("where");
     const clauses = [
       ...this.data.where,
