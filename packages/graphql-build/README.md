@@ -4,9 +4,9 @@ graphql-build
 Usage
 -----
 
-The following example creates a plugin that hooks the 'objectType:fields' event
-in the system and adds a 'random' field to every object everywhere (including
-the root Query).
+The following [runnable example][] creates a plugin that hooks the
+'objectType:fields' event in the system and adds a 'random' field to every
+object everywhere (including the root Query).
 
 ```js
 const { buildSchema, defaultPlugins } = require("graphql-build");
@@ -148,3 +148,5 @@ If you extend the build object (in the `build` event) or add details to the
 scope of a `buildObjectWithHooks` or `buildFieldWithHooks`, please prefix all
 keys with a namespace; for example `graphql-build-pg` uses the `pg` namespace
 prefix. Do not pollute other namespaces (unless you have their permission).
+
+[runnable example]: examples/README-1.js

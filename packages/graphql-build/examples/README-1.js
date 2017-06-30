@@ -1,3 +1,5 @@
+// ⚠ NOTE: If running this outside the repository, please replace the contents
+// of the require brackets
 const { buildSchema, defaultPlugins } = require(/*"graphql-build"*/ "..");
 // or import { buildSchema, defaultPlugins } from 'graphql-build';
 const { graphql, GraphQLInt } = require("graphql");
