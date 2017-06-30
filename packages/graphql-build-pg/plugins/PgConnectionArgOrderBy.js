@@ -66,7 +66,7 @@ module.exports = function PgConnectionArgOrderBy(
             orderBy && orderBy.alias && sql.literal(orderBy && orderBy.alias),
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              const { specs } = orderBy;
+              const { specs, unique } = orderBy;
               const orders = Array.isArray(specs[0]) ? specs : [specs];
               orders.forEach(([col, ascending]) => {
                 const expr = isString(col)
@@ -76,6 +76,9 @@ module.exports = function PgConnectionArgOrderBy(
                   : col;
                 queryBuilder.orderBy(expr, ascending);
               });
+              if (unique) {
+                queryBuilder.setOrderIsUnique();
+              }
             }
           },
         };

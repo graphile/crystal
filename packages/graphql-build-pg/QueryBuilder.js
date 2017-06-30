@@ -26,6 +26,7 @@ class QueryBuilder {
         upper: [],
       },
       orderBy: [],
+      orderIsUnique: false,
       limit: null,
       offset: null,
       flip: false,
@@ -89,6 +90,9 @@ class QueryBuilder {
     this.checkLock("whereBound");
     this.data.whereBound[isLower ? "lower" : "upper"].push(exprGen);
   }
+  setOrderIsUnique() {
+    this.data.orderIsUnique = true;
+  }
   orderBy(exprGen, ascending = true) {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending]);
@@ -111,6 +115,9 @@ class QueryBuilder {
 
   // ----------------------------------------
 
+  isOrderUnique() {
+    return this.data.orderIsUnique;
+  }
   getTableAlias() {
     this.lock("from");
     return this.data.from[1];

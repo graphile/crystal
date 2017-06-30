@@ -124,17 +124,20 @@ module.exports = function PgBackwardRelationPlugin(
                           if (primaryKeys) {
                             innerQueryBuilder.beforeLock("orderBy", () => {
                               // append order by primary key to the list of orders
-                              innerQueryBuilder.data.cursorPrefix = [
-                                "primary_key_asc",
-                              ];
-                              primaryKeys.forEach(key => {
-                                innerQueryBuilder.orderBy(
-                                  sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
-                                    key.name
-                                  )}`,
-                                  true
-                                );
-                              });
+                              if (!innerQueryBuilder.isOrderUnique()) {
+                                innerQueryBuilder.data.cursorPrefix = [
+                                  "primary_key_asc",
+                                ];
+                                primaryKeys.forEach(key => {
+                                  innerQueryBuilder.orderBy(
+                                    sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
+                                      key.name
+                                    )}`,
+                                    true
+                                  );
+                                });
+                                innerQueryBuilder.setOrderIsUnique();
+                              }
                             });
                           }
 

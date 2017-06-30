@@ -28,12 +28,14 @@ module.exports = function PgOrderByPrimaryKeyPlugin(builder) {
           value: {
             alias: "primary_key_asc",
             specs: primaryKeys.map(key => [key.name, true]),
+            unique: true,
           },
         },
         PRIMARY_KEY_DESC: {
           value: {
             alias: "primary_key_desc",
             specs: primaryKeys.map(key => [key.name, false]),
+            unique: true,
           },
         },
       });
