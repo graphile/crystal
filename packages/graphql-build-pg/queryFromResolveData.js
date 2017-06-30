@@ -3,7 +3,12 @@ const sql = require("./sql");
 const isSafeInteger = require("lodash/isSafeInteger");
 
 module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
-  const { pgQuery, pgCursorPrefix: reallyRawCursorPrefix } = resolveData;
+  const {
+    pgQuery,
+    pgCursorPrefix: reallyRawCursorPrefix,
+    calculateHasNextPage,
+    calculateHasPreviousPage,
+  } = resolveData;
   const rawCursorPrefix =
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(_ => _);
 
@@ -164,9 +169,9 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         sql.fragment`coalesce((select ${sqlSummaryAlias}.data from ${sqlSummaryAlias}), '[]'::json)`,
         "data",
       ],
-      [hasNextPage, "hasNextPage"],
-      [hasPreviousPage, "hasPreviousPage"],
-    ];
+      calculateHasNextPage && [hasNextPage, "hasNextPage"],
+      calculateHasPreviousPage && [hasPreviousPage, "hasPreviousPage"],
+    ].filter(_ => _);
     if (options.withPaginationAsFields) {
       return sql.fragment`${sqlWith} select ${sql.join(
         fields.map(

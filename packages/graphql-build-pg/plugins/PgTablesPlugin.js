@@ -221,6 +221,7 @@ module.exports = function PgTablesPlugin(
               fields: ({ recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("edges");
                 recurseDataGeneratorsForField("nodes");
+                recurseDataGeneratorsForField("pageInfo");
                 return {
                   // XXX: pageInfo
                   // XXX: totalCount

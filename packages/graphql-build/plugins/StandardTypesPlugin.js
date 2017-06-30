@@ -34,14 +34,34 @@ module.exports = function StandardTypesPlugin(builder) {
     /* const PageInfo = */
     buildObjectWithHooks(GraphQLObjectType, {
       name: "PageInfo",
-      fields: {
-        hasNextPage: {
-          type: new GraphQLNonNull(GraphQLBoolean),
-        },
-        hasPreviousPage: {
-          type: new GraphQLNonNull(GraphQLBoolean),
-        },
-      },
+      fields: ({ buildFieldWithHooks }) => ({
+        hasNextPage: buildFieldWithHooks(
+          "hasNextPage",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => {
+              return {
+                calculateHasNextPage: true,
+              };
+            });
+            return {
+              type: new GraphQLNonNull(GraphQLBoolean),
+            };
+          }
+        ),
+        hasPreviousPage: buildFieldWithHooks(
+          "hasPreviousPage",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => {
+              return {
+                calculateHasPreviousPage: true,
+              };
+            });
+            return {
+              type: new GraphQLNonNull(GraphQLBoolean),
+            };
+          }
+        ),
+      }),
     });
     return _;
   });
