@@ -1,0 +1,29 @@
+{
+  "name": "graphql-parse-resolve-info",
+  "version": "0.0.0",
+  "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjie/graphql-build.git"
+  },
+  "keywords": [
+    "graphql",
+    "resolveinfo",
+    "graphqljs",
+    "graphql-js",
+    "graphqlresolveinfo"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjie/graphql-build/issues"
+  },
+  "homepage": "https://github.com/benjie/graphql-build#readme",
+  "peerDependencies": {
+    "graphql": ">=0.10"
+  }
+}

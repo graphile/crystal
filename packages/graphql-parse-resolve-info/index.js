@@ -1,11 +1,10 @@
 "use strict";
 const assert = require("assert");
-const defaults = require("lodash/defaults");
 const { getArgumentValues } = require("graphql/execution/values");
 const { getNamedType } = require("graphql");
-const debug = require("debug")("parse-resolve-info");
+const debug = require("debug")("graphql-parse-resolve-info");
 
-// Based on https://github.com/tjmehta/graphql-parse-fields
+// Originally based on https://github.com/tjmehta/graphql-parse-fields
 
 function getAlias(resolveInfo) {
   const asts = resolveInfo.fieldASTs || resolveInfo.fieldNodes;
@@ -28,10 +27,12 @@ function parseFields(resolveInfo, options = {}) {
   if (!fieldNodes) {
     throw new Error("No fieldNodes provided!");
   }
-  defaults(options, {
-    keepRoot: false,
-    deep: true,
-  });
+  if (options.keepRoot == null) {
+    options.keepRoot = false;
+  }
+  if (options.deep == null) {
+    options.deep = true;
+  }
   let tree = fieldTreeFromAST(
     fieldNodes,
     resolveInfo,

@@ -27,7 +27,8 @@
   "dependencies": {
     "dataloader": "^1.3.0",
     "debug": ">=2",
-    "graphql-type-json": "^0.1.4"
+    "graphql-type-json": "^0.1.4",
+    "graphql-parse-resolve-info": "0.0.0"
   },
   "engines": {
     "node": ">=8",

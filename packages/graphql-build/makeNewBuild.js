@@ -5,7 +5,7 @@ const {
   GraphQLEnumType,
   getNamedType,
 } = require("graphql");
-const parseResolveInfo = require("./parseResolveInfo");
+const parseResolveInfo = require("graphql-parse-resolve-info");
 const isString = require("lodash/isString");
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 const debug = require("debug")("graphql-build");
