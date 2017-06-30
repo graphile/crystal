@@ -1,0 +1,34 @@
+{
+  "name": "pg-sql2",
+  "version": "0.0.0",
+  "description": "Generate safe SQL with tagged template literals",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjie/graphql-build.git"
+  },
+  "keywords": [
+    "sql",
+    "injection",
+    "pg",
+    "postgres",
+    "postgresql",
+    "tagged",
+    "template",
+    "literal",
+    "es6"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjie/graphql-build/issues"
+  },
+  "homepage": "https://github.com/benjie/graphql-build#readme",
+  "peerDependencies": {
+    "lodash": ">=3 <5",
+    "debug": ">=2 <3"
+  }
+}

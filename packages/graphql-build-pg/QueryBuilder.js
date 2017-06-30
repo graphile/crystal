@@ -1,4 +1,4 @@
-const sql = require("./sql");
+const sql = require("pg-sql2");
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 const isSafeInteger = require("lodash/isSafeInteger");
 

@@ -1,5 +1,5 @@
 const QueryBuilder = require("./QueryBuilder");
-const sql = require("./sql");
+const sql = require("pg-sql2");
 const isSafeInteger = require("lodash/isSafeInteger");
 
 module.exports = (from, fromAlias, resolveData, options, withBuilder) => {

@@ -1,4 +1,4 @@
-const sql = require("./sql");
+const sql = require("pg-sql2");
 
 exports.sqlJsonBuildObjectFromFragments = fragments => {
   return sql.fragment`

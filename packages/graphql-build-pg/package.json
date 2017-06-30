@@ -36,7 +36,8 @@
     "graphql-iso-date": "^3.2.0",
     "graphql-type-json": "^0.1.4",
     "pg-range-parser": "^1.0.0",
-    "pluralize": "^5.0.0"
+    "pluralize": "^5.0.0",
+    "pg-sql2": "0.0.0"
   },
   "peerDependencies": {
     "pg": ">=6 <7"

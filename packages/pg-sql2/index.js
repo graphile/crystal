@@ -6,7 +6,7 @@ const isSymbol = require("lodash/isSymbol");
 const isNil = require("lodash/isNil");
 const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
-const debug = require("debug")("graphql-build-pg");
+const debug = require("debug")("pg-sql2");
 
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 

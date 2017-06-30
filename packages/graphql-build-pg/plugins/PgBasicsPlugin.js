@@ -1,4 +1,4 @@
-const sql = require("../sql");
+const sql = require("pg-sql2");
 
 module.exports = function PgBasicsPlugin(builder) {
   builder.hook("build", build => {
