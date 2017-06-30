@@ -14,6 +14,8 @@ const callIfNecessary = o => {
 class QueryBuilder {
   constructor() {
     this.data = {
+      // TODO: refactor `cursorPrefix`, it shouldn't be here (or should at least have getters/setters)
+      cursorPrefix: ["natural"],
       select: [],
       selectCursor: null,
       from: null,

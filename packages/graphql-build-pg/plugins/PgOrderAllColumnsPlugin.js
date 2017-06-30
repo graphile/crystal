@@ -31,13 +31,13 @@ module.exports = function PgOrderAllColumnsPlugin(
             );
             memo[ascFieldName] = {
               value: {
-                alias: ascFieldName,
+                alias: ascFieldName.toLowerCase(),
                 specs: [[attr.name, true]],
               },
             };
             memo[descFieldName] = {
               value: {
-                alias: descFieldName,
+                alias: descFieldName.toLowerCase(),
                 specs: [[attr.name, false]],
               },
             };

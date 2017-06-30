@@ -84,6 +84,7 @@ module.exports = async function PgAllRows(
                             builder.beforeLock("orderBy", () => {
                               if (builder.data.orderBy.length === 0) {
                                 // Order by PK if no order specified
+                                builder.data.cursorPrefix = ["primary_key_asc"];
                                 primaryKeys.forEach(key => {
                                   builder.orderBy(
                                     sql.fragment`${builder.getTableAlias()}.${sql.identifier(

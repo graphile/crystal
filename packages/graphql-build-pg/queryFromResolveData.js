@@ -3,7 +3,7 @@ const sql = require("./sql");
 const isSafeInteger = require("lodash/isSafeInteger");
 
 module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
-  const { pgQuery, pgCursorPrefix = [] } = resolveData;
+  const { pgQuery, pgCursorPrefix: rawCursorPrefix } = resolveData;
 
   const queryBuilder = new QueryBuilder();
   queryBuilder.from(from, fromAlias);
@@ -54,10 +54,14 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     }
   }
   if (options.withPagination || options.withPaginationAsFields) {
+    const getPgCursorPrefix = () =>
+      rawCursorPrefix && rawCursorPrefix.length > 0
+        ? rawCursorPrefix
+        : queryBuilder.data.cursorPrefix;
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
       if (orderByExpressionsAndDirections.length > 0) {
-        const sqlCursors = cursorValue[pgCursorPrefix.length].map(val =>
+        const sqlCursors = cursorValue[getPgCursorPrefix().length].map(val =>
           sql.value(val)
         );
         if (!Array.isArray(sqlCursors)) {
@@ -91,7 +95,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         }
         return sqlFilter;
       } else {
-        const rowNumber = cursorValue[pgCursorPrefix.length];
+        const rowNumber = cursorValue[getPgCursorPrefix().length];
         if (!isSafeInteger(rowNumber)) {
           return sql.literal(false);
         }
@@ -109,7 +113,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       if (orderBy.length > 0) {
         return sql.fragment`json_build_array(${sql.join(
           [
-            ...pgCursorPrefix,
+            ...getPgCursorPrefix(),
             sql.fragment`json_build_array(${sql.join(
               queryBuilder
                 .getOrderByExpressionsAndDirections()
@@ -121,12 +125,9 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         )})`;
       } else {
         return sql.fragment`json_build_array(${sql.join(
-          [
-            ...(pgCursorPrefix.length ? pgCursorPrefix : "natural"),
-            sql.fragment`(row_number() over (partition by 1))`,
-          ],
+          getPgCursorPrefix(),
           ", "
-        )})`;
+        )}, (row_number() over (partition by 1)))`;
       }
     });
     const query = queryBuilder.build(options);

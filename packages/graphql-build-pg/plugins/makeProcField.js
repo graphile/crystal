@@ -108,6 +108,7 @@ module.exports = function makeProcField(
       addArgDataGenerator,
     }) => {
       if (proc.returnsSet && !returnTypeTable && !returnFirstValueAsValue) {
+        // Natural ordering
         addArgDataGenerator(function addPgCursorPrefix() {
           return {
             pgCursorPrefix: sql.literal("natural"),
