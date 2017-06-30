@@ -3,7 +3,9 @@ const sql = require("./sql");
 const isSafeInteger = require("lodash/isSafeInteger");
 
 module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
-  const { pgQuery, pgCursorPrefix: rawCursorPrefix } = resolveData;
+  const { pgQuery, pgCursorPrefix: reallyRawCursorPrefix } = resolveData;
+  const rawCursorPrefix =
+    reallyRawCursorPrefix && reallyRawCursorPrefix.filter(_ => _);
 
   const queryBuilder = new QueryBuilder();
   queryBuilder.from(from, fromAlias);
@@ -57,7 +59,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const getPgCursorPrefix = () =>
       rawCursorPrefix && rawCursorPrefix.length > 0
         ? rawCursorPrefix
-        : queryBuilder.data.cursorPrefix;
+        : queryBuilder.data.cursorPrefix.map(val => sql.literal(val));
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
       if (orderByExpressionsAndDirections.length > 0) {

@@ -25,7 +25,7 @@ module.exports = function PgConnectionArgOrderBy(
             values: {
               NATURAL: {
                 value: {
-                  alias: "natural",
+                  alias: null,
                   specs: [],
                 },
               },
@@ -62,7 +62,8 @@ module.exports = function PgConnectionArgOrderBy(
 
       addArgDataGenerator(function connectionOrderBy({ orderBy }) {
         return {
-          pgCursorPrefix: sql.literal((orderBy && orderBy.alias) || "natural"),
+          pgCursorPrefix:
+            orderBy && orderBy.alias && sql.literal(orderBy && orderBy.alias),
           pgQuery: queryBuilder => {
             if (orderBy != null) {
               const { specs } = orderBy;
