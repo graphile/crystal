@@ -103,15 +103,59 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
     // XXX: if last then hasNextPage = false
-    const hasNextPage = sql.fragment`exists(
-      select 1
-      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-      ${queryBuilder.data.where.length &&
-        sql.fragment`where ${sql.join(queryBuilder.data.where, " AND ")}`}
-      and (${queryBuilder.data
-        .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
-    )`;
-    const hasPreviousPage = sql.literal(false);
+    const queryHasBefore = queryBuilder.data.whereBound.upper.length > 0;
+    const queryHasAfter = queryBuilder.data.whereBound.lower.length > 0;
+    const queryHasFirst = queryBuilder.data.limit && !queryBuilder.data.flip;
+    const queryHasLast = queryBuilder.data.limit && queryBuilder.data.flip;
+
+    let hasNextPage;
+    if (!queryHasBefore && !queryHasFirst) {
+      // There can be no next page since there's no upper bound
+      hasNextPage = sql.literal(false);
+    } else if (queryHasBefore) {
+      // Simply see if there are any records after the before cursor
+      hasNextPage = sql.fragment`exists(
+        select 1
+        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+        where ${queryBuilder.buildWhereClause(true, false)}
+        and not (${queryBuilder.buildWhereBoundClause(false)})
+      )`;
+    } else {
+      // Query must have "first"
+      // Drop the limit, see if there are any records that aren't already in the list we've fetched
+      hasNextPage = sql.fragment`exists(
+        select 1
+        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+        where ${queryBuilder.buildWhereClause(true, false)}
+        and (${queryBuilder.data
+          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+      )`;
+    }
+
+    let hasPreviousPage;
+    if (!queryHasAfter && !queryHasLast) {
+      // There can be no next page since there's no lower bound
+      hasPreviousPage = sql.literal(false);
+    } else if (queryHasAfter) {
+      // Simply see if there are any records before the after cursor
+      hasPreviousPage = sql.fragment`exists(
+        select 1
+        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+        where ${queryBuilder.buildWhereClause(false, true)}
+        and not (${queryBuilder.buildWhereBoundClause(true)})
+      )`;
+    } else {
+      // Query must have "last"
+      // Drop the limit, see if there are any records that aren't already in the list we've fetched
+      hasPreviousPage = sql.fragment`exists(
+        select 1
+        from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+        where ${queryBuilder.buildWhereClause(false, true)}
+        and (${queryBuilder.data
+          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+      )`;
+    }
+
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
     const sqlFrom = sql.fragment``;
     const fields = [
