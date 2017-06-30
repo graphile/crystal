@@ -145,23 +145,28 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       queryBuilder.getOrderByExpressionsAndDirections().length > 0;
     const queryHasBefore = queryBuilder.data.whereBound.upper.length > 0;
     const queryHasAfter = queryBuilder.data.whereBound.lower.length > 0;
+    const queryHasZeroLimit = queryBuilder.data.limit === 0;
     const queryHasFirst =
       isSafeInteger(queryBuilder.data.limit) && !queryBuilder.data.flip;
     const queryHasLast =
       isSafeInteger(queryBuilder.data.limit) && queryBuilder.data.flip;
-    const hasNextPage = generateNextPrevPageSql(
-      sqlQueryAlias,
-      canHaveCursorInWhere,
-      queryHasBefore,
-      queryHasFirst
-    );
-    const hasPreviousPage = generateNextPrevPageSql(
-      sqlQueryAlias,
-      canHaveCursorInWhere,
-      queryHasAfter,
-      queryHasLast,
-      true
-    );
+    const hasNextPage = queryHasZeroLimit
+      ? sql.literal(false)
+      : generateNextPrevPageSql(
+          sqlQueryAlias,
+          canHaveCursorInWhere,
+          queryHasBefore,
+          queryHasFirst
+        );
+    const hasPreviousPage = queryHasZeroLimit
+      ? sql.literal(false)
+      : generateNextPrevPageSql(
+          sqlQueryAlias,
+          canHaveCursorInWhere,
+          queryHasAfter,
+          queryHasLast,
+          true
+        );
 
     const totalCount = sql.fragment`(
       select count(*)
