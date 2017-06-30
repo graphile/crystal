@@ -61,20 +61,31 @@ Plugins can be asynchronous functions (simply define them as `async function
 MyPlugin(builder, options) {...}` or return a Promise object).
 
 When a plugin first runs, it should do any of its asynchronous work, and then
-return. Schema generation itself is synchronous (deliberately).
+return. Schema generation itself (i.e. firing of hooks) is synchronous
+(deliberately).
 
 Most plugins will be of the form:
 
 ```js
 function MyRandomPlugin(builder) {
-  builder.hook('...',
-    (inputValue, { extend, /* ... */ }, { scope: { isMyRandomObject, /* ... */ } }) => {
+  builder.hook('HOOK_NAME_HERE',
+    (
+      // 'inputValue' - the value to replace with the return result
+      inputValue,
+
+      // 'build' - a frozen collection of utils and stores for this build,
+      // not available during the 'build' event
+      { extend, /* ... */ },
+
+      // 'context' - more information about the current object
+      { scope: { isMyRandomObject, /* ... */ }, /* ... */ },
+    ) => {
       if (!isMyRandomObject) {
         // Exit early if this doesn't have the scope we want
         return inputValue;
       }
       return extend(inputValue, {
-        // add additional properties here...
+        // add additional attributes here...
       });
     }
   );
@@ -84,7 +95,7 @@ function MyRandomPlugin(builder) {
 Hooks
 -----
 
-[(See hooks)](https://github.com/benjie/graphql-build/blob/996e28f0af68f53e264170bd4528b6500ff3ef25/packages/graphql-build/SchemaBuilder.js#L11-L59)
+[(See hooks in the source)](https://github.com/benjie/graphql-build/blob/996e28f0af68f53e264170bd4528b6500ff3ef25/packages/graphql-build/SchemaBuilder.js#L11-L59)
 
 - `build`: The build object represents the current schema build and is passed
   to all hooks, hook the 'build' event to extend this object.
