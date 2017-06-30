@@ -17,13 +17,13 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
 
   function generateNextPrevPageSql(
     sqlQueryAlias,
+    canHaveCursorInWhere,
     queryHasBefore,
     queryHasFirst,
     invert
   ) {
     // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
     const sqlCommon = sql.fragment`
-      select 1
       from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
       where ${queryBuilder.buildWhereClause(!invert, invert)}
     `;
@@ -33,17 +33,25 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     } else if (queryHasBefore) {
       // Simply see if there are any records after the before cursor
       return sql.fragment`exists(
+        select 1
         ${sqlCommon}
         and not (${queryBuilder.buildWhereBoundClause(invert)})
       )`;
-    } else {
+    } else if (canHaveCursorInWhere) {
       // Query must have "first"
       // Drop the limit, see if there are any records that aren't already in the list we've fetched
       return sql.fragment`exists(
+        select 1
         ${sqlCommon}
         and (${queryBuilder.data
           .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
       )`;
+    } else {
+      // Should make this more efficient; running this against a billion rows would not be good.
+      return sql.fragment`((
+        select count(*)
+        ${sqlCommon}
+      ) > (select count(*) from ${sqlQueryAlias}))`;
     }
   }
   if (options.withPagination || options.withPaginationAsFields) {
@@ -125,18 +133,21 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const query = queryBuilder.build(options);
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
-    // XXX: if last then hasNextPage = false
+    const canHaveCursorInWhere =
+      queryBuilder.getOrderByExpressionsAndDirections().length > 0;
     const queryHasBefore = queryBuilder.data.whereBound.upper.length > 0;
     const queryHasAfter = queryBuilder.data.whereBound.lower.length > 0;
     const queryHasFirst = queryBuilder.data.limit && !queryBuilder.data.flip;
     const queryHasLast = queryBuilder.data.limit && queryBuilder.data.flip;
     const hasNextPage = generateNextPrevPageSql(
       sqlQueryAlias,
+      canHaveCursorInWhere,
       queryHasBefore,
       queryHasFirst
     );
     const hasPreviousPage = generateNextPrevPageSql(
       sqlQueryAlias,
+      canHaveCursorInWhere,
       queryHasAfter,
       queryHasLast,
       true
