@@ -11,7 +11,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "jest"
+    "test": "lerna run test"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"

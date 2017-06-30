@@ -6,7 +6,7 @@ module.exports = function PgConnectionArgs(builder) {
     "field:args",
     (
       args,
-      { extend, getTypeByName, pgSql: sql },
+      { extend, getTypeByName },
       {
         scope: { isPgConnectionField, pgIntrospection: table },
         addArgDataGenerator,
