@@ -1,4 +1,4 @@
-FROM node
+FROM node:alpine
 LABEL description="A GraphQL API created by reflection over a PostgreSQL schmea https://github.com/postgraphql/postgraphql"
 
 RUN mkdir -p /postgraphql
