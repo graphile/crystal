@@ -1,6 +1,6 @@
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
-const createPostGraphQLSchema = require("./createPostGraphQLSchema");
+const createPostGraphQLSchema = require("../..");
 const { readdirSync, readFile: rawReadFile } = require("fs");
 const { promisify } = require("util");
 const { resolve: resolvePath } = require("path");
