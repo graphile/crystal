@@ -19,7 +19,7 @@ The basic installation procedure is described at  [section Usage](README.md#usag
 
 About `postgraphql`'s [usage](README.md#usage).
 
-1. A commom misuse have origim in the interpretation of "what is default", causing  authentication errors. The best way to check is the case, is to express the conectin string with `-c` option. Example: `postgraphql -c postgres://postgres:postgres@localhost:5432/issn`. Compare with the conection of your usual `psql`  command, eg. `PGPASSWORD=postgres psql -U postgres issn`, must be consistent.<br/>Details at [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
+1. A commom misuse have origim in the interpretation of "what is default", causing  authentication errors. The best way to check is the case, is to express the conectin string with `-c` option. Example: `postgraphql -c postgres://postgres:postgres@localhost:5432/issn`. Compare with the conection of your usual `psql`  command, eg. `PGPASSWORD=postgres psql -U postgres issn`, must be consistent.<br/>Details at [issue #482](https://github.com/postgraphql/postgraphql/issues/482) and [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
 
 2. ...
 
@@ -28,3 +28,7 @@ About `postgraphql`'s [usage](README.md#usage).
 
 ...
  
+
+## Test and becnhmarking
+
+... See [issue #461](https://github.com/postgraphql/postgraphql/issues/461) and 
