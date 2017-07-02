@@ -7,7 +7,7 @@ module.exports = async function QueryPlugin(builder) {
     })
   );
   builder.hook(
-    "schema",
+    "GraphQLSchema",
     (spec, { $$isQuery, buildObjectWithHooks, extend }) => {
       const queryType = buildObjectWithHooks(
         GraphQLObjectType,

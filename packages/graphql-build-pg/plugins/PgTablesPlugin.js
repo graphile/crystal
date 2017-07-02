@@ -13,7 +13,7 @@ module.exports = function PgTablesPlugin(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "schema",
+    "init",
     (
       _,
       {

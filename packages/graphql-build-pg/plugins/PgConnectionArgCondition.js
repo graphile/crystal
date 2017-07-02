@@ -4,9 +4,9 @@ module.exports = function PgConnectionArgCondition(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "schema",
+    "init",
     (
-      schema,
+      _,
       {
         buildObjectWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
@@ -48,7 +48,7 @@ module.exports = function PgConnectionArgCondition(
           }
         );
       });
-      return schema;
+      return _;
     }
   );
   builder.hook(

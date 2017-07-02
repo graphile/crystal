@@ -105,7 +105,7 @@ Hooks
   useful later. The argument to this is an empty object and should be passed
   through unmodified (it is ignored currently).
 
-- `schema`: This event defines the root-level schema; hook it to add `query`,
+- `GraphQLSchema`: This event defines the root-level schema; hook it to add `query`,
   `mutation`, `subscription` or similar GraphQL fields.
 
 - `GraphQLObjectType*`: When creating a GraphQLObjectType via

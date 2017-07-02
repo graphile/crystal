@@ -6,9 +6,9 @@ module.exports = function PgConnectionArgOrderBy(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "schema",
+    "init",
     (
-      schema,
+      _,
       {
         buildObjectWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
@@ -37,7 +37,7 @@ module.exports = function PgConnectionArgOrderBy(
           }
         );
       });
-      return schema;
+      return _;
     }
   );
   builder.hook(

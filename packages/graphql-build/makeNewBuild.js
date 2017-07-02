@@ -147,7 +147,7 @@ module.exports = function makeNewBuild(builder) {
         );
       }
       if (Type === GraphQLSchema) {
-        newSpec = builder.applyHooks(this, "schema", newSpec, {
+        newSpec = builder.applyHooks(this, "GraphQLSchema", newSpec, {
           scope,
         });
       } else if (Type === GraphQLObjectType) {

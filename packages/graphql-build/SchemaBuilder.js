@@ -19,7 +19,7 @@ class SchemaBuilder {
       init: [],
 
       // Add 'query', 'mutation' or 'subscription' types in this hook:
-      schema: [],
+      GraphQLSchema: [],
 
       // When creating a GraphQLObjectType via `buildObjectWithHooks`, we'll
       // execute, the following hooks:
