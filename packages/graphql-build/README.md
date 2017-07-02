@@ -125,11 +125,11 @@ Hooks
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
 
-- `enumType*`: When creating a GraphQLEnumType via `buildObjectWithHooks`,
+- `GraphQLEnumType*`: When creating a GraphQLEnumType via `buildObjectWithHooks`,
   we'll execute, the following hooks:
 
-  - `enumType` to add any root-level attributes, e.g. add a description
-  - `enumType:values` to add additional values
+  - `GraphQLEnumType` to add any root-level attributes, e.g. add a description
+  - `GraphQLEnumType:values` to add additional values
 
 - `field*`: When you add a field to a GraphQLObjectType, wrap the call with
   `buildFieldWithHooks` in order to fire these hooks:

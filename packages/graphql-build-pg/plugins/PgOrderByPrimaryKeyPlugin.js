@@ -1,6 +1,6 @@
 module.exports = function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
-    "enumType:values",
+    "GraphQLEnumType:values",
     (
       values,
       { extend, pgIntrospectionResultsByKind: introspectionResultsByKind },

@@ -378,13 +378,13 @@ module.exports = function makeNewBuild(builder) {
           },
         });
       } else if (Type === GraphQLEnumType) {
-        newSpec = builder.applyHooks(this, "enumType", newSpec, {
+        newSpec = builder.applyHooks(this, "GraphQLEnumType", newSpec, {
           scope,
         });
 
         newSpec.values = builder.applyHooks(
           this,
-          "enumType:values",
+          "GraphQLEnumType:values",
           newSpec.values,
           {
             scope,

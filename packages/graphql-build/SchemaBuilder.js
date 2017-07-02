@@ -43,10 +43,10 @@ class SchemaBuilder {
 
       // When creating a GraphQLEnumType via `buildObjectWithHooks`, we'll
       // execute, the following hooks:
-      // - 'enumType' to add any root-level attributes, e.g. add a description
-      // - 'enumType:values' to add additional values
-      enumType: [],
-      "enumType:values": [],
+      // - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
+      // - 'GraphQLEnumType:values' to add additional values
+      GraphQLEnumType: [],
+      "GraphQLEnumType:values": [],
 
       // When you add a field to a GraphQLObjectType, wrap the call with
       // `buildFieldWithHooks` in order to fire these hooks:

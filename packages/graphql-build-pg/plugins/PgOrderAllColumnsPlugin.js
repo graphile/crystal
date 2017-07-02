@@ -3,7 +3,7 @@ module.exports = function PgOrderAllColumnsPlugin(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "enumType:values",
+    "GraphQLEnumType:values",
     (
       values,
       { extend, pgIntrospectionResultsByKind: introspectionResultsByKind },
