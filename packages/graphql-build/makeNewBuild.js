@@ -133,7 +133,7 @@ module.exports = function makeNewBuild(builder) {
       }
       return Object.assign({}, obj, obj2);
     },
-    buildObjectWithHooks(Type, spec, scope = {}) {
+    buildObjectWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
       if (!this.buildObjectWithHooks || !Object.isFrozen(this)) {
         throw new Error(
           "Please do not generate the schema during the build building phase, use 'init' instead"
@@ -141,6 +141,7 @@ module.exports = function makeNewBuild(builder) {
       }
       const fieldDataGeneratorsByFieldName = {};
       let newSpec = spec;
+      let valid = true;
       if (!knownTypes.includes(Type) && knownTypeNames.includes(Type.name)) {
         throw new Error(
           `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
@@ -150,6 +151,7 @@ module.exports = function makeNewBuild(builder) {
         newSpec = builder.applyHooks(this, "GraphQLSchema", newSpec, {
           scope,
         });
+        valid = valid && Object.keys(newSpec).length;
       } else if (Type === GraphQLObjectType) {
         const addDataGeneratorForField = (fieldName, fn) => {
           fn.displayName =
@@ -329,6 +331,7 @@ module.exports = function makeNewBuild(builder) {
             );
           },
         });
+        valid = valid && Object.keys(newSpec.fields).length;
       } else if (Type === GraphQLInputObjectType) {
         newSpec = builder.applyHooks(this, "GraphQLInputObjectType", newSpec, {
           scope,
@@ -377,6 +380,7 @@ module.exports = function makeNewBuild(builder) {
             );
           },
         });
+        valid = valid && Object.keys(newSpec.fields).length;
       } else if (Type === GraphQLEnumType) {
         newSpec = builder.applyHooks(this, "GraphQLEnumType", newSpec, {
           scope,
@@ -390,8 +394,16 @@ module.exports = function makeNewBuild(builder) {
             scope,
           }
         );
+        valid = valid && Object.keys(newSpec.values).length;
       }
       const finalSpec = newSpec;
+
+      // For certain things, rather than throwing an error we should handle it
+      // silently, for example if there's no fields on the root mutation object
+      // then simply don't add it to the schema!
+      if (returnNullOnInvalid && !valid) {
+        return null;
+      }
 
       const Self = new Type(finalSpec);
       if (finalSpec.name) {
