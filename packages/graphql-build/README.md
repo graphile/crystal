@@ -117,11 +117,11 @@ Hooks
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
 
-- `inputObjectType*`: When creating a GraphQLInputObjectType via
+- `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType via
   `buildObjectWithHooks`, we'll execute, the following hooks:
 
-  - `inputObjectType` to add any root-level attributes, e.g. add a description
-  - `inputObjectType:fields` to add additional fields to this object type (is
+  - `GraphQLInputObjectType` to add any root-level attributes, e.g. add a description
+  - `GraphQLInputObjectType:fields` to add additional fields to this object type (is
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
 

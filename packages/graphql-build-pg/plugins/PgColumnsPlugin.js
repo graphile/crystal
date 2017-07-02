@@ -117,7 +117,7 @@ module.exports = function PgColumnsPlugin(
     }
   );
   builder.hook(
-    "inputObjectType:fields",
+    "GraphQLInputObjectType:fields",
     (
       fields,
       {

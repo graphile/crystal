@@ -330,7 +330,7 @@ module.exports = function makeNewBuild(builder) {
           },
         });
       } else if (Type === GraphQLInputObjectType) {
-        newSpec = builder.applyHooks(this, "inputObjectType", newSpec, {
+        newSpec = builder.applyHooks(this, "GraphQLInputObjectType", newSpec, {
           scope,
         });
         newSpec.fields = newSpec.fields || {};
@@ -371,7 +371,7 @@ module.exports = function makeNewBuild(builder) {
             }
             return builder.applyHooks(
               this,
-              "inputObjectType:fields",
+              "GraphQLInputObjectType:fields",
               rawFields,
               fieldsContext
             );
