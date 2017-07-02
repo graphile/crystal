@@ -61,7 +61,7 @@ module.exports = function makeNewBuild(builder) {
   // request the fieldData, e.g. to perform optimisations.
 
   // fieldData is an object whose keys are the fields on this
-  // objectType and whose values are an object (whose keys are
+  // GraphQLObjectType and whose values are an object (whose keys are
   // arbitrary namespaced keys and whose values are arrays of
   // information of this kind)
   const fieldDataGeneratorsByType = new Map();
@@ -192,7 +192,7 @@ module.exports = function makeNewBuild(builder) {
           // get type from field, get
         };
 
-        newSpec = builder.applyHooks(this, "objectType", newSpec, {
+        newSpec = builder.applyHooks(this, "GraphQLObjectType", newSpec, {
           scope,
           addDataGeneratorForField,
           recurseDataGeneratorsForField,
@@ -204,7 +204,7 @@ module.exports = function makeNewBuild(builder) {
             const interfacesContext = {
               scope,
               Self,
-              objectType: rawSpec,
+              GraphQLObjectType: rawSpec,
             };
             let rawInterfaces = rawSpec.interfaces || [];
             if (typeof rawInterfaces === "function") {
@@ -212,7 +212,7 @@ module.exports = function makeNewBuild(builder) {
             }
             return builder.applyHooks(
               this,
-              "objectType:interfaces",
+              "GraphQLObjectType:interfaces",
               rawInterfaces,
               interfacesContext
             );
@@ -223,7 +223,7 @@ module.exports = function makeNewBuild(builder) {
               addDataGeneratorForField,
               recurseDataGeneratorsForField,
               Self,
-              objectType: rawSpec,
+              GraphQLObjectType: rawSpec,
               buildFieldWithHooks: (fieldName, spec, scope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
@@ -323,7 +323,7 @@ module.exports = function makeNewBuild(builder) {
             }
             return builder.applyHooks(
               this,
-              "objectType:fields",
+              "GraphQLObjectType:fields",
               rawFields,
               fieldsContext
             );
@@ -341,7 +341,7 @@ module.exports = function makeNewBuild(builder) {
             const fieldsContext = {
               scope,
               Self,
-              objectType: rawSpec,
+              GraphQLObjectType: rawSpec,
               buildFieldWithHooks: (fieldName, spec, scope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(

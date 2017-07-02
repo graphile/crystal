@@ -5,7 +5,7 @@ module.exports = function PgQueryProceduresPlugin(
   { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
 ) {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

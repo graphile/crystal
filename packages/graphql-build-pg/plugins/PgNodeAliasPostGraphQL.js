@@ -4,7 +4,7 @@ const pluralize = require("pluralize");
 
 module.exports = async function PgNodeAliasPostGraphQL(builder) {
   builder.hook(
-    "objectType",
+    "GraphQLObjectType",
     (
       object,
       { setNodeAlias },

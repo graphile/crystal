@@ -9,7 +9,7 @@ module.exports = function PgColumnsPlugin(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

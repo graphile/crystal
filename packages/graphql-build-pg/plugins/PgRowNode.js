@@ -8,7 +8,7 @@ module.exports = async function PgRowByUniqueConstraint(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "objectType",
+    "GraphQLObjectType",
     (
       object,
       {
@@ -76,7 +76,7 @@ module.exports = async function PgRowByUniqueConstraint(
   );
 
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

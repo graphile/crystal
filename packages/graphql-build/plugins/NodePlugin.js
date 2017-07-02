@@ -65,7 +65,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
     return _;
   });
 
-  builder.hook("objectType:interfaces", function addNodeIdToQuery(
+  builder.hook("GraphQLObjectType:interfaces", function addNodeIdToQuery(
     interfaces,
     { getTypeByName },
     { scope: { isRootQuery } }
@@ -76,7 +76,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
     return [...interfaces, getTypeByName("Node")];
   });
 
-  builder.hook("objectType:fields", function addNodeIdToQuery(
+  builder.hook("GraphQLObjectType:fields", function addNodeIdToQuery(
     fields,
     {
       $$isQuery,

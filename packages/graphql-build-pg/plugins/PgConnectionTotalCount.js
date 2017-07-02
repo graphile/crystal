@@ -2,7 +2,7 @@ const { GraphQLInt } = require("graphql");
 
 module.exports = function PgConnectionTotalCount(builder) {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       { extend },

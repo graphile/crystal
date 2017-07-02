@@ -5,7 +5,7 @@ Usage
 -----
 
 The following [runnable example][] creates a plugin that hooks the
-'objectType:fields' event in the system and adds a 'random' field to every
+'GraphQLObjectType:fields' event in the system and adds a 'random' field to every
 object everywhere (including the root Query).
 
 ```js
@@ -18,7 +18,7 @@ function MyRandomFieldPlugin(
   builder,
   { myDefaultMin = 1, myDefaultMax = 100 }
 ) {
-  builder.hook("objectType:fields", (fields, { extend }) => {
+  builder.hook("GraphQLObjectType:fields", (fields, { extend }) => {
     return extend(fields, {
       random: {
         type: GraphQLInt,
@@ -108,12 +108,12 @@ Hooks
 - `schema`: This event defines the root-level schema; hook it to add `query`,
   `mutation`, `subscription` or similar GraphQL fields.
 
-- `objectType*`: When creating a GraphQLObjectType via
+- `GraphQLObjectType*`: When creating a GraphQLObjectType via
   `buildObjectWithHooks`, we'll execute, the following hooks:
 
-  - `objectType` to add any root-level attributes, e.g. add a description
-  - `objectType:interfaces` to add additional interfaces to this object type
-  - `objectType:fields` to add additional fields to this object type (is
+  - `GraphQLObjectType` to add any root-level attributes, e.g. add a description
+  - `GraphQLObjectType:interfaces` to add additional interfaces to this object type
+  - `GraphQLObjectType:fields` to add additional fields to this object type (is
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
 

@@ -31,7 +31,7 @@ const compare = (a, b, ascending) => {
 
 const DummyConnectionPlugin = async builder => {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

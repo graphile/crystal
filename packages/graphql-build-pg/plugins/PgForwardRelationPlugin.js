@@ -9,7 +9,7 @@ module.exports = function PgForwardRelationPlugin(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

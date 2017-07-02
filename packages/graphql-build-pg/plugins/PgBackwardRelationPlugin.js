@@ -8,7 +8,7 @@ module.exports = function PgBackwardRelationPlugin(
   { pgInflection: inflection }
 ) {
   builder.hook(
-    "objectType:fields",
+    "GraphQLObjectType:fields",
     (
       fields,
       {

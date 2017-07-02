@@ -9,7 +9,7 @@ function MyRandomFieldPlugin(
   builder,
   { myDefaultMin = 1, myDefaultMax = 100 }
 ) {
-  builder.hook("objectType:fields", (fields, { extend }) => {
+  builder.hook("GraphQLObjectType:fields", (fields, { extend }) => {
     return extend(fields, {
       random: {
         type: GraphQLInt,
