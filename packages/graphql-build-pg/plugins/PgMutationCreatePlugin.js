@@ -1,4 +1,9 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLString } = require("graphql");
+const {
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+} = require("graphql");
 
 module.exports = function PgMutationCreatePlugin(
   builder,
@@ -45,7 +50,7 @@ module.exports = function PgMutationCreatePlugin(
               return memo;
             }
             const InputType = buildObjectWithHooks(
-              GraphQLObjectType,
+              GraphQLInputObjectType,
               {
                 name: inflection.createInputType(
                   table.name,
@@ -102,7 +107,7 @@ module.exports = function PgMutationCreatePlugin(
               },
             });
             return memo;
-          })
+          }, {})
       );
     }
   );
