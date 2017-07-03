@@ -33,7 +33,7 @@ exports.defaultInflection = {
     return upperFirst(camelcase(`${typeName}-patch`));
   },
   tableName(name, _schema) {
-    return camelcase(name);
+    return camelcase(pluralize.singular(name));
   },
   tableNode(name, _schema) {
     return camelcase(name);
@@ -79,7 +79,7 @@ exports.defaultInflection = {
     return upperFirst(camelcase(`${procName}-edge`));
   },
   createField(name, _schema) {
-    return camelcase(`create-${name}`);
+    return camelcase(`create-${pluralize.singular(name)}`);
   },
   createInputType(name, _schema) {
     return upperFirst(camelcase(`create-${name}-input`));
