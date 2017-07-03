@@ -90,7 +90,6 @@ module.exports = function PgMutationCreatePlugin(
               table.name,
               table.namespace.name
             );
-            process.exit(1);
             memo[fieldName] = buildFieldWithHooks(fieldName, {
               type: PayloadType,
               args: {
