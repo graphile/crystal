@@ -11,7 +11,13 @@ const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
 const mutationsDir = `${__dirname}/../fixtures/mutations`;
-const mutationFileNames = readdirSync(mutationsDir);
+//const mutationFileNames = readdirSync(mutationsDir);
+const mutationFileNames = [
+  "mutation-create.graphql",
+  //"mutation-delete.graphql",
+  //"mutation-update.graphql",
+  //"procedure-mutation.graphql",
+];
 let mutationResults = [];
 
 beforeAll(() => {
