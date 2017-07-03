@@ -78,6 +78,15 @@ exports.defaultInflection = {
   scalarFunctionEdge(procName, _procSchema) {
     return upperFirst(camelcase(`${procName}-edge`));
   },
+  createField(name, _schema) {
+    return camelcase(`create-${name}`);
+  },
+  createInputType(name, _schema) {
+    return upperFirst(camelcase(`create-${name}-input`));
+  },
+  createPayloadType(name, _schema) {
+    return upperFirst(camelcase(`create-${name}-payload`));
+  },
 };
 
 exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection, {
