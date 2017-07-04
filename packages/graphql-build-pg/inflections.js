@@ -67,7 +67,7 @@ exports.defaultInflection = {
     );
   },
   edge(typeName) {
-    return upperFirst(camelcase(`${typeName}-edge`));
+    return upperFirst(camelcase(`${pluralize(typeName)}-edge`));
   },
   connection(typeName) {
     return upperFirst(camelcase(`${this.pluralize(typeName)}-connection`));
