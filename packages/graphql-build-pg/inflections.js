@@ -67,8 +67,18 @@ exports.defaultInflection = {
         .join("-and-")}`
     );
   },
+  deleteByKeys(detailedKeys, table, schema) {
+    return camelcase(
+      `delete-${this.tableName(table, schema)}-by-${detailedKeys
+        .map(key => this.column(key.column, key.table, key.schema))
+        .join("-and-")}`
+    );
+  },
   updateNode(name, _schema) {
     return camelcase(`update-${pluralize.singular(name)}`);
+  },
+  deleteNode(name, _schema) {
+    return camelcase(`delete-${pluralize.singular(name)}`);
   },
   updateByKeysInputType(detailedKeys, name, _schema) {
     return upperFirst(
@@ -79,8 +89,20 @@ exports.defaultInflection = {
       )
     );
   },
+  deleteByKeysInputType(detailedKeys, name, _schema) {
+    return upperFirst(
+      camelcase(
+        `delete-${pluralize.singular(name)}-by-${detailedKeys
+          .map(key => this.column(key.column, key.table, key.schema))
+          .join("-and-")}-input`
+      )
+    );
+  },
   updateNodeInputType(name, _schema) {
     return upperFirst(camelcase(`update-${pluralize.singular(name)}-input`));
+  },
+  deleteNodeInputType(name, _schema) {
+    return upperFirst(camelcase(`delete-${pluralize.singular(name)}-input`));
   },
   deleteByKeys(detailedKeys, table, schema) {
     return camelcase(
@@ -124,6 +146,9 @@ exports.defaultInflection = {
   },
   updatePayloadType(name, _schema) {
     return upperFirst(camelcase(`update-${pluralize.singular(name)}-payload`));
+  },
+  deletePayloadType(name, _schema) {
+    return upperFirst(camelcase(`delete-${pluralize.singular(name)}-payload`));
   },
 };
 

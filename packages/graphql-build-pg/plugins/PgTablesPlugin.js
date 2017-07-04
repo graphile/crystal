@@ -103,9 +103,12 @@ module.exports = function PgTablesPlugin(
                 fields[nodeIdFieldName] = {
                   type: new GraphQLNonNull(GraphQLID),
                   resolve(data) {
-                    return getNodeIdForTypeAndIdentifiers(
-                      Self,
-                      ...data.__identifiers
+                    return (
+                      data.__identifiers &&
+                      getNodeIdForTypeAndIdentifiers(
+                        Self,
+                        ...data.__identifiers
+                      )
                     );
                   },
                 };
