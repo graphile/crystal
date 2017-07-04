@@ -17,9 +17,13 @@ const buildSchema = async (plugins, options = {}) => {
   return build.buildRoot();
 };
 
-const defaultPlugins = Object.values(localPlugins).filter(
-  fn => typeof fn === "function"
-);
+const defaultPlugins = [
+  localPlugins.StandardTypesPlugin,
+  localPlugins.NodePlugin,
+  localPlugins.QueryPlugin,
+  localPlugins.MutationPlugin,
+  localPlugins.MutationPayloadQueryPlugin,
+];
 
 Object.assign(exports, localPlugins);
 exports.buildSchema = buildSchema;
