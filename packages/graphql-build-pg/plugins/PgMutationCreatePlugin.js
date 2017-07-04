@@ -80,16 +80,22 @@ module.exports = function PgMutationCreatePlugin(
                 fields: {
                   clientMutationId: {
                     type: GraphQLString,
+                    resolve(data) {
+                      return data.__clientMutationId;
+                    },
                   },
                   [inflection.tableName(table.name, table.namespace.name)]: {
                     type: Table,
+                    resolve(data) {
+                      return data;
+                    },
                   },
                 },
               },
               {
                 isMutationPayload: true,
                 isPgCreatePayloadType: true,
-                pgInflection: table,
+                pgIntrospection: table,
               }
             );
             const fieldName = inflection.createField(

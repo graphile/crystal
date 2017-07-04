@@ -19,9 +19,21 @@ module.exports = function PgForwardRelationPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
       },
-      { scope: { isPgRowType, pgIntrospection: table }, buildFieldWithHooks }
+      {
+        scope: {
+          isPgRowType,
+          isPgCreatePayloadType,
+          isMutationPayload,
+          pgIntrospection: table,
+        },
+        buildFieldWithHooks,
+      }
     ) => {
-      if (!isPgRowType || !table || table.kind !== "class") {
+      if (
+        !(isPgRowType || isPgCreatePayloadType) ||
+        !table ||
+        table.kind !== "class"
+      ) {
         return fields;
       }
       // This is a relation in which we (table) are local, and there's a foreign table
