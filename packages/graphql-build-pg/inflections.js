@@ -67,6 +67,9 @@ exports.defaultInflection = {
         .join("-and-")}`
     );
   },
+  updateNode(name, _schema) {
+    return camelcase(`update-${pluralize.singular(name)}`);
+  },
   updateByKeysInputType(detailedKeys, name, _schema) {
     return upperFirst(
       camelcase(
@@ -75,6 +78,9 @@ exports.defaultInflection = {
           .join("-and-")}-input`
       )
     );
+  },
+  updateNodeInputType(name, _schema) {
+    return upperFirst(camelcase(`update-${pluralize.singular(name)}-input`));
   },
   deleteByKeys(detailedKeys, table, schema) {
     return camelcase(
