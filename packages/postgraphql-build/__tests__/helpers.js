@@ -12,8 +12,9 @@ const withPgClient = async (url, fn) => {
   let client;
   try {
     client = await pgPool.connect();
-    // MUST await here, otherwise the release happens too early!
+    await client.query("begin");
     const result = await fn(client);
+    await client.query("rollback");
     return result;
   } finally {
     try {
