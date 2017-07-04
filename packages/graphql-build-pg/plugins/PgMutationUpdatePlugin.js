@@ -240,7 +240,9 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                           text,
                           values
                         );
-                        return row;
+                        return Object.assign({}, row, {
+                          __clientMutationId: input.clientMutationId,
+                        });
                       } catch (e) {
                         debug(e);
                         return null;
@@ -415,8 +417,9 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                         text,
                         values
                       );
-                      console.log(row);
-                      return row;
+                      return Object.assign({}, row, {
+                        __clientMutationId: input.clientMutationId,
+                      });
                     },
                   };
                 }
