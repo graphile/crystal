@@ -69,6 +69,9 @@ exports.defaultInflection = {
   edge(typeName) {
     return upperFirst(camelcase(`${pluralize(typeName)}-edge`));
   },
+  edgeField(name, _schema) {
+    return camelcase(`${pluralize.singular(name)}-edge`);
+  },
   connection(typeName) {
     return upperFirst(camelcase(`${this.pluralize(typeName)}-connection`));
   },

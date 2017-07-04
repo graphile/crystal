@@ -23,5 +23,6 @@ exports.defaultPlugins = [
 
   // Mutations
   require("./plugins/PgMutationCreatePlugin"),
+  require("./plugins/PgMutationPayloadEdgePlugin"),
 ];
 exports.inflections = require("./inflections");

@@ -74,11 +74,42 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       }
     }
   }
+  const getPgCursorPrefix = () =>
+    rawCursorPrefix && rawCursorPrefix.length > 0
+      ? rawCursorPrefix
+      : queryBuilder.data.cursorPrefix.map(val => sql.literal(val));
+  if (
+    options.withPagination ||
+    options.withPaginationAsFields ||
+    options.withCursor
+  ) {
+    // Sometimes we need a __cursor even if it's not a collection; e.g. to get the edge field on a mutation
+    queryBuilder.selectCursor(() => {
+      const orderBy = queryBuilder
+        .getOrderByExpressionsAndDirections()
+        .map(([expr]) => expr);
+      if (orderBy.length > 0) {
+        return sql.fragment`json_build_array(${sql.join(
+          [
+            ...getPgCursorPrefix(),
+            sql.fragment`json_build_array(${sql.join(
+              queryBuilder
+                .getOrderByExpressionsAndDirections()
+                .map(([expr]) => expr),
+              ", "
+            )})`,
+          ],
+          ","
+        )})`;
+      } else {
+        return sql.fragment`json_build_array(${sql.join(
+          getPgCursorPrefix(),
+          ", "
+        )}, (row_number() over (partition by 1)))`;
+      }
+    });
+  }
   if (options.withPagination || options.withPaginationAsFields) {
-    const getPgCursorPrefix = () =>
-      rawCursorPrefix && rawCursorPrefix.length > 0
-        ? rawCursorPrefix
-        : queryBuilder.data.cursorPrefix.map(val => sql.literal(val));
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
       if (orderByExpressionsAndDirections.length > 0) {
@@ -120,30 +151,6 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
       }
     });
 
-    queryBuilder.selectCursor(() => {
-      const orderBy = queryBuilder
-        .getOrderByExpressionsAndDirections()
-        .map(([expr]) => expr);
-      if (orderBy.length > 0) {
-        return sql.fragment`json_build_array(${sql.join(
-          [
-            ...getPgCursorPrefix(),
-            sql.fragment`json_build_array(${sql.join(
-              queryBuilder
-                .getOrderByExpressionsAndDirections()
-                .map(([expr]) => expr),
-              ", "
-            )})`,
-          ],
-          ","
-        )})`;
-      } else {
-        return sql.fragment`json_build_array(${sql.join(
-          getPgCursorPrefix(),
-          ", "
-        )}, (row_number() over (partition by 1)))`;
-      }
-    });
     const query = queryBuilder.build(options);
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
