@@ -82,19 +82,26 @@ module.exports = function PgMutationCreatePlugin(
                   table.name,
                   table.namespace.name
                 ),
-                fields: {
-                  clientMutationId: {
-                    type: GraphQLString,
-                    resolve(data) {
-                      return data.__clientMutationId;
+                fields: ({ recurseDataGeneratorsForField }) => {
+                  const tableName = inflection.tableName(
+                    table.name,
+                    table.namespace.name
+                  );
+                  recurseDataGeneratorsForField(tableName);
+                  return {
+                    clientMutationId: {
+                      type: GraphQLString,
+                      resolve(data) {
+                        return data.__clientMutationId;
+                      },
                     },
-                  },
-                  [inflection.tableName(table.name, table.namespace.name)]: {
-                    type: Table,
-                    resolve(data) {
-                      return data;
+                    [tableName]: {
+                      type: Table,
+                      resolve(data) {
+                        return data;
+                      },
                     },
-                  },
+                  };
                 },
               },
               {

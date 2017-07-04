@@ -64,6 +64,9 @@ module.exports = function PgTablesPlugin(
             num =>
               introspectionResultsByKind.attributeByClassIdAndNum[table.id][num]
           );
+        const attributes = introspectionResultsByKind.attribute
+          .filter(attr => attr.classId === table.id)
+          .sort((a1, a2) => a1.num - a2.num);
         const TableType = buildObjectWithHooks(
           GraphQLObjectType,
           {
@@ -139,24 +142,30 @@ module.exports = function PgTablesPlugin(
         pg2GqlMapper[tablePgType.id] = {
           map: _ => _,
           unmap: obj => {
-            // We use json_populate_record here rather than casting directly
-            // because a direct cast could result in weirdness if the table is
-            // modified between being introspected and this code being
-            // executed.
-            return sql.fragment`json_populate_record(null::${sql.identifier(
-              tablePgType.namespaceName,
-              tablePgType.name
-            )}, json_build_object(${sql.join(
-              Object.keys(obj).filter(k => pgInputFields[k]).map(k => {
-                const v = obj[k];
-                const { name, type } = pgInputFields[k];
-                return sql.fragment`${sql.literal(name)}, ${gql2pg(
-                  v,
-                  type
-                )}::${sql.identifier(type.namespaceName, type.name)}`;
+            return sql.fragment`row(${sql.join(
+              attributes.map(attr => {
+                const fieldName = inflection.column(
+                  attr.name,
+                  table.name,
+                  table.namespace.name
+                );
+                const pgInputField = pgInputFields[fieldName];
+                const v = obj[fieldName];
+                if (pgInputField && v != null) {
+                  const { name, type } = pgInputField;
+                  return sql.fragment`${gql2pg(v, type)}::${sql.identifier(
+                    type.namespaceName,
+                    type.name
+                  )}`;
+                } else {
+                  return sql.null;
+                }
               }),
               ","
-            )}))`;
+            )})::${sql.identifier(
+              tablePgType.namespaceName,
+              tablePgType.name
+            )}`;
           },
         };
 

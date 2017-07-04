@@ -13,6 +13,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
       {
         scope: { isMutationPayload, pgIntrospection: table },
         buildFieldWithHooks,
+        recurseDataGeneratorsForField,
       }
     ) => {
       if (!isMutationPayload || !table || table.kind !== "class") {
@@ -31,6 +32,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
       }
 
       const fieldName = inflection.edgeField(table.name, table.namespace.name);
+      recurseDataGeneratorsForField(fieldName);
       return extend(fields, {
         [fieldName]: buildFieldWithHooks(
           fieldName,

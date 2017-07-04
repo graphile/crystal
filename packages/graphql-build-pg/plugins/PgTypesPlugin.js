@@ -11,19 +11,6 @@ const {
   isInputType,
 } = require("graphql");
 const { types: pgTypes } = require("pg");
-const rawParseInterval = require("postgres-interval");
-const LRU = require("lru-cache");
-
-const parseCache = LRU(500);
-function parseInterval(str) {
-  let result = parseCache.get(str);
-  if (!str) {
-    result = rawParseInterval(str);
-    Object.freeze(result);
-    parseCache.set(str, result);
-  }
-  return result;
-}
 
 const pgRangeParser = {
   parse(str) {
@@ -33,13 +20,13 @@ const pgRangeParser = {
     }
 
     return {
-      start: parts[0]
+      start: parts[0].length > 1
         ? {
             inclusive: parts[0][0] === "[",
             value: parts[0].slice(1),
           }
         : null,
-      end: parts[1]
+      end: parts[1].length > 1
         ? {
             inclusive: parts[1][parts[1].length - 1] === "]",
             value: parts[1].slice(0, -1),
@@ -239,8 +226,9 @@ module.exports = function PgTypesPlugin(
 
     // interval
     pg2GqlMapper[1186] = {
-      map: str => {
-        return parseInterval(str);
+      map: o => {
+        // `pg` module has already parsed this for us using `postgres-interval`
+        return o;
       },
       unmap: o => {
         const keys = ["seconds", "minutes", "hours", "days", "months", "years"];
