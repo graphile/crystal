@@ -87,6 +87,7 @@ module.exports = function PgMutationCreatePlugin(
                 },
               },
               {
+                isMutationPayload: true,
                 isPgCreatePayloadType: true,
                 pgInflection: table,
               }
