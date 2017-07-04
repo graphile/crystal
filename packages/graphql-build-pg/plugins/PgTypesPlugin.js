@@ -25,6 +25,19 @@ const stringType = name =>
       return ast.value;
     },
   });
+const rawParseInterval = require("postgres-interval");
+const LRU = require("lru-cache");
+
+const parseCache = LRU(500);
+function parseInterval(str) {
+  let result = parseCache.get(str);
+  if (!result) {
+    result = rawParseInterval(str);
+    Object.freeze(result);
+    parseCache.set(str, result);
+  }
+  return result;
+}
 
 const pgRangeParser = {
   parse(str) {
@@ -194,7 +207,12 @@ module.exports = function PgTypesPlugin(
         ),
     };
     const pgTweakFragmentForType = (fragment, type) => {
-      if ([1186, 1082, 1114, 1184, 1083, 1266].indexOf(type.id)) {
+      // ::text intervals
+      if ([1186].indexOf(parseInt(type.id, 10)) >= 0) {
+        return sql.fragment`${fragment}::text`;
+      }
+      // to_json all dates to make them ISO
+      if ([1082, 1114, 1184, 1083, 1266].indexOf(parseInt(type.id, 10)) >= 0) {
         return sql.fragment`to_json(${fragment})`;
       }
       return fragment;
@@ -255,10 +273,7 @@ module.exports = function PgTypesPlugin(
 
     // interval
     pg2GqlMapper[1186] = {
-      map: o => {
-        // `pg` module has already parsed this for us using `postgres-interval`
-        return o;
-      },
+      map: str => parseInterval(str),
       unmap: o => {
         const keys = ["seconds", "minutes", "hours", "days", "months", "years"];
         const parts = [];
