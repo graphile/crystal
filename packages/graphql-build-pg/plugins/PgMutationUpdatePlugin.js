@@ -92,6 +92,77 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
               }
             );
 
+            async function commonCodeRenameMe(
+              pgClient,
+              resolveInfo,
+              getDataFromParsedResolveInfoFragment,
+              PayloadType,
+              input,
+              condition
+            ) {
+              const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+              const resolveData = getDataFromParsedResolveInfoFragment(
+                parsedResolveInfoFragment,
+                PayloadType
+              );
+              const updatedRowAlias = sql.identifier(Symbol());
+              const query = queryFromResolveData(
+                updatedRowAlias,
+                updatedRowAlias,
+                resolveData,
+                {}
+              );
+              const sqlColumns = [];
+              const sqlValues = [];
+              const inputData =
+                input[
+                  inflection.patchField(
+                    inflection.tableName(table.name, table.namespace.name)
+                  )
+                ];
+              introspectionResultsByKind.attribute
+                .filter(attr => attr.classId === table.id)
+                .forEach(attr => {
+                  const fieldName = inflection.column(
+                    attr.name,
+                    table.name,
+                    table.namespace.name
+                  );
+                  if (
+                    fieldName in inputData /* Because we care about null! */
+                  ) {
+                    const val = inputData[fieldName];
+                    sqlColumns.push(sql.identifier(attr.name));
+                    sqlValues.push(gql2pg(val, attr.type));
+                  }
+                });
+              if (sqlColumns.length === 0) {
+                return null;
+              }
+              const queryWithUpdate = sql.query`
+                          with ${updatedRowAlias} as (
+                            update ${sql.identifier(
+                              table.namespace.name,
+                              table.name
+                            )} set ${sql.join(
+                sqlColumns.map(
+                  (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
+                ),
+                ", "
+              )}
+                            where ${condition}
+                            returning *
+                          ) ${query}
+                          `;
+              const { text, values } = sql.compile(queryWithUpdate);
+              if (debugSql.enabled)
+                debugSql(require("sql-formatter").format(text));
+              const { rows: [row] } = await pgClient.query(text, values);
+              return Object.assign({}, row, {
+                __clientMutationId: input.clientMutationId,
+              });
+            }
+
             // NodeId
             if (nodeIdFieldName) {
               const primaryKeyConstraint = introspectionResultsByKind.constraint
@@ -168,81 +239,22 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                           throw new Error("Invalid ID");
                         }
 
-                        const parsedResolveInfoFragment = parseResolveInfo(
-                          resolveInfo
+                        return commonCodeRenameMe(
+                          pgClient,
+                          resolveInfo,
+                          getDataFromParsedResolveInfoFragment,
+                          PayloadType,
+                          input,
+                          sql.join(
+                            primaryKeys.map(
+                              (key, idx) =>
+                                sql.fragment`${sql.identifier(
+                                  key.name
+                                )} = ${gql2pg(identifiers[idx], key.type)}`
+                            ),
+                            " AND "
+                          )
                         );
-                        const resolveData = getDataFromParsedResolveInfoFragment(
-                          parsedResolveInfoFragment,
-                          PayloadType
-                        );
-                        const updatedRowAlias = sql.identifier(Symbol());
-                        const query = queryFromResolveData(
-                          updatedRowAlias,
-                          updatedRowAlias,
-                          resolveData,
-                          {}
-                        );
-                        const sqlColumns = [];
-                        const sqlValues = [];
-                        const inputData =
-                          input[
-                            inflection.patchField(
-                              inflection.tableName(
-                                table.name,
-                                table.namespace.name
-                              )
-                            )
-                          ];
-                        introspectionResultsByKind.attribute
-                          .filter(attr => attr.classId === table.id)
-                          .forEach(attr => {
-                            const fieldName = inflection.column(
-                              attr.name,
-                              table.name,
-                              table.namespace.name
-                            );
-                            const val = inputData[fieldName];
-                            if (val != null) {
-                              sqlColumns.push(sql.identifier(attr.name));
-                              sqlValues.push(gql2pg(val, attr.type));
-                            }
-                          });
-                        if (sqlColumns.length === 0) {
-                          return null;
-                        }
-                        const queryWithUpdate = sql.query`
-                          with ${updatedRowAlias} as (
-                            update ${sql.identifier(
-                              table.namespace.name,
-                              table.name
-                            )} set ${sql.join(
-                          sqlColumns.map(
-                            (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
-                          ),
-                          ", "
-                        )}
-                            where ${sql.join(
-                              primaryKeys.map(
-                                (key, idx) =>
-                                  sql.fragment`${sql.identifier(
-                                    key.name
-                                  )} = ${gql2pg(identifiers[idx], key.type)}`
-                              ),
-                              " AND "
-                            )}
-                            returning *
-                          ) ${query}
-                          `;
-                        const { text, values } = sql.compile(queryWithUpdate);
-                        if (debugSql.enabled)
-                          debugSql(require("sql-formatter").format(text));
-                        const { rows: [row] } = await pgClient.query(
-                          text,
-                          values
-                        );
-                        return Object.assign({}, row, {
-                          __clientMutationId: input.clientMutationId,
-                        });
                       } catch (e) {
                         debug(e);
                         return null;
@@ -334,92 +346,31 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                       { pgClient },
                       resolveInfo
                     ) {
-                      const parsedResolveInfoFragment = parseResolveInfo(
-                        resolveInfo
+                      return commonCodeRenameMe(
+                        pgClient,
+                        resolveInfo,
+                        getDataFromParsedResolveInfoFragment,
+                        PayloadType,
+                        input,
+                        sql.join(
+                          keys.map(
+                            key =>
+                              sql.fragment`${sql.identifier(
+                                key.name
+                              )} = ${gql2pg(
+                                input[
+                                  inflection.column(
+                                    key.name,
+                                    key.class.name,
+                                    key.class.namespace.name
+                                  )
+                                ],
+                                key.type
+                              )}`
+                          ),
+                          " AND "
+                        )
                       );
-                      const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment,
-                        PayloadType
-                      );
-                      const updatedRowAlias = sql.identifier(Symbol());
-                      const query = queryFromResolveData(
-                        updatedRowAlias,
-                        updatedRowAlias,
-                        resolveData,
-                        {}
-                      );
-                      const sqlColumns = [];
-                      const sqlValues = [];
-                      const inputData =
-                        input[
-                          inflection.patchField(
-                            inflection.tableName(
-                              table.name,
-                              table.namespace.name
-                            )
-                          )
-                        ];
-                      introspectionResultsByKind.attribute
-                        .filter(attr => attr.classId === table.id)
-                        .forEach(attr => {
-                          const fieldName = inflection.column(
-                            attr.name,
-                            table.name,
-                            table.namespace.name
-                          );
-                          const val = inputData[fieldName];
-                          if (val != null) {
-                            sqlColumns.push(sql.identifier(attr.name));
-                            sqlValues.push(gql2pg(val, attr.type));
-                          }
-                        });
-                      if (sqlColumns.length === 0) {
-                        return null;
-                      }
-                      const queryWithUpdate = sql.query`
-                        with ${updatedRowAlias} as (
-                          update ${sql.identifier(
-                            table.namespace.name,
-                            table.name
-                          )} set ${sql.join(
-                        sqlColumns.map(
-                          (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
-                        ),
-                        ", "
-                      )}
-                          where ${sql.join(
-                            keys.map(
-                              key =>
-                                sql.fragment`${sql.identifier(
-                                  key.name
-                                )} = ${gql2pg(
-                                  input[
-                                    inflection.column(
-                                      key.name,
-                                      key.class.name,
-                                      key.class.namespace.name
-                                    )
-                                  ],
-                                  key.type
-                                )}`
-                            ),
-                            " AND "
-                          )}
-                          returning *
-                        ) ${query}
-                        `;
-                      const { text, values } = sql.compile(queryWithUpdate);
-                      if (debugSql.enabled) {
-                        debugSql(require("sql-formatter").format(text));
-                        debugSql(values);
-                      }
-                      const { rows: [row] } = await pgClient.query(
-                        text,
-                        values
-                      );
-                      return Object.assign({}, row, {
-                        __clientMutationId: input.clientMutationId,
-                      });
                     },
                   };
                 }
