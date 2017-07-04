@@ -10,6 +10,7 @@ const debugSql = require("debug")("graphql-build-pg:sql");
 const debug = require("debug")("graphql-build-pg");
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 const camelcase = require("lodash/camelcase");
+const pluralize = require("pluralize");
 
 module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
   builder,
@@ -196,7 +197,11 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                     debugSql(require("sql-formatter").format(text));
                   const { rows: [row] } = await pgClient.query(text, values);
                   if (!row) {
-                    return null;
+                    throw new Error(
+                      `No values were deleted in collection '${pluralize(
+                        table.name
+                      )}' because no values were found.`
+                    );
                   }
                   return Object.assign({}, row, {
                     __clientMutationId: input.clientMutationId,
