@@ -206,14 +206,22 @@ module.exports = function PgTypesPlugin(
           )
         ),
     };
+    const rawTypes = [
+      1186, // interval
+      1082, // date
+      1114, // timestamp
+      1184, // timestamptz
+      1083, // time
+      1266, // timetz
+    ];
     const pgTweakFragmentForType = (fragment, type) => {
-      // ::text intervals
-      if ([1186].indexOf(parseInt(type.id, 10)) >= 0) {
-        return sql.fragment`${fragment}::text`;
-      }
       // to_json all dates to make them ISO
       if ([1082, 1114, 1184, 1083, 1266].indexOf(parseInt(type.id, 10)) >= 0) {
         return sql.fragment`to_json(${fragment})`;
+      }
+      // ::text rawTypes
+      if (rawTypes.indexOf(parseInt(type.id, 10)) >= 0) {
+        return sql.fragment`${fragment}::text`;
       }
       return fragment;
     };
@@ -266,7 +274,7 @@ module.exports = function PgTypesPlugin(
     } else {
       pg2GqlMapper[114] = {
         map: jsonStringify,
-        unmap: o => sql.value(jsonStringify(o)),
+        unmap: str => sql.value(str),
       };
     }
     pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
@@ -398,7 +406,9 @@ module.exports = function PgTypesPlugin(
             // Since the value we will get from `parsed.(start|end).value` is a
             // string but our code will expect it to be the value after `pg`
             // parsed it, we pass through to `pg-types` for parsing.
-            const pgParse = pgTypes.getTypeParser(subtype.id);
+            const pgParse = rawTypes.includes(parseInt(subtype.id, 10))
+              ? identity
+              : pgTypes.getTypeParser(subtype.id);
             return {
               start: parsed.start && {
                 value: pg2gql(pgParse(parsed.start.value), subtype),
