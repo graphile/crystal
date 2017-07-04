@@ -176,7 +176,9 @@ module.exports = function PgMutationCreatePlugin(
                   if (debugSql.enabled)
                     debugSql(require("sql-formatter").format(text));
                   const { rows: [row] } = await pgClient.query(text, values);
-                  return row;
+                  return Object.assign({}, row, {
+                    __clientMutationId: input.clientMutationId,
+                  });
                 },
               })
             );

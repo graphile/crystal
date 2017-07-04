@@ -201,7 +201,9 @@ module.exports = function PgTablesPlugin(
                   cursor: {
                     type: Cursor,
                     resolve(data) {
-                      return base64(JSON.stringify(data.__cursor));
+                      return (
+                        data.__cursor && base64(JSON.stringify(data.__cursor))
+                      );
                     },
                   },
                   node: {
