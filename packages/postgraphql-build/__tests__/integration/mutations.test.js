@@ -49,9 +49,13 @@ beforeAll(() => {
       await pgClient.query(await kitchenSinkData);
 
       // Return the result of our GraphQL query.
-      return await graphql(gqlSchema, mutation, null, {
+      const result = await graphql(gqlSchema, mutation, null, {
         pgClient: pgClient,
       });
+      if (result.errors) {
+        console.log(result.errors.map(e => e.originalError));
+      }
+      return result;
     });
   });
 });
