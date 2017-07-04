@@ -194,7 +194,7 @@ module.exports = function PgTypesPlugin(
         ),
     };
     const pgTweakFragmentForType = (fragment, type) => {
-      if ([1082, 1114, 1184, 1083, 1266].indexOf(type.id)) {
+      if ([1186, 1082, 1114, 1184, 1083, 1266].indexOf(type.id)) {
         return sql.fragment`to_json(${fragment})`;
       }
       return fragment;
