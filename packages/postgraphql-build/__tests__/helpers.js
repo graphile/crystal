@@ -13,6 +13,7 @@ const withPgClient = async (url, fn) => {
   try {
     client = await pgPool.connect();
     await client.query("begin");
+    await client.query("set local timezone to '+04:00'");
     const result = await fn(client);
     await client.query("rollback");
     return result;

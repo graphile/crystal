@@ -19,6 +19,7 @@ module.exports = function PgColumnsPlugin(
         pgSql: sql,
         pg2gql,
         parseResolveInfo,
+        pgTweakFragmentForType,
       },
       {
         scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -91,9 +92,12 @@ module.exports = function PgColumnsPlugin(
                     return {
                       pgQuery: queryBuilder => {
                         queryBuilder.select(
-                          sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                            attr.name
-                          )}`,
+                          pgTweakFragmentForType(
+                            sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                              attr.name
+                            )}`,
+                            attr.type
+                          ),
                           alias
                         );
                       },

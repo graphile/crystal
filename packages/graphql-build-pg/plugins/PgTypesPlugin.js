@@ -8,9 +8,23 @@ const {
   GraphQLEnumType,
   GraphQLObjectType,
   GraphQLInputObjectType,
+  GraphQLScalarType,
   isInputType,
 } = require("graphql");
+const { Kind } = require("graphql/language");
 const { types: pgTypes } = require("pg");
+const stringType = name =>
+  new GraphQLScalarType({
+    name,
+    serialize: value => String(value),
+    parseValue: value => String(value),
+    parseLiteral: ast => {
+      if (ast.kind !== Kind.STRING) {
+        throw new Error("Can only parse string values");
+      }
+      return ast.value;
+    },
+  });
 
 const pgRangeParser = {
   parse(str) {
@@ -179,6 +193,12 @@ module.exports = function PgTypesPlugin(
           )
         ),
     };
+    const pgTweakFragmentForType = (fragment, type) => {
+      if ([1082, 1114, 1184, 1083, 1266].indexOf(type.id)) {
+        return sql.fragment`to_json(${fragment})`;
+      }
+      return fragment;
+    };
     /*
         Determined by running:
 
@@ -186,6 +206,9 @@ module.exports = function PgTypesPlugin(
 
         We only need to add oidLookups for types that don't have the correct fallback
       */
+    const SimpleDate = stringType("Date");
+    const SimpleDatetime = stringType("Datetime");
+    const SimpleTime = stringType("Time");
     const oidLookup = Object.assign(
       {
         20: GraphQLString, // Even though this is int8, it's too big for JS int, so cast to string.
@@ -193,17 +216,23 @@ module.exports = function PgTypesPlugin(
         23: GraphQLInt,
         790: GraphQLFloat, // money
         1186: GQLInterval, // interval
+        1082: SimpleDate, // date
+        1114: SimpleDatetime, // timestamp
+        1184: SimpleDatetime, // timestamptz
+        1083: SimpleTime, // time
+        1266: SimpleTime, // timetz
       },
       pgExtendedTypes && {
         114: GraphQLJSON,
         3802: GraphQLJSON,
         2950: GraphQLUUID,
+        /*
         1082: GraphQLDate, // date
         1114: GraphQLDateTime, // timestamp
         1184: GraphQLDateTime, // timestamptz
         1083: GraphQLTime, // time
         1266: GraphQLTime, // timetz
-        // 1186 interval
+        */
       }
     );
     const oidInputLookup = {
@@ -409,6 +438,7 @@ module.exports = function PgTypesPlugin(
       pg2GqlMapper,
       pg2gql,
       gql2pg,
+      pgTweakFragmentForType,
     });
   });
 };
