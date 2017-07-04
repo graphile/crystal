@@ -182,11 +182,7 @@ module.exports = function PgTablesPlugin(
               isPgCompoundType: !table.isSelectable,
               isPgPatch: true,
               pgAddSubfield(fieldName, _attrName, _type, spec) {
-                if (!pgInputFields[fieldName]) {
-                  throw new Error(
-                    "Patch and Input types share the same subfield specs currently"
-                  );
-                }
+                // We don't use this currently
                 return spec;
               },
             }

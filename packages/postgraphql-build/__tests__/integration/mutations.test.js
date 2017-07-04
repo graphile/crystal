@@ -1,12 +1,16 @@
 const { resolve: resolvePath } = require("path");
-const { readFile, readdirSync } = require("fs");
+const { readdirSync, readFile: rawReadFile } = require("fs");
+const { promisify } = require("util");
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
 const createPostGraphQLSchema = require("../..");
+const { printSchema } = require("graphql/utilities");
+const debug = require("debug")("graphql-build:schema");
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
+const readFile = promisify(rawReadFile);
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
@@ -23,7 +27,9 @@ let mutationResults = [];
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
   const gqlSchemaPromise = withPgClient(async pgClient => {
-    return await createPostGraphQLSchema(pgClient, ["a", "b", "c"]);
+    const schema = await createPostGraphQLSchema(pgClient, ["a", "b", "c"]);
+    debug(printSchema(schema));
+    return schema;
   });
 
   // Execute all of the mutations in parallel. We will not wait for them to
@@ -46,7 +52,7 @@ beforeAll(() => {
       });
 
       // Add data to the client instance we are using.
-      await pgClient.query(await kitchenSinkData);
+      await pgClient.query(await kitchenSinkData());
 
       // Return the result of our GraphQL query.
       const result = await graphql(gqlSchema, mutation, null, {

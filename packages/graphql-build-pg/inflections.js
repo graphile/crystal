@@ -32,6 +32,9 @@ exports.defaultInflection = {
   patchType(typeName) {
     return upperFirst(camelcase(`${typeName}-patch`));
   },
+  patchField(itemName) {
+    return camelcase(`${itemName}-patch`);
+  },
   tableName(name, _schema) {
     return camelcase(pluralize.singular(name));
   },
@@ -53,6 +56,29 @@ exports.defaultInflection = {
   singleRelationByKeys(detailedKeys, table, schema) {
     return camelcase(
       `${this.tableName(table, schema)}-by-${detailedKeys
+        .map(key => this.column(key.column, key.table, key.schema))
+        .join("-and-")}`
+    );
+  },
+  updateByKeys(detailedKeys, table, schema) {
+    return camelcase(
+      `update-${this.tableName(table, schema)}-by-${detailedKeys
+        .map(key => this.column(key.column, key.table, key.schema))
+        .join("-and-")}`
+    );
+  },
+  updateByKeysInputType(detailedKeys, name, _schema) {
+    return upperFirst(
+      camelcase(
+        `update-${pluralize.singular(name)}-by-${detailedKeys
+          .map(key => this.column(key.column, key.table, key.schema))
+          .join("-and-")}-input`
+      )
+    );
+  },
+  deleteByKeys(detailedKeys, table, schema) {
+    return camelcase(
+      `delete-${this.tableName(table, schema)}-by-${detailedKeys
         .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
@@ -89,6 +115,9 @@ exports.defaultInflection = {
   },
   createPayloadType(name, _schema) {
     return upperFirst(camelcase(`create-${pluralize.singular(name)}-payload`));
+  },
+  updatePayloadType(name, _schema) {
+    return upperFirst(camelcase(`update-${pluralize.singular(name)}-payload`));
   },
 };
 
