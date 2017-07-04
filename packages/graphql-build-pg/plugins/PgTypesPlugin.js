@@ -11,6 +11,19 @@ const {
   isInputType,
 } = require("graphql");
 const { types: pgTypes } = require("pg");
+const rawParseInterval = require("postgres-interval");
+const LRU = require("lru-cache");
+
+const parseCache = LRU(500);
+function parseInterval(str) {
+  let result = parseCache.get(str);
+  if (!str) {
+    result = rawParseInterval(str);
+    Object.freeze(result);
+    parseCache.set(str, result);
+  }
+  return result;
+}
 
 const pgRangeParser = {
   parse(str) {
@@ -114,6 +127,57 @@ module.exports = function PgTypesPlugin(
           enumVariants: null,
           rangeSubTypeId: null }
       */
+
+    const GQLInterval = new GraphQLObjectType({
+      name: "Interval",
+      fields: {
+        seconds: {
+          type: GraphQLFloat,
+        },
+        minutes: {
+          type: GraphQLInt,
+        },
+        hours: {
+          type: GraphQLInt,
+        },
+        days: {
+          type: GraphQLInt,
+        },
+        months: {
+          type: GraphQLInt,
+        },
+        years: {
+          type: GraphQLInt,
+        },
+      },
+    });
+    addType(GQLInterval);
+
+    const GQLIntervalInput = new GraphQLInputObjectType({
+      name: "IntervalInput",
+      fields: {
+        seconds: {
+          type: GraphQLFloat,
+        },
+        minutes: {
+          type: GraphQLInt,
+        },
+        hours: {
+          type: GraphQLInt,
+        },
+        days: {
+          type: GraphQLInt,
+        },
+        months: {
+          type: GraphQLInt,
+        },
+        years: {
+          type: GraphQLInt,
+        },
+      },
+    });
+    addType(GQLIntervalInput);
+
     const pgTypeById = introspectionResultsByKind.type.reduce((memo, type) => {
       memo[type.id] = type;
       return memo;
@@ -141,6 +205,7 @@ module.exports = function PgTypesPlugin(
         21: GraphQLInt,
         23: GraphQLInt,
         790: GraphQLFloat, // money
+        1186: GQLInterval, // interval
       },
       pgExtendedTypes && {
         114: GraphQLJSON,
@@ -154,6 +219,9 @@ module.exports = function PgTypesPlugin(
         // 1186 interval
       }
     );
+    const oidInputLookup = {
+      1186: GQLIntervalInput, // interval
+    };
     const identity = _ => _;
     const jsonStringify = o => JSON.stringify(o);
     if (pgExtendedTypes) {
@@ -168,6 +236,23 @@ module.exports = function PgTypesPlugin(
       };
     }
     pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
+
+    // interval
+    pg2GqlMapper[1186] = {
+      map: str => {
+        return parseInterval(str);
+      },
+      unmap: o => {
+        const keys = ["seconds", "minutes", "hours", "days", "months", "years"];
+        const parts = [];
+        for (const key of keys) {
+          if (o[key]) {
+            parts.push(`${o[key]} ${key}`);
+          }
+        }
+        return parts.join(" ") || "0 seconds";
+      },
+    };
 
     const parseMoney = str => {
       const numerical = str.replace(/[^0-9.,]/g, "");
@@ -190,6 +275,12 @@ module.exports = function PgTypesPlugin(
         const gqlType = oidLookup[type.id];
         if (gqlType) {
           gqlTypeByTypeId[type.id] = gqlType;
+        }
+      }
+      if (!gqlInputTypeByTypeId[type.id]) {
+        const gqlInputType = oidInputLookup[type.id];
+        if (gqlInputType) {
+          gqlInputTypeByTypeId[type.id] = gqlInputType;
         }
       }
       // Enums
