@@ -154,7 +154,7 @@ module.exports = function PgColumnsPlugin(
             );
             memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
               type: nullableIf(
-                isPgPatch || !attr.isNotNull,
+                isPgPatch || !attr.isNotNull || attr.hasDefault,
                 gqlInputTypeByTypeId[attr.typeId] || GraphQLString
               ),
             });
