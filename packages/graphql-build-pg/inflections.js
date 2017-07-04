@@ -82,10 +82,10 @@ exports.defaultInflection = {
     return camelcase(`create-${pluralize.singular(name)}`);
   },
   createInputType(name, _schema) {
-    return upperFirst(camelcase(`create-${name}-input`));
+    return upperFirst(camelcase(`create-${pluralize.singular(name)}-input`));
   },
   createPayloadType(name, _schema) {
-    return upperFirst(camelcase(`create-${name}-payload`));
+    return upperFirst(camelcase(`create-${pluralize.singular(name)}-payload`));
   },
 };
 
