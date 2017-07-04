@@ -4,6 +4,8 @@ const {
   GraphQLNonNull,
   GraphQLString,
 } = require("graphql");
+const queryFromResolveData = require("../queryFromResolveData");
+const debugSql = require("debug")("graphql-build-pg:sql");
 
 module.exports = function PgMutationCreatePlugin(
   builder,
@@ -17,7 +19,10 @@ module.exports = function PgMutationCreatePlugin(
         extend,
         getTypeByName,
         buildObjectWithHooks,
+        parseResolveInfo,
         pgIntrospectionResultsByKind,
+        pgSql: sql,
+        gql2pg,
       },
       { scope: { isRootMutation }, buildFieldWithHooks }
     ) => {
@@ -102,17 +107,72 @@ module.exports = function PgMutationCreatePlugin(
               table.name,
               table.namespace.name
             );
-            memo[fieldName] = buildFieldWithHooks(fieldName, {
-              type: PayloadType,
-              args: {
-                input: {
-                  type: new GraphQLNonNull(InputType),
+            memo[
+              fieldName
+            ] = buildFieldWithHooks(
+              fieldName,
+              ({ getDataFromParsedResolveInfoFragment }) => ({
+                type: PayloadType,
+                args: {
+                  input: {
+                    type: new GraphQLNonNull(InputType),
+                  },
                 },
-              },
-              resolve() {
-                throw new Error("Unimplemented");
-              },
-            });
+                async resolve(data, { input }, { pgClient }, resolveInfo) {
+                  const parsedResolveInfoFragment = parseResolveInfo(
+                    resolveInfo
+                  );
+                  const resolveData = getDataFromParsedResolveInfoFragment(
+                    parsedResolveInfoFragment,
+                    PayloadType
+                  );
+                  const insertedRowAlias = sql.identifier(Symbol());
+                  const query = queryFromResolveData(
+                    insertedRowAlias,
+                    insertedRowAlias,
+                    resolveData,
+                    {}
+                  );
+                  const sqlColumns = [];
+                  const sqlValues = [];
+                  const inputData =
+                    input[
+                      inflection.tableName(table.name, table.namespace.name)
+                    ];
+                  pgIntrospectionResultsByKind.attribute
+                    .filter(attr => attr.classId === table.id)
+                    .forEach(attr => {
+                      const fieldName = inflection.column(
+                        attr.name,
+                        table.name,
+                        table.namespace.name
+                      );
+                      const val = inputData[fieldName];
+                      if (val != null) {
+                        sqlColumns.push(sql.identifier(attr.name));
+                        sqlValues.push(gql2pg(val, attr.type));
+                      }
+                    });
+                  const queryWithInsert = sql.query`
+                    with ${insertedRowAlias} as (
+                      insert into ${sql.identifier(
+                        table.namespace.name,
+                        table.name
+                      )} (
+                        ${sql.join(sqlColumns, ", ")}
+                      )
+                      values(${sql.join(sqlValues, ", ")})
+                      returning *
+                    ) ${query}
+                    `;
+                  const { text, values } = sql.compile(queryWithInsert);
+                  if (debugSql.enabled)
+                    debugSql(require("sql-formatter").format(text));
+                  const { rows: [row] } = await pgClient.query(text, values);
+                  return row;
+                },
+              })
+            );
             return memo;
           }, {})
       );

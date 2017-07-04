@@ -250,7 +250,7 @@ module.exports = function PgTypesPlugin(
             parts.push(`${o[key]} ${key}`);
           }
         }
-        return parts.join(" ") || "0 seconds";
+        return sql.value(parts.join(" ") || "0 seconds");
       },
     };
 
