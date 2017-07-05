@@ -230,7 +230,24 @@ function flatten(array) {
   );
 }
 
-const escapeSqlIdentifier = str => `"${str.replace(/"/g, '""')}"`;
+// Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
+// Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
+const escapeSqlIdentifier = function(str) {
+  var escaped = '"';
+
+  for (var i = 0; i < str.length; i++) {
+    var c = str[i];
+    if (c === '"') {
+      escaped += c + c;
+    } else {
+      escaped += c;
+    }
+  }
+
+  escaped += '"';
+
+  return escaped;
+};
 
 exports.query = query;
 exports.fragment = query;
