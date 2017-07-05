@@ -1,0 +1,39 @@
+{
+  allPosts {
+    edges {
+      cursor
+      node {
+        ...PostDetails
+        author: personByAuthorId {
+          firstPost {
+            ...PostDetails
+          }
+          friends {
+            nodes {
+              ...PersonDetails
+            }
+            totalCount
+            pageInfo {
+              startCursor
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment PersonDetails on Person {
+  id
+  name
+  firstName
+}
+
+fragment PostDetails on Post {
+  id
+  headline
+  headlineTrimmed
+  author: personByAuthorId {
+    ...PersonDetails
+  }
+}

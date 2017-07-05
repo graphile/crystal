@@ -109,20 +109,20 @@ function fieldTreeFromAST(
             [fieldGqlType.name]: {},
           },
         };
-        if (val.selectionSet && options.deep) {
-          debug("%s[%d] Recursing into subfields", depth, instance);
-          fieldTreeFromAST(
-            val.selectionSet.selections,
-            resolveInfo,
-            tree[parentType.name][alias].fieldsByTypeName,
-            options,
-            fieldGqlType,
-            `${depth}  `
-          );
-        } else {
-          // No fields to add
-          debug("%s[%d] Exiting (no fields to add)", depth, instance);
-        }
+      }
+      if (val.selectionSet && options.deep) {
+        debug("%s[%d] Recursing into subfields", depth, instance);
+        fieldTreeFromAST(
+          val.selectionSet.selections,
+          resolveInfo,
+          tree[parentType.name][alias].fieldsByTypeName,
+          options,
+          fieldGqlType,
+          `${depth}  `
+        );
+      } else {
+        // No fields to add
+        debug("%s[%d] Exiting (no fields to add)", depth, instance);
       }
     } else if (kind === "FragmentSpread" && options.deep) {
       debug("%s[%d] Fragment spread '%s'", depth, instance, name);
