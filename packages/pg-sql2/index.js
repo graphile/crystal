@@ -15,6 +15,17 @@ const debugError = err => {
   return err;
 };
 
+const $$type = Symbol("type");
+function makeNode(type, obj) {
+  const newObj = Object.assign({}, obj);
+  Object.defineProperty(newObj, $$type, {
+    enumerable: false,
+    configurable: false,
+    value: type,
+  });
+  return newObj;
+}
+
 const ensureNonEmptyArray = (array, allowZeroLength = false) => {
   if (!Array.isArray(array)) {
     throw debugError(new Error("Expected array"));
@@ -48,7 +59,7 @@ function compile(sql) {
   const items = Array.isArray(sql) ? sql : [sql];
 
   for (const item of items) {
-    switch (item.type) {
+    switch (item[$$type]) {
       case "RAW":
         sqlFragments.push(item.text);
         break;
@@ -88,7 +99,7 @@ function compile(sql) {
         break;
       default:
         throw new Error(
-          `Unexpected Sql item type '${item["type"]}' (full item: '${item}').`
+          `Unexpected Sql item type '${item[$$type]}' (full item: '${item}').`
         );
     }
   }
@@ -111,7 +122,7 @@ function compile(sql) {
 const query = (strings, ...values) =>
   strings.reduce((items, text, i) => {
     if (!values[i]) {
-      return [...items, { type: "RAW", text }];
+      return [...items, makeNode("RAW", { text })];
     } else {
       const value = values[i];
       if (isDev) {
@@ -130,7 +141,7 @@ const query = (strings, ...values) =>
           }
         }
       }
-      return [...items, { type: "RAW", text }, ...flatten(value)];
+      return [...items, makeNode("RAW", { text }), ...flatten(value)];
     }
   }, []);
 
@@ -139,23 +150,23 @@ const query = (strings, ...values) =>
  * method is dangerous though because it involves no escaping, so proceed
  * with caution!
  */
-const raw = text => ({ type: "RAW", text });
+const raw = text => makeNode("RAW", { text });
 
 /**
  * Creates a Sql item for a Sql identifier. A Sql identifier is anything like
  * a table, schema, or column name. An identifier may also have a namespace,
  * thus why many names are accepted.
  */
-const identifier = (...names) => ({
-  type: "IDENTIFIER",
-  names: ensureNonEmptyArray(names),
-});
+const identifier = (...names) =>
+  makeNode("IDENTIFIER", {
+    names: ensureNonEmptyArray(names),
+  });
 
 /**
  * Creates a Sql item for a value that will be included in our final query.
  * This value will be added in a way which avoids Sql injection.
  */
-const value = val => ({ type: "VALUE", value: val });
+const value = val => makeNode("VALUE", { value: val });
 
 /**
  * If the value is simple will inline it into the query, otherwise will defer
@@ -179,7 +190,7 @@ const literal = val => {
   } else if (isNil(val)) {
     return raw(`NULL`);
   } else {
-    return { type: "VALUE", value: val };
+    return makeNode("VALUE", { value: val });
   }
 };
 
@@ -192,7 +203,11 @@ const join = (items, seperator = "") =>
     (currentItems, item, i) =>
       i === 0 || !seperator
         ? [...currentItems, ...flatten(item)]
-        : [...currentItems, { type: "RAW", text: seperator }, ...flatten(item)],
+        : [
+            ...currentItems,
+            makeNode("RAW", { text: seperator }),
+            ...flatten(item),
+          ],
     []
   );
 
