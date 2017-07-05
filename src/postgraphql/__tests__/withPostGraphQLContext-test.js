@@ -239,3 +239,48 @@ test('will set a role provided in the JWT superceding the default role', async (
     ],
   }], ['commit']])
 })
+
+test('will set a role provided in the JWT', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql', a: 1, b: 2, c: 3, some: {other: {path: 'test_deep_role' }}}, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    jwtRole: ['some', 'other', 'path'],
+  }, () => {})
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [{
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)',
+    values: [
+      'role', 'test_deep_role',
+      'jwt.claims.aud', 'postgraphql',
+      'jwt.claims.a', 1,
+      'jwt.claims.b', 2,
+      'jwt.claims.c', 3,
+      'jwt.claims.some', {'other': {'path': 'test_deep_role'}},
+    ],
+  }], ['commit']])
+})
+
+test('will set a role provided in the JWT superceding the default role', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql', a: 1, b: 2, c: 3, some: {other: {path: 'test_deep_role' }}}, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    jwtRole: ['some', 'other', 'path'],
+    pgDefaultRole: 'test_default_role',
+  }, () => {})
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [{
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)',
+    values: [
+      'role', 'test_deep_role',
+      'jwt.claims.aud', 'postgraphql',
+      'jwt.claims.a', 1,
+      'jwt.claims.b', 2,
+      'jwt.claims.c', 3,
+      'jwt.claims.some', {'other': {'path': 'test_deep_role'}},
+    ],
+  }], ['commit']])
+})

@@ -41,6 +41,7 @@ The usage of the `postgraphql` binary is as follows. To pull up this documentati
     --secret <string>                DEPRECATED: Use jwt-secret instead
     -e, --jwt-secret <string>        the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled
     -A, --jwt-audience <string>      a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`
+    --jwt-role <string>              a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.
     --export-schema-json [path]      enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.
     --export-schema-graphql [path]   enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.
     --show-error-stack [setting]     show JavaScript error stacks in the GraphQL result errors

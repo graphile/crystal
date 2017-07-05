@@ -36,7 +36,11 @@ export default function createPgProcedureMutationGqlFieldEntry (
   // `PgCollection` which has the same type. If it exists we add some extra
   // stuffs.
   const pgCollection = !pgProcedure.returnsSet
-    ? inventory.getCollections().find(collection => collection instanceof PgCollection && collection.pgClass.typeId === fixtures.return.pgType.id)
+    ? inventory.getCollections().find(collection => (
+      collection instanceof PgCollection &&
+      fixtures.return !== null &&
+      collection.pgClass.typeId === fixtures.return.pgType.id
+    ))
     : null
 
   // Create our GraphQL input fields users will use to input data into our
@@ -56,7 +60,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
     inputFields,
 
     outputFields: [
-      [formatName.field(pgProcedure.returnsSet
+      fixtures.return && [formatName.field(pgProcedure.returnsSet
         // If we are returning a set, we should pluralize the name just in
         // case.
         ? pluralize(getTypeFieldName(fixtures.return.type))
@@ -68,7 +72,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
             ? new GraphQLList(fixtures.return.gqlType)
             : fixtures.return.gqlType,
 
-          resolve: value => fixtures.return.intoGqlOutput(value),
+          resolve: value => fixtures.return!.intoGqlOutput(value),
       }],
 
       // An edge variant of the created value. Because we use cursor
@@ -115,7 +119,7 @@ export default function createPgProcedureMutationGqlFieldEntry (
       )
 
       const { rows } = await client.query(query)
-      const values = rows.map(({ value }) => fixtures.return.type.transformPgValueIntoValue(value))
+      const values = rows.map(({ value }) => fixtures.return !== null ? fixtures.return.type.transformPgValueIntoValue(value) : null)
 
       // If we selected a set of values, return the full set. Otherwise only
       // return the one we queried.

@@ -388,13 +388,14 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       if (debugGraphql.enabled)
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
-      const jwtToken = getJwtToken(req)
+      const jwtToken = options.jwtSecret ? getJwtToken(req) : null
 
       result = await withPostGraphQLContext({
         pgPool,
         jwtToken,
         jwtSecret: options.jwtSecret,
         jwtAudiences: options.jwtAudiences,
+        jwtRole: options.jwtRole,
         pgDefaultRole: options.pgDefaultRole,
         pgSettings,
       }, context => {
