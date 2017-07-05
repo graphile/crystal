@@ -175,11 +175,17 @@ module.exports = function makeNewBuild(builder) {
           // get type from field, get
         };
 
-        newSpec = builder.applyHooks(this, "GraphQLObjectType", newSpec, {
-          scope,
-          addDataGeneratorForField,
-          recurseDataGeneratorsForField,
-        });
+        newSpec = builder.applyHooks(
+          this,
+          "GraphQLObjectType",
+          newSpec,
+          {
+            scope,
+            addDataGeneratorForField,
+            recurseDataGeneratorsForField,
+          },
+          `|${newSpec.name}`
+        );
 
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
@@ -197,7 +203,8 @@ module.exports = function makeNewBuild(builder) {
               this,
               "GraphQLObjectType:interfaces",
               rawInterfaces,
-              interfacesContext
+              interfacesContext,
+              `|${Self.name}`
             );
           },
           fields: () => {
@@ -283,7 +290,13 @@ module.exports = function makeNewBuild(builder) {
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
                 }
-                newSpec = builder.applyHooks(this, "field", newSpec, context);
+                newSpec = builder.applyHooks(
+                  this,
+                  "field",
+                  newSpec,
+                  context,
+                  `|${Self.name}`
+                );
                 newSpec.args = newSpec.args || {};
                 newSpec = Object.assign({}, newSpec, {
                   args: builder.applyHooks(
@@ -293,7 +306,8 @@ module.exports = function makeNewBuild(builder) {
                     Object.assign({}, context, {
                       field: newSpec,
                       returnType: newSpec.type,
-                    })
+                    }),
+                    `|${Self.name}`
                   ),
                 });
                 const finalSpec = newSpec;
@@ -308,14 +322,21 @@ module.exports = function makeNewBuild(builder) {
               this,
               "GraphQLObjectType:fields",
               rawFields,
-              fieldsContext
+              fieldsContext,
+              `|${rawSpec.name}`
             );
           },
         });
       } else if (Type === GraphQLInputObjectType) {
-        newSpec = builder.applyHooks(this, "GraphQLInputObjectType", newSpec, {
-          scope,
-        });
+        newSpec = builder.applyHooks(
+          this,
+          "GraphQLInputObjectType",
+          newSpec,
+          {
+            scope,
+          },
+          `|${newSpec.name}`
+        );
         newSpec.fields = newSpec.fields || {};
 
         const rawSpec = newSpec;
@@ -342,7 +363,8 @@ module.exports = function makeNewBuild(builder) {
                   this,
                   "inputField",
                   newSpec,
-                  context
+                  context,
+                  `|${Self.name}`
                 );
                 const finalSpec = newSpec;
                 return finalSpec;
@@ -356,14 +378,21 @@ module.exports = function makeNewBuild(builder) {
               this,
               "GraphQLInputObjectType:fields",
               rawFields,
-              fieldsContext
+              fieldsContext,
+              `|${Self.name}`
             );
           },
         });
       } else if (Type === GraphQLEnumType) {
-        newSpec = builder.applyHooks(this, "GraphQLEnumType", newSpec, {
-          scope,
-        });
+        newSpec = builder.applyHooks(
+          this,
+          "GraphQLEnumType",
+          newSpec,
+          {
+            scope,
+          },
+          `|${newSpec.name}`
+        );
 
         newSpec.values = builder.applyHooks(
           this,
@@ -371,7 +400,8 @@ module.exports = function makeNewBuild(builder) {
           newSpec.values,
           {
             scope,
-          }
+          },
+          `|${newSpec.name}`
         );
       }
       const finalSpec = newSpec;

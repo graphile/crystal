@@ -84,10 +84,10 @@ class SchemaBuilder {
     this.hooks[hookName].push(fn);
   }
 
-  applyHooks(build, hookName, oldObj, context) {
+  applyHooks(build, hookName, oldObj, context, debugStr = "") {
     this.depth++;
     try {
-      debug(`${INDENT.repeat(this.depth)}[${hookName}]: Running...`);
+      debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
 
       const hooks = this.hooks[hookName];
       if (!hooks) {
@@ -102,7 +102,7 @@ class SchemaBuilder {
           debug(
             `${INDENT.repeat(
               this.depth
-            )}[${hookName}]:   Executing '${hookDisplayName}'`
+            )}[${hookName}${debugStr}]:   Executing '${hookDisplayName}'`
           );
           newObj = hook(newObj, build, context);
           if (!newObj) {
@@ -115,14 +115,14 @@ class SchemaBuilder {
           debug(
             `${INDENT.repeat(
               this.depth
-            )}[${hookName}]:   '${hookDisplayName}' complete`
+            )}[${hookName}${debugStr}]:   '${hookDisplayName}' complete`
           );
         } finally {
           this.depth--;
         }
       }
 
-      debug(`${INDENT.repeat(this.depth)}[${hookName}]: Complete`);
+      debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Complete`);
 
       return newObj;
     } finally {
