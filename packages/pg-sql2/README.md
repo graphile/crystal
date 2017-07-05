@@ -57,7 +57,7 @@ console.log(values); // [ 22 ]
 API
 ---
 
-### `sql.query\`...\``
+### ``sql.query`...` ``
 
 Builds part of (or the whole of) an SQL query, safely interpretting the embedded expressions. If a non `sql.*` expression is passed in, e.g.:
 
@@ -151,5 +151,7 @@ and offering the following enhancements:
   then debugging your SQL becomes a lot easier because fewer placeholders are
   used.
 
+
+---
 
 \* Development mode is when `process.env.NODE_ENV` is either `development` or `test`
