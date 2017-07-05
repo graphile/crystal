@@ -122,7 +122,7 @@ function compile(sql) {
 const query = (strings, ...values) =>
   strings.reduce((items, text, i) => {
     if (!values[i]) {
-      return [...items, makeNode("RAW", { text })];
+      return items.concat(makeNode("RAW", { text }));
     } else {
       const value = values[i];
       if (isDev) {
@@ -141,7 +141,7 @@ const query = (strings, ...values) =>
           }
         }
       }
-      return [...items, makeNode("RAW", { text }), ...flatten(value)];
+      return items.concat(makeNode("RAW", { text }), value);
     }
   }, []);
 
@@ -199,36 +199,13 @@ const literal = val => {
  * with lists of Sql items that doesn’t make sense as a Sql query.
  */
 const join = (items, seperator = "") =>
-  ensureNonEmptyArray(items, true).reduce(
-    (currentItems, item, i) =>
-      i === 0 || !seperator
-        ? [...currentItems, ...flatten(item)]
-        : [
-            ...currentItems,
-            makeNode("RAW", { text: seperator }),
-            ...flatten(item),
-          ],
-    []
-  );
-
-/**
- * Flattens a deeply nested array.
- *
- * @private
- */
-function flatten(array) {
-  if (!Array.isArray(array)) return [array];
-
-  // Type cheats ahead! Making TypeScript compile here is more important then
-  // making the code statically correct.
-  return array.reduce(
-    (currentArray, item) =>
-      Array.isArray(item)
-        ? [...currentArray, ...flatten(item)]
-        : [...currentArray, item],
-    []
-  );
-}
+  ensureNonEmptyArray(items, true).reduce((currentItems, item, i) => {
+    if (i === 0 || !seperator) {
+      return currentItems.concat(item);
+    } else {
+      return currentItems.concat(makeNode("RAW", { text: seperator }), item);
+    }
+  }, []);
 
 // Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
