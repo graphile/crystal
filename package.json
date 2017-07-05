@@ -1,6 +1,8 @@
 {
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "babel-eslint": "^7.2.3",
+    "babel-preset-env": "^1.6.0",
     "eslint": "^4.0.0",
     "eslint-config-prettier": "^2.1.1",
     "eslint-plugin-jest": "^20.0.3",
