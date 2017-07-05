@@ -1,6 +1,6 @@
 {
   "name": "postgraphql-build",
-  "version": "0.0.1-alpha1.0",
+  "version": "0.0.1-alpha2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "url": "https://github.com/benjie/graphql-build/issues"
   },
   "dependencies": {
-    "graphql-build": "^0.0.1-alpha1.0",
+    "graphql-build": "^0.0.1-alpha2.0",
     "graphql-build-pg": "^0.0.1-alpha1.0"
   },
   "devDependencies": {
