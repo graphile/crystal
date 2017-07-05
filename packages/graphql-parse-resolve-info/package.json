@@ -26,5 +26,11 @@
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "peerDependencies": {
     "graphql": ">=0.10 <1"
+  },
+  "devDependencies": {
+    "jest": "20.0.4"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
   }
 }

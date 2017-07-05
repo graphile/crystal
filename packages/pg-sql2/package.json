@@ -35,5 +35,11 @@
   },
   "devDependencies": {
     "markdown-doctest": "^0.9.1"
+  },
+  "devDependencies": {
+    "jest": "20.0.4"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
   }
 }
