@@ -1,16 +1,23 @@
 const { resolve: resolvePath } = require("path");
 const { readdirSync, readFile: rawReadFile } = require("fs");
-const { promisify } = require("util");
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
 const createPostGraphQLSchema = require("../..");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphql-build:schema");
 
+function readFile(filename, encoding) {
+  return new Promise((resolve, reject) => {
+    rawReadFile(filename, encoding, (err, res) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+}
+
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-const readFile = promisify(rawReadFile);
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
@@ -44,12 +51,10 @@ beforeAll(() => {
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async pgClient => {
       // Read the mutation from the file system.
-      const mutation = await new Promise((resolve, reject) => {
-        readFile(resolvePath(mutationsDir, fileName), "utf8", (error, data) => {
-          if (error) reject(error);
-          else resolve(data);
-        });
-      });
+      const mutation = await readFile(
+        resolvePath(mutationsDir, fileName),
+        "utf8"
+      );
 
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());

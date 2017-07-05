@@ -1,5 +1,4 @@
 const pg = require("pg");
-const { promisify } = require("util");
 const debug = require("debug")("graphql-build-pg");
 
 const withPgClient = async (pgConfig = process.env.DATABASE_URL, fn) => {
@@ -25,8 +24,13 @@ const withPgClient = async (pgConfig = process.env.DATABASE_URL, fn) => {
       pgClient.on("error", e => {
         debug("pgClient error occurred: %s", e);
       });
-      releasePgClient = () => promisify(pgClient.end.bind(pgClient))();
-      await promisify(pgClient.connect.bind(pgClient))();
+      releasePgClient = () =>
+        new Promise((resolve, reject) =>
+          pgClient.end(err => (err ? reject(err) : resolve()))
+        );
+      await new Promise((resolve, reject) =>
+        pgClient.connect(err => (err ? reject(err) : resolve()))
+      );
     } else {
       throw new Error("You must provide a valid PG client configuration");
     }

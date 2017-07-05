@@ -2,12 +2,18 @@ const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
 const createPostGraphQLSchema = require("../..");
 const { readdirSync, readFile: rawReadFile } = require("fs");
-const { promisify } = require("util");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphql-build:schema");
 
-const readFile = promisify(rawReadFile);
+function readFile(filename, encoding) {
+  return new Promise((resolve, reject) => {
+    rawReadFile(filename, encoding, (err, res) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+}
 
 const queriesDir = `${__dirname}/../fixtures/queries`;
 const queryFileNames = readdirSync(queriesDir);
@@ -51,16 +57,10 @@ beforeAll(() => {
       return await Promise.all(
         queryFileNames.map(async fileName => {
           // Read the query from the file system.
-          const query = await new Promise((resolve, reject) => {
-            readFile(
-              resolvePath(queriesDir, fileName),
-              "utf8",
-              (error, data) => {
-                if (error) reject(error);
-                else resolve(data);
-              }
-            );
-          });
+          const query = await readFile(
+            resolvePath(queriesDir, fileName),
+            "utf8"
+          );
           // Get the appropriate GraphQL schema for this fixture. We want to test
           // some specific fixtures against a schema configured slightly
           // differently.

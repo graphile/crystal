@@ -1,7 +1,15 @@
 const pg = require("pg");
-const promisify = require("util").promisify;
-const readFile = promisify(require("fs").readFile);
+const { readFile } = require("fs");
 const pgConnectionString = require("pg-connection-string");
+
+function readFilePromise(filename, encoding) {
+  return new Promise((resolve, reject) => {
+    readFile(filename, encoding, (err, res) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+}
 
 const withPgClient = async (url, fn) => {
   if (!fn) {
@@ -44,7 +52,7 @@ let prepopulatedDBKeepalive;
 
 const populateDatabase = async client => {
   await client.query(
-    await readFile(`${__dirname}/kitchen-sink-data.sql`, "utf8")
+    await readFilePromise(`${__dirname}/kitchen-sink-data.sql`, "utf8")
   );
   return {};
 };

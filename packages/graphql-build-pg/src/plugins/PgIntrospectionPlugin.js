@@ -1,7 +1,15 @@
 const withPgClient = require("../withPgClient");
-const promisify = require("util").promisify;
-const readFile = promisify(require("fs").readFile);
+const { readFile: rawReadFile } = require("fs");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
+
+function readFile(filename, encoding) {
+  return new Promise((resolve, reject) => {
+    rawReadFile(filename, encoding, (err, res) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+}
 
 module.exports = async function PgIntrospectionPlugin(
   builder,
