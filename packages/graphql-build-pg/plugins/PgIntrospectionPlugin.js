@@ -58,13 +58,18 @@ module.exports = async function PgIntrospectionPlugin(
       "num"
     );
 
-    const relate = (array, newAttr, lookupAttr, lookup) => {
+    const relate = (array, newAttr, lookupAttr, lookup, missingOk = false) => {
       array.forEach(entry => {
         const key = entry[lookupAttr];
         const result = lookup[key];
         if (key && !result) {
+          if (missingOk) {
+            return;
+          }
           throw new Error(
-            `Could not look up '${newAttr}' by '${lookupAttr}' on '${entry}'`
+            `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
+              entry
+            )}'`
           );
         }
         entry[newAttr] = result;
@@ -110,7 +115,8 @@ module.exports = async function PgIntrospectionPlugin(
       introspectionResultsByKind.type,
       "class",
       "classId",
-      introspectionResultsByKind.classById
+      introspectionResultsByKind.classById,
+      true
     );
 
     builder.hook("build", build => {
