@@ -68,25 +68,7 @@ module.exports = function makeNewBuild(builder) {
 
   return {
     parseResolveInfo,
-    simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, Type) {
-      if (!Type) {
-        throw new Error("No type!!");
-      }
-      const { fieldsByTypeName } = parsedResolveInfoFragment;
-      const fields = {};
-      const StrippedType = getNamedType(Type);
-      Object.assign(fields, fieldsByTypeName[StrippedType.name]);
-      if (StrippedType.getInterfaces) {
-        // GraphQL ensures that the subfields cannot clash, so it's safe to simply overwrite them
-        for (const Interface of StrippedType.getInterfaces()) {
-          Object.assign(fields, fieldsByTypeName[Interface.name]);
-        }
-      }
-      return Object.assign({}, parsedResolveInfoFragment, {
-        fields,
-      });
-    },
-
+    simplifyParsedResolveInfoFragmentWithType: parseResolveInfo.simplify,
     generateDataForType(Type, parsedResolveInfoFragment) {
       const StrippedType = getNamedType(Type);
       if (!StrippedType) {

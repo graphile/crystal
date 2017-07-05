@@ -200,6 +200,27 @@ function getType(resolveInfo, typeCondition) {
   }
 }
 
+function simplifyParsedResolveInfoFragmentWithType(
+  parsedResolveInfoFragment,
+  Type
+) {
+  const { fieldsByTypeName } = parsedResolveInfoFragment;
+  const fields = {};
+  const StrippedType = getNamedType(Type);
+  Object.assign(fields, fieldsByTypeName[StrippedType.name]);
+  if (StrippedType.getInterfaces) {
+    // GraphQL ensures that the subfields cannot clash, so it's safe to simply overwrite them
+    for (const Interface of StrippedType.getInterfaces()) {
+      Object.assign(fields, fieldsByTypeName[Interface.name]);
+    }
+  }
+  return Object.assign({}, parsedResolveInfoFragment, {
+    fields,
+  });
+}
+
 parseFields.getAlias = getAlias;
 
 module.exports = parseFields;
+module.exports.simplifyParsedResolveInfoFragmentWithType = simplifyParsedResolveInfoFragmentWithType;
+module.exports.simplify = simplifyParsedResolveInfoFragmentWithType;
