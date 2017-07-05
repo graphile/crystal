@@ -70,7 +70,7 @@ module.exports = function PgTablesPlugin(
         const TableType = buildObjectWithHooks(
           GraphQLObjectType,
           {
-            name: inflection.tableType(table.name, schema.name),
+            name: inflection.tableType(table.name, schema && schema.name),
             interfaces: () => {
               if (nodeIdFieldName && table.isSelectable) {
                 return [getTypeByName("Node")];

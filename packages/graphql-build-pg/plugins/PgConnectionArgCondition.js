@@ -19,7 +19,10 @@ module.exports = function PgConnectionArgCondition(
           GraphQLInputObjectType,
           {
             name: inflection.conditionType(
-              inflection.tableType(table.name, table.namespace.name)
+              inflection.tableType(
+                table.name,
+                table.namespace && table.namespace.name
+              )
             ),
             fields: ({ buildFieldWithHooks }) =>
               introspectionResultsByKind.attribute
@@ -28,7 +31,7 @@ module.exports = function PgConnectionArgCondition(
                   const fieldName = inflection.column(
                     attr.name,
                     table.name,
-                    table.namespace.name
+                    table.namespace && table.namespace.name
                   );
                   memo[fieldName] = buildFieldWithHooks(
                     fieldName,
@@ -72,7 +75,10 @@ module.exports = function PgConnectionArgCondition(
       }
       const TableConditionType = getTypeByName(
         inflection.conditionType(
-          inflection.tableType(table.name, table.namespace.name)
+          inflection.tableType(
+            table.name,
+            table.namespace && table.namespace.name
+          )
         )
       );
 

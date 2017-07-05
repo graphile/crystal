@@ -80,7 +80,8 @@ module.exports = async function PgIntrospectionPlugin(
       introspectionResultsByKind.class,
       "namespace",
       "namespaceId",
-      introspectionResultsByKind.namespaceById
+      introspectionResultsByKind.namespaceById,
+      true // Because it could be a type defined in a different namespace - which is fine so long as we don't allow querying it directly
     );
 
     relate(

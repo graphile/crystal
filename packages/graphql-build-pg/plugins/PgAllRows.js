@@ -26,6 +26,7 @@ module.exports = async function PgAllRows(
         fields,
         introspectionResultsByKind.class
           .filter(table => table.isSelectable)
+          .filter(table => table.namespace)
           .reduce((memo, table) => {
             const TableType = getTypeByName(
               inflection.tableType(table.name, table.namespace.name)

@@ -23,80 +23,85 @@ module.exports = function PgTablesPlugin(
       }
     ) => {
       const Cursor = getTypeByName("Cursor");
-      introspectionResultsByKind.procedure.forEach(proc => {
-        const returnType =
-          introspectionResultsByKind.typeById[proc.returnTypeId];
-        const returnTypeTable =
-          introspectionResultsByKind.classById[returnType.classId];
-        if (returnTypeTable) {
-          // Just use the standard table connection from PgTablesPlugin
-          return;
-        }
-        const NodeType = gqlTypeByTypeId[returnType.id] || GraphQLString;
-        const EdgeType = buildObjectWithHooks(
-          GraphQLObjectType,
-          {
-            name: inflection.scalarFunctionEdge(proc.name, proc.namespace.name),
-            fields: () => {
-              return {
-                cursor: {
-                  type: Cursor,
-                  resolve(data) {
-                    return base64(JSON.stringify(data.__cursor));
-                  },
-                },
-                node: {
-                  type: NodeType,
-                  resolve(data) {
-                    return data.value;
-                  },
-                },
-              };
-            },
-          },
-          {
-            isEdgeType: true,
-            nodeType: NodeType,
-            pgIntrospection: proc,
+      introspectionResultsByKind.procedure
+        .filter(proc => proc.returnsSet)
+        .forEach(proc => {
+          const returnType =
+            introspectionResultsByKind.typeById[proc.returnTypeId];
+          const returnTypeTable =
+            introspectionResultsByKind.classById[returnType.classId];
+          if (returnTypeTable) {
+            // Just use the standard table connection from PgTablesPlugin
+            return;
           }
-        );
-        /*const ConnectionType = */
-        buildObjectWithHooks(
-          GraphQLObjectType,
-          {
-            name: inflection.scalarFunctionConnection(
-              proc.name,
-              proc.namespace.name
-            ),
-            fields: ({ recurseDataGeneratorsForField }) => {
-              recurseDataGeneratorsForField("edges");
-              recurseDataGeneratorsForField("nodes");
-              return {
-                nodes: {
-                  type: new GraphQLNonNull(new GraphQLList(NodeType)),
-                  resolve(data) {
-                    return data.data.map(entry => entry.value);
+          const NodeType = gqlTypeByTypeId[returnType.id] || GraphQLString;
+          const EdgeType = buildObjectWithHooks(
+            GraphQLObjectType,
+            {
+              name: inflection.scalarFunctionEdge(
+                proc.name,
+                proc.namespace.name
+              ),
+              fields: () => {
+                return {
+                  cursor: {
+                    type: Cursor,
+                    resolve(data) {
+                      return base64(JSON.stringify(data.__cursor));
+                    },
                   },
-                },
-                edges: {
-                  type: new GraphQLNonNull(
-                    new GraphQLList(new GraphQLNonNull(EdgeType))
-                  ),
-                  resolve(data) {
-                    return data.data;
+                  node: {
+                    type: NodeType,
+                    resolve(data) {
+                      return data.value;
+                    },
                   },
-                },
-              };
+                };
+              },
             },
-          },
-          {
-            isConnectionType: true,
-            edgeType: EdgeType,
-            nodeType: NodeType,
-            pgIntrospection: proc,
-          }
-        );
-      });
+            {
+              isEdgeType: true,
+              nodeType: NodeType,
+              pgIntrospection: proc,
+            }
+          );
+          /*const ConnectionType = */
+          buildObjectWithHooks(
+            GraphQLObjectType,
+            {
+              name: inflection.scalarFunctionConnection(
+                proc.name,
+                proc.namespace.name
+              ),
+              fields: ({ recurseDataGeneratorsForField }) => {
+                recurseDataGeneratorsForField("edges");
+                recurseDataGeneratorsForField("nodes");
+                return {
+                  nodes: {
+                    type: new GraphQLNonNull(new GraphQLList(NodeType)),
+                    resolve(data) {
+                      return data.data.map(entry => entry.value);
+                    },
+                  },
+                  edges: {
+                    type: new GraphQLNonNull(
+                      new GraphQLList(new GraphQLNonNull(EdgeType))
+                    ),
+                    resolve(data) {
+                      return data.data;
+                    },
+                  },
+                };
+              },
+            },
+            {
+              isConnectionType: true,
+              edgeType: EdgeType,
+              nodeType: NodeType,
+              pgIntrospection: proc,
+            }
+          );
+        });
       return _;
     }
   );

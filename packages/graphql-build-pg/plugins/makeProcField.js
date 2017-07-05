@@ -100,7 +100,10 @@ module.exports = function makeProcField(
   let returnFirstValueAsValue = false;
   if (returnTypeTable) {
     const TableType = getTypeByName(
-      inflection.tableType(returnTypeTable.name, returnTypeTable.namespace.name)
+      inflection.tableType(
+        returnTypeTable.name,
+        returnTypeTable.namespace && returnTypeTable.namespace.name
+      )
     );
     if (proc.returnsSet) {
       if (isMutation) {

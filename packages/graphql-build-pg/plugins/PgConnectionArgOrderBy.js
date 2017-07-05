@@ -20,7 +20,10 @@ module.exports = function PgConnectionArgOrderBy(
           GraphQLEnumType,
           {
             name: inflection.orderByType(
-              inflection.tableType(table.name, table.namespace.name)
+              inflection.tableType(
+                table.name,
+                table.namespace && table.namespace.name
+              )
             ),
             values: {
               NATURAL: {
@@ -55,7 +58,10 @@ module.exports = function PgConnectionArgOrderBy(
       }
       const TableOrderByType = getTypeByName(
         inflection.orderByType(
-          inflection.tableType(table.name, table.namespace.name)
+          inflection.tableType(
+            table.name,
+            table.namespace && table.namespace.name
+          )
         )
       );
 

@@ -21,13 +21,13 @@ module.exports = function PgOrderAllColumnsPlugin(
               attr.name,
               true,
               table.name,
-              table.namespace.name
+              table.namespace && table.namespace.name
             );
             const descFieldName = inflection.orderByEnum(
               attr.name,
               false,
               table.name,
-              table.namespace.name
+              table.namespace && table.namespace.name
             );
             memo[ascFieldName] = {
               value: {

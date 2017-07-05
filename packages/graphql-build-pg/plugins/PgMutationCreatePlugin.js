@@ -33,6 +33,7 @@ module.exports = function PgMutationCreatePlugin(
       return extend(
         fields,
         pgIntrospectionResultsByKind.class
+          .filter(table => !!table.namespace)
           .filter(table => table.isSelectable)
           .filter(table => table.isInsertable)
           .reduce((memo, table) => {

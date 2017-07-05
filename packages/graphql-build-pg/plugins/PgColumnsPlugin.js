@@ -52,7 +52,7 @@ module.exports = function PgColumnsPlugin(
             const fieldName = inflection.column(
               attr.name,
               table.name,
-              table.namespace.name
+              table.namespace && table.namespace.name
             );
             memo[
               fieldName
