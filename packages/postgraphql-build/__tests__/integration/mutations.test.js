@@ -18,9 +18,9 @@ const mutationsDir = `${__dirname}/../fixtures/mutations`;
 //const mutationFileNames = readdirSync(mutationsDir);
 const mutationFileNames = [
   "mutation-create.graphql",
-  //"mutation-delete.graphql",
-  //"mutation-update.graphql",
-  //"procedure-mutation.graphql",
+  "mutation-update.graphql",
+  "mutation-delete.graphql",
+  "procedure-mutation.graphql",
 ];
 let mutationResults = [];
 

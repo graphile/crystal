@@ -98,7 +98,7 @@ module.exports = function PgMutationCreatePlugin(
                     [tableName]: {
                       type: Table,
                       resolve(data) {
-                        return data;
+                        return data.data;
                       },
                     },
                   };
@@ -177,9 +177,10 @@ module.exports = function PgMutationCreatePlugin(
                   if (debugSql.enabled)
                     debugSql(require("sql-formatter").format(text));
                   const { rows: [row] } = await pgClient.query(text, values);
-                  return Object.assign({}, row, {
+                  return {
                     __clientMutationId: input.clientMutationId,
-                  });
+                    data: row,
+                  };
                 },
               })
             );

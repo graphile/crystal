@@ -267,7 +267,6 @@ module.exports = function makeProcField(
                   [resultFieldName]: {
                     type: type,
                     resolve(data) {
-                      console.log(data.data);
                       return data.data;
                     },
                   },
@@ -360,7 +359,6 @@ module.exports = function makeProcField(
                   }
                 }
               })();
-              console.log(result);
               if (isMutation) {
                 return {
                   __clientMutationId: args.input.clientMutationId,

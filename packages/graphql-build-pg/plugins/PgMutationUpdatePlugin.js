@@ -84,7 +84,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                           [tableName]: {
                             type: Table,
                             resolve(data) {
-                              return data;
+                              return data.data;
                             },
                           },
                         },
@@ -93,10 +93,10 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                             type: GraphQLID,
                             resolve(data) {
                               return (
-                                data.__identifiers &&
+                                data.data.__identifiers &&
                                 getNodeIdForTypeAndIdentifiers(
                                   Table,
-                                  ...data.__identifiers
+                                  ...data.data.__identifiers
                                 )
                               );
                             },
@@ -203,9 +203,10 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                       )}' because no values were found.`
                     );
                   }
-                  return Object.assign({}, row, {
+                  return {
                     __clientMutationId: input.clientMutationId,
-                  });
+                    data: row,
+                  };
                 }
 
                 // NodeId
