@@ -179,7 +179,7 @@ const literal = val => {
     if (Number.isInteger(val)) {
       return raw(String(val));
     } else {
-      return raw(`'${val}'::float`);
+      return raw(`'${0 + val}'::float`);
     }
   } else if (isBoolean(val)) {
     if (val) {
