@@ -32,7 +32,6 @@
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "dependencies": {
-    "debug": "^2.6.8",
     "graphql-iso-date": "^3.2.0",
     "graphql-type-json": "^0.1.4",
     "lru-cache": "4.1.1",
@@ -41,6 +40,7 @@
     "pluralize": "^5.0.0"
   },
   "peerDependencies": {
+    "debug": ">=2 <3",
     "pg": ">=6 <7"
   },
   "jest": {

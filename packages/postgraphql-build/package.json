@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "graphql-build": "0.0.0",
-    "graphql-build-pg": "0.0.0",
+    "graphql-build-pg": "0.0.0"
+  },
+  "devDependencies": {
     "jest": "20.0.4"
   },
   "jest": {

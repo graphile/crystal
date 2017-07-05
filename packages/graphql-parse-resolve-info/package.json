@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "peerDependencies": {
-    "graphql": ">=0.10"
+    "graphql": ">=0.10 <1"
   }
 }
