@@ -71,7 +71,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
                 },
               },
               resolve(data) {
-                return data;
+                return data.data;
               },
             };
           }

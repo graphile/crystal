@@ -137,7 +137,8 @@ module.exports = function PgForwardRelationPlugin(
                   !keys.every(key => key.isNotNull),
                   gqlForeignTableType
                 ),
-                resolve: (data, _args, _context, resolveInfo) => {
+                resolve: (rawData, _args, _context, resolveInfo) => {
+                  const data = isMutationPayload ? rawData.data : rawData;
                   const alias = parseResolveInfo(resolveInfo, {
                     aliasOnly: true,
                   });
