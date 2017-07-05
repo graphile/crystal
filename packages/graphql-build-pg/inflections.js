@@ -9,7 +9,7 @@ exports.defaultInflection = {
     return camelcase(name || `arg${index}`);
   },
   orderByType(typeName) {
-    return upperFirst(camelcase(`${typeName}-order-by`));
+    return upperFirst(camelcase(`${pluralize(typeName)}-order-by`));
   },
   orderByEnum(name, ascending, _table, _schema) {
     return snakeCase(`${name}_${ascending ? "ASC" : "DESC"}`).toUpperCase();
