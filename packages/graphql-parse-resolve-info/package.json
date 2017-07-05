@@ -4,7 +4,8 @@
   "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
   "main": "index.js",
   "scripts": {
-    "test": "jest ."
+    "test": "jest .",
+    "prepublish": "babel --out-dir lib src"
   },
   "repository": {
     "type": "git",

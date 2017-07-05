@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "scripts/test"
+    "test": "scripts/test",
+    "prepublish": "babel --out-dir lib src"
   },
   "repository": {
     "type": "git",

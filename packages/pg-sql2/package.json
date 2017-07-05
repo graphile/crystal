@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest .",
-    "test:docs": "markdown-doctest"
+    "test:docs": "markdown-doctest",
+    "prepublish": "babel --out-dir lib src"
   },
   "repository": {
     "type": "git",
