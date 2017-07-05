@@ -6,8 +6,15 @@
   "scripts": {
     "test": "scripts/test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjie/graphql-build.git"
+  },
   "author": "Benjie Gillam <benjie@jemjie.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/benjie/graphql-build/issues"
+  },
   "dependencies": {
     "graphql-build": "0.0.0",
     "graphql-build-pg": "0.0.0",
