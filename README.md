@@ -30,7 +30,7 @@ Status
 
 graphql-build - complete (but needs tests, documentation, refactoring)
 
-graphql-build-pg - read-only plugins are functional, mutations not yet supported, no descriptions are added to fields yet
+graphql-build-pg - passes the PostGraphQL integration tests for queries and mutations, no descriptions are added to fields yet
 
 postgraphql-build - see graphql-build-pg
 
