@@ -659,7 +659,7 @@ Object {
       ],
     },
     "jsonIdentityMutation": Object {
-      "json": "{"a":1,"b":2,"c":3}",
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     },
     "mult1": Object {
       "integer": 0,
