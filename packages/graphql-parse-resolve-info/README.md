@@ -68,3 +68,8 @@ new GraphQLObjectType({
   }
 });
 ```
+
+Thanks
+------
+
+This project was originally based on https://github.com/tjmehta/graphql-parse-fields, but has evolved a lot since then.
