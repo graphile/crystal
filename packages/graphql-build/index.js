@@ -1,30 +1,10 @@
-const SchemaBuilder = require("./SchemaBuilder");
-const localPlugins = require("./plugins");
+// This script detects if you're running on Node v8 or above; if so it runs the
+// code directly, otherwise it falls back to the babel-compiled version
 
-const getBuilder = async (plugins, options) => {
-  const builder = new SchemaBuilder();
-  for (const plugin of plugins) {
-    builder._setPluginName(plugin.displayName || plugin.name);
-    await plugin(builder, options);
-    builder._setPluginName(null);
-  }
-  return builder;
-};
-
-const buildSchema = async (plugins, options = {}) => {
-  const builder = await getBuilder(plugins, options);
-  const build = builder.createBuild();
-  return build.buildRoot();
-};
-
-const defaultPlugins = [
-  localPlugins.StandardTypesPlugin,
-  localPlugins.NodePlugin,
-  localPlugins.QueryPlugin,
-  localPlugins.MutationPlugin,
-  localPlugins.MutationPayloadQueryPlugin,
-];
-
-Object.assign(exports, localPlugins);
-exports.buildSchema = buildSchema;
-exports.defaultPlugins = defaultPlugins;
+if (process.versions.node.match(/^([89]|[1-9][0-9]+)\./)) {
+  // Modern node, run verbatim
+  module.exports = require("./src");
+} else {
+  // Older node, run compiled code
+  module.exports = require("./lib");
+}

@@ -1,30 +1,10 @@
-exports.defaultPlugins = [
-  require("./plugins/PgBasicsPlugin"),
-  require("./plugins/PgIntrospectionPlugin"),
-  require("./plugins/PgTypesPlugin"),
-  require("./plugins/PgTablesPlugin"),
-  require("./plugins/PgConnectionArgFirstLastBeforeAfter"),
-  require("./plugins/PgConnectionArgOrderBy"),
-  require("./plugins/PgConnectionArgCondition"),
-  require("./plugins/PgAllRows"),
-  require("./plugins/PgColumnsPlugin"),
-  require("./plugins/PgForwardRelationPlugin"),
-  require("./plugins/PgBackwardRelationPlugin"),
-  require("./plugins/PgRowByUniqueConstraint"),
-  require("./plugins/PgComputedColumnsPlugin"),
-  require("./plugins/PgQueryProceduresPlugin"),
-  require("./plugins/PgOrderAllColumnsPlugin"),
-  require("./plugins/PgOrderByPrimaryKeyPlugin"),
-  require("./plugins/PgRowNode"),
-  require("./plugins/PgNodeAliasPostGraphQL"),
-  require("./plugins/PgScalarFunctionConnectionPlugin"), // For PostGraphQL compatibility
-  require("./plugins/PageInfoStartEndCursor"), // For PostGraphQL compatibility
-  require("./plugins/PgConnectionTotalCount"),
+// This script detects if you're running on Node v8 or above; if so it runs the
+// code directly, otherwise it falls back to the babel-compiled version
 
-  // Mutations
-  require("./plugins/PgMutationCreatePlugin"),
-  require("./plugins/PgMutationUpdatePlugin"),
-  require("./plugins/PgMutationProceduresPlugin"),
-  require("./plugins/PgMutationPayloadEdgePlugin"),
-];
-exports.inflections = require("./inflections");
+if (process.versions.node.match(/^([89]|[1-9][0-9]+)\./)) {
+  // Modern node, run verbatim
+  module.exports = require("./src");
+} else {
+  // Older node, run compiled code
+  module.exports = require("./lib");
+}

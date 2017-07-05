@@ -1,22 +1,10 @@
-const { defaultPlugins, buildSchema } = require("graphql-build");
-const {
-  defaultPlugins: pgDefaultPlugins,
-  inflections,
-} = require("graphql-build-pg");
+// This script detects if you're running on Node v8 or above; if so it runs the
+// code directly, otherwise it falls back to the babel-compiled version
 
-module.exports = function createPostGraphQLSchema(
-  client,
-  schemas,
-  options = {}
-) {
-  const { dynamicJson, classicIds } = options;
-  return buildSchema([...defaultPlugins, ...pgDefaultPlugins], {
-    pgConfig: client,
-    pgSchemas: schemas,
-    pgExtendedTypes: !!dynamicJson,
-    pgInflection: classicIds
-      ? inflections.postGraphQLClassicIdsInflection
-      : inflections.postGraphQLInflection,
-    nodeIdFieldName: classicIds ? "id" : "nodeId",
-  });
-};
+if (process.versions.node.match(/^([89]|[1-9][0-9]+)\./)) {
+  // Modern node, run verbatim
+  module.exports = require("./src");
+} else {
+  // Older node, run compiled code
+  module.exports = require("./lib");
+}
