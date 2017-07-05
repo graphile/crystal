@@ -190,7 +190,7 @@ module.exports = function makeProcField(
           sql.fragment`${sql.identifier(
             proc.namespace.name,
             proc.name
-          )}(${sql.join([...implicitArgs, ...sqlArgValues], ",")})`,
+          )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`,
           functionAlias,
           resolveData,
           {

@@ -300,15 +300,15 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                               getDataFromParsedResolveInfoFragment,
                               PayloadType,
                               input,
-                              sql.join(
+                              sql.fragment`(${sql.join(
                                 primaryKeys.map(
                                   (key, idx) =>
                                     sql.fragment`${sql.identifier(
                                       key.name
                                     )} = ${gql2pg(identifiers[idx], key.type)}`
                                 ),
-                                " AND "
-                              )
+                                ") AND ("
+                              )})`
                             );
                           } catch (e) {
                             debug(e);
@@ -412,7 +412,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                             getDataFromParsedResolveInfoFragment,
                             PayloadType,
                             input,
-                            sql.join(
+                            sql.fragment`(${sql.join(
                               keys.map(
                                 key =>
                                   sql.fragment`${sql.identifier(
@@ -428,8 +428,8 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                                     key.type
                                   )}`
                               ),
-                              " AND "
-                            )
+                              ") AND ("
+                            )})`
                           );
                         },
                       };

@@ -99,7 +99,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
               ", "
             )})`,
           ],
-          ","
+          ", "
         )})`;
       } else {
         return sql.fragment`json_build_array(${sql.join(
