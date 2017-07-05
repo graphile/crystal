@@ -295,7 +295,7 @@ module.exports = function makeNewBuild(builder) {
                   "field",
                   newSpec,
                   context,
-                  `|${Self.name}`
+                  `|${Self.name}.fields.${fieldName}`
                 );
                 newSpec.args = newSpec.args || {};
                 newSpec = Object.assign({}, newSpec, {
@@ -307,7 +307,7 @@ module.exports = function makeNewBuild(builder) {
                       field: newSpec,
                       returnType: newSpec.type,
                     }),
-                    `|${Self.name}`
+                    `|${Self.name}.fields.${fieldName}`
                   ),
                 });
                 const finalSpec = newSpec;
@@ -364,7 +364,7 @@ module.exports = function makeNewBuild(builder) {
                   "inputField",
                   newSpec,
                   context,
-                  `|${Self.name}`
+                  `|${Self.name}.fields.${fieldName}`
                 );
                 const finalSpec = newSpec;
                 return finalSpec;
