@@ -4,7 +4,7 @@
   "description": "Generate safe SQL with tagged template literals",
   "main": "index.js",
   "scripts": {
-    "test": "jest .",
+    "test": "jest . && npm run test:docs",
     "test:docs": "markdown-doctest",
     "prepublish": "babel --out-dir lib src"
   },
@@ -30,13 +30,12 @@
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "peerDependencies": {
+    "babel-polyfill": ">=6 <7",
     "debug": ">=2 <3",
     "lodash": ">=3 <5"
   },
   "devDependencies": {
-    "markdown-doctest": "^0.9.1"
-  },
-  "devDependencies": {
+    "markdown-doctest": "^0.9.1",
     "jest": "20.0.4"
   },
   "jest": {

@@ -19,6 +19,7 @@
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "graphql": "^0.10.3",
     "pg": ">=6 < 7",
     "sql-formatter": "^1.2.2"

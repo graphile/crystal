@@ -20,6 +20,9 @@
     "graphql-build": "^0.0.1-alpha2.2",
     "graphql-build-pg": "^0.0.1-alpha2.4"
   },
+  "peerDependencies": {
+    "babel-polyfill": ">=6 <7"
+  },
   "devDependencies": {
     "jest": "20.0.4"
   },

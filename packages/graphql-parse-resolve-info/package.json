@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "peerDependencies": {
+    "babel-polyfill": ">=6 <7",
     "graphql": ">=0.10 <1"
   },
   "devDependencies": {

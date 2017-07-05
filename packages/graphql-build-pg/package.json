@@ -41,6 +41,7 @@
     "pluralize": "^5.0.0"
   },
   "peerDependencies": {
+    "babel-polyfill": ">=6 <7",
     "debug": ">=2 <3",
     "pg": ">=6 <7"
   },

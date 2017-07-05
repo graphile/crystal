@@ -6,5 +6,6 @@ if (process.versions.node.match(/^([89]|[1-9][0-9]+)\./)) {
   module.exports = require("./src");
 } else {
   // Older node, run compiled code
+  require("babel-polyfill");
   module.exports = require("./lib");
 }

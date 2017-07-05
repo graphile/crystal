@@ -37,6 +37,7 @@
     "jest": "^20.0.4"
   },
   "peerDependencies": {
+    "babel-polyfill": ">=6 <7",
     "debug": ">=2 <3",
     "graphql": ">=0.9 <1"
   },
