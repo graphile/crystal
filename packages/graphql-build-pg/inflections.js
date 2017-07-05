@@ -47,6 +47,12 @@ exports.defaultInflection = {
   functionName(name, _schema) {
     return camelcase(name);
   },
+  functionPayloadType(name, _schema) {
+    return upperFirst(camelcase(`${name}-payload`));
+  },
+  functionInputType(name, _schema) {
+    return upperFirst(camelcase(`${name}-input`));
+  },
   tableType(name, schema) {
     return upperFirst(this.tableName(name, schema));
   },

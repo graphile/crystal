@@ -235,11 +235,13 @@ module.exports = function PgTypesPlugin(
     const SimpleDate = stringType("Date");
     const SimpleDatetime = stringType("Datetime");
     const SimpleTime = stringType("Time");
+    const SimpleJSON = stringType("JSON");
+    const SimpleUUID = stringType("UUID");
     const oidLookup = Object.assign(
       {
         20: GraphQLString, // Even though this is int8, it's too big for JS int, so cast to string.
-        21: GraphQLInt,
-        23: GraphQLInt,
+        21: GraphQLInt, // int2
+        23: GraphQLInt, // int4
         790: GraphQLFloat, // money
         1186: GQLInterval, // interval
         1082: SimpleDate, // date
@@ -247,6 +249,9 @@ module.exports = function PgTypesPlugin(
         1184: SimpleDatetime, // timestamptz
         1083: SimpleTime, // time
         1266: SimpleTime, // timetz
+        114: SimpleJSON, // json
+        3802: SimpleJSON, // jsonb
+        2950: SimpleUUID, // uuid
       },
       pgExtendedTypes && {
         114: GraphQLJSON,

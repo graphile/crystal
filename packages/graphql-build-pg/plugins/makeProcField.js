@@ -1,5 +1,17 @@
-const { GraphQLNonNull, GraphQLList, GraphQLString } = require("graphql");
+const {
+  GraphQLNonNull,
+  GraphQLList,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+  getNamedType,
+} = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
+const camelcase = require("lodash/camelcase");
+const pluralize = require("pluralize");
 const queryFromResolveData = require("../queryFromResolveData");
 const firstValue = obj => {
   let firstKey;
@@ -10,6 +22,22 @@ const firstValue = obj => {
 };
 const addStartEndCursor = require("./addStartEndCursor");
 
+function getResultFieldName(gqlType, type, returnsSet) {
+  const gqlNamedType = getNamedType(gqlType);
+  let name;
+  if (gqlNamedType === GraphQLInt) {
+    name = "integer";
+  } else if (gqlNamedType === GraphQLFloat) {
+    name = "float";
+  } else if (gqlNamedType === GraphQLBoolean) {
+    name = "boolean";
+  } else if (gqlNamedType === GraphQLString) {
+    name = "string";
+  } else {
+    name = camelcase(gqlNamedType.name);
+  }
+  return returnsSet ? pluralize(name) : name;
+}
 module.exports = function makeProcField(
   fieldName,
   proc,
@@ -26,8 +54,14 @@ module.exports = function makeProcField(
     parseResolveInfo,
     gql2pg,
     pg2gql,
-  }
+    $$isQuery,
+    buildObjectWithHooks,
+  },
+  isMutation = false
 ) {
+  if (computed && isMutation) {
+    throw new Error("Mutation procedure cannot be computed");
+  }
   const sliceAmount = computed ? 1 : 0;
   const argNames = proc.argTypeIds
     .map((_, idx) => proc.argNames[idx] || "")
@@ -69,11 +103,15 @@ module.exports = function makeProcField(
       inflection.tableType(returnTypeTable.name, returnTypeTable.namespace.name)
     );
     if (proc.returnsSet) {
-      const ConnectionType = getTypeByName(
-        inflection.connection(TableType.name)
-      );
-      type = new GraphQLNonNull(ConnectionType);
-      scope.isPgConnectionField = true;
+      if (isMutation) {
+        type = new GraphQLList(TableType);
+      } else {
+        const ConnectionType = getTypeByName(
+          inflection.connection(TableType.name)
+        );
+        type = new GraphQLNonNull(ConnectionType);
+        scope.isPgConnectionField = true;
+      }
       scope.pgIntrospection = returnTypeTable;
     } else {
       type = TableType;
@@ -88,8 +126,14 @@ module.exports = function makeProcField(
       );
       const ConnectionType = getTypeByName(connectionTypeName);
       if (ConnectionType) {
-        type = new GraphQLNonNull(ConnectionType);
-        scope.isPgConnectionField = true;
+        if (isMutation) {
+          // Cannot return a connection because it would have to run the mutation again
+          type = new GraphQLList(Type);
+          returnFirstValueAsValue = true;
+        } else {
+          type = new GraphQLNonNull(ConnectionType);
+          scope.isPgConnectionField = true;
+        }
         scope.pgIntrospection = proc;
       } else {
         returnFirstValueAsValue = true;
@@ -107,7 +151,12 @@ module.exports = function makeProcField(
       getDataFromParsedResolveInfoFragment,
       addArgDataGenerator,
     }) => {
-      if (proc.returnsSet && !returnTypeTable && !returnFirstValueAsValue) {
+      if (
+        proc.returnsSet &&
+        !returnTypeTable &&
+        !returnFirstValueAsValue &&
+        !isMutation
+      ) {
         // Natural ordering
         addArgDataGenerator(function addPgCursorPrefix() {
           return {
@@ -124,7 +173,8 @@ module.exports = function makeProcField(
           parsedResolveInfoFragment,
           ReturnType
         );
-        const { args = {} } = parsedResolveInfoFragment;
+        const { args: rawArgs = {} } = parsedResolveInfoFragment;
+        const args = isMutation ? rawArgs.input : rawArgs;
         const sqlArgValues = argNames.map((argName, argIndex) => {
           const gqlArgName = inflection.argument(argName, argIndex);
           return gql2pg(args[gqlArgName], argTypes[argIndex]);
@@ -144,8 +194,8 @@ module.exports = function makeProcField(
           functionAlias,
           resolveData,
           {
-            withPagination: proc.returnsSet,
-            withPaginationAsFields: proc.returnsSet && !computed,
+            withPagination: !isMutation && proc.returnsSet,
+            withPaginationAsFields: !isMutation && proc.returnsSet && !computed,
             asJson: !proc.returnsSet && computed && !returnFirstValueAsValue,
             addNullCase: !proc.returnsSet && returnTypeTable,
           },
@@ -175,15 +225,86 @@ module.exports = function makeProcField(
           };
         });
       }
+
+      let ReturnType = type;
+      let PayloadType;
+      let args = argNames.reduce((memo, argName, argIndex) => {
+        const gqlArgName = inflection.argument(argName, argIndex);
+        memo[gqlArgName] = {
+          type: argGqlTypes[argIndex],
+        };
+        return memo;
+      }, {});
+      if (isMutation) {
+        const resultFieldName = getResultFieldName(
+          type,
+          returnType,
+          proc.returnsSet
+        );
+        const isNotVoid = String(returnType.id) !== "2278";
+        // If set then plural name
+        PayloadType = buildObjectWithHooks(
+          GraphQLObjectType,
+          {
+            name: inflection.functionPayloadType(
+              proc.name,
+              proc.namespace.name
+            ),
+            fields: ({ recurseDataGeneratorsForField }) => {
+              if (isNotVoid) {
+                recurseDataGeneratorsForField(resultFieldName);
+              }
+              return Object.assign(
+                {
+                  clientMutationId: {
+                    type: GraphQLString,
+                    resolve(data) {
+                      return data.__clientMutationId;
+                    },
+                  },
+                },
+                isNotVoid && {
+                  [resultFieldName]: {
+                    type: type,
+                    resolve(data) {
+                      console.log(data.data);
+                      return data.data;
+                    },
+                  },
+                  // Result
+                }
+              );
+            },
+          },
+          Object.assign(
+            {
+              isMutationPayload: true,
+            },
+            scope
+          )
+        );
+        ReturnType = new GraphQLNonNull(PayloadType);
+        const InputType = buildObjectWithHooks(GraphQLInputObjectType, {
+          name: inflection.functionInputType(proc.name, proc.namespace.name),
+          fields: Object.assign(
+            {
+              clientMutationId: {
+                type: GraphQLString,
+              },
+            },
+            args
+          ),
+        });
+        args = {
+          input: {
+            type: new GraphQLNonNull(InputType),
+          },
+        };
+      }
+
       return {
-        type: type,
-        args: argNames.reduce((memo, argName, argIndex) => {
-          const gqlArgName = inflection.argument(argName, argIndex);
-          memo[gqlArgName] = {
-            type: argGqlTypes[argIndex],
-          };
-          return memo;
-        }, {}),
+        type: ReturnType,
+        args: args,
         resolve: computed
           ? (data, _args, _context, resolveInfo) => {
               const alias = parseResolveInfo(resolveInfo, { aliasOnly: true });
@@ -197,7 +318,7 @@ module.exports = function makeProcField(
                   return pg2gql(value, returnType);
                 }
               } else {
-                if (proc.returnsSet) {
+                if (proc.returnsSet && !isMutation) {
                   return addStartEndCursor(value);
                 } else {
                   return value;
@@ -215,22 +336,38 @@ module.exports = function makeProcField(
               const { text, values } = sql.compile(query);
               if (debugSql.enabled)
                 debugSql(require("sql-formatter").format(text));
-              const { rows: [row] } = await pgClient.query(text, values);
-              if (returnFirstValueAsValue) {
-                if (proc.returnsSet) {
-                  return row.data
-                    .map(firstValue)
-                    .map(v => pg2gql(v, returnType));
+              const { rows } = await pgClient.query(text, values);
+              const [row] = rows;
+              const result = (() => {
+                if (returnFirstValueAsValue) {
+                  if (proc.returnsSet && !isMutation) {
+                    return row.data
+                      .map(firstValue)
+                      .map(v => pg2gql(v, returnType));
+                  } else if (proc.returnsSet) {
+                    return rows.map(firstValue).map(v => pg2gql(v, returnType));
+                  } else {
+                    return pg2gql(firstValue(row), returnType);
+                  }
                 } else {
-                  return pg2gql(firstValue(row), returnType);
+                  if (proc.returnsSet && !isMutation) {
+                    // Connection
+                    return addStartEndCursor(row);
+                  } else if (proc.returnsSet) {
+                    return rows;
+                  } else {
+                    return row;
+                  }
                 }
+              })();
+              console.log(result);
+              if (isMutation) {
+                return {
+                  __clientMutationId: args.input.clientMutationId,
+                  data: result,
+                };
               } else {
-                if (proc.returnsSet) {
-                  // Connection
-                  return addStartEndCursor(row);
-                } else {
-                  return row;
-                }
+                return result;
               }
             },
       };

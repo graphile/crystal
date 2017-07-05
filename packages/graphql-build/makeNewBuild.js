@@ -167,8 +167,9 @@ module.exports = function makeNewBuild(builder) {
             );
             const results = [];
             const StrippedType = getNamedType(ReturnType);
-            const fieldDataGenerators =
-              fieldDataGeneratorsByType.get(StrippedType) || {};
+            const fieldDataGenerators = fieldDataGeneratorsByType.get(
+              StrippedType
+            );
             if (fieldDataGenerators) {
               const typeFields = StrippedType.getFields();
               for (const alias of Object.keys(fields)) {
