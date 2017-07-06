@@ -76,16 +76,20 @@ Development
 npm install -g lerna yarn
 yarn
 lerna bootstrap
+lerna run test
 ```
 
-GraphQL conflict
-----------------
+If the above succeeds, you're good to go! If not, please reach out on twitter:
+[@benjie](https://twitter.com/benjie).
+
+### GraphQL conflict
 
 If you get an error like the below:
 
 `GraphQL conflict for 'GraphQLObjectType' detected! Multiple versions of graphql exist in your node_modules?`
 
-it means the peerDependencies have been installed locally in each package which is not what we want (we want them installed in the root `node_modules`.
+it means the `peerDependencies` have been installed locally in each package
+which is not what we want (we want them installed in the root `node_modules`.
 
 To solve this, we need to re-bootstrap:
 
