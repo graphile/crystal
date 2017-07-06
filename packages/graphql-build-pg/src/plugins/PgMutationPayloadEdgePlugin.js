@@ -11,11 +11,12 @@ module.exports = function PgMutationPayloadEdgePlugin(
       fields,
       { extend, getTypeByName, pgSql: sql },
       {
-        scope: { isMutationPayload, pgIntrospection: table },
+        scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
         buildFieldWithHooks,
         recurseDataGeneratorsForField,
       }
     ) => {
+      const table = pgIntrospectionTable || pgIntrospection;
       if (!isMutationPayload || !table || table.kind !== "class") {
         return fields;
       }

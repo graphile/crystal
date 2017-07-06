@@ -94,7 +94,9 @@ module.exports = function makeProcField(
     );
   }
   let type;
-  const scope = {};
+  const scope = {
+    pgIntrospection: proc,
+  };
   let returnFirstValueAsValue = false;
   if (returnTypeTable) {
     const TableType = getTypeByName(
@@ -113,10 +115,10 @@ module.exports = function makeProcField(
         type = new GraphQLNonNull(ConnectionType);
         scope.isPgConnectionField = true;
       }
-      scope.pgIntrospection = returnTypeTable;
+      scope.pgIntrospectionTable = returnTypeTable;
     } else {
       type = TableType;
-      scope.pgIntrospection = returnTypeTable;
+      scope.pgIntrospectionTable = returnTypeTable;
     }
   } else {
     const Type = pgGqlTypeByTypeId[returnType.id] || GraphQLString;
@@ -135,7 +137,6 @@ module.exports = function makeProcField(
           type = new GraphQLNonNull(ConnectionType);
           scope.isPgConnectionField = true;
         }
-        scope.pgIntrospection = proc;
       } else {
         returnFirstValueAsValue = true;
         type = new GraphQLList(Type);

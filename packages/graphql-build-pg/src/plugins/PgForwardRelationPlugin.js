@@ -20,10 +20,16 @@ module.exports = function PgForwardRelationPlugin(
         pgSql: sql,
       },
       {
-        scope: { isPgRowType, isMutationPayload, pgIntrospection: table },
+        scope: {
+          isPgRowType,
+          isMutationPayload,
+          pgIntrospection,
+          pgIntrospectionTable,
+        },
         buildFieldWithHooks,
       }
     ) => {
+      const table = pgIntrospectionTable || pgIntrospection;
       if (
         !(isPgRowType || isMutationPayload) ||
         !table ||

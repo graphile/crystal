@@ -8,11 +8,15 @@ module.exports = function PgConnectionArgs(builder) {
       args,
       { extend, getTypeByName },
       {
-        scope: { isPgConnectionField, pgIntrospection: table },
+        scope: { isPgConnectionField, pgIntrospection: source },
         addArgDataGenerator,
       }
     ) => {
-      if (!isPgConnectionField || !table || table.kind !== "class") {
+      if (
+        !isPgConnectionField ||
+        !source ||
+        (source.kind !== "class" && source.kind !== "procedure")
+      ) {
         return args;
       }
       const Cursor = getTypeByName("Cursor");
