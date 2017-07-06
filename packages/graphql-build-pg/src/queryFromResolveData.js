@@ -92,12 +92,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         return sql.fragment`json_build_array(${sql.join(
           [
             ...getPgCursorPrefix(),
-            sql.fragment`json_build_array(${sql.join(
-              queryBuilder
-                .getOrderByExpressionsAndDirections()
-                .map(([expr]) => expr),
-              ", "
-            )})`,
+            sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
           ],
           ", "
         )})`;
