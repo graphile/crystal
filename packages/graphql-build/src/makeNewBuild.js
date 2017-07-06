@@ -5,7 +5,11 @@ const {
   GraphQLEnumType,
   getNamedType,
 } = require("graphql");
-const parseResolveInfo = require("graphql-parse-resolve-info");
+const {
+  parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType,
+  getAliasFromResolveInfo,
+} = require("graphql-parse-resolve-info");
 const isString = require("lodash/isString");
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 const debug = require("debug")("graphql-build");
@@ -68,7 +72,8 @@ module.exports = function makeNewBuild(builder) {
 
   return {
     parseResolveInfo,
-    simplifyParsedResolveInfoFragmentWithType: parseResolveInfo.simplify,
+    simplifyParsedResolveInfoFragmentWithType,
+    getAliasFromResolveInfo,
     generateDataForType(Type, parsedResolveInfoFragment) {
       const StrippedType = getNamedType(Type);
       if (!StrippedType) {
@@ -96,7 +101,7 @@ module.exports = function makeNewBuild(builder) {
     },
 
     resolveAlias(data, _args, _context, resolveInfo) {
-      const alias = parseResolveInfo(resolveInfo, { aliasOnly: true });
+      const alias = getAliasFromResolveInfo(resolveInfo);
       return data[alias];
     },
     addType(type) {

@@ -11,36 +11,16 @@ complete the GraphQL request.
 
 Also provides a quick way to get the alias of the current field being resolved.
 
-Usage: requested subfields
---------------------------
+API
+---
 
-To get the tree of subfields of the current field that is being requested:
-
-```js
-const parseResolveInfo = require('graphql-parse-resolve-info');
-// or import parseResolveInfo from 'graphql-parse-resolve-info';
-
-new GraphQLObjectType({
-  name: ...
-  fields: {
-    ...
-    foo: {
-      type: new GraphQLNonNull(ComplexType),
-      resolve(data, args, context, resolveInfo) {
-        const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-        const { fields } =
-          parseResolveInfo.simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, ComplexType);
-        console.dir(fields);
-        ...
-      }
-    }
-  }
-});
-```
 
 ### `parseResolveInfo(resolveInfo)`
 
-Returns the following properties (recursively):
+Alias: `parse`
+
+Gets the tree of subfields of the current field that is being requested,
+returning the following properties (recursively):
 
 - `name`: the name of the GraphQL field
 - `alias`: the alias this GraphQL field has been requested as, or if no alias was specified then the `name`
@@ -50,8 +30,8 @@ Returns the following properties (recursively):
   `args` for the nested fields without waiting for their resolvers to be called.
 - `fieldsByTypeName`: an object keyed by GraphQL object type names, where the
   values are another object keyed by the aliases of the fields requested with
-  values of the same format as this (i.e. `{alias, name, args,
-  fieldsByTypeName}`)
+  values of the same format as the root level (i.e. `{alias, name, args,
+  fieldsByTypeName}`); see below for an example
 
 Note that because GraphQL supports interfaces a resolver may return items of
 different types. For this reason, we key the fields by the GraphQL type name of
@@ -63,9 +43,38 @@ we provide a `simplifyParsedResolveInfoFragmentWithType` helper to aid you with
 this. In many cases you will know what type the result will be (because it can
 only be one type) so you will probably use this helper heavily.
 
-### `parseResolveInfo.simplify(parsedResolveInfoFragment, ReturnType)`
+Example usage:
 
-Alias: `simplifyParsedResolveInfoFragmentWithType`
+```js
+const {
+	parseResolveInfo,
+	simplifyParsedResolveInfoFragmentWithType
+} = require('graphql-parse-resolve-info');
+// or import { parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from 'graphql-parse-resolve-info';
+
+new GraphQLObjectType({
+  name: ...
+  fields: {
+    ...
+    foo: {
+      type: new GraphQLNonNull(ComplexType),
+      resolve(data, args, context, resolveInfo) {
+        const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+        const { fields } = simplifyParsedResolveInfoFragmentWithType(
+					parsedResolveInfoFragment,
+					ComplexType
+				);
+        console.dir(fields);
+        ...
+      }
+    }
+  }
+});
+```
+
+### `simplifyParsedResolveInfoFragmentWithType(parsedResolveInfoFragment, ReturnType)`
+
+Alias: `simplify`
 
 Given an object of the form returned by `parseResolveInfo(...)` (which can be
 the root-level instance, or it could be one of the nested subfields) and a
@@ -76,19 +85,45 @@ specified `ReturnType`.
 Or, in other words, this simplifies the `fieldsByTypeName` to an object of only
 the fields compatible with `ReturnType`.
 
-Usage: alias
-------------
+Example usage:
 
-### `parseResolveInfo(resolveInfo, { aliasOnly: true })`
+```js
+const {
+	parseResolveInfo,
+	simplifyParsedResolveInfoFragmentWithType
+} = require('graphql-parse-resolve-info');
 
-Instead of returning an object as above, if you specify `aliasOnly: true` then
-only a string is returned: the alias of the field being requested (or, if none
-were provided, then the name of the field).
+new GraphQLObjectType({
+  name: ...
+  fields: {
+    ...
+    foo: {
+      type: new GraphQLNonNull(ComplexType),
+      resolve(data, args, context, resolveInfo) {
+        const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+
+        const { fields } = simplifyParsedResolveInfoFragmentWithType(
+					parsedResolveInfoFragment,
+					ComplexType
+				);
+        ...
+      }
+    }
+  }
+});
+```
+
+### `getAliasFromResolveInfo(resolveInfo)`
+
+Alias: `getAlias`
+
+Returns the alias of the field being requested (or, if no alias was specified,
+then the name of the field).
 
 Example:
 
 ```js
-const parseResolveInfo = require('graphql-parse-resolve-info');
+const { getAliasFromResolveInfo } = require('graphql-parse-resolve-info');
 
 new GraphQLObjectType({
   name: ...
@@ -97,7 +132,7 @@ new GraphQLObjectType({
     foo: {
       type: new GraphQLNonNull(GraphQLString),
       resolve(data, args, context, resolveInfo) {
-        const alias = parseResolveInfo(resolveInfo, { aliasOnly: true });
+        const alias = getAliasFromResolveInfo(resolveInfo);
         return alias;
       }
     }
@@ -166,7 +201,7 @@ const Query = new GraphQLObjectType({
         const parsedResolveInfoFragment = parseResolveInfo(
           resolveInfo
         );
-        const simplifiedFragment = parseResolveInfo.simplify(
+        const simplifiedFragment = simplifyParsedResolveInfoFragmentWithType(
           parsedResolveInfoFragment,
           resolveInfo.returnType
         );
@@ -296,8 +331,6 @@ has `parsedResolveInfoFragment`:
                                                         fieldsByTypeName: {} } } } } } } } } } } } } } } } } } },
 ```
 
-_Note: the `ast` fields has been omitted at every level to make this easier to read._
-
 and the simplified `simplifiedFragment` is the same as
 `parsedResolveInfoFragment`, but with the additional root-level property
 `fields` which compresses the root-level property `fieldsByTypeName` to a
@@ -305,14 +338,18 @@ single-level object containing only the fields compatible with
 `resolveInfo.returnType` (in this case: only `edges`):
 
 ```js
+{ alias: 'allPosts',
+  name: 'allPosts',
+  args: {},
+  fieldsByTypeName:
+		...as before...
   fields:
    { edges:
       { alias: 'edges',
         name: 'edges',
         args: {},
         fieldsByTypeName:
-         { PostsEdge:
-          ...as before...
+           ...as before...
 ```
 
 Thanks

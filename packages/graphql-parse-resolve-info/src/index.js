@@ -6,7 +6,7 @@ const debug = require("debug")("graphql-parse-resolve-info");
 
 // Originally based on https://github.com/tjmehta/graphql-parse-fields
 
-function getAlias(resolveInfo) {
+function getAliasFromResolveInfo(resolveInfo) {
   const asts = resolveInfo.fieldASTs || resolveInfo.fieldNodes;
   return asts.reduce(function(alias, val) {
     if (!alias) {
@@ -18,10 +18,7 @@ function getAlias(resolveInfo) {
   }, null);
 }
 
-function parseFields(resolveInfo, options = {}) {
-  if (options.aliasOnly) {
-    return getAlias(resolveInfo);
-  }
+function parseResolveInfo(resolveInfo, options = {}) {
   const fieldNodes = resolveInfo.fieldASTs || resolveInfo.fieldNodes;
   const { parentType } = resolveInfo;
   if (!fieldNodes) {
@@ -101,7 +98,6 @@ function fieldTreeFromAST(
       const args = getArgumentValues(field, val, variableValues) || {};
       if (!tree[parentType.name][alias]) {
         tree[parentType.name][alias] = {
-          ast: val,
           alias,
           name,
           args,
@@ -221,8 +217,9 @@ function simplifyParsedResolveInfoFragmentWithType(
   });
 }
 
-parseFields.getAlias = getAlias;
-
-module.exports = parseFields;
-module.exports.simplifyParsedResolveInfoFragmentWithType = simplifyParsedResolveInfoFragmentWithType;
-module.exports.simplify = simplifyParsedResolveInfoFragmentWithType;
+exports.parseResolveInfo = parseResolveInfo;
+exports.parse = parseResolveInfo;
+exports.simplifyParsedResolveInfoFragmentWithType = simplifyParsedResolveInfoFragmentWithType;
+exports.simplify = simplifyParsedResolveInfoFragmentWithType;
+exports.getAliasFromResolveInfo = getAliasFromResolveInfo;
+exports.getAlias = getAliasFromResolveInfo;

@@ -52,6 +52,7 @@ module.exports = function makeProcField(
     inflection,
     sql,
     parseResolveInfo,
+    getAliasFromResolveInfo,
     gql2pg,
     pg2gql,
     $$isQuery,
@@ -309,7 +310,7 @@ module.exports = function makeProcField(
         args: args,
         resolve: computed
           ? (data, _args, _context, resolveInfo) => {
-              const alias = parseResolveInfo(resolveInfo, { aliasOnly: true });
+              const alias = getAliasFromResolveInfo(resolveInfo);
               const value = data[alias];
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet) {

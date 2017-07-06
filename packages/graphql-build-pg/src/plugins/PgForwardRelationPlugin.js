@@ -15,7 +15,7 @@ module.exports = function PgForwardRelationPlugin(
       {
         extend,
         getTypeByName,
-        parseResolveInfo,
+        getAliasFromResolveInfo,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
       },
@@ -139,9 +139,7 @@ module.exports = function PgForwardRelationPlugin(
                 ),
                 resolve: (rawData, _args, _context, resolveInfo) => {
                   const data = isMutationPayload ? rawData.data : rawData;
-                  const alias = parseResolveInfo(resolveInfo, {
-                    aliasOnly: true,
-                  });
+                  const alias = getAliasFromResolveInfo(resolveInfo);
                   return data[alias];
                 },
               };

@@ -16,7 +16,7 @@ module.exports = function PgBackwardRelationPlugin(
         getTypeByName,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
-        parseResolveInfo,
+        getAliasFromResolveInfo,
       },
       {
         scope: { isPgRowType, pgIntrospection: foreignTable },
@@ -164,9 +164,7 @@ module.exports = function PgBackwardRelationPlugin(
                 type: new GraphQLNonNull(ConnectionType),
                 args: {},
                 resolve: (data, _args, _context, resolveInfo) => {
-                  const alias = parseResolveInfo(resolveInfo, {
-                    aliasOnly: true,
-                  });
+                  const alias = getAliasFromResolveInfo(resolveInfo);
                   return addStartEndCursor(data[alias]);
                 },
               };

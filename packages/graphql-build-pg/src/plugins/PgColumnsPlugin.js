@@ -18,7 +18,7 @@ module.exports = function PgColumnsPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pg2gql,
-        parseResolveInfo,
+        getAliasFromResolveInfo,
         pgTweakFragmentForType,
       },
       {
@@ -107,9 +107,7 @@ module.exports = function PgColumnsPlugin(
                 return {
                   type: nullableIf(!attr.isNotNull, ReturnType),
                   resolve: (data, _args, _context, resolveInfo) => {
-                    const alias = parseResolveInfo(resolveInfo, {
-                      aliasOnly: true,
-                    });
+                    const alias = getAliasFromResolveInfo(resolveInfo);
                     return pg2gql(data[alias], attr.type);
                   },
                 };
