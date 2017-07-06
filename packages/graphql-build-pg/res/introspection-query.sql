@@ -61,6 +61,8 @@ with
       -- Do not select procedures that create range types. These are utility
       -- functions that really don’t need to be exposed in an API.
       pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace) and
+      -- Do not expose trigger functions (type trigger has oid 2279)
+      pro.prorettype <> 2279 and
       -- We also don’t want procedures that have been defined in our namespace
       -- twice. This leads to duplicate fields in the API which throws an
       -- error. In the future we may support this case. For now though, it is
