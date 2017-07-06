@@ -15,16 +15,15 @@ module.exports = function PgConnectionArgOrderBy(
       }
     ) => {
       introspectionResultsByKind.class.map(table => {
+        const tableTypeName = inflection.tableType(
+          table.name,
+          table.namespace && table.namespace.name
+        );
         /* const TableOrderByType = */
         buildObjectWithHooks(
           GraphQLEnumType,
           {
-            name: inflection.orderByType(
-              inflection.tableType(
-                table.name,
-                table.namespace && table.namespace.name
-              )
-            ),
+            name: inflection.orderByType(tableTypeName),
             values: {
               NATURAL: {
                 value: {
@@ -56,13 +55,12 @@ module.exports = function PgConnectionArgOrderBy(
       if (!isPgConnectionField || !table || table.kind !== "class") {
         return args;
       }
+      const tableTypeName = inflection.tableType(
+        table.name,
+        table.namespace && table.namespace.name
+      );
       const TableOrderByType = getTypeByName(
-        inflection.orderByType(
-          inflection.tableType(
-            table.name,
-            table.namespace && table.namespace.name
-          )
-        )
+        inflection.orderByType(tableTypeName)
       );
 
       addArgDataGenerator(function connectionOrderBy({ orderBy }) {
@@ -88,10 +86,15 @@ module.exports = function PgConnectionArgOrderBy(
           },
         };
       });
+      const defaultValueEnum =
+        TableOrderByType.getValues().find(v => v.name === "PRIMARY_KEY_ASC") ||
+        TableOrderByType.getValues()[0];
 
       return extend(args, {
         orderBy: {
+          description: `The method to use when ordering \`${tableTypeName}\`.`,
           type: TableOrderByType,
+          defaultValue: defaultValueEnum && defaultValueEnum.value,
         },
       });
     }

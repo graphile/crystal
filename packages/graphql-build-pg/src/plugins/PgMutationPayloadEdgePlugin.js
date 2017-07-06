@@ -19,14 +19,14 @@ module.exports = function PgMutationPayloadEdgePlugin(
       if (!isMutationPayload || !table || table.kind !== "class") {
         return fields;
       }
+      const tableTypeName = inflection.tableType(
+        table.name,
+        table.namespace.name
+      );
       const TableOrderByType = getTypeByName(
-        inflection.orderByType(
-          inflection.tableType(table.name, table.namespace.name)
-        )
+        inflection.orderByType(tableTypeName)
       );
-      const TableEdgeType = getTypeByName(
-        inflection.edge(inflection.tableType(table.name, table.namespace.name))
-      );
+      const TableEdgeType = getTypeByName(inflection.edge(tableTypeName));
       if (!TableEdgeType) {
         return fields;
       }
@@ -63,11 +63,17 @@ module.exports = function PgMutationPayloadEdgePlugin(
               };
             });
 
+            const defaultValueEnum =
+              TableOrderByType.getValues().find(
+                v => v.name === "PRIMARY_KEY_ASC"
+              ) || TableOrderByType.getValues()[0];
             return {
               type: TableEdgeType,
               args: {
                 orderBy: {
+                  description: `The method to use when ordering \`${tableTypeName}\`.`,
                   type: TableOrderByType,
+                  defaultValue: defaultValueEnum && defaultValueEnum.value,
                 },
               },
               resolve(data) {

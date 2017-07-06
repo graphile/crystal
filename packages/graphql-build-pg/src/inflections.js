@@ -17,6 +17,9 @@ exports.defaultInflection = {
   enumName(value) {
     return value;
   },
+  enumType(name) {
+    return upperFirst(camelcase(name));
+  },
   conditionType(typeName) {
     return upperFirst(camelcase(`${typeName}-condition`));
   },
