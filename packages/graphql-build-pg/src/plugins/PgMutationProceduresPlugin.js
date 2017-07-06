@@ -1,31 +1,17 @@
 const makeProcField = require("./makeProcField");
 
-module.exports = function PgMutationProceduresPlugin(
-  builder,
-  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
-) {
+module.exports = function PgMutationProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
-    (
-      fields,
-      {
-        $$isQuery,
-        parseResolveInfo,
-        getTypeByName,
-        extend,
-        gql2pg,
-        pg2gql,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
-        buildObjectWithHooks,
-      },
-      { scope: { isRootMutation }, buildFieldWithHooks }
-    ) => {
+    (fields, build, { scope: { isRootMutation }, buildFieldWithHooks }) => {
       if (!isRootMutation) {
         return fields;
       }
+      const {
+        extend,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgInflection: inflection,
+      } = build;
       return extend(
         fields,
         introspectionResultsByKind.procedure
@@ -62,26 +48,10 @@ module.exports = function PgMutationProceduresPlugin(
               proc.name,
               proc.namespace.name
             );
-            memo[fieldName] = makeProcField(
-              fieldName,
-              proc,
-              {
-                buildFieldWithHooks,
-                introspectionResultsByKind,
-                strictFunctions,
-                gqlTypeByTypeId,
-                gqlInputTypeByTypeId,
-                getTypeByName,
-                gql2pg,
-                pg2gql,
-                inflection,
-                sql,
-                parseResolveInfo,
-                $$isQuery,
-                buildObjectWithHooks,
-              },
-              true
-            );
+            memo[fieldName] = makeProcField(fieldName, proc, build, {
+              buildFieldWithHooks,
+              isMutation: true,
+            });
             return memo;
           }, {})
       );

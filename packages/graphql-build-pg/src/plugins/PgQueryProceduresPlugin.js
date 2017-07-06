@@ -1,29 +1,17 @@
 const makeProcField = require("./makeProcField");
 
-module.exports = function PgQueryProceduresPlugin(
-  builder,
-  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
-) {
+module.exports = function PgQueryProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
-    (
-      fields,
-      {
-        parseResolveInfo,
-        getTypeByName,
-        extend,
-        gql2pg,
-        pg2gql,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
-      },
-      { scope: { isRootQuery }, buildFieldWithHooks }
-    ) => {
+    (fields, build, { scope: { isRootQuery }, buildFieldWithHooks }) => {
       if (!isRootQuery) {
         return fields;
       }
+      const {
+        extend,
+        pgInflection: inflection,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+      } = build;
       return extend(
         fields,
         introspectionResultsByKind.procedure
@@ -60,18 +48,8 @@ module.exports = function PgQueryProceduresPlugin(
               proc.name,
               proc.namespace.name
             );
-            memo[fieldName] = makeProcField(fieldName, proc, {
+            memo[fieldName] = makeProcField(fieldName, proc, build, {
               buildFieldWithHooks,
-              introspectionResultsByKind,
-              strictFunctions,
-              gqlTypeByTypeId,
-              gqlInputTypeByTypeId,
-              getTypeByName,
-              gql2pg,
-              pg2gql,
-              inflection,
-              sql,
-              parseResolveInfo,
             });
             return memo;
           }, {})

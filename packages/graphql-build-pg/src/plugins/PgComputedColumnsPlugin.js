@@ -1,24 +1,11 @@
 const makeProcField = require("./makeProcField");
 
-module.exports = function PgComputedColumnsPlugin(
-  builder,
-  { pgInflection: inflection, pgStrictFunctions: strictFunctions = false }
-) {
+module.exports = function PgComputedColumnsPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
       fields,
-      {
-        parseResolveInfo,
-        getTypeByName,
-        extend,
-        gql2pg,
-        pg2gql,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgSql: sql,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
-      },
+      build,
       {
         scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
         buildFieldWithHooks,
@@ -31,6 +18,11 @@ module.exports = function PgComputedColumnsPlugin(
       ) {
         return fields;
       }
+      const {
+        extend,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgInflection: inflection,
+      } = build;
       const tableType = introspectionResultsByKind.type.filter(
         type =>
           type.type === "c" &&
@@ -85,19 +77,9 @@ module.exports = function PgComputedColumnsPlugin(
               table.name,
               table.namespace.name
             );
-            memo[fieldName] = makeProcField(fieldName, proc, {
+            memo[fieldName] = makeProcField(fieldName, proc, build, {
               buildFieldWithHooks,
               computed: true,
-              introspectionResultsByKind,
-              strictFunctions,
-              gqlTypeByTypeId,
-              gqlInputTypeByTypeId,
-              getTypeByName,
-              gql2pg,
-              pg2gql,
-              inflection,
-              sql,
-              parseResolveInfo,
             });
             return memo;
           }, {})

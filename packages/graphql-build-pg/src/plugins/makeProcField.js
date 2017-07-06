@@ -42,23 +42,20 @@ module.exports = function makeProcField(
   fieldName,
   proc,
   {
-    buildFieldWithHooks,
-    computed,
-    strictFunctions,
-    introspectionResultsByKind,
-    gqlTypeByTypeId,
-    gqlInputTypeByTypeId,
+    pgIntrospectionResultsByKind: introspectionResultsByKind,
+    pgGqlTypeByTypeId,
+    pgGqlInputTypeByTypeId,
     getTypeByName,
-    inflection,
-    sql,
+    pgSql: sql,
     parseResolveInfo,
     getAliasFromResolveInfo,
     gql2pg,
     pg2gql,
-    $$isQuery,
     buildObjectWithHooks,
+    pgInflection: inflection,
+    pgStrictFunctions: strictFunctions,
   },
-  isMutation = false
+  { buildFieldWithHooks, computed = false, isMutation = false }
 ) {
   if (computed && isMutation) {
     throw new Error("Mutation procedure cannot be computed");
@@ -80,7 +77,7 @@ module.exports = function makeProcField(
     ? requiredArgCount
     : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
-    const Type = gqlInputTypeByTypeId[type.id] || GraphQLString;
+    const Type = pgGqlInputTypeByTypeId[type.id] || GraphQLString;
     if (idx >= notNullArgCount) {
       return Type;
     } else {
@@ -122,7 +119,7 @@ module.exports = function makeProcField(
       scope.pgIntrospection = returnTypeTable;
     }
   } else {
-    const Type = gqlTypeByTypeId[returnType.id] || GraphQLString;
+    const Type = pgGqlTypeByTypeId[returnType.id] || GraphQLString;
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(
         proc.name,
