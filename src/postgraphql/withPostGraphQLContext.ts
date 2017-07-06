@@ -36,6 +36,7 @@ export default async function withPostGraphQLContext(
     jwtToken,
     jwtSecret,
     jwtAudiences = ['postgraphql'],
+    jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
   }: {
@@ -43,6 +44,7 @@ export default async function withPostGraphQLContext(
     jwtToken?: string,
     jwtSecret?: string,
     jwtAudiences?: Array<string>,
+    jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -64,6 +66,7 @@ export default async function withPostGraphQLContext(
       jwtToken,
       jwtSecret,
       jwtAudiences,
+      jwtRole,
       pgDefaultRole,
       pgSettings,
     })
@@ -95,6 +98,7 @@ async function setupPgClientTransaction ({
   jwtToken,
   jwtSecret,
   jwtAudiences,
+  jwtRole,
   pgDefaultRole,
   pgSettings,
 }: {
@@ -102,6 +106,7 @@ async function setupPgClientTransaction ({
   jwtToken?: string,
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
+  jwtRole: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -115,7 +120,7 @@ async function setupPgClientTransaction ({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not procided to the server
+      // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
@@ -124,7 +129,7 @@ async function setupPgClientTransaction ({
         audience: jwtAudiences,
       })
 
-      const roleClaim = jwtClaims['role']
+      const roleClaim = getPath(jwtClaims, jwtRole)
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
@@ -136,9 +141,16 @@ async function setupPgClientTransaction ({
       }
     }
     catch (error) {
-      // In case this error is thrown in an HTTP context, we want to add a 403
-      // status code.
-      error.statusCode = 403
+      // In case this error is thrown in an HTTP context, we want to add status code
+      // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
+      if ( ('name' in error) && error.name === 'TokenExpiredError') {
+        // The correct status code for an expired ( but otherwise acceptable token is 401 )
+        error.statusCode = 401
+      } else {
+        // All other authentication errors should get a 403 status code.
+        error.statusCode = 403
+      }
+
       throw error
     }
   }
@@ -219,5 +231,22 @@ function debugPgClient (pgClient: Client): Client {
   }
 
   return pgClient
+}
+
+/**
+ * Safely gets the value at `path` (array of keys) of `inObject`.
+ *
+ * @private
+ */
+function getPath(inObject: mixed, path: Array<string>): any {
+  let object = inObject
+  // From https://github.com/lodash/lodash/blob/master/.internal/baseGet.js
+  let index = 0
+  const length = path.length
+
+  while (object && index < length) {
+    object = object[path[index++]]
+  }
+  return (index && index === length) ? object : undefined
 }
 // tslint:enable no-any

@@ -46,7 +46,7 @@ $ psql postgres://localhost:5432/testdb # Connects to the `testdb` database at `
 $ psql postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
 ```
 
-Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats.
+Read the documentation on [Postgres connection strings](https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-CONNSTRING) to learn more about alternative formats (including using a password).
 
 After running `psql` with your database URL, you should be in a SQL prompt:
 
@@ -308,7 +308,7 @@ Don’t get too stuck on the function implementations. It is fairly easy to disc
 >
 > 1. The function has a table row as the first argument.
 > 2. The function is in the same schema as the table of the first argument.
-> 3. The function’s name is prefixed by the table first argument’s name.
+> 3. The function’s name is prefixed by the table’s name.
 > 4. The function is marked as `stable` or `immutable` which makes it a query and not a mutation.
 >
 > All three of the above functions meet these conditions and as such will be computed fields. In GraphQL this ends up looking like:

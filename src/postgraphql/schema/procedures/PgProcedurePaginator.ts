@@ -26,7 +26,7 @@ class PgProcedurePaginator<TItemValue> extends PgPaginator<ProcedureInput, TItem
   }
 
   public name: string = this._fixtures.pgProcedure.name
-  public itemType: PgType<TItemValue> = this._fixtures.return.type as PgType<TItemValue>
+  public itemType: PgType<TItemValue> = this._fixtures.return!.type as PgType<TItemValue>
 
   /**
    * The different ways we can order our procedure. Of course we can order the

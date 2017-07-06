@@ -1,7 +1,7 @@
 import { conditionHelpers } from '../Condition'
 
 test('and will throw when there are no conditions', () => {
-  expect(() => conditionHelpers.and()).toThrow('Cannot have 0 conditions, must have at least 1.')
+  expect(() => conditionHelpers.and()).toThrowError('Cannot have 0 conditions, must have at least 1.')
 })
 
 test('and will return false if there is one false', () => {
