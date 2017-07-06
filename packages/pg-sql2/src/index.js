@@ -235,3 +235,4 @@ exports.literal = literal;
 exports.join = join;
 exports.compile = compile;
 exports.null = literal(null);
+exports.blank = query``;

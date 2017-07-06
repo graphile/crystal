@@ -53,7 +53,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
         ${sqlCommon}
         and (${queryBuilder.data
           .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
-        offset ${sql.value(offset)}
+        ${offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`}
       )`;
     } else {
       if (!invert) {
