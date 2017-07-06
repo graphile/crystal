@@ -134,6 +134,7 @@ module.exports = async function PgRowByUniqueConstraint(
                     type: TableType,
                     args: {
                       [nodeIdFieldName]: {
+                        description: `The globally unique \`ID\` to be used in selecting a single \`${TableType.name}\`.`,
                         type: new GraphQLNonNull(GraphQLID),
                       },
                     },
