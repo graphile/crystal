@@ -28,23 +28,38 @@ This repository is a monorepo (managed by [lerna][]) which comprises the followi
 Status
 ------
 
-graphql-build - complete (but needs tests, documentation, refactoring)
+- graphql-build - working (but needs tests, more documentation, refactoring,
+  and probably needs to support more hooks)
 
-graphql-build-pg - passes the PostGraphQL integration tests for queries and mutations, no descriptions are added to fields yet
+- graphql-build-pg / postgraphql-build - working - passes the PostGraphQL
+  integration tests for queries and mutations, no descriptions are added to
+  fields yet
 
-postgraphql-build - see graphql-build-pg
+- pg-sql2 - complete (but needs dedicated tests because it's currently only
+  tested by virtue of the postgraphql-build tests depending on it)
 
-graphql-parse-resolve-info - complete (but needs tests, documentation, refactoring)
+- graphql-parse-resolve-info - complete (but needs tests for similar reasons to
+  `pg-sql2`)
 
-pg-sql2 - complete (but needs tests, documentation, refactoring)
+Running on Node less than v8
+----------------------------
 
-This won't run on Node less than v8
------------------------------------
+On Node v8 and above, we run the code in the `src` folders directly as modern
+Node has basically everything you need (except [object
+splatting](https://github.com/tc39/proposal-object-rest-spread), but we make
+do), including async/await, so there's no need for source transpiling, source
+maps, polyfills, and other such workarounds.
 
-This is a temporary situation; I want to run the native code on Node directly
-if possible but I'll be using Babel to compile the code so it can support
-earlier versions of node. In the mean time, why not try Node v8?
-`async`/`await` is built in!
+However before Node v8 we need various helpers, even such simple things as
+`Array.prototype.includes`, and so we bundle
+[`babel-polyfill`](http://babeljs.io/docs/usage/polyfill/). It's marked as a
+peer-dependency, so we'll use the version you provide (to avoid it being
+installed too many times!) and it is **only loaded** if you're on a Node
+version before v8 - you can see the switching code in, e.g.,
+[packages/graphql-build/index.js](packages/graphql-build/index.js).
+
+You're highly encouraged to upgrade to Node v8, not just for the fancy new
+features but also the performance improvements!
 
 History
 -------
