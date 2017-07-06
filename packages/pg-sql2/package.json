@@ -1,6 +1,6 @@
 {
   "name": "pg-sql2",
-  "version": "0.0.1-alpha2.4",
+  "version": "0.0.1-alpha3.0",
   "description": "Generate safe SQL with tagged template literals",
   "main": "index.js",
   "scripts": {
@@ -35,8 +35,8 @@
     "lodash": ">=3 <5"
   },
   "devDependencies": {
-    "markdown-doctest": "^0.9.1",
-    "jest": "20.0.4"
+    "jest": "20.0.4",
+    "markdown-doctest": "^0.9.1"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
