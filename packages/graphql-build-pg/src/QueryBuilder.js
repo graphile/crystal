@@ -263,12 +263,12 @@ class QueryBuilder {
     if (this[`${type}Locked`]) {
       if (isDev) {
         throw new Error(
-          "orderBy has already been locked\n    " +
+          `'${type}' has already been locked\n    ` +
             this[`${type}Locked`].replace(/\n/g, "\n    ") +
             "\n"
         );
       }
-      throw new Error("orderBy has already been locked");
+      throw new Error(`'${type}' has already been locked`);
     }
   }
   lockEverything() {
