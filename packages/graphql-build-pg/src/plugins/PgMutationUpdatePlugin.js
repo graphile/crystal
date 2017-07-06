@@ -320,7 +320,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                                         key.type
                                       )}`
                                   ),
-                                  ") AND ("
+                                  ") and ("
                                 )})`
                               );
                             } catch (e) {
@@ -441,7 +441,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                                       key.type
                                     )}`
                                 ),
-                                ") AND ("
+                                ") and ("
                               )})`
                             );
                           },

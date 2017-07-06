@@ -13,7 +13,7 @@ const sqlFields = sql.join(
 
 // sql.value will store the value and instead add a placeholder to the SQL
 // statement, to ensure that no SQL injection can occur.
-const sqlConditions = sql.query`created_at > NOW() - interval '3 years' AND age > ${sql.value(
+const sqlConditions = sql.query`created_at > NOW() - interval '3 years' and age > ${sql.value(
   22
 )}`;
 
@@ -37,7 +37,7 @@ const { text, values } = sql.compile(query);
 
 console.log(text);
 /* ->
-with __local_0__ as (select "user"."name", "user"."age", "user"."height" from "user" where created_at > NOW() - interval '3 years' AND age > $1)
+with __local_0__ as (select "user"."name", "user"."age", "user"."height" from "user" where created_at > NOW() - interval '3 years' and age > $1)
 select
   (select json_agg(row_to_json(__local_0__)) from __local_0__) as all_data,
   (select max(age) from __local_0__) as max_age

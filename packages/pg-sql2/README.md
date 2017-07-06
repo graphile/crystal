@@ -21,7 +21,7 @@ const sqlFields = sql.join(
 // sql.value will store the value and instead add a placeholder to the SQL
 // statement, to ensure that no SQL injection can occur.
 const sqlConditions =
-  sql.query`created_at > NOW() - interval '3 years' AND age > ${sql.value(22)}`;
+  sql.query`created_at > NOW() - interval '3 years' and age > ${sql.value(22)}`;
 
 // This could be a full query, but we're going to embed it in another query safely
 const innerQuery =
@@ -42,7 +42,7 @@ const { text, values } = sql.compile(query);
 
 console.log(text);
 /* ->
-with __local_0__ as (select "user"."name", "user"."age", "user"."height" from "user" where created_at > NOW() - interval '3 years' AND age > $1)
+with __local_0__ as (select "user"."name", "user"."age", "user"."height" from "user" where created_at > NOW() - interval '3 years' and age > $1)
 select
   (select json_agg(row_to_json(__local_0__)) from __local_0__) as all_data,
   (select max(age) from __local_0__) as max_age
@@ -88,7 +88,7 @@ const arrayOfSqlFields = ['a', 'b', 'c', 'd'].map(n => sql.identifier(n));
 sql.query`select ${sql.join(arrayOfSqlFields, ', ')}` // -> select "a", "b", "c", "d"
 
 const arrayOfSqlConditions = [sql.query`a = 1`, sql.query`b = 2`, sql.query`c = 3`];
-sql.query`where (${sql.join(arrayOfSqlConditions, ') AND (')})` // -> where (a = 1) AND (b = 2) AND (c = 3)
+sql.query`where (${sql.join(arrayOfSqlConditions, ') and (')})` // -> where (a = 1) and (b = 2) and (c = 3)
 
 const fragments = [
   {alias: 'name', sqlFragment: sql.identifier('user', 'name')},

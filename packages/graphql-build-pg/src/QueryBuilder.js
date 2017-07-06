@@ -161,7 +161,7 @@ class QueryBuilder {
     this.lock("whereBound");
     const clauses = this.data.whereBound[isLower ? "lower" : "upper"];
     if (clauses.length) {
-      return sql.fragment`(${sql.join(clauses, ") AND (")})`;
+      return sql.fragment`(${sql.join(clauses, ") and (")})`;
     } else {
       return sql.literal(true);
     }
@@ -174,7 +174,7 @@ class QueryBuilder {
       ...(includeUpperBound ? [this.buildWhereBoundClause(false)] : []),
     ];
     return clauses.length
-      ? sql.fragment`(${sql.join(clauses, ") AND (")})`
+      ? sql.fragment`(${sql.join(clauses, ") and (")})`
       : sql.fragment`1 = 1`;
   }
   build(
