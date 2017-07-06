@@ -32,4 +32,19 @@ module.exports = function ClientMutationIdDescriptionPlugin(builder) {
       });
     }
   );
+
+  builder.hook(
+    "field:args",
+    (args, { extend }, { scope: { isRootMutation } }) => {
+      if (!isRootMutation || !args.input || args.input.description) {
+        return args;
+      }
+      return Object.assign({}, args, {
+        input: extend(args.input, {
+          description:
+            "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+        }),
+      });
+    }
+  );
 };
