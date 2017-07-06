@@ -134,7 +134,7 @@ module.exports = function PgForwardRelationPlugin(
               });
               return {
                 type: nullableIf(
-                  !keys.every(key => key.isNotNull),
+                  isMutationPayload || !keys.every(key => key.isNotNull),
                   gqlForeignTableType
                 ),
                 resolve: (rawData, _args, _context, resolveInfo) => {
