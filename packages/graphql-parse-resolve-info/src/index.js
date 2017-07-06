@@ -1,7 +1,7 @@
 "use strict";
 const assert = require("assert");
 const { getArgumentValues } = require("graphql/execution/values");
-const { getNamedType } = require("graphql");
+const { getNamedType, isCompositeType } = require("graphql");
 const debug = require("debug")("graphql-parse-resolve-info");
 
 // Originally based on https://github.com/tjmehta/graphql-parse-fields
@@ -105,9 +105,11 @@ function fieldTreeFromAST(
           alias,
           name,
           args,
-          fieldsByTypeName: {
-            [fieldGqlType.name]: {},
-          },
+          fieldsByTypeName: isCompositeType(fieldGqlType)
+            ? {
+                [fieldGqlType.name]: {},
+              }
+            : {},
         };
       }
       if (val.selectionSet && options.deep) {
