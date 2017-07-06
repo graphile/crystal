@@ -28,17 +28,17 @@ This repository is a monorepo (managed by [lerna][]) which comprises the followi
 Status
 ------
 
-- graphql-build - working (but needs tests, more documentation, refactoring,
+- [graphql-build][] - working (but needs tests, more documentation, refactoring,
   and probably needs to support more hooks)
 
-- graphql-build-pg / postgraphql-build - working - passes the PostGraphQL
+- [graphql-build-pg][] / [postgraphql-build][] - working - passes the PostGraphQL
   integration tests for queries and mutations, no descriptions are added to
   fields yet
 
-- pg-sql2 - complete (but needs dedicated tests because it's currently only
+- [pg-sql2][] - complete (but needs dedicated tests because it's currently only
   tested by virtue of the postgraphql-build tests depending on it)
 
-- graphql-parse-resolve-info - complete (but needs tests for similar reasons to
+- [graphql-parse-resolve-info][] - complete (but needs tests for similar reasons to
   `pg-sql2`)
 
 Running on Node less than v8
