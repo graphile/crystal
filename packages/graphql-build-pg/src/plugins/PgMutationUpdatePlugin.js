@@ -84,9 +84,6 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                           {
                             clientMutationId: {
                               type: GraphQLString,
-                              resolve(data) {
-                                return data.__clientMutationId;
-                              },
                             },
                             [tableName]: {
                               type: Table,
@@ -214,7 +211,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                       );
                     }
                     return {
-                      __clientMutationId: input.clientMutationId,
+                      clientMutationId: input.clientMutationId,
                       data: row,
                     };
                   }
@@ -270,6 +267,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                         isPgDeleteInputType: mode === "delete",
                         isPgDeleteNodeInputType: mode === "delete",
                         pgInflection: table,
+                        isMutationInput: true,
                       }
                     );
 
@@ -398,6 +396,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                         isPgDeleteByKeysInputType: mode === "delete",
                         pgInflection: table,
                         pgKeys: keys,
+                        isMutationInput: true,
                       }
                     );
 

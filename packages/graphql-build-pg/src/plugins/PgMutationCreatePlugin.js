@@ -92,9 +92,6 @@ module.exports = function PgMutationCreatePlugin(
                   return {
                     clientMutationId: {
                       type: GraphQLString,
-                      resolve(data) {
-                        return data.__clientMutationId;
-                      },
                     },
                     [tableName]: {
                       type: Table,
@@ -179,7 +176,7 @@ module.exports = function PgMutationCreatePlugin(
                     debugSql(require("sql-formatter").format(text));
                   const { rows: [row] } = await pgClient.query(text, values);
                   return {
-                    __clientMutationId: input.clientMutationId,
+                    clientMutationId: input.clientMutationId,
                     data: row,
                   };
                 },

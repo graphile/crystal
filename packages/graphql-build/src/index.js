@@ -22,6 +22,7 @@ const defaultPlugins = [
   localPlugins.NodePlugin,
   localPlugins.QueryPlugin,
   localPlugins.MutationPlugin,
+  localPlugins.ClientMutationIdDescriptionPlugin,
   localPlugins.MutationPayloadQueryPlugin,
 ];
 

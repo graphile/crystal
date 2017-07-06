@@ -213,13 +213,14 @@ module.exports = function makeNewBuild(builder) {
             );
           },
           fields: () => {
+            const processedFields = [];
             const fieldsContext = {
               scope,
               addDataGeneratorForField,
               recurseDataGeneratorsForField,
               Self,
               GraphQLObjectType: rawSpec,
-              buildFieldWithHooks: (fieldName, spec, scope = {}) => {
+              buildFieldWithHooks: (fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
@@ -290,7 +291,14 @@ module.exports = function makeNewBuild(builder) {
                     }
                     return data;
                   },
-                  scope,
+                  scope: Object.assign(
+                    {},
+                    scope,
+                    {
+                      fieldName,
+                    },
+                    fieldScope
+                  ),
                 };
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
@@ -316,6 +324,7 @@ module.exports = function makeNewBuild(builder) {
                   ),
                 });
                 const finalSpec = newSpec;
+                processedFields.push(finalSpec);
                 return finalSpec;
               },
             };
@@ -323,13 +332,25 @@ module.exports = function makeNewBuild(builder) {
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
             }
-            return builder.applyHooks(
+            const fieldsSpec = builder.applyHooks(
               this,
               "GraphQLObjectType:fields",
               rawFields,
               fieldsContext,
               `|${rawSpec.name}`
             );
+            // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
+            for (const fieldName in fieldsSpec) {
+              const fieldSpec = fieldsSpec[fieldName];
+              if (!processedFields.indexOf(fieldSpec) >= 0) {
+                // We've not processed this yet; process it now!
+                fieldsSpec[fieldName] = fieldsContext.buildFieldWithHooks(
+                  fieldName,
+                  fieldSpec
+                );
+              }
+            }
+            return fieldsSpec;
           },
         });
       } else if (Type === GraphQLInputObjectType) {
@@ -347,18 +368,26 @@ module.exports = function makeNewBuild(builder) {
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
           fields: () => {
+            const processedFields = [];
             const fieldsContext = {
               scope,
               Self,
               GraphQLObjectType: rawSpec,
-              buildFieldWithHooks: (fieldName, spec, scope = {}) => {
+              buildFieldWithHooks: (fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
                 let context = {
-                  scope,
+                  scope: Object.assign(
+                    {},
+                    scope,
+                    {
+                      fieldName,
+                    },
+                    fieldScope
+                  ),
                 };
                 let newSpec = spec;
                 if (typeof newSpec === "function") {
@@ -372,6 +401,7 @@ module.exports = function makeNewBuild(builder) {
                   `|${Self.name}.fields.${fieldName}`
                 );
                 const finalSpec = newSpec;
+                processedFields.push(finalSpec);
                 return finalSpec;
               },
             };
@@ -379,13 +409,25 @@ module.exports = function makeNewBuild(builder) {
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
             }
-            return builder.applyHooks(
+            const fieldsSpec = builder.applyHooks(
               this,
               "GraphQLInputObjectType:fields",
               rawFields,
               fieldsContext,
               `|${Self.name}`
             );
+            // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
+            for (const fieldName in fieldsSpec) {
+              const fieldSpec = fieldsSpec[fieldName];
+              if (!processedFields.indexOf(fieldSpec) >= 0) {
+                // We've not processed this yet; process it now!
+                fieldsSpec[fieldName] = fieldsContext.buildFieldWithHooks(
+                  fieldName,
+                  fieldSpec
+                );
+              }
+            }
+            return fieldsSpec;
           },
         });
       } else if (Type === GraphQLEnumType) {

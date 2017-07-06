@@ -259,9 +259,6 @@ module.exports = function makeProcField(
                 {
                   clientMutationId: {
                     type: GraphQLString,
-                    resolve(data) {
-                      return data.__clientMutationId;
-                    },
                   },
                 },
                 isNotVoid && {
@@ -284,17 +281,23 @@ module.exports = function makeProcField(
           )
         );
         ReturnType = new GraphQLNonNull(PayloadType);
-        const InputType = buildObjectWithHooks(GraphQLInputObjectType, {
-          name: inflection.functionInputType(proc.name, proc.namespace.name),
-          fields: Object.assign(
-            {
-              clientMutationId: {
-                type: GraphQLString,
+        const InputType = buildObjectWithHooks(
+          GraphQLInputObjectType,
+          {
+            name: inflection.functionInputType(proc.name, proc.namespace.name),
+            fields: Object.assign(
+              {
+                clientMutationId: {
+                  type: GraphQLString,
+                },
               },
-            },
-            args
-          ),
-        });
+              args
+            ),
+          },
+          {
+            isMutationInput: true,
+          }
+        );
         args = {
           input: {
             type: new GraphQLNonNull(InputType),
@@ -362,7 +365,7 @@ module.exports = function makeProcField(
               })();
               if (isMutation) {
                 return {
-                  __clientMutationId: args.input.clientMutationId,
+                  clientMutationId: args.input.clientMutationId,
                   data: result,
                 };
               } else {
