@@ -76,7 +76,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       -- results of the query.
       with ${sql.identifier(cteIdentifier)} as (
         -- The standard select/from clauses up top.
-        select ${sql.identifier(aliasIdentifier)}.*
+        select ${sql.identifier(aliasIdentifier)} as value
         from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
         -- Combine our cursors with the condition used for this page to
@@ -102,7 +102,7 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
 
         -- If we have an offset, add that as well.
         ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
-      ) select to_json(${sql.identifier(cteIdentifier)}) as value from ${sql.identifier(cteIdentifier)};
+      ) select to_json(${sql.identifier(cteIdentifier)}.value) as value from ${sql.identifier(cteIdentifier)};
     `)
 
     let { rows } = await client.query(query)
