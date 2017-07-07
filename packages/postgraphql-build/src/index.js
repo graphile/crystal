@@ -9,7 +9,7 @@ module.exports = function createPostGraphQLSchema(
   schemas,
   options = {}
 ) {
-  const { dynamicJson, classicIds } = options;
+  const { dynamicJson, classicIds, nodeIdFieldName } = options;
   return buildSchema([...defaultPlugins, ...pgDefaultPlugins], {
     pgConfig: client,
     pgSchemas: schemas,
@@ -17,6 +17,6 @@ module.exports = function createPostGraphQLSchema(
     pgInflection: classicIds
       ? inflections.postGraphQLClassicIdsInflection
       : inflections.postGraphQLInflection,
-    nodeIdFieldName: classicIds ? "id" : "nodeId",
+    nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
   });
 };

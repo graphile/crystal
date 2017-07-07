@@ -89,7 +89,7 @@ function fieldTreeFromAST(
       kind
     );
     const name = val.name && val.name.value;
-    const isReserved = name && name.substr(0, 2) === "__";
+    const isReserved = name && name !== "__id" && name.substr(0, 2) === "__";
     if (kind === "Field" && !isReserved) {
       const alias = val.alias ? val.alias.value : name;
       debug("%s[%d] Field '%s' (alias = '%s')", depth, instance, name, alias);
