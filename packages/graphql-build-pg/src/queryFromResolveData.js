@@ -35,7 +35,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const sqlCommon = sql.fragment`
       select 1
       from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-      where ${queryBuilder.buildWhereClause(!invert, invert)}
+      where ${queryBuilder.buildWhereClause(!invert, invert, options)}
     `;
     if (!queryHasBefore && !queryHasFirst && (!invert || offset === 0)) {
       // There can be no next page since there's no upper bound
@@ -181,7 +181,7 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
     const totalCount = sql.fragment`(
       select count(*)
       from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
-      where ${queryBuilder.buildWhereClause(false, false)}
+      where ${queryBuilder.buildWhereClause(false, false, options)}
     )`;
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
     const sqlFrom = sql.fragment``;

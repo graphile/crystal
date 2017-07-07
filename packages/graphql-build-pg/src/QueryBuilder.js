@@ -166,9 +166,12 @@ class QueryBuilder {
       return sql.literal(true);
     }
   }
-  buildWhereClause(includeLowerBound, includeUpperBound) {
+  buildWhereClause(includeLowerBound, includeUpperBound, { addNullCase }) {
     this.lock("where");
     const clauses = [
+      ...(addNullCase
+        ? [sql.fragment`${this.getTableAlias()} is not null`]
+        : []),
       ...this.data.where,
       ...(includeLowerBound ? [this.buildWhereBoundClause(true)] : []),
       ...(includeUpperBound ? [this.buildWhereBoundClause(false)] : []),
@@ -177,14 +180,14 @@ class QueryBuilder {
       ? sql.fragment`(${sql.join(clauses, ") and (")})`
       : sql.fragment`1 = 1`;
   }
-  build(
-    {
+  build(options = {}) {
+    const {
       asJson = false,
       asJsonAggregate = false,
       onlyJsonField = false,
       addNullCase = false,
-    } = {}
-  ) {
+    } = options;
+
     this.lockEverything();
     if (onlyJsonField) {
       return this.buildSelectJson({ addNullCase });
@@ -197,7 +200,7 @@ class QueryBuilder {
       ${this.data.from &&
         sql.fragment`from ${this.data.from[0]} as ${this.getTableAlias()}`}
       ${this.data.join.length && sql.join(this.data.join, " ")}
-      where ${this.buildWhereClause(true, true)}
+      where ${this.buildWhereClause(true, true, options)}
       ${this.data.orderBy.length
         ? sql.fragment`order by ${sql.join(
             this.data.orderBy.map(
