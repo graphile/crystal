@@ -70,7 +70,7 @@
     "nodemon": "^1.11.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
-    "react-scripts": "0.7.0",
+    "react-scripts": "1.0.10",
     "source-map-support": "^0.4.6",
     "supertest": "^2.0.1",
     "ts-node": "^2.0.0",
