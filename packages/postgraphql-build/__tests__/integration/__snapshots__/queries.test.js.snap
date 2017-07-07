@@ -784,6 +784,14 @@ Object {
 }
 `;
 
+exports[`nonexistant-record-from-function.graphql 1`] = `
+Object {
+  "data": Object {
+    "tableQuery": null,
+  },
+}
+`;
+
 exports[`posts.graphql 1`] = `
 Object {
   "data": Object {

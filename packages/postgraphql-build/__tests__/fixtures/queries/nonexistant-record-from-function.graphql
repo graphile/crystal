@@ -1,0 +1,6 @@
+{
+  tableQuery(id: 13373475) {
+    id
+    headline
+  }
+}
