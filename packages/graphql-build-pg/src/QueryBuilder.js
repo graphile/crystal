@@ -170,7 +170,25 @@ class QueryBuilder {
     this.lock("where");
     const clauses = [
       ...(addNullCase
-        ? [sql.fragment`${this.getTableAlias()} is not null`]
+        ? /*
+           * Okay... so this is quite interesting. When we're talking about
+           * composite types, `(foo is not null)` and `not (foo is null)` are
+           * NOT equivalent! Here's why:
+           *
+           * `(foo is null)`
+           *   true if every field of the row is null
+           *
+           * `(foo is not null)`
+           *   true if every field of the row is not null
+           *
+           * `not (foo is null)`
+           *   true if there's at least one field that is not null
+           *
+           * So don't "simplify" the line below! We're probably checking if
+           * the result of a function call returning a compound type was
+           * indeed null.
+           */
+          [sql.fragment`not (${this.getTableAlias()} is null)`]
         : []),
       ...this.data.where,
       ...(includeLowerBound ? [this.buildWhereBoundClause(true)] : []),
