@@ -1,0 +1,46 @@
+"use strict";
+jest.mock('../../../interface/Inventory');
+var interface_1 = require("../../../interface");
+var idSerde_1 = require("../idSerde");
+var mockObjectType = function () {
+    return new interface_1.BasicObjectType({
+        name: 'hello-type',
+        fields: new Map([
+            ['b', { type: { isTypeOf: function () { return true; } } }],
+            ['a', { type: { isTypeOf: function () { return true; } } }],
+            ['c', { type: { isTypeOf: function () { return true; } } }],
+        ]),
+    });
+};
+test('serialize will create a base64 encoded key value for a collection key', function () {
+    var collection = { name: 'hello', primaryKey: { keyType: interface_1.stringType, getKeyFromValue: jest.fn(function (x) { return x; }) } };
+    expect(idSerde_1.default.serialize(collection, 'world')).toEqual('WyJoZWxsbyIsIndvcmxkIl0=');
+    expect(collection.primaryKey.getKeyFromValue.mock.calls).toEqual([['world']]);
+});
+test('serialize will give object types a special treatment create a base64 encoded key value for a collection key', function () {
+    var value = Symbol();
+    var collection = {
+        name: 'hello',
+        primaryKey: { keyType: mockObjectType(), getKeyFromValue: jest.fn(function () { return ({ a: 1, b: 2, c: 3 }); }) },
+    };
+    expect(idSerde_1.default.serialize(collection, value)).toEqual('WyJoZWxsbyIsMiwxLDNd');
+    expect(collection.primaryKey.getKeyFromValue.mock.calls).toEqual([[value]]);
+});
+test('deserialize will turn an id into a collection key and key value', function () {
+    var inventory = new interface_1.Inventory();
+    var collectionKey = { keyType: { kind: 'SCALAR' } };
+    var collection = { primaryKey: collectionKey };
+    inventory.getCollection.mockReturnValue(collection);
+    expect(idSerde_1.default.deserialize(inventory, 'WyJoZWxsbyIsIndvcmxkIl0=')).toEqual({ collection: collection, keyValue: 'world' });
+    expect(inventory.getCollection.mock.calls).toEqual([['hello']]);
+});
+test('deserialize will turn an id into a collection key and key value even if the key type is an object type', function () {
+    var inventory = new interface_1.Inventory();
+    var collectionKey = { keyType: mockObjectType() };
+    var collection = { primaryKey: collectionKey };
+    inventory.getCollection.mockReturnValue(collection);
+    collectionKey.keyType.isTypeOf = jest.fn(collectionKey.keyType.isTypeOf);
+    expect(idSerde_1.default.deserialize(inventory, 'WyJoZWxsbyIsMiwxLDNd')).toEqual({ collection: collection, keyValue: { b: 2, a: 1, c: 3 } });
+    expect(inventory.getCollection.mock.calls).toEqual([['hello']]);
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaWRTZXJkZS10ZXN0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vc3JjL2dyYXBocWwvdXRpbHMvX190ZXN0c19fL2lkU2VyZGUtdGVzdC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsSUFBSSxDQUFDLElBQUksQ0FBQyw4QkFBOEIsQ0FBQyxDQUFBO0FBRXpDLGdEQUEyRTtBQUMzRSxzQ0FBZ0M7QUFFaEMsSUFBTSxjQUFjLEdBQUc7SUFDckIsT0FBQSxJQUFJLDJCQUFlLENBQUM7UUFDbEIsSUFBSSxFQUFFLFlBQVk7UUFDbEIsTUFBTSxFQUFFLElBQUksR0FBRyxDQUFDO1lBQ2QsQ0FBQyxHQUFHLEVBQUUsRUFBRSxJQUFJLEVBQUUsRUFBRSxRQUFRLEVBQUUsY0FBTSxPQUFBLElBQUksRUFBSixDQUFJLEVBQUUsRUFBRSxDQUFDO1lBQ3pDLENBQUMsR0FBRyxFQUFFLEVBQUUsSUFBSSxFQUFFLEVBQUUsUUFBUSxFQUFFLGNBQU0sT0FBQSxJQUFJLEVBQUosQ0FBSSxFQUFFLEVBQUUsQ0FBQztZQUN6QyxDQUFDLEdBQUcsRUFBRSxFQUFFLElBQUksRUFBRSxFQUFFLFFBQVEsRUFBRSxjQUFNLE9BQUEsSUFBSSxFQUFKLENBQUksRUFBRSxFQUFFLENBQUM7U0FDMUMsQ0FBQztLQUNILENBQUM7QUFQRixDQU9FLENBQUE7QUFFSixJQUFJLENBQUMsdUVBQXVFLEVBQUU7SUFDNUUsSUFBTSxVQUFVLEdBQUcsRUFBRSxJQUFJLEVBQUUsT0FBTyxFQUFFLFVBQVUsRUFBRSxFQUFFLE9BQU8sRUFBRSxzQkFBVSxFQUFFLGVBQWUsRUFBRSxJQUFJLENBQUMsRUFBRSxDQUFDLFVBQUEsQ0FBQyxJQUFJLE9BQUEsQ0FBQyxFQUFELENBQUMsQ0FBQyxFQUFFLEVBQUUsQ0FBQTtJQUMzRyxNQUFNLENBQUMsaUJBQU8sQ0FBQyxTQUFTLENBQUMsVUFBVSxFQUFFLE9BQU8sQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLDBCQUEw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

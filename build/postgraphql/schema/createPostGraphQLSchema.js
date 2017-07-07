@@ -1,0 +1,5 @@
+"use strict";
+var createPostGraphQLSchema = require("postgraphql-build");
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = createPostGraphQLSchema;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY3JlYXRlUG9zdEdyYXBoUUxTY2hlbWEuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvcG9zdGdyYXBocWwvc2NoZW1hL2NyZWF0ZVBvc3RHcmFwaFFMU2NoZW1hLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSwyREFBOEQ7O0FBQzlELGtCQUFlLHVCQUF1QixDQUFDIn0=
