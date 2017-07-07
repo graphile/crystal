@@ -201,9 +201,7 @@ module.exports = function PgTypesPlugin(
       N: () => GraphQLFloat,
       A: type =>
         new GraphQLList(
-          new GraphQLNonNull(
-            enforceGqlTypeByPgType(pgTypeById[type.arrayItemTypeId])
-          )
+          enforceGqlTypeByPgType(pgTypeById[type.arrayItemTypeId])
         ),
     };
     const rawTypes = [
