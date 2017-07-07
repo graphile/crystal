@@ -30,8 +30,8 @@
     "graphql-type-json": "^0.1.4"
   },
   "engines": {
-    "node": ">=8",
-    "yarn": "^0.24.5"
+    "node": ">=4",
+    "yarn": ">=0.20"
   },
   "devDependencies": {
     "jest": "^20.0.4"
