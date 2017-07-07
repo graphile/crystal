@@ -22,7 +22,7 @@ For an example of what procedures look like, see the [forum example SQL schema][
 [computed columns in PostgreSQL]: http://stackoverflow.com/a/11166268/1568890
 
 ## Scripting Languages
-Procedures in PostgreSQL require you to use a scripting language. The two most common procedure languages for PostgreSQL are SQL and [PL/pgSQL][PL/pgSQL]. SQL is probably the easiest to use as you are most likely already familiar with it. PL/pgSQL is PostgreSQL’s custom scripting language which is fairly easy to find plenty of StackOverflow and other resources on with a few search engine queries. You’ll need to learn PL/pgSQL if you want to write any triggers, because SQL can’t be used for triggers. But again, don’t worry, you can definetly make awesome applications without know PL/pgSQL as well as other languages you are familiar with as long as you defer to the internet.
+Procedures in PostgreSQL require you to use a scripting language. The two most common procedure languages for PostgreSQL are SQL and [PL/pgSQL][PL/pgSQL]. SQL is probably the easiest to use as you are most likely already familiar with it. PL/pgSQL is PostgreSQL’s custom scripting language which is fairly easy to find plenty of StackOverflow and other resources on with a few search engine queries. You’ll need to learn PL/pgSQL if you want to write any triggers, because SQL can’t be used for triggers. But again, don’t worry, you can definitely make awesome applications without knowing PL/pgSQL as well as other languages you are familiar with as long as you defer to the internet.
 
 A simple procedure written with SQL looks like this:
 
