@@ -1,34 +1,39 @@
-
 # Troubleshooting
 
-When troubleshooting, you may see unexpected behaviors or receive an error message. This section provide links or minor instructions for identifying the cause of the problem and how to resolve it. 
+When troubleshooting, you may see unexpected behaviors or receive an error message. This section provide links/instructions for identifying the cause of some problems and how to resolve them. 
 
-This document lists frequent cases of misusing and frequent problems with different enviroments. To report or discuss details, [use the issues](https://github.com/postgraphql/postgraphql/issues).
+To report or discuss details, [use the issues](https://github.com/postgraphql/postgraphql/issues). Pull requests to update this file with more troubleshooting tips are welcome.
 
 
 ## Installing by npm
 
 The basic installation procedure is described at  [section Usage](README.md#usage).
 
-1. The most commom error on `npm install -g postgraphql` is *"EACCES: permission denied"*, and sometimes the natural `sudo npm install` is not the best solution. For all alternatives, see  [this tutorial of "Installing global node modules"](https://github.com/nodeschool/discussions/wiki/Installing-global-node-modules-(Linux-and-Mac)). <br/>Details at [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
+### "EACCES: permission denied" on `npm install -g postgraphql`
 
-2. ..
-
+See  [this tutorial of "Installing global node modules"](https://github.com/nodeschool/discussions/wiki/Installing-global-node-modules-(Linux-and-Mac)).  
+Details at [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
 
 ## Using the command line `postgraphql`
 
-About `postgraphql`'s [usage](README.md#usage).
+See [usage](README.md#usage)
 
-1. A commom misuse have origim in the interpretation of "what is default", causing  authentication errors. The best way to check is the case, is to express the conectin string with `-c` option. Example: `postgraphql -c postgres://postgres:postgres@localhost:5432/issn`. Compare with the conection of your usual `psql`  command, eg. `PGPASSWORD=postgres psql -U postgres issn`, must be consistent.<br/>Details at [issue #482](https://github.com/postgraphql/postgraphql/issues/482) and [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
+### "error: password authentication failed for user"
 
-2. ...
+Please check your connection string (provided via the `-c` option) is valid. Example: 
 
+```
+postgraphql -c postgres://postgres:postgres@localhost:5432/issn
+```
 
-## Quering with /graphiql
+If you believe the connection string to be valid, you can check it with the `psql` command line utility:
 
-...
- 
+```
+psql postgres://postgres:postgres@localhost:5432/issn
+```
 
-## Test and becnhmarking
+(Note this works with `postgres://` and `postgresql://` schemas, but not `pg://`)
 
-... See [issue #461](https://github.com/postgraphql/postgraphql/issues/461) and 
+If this is failing then your issue lies outside of PostGraphQL - check your postgresql roles and grants.
+
+Details at [issue #482](https://github.com/postgraphql/postgraphql/issues/482) and [issue #495](https://github.com/postgraphql/postgraphql/issues/495).
