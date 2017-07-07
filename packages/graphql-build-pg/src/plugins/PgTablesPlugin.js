@@ -67,10 +67,15 @@ module.exports = function PgTablesPlugin(
         const attributes = introspectionResultsByKind.attribute
           .filter(attr => attr.classId === table.id)
           .sort((a1, a2) => a1.num - a2.num);
+        const tableTypeName = inflection.tableType(
+          table.name,
+          schema && schema.name
+        );
         const TableType = buildObjectWithHooks(
           GraphQLObjectType,
           {
-            name: inflection.tableType(table.name, schema && schema.name),
+            description: table.description,
+            name: tableTypeName,
             interfaces: () => {
               if (nodeIdFieldName && table.isSelectable) {
                 return [getTypeByName("Node")];
@@ -101,6 +106,8 @@ module.exports = function PgTablesPlugin(
                   };
                 });
                 fields[nodeIdFieldName] = {
+                  description:
+                    "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
                   type: new GraphQLNonNull(GraphQLID),
                   resolve(data) {
                     return (
@@ -126,6 +133,7 @@ module.exports = function PgTablesPlugin(
         const TableInputType = buildObjectWithHooks(
           GraphQLInputObjectType,
           {
+            description: `An input for mutations affecting \`${tableTypeName}\``,
             name: inflection.inputType(TableType),
           },
           {
@@ -177,6 +185,7 @@ module.exports = function PgTablesPlugin(
           buildObjectWithHooks(
             GraphQLInputObjectType,
             {
+              description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
               name: inflection.patchType(TableType),
             },
             {
@@ -193,11 +202,13 @@ module.exports = function PgTablesPlugin(
           const EdgeType = buildObjectWithHooks(
             GraphQLObjectType,
             {
+              description: `A \`${tableTypeName}\` edge in the connection.`,
               name: inflection.edge(TableType.name),
               fields: ({ recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("node");
                 return {
                   cursor: {
+                    description: "A cursor for use in pagination.",
                     type: Cursor,
                     resolve(data) {
                       return (
@@ -206,6 +217,7 @@ module.exports = function PgTablesPlugin(
                     },
                   },
                   node: {
+                    description: `The \`${tableTypeName}\` at the end of the edge.`,
                     type: new GraphQLNonNull(TableType),
                     resolve(data) {
                       return data;
@@ -226,6 +238,7 @@ module.exports = function PgTablesPlugin(
           buildObjectWithHooks(
             GraphQLObjectType,
             {
+              description: `A connection to a list of \`${tableTypeName}\` values.`,
               name: inflection.connection(TableType.name),
               fields: ({ recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("edges");
@@ -233,12 +246,14 @@ module.exports = function PgTablesPlugin(
                 recurseDataGeneratorsForField("pageInfo");
                 return {
                   nodes: {
+                    description: `A list of \`${tableTypeName}\` objects.`,
                     type: new GraphQLNonNull(new GraphQLList(TableType)),
                     resolve(data) {
                       return data.data;
                     },
                   },
                   edges: {
+                    description: `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),
@@ -247,6 +262,7 @@ module.exports = function PgTablesPlugin(
                     },
                   },
                   pageInfo: PageInfo && {
+                    description: "Information to aid in pagination.",
                     type: new GraphQLNonNull(PageInfo),
                     resolve(data) {
                       return data;

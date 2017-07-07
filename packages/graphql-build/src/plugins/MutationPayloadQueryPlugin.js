@@ -12,6 +12,8 @@ module.exports = function MutationPayloadQueryPlugin(builder) {
       const Query = getTypeByName("Query");
       return extend(fields, {
         query: {
+          description:
+            "Our root query field type. Allows us to run any query from our mutation payload.",
           type: Query,
           resolve() {
             return $$isQuery;

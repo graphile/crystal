@@ -5,15 +5,24 @@ module.exports = function PgConnectionTotalCount(builder) {
     "GraphQLObjectType:fields",
     (
       fields,
-      { extend },
+      { extend, pgInflection: inflection },
       {
         scope: { isPgRowConnectionType, pgIntrospection: table },
         buildFieldWithHooks,
       }
     ) => {
-      if (!isPgRowConnectionType || !table || table.kind !== "class") {
+      if (
+        !isPgRowConnectionType ||
+        !table ||
+        table.kind !== "class" ||
+        !table.namespace
+      ) {
         return fields;
       }
+      const tableTypeName = inflection.tableType(
+        table.name,
+        table.namespace.name
+      );
       return extend(fields, {
         totalCount: buildFieldWithHooks(
           "totalCount",
@@ -24,6 +33,7 @@ module.exports = function PgConnectionTotalCount(builder) {
               };
             });
             return {
+              description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
               type: GraphQLInt,
             };
           }

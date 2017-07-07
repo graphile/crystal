@@ -58,6 +58,8 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
       },
       fields: {
         [nodeIdFieldName]: {
+          description:
+            "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
           type: new GraphQLNonNull(GraphQLID),
         },
       },
@@ -94,6 +96,8 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
     }
     return extend(fields, {
       [nodeIdFieldName]: {
+        description:
+          "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
         type: new GraphQLNonNull(GraphQLID),
         resolve() {
           return "query";

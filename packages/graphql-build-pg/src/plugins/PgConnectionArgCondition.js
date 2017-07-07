@@ -14,10 +14,15 @@ module.exports = function PgConnectionArgCondition(
       }
     ) => {
       introspectionResultsByKind.class.map(table => {
+        const tableTypeName = inflection.tableType(
+          table.name,
+          table.namespace && table.namespace.name
+        );
         /* const TableConditionType = */
         buildObjectWithHooks(
           GraphQLInputObjectType,
           {
+            description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
             name: inflection.conditionType(
               inflection.tableType(
                 table.name,
@@ -36,6 +41,7 @@ module.exports = function PgConnectionArgCondition(
                   memo[fieldName] = buildFieldWithHooks(
                     fieldName,
                     {
+                      description: `Checks for equality with the object’s \`${fieldName}\` field.`,
                       type: gqlTypeByTypeId[attr.typeId] || GraphQLString,
                     },
                     {
@@ -110,6 +116,8 @@ module.exports = function PgConnectionArgCondition(
 
       return extend(args, {
         condition: {
+          description:
+            "A condition to be used in determining which values should be returned by the collection.",
           type: TableConditionType,
         },
       });

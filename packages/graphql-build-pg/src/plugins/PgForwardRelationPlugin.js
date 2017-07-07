@@ -49,9 +49,11 @@ module.exports = function PgForwardRelationPlugin(
       return extend(
         fields,
         foreignKeyConstraints.reduce((memo, constraint) => {
-          const gqlTableType = getTypeByName(
-            inflection.tableType(table.name, table.namespace.name)
+          const tableTypeName = inflection.tableType(
+            table.name,
+            table.namespace.name
           );
+          const gqlTableType = getTypeByName(tableTypeName);
           if (!gqlTableType) {
             debug(
               `Could not determine type for table with id ${constraint.classId}`
@@ -60,9 +62,11 @@ module.exports = function PgForwardRelationPlugin(
           }
           const foreignTable =
             introspectionResultsByKind.classById[constraint.foreignClassId];
-          const gqlForeignTableType = getTypeByName(
-            inflection.tableType(foreignTable.name, foreignTable.namespace.name)
+          const foreignTableTypeName = inflection.tableType(
+            foreignTable.name,
+            foreignTable.namespace.name
           );
+          const gqlForeignTableType = getTypeByName(foreignTableTypeName);
           if (!gqlForeignTableType) {
             debug(
               `Could not determine type for foreign table with id ${constraint.foreignClassId}`
@@ -139,6 +143,7 @@ module.exports = function PgForwardRelationPlugin(
                 };
               });
               return {
+                description: `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
                 type: nullableIf(
                   isMutationPayload || !keys.every(key => key.isNotNull),
                   gqlForeignTableType

@@ -252,6 +252,10 @@ module.exports = function makeProcField(
               proc.name,
               proc.namespace.name
             ),
+            description: `The output of our \`${inflection.functionName(
+              proc.name,
+              proc.namespace.name
+            )}\` mutation.`,
             fields: ({ recurseDataGeneratorsForField }) => {
               if (isNotVoid) {
                 recurseDataGeneratorsForField(resultFieldName);
@@ -286,6 +290,10 @@ module.exports = function makeProcField(
           GraphQLInputObjectType,
           {
             name: inflection.functionInputType(proc.name, proc.namespace.name),
+            description: `All input for the \`${inflection.functionName(
+              proc.name,
+              proc.namespace.name
+            )}\` mutation.`,
             fields: Object.assign(
               {
                 clientMutationId: {

@@ -62,11 +62,14 @@ type DummyEdge {
 }
 
 interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
 }
 
 type Query implements Node {
   query: Query
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
   node(nodeId: ID!): Node
   dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection

@@ -28,9 +28,11 @@ module.exports = async function PgAllRows(
           .filter(table => table.isSelectable)
           .filter(table => table.namespace)
           .reduce((memo, table) => {
-            const TableType = getTypeByName(
-              inflection.tableType(table.name, table.namespace.name)
+            const tableTypeName = inflection.tableType(
+              table.name,
+              table.namespace.name
             );
+            const TableType = getTypeByName(tableTypeName);
             const ConnectionType = getTypeByName(
               inflection.connection(TableType.name)
             );
@@ -63,6 +65,7 @@ module.exports = async function PgAllRows(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {
+                    description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
                     type: ConnectionType,
                     args: {},
                     async resolve(parent, args, { pgClient }, resolveInfo) {

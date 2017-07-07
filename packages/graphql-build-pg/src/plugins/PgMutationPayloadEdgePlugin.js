@@ -69,6 +69,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
                 v => v.name === "PRIMARY_KEY_ASC"
               ) || TableOrderByType.getValues()[0];
             return {
+              description: "An edge for the type. May be used by Relay 1.",
               type: TableEdgeType,
               args: {
                 orderBy: {

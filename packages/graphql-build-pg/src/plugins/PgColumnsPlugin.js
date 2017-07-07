@@ -105,6 +105,7 @@ module.exports = function PgColumnsPlugin(
                   }
                 });
                 return {
+                  description: attr.description,
                   type: nullableIf(!attr.isNotNull, ReturnType),
                   resolve: (data, _args, _context, resolveInfo) => {
                     const alias = getAliasFromResolveInfo(resolveInfo);
@@ -155,6 +156,7 @@ module.exports = function PgColumnsPlugin(
               table.namespace.name
             );
             memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
+              description: attr.description,
               type: nullableIf(
                 isPgPatch || !attr.isNotNull || attr.hasDefault,
                 gqlInputTypeByTypeId[attr.typeId] || GraphQLString

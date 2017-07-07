@@ -131,6 +131,7 @@ module.exports = async function PgRowByUniqueConstraint(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {
+                    description: `Reads a single \`${TableType.name}\` using its globally unique \`ID\`.`,
                     type: TableType,
                     args: {
                       [nodeIdFieldName]: {

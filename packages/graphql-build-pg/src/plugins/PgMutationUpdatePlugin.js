@@ -60,9 +60,11 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                   const attributes = introspectionResultsByKind.attribute
                     .filter(attr => attr.classId === table.id)
                     .sort((a, b) => a.num - b.num);
-                  const Table = getTypeByName(
-                    inflection.tableType(table.name, table.namespace.name)
+                  const tableTypeName = inflection.tableType(
+                    table.name,
+                    table.namespace.name
                   );
+                  const Table = getTypeByName(tableTypeName);
                   const TablePatch = getTypeByName(
                     inflection.patchType(Table.name)
                   );
@@ -83,6 +85,8 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                         return Object.assign(
                           {
                             clientMutationId: {
+                              description:
+                                "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
                               type: GraphQLString,
                             },
                             [tableName]: {
@@ -235,6 +239,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                     const InputType = buildObjectWithHooks(
                       GraphQLInputObjectType,
                       {
+                        description: `All input for the \`${fieldName}\` mutation.`,
                         name: inflection[
                           mode === "update"
                             ? "updateNodeInputType"
@@ -243,9 +248,12 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                         fields: Object.assign(
                           {
                             clientMutationId: {
+                              description:
+                                "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
                               type: GraphQLString,
                             },
                             [nodeIdFieldName]: {
+                              description: `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be updated.`,
                               type: new GraphQLNonNull(GraphQLID),
                             },
                           },
@@ -256,6 +264,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                                 table.namespace.name
                               )
                             )]: {
+                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being updated.`,
                               type: new GraphQLNonNull(TablePatch),
                             },
                           }
@@ -277,6 +286,9 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
+                          description: mode === "update"
+                            ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
+                            : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
                           type: PayloadType,
                           args: {
                             input: {
@@ -352,6 +364,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                     const InputType = buildObjectWithHooks(
                       GraphQLInputObjectType,
                       {
+                        description: `All input for the \`${fieldName}\` mutation.`,
                         name: inflection[
                           mode === "update"
                             ? "updateByKeysInputType"
@@ -370,6 +383,7 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                                 table.namespace.name
                               )
                             )]: {
+                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being updated.`,
                               type: new GraphQLNonNull(TablePatch),
                             },
                           },
@@ -406,6 +420,9 @@ module.exports = async function PgMutationUpdateRowByUniqueConstraintPlugin(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
+                          description: mode === "update"
+                            ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
+                            : `Deletes a single \`${tableTypeName}\` using a unique key.`,
                           type: PayloadType,
                           args: {
                             input: {

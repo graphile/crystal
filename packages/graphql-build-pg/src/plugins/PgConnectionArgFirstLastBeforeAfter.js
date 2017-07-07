@@ -62,18 +62,24 @@ module.exports = function PgConnectionArgs(builder) {
 
       return extend(args, {
         first: {
+          description: "Only read the first `n` values of the set.",
           type: GraphQLInt,
         },
         last: {
+          description: "Only read the last `n` values of the set.",
           type: GraphQLInt,
         },
         offset: {
+          description:
+            "Skip the first `n` values from our `after` cursor, an alternative to cursor based pagination. May not be used with `last`.",
           type: GraphQLInt,
         },
         before: {
+          description: "Read all values in the set before (above) this cursor.",
           type: Cursor,
         },
         after: {
+          description: "Read all values in the set after (below) this cursor.",
           type: Cursor,
         },
       });

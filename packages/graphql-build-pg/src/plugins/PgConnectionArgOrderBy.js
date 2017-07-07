@@ -24,6 +24,7 @@ module.exports = function PgConnectionArgOrderBy(
           GraphQLEnumType,
           {
             name: inflection.orderByType(tableTypeName),
+            description: `Methods to use when ordering \`${tableTypeName}\`.`,
             values: {
               NATURAL: {
                 value: {

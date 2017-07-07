@@ -108,6 +108,10 @@ module.exports = function PgMutationCreatePlugin(
                 pgIntrospection: table,
               }
             );
+            const tableTypeName = inflection.tableType(
+              table.name,
+              table.namespace.name
+            );
             const fieldName = inflection.createField(
               table.name,
               table.namespace.name
@@ -117,6 +121,7 @@ module.exports = function PgMutationCreatePlugin(
             ] = buildFieldWithHooks(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment }) => ({
+                description: `Creates a single \`${tableTypeName}\`.`,
                 type: PayloadType,
                 args: {
                   input: {

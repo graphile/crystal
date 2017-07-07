@@ -39,9 +39,11 @@ module.exports = function PgBackwardRelationPlugin(
         foreignKeyConstraints.reduce((memo, constraint) => {
           const table =
             introspectionResultsByKind.classById[constraint.classId];
-          const gqlTableType = getTypeByName(
-            inflection.tableType(table.name, table.namespace.name)
+          const tableTypeName = inflection.tableType(
+            table.name,
+            table.namespace.name
           );
+          const gqlTableType = getTypeByName(tableTypeName);
           if (!gqlTableType) {
             debug(
               `Could not determine type for table with id ${constraint.classId}`
@@ -161,6 +163,7 @@ module.exports = function PgBackwardRelationPlugin(
                 inflection.connection(gqlTableType.name)
               );
               return {
+                description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
                 type: new GraphQLNonNull(ConnectionType),
                 args: {},
                 resolve: (data, _args, _context, resolveInfo) => {
