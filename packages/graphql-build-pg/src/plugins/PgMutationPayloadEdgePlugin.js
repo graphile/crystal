@@ -17,7 +17,13 @@ module.exports = function PgMutationPayloadEdgePlugin(
       }
     ) => {
       const table = pgIntrospectionTable || pgIntrospection;
-      if (!isMutationPayload || !table || table.kind !== "class") {
+      if (
+        !isMutationPayload ||
+        !table ||
+        table.kind !== "class" ||
+        !table.namespace ||
+        !table.isSelectable
+      ) {
         return fields;
       }
       const tableTypeName = inflection.tableType(
