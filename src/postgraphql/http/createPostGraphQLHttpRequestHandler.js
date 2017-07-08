@@ -1,6 +1,7 @@
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { IncomingMessage, ServerResponse } from 'http'
+import { parse as urlParse } from 'url'
 import {
   Source,
   parse as parseGraphql,
@@ -308,9 +309,9 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       ), Promise.resolve())
 
       // If this is not one of the correct methods, throw an error.
-      if (req.method !== 'POST') {
-        res.setHeader('Allow', 'POST, OPTIONS')
-        throw httpError(405, 'Only `POST` requests are allowed.')
+      if (!(req.method === 'POST' || req.method === 'GET')) {
+        res.setHeader('Allow', 'POST, GET, OPTIONS')
+        throw httpError(405, 'Only `POST` and `GET` requests are allowed.')
       }
 
       // Get the parameters we will use to run a GraphQL request. `params` may
@@ -320,7 +321,11 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      params = typeof req.body === 'string' ? { query: req.body } : req.body
+      if (req.method === 'GET') {
+        params = urlParse(req.url, true).query
+      } else {
+        params = typeof req.body === 'string' ? { query: req.body } : req.body
+      }
 
       // Validate our params object a bit.
       if (params == null) throw httpError(400, 'Must provide an object parameters, not nullish value.')
