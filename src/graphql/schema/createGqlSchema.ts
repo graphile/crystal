@@ -20,6 +20,8 @@ export type SchemaOptions = {
   // GraphQL types that override the default type generation. Currently this
   // API is private. Use at your own risk.
   _typeOverrides?: _BuildTokenTypeOverrides,
+  // The path to read our injections from
+  schemaInjection?: string,
 }
 
 /**
@@ -36,6 +38,7 @@ export default function createGqlSchema (inventory: Inventory, options: SchemaOp
       nodeIdFieldName: options.nodeIdFieldName || 'nodeId',
       dynamicJson: options.dynamicJson || false,
       disableDefaultMutations: options.disableDefaultMutations || false,
+      schemaInjection: options.schemaInjection || '',
     },
     _hooks: options._hooks || {},
     _typeOverrides: options._typeOverrides || new Map(),

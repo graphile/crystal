@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
-import { buildObject, memoize1 } from '../utils'
+import { buildObject, memoize1, loadInjections } from '../utils'
 import createNodeFieldEntry from './node/createNodeFieldEntry'
 import getNodeInterfaceType from './node/getNodeInterfaceType'
 import createCollectionQueryFieldEntries from './collection/createCollectionQueryFieldEntries'
@@ -36,6 +36,8 @@ function createGqlQueryType (buildToken: BuildToken): GraphQLObjectType {
         .getCollections()
         .map(collection => createCollectionQueryFieldEntries(buildToken, collection))
         .reduce((a, b) => a.concat(b), []),
+      // Load injections
+      loadInjections(options.schemaInjection, 'query'),
       [
         // The root query type is useful for Relay 1 as it limits what fields
         // can be queried at the top level.

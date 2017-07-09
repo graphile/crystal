@@ -73,7 +73,8 @@ export default async function withPostGraphQLContext(
 
     return await callback({
       [$$pgClient]: pgClient,
-      pgRole,
+      pgRole: pgRole.role,
+      jwtClaims: pgRole.jwtClaims,
     })
   }
   // Cleanup our Postgres client by ending the transaction and releasing
@@ -109,7 +110,7 @@ async function setupPgClientTransaction ({
   jwtRole: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
-}): Promise<string | undefined> {
+}): Promise<{role: string | undefined, jwtClaims: {} | undefined}> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
   let jwtClaims: { [claimName: string]: mixed } = {}
@@ -192,7 +193,7 @@ async function setupPgClientTransaction ({
     await pgClient.query(query)
   }
 
-  return role
+  return {role, jwtClaims}
 }
 
 const $$pgClientOrigQuery = Symbol()

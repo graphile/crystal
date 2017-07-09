@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLFieldConfig } from 'graphql'
-import { buildObject, memoize1 } from '../utils'
+import { buildObject, memoize1, loadInjections } from '../utils'
 import BuildToken from './BuildToken'
 import createCollectionMutationFieldEntries from './collection/createCollectionMutationFieldEntries'
 
@@ -38,6 +38,7 @@ function createMutationGqlType (buildToken: BuildToken): GraphQLObjectType | und
             .map(collection => createCollectionMutationFieldEntries(buildToken, collection))
             .reduce((a, b) => a.concat(b), [])
     ),
+    ...(loadInjections(options.schemaInjection, 'mutation')),
   ]
 
   // If there are no mutation fields, just return to avoid errors.
