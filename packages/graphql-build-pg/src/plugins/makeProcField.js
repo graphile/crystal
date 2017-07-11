@@ -73,9 +73,8 @@ module.exports = function makeProcField(
       ? argNames.length - sliceAmount
       : argNames.length - sliceAmount - proc.argDefaultsNum
   );
-  const notNullArgCount = proc.isStrict || strictFunctions
-    ? requiredArgCount
-    : 0;
+  const notNullArgCount =
+    proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     const Type = pgGqlInputTypeByTypeId[type.id] || GraphQLString;
     if (idx >= notNullArgCount) {

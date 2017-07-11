@@ -119,9 +119,8 @@ module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
           const [sqlExpression, ascending] = orderByExpressionsAndDirections[i];
           // If ascending and isAfter then >
           // If ascending and isBefore then <
-          const comparison = ascending ^ !isAfter
-            ? sql.fragment`>`
-            : sql.fragment`<`;
+          const comparison =
+            ascending ^ !isAfter ? sql.fragment`>` : sql.fragment`<`;
 
           const sqlOldFilter = sqlFilter;
           sqlFilter = sql.fragment`

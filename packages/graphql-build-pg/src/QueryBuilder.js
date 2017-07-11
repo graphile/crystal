@@ -210,9 +210,10 @@ class QueryBuilder {
     if (onlyJsonField) {
       return this.buildSelectJson({ addNullCase });
     }
-    const fields = asJson || asJsonAggregate
-      ? sql.fragment`${this.buildSelectJson({ addNullCase })} as object`
-      : this.buildSelectFields();
+    const fields =
+      asJson || asJsonAggregate
+        ? sql.fragment`${this.buildSelectJson({ addNullCase })} as object`
+        : this.buildSelectFields();
     let fragment = sql.fragment`
       select ${fields}
       ${this.data.from &&
