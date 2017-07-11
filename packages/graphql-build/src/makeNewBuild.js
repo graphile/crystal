@@ -478,8 +478,5 @@ module.exports = function makeNewBuild(builder) {
       fieldDataGeneratorsByType.set(Self, fieldDataGeneratorsByFieldName);
       return Self;
     },
-    buildRoot() {
-      return this.buildObjectWithHooks(GraphQLSchema, {});
-    },
   };
 };
