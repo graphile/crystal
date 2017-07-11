@@ -155,10 +155,10 @@ test("schema is updated when rebuild triggered", async () => {
     const result = await graphql(
       schema,
       `query {
-      dummy {
-        n
-      }
-    }`
+        dummy {
+          n
+        }
+      }`
     );
     if (result.errors) {
       console.log(result.errors.map(e => e.originalError));
