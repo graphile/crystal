@@ -2,7 +2,7 @@ const { GraphQLSchema, GraphQLObjectType, GraphQLInt } = require('graphql');
 
 const dummySchema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'Query',
+    name: 'MockSchemaQuery',
     fields: {
       foo: {
         type: GraphQLInt,

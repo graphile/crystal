@@ -1,6 +1,8 @@
 // TODO: There may be some excessive waste, if we could somehow filter what
 // these guys see, that would be great 👍
 
+jest.unmock('postgraphql-build')
+
 import { printSchema } from 'graphql'
 import withPgClient from '../../__tests__/utils/withPgClient'
 import { createPostGraphQLSchema } from '..'

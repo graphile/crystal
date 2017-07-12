@@ -1,4 +1,5 @@
 jest.mock('fs')
+jest.unmock('postgraphql-build')
 
 import withPgClient from '../../__tests__/utils/withPgClient'
 import { createPostGraphQLSchema } from '..'

@@ -1,3 +1,5 @@
+jest.unmock('postgraphql-build')
+
 import { resolve as resolvePath } from 'path'
 import { readFile, readdirSync } from 'fs'
 import { graphql } from 'graphql'
