@@ -216,19 +216,19 @@ module.exports = function PgTypesPlugin(
     const tweakToJson = fragment => sql.fragment`to_json(${fragment})`;
     const tweakToText = fragment => sql.fragment`(${fragment})::text`;
     const pgTweaksByTypeId = Object.assign(
+      // ::text rawTypes
+      rawTypes.reduce((memo, typeId) => {
+        memo[typeId] = tweakToText;
+        return memo;
+      }, {}),
       {
-        // to_json all dates to make them ISO
+        // to_json all dates to make them ISO (overrides rawTypes above)
         1082: tweakToJson,
         1114: tweakToJson,
         1184: tweakToJson,
         1083: tweakToJson,
         1266: tweakToJson,
-      },
-      // ::text rawTypes
-      rawTypes.reduce((memo, typeId) => {
-        memo[typeId] = tweakToText;
-        return memo;
-      })
+      }
     );
     const pgTweakFragmentForType = (fragment, type) => {
       const tweaker = pgTweaksByTypeId[type.id];
