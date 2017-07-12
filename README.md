@@ -50,6 +50,19 @@ createServer(postgraphql())
 
 For more information around using PostGraphQL as a library, and the options the API expects read the [library usage documentation article](https://github.com/calebmer/postgraphql/blob/master/docs/library.md).
 
+There is also a docker image for running PostGraphQL maintained by @angelosarto, simply pass the same options to the docker container:
+
+```bash
+docker pull postgraphql/postgraphql
+docker run postgraphql/postgraphql --help
+```
+
+To connect to a database and expose the PostGraphQL port try this:
+
+```bash
+docker run -p 5000:5000 postgraphql/postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_SCHEMA
+```
+
 Also make sure to check out the **[forum example][]** and especially **[step by step tutorial][]** for a demo of a PostGraphQL compliant schema and authentication.
 
 [forum example]: https://github.com/calebmer/postgraphql/tree/master/examples/forum
