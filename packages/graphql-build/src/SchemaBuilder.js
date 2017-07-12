@@ -166,47 +166,50 @@ class SchemaBuilder extends EventEmitter {
     return this.generatedSchema;
   }
 
-  watchSchema(listener) {
-    if (this.watching) {
+  async watchSchema(listener) {
+    if (this.watching || this.busy) {
       throw new Error("We're already watching this schema!");
     }
-    this.watching = true;
-    this.explicitSchemaListener = listener;
-    let changed = false; // To detect if watchers behave badly
-    this.triggerChange = () => {
-      changed = true;
-      this.generatedSchema = null;
-      // XXX: optionally debounce
-      this.emit("schema", this.buildSchema());
-    };
-    if (listener) {
-      this.on("schema", listener);
-    }
-    this.watchers.forEach(fn => {
-      fn(this.triggerChange);
-      if (changed === true) {
-        throw new Error(
-          "Watcher triggered schema change synchronously, that's a bug."
-        );
+    try {
+      this.busy = true;
+      this.watching = true;
+      this.explicitSchemaListener = listener;
+      this.triggerChange = () => {
+        this.generatedSchema = null;
+        // XXX: optionally debounce
+        this.emit("schema", this.buildSchema());
+      };
+      if (listener) {
+        this.on("schema", listener);
       }
-    });
-    this.emit("schema", this.buildSchema());
+      for (const fn of this.watchers) {
+        await fn(this.triggerChange);
+      }
+      this.emit("schema", this.buildSchema());
+    } finally {
+      this.busy = false;
+    }
   }
 
-  unwatchSchema() {
-    if (!this.watching) {
+  async unwatchSchema() {
+    if (!this.watching || this.busy) {
       throw new Error("We're not watching this schema!");
     }
-    this.watching = false;
-    const listener = this.explicitSchemaListener;
-    this.explicitSchemaListener = null;
-    if (listener) {
-      this.removeEventListener("schema", listener);
+    this.busy = true;
+    try {
+      const listener = this.explicitSchemaListener;
+      this.explicitSchemaListener = null;
+      if (listener) {
+        this.removeEventListener("schema", listener);
+      }
+      for (const fn of this.unwatchers) {
+        await fn(this.triggerChange);
+      }
+      this.triggerChange = null;
+      this.watching = false;
+    } finally {
+      this.busy = false;
     }
-    this.unwatchers.forEach(fn => {
-      fn(this.triggerChange);
-    });
-    this.triggerChange = null;
   }
 }
 
