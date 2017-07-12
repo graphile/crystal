@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generated schema n = 0, n = 3 1`] = `
+"type Dummy0 {
+  n: Int!
+}
+
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+type Query implements Node {
+  query: Query
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+  node(nodeId: ID!): Node
+  dummy: Dummy0
+}
+"
+`;
+
+exports[`generated schema n = 0, n = 3 2`] = `
+"type Dummy3 {
+  n: Int!
+}
+
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+type Query implements Node {
+  query: Query
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+  node(nodeId: ID!): Node
+  dummy: Dummy3
+}
+"
+`;

@@ -1,8 +1,8 @@
 const SchemaBuilder = require("./SchemaBuilder");
 const localPlugins = require("./plugins");
 
-const getBuilder = async (plugins, options) => {
-  const builder = new SchemaBuilder();
+const getBuilder = async (plugins, options = {}) => {
+  const builder = new SchemaBuilder(options);
   for (const plugin of plugins) {
     builder._setPluginName(plugin.displayName || plugin.name);
     await plugin(builder, options);
@@ -13,8 +13,7 @@ const getBuilder = async (plugins, options) => {
 
 const buildSchema = async (plugins, options = {}) => {
   const builder = await getBuilder(plugins, options);
-  const build = builder.createBuild();
-  return build.buildRoot();
+  return builder.buildSchema();
 };
 
 const defaultPlugins = [
@@ -27,5 +26,6 @@ const defaultPlugins = [
 ];
 
 Object.assign(exports, localPlugins);
+exports.getBuilder = getBuilder;
 exports.buildSchema = buildSchema;
 exports.defaultPlugins = defaultPlugins;

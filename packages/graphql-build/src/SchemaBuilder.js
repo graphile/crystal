@@ -1,10 +1,18 @@
 const debug = require("debug")("graphql-builder");
 const makeNewBuild = require("./makeNewBuild");
 const { bindAll } = require("./utils");
+const { GraphQLSchema } = require("graphql");
+const EventEmitter = require("events");
+
 const INDENT = "  ";
 
-class SchemaBuilder {
-  constructor() {
+class SchemaBuilder extends EventEmitter {
+  constructor({ watch = false } = {}) {
+    super();
+
+    this.watchers = [];
+    this.unwatchers = [];
+
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
 
@@ -130,6 +138,14 @@ class SchemaBuilder {
     }
   }
 
+  addWatcher(listen, unlisten) {
+    if (!listen || !unlisten) {
+      throw new Error("You must provide both a listener and an unlistener");
+    }
+    this.watchers.push(listen);
+    this.unwatchers.push(unlisten);
+  }
+
   createBuild() {
     const build = this.applyHooks(null, "build", makeNewBuild(this));
     // Bind all functions so they can be dereferenced
@@ -140,6 +156,60 @@ class SchemaBuilder {
     Object.freeze(build);
     this.applyHooks(build, "init", {});
     return build;
+  }
+
+  buildSchema() {
+    if (!this.generatedSchema) {
+      const build = this.createBuild();
+      this.generatedSchema = build.buildObjectWithHooks(GraphQLSchema, {});
+    }
+    return this.generatedSchema;
+  }
+
+  async watchSchema(listener) {
+    if (this.watching || this.busy) {
+      throw new Error("We're already watching this schema!");
+    }
+    try {
+      this.busy = true;
+      this.watching = true;
+      this.explicitSchemaListener = listener;
+      this.triggerChange = () => {
+        this.generatedSchema = null;
+        // XXX: optionally debounce
+        this.emit("schema", this.buildSchema());
+      };
+      if (listener) {
+        this.on("schema", listener);
+      }
+      for (const fn of this.watchers) {
+        await fn(this.triggerChange);
+      }
+      this.emit("schema", this.buildSchema());
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  async unwatchSchema() {
+    if (!this.watching || this.busy) {
+      throw new Error("We're not watching this schema!");
+    }
+    this.busy = true;
+    try {
+      const listener = this.explicitSchemaListener;
+      this.explicitSchemaListener = null;
+      if (listener) {
+        this.removeEventListener("schema", listener);
+      }
+      for (const fn of this.unwatchers) {
+        await fn(this.triggerChange);
+      }
+      this.triggerChange = null;
+      this.watching = false;
+    } finally {
+      this.busy = false;
+    }
   }
 }
 

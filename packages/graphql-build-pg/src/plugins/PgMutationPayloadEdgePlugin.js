@@ -48,8 +48,8 @@ module.exports = function PgMutationPayloadEdgePlugin(
               return {
                 pgCursorPrefix:
                   orderBy &&
-                    orderBy.alias &&
-                    sql.literal(orderBy && orderBy.alias),
+                  orderBy.alias &&
+                  sql.literal(orderBy && orderBy.alias),
                 pgQuery: queryBuilder => {
                   if (orderBy != null) {
                     const { specs, unique } = orderBy;
