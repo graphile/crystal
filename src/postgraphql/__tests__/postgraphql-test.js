@@ -1,12 +1,12 @@
 jest.mock('pg')
 jest.mock('pg-connection-string')
-jest.mock('../schema/createPostGraphQLSchema')
+jest.mock('..')
 jest.mock('../http/createPostGraphQLHttpRequestHandler')
 jest.mock('../watch/watchPgSchemas')
 
 import { Pool } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
+import { createPostGraphQLSchema } from '..'
 import createPostGraphQLHttpRequestHandler from '../http/createPostGraphQLHttpRequestHandler'
 import watchPgSchemas from '../watch/watchPgSchemas'
 import postgraphql from '../postgraphql'

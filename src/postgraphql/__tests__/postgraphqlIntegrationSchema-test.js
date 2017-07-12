@@ -3,7 +3,7 @@
 
 import { printSchema } from 'graphql'
 import withPgClient from '../../__tests__/utils/withPgClient'
-import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
+import { createPostGraphQLSchema } from '..'
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
