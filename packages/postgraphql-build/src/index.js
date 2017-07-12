@@ -14,6 +14,8 @@ const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
       ? inflections.postGraphQLClassicIdsInflection
       : inflections.postGraphQLInflection,
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
+    pgJwtTypeIdentifier: options.jwtPgTypeIdentifier,
+    pgJwtSecret: options.jwtSecret,
   });
 };
 

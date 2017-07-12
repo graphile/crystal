@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jwt normal 1`] = `
+Object {
+  "data": Object {
+    "authenticate": Object {
+      "jwtToken": Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+        "exp": 5,
+        "role": "yay",
+      },
+    },
+  },
+}
+`;
+
+exports[`jwt pgJwtTypeIdentifier 1`] = `
+Object {
+  "data": Object {
+    "authenticate": Object {
+      "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTk5NTc1MDYsImlhdCI6MTQ5OTg3MTEwNiwiYXVkIjoicG9zdGdyYXBocWwiLCJpc3MiOiJwb3N0Z3JhcGhxbCJ9.GsuNZneEy-BVPKcxOhjtogAfNS9zjMHjT-RbbWUF0iY",
+    },
+  },
+}
+`;
