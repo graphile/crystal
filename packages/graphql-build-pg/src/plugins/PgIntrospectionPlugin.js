@@ -184,10 +184,8 @@ module.exports = async function PgIntrospectionPlugin(
       );
     }
     // Install the watch fixtures.
-    const sql = `begin; ${await readFile(
-      WATCH_FIXTURES_PATH,
-      "utf8"
-    )}; commit;`;
+    const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
+    const sql = `begin; ${watchSqlInner}; commit;`;
     try {
       await pgClient.query(sql);
     } catch (error) {
