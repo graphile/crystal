@@ -5,6 +5,7 @@ const { readdirSync, readFile: rawReadFile } = require("fs");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphql-build:schema");
+const jwt = require("jsonwebtoken");
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -55,6 +56,11 @@ const tests = [
       }
     }`,
     schema: "withJwt",
+    process: ({ data: { authenticate: { jwtToken: str } } }) => {
+      return Object.assign(jwt.verify(str, jwtSecret), {
+        iat: "[timestamp]",
+      });
+    },
   },
 ];
 
@@ -114,8 +120,8 @@ beforeAll(() => {
 });
 
 for (let i = 0; i < tests.length; i++) {
-  const { name } = tests[i];
+  const { name, process = _ => _ } = tests[i];
   test(name, async () => {
-    expect(await queryResults[i]).toMatchSnapshot();
+    expect(process(await queryResults[i])).toMatchSnapshot();
   });
 }

@@ -8,7 +8,7 @@ Object {
         "a": 1,
         "b": 2,
         "c": 3,
-        "exp": 5,
+        "exp": 2130969600,
         "role": "yay",
       },
     },
@@ -18,10 +18,13 @@ Object {
 
 exports[`jwt pgJwtTypeIdentifier 1`] = `
 Object {
-  "data": Object {
-    "authenticate": Object {
-      "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTk5NTc1MDYsImlhdCI6MTQ5OTg3MTEwNiwiYXVkIjoicG9zdGdyYXBocWwiLCJpc3MiOiJwb3N0Z3JhcGhxbCJ9.GsuNZneEy-BVPKcxOhjtogAfNS9zjMHjT-RbbWUF0iY",
-    },
-  },
+  "a": 1,
+  "aud": "postgraphql",
+  "b": 2,
+  "c": 3,
+  "exp": 2130969600,
+  "iat": "[timestamp]",
+  "iss": "postgraphql",
+  "role": "yay",
 }
 `;
