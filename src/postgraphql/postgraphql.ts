@@ -96,12 +96,13 @@ export default function postgraphql (
   //
   // This is not a constant because when we are in watch mode, we want to swap
   // out the `gqlSchema`.
-  let gqlSchema = createGqlSchema();
+  let gqlSchema
+  let gqlSchemaPromise = createGqlSchema()
 
   // Finally create our Http request handler using our options, the Postgres
   // pool, and GraphQL schema. Return the final result.
   return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
-    getGqlSchema: () => gqlSchema,
+    getGqlSchema: () => gqlSchema || gqlSchemaPromise,
     pgPool,
     _emitter,
   }))
@@ -109,17 +110,12 @@ export default function postgraphql (
   async function createGqlSchema (): Promise<GraphQLSchema> {
     try {
       if (options.watchPg) {
-        let firstSchema = true;
         await watchPostGraphQLSchema(pgPool, pgSchemas, options, schema => {
           gqlSchema = schema
-          if (firstSchema) {
-            firstSchema = false;
-          } else {
-            _emitter.emit('schemas:changed')
-          }
+          _emitter.emit('schemas:changed')
           exportGqlSchema(gqlSchema)
         });
-        if (firstSchema) {
+        if (!gqlSchema) {
           throw new Error("Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn't happened")
         }
       } else {
@@ -146,8 +142,7 @@ export default function postgraphql (
 }
 
 function handleFatalError (error: Error): never {
-  // tslint:disable-next-line no-console
-  console.error(`${error.stack}\n`)
+  process.stderr.write(`${error.stack}\n`) // console.error fails under the tests
   process.exit(1)
 
   // `process.exit` will mean all code below it will never get called.
