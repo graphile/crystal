@@ -157,7 +157,7 @@ module.exports = function makeNewBuild(builder) {
             const fieldDataGenerators = fieldDataGeneratorsByType.get(
               StrippedType
             );
-            if (fieldDataGenerators) {
+            if (fieldDataGenerators && StrippedType.getFields) {
               const typeFields = StrippedType.getFields();
               for (const alias of Object.keys(fields)) {
                 const field = fields[alias];

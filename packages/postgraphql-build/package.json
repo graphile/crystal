@@ -24,7 +24,8 @@
     "babel-polyfill": ">=6 <7"
   },
   "devDependencies": {
-    "jest": "20.0.4"
+    "jest": "20.0.4",
+    "jsonwebtoken": "^7.4.1"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"

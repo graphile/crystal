@@ -41,6 +41,10 @@ module.exports = function PgTablesPlugin(
         if (!tablePgType) {
           throw new Error("Could not determine the type for this table");
         }
+        if (pg2GqlMapper[tablePgType.id]) {
+          // Already handled
+          return;
+        }
         /*
         table =
           { kind: 'class',

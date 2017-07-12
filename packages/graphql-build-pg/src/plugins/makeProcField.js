@@ -8,6 +8,7 @@ const {
   GraphQLObjectType,
   GraphQLInputObjectType,
   getNamedType,
+  isCompositeType,
 } = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
 const camelcase = require("lodash/camelcase");
@@ -54,6 +55,7 @@ module.exports = function makeProcField(
     buildObjectWithHooks,
     pgInflection: inflection,
     pgStrictFunctions: strictFunctions,
+    pgTweakFragmentForType,
   },
   { buildFieldWithHooks, computed = false, isMutation = false }
 ) {
@@ -73,8 +75,9 @@ module.exports = function makeProcField(
       ? argNames.length - sliceAmount
       : argNames.length - sliceAmount - proc.argDefaultsNum
   );
-  const notNullArgCount =
-    proc.isStrict || strictFunctions ? requiredArgCount : 0;
+  const notNullArgCount = proc.isStrict || strictFunctions
+    ? requiredArgCount
+    : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     const Type = pgGqlInputTypeByTypeId[type.id] || GraphQLString;
     if (idx >= notNullArgCount) {
@@ -97,13 +100,17 @@ module.exports = function makeProcField(
     pgIntrospection: proc,
   };
   let returnFirstValueAsValue = false;
-  if (returnTypeTable) {
-    const TableType = getTypeByName(
+  const TableType =
+    returnTypeTable &&
+    getTypeByName(
       inflection.tableType(
         returnTypeTable.name,
         returnTypeTable.namespace && returnTypeTable.namespace.name
       )
     );
+
+  const isTableLike = TableType && isCompositeType(TableType);
+  if (isTableLike) {
     if (proc.returnsSet) {
       if (isMutation) {
         type = new GraphQLList(TableType);
@@ -154,7 +161,7 @@ module.exports = function makeProcField(
     }) => {
       if (
         proc.returnsSet &&
-        !returnTypeTable &&
+        !isTableLike &&
         !returnFirstValueAsValue &&
         !isMutation
       ) {
@@ -198,14 +205,24 @@ module.exports = function makeProcField(
             withPagination: !isMutation && proc.returnsSet,
             withPaginationAsFields: !isMutation && proc.returnsSet && !computed,
             asJson: !proc.returnsSet && computed && !returnFirstValueAsValue,
-            addNullCase: !proc.returnsSet && returnTypeTable,
+            addNullCase: !proc.returnsSet && isTableLike,
           },
           innerQueryBuilder => {
-            if (!returnTypeTable) {
-              innerQueryBuilder.select(
-                sql.fragment`${functionAlias}.${functionAlias}`,
-                "value"
-              );
+            if (!isTableLike) {
+              if (returnTypeTable) {
+                innerQueryBuilder.select(
+                  pgTweakFragmentForType(
+                    sql.fragment`${functionAlias}`,
+                    returnTypeTable.type
+                  ),
+                  "value"
+                );
+              } else {
+                innerQueryBuilder.select(
+                  sql.fragment`${functionAlias}.${functionAlias}`,
+                  "value"
+                );
+              }
             }
           }
         );

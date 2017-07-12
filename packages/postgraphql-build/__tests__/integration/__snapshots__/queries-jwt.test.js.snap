@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jwt normal 1`] = `
+Object {
+  "data": Object {
+    "authenticate": Object {
+      "jwtToken": Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+        "exp": 2130969600,
+        "role": "yay",
+      },
+    },
+  },
+}
+`;
+
+exports[`jwt pgJwtTypeIdentifier 1`] = `
+Object {
+  "a": 1,
+  "aud": "postgraphql",
+  "b": 2,
+  "c": 3,
+  "exp": 2130969600,
+  "iat": "[timestamp]",
+  "iss": "postgraphql",
+  "role": "yay",
+}
+`;
