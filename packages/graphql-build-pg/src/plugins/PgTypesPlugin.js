@@ -212,20 +212,31 @@ module.exports = function PgTypesPlugin(
       1083, // time
       1266, // timetz
     ];
-    const pgTweakFragmentForType = (fragment, type) => {
-      // to_json all dates to make them ISO
-      if ([1082, 1114, 1184, 1083, 1266].indexOf(parseInt(type.id, 10)) >= 0) {
-        return sql.fragment`to_json(${fragment})`;
-      }
+
+    const tweakToJson = fragment => sql.fragment`to_json(${fragment})`;
+    const tweakToText = fragment => sql.fragment`(${fragment})::text`;
+    const pgTweaksByTypeId = Object.assign(
+      {
+        // to_json all dates to make them ISO
+        1082: tweakToJson,
+        1114: tweakToJson,
+        1184: tweakToJson,
+        1083: tweakToJson,
+        1266: tweakToJson,
+      },
       // ::text rawTypes
-      if (rawTypes.indexOf(parseInt(type.id, 10)) >= 0) {
-        return sql.fragment`${fragment}::text`;
+      rawTypes.reduce((memo, typeId) => {
+        memo[typeId] = tweakToText;
+        return memo;
+      })
+    );
+    const pgTweakFragmentForType = (fragment, type) => {
+      const tweaker = pgTweaksByTypeId[type.id];
+      if (tweaker) {
+        return tweaker(fragment);
+      } else {
+        return fragment;
       }
-      // money
-      if (parseInt(type.id, 10) === 790) {
-        return sql.fragment`(${fragment})::money`;
-      }
-      return fragment;
     };
     /*
         Determined by running:
@@ -314,8 +325,9 @@ module.exports = function PgTypesPlugin(
     };
     pg2GqlMapper[790] = {
       map: parseMoney,
-      unmap: val => sql.value(val),
+      unmap: val => sql.fragment`(${sql.value(val)})::money`,
     };
+
     const enforceGqlTypeByPgType = type => {
       // Explicit overrides
       if (!gqlTypeByTypeId[type.id]) {
@@ -471,6 +483,7 @@ module.exports = function PgTypesPlugin(
       pg2gql,
       gql2pg,
       pgTweakFragmentForType,
+      pgTweaksByTypeId,
     });
   });
 };
