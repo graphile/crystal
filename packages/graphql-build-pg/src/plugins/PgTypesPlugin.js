@@ -223,6 +223,10 @@ module.exports = function PgTypesPlugin(
       if (rawTypes.indexOf(parseInt(type.id, 10)) >= 0) {
         return sql.fragment`${fragment}::text`;
       }
+      // money
+      if (parseInt(type.id, 10) === 790) {
+        return sql.fragment`(${fragment})::money`;
+      }
       return fragment;
     };
     /*
