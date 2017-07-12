@@ -14,12 +14,30 @@ drop schema if exists postgraphql_watch cascade;
 -- watching.
 create schema postgraphql_watch;
 
--- This function will notify PostGraphQL of schema changes via a trigger.
-create function postgraphql_watch.notify_watchers() returns event_trigger as $$
+create function postgraphql_watch.notify_watchers_ddl() returns event_trigger as $$
 begin
   perform pg_notify(
     'postgraphql_watch',
-    (select array_to_json(array_agg(x)) from (select schema_name as schema, command_tag as command from pg_event_trigger_ddl_commands()) as x)::text
+    json_build_object(
+      'type',
+      'ddl',
+      'payload',
+      (select json_agg(json_build_object('schema', schema_name, 'command', command_tag)) from pg_event_trigger_ddl_commands() as x)
+    )::text
+  );
+end;
+$$ language plpgsql;
+
+create function postgraphql_watch.notify_watchers_drop() returns event_trigger as $$
+begin
+  perform pg_notify(
+    'postgraphql_watch',
+    json_build_object(
+      'type',
+      'drop',
+      'payload',
+      (select json_agg(row_to_json(x)) from pg_event_trigger_dropped_objects() as x)
+    )::text
   );
 end;
 $$ language plpgsql;
@@ -28,7 +46,7 @@ $$ language plpgsql;
 -- events and report that they happened to PostGraphQL. Events are selected by
 -- whether or not they modify the static definition of `pg_catalog` that
 -- `introspection-query.sql` queries.
-create event trigger postgraphql_watch
+create event trigger postgraphql_watch_ddl
   on ddl_command_end
   when tag in (
     'ALTER DOMAIN',
@@ -56,4 +74,11 @@ create event trigger postgraphql_watch
     'REVOKE',
     'SELECT INTO'
   )
-  execute procedure postgraphql_watch.notify_watchers();
+  execute procedure postgraphql_watch.notify_watchers_ddl();
+
+-- Create an event trigger which will listen for drop events because on drops
+-- the DDL method seems to get nothing returned from
+-- pg_event_trigger_ddl_commands()
+create event trigger postgraphql_watch_drop
+  on sql_drop
+  execute procedure postgraphql_watch.notify_watchers_drop();

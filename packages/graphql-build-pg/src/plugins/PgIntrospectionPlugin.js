@@ -196,6 +196,7 @@ module.exports = async function PgIntrospectionPlugin(
       console.warn(
         "This is likely because your Postgres user is not a superuser. If the fixtures already exist, the watch functionality may still work."
       );
+      console.warn(error);
       /* eslint-enable no-console */
       await pgClient.query("rollback");
     }
@@ -214,13 +215,25 @@ module.exports = async function PgIntrospectionPlugin(
       }
       try {
         const payload = JSON.parse(notification.payload);
-        const commands = payload
-          .filter(
-            ({ schema }) => schema == null || schemas.indexOf(schema) >= 0
-          )
-          .map(({ command }) => command);
-        if (commands.length) {
-          listener();
+        payload.payload = payload.payload || [];
+        if (payload.type === "ddl") {
+          const commands = payload.payload
+            .filter(
+              ({ schema }) => schema == null || schemas.indexOf(schema) >= 0
+            )
+            .map(({ command }) => command);
+          if (commands.length) {
+            listener();
+          }
+        } else if (payload.type === "drop") {
+          const affectsOurSchemas = payload.payload.some(
+            entry => schemas.indexOf(entry.schema_name) >= 0
+          );
+          if (affectsOurSchemas) {
+            listener();
+          }
+        } else {
+          throw new Error(`Payload type '${payload.type}' not recognised`);
         }
       } catch (e) {
         debug(`Error occurred parsing notification payload: ${e}`);
