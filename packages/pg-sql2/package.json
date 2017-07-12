@@ -1,6 +1,6 @@
 {
   "name": "pg-sql2",
-  "version": "0.0.1-alpha5.0",
+  "version": "0.0.1-alpha5.1",
   "description": "Generate safe SQL with tagged template literals",
   "main": "index.js",
   "scripts": {
