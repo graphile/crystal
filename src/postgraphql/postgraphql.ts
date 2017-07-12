@@ -3,10 +3,9 @@ import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
 import chalk = require('chalk')
-import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
+import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphql-build'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
-import watchPgSchemas from './watch/watchPgSchemas'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -90,39 +89,14 @@ export default function postgraphql (
         : poolOrConfig || {},
       )
 
+  const _emitter = new EventEmitter()
+
   // Creates a promise which will resolve to a GraphQL schema. Connects a
   // client from our pool to introspect the database.
   //
   // This is not a constant because when we are in watch mode, we want to swap
   // out the `gqlSchema`.
-  let gqlSchema = createGqlSchema()
-
-  const _emitter = new EventEmitter()
-
-  // If the user wants us to watch the schema, execute the following:
-  if (options.watchPg) {
-    watchPgSchemas({
-      pgPool,
-      pgSchemas,
-      onChange: ({ commands }) => {
-        // tslint:disable-next-line no-console
-        console.log(`Rebuilding PostGraphQL API after Postgres command(s): ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
-
-        _emitter.emit('schemas:changed')
-
-        // Actually restart the GraphQL schema by creating a new one. Note that
-        // `createGqlSchema` returns a promise and we aren’t ‘await’ing it.
-        gqlSchema = createGqlSchema()
-      },
-    })
-      // If an error occurs when watching the Postgres schemas, log the error and
-      // exit the process.
-      .catch(error => {
-        // tslint:disable-next-line no-console
-        console.error(`${error.stack}\n`)
-        process.exit(1)
-      })
-  }
+  let gqlSchema = createGqlSchema();
 
   // Finally create our Http request handler using our options, the Postgres
   // pool, and GraphQL schema. Return the final result.
@@ -132,25 +106,27 @@ export default function postgraphql (
     _emitter,
   }))
 
-  /**
-   * Creates a GraphQL schema by connecting a client from our pool which will
-   * be used to introspect our Postgres database. If this function fails, we
-   * will log the error and exit the process.
-   *
-   * This may only be executed once, at startup. However, if we are in watch
-   * mode this will be updated whenever there is a change in our schema.
-   */
   async function createGqlSchema (): Promise<GraphQLSchema> {
     try {
-      const pgClient = await pgPool.connect()
-      const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
-      exportGqlSchema(newGqlSchema)
-
-      // If no release function exists, don’t release. This is just for tests.
-      if (pgClient && pgClient.release)
-        pgClient.release()
-
-      return newGqlSchema
+      if (options.watchPg) {
+        let firstSchema = true;
+        await watchPostGraphQLSchema(pgPool, pgSchemas, options, schema => {
+          gqlSchema = schema
+          if (firstSchema) {
+            firstSchema = false;
+          } else {
+            _emitter.emit('schemas:changed')
+          }
+          exportGqlSchema(gqlSchema)
+        });
+        if (firstSchema) {
+          throw new Error("Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn't happened")
+        }
+      } else {
+        gqlSchema = await createPostGraphQLSchema(pgPool, pgSchemas, options)
+        exportGqlSchema(gqlSchema)
+      }
+      return gqlSchema;
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {
