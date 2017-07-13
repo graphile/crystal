@@ -76,7 +76,12 @@ type Query implements Node {
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
-  node(nodeId: ID!): Node
+
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    nodeId: ID!
+  ): Node
   dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection
 }
 "
