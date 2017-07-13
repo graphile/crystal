@@ -1,6 +1,6 @@
 {
   "name": "graphql-build-pg",
-  "version": "0.0.1-alpha6.8",
+  "version": "0.0.1-alpha7.0",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphql-build",
   "main": "index.js",
   "scripts": {
@@ -40,7 +40,7 @@
     "lodash": ">=4 <5",
     "lru-cache": "4.1.1",
     "pg-range-parser": "^1.0.0",
-    "pg-sql2": "^0.0.1-alpha5.1",
+    "pg-sql2": "^0.0.1-alpha7.0",
     "pluralize": "^5.0.0"
   },
   "peerDependencies": {
