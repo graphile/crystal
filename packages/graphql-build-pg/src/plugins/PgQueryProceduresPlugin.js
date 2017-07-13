@@ -34,8 +34,24 @@ module.exports = function PgQueryProceduresPlugin(builder) {
             const argTypes = proc.argTypeIds.map(
               typeId => introspectionResultsByKind.typeById[typeId]
             );
-            if (argTypes.some(type => type.type === "c" && type.class)) {
-              // It selects a table, don't add it at root level (see Computed Columns plugin)
+            if (
+              argTypes.some(
+                type =>
+                  type.type === "c" && type.class && type.class.isSelectable
+              )
+            ) {
+              // Selects a table, ignore!
+              return memo;
+            }
+            const firstArgType = argTypes[0];
+            if (
+              firstArgType &&
+              firstArgType.type === "c" &&
+              firstArgType.class &&
+              firstArgType.namespaceId === proc.namespaceId &&
+              proc.name.startsWith(`${firstArgType.name}_`)
+            ) {
+              // It's a computed field, skip
               return memo;
             }
 
