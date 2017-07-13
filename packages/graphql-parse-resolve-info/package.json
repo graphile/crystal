@@ -26,12 +26,15 @@
   "homepage": "https://github.com/benjie/graphql-build#readme",
   "peerDependencies": {
     "babel-polyfill": ">=6 <7",
-    "graphql": ">=0.10 <1"
+    "graphql": ">=0.9 <1"
   },
   "devDependencies": {
     "jest": "20.0.4"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
+  },
+  "dependencies": {
+    "debug": ">=2 <3"
   }
 }

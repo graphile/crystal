@@ -10,7 +10,7 @@ const {
   simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo,
 } = require("graphql-parse-resolve-info");
-const isString = require("lodash/isString");
+const isString = str => typeof str === "string";
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 const debug = require("debug")("graphql-build");
 
