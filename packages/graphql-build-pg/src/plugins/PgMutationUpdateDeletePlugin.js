@@ -9,7 +9,7 @@ const {
 const debugSql = require("debug")("graphql-build-pg:sql");
 const debug = require("debug")("graphql-build-pg");
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
-const camelcase = require("lodash/camelcase");
+const camelCase = require("lodash/camelCase");
 const pluralize = require("pluralize");
 
 module.exports = async function PgMutationUpdateDeletePlugin(
@@ -197,7 +197,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                             },
                           },
                           mode === "delete" && {
-                            [camelcase(
+                            [camelCase(
                               `deleted-${pluralize.singular(table.name)}-id`
                             )]: {
                               type: GraphQLID,

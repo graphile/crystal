@@ -11,7 +11,7 @@ const {
   isCompositeType,
 } = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
-const camelcase = require("lodash/camelcase");
+const camelCase = require("lodash/camelCase");
 const pluralize = require("pluralize");
 const queryFromResolveData = require("../queryFromResolveData");
 const firstValue = obj => {
@@ -35,7 +35,7 @@ function getResultFieldName(gqlType, type, returnsSet) {
   } else if (gqlNamedType === GraphQLString) {
     name = "string";
   } else {
-    name = camelcase(gqlNamedType.name);
+    name = camelCase(gqlNamedType.name);
   }
   return returnsSet || type.arrayItemType ? pluralize(name) : name;
 }

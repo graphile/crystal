@@ -520,7 +520,7 @@ module.exports = function PgTypesPlugin(
 
       // Nothing else worked; pass through as string!
       if (!gqlTypeByTypeId[type.id]) {
-        // XXX: consider using stringType(upperFirst(camelcase(`fallback_${type.name}`)), type.description)?
+        // XXX: consider using stringType(upperFirst(camelCase(`fallback_${type.name}`)), type.description)?
         gqlTypeByTypeId[type.id] = GraphQLString;
       }
       // Now for input types, fall back to output types if possible
