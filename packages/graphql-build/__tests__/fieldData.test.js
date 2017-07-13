@@ -341,6 +341,10 @@ test("sort", async () => {
       }
     }`
   );
+  if (result.errors) {
+    console.log(result.errors.map(e => e.originalError));
+  }
+  expect(result.errors).toBeFalsy();
   expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
     "bar",
     "baz",
@@ -405,6 +409,10 @@ test("sort, after", async () => {
       }
     }`
   );
+  if (result.errors) {
+    console.log(result.errors.map(e => e.originalError));
+  }
+  expect(result.errors).toBeFalsy();
   expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
     "foo",
     "qux",
