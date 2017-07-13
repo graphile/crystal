@@ -32,7 +32,6 @@ module.exports = function PgComputedColumnsPlugin(builder) {
       const tableType = introspectionResultsByKind.type.filter(
         type =>
           type.type === "c" &&
-          type.category === "C" &&
           type.namespaceId === table.namespaceId &&
           type.classId === table.id
       )[0];
