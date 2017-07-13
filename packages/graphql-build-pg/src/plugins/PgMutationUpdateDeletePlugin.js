@@ -79,6 +79,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                           ? "deletePayloadType"
                           : "updatePayloadType"
                       ](table.name, table.namespace.name),
+                      description: `The output of our ${mode} \`${tableTypeName}\` mutation.`,
                       fields: ({ recurseDataGeneratorsForField }) => {
                         const tableName = inflection.tableName(
                           table.name,
@@ -93,6 +94,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                               type: GraphQLString,
                             },
                             [tableName]: {
+                              description: `The \`${tableTypeName}\` that was ${mode}d by this mutation.`,
                               type: Table,
                               resolve(data) {
                                 return data.data;
