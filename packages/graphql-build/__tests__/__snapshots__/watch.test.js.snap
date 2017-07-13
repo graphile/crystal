@@ -12,7 +12,9 @@ interface Node {
 
 # The root query type which gives access points into the data universe.
 type Query implements Node {
-  query: Query
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  query: Query!
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
@@ -34,7 +36,9 @@ interface Node {
 
 # The root query type which gives access points into the data universe.
 type Query implements Node {
-  query: Query
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  query: Query!
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!

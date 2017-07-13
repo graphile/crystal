@@ -1,4 +1,4 @@
-const { GraphQLObjectType } = require("graphql");
+const { GraphQLObjectType, GraphQLNonNull } = require("graphql");
 
 module.exports = async function QueryPlugin(builder) {
   builder.hook("build", build =>
@@ -19,7 +19,9 @@ module.exports = async function QueryPlugin(builder) {
             info.parentType == null || value === $$isQuery,
           fields: ({ Self }) => ({
             query: {
-              type: Self,
+              description:
+                "Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.",
+              type: new GraphQLNonNull(Self),
               resolve() {
                 return $$isQuery;
               },
