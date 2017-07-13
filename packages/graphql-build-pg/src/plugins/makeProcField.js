@@ -37,7 +37,7 @@ function getResultFieldName(gqlType, type, returnsSet) {
   } else {
     name = camelcase(gqlNamedType.name);
   }
-  return returnsSet ? pluralize(name) : name;
+  return returnsSet || type.arrayItemType ? pluralize(name) : name;
 }
 module.exports = function makeProcField(
   fieldName,
@@ -87,7 +87,8 @@ module.exports = function makeProcField(
     }
   });
 
-  const returnType = introspectionResultsByKind.typeById[proc.returnTypeId];
+  const rawReturnType = introspectionResultsByKind.typeById[proc.returnTypeId];
+  const returnType = rawReturnType.arrayItemType || rawReturnType;
   const returnTypeTable =
     introspectionResultsByKind.classById[returnType.classId];
   if (!returnType) {
@@ -124,6 +125,9 @@ module.exports = function makeProcField(
       scope.pgIntrospectionTable = returnTypeTable;
     } else {
       type = TableType;
+      if (rawReturnType.arrayItemType) {
+        type = new GraphQLList(type);
+      }
       scope.pgIntrospectionTable = returnTypeTable;
     }
   } else {
@@ -150,6 +154,9 @@ module.exports = function makeProcField(
     } else {
       returnFirstValueAsValue = true;
       type = Type;
+      if (rawReturnType.arrayItemType) {
+        type = new GraphQLList(type);
+      }
     }
   }
   return buildFieldWithHooks(
@@ -256,7 +263,7 @@ module.exports = function makeProcField(
       if (isMutation) {
         const resultFieldName = getResultFieldName(
           type,
-          returnType,
+          rawReturnType,
           proc.returnsSet
         );
         const isNotVoid = String(returnType.id) !== "2278";

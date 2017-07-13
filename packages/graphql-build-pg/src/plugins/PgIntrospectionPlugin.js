@@ -143,8 +143,17 @@ module.exports = async function PgIntrospectionPlugin(
         "domainBaseType",
         "domainBaseTypeId",
         introspectionResultsByKind.typeById,
-        true // Because not all types are domains (thankfully!)
+        true // Because not all types are domains
       );
+
+      relate(
+        introspectionResultsByKind.type,
+        "arrayItemType",
+        "arrayItemTypeId",
+        introspectionResultsByKind.typeById,
+        true // Because not all types are arrays
+      );
+
       return introspectionResultsByKind;
     });
   }
