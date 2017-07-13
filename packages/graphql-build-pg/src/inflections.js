@@ -1,7 +1,9 @@
 const upperFirst = require("lodash/upperFirst");
 const camelcase = require("lodash/camelcase");
-const snakeCase = require("lodash/snakeCase");
+const rawSnakeCase = require("lodash/snakeCase");
 const pluralize = require("pluralize");
+
+const snakeCase = str => rawSnakeCase(str).replace(/(\D)_+(\d)/g, "$1$2");
 
 exports.defaultInflection = {
   pluralize,
