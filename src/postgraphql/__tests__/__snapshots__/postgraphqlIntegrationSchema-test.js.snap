@@ -599,7 +599,7 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -624,7 +624,7 @@ type Person implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -653,7 +653,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -761,7 +761,7 @@ type Post {
 
 # The root query type which gives access points into the data universe.
 type Query implements Node {
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -786,7 +786,7 @@ type Query implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -811,7 +811,7 @@ type Query implements Node {
     orderBy: EdgeCasesOrderBy = NATURAL
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -846,7 +846,7 @@ type Query implements Node {
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   id: ID!
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -892,7 +892,7 @@ type Query implements Node {
   query: Query!
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -1639,7 +1639,7 @@ type PageInfo {
 
 # The root query type which gives access points into the data universe.
 type Query implements Node {
-  # Reads and enables paginatation through a set of \`Type\`.
+  # Reads and enables pagination through a set of \`Type\`.
   allTypes(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -1664,7 +1664,7 @@ type Query implements Node {
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesConnection
 
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  # Reads and enables pagination through a set of \`UpdatableView\`.
   allUpdatableViews(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -2261,7 +2261,7 @@ enum Color {
 type CompoundKey implements Node {
   extra: Boolean
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByCompoundKey1AndCompoundKey2(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -3725,7 +3725,7 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -3750,7 +3750,7 @@ type Person implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -3779,7 +3779,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByPersonId(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -3804,7 +3804,7 @@ type Person implements Node {
     orderBy: ForeignKeysOrderBy = NATURAL
   ): ForeignKeysConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -3833,7 +3833,7 @@ type Person implements Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   postsByAuthorId(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4025,7 +4025,7 @@ type Query implements Node {
   # lol, add some stuff 4 query
   add4Query(arg0: Int, b: Int): Int
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4050,7 +4050,7 @@ type Query implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4075,7 +4075,7 @@ type Query implements Node {
     orderBy: EdgeCasesOrderBy = NATURAL
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   allForeignKeys(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4100,7 +4100,7 @@ type Query implements Node {
     orderBy: ForeignKeysOrderBy = NATURAL
   ): ForeignKeysConnection
 
-  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
+  # Reads and enables pagination through a set of \`NonUpdatableView\`.
   allNonUpdatableViews(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4125,7 +4125,7 @@ type Query implements Node {
     orderBy: NonUpdatableViewsOrderBy = NATURAL
   ): NonUpdatableViewsConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4150,7 +4150,7 @@ type Query implements Node {
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
   ): PeopleConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   allPosts(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4175,7 +4175,7 @@ type Query implements Node {
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
   ): PostsConnection
 
-  # Reads and enables paginatation through a set of \`SimilarTable1\`.
+  # Reads and enables pagination through a set of \`SimilarTable1\`.
   allSimilarTable1S(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4200,7 +4200,7 @@ type Query implements Node {
     orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
   ): SimilarTable1SConnection
 
-  # Reads and enables paginatation through a set of \`SimilarTable2\`.
+  # Reads and enables pagination through a set of \`SimilarTable2\`.
   allSimilarTable2S(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4225,7 +4225,7 @@ type Query implements Node {
     orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
   ): SimilarTable2SConnection
 
-  # Reads and enables paginatation through a set of \`Type\`.
+  # Reads and enables pagination through a set of \`Type\`.
   allTypes(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4250,7 +4250,7 @@ type Query implements Node {
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesConnection
 
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  # Reads and enables pagination through a set of \`UpdatableView\`.
   allUpdatableViews(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4283,7 +4283,7 @@ type Query implements Node {
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4353,7 +4353,7 @@ type Query implements Node {
   similarTable2ById(id: Int!): SimilarTable2
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5564,7 +5564,7 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5589,7 +5589,7 @@ type Person implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5618,7 +5618,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5704,7 +5704,7 @@ type Post {
 
 # The root query type which gives access points into the data universe.
 type Query implements Node {
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5729,7 +5729,7 @@ type Query implements Node {
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5754,7 +5754,7 @@ type Query implements Node {
     orderBy: EdgeCasesOrderBy = NATURAL
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5786,7 +5786,7 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -5835,7 +5835,7 @@ type Query implements Node {
   query: Query!
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
