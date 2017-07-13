@@ -1,4 +1,4 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLInt } = require('graphql');
+const { GraphQLSchema, GraphQLObjectType, GraphQLInt } = require('graphql')
 
 const dummySchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -6,9 +6,9 @@ const dummySchema = new GraphQLSchema({
     fields: {
       foo: {
         type: GraphQLInt,
-      }
-    }
-  })
+      },
+    },
+  }),
 })
 
 module.exports = {

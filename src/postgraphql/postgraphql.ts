@@ -110,19 +110,19 @@ export default function postgraphql (
   async function createGqlSchema (): Promise<GraphQLSchema> {
     try {
       if (options.watchPg) {
-        await watchPostGraphQLSchema(pgPool, pgSchemas, options, schema => {
-          gqlSchema = schema
+        await watchPostGraphQLSchema(pgPool, pgSchemas, options, newSchema => {
+          gqlSchema = newSchema
           _emitter.emit('schemas:changed')
           exportGqlSchema(gqlSchema)
-        });
+        })
         if (!gqlSchema) {
-          throw new Error("Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn't happened")
+          throw new Error('Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
         }
       } else {
         gqlSchema = await createPostGraphQLSchema(pgPool, pgSchemas, options)
         exportGqlSchema(gqlSchema)
       }
-      return gqlSchema;
+      return gqlSchema
     }
     // If we fail to build our schema, log the error and exit the process.
     catch (error) {

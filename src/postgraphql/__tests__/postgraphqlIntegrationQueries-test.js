@@ -7,7 +7,6 @@ import withPgClient from '../../__tests__/utils/withPgClient'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import { createPostGraphQLSchema } from '..'
 
-
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
 

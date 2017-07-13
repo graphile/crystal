@@ -60,8 +60,8 @@ test('will watch Postgres schemas when `watchPg` is true', async () => {
   await postgraphql(pgPool, pgSchemas, { watchPg: true })
   expect(createPostGraphQLSchema.mock.calls).toEqual([[pgPool, pgSchemas, { watchPg: false }]])
 
-  expect(watchPostGraphQLSchema.mock.calls.length).toBe(1);
-  expect(watchPostGraphQLSchema.mock.calls[0].length).toBe(4);
+  expect(watchPostGraphQLSchema.mock.calls.length).toBe(1)
+  expect(watchPostGraphQLSchema.mock.calls[0].length).toBe(4)
   expect(watchPostGraphQLSchema.mock.calls[0][0]).toEqual(pgPool)
   expect(watchPostGraphQLSchema.mock.calls[0][1]).toEqual(pgSchemas)
   expect(watchPostGraphQLSchema.mock.calls[0][2]).toEqual({ watchPg: true })
