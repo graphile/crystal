@@ -358,11 +358,9 @@ module.exports = function PgTypesPlugin(
       // Enums
       if (!gqlTypeByTypeId[type.id] && type.type === "e") {
         gqlTypeByTypeId[type.id] = new GraphQLEnumType({
-          // XXX: use inflection
           name: inflection.enumType(type.name),
           values: type.enumVariants.reduce((memo, value) => {
             memo[inflection.enumName(value)] = {
-              name: value,
               value: value,
             };
             return memo;

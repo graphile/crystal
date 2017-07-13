@@ -1,9 +1,13 @@
 const upperFirst = require("lodash/upperFirst");
 const camelcase = require("lodash/camelcase");
-const rawSnakeCase = require("lodash/snakeCase");
 const pluralize = require("pluralize");
 
-const snakeCase = str => rawSnakeCase(str).replace(/(\D)_+(\d)/g, "$1$2");
+const constantCase = str =>
+  str
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/[A-Z]/g, str => `_${str.toLowerCase()}`)
+    .replace(/__+/g, "_")
+    .toUpperCase();
 
 exports.defaultInflection = {
   pluralize,
@@ -14,7 +18,7 @@ exports.defaultInflection = {
     return upperFirst(camelcase(`${pluralize(typeName)}-order-by`));
   },
   orderByEnum(name, ascending, _table, _schema) {
-    return snakeCase(`${name}_${ascending ? "ASC" : "DESC"}`).toUpperCase();
+    return constantCase(`${name}_${ascending ? "asc" : "desc"}`);
   },
   domainType(name) {
     return upperFirst(camelcase(name));
@@ -168,7 +172,7 @@ exports.defaultInflection = {
 
 exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection, {
   enumName(value) {
-    return snakeCase(value).toUpperCase();
+    return constantCase(value);
   },
 });
 
