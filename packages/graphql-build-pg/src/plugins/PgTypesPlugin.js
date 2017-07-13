@@ -258,7 +258,7 @@ module.exports = function PgTypesPlugin(
     const SimpleUUID = stringType("UUID");
     const oidLookup = Object.assign(
       {
-        20: GraphQLString, // Even though this is int8, it's too big for JS int, so cast to string.
+        20: stringType("BigInt"), // bitint - even though this is int8, it's too big for JS int, so cast to string.
         21: GraphQLInt, // int2
         23: GraphQLInt, // int4
         790: GraphQLFloat, // money
