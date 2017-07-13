@@ -2,7 +2,6 @@ import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
-import chalk = require('chalk')
 import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphql-build'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
@@ -96,13 +95,13 @@ export default function postgraphql (
   //
   // This is not a constant because when we are in watch mode, we want to swap
   // out the `gqlSchema`.
-  let gqlSchema
-  let gqlSchemaPromise = createGqlSchema()
+  let gqlSchema: GraphQLSchema
+  let gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
 
   // Finally create our Http request handler using our options, the Postgres
   // pool, and GraphQL schema. Return the final result.
   return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
-    getGqlSchema: () => gqlSchema || gqlSchemaPromise,
+    getGqlSchema: (): Promise<GraphQLSchema> => Promise.resolve(gqlSchema || gqlSchemaPromise),
     pgPool,
     _emitter,
   }))
