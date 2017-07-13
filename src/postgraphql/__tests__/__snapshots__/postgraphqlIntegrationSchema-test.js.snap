@@ -609,7 +609,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # The method to use when ordering \`Person\`.
     orderBy: PersonFriendsOrderBy = NATURAL
@@ -631,7 +631,7 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -656,7 +656,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -766,7 +766,7 @@ type Query implements Node {
     id: ID!
   ): Node
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # The method to use when ordering \`Int\`.
     orderBy: IntSetQueryOrderBy = NATURAL
@@ -794,7 +794,7 @@ type Query implements Node {
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # The method to use when ordering \`Person\`.
     orderBy: TableSetQueryOrderBy = NATURAL
@@ -817,7 +817,7 @@ type Query implements Node {
   ): TableSetQueryConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -849,7 +849,7 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
@@ -874,7 +874,7 @@ type Query implements Node {
     condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
@@ -1637,7 +1637,7 @@ type Query implements Node {
   ): Node
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
-  # Reads and enables paginatation through a set of \`Type\`.
+  # Reads and enables pagination through a set of \`Type\`.
   allTypes(
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
@@ -1669,7 +1669,7 @@ type Query implements Node {
   ): Type
   typeById(id: Int!): Type
 
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  # Reads and enables pagination through a set of \`UpdatableView\`.
   allUpdatableViews(
     # The method to use when ordering \`UpdatableView\`.
     orderBy: UpdatableViewsOrderBy = NATURAL
@@ -2257,7 +2257,7 @@ type CompoundKey implements Node {
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId1: Person
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByCompoundKey1AndCompoundKey2(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -3716,7 +3716,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # The method to use when ordering \`Person\`.
     orderBy: PersonFriendsOrderBy = NATURAL
@@ -3738,7 +3738,7 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   postsByAuthorId(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
@@ -3763,7 +3763,7 @@ type Person implements Node {
     condition: PostCondition
   ): PostsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -3788,7 +3788,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -3813,7 +3813,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByPersonId(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -4011,7 +4011,7 @@ type Query implements Node {
   add4Query(arg0: Int, b: Int): Int
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # The method to use when ordering \`Int\`.
     orderBy: IntSetQueryOrderBy = NATURAL
@@ -4039,7 +4039,7 @@ type Query implements Node {
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # The method to use when ordering \`Person\`.
     orderBy: TableSetQueryOrderBy = NATURAL
@@ -4062,7 +4062,7 @@ type Query implements Node {
   ): TableSetQueryConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   allForeignKeys(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -4087,7 +4087,7 @@ type Query implements Node {
     condition: ForeignKeyCondition
   ): ForeignKeysConnection
 
-  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
+  # Reads and enables pagination through a set of \`NonUpdatableView\`.
   allNonUpdatableViews(
     # The method to use when ordering \`NonUpdatableView\`.
     orderBy: NonUpdatableViewsOrderBy = NATURAL
@@ -4112,7 +4112,7 @@ type Query implements Node {
     condition: NonUpdatableViewCondition
   ): NonUpdatableViewsConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   allPosts(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
@@ -4144,7 +4144,7 @@ type Query implements Node {
   ): Post
   postById(id: Int!): Post
 
-  # Reads and enables paginatation through a set of \`SimilarTable1\`.
+  # Reads and enables pagination through a set of \`SimilarTable1\`.
   allSimilarTable1S(
     # The method to use when ordering \`SimilarTable1\`.
     orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
@@ -4176,7 +4176,7 @@ type Query implements Node {
   ): SimilarTable1
   similarTable1ById(id: Int!): SimilarTable1
 
-  # Reads and enables paginatation through a set of \`SimilarTable2\`.
+  # Reads and enables pagination through a set of \`SimilarTable2\`.
   allSimilarTable2S(
     # The method to use when ordering \`SimilarTable2\`.
     orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
@@ -4208,7 +4208,7 @@ type Query implements Node {
   ): SimilarTable2
   similarTable2ById(id: Int!): SimilarTable2
 
-  # Reads and enables paginatation through a set of \`Type\`.
+  # Reads and enables pagination through a set of \`Type\`.
   allTypes(
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
@@ -4240,7 +4240,7 @@ type Query implements Node {
   ): Type
   typeById(id: Int!): Type
 
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  # Reads and enables pagination through a set of \`UpdatableView\`.
   allUpdatableViews(
     # The method to use when ordering \`UpdatableView\`.
     orderBy: UpdatableViewsOrderBy = NATURAL
@@ -4265,7 +4265,7 @@ type Query implements Node {
     condition: UpdatableViewCondition
   ): UpdatableViewsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -4297,7 +4297,7 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
@@ -4322,7 +4322,7 @@ type Query implements Node {
     condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
@@ -5549,7 +5549,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # The method to use when ordering \`Person\`.
     orderBy: PersonFriendsOrderBy = NATURAL
@@ -5571,7 +5571,7 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -5596,7 +5596,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -5684,7 +5684,7 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # The method to use when ordering \`Int\`.
     orderBy: IntSetQueryOrderBy = NATURAL
@@ -5712,7 +5712,7 @@ type Query implements Node {
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # The method to use when ordering \`Person\`.
     orderBy: TableSetQueryOrderBy = NATURAL
@@ -5735,7 +5735,7 @@ type Query implements Node {
   ): TableSetQueryConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -5767,7 +5767,7 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
@@ -5792,7 +5792,7 @@ type Query implements Node {
     condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
