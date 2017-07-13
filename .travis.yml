@@ -11,9 +11,19 @@ env:
   TEST_PG_URL: postgres://localhost:5432/travis
 
 cache:
+  yarn: true
   directories:
     - node_modules
     - $NVM_DIR
+    - packages/graphql-build-pg/node_modules
+    - packages/graphql-parse-resolve-info/node_modules
+    - packages/postgraphql-build/node_modules
+    - packages/graphql-build/node_modules
+    - packages/pg-sql2/node_modules
+
+install:
+  - yarn --frozen-lockfile
+  - lerna bootstrap
 
 script:
   - scripts/ci
