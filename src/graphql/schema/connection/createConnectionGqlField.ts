@@ -39,7 +39,7 @@ export default function createConnectionGqlField <TSource, TInput, TItemValue>(
   }
 
   return {
-    description: config.description || `Reads and enables paginatation through a set of ${scrib.type(gqlType)}.`,
+    description: config.description || `Reads and enables pagination through a set of ${scrib.type(gqlType)}.`,
     type: getConnectionGqlType(buildToken, paginator),
     args: buildObject<GraphQLArgumentConfig>([
       // Only include an `orderBy` field if there are ways in which we can
