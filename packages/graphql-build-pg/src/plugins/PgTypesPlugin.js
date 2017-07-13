@@ -178,12 +178,16 @@ module.exports = function PgTypesPlugin(
     };
     const GQLInterval = new GraphQLObjectType({
       name: "Interval",
+      description:
+        "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
     });
     addType(GQLInterval);
 
     const GQLIntervalInput = new GraphQLInputObjectType({
       name: "IntervalInput",
+      description:
+        "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
     });
     addType(GQLIntervalInput);

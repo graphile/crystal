@@ -1,10 +1,11 @@
 const upperFirst = require("lodash/upperFirst");
+const lowerFirst = require("lodash/lowerFirst");
 const camelcase = require("lodash/camelcase");
 const pluralize = require("pluralize");
 
 const constantCase = str =>
-  str
-    .replace(/[^a-z0-9_]+/g, "_")
+  lowerFirst(str.replace(/^[^a-z0-9_]+/gi, ""))
+    .replace(/[^a-z0-9_]+/gi, "_")
     .replace(/[A-Z]/g, str => `_${str.toLowerCase()}`)
     .replace(/__+/g, "_")
     .toUpperCase();

@@ -105,9 +105,11 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
         },
       },
       node: {
+        description: "Fetches an object given its globally unique `ID`.",
         type: getTypeByName("Node"),
         args: {
           [nodeIdFieldName]: {
+            description: "The globally unique `ID`.",
             type: new GraphQLNonNull(GraphQLID),
           },
         },
