@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+echo "[1/3]: Building Code"
+lerna run prepublish
+
+echo "[2/3]: Linting Code"
+npm run lint
+
+echo "[3/3]: Testing Project"
+lerna run test
+
+echo ""
+echo "CI completed succesfully 🎉"
+echo ""
