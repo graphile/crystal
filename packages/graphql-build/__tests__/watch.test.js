@@ -111,7 +111,7 @@ test("generated schema n = 0, n = 3", async () => {
 test("schema is cached if no watcher fires", async () => {
   const { plugin, setN } = makePluginEtc();
   const builder = await getBuilder([...defaultPlugins, plugin], options);
-  builder.watchSchema();
+  await builder.watchSchema();
 
   const schema0 = builder.buildSchema();
   const schema0_2 = builder.buildSchema();
@@ -120,13 +120,13 @@ test("schema is cached if no watcher fires", async () => {
   expect(schema0).toBe(schema0_2);
   expect(schema0).toBe(schema0_3);
 
-  builder.unwatchSchema();
+  await builder.unwatchSchema();
 });
 
 test("schema is equivalent (but not identical) if rebuild fires but no changes occur", async () => {
   const { plugin, eventEmitter } = makePluginEtc();
   const builder = await getBuilder([...defaultPlugins, plugin], options);
-  builder.watchSchema();
+  await builder.watchSchema();
 
   const schema0 = builder.buildSchema();
   eventEmitter.emit("change");
@@ -135,13 +135,13 @@ test("schema is equivalent (but not identical) if rebuild fires but no changes o
   expect(schema0).not.toBe(schema0_2);
   expect(printSchema(schema0)).toEqual(printSchema(schema0_2));
 
-  builder.unwatchSchema();
+  await builder.unwatchSchema();
 });
 
 test("schema is updated when rebuild triggered", async () => {
   const { plugin, setN, eventEmitter } = makePluginEtc();
   const builder = await getBuilder([...defaultPlugins, plugin], options);
-  builder.watchSchema();
+  await builder.watchSchema();
 
   const schema0 = builder.buildSchema();
   setN(70);
@@ -170,5 +170,5 @@ test("schema is updated when rebuild triggered", async () => {
   expect(await getNFrom(schema0)).toEqual(0);
   expect(await getNFrom(schema1)).toEqual(70);
 
-  builder.unwatchSchema();
+  await builder.unwatchSchema();
 });
