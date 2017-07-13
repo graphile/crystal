@@ -110,6 +110,8 @@ module.exports = function PgTypesPlugin(
       }
       if (pg2GqlMapper[type.id]) {
         return pg2GqlMapper[type.id].map(val);
+      } else if (type.domainBaseType) {
+        return pg2gql(val, type.domainBaseType);
       } else {
         return val;
       }
@@ -120,6 +122,8 @@ module.exports = function PgTypesPlugin(
       }
       if (pg2GqlMapper[type.id]) {
         return pg2GqlMapper[type.id].unmap(val);
+      } else if (type.domainBaseType) {
+        return gql2pg(val, type.domainBaseType);
       } else {
         return sql.value(val);
       }
@@ -234,6 +238,8 @@ module.exports = function PgTypesPlugin(
       const tweaker = pgTweaksByTypeId[type.id];
       if (tweaker) {
         return tweaker(fragment);
+      } else if (type.domainBaseType) {
+        return pgTweakFragmentForType(fragment, type.domainBaseType);
       } else {
         return fragment;
       }
@@ -454,6 +460,31 @@ module.exports = function PgTypesPlugin(
           },
         };
       }
+
+      // Domains
+      if (
+        !gqlTypeByTypeId[type.id] &&
+        type.type === "d" &&
+        type.domainBaseTypeId
+      ) {
+        const baseType = enforceGqlTypeByPgType(type.domainBaseType);
+        const baseInputType = gqlInputTypeByTypeId[type.domainBaseTypeId];
+        // Hack stolen from: https://github.com/postgraphql/postgraphql/blob/ade728ed8f8e3ecdc5fdad7d770c67aa573578eb/src/graphql/schema/type/aliasGqlType.ts#L16
+        gqlTypeByTypeId[type.id] = Object.assign(Object.create(baseType), {
+          name: inflection.domainType(type.name),
+          description: type.description,
+        });
+        if (baseInputType && baseInputType !== baseType) {
+          gqlInputTypeByTypeId[type.id] = Object.assign(
+            Object.create(baseInputType),
+            {
+              name: inflection.inputType(gqlTypeByTypeId[type.id]),
+              description: type.description,
+            }
+          );
+        }
+      }
+
       // Fall back to categories
       if (!gqlTypeByTypeId[type.id]) {
         const gen = categoryLookup[type.category];
@@ -461,6 +492,7 @@ module.exports = function PgTypesPlugin(
           gqlTypeByTypeId[type.id] = gen(type);
         }
       }
+
       // Nothing else worked; pass through as string!
       if (!gqlTypeByTypeId[type.id]) {
         gqlTypeByTypeId[type.id] = GraphQLString;

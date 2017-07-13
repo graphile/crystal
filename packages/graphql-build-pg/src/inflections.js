@@ -14,6 +14,9 @@ exports.defaultInflection = {
   orderByEnum(name, ascending, _table, _schema) {
     return snakeCase(`${name}_${ascending ? "ASC" : "DESC"}`).toUpperCase();
   },
+  domainType(name) {
+    return upperFirst(camelcase(name));
+  },
   enumName(value) {
     return value;
   },
