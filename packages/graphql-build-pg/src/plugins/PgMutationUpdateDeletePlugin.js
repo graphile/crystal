@@ -56,6 +56,101 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                 const TableType = getTypeByName(
                   inflection.tableType(table.name, table.namespace.name)
                 );
+                async function commonCodeRenameMe(
+                  pgClient,
+                  resolveInfo,
+                  getDataFromParsedResolveInfoFragment,
+                  PayloadType,
+                  input,
+                  condition
+                ) {
+                  const parsedResolveInfoFragment = parseResolveInfo(
+                    resolveInfo
+                  );
+                  const resolveData = getDataFromParsedResolveInfoFragment(
+                    parsedResolveInfoFragment,
+                    PayloadType
+                  );
+                  const modifiedRowAlias = sql.identifier(Symbol());
+                  const query = queryFromResolveData(
+                    modifiedRowAlias,
+                    modifiedRowAlias,
+                    resolveData,
+                    {}
+                  );
+                  let queryWithMutation;
+                  if (mode === "update") {
+                    const sqlColumns = [];
+                    const sqlValues = [];
+                    const inputData =
+                      input[
+                        inflection.patchField(
+                          inflection.tableName(table.name, table.namespace.name)
+                        )
+                      ];
+                    introspectionResultsByKind.attribute
+                      .filter(attr => attr.classId === table.id)
+                      .forEach(attr => {
+                        const fieldName = inflection.column(
+                          attr.name,
+                          table.name,
+                          table.namespace.name
+                        );
+                        if (
+                          fieldName in
+                          inputData /* Because we care about null! */
+                        ) {
+                          const val = inputData[fieldName];
+                          sqlColumns.push(sql.identifier(attr.name));
+                          sqlValues.push(gql2pg(val, attr.type));
+                        }
+                      });
+                    if (sqlColumns.length === 0) {
+                      return null;
+                    }
+                    queryWithMutation = sql.query`
+                          with ${modifiedRowAlias} as (
+                            update ${sql.identifier(
+                              table.namespace.name,
+                              table.name
+                            )} set ${sql.join(
+                      sqlColumns.map(
+                        (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
+                      ),
+                      ", "
+                    )}
+                            where ${condition}
+                            returning *
+                          ) ${query}
+                          `;
+                  } else {
+                    queryWithMutation = sql.query`
+                      with ${modifiedRowAlias} as (
+                        delete from ${sql.identifier(
+                          table.namespace.name,
+                          table.name
+                        )}
+                        where ${condition}
+                        returning *
+                      ) ${query}
+                      `;
+                  }
+                  const { text, values } = sql.compile(queryWithMutation);
+                  if (debugSql.enabled)
+                    debugSql(require("sql-formatter").format(text));
+                  const { rows: [row] } = await pgClient.query(text, values);
+                  if (!row) {
+                    throw new Error(
+                      `No values were deleted in collection '${pluralize(
+                        table.name
+                      )}' because no values were found.`
+                    );
+                  }
+                  return {
+                    clientMutationId: input.clientMutationId,
+                    data: row,
+                  };
+                }
                 if (TableType) {
                   const uniqueConstraints = introspectionResultsByKind.constraint
                     .filter(con => con.classId === table.id)
@@ -127,105 +222,6 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                       pgIntrospection: table,
                     }
                   );
-
-                  async function commonCodeRenameMe(
-                    pgClient,
-                    resolveInfo,
-                    getDataFromParsedResolveInfoFragment,
-                    PayloadType,
-                    input,
-                    condition
-                  ) {
-                    const parsedResolveInfoFragment = parseResolveInfo(
-                      resolveInfo
-                    );
-                    const resolveData = getDataFromParsedResolveInfoFragment(
-                      parsedResolveInfoFragment,
-                      PayloadType
-                    );
-                    const modifiedRowAlias = sql.identifier(Symbol());
-                    const query = queryFromResolveData(
-                      modifiedRowAlias,
-                      modifiedRowAlias,
-                      resolveData,
-                      {}
-                    );
-                    let queryWithMutation;
-                    if (mode === "update") {
-                      const sqlColumns = [];
-                      const sqlValues = [];
-                      const inputData =
-                        input[
-                          inflection.patchField(
-                            inflection.tableName(
-                              table.name,
-                              table.namespace.name
-                            )
-                          )
-                        ];
-                      introspectionResultsByKind.attribute
-                        .filter(attr => attr.classId === table.id)
-                        .forEach(attr => {
-                          const fieldName = inflection.column(
-                            attr.name,
-                            table.name,
-                            table.namespace.name
-                          );
-                          if (
-                            fieldName in
-                            inputData /* Because we care about null! */
-                          ) {
-                            const val = inputData[fieldName];
-                            sqlColumns.push(sql.identifier(attr.name));
-                            sqlValues.push(gql2pg(val, attr.type));
-                          }
-                        });
-                      if (sqlColumns.length === 0) {
-                        return null;
-                      }
-                      queryWithMutation = sql.query`
-                          with ${modifiedRowAlias} as (
-                            update ${sql.identifier(
-                              table.namespace.name,
-                              table.name
-                            )} set ${sql.join(
-                        sqlColumns.map(
-                          (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
-                        ),
-                        ", "
-                      )}
-                            where ${condition}
-                            returning *
-                          ) ${query}
-                          `;
-                    } else {
-                      queryWithMutation = sql.query`
-                      with ${modifiedRowAlias} as (
-                        delete from ${sql.identifier(
-                          table.namespace.name,
-                          table.name
-                        )}
-                        where ${condition}
-                        returning *
-                      ) ${query}
-                      `;
-                    }
-                    const { text, values } = sql.compile(queryWithMutation);
-                    if (debugSql.enabled)
-                      debugSql(require("sql-formatter").format(text));
-                    const { rows: [row] } = await pgClient.query(text, values);
-                    if (!row) {
-                      throw new Error(
-                        `No values were deleted in collection '${pluralize(
-                          table.name
-                        )}' because no values were found.`
-                      );
-                    }
-                    return {
-                      clientMutationId: input.clientMutationId,
-                      data: row,
-                    };
-                  }
 
                   // NodeId
                   if (nodeIdFieldName) {

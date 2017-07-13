@@ -1,4 +1,3 @@
-const { GraphQLEnumType } = require("graphql");
 const isString = require("lodash/isString");
 
 module.exports = function PgMutationPayloadEdgePlugin(

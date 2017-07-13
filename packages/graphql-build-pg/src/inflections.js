@@ -123,13 +123,6 @@ exports.defaultInflection = {
   deleteNodeInputType(name, _schema) {
     return upperFirst(camelcase(`delete-${pluralize.singular(name)}-input`));
   },
-  deleteByKeys(detailedKeys, table, schema) {
-    return camelcase(
-      `delete-${this.tableName(table, schema)}-by-${detailedKeys
-        .map(key => this.column(key.column, key.table, key.schema))
-        .join("-and-")}`
-    );
-  },
   manyRelationByKeys(detailedKeys, table, schema) {
     return camelcase(
       `${this.pluralize(

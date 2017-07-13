@@ -6,6 +6,7 @@ const {
 } = require("graphql");
 const queryFromResolveData = require("../queryFromResolveData");
 const debugSql = require("debug")("graphql-build-pg:sql");
+const debug = require("debug")("graphql-build-pg");
 
 module.exports = function PgMutationCreatePlugin(
   builder,
@@ -44,7 +45,7 @@ module.exports = function PgMutationCreatePlugin(
               inflection.tableType(table.name, table.namespace.name)
             );
             if (!Table) {
-              console.warn(
+              debug(
                 `There was no table type for table '${table.namespace
                   .name}.${table.name}', so we're not generating a create mutation for it.`
               );
@@ -52,7 +53,7 @@ module.exports = function PgMutationCreatePlugin(
             }
             const TableInput = getTypeByName(inflection.inputType(Table.name));
             if (!TableInput) {
-              console.warn(
+              debug(
                 `There was no input type for table '${table.namespace
                   .name}.${table.name}', so we're not generating a create mutation for it.`
               );

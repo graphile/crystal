@@ -168,7 +168,7 @@ module.exports = function PgTablesPlugin(
                 const pgInputField = pgInputFields[fieldName];
                 const v = obj[fieldName];
                 if (pgInputField && v != null) {
-                  const { name, type } = pgInputField;
+                  const { type } = pgInputField;
                   return sql.fragment`${gql2pg(v, type)}::${sql.identifier(
                     type.namespaceName,
                     type.name

@@ -28,6 +28,13 @@ const stringType = (name, description) =>
   });
 const rawParseInterval = require("postgres-interval");
 const LRU = require("lru-cache");
+/*
+const {
+  GraphQLDate,
+  GraphQLTime,
+  GraphQLDateTime,
+} = require("graphql-iso-date");
+*/
 
 const parseCache = LRU(500);
 function parseInterval(str) {
@@ -77,15 +84,6 @@ const pgRangeParser = {
     ].join(",");
   },
 };
-
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime,
-} = require("graphql-iso-date");
-
-const upperFirst = require("lodash/upperFirst");
-const camelcase = require("lodash/camelcase");
 
 module.exports = function PgTypesPlugin(
   builder,
@@ -372,7 +370,6 @@ module.exports = function PgTypesPlugin(
             };
             return memo;
           }, {}),
-          description: type.description,
         });
       }
       // Ranges

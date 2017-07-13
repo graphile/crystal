@@ -7,7 +7,7 @@ const EventEmitter = require("events");
 const INDENT = "  ";
 
 class SchemaBuilder extends EventEmitter {
-  constructor({ watch = false } = {}) {
+  constructor() {
     super();
 
     this.watchers = [];
