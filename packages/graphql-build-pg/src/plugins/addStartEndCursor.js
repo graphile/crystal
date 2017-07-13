@@ -1,4 +1,4 @@
-const base64 = str => Buffer.from(String(str)).toString("base64");
+const base64 = str => new Buffer(String(str)).toString("base64");
 
 function cursorify(val) {
   return val && val.__cursor ? base64(JSON.stringify(val.__cursor)) : val;

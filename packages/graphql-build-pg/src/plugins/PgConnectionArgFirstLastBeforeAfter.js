@@ -1,4 +1,4 @@
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 const { GraphQLInt } = require("graphql");
 
 module.exports = function PgConnectionArgs(builder) {

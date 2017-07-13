@@ -8,7 +8,7 @@ const {
 } = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
 const debug = require("debug")("graphql-build-pg");
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 const camelCase = require("lodash/camelCase");
 const pluralize = require("pluralize");
 

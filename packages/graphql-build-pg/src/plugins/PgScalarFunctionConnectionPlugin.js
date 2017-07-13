@@ -5,7 +5,7 @@ const {
   GraphQLString,
 } = require("graphql");
 
-const base64 = str => Buffer.from(String(str)).toString("base64");
+const base64 = str => new Buffer(String(str)).toString("base64");
 
 module.exports = function PgTablesPlugin(
   builder,
