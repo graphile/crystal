@@ -64,11 +64,12 @@ beforeAll(() => {
           // Get the appropriate GraphQL schema for this fixture. We want to test
           // some specific fixtures against a schema configured slightly
           // differently.
-          const gqlSchema = fileName === "classic-ids.graphql"
-            ? gqlSchemas.classicIds
-            : fileName === "dynamic-json.graphql"
-              ? gqlSchemas.dynamicJson
-              : gqlSchemas.normal;
+          const gqlSchema =
+            fileName === "classic-ids.graphql"
+              ? gqlSchemas.classicIds
+              : fileName === "dynamic-json.graphql"
+                ? gqlSchemas.dynamicJson
+                : gqlSchemas.normal;
           // Return the result of our GraphQL query.
           const result = await graphql(gqlSchema, query, null, {
             pgClient: pgClient,

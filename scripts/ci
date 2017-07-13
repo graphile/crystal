@@ -8,7 +8,11 @@ echo "[2/3]: Linting Code"
 npm run lint
 
 echo "[3/3]: Testing Project"
-lerna run test
+for I in packages/*/; do
+  cd $I
+  yarn test
+  cd -
+done
 
 echo ""
 echo "CI completed succesfully 🎉"
