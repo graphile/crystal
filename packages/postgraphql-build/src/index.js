@@ -16,6 +16,7 @@ const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
     pgJwtTypeIdentifier: options.jwtPgTypeIdentifier,
     pgJwtSecret: options.jwtSecret,
+    pgDisableDefaultMutations: options.disableDefaultMutations,
   });
 };
 

@@ -24,7 +24,7 @@ exports.defaultPlugins = [
 
   // Mutations
   require("./plugins/PgMutationCreatePlugin"),
-  require("./plugins/PgMutationUpdatePlugin"),
+  require("./plugins/PgMutationUpdateDeletePlugin"),
   require("./plugins/PgMutationProceduresPlugin"),
   require("./plugins/PgMutationPayloadEdgePlugin"),
 ];

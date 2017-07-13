@@ -9,8 +9,11 @@ const debugSql = require("debug")("graphql-build-pg:sql");
 
 module.exports = function PgMutationCreatePlugin(
   builder,
-  { pgInflection: inflection }
+  { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
+  if (pgDisableDefaultMutations) {
+    return;
+  }
   builder.hook(
     "GraphQLObjectType:fields",
     (
