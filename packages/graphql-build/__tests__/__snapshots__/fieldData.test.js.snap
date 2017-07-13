@@ -66,6 +66,7 @@ interface Node {
   nodeId: ID!
 }
 
+# The root query type which gives access points into the data universe.
 type Query implements Node {
   query: Query
 
