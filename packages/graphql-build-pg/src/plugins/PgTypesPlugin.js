@@ -383,11 +383,16 @@ module.exports = function PgTypesPlugin(
         if (!Range) {
           const RangeBound = new GraphQLObjectType({
             name: inflection.rangeBoundType(gqlRangeSubType.name),
+            description:
+              "The value at one end of a range. A range can either include this value, or not.",
             fields: {
               value: {
+                description: "The value at one end of our range.",
                 type: new GraphQLNonNull(gqlRangeSubType),
               },
               inclusive: {
+                description:
+                  "Whether or not the value of this bound is included in the range.",
                 type: new GraphQLNonNull(GraphQLBoolean),
               },
             },
@@ -410,7 +415,7 @@ module.exports = function PgTypesPlugin(
           });
           Range = new GraphQLObjectType({
             name: inflection.rangeType(gqlRangeSubType.name),
-            description: "A range of `${gqlRangeSubType.name}`.",
+            description: `A range of \`${gqlRangeSubType.name}\`.`,
             fields: {
               start: {
                 description: "The starting bound of our range.",
@@ -424,11 +429,14 @@ module.exports = function PgTypesPlugin(
           });
           RangeInput = new GraphQLInputObjectType({
             name: inflection.inputType(Range.name),
+            description: `A range of \`${gqlRangeSubType.name}\`.`,
             fields: {
               start: {
+                description: "The starting bound of our range.",
                 type: RangeBoundInput,
               },
               end: {
+                description: "The ending bound of our range.",
                 type: RangeBoundInput,
               },
             },

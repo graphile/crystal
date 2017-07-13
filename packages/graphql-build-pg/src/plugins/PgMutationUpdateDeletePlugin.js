@@ -102,7 +102,9 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                             },
                           },
                           mode === "delete" && {
-                            [camelcase(`deleted-${table.name}-id`)]: {
+                            [camelcase(
+                              `deleted-${pluralize.singular(table.name)}-id`
+                            )]: {
                               type: GraphQLID,
                               resolve(data) {
                                 return (
@@ -258,7 +260,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                               type: GraphQLString,
                             },
                             [nodeIdFieldName]: {
-                              description: `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be updated.`,
+                              description: `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${mode}d.`,
                               type: new GraphQLNonNull(GraphQLID),
                             },
                           },
@@ -269,7 +271,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                                 table.namespace.name
                               )
                             )]: {
-                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being updated.`,
+                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
                               type: new GraphQLNonNull(TablePatch),
                             },
                           }
@@ -388,7 +390,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                                 table.namespace.name
                               )
                             )]: {
-                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being updated.`,
+                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
                               type: new GraphQLNonNull(TablePatch),
                             },
                           },
