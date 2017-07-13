@@ -331,6 +331,7 @@ module.exports = function makeProcField(
       }
 
       return {
+        description: proc.description,
         type: ReturnType,
         args: args,
         resolve: computed
