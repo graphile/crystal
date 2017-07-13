@@ -3,7 +3,7 @@
 
 jest.unmock('postgraphql-build')
 
-import { printSchema } from 'graphql'
+import printSchemaOrdered from '../../__tests__/utils/printSchemaOrdered'
 import withPgClient from '../../__tests__/utils/withPgClient'
 import { createPostGraphQLSchema } from '..'
 
@@ -39,6 +39,6 @@ beforeAll(() => {
 
 for (let i = 0; i < testFixtures.length; i++) {
   test(testFixtures[i].name, async () => {
-    expect(printSchema(await testResults[i])).toMatchSnapshot()
+    expect(printSchemaOrdered(await testResults[i])).toMatchSnapshot()
   })
 }
