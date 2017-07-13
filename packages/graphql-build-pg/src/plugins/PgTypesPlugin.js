@@ -359,6 +359,7 @@ module.exports = function PgTypesPlugin(
       if (!gqlTypeByTypeId[type.id] && type.type === "e") {
         gqlTypeByTypeId[type.id] = new GraphQLEnumType({
           name: inflection.enumType(type.name),
+          description: type.description,
           values: type.enumVariants.reduce((memo, value) => {
             memo[inflection.enumName(value)] = {
               value: value,
@@ -516,6 +517,7 @@ module.exports = function PgTypesPlugin(
 
       // Nothing else worked; pass through as string!
       if (!gqlTypeByTypeId[type.id]) {
+        // XXX: consider using stringType(upperFirst(camelcase(`fallback_${type.name}`)), type.description)?
         gqlTypeByTypeId[type.id] = GraphQLString;
       }
       // Now for input types, fall back to output types if possible
