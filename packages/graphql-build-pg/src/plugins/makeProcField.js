@@ -75,9 +75,8 @@ module.exports = function makeProcField(
       ? argNames.length - sliceAmount
       : argNames.length - sliceAmount - proc.argDefaultsNum
   );
-  const notNullArgCount = proc.isStrict || strictFunctions
-    ? requiredArgCount
-    : 0;
+  const notNullArgCount =
+    proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     const Type = pgGqlInputTypeByTypeId[type.id] || GraphQLString;
     if (idx >= notNullArgCount) {
@@ -340,8 +339,8 @@ module.exports = function makeProcField(
       return {
         description:
           proc.description ||
-            (isTableLike &&
-              `Reads and enables pagination through a set of \`${TableType.name}\`.`),
+          (isTableLike &&
+            `Reads and enables pagination through a set of \`${TableType.name}\`.`),
         type: ReturnType,
         args: args,
         resolve: computed

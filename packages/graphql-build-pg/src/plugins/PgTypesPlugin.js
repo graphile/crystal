@@ -48,18 +48,20 @@ const pgRangeParser = {
     }
 
     return {
-      start: parts[0].length > 1
-        ? {
-            inclusive: parts[0][0] === "[",
-            value: parts[0].slice(1),
-          }
-        : null,
-      end: parts[1].length > 1
-        ? {
-            inclusive: parts[1][parts[1].length - 1] === "]",
-            value: parts[1].slice(0, -1),
-          }
-        : null,
+      start:
+        parts[0].length > 1
+          ? {
+              inclusive: parts[0][0] === "[",
+              value: parts[0].slice(1),
+            }
+          : null,
+      end:
+        parts[1].length > 1
+          ? {
+              inclusive: parts[1][parts[1].length - 1] === "]",
+              value: parts[1].slice(0, -1),
+            }
+          : null,
     };
   },
 

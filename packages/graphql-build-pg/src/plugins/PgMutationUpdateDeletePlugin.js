@@ -293,9 +293,10 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
-                          description: mode === "update"
-                            ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
-                            : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
+                          description:
+                            mode === "update"
+                              ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
+                              : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
                           type: PayloadType,
                           args: {
                             input: {
@@ -427,9 +428,10 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
-                          description: mode === "update"
-                            ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
-                            : `Deletes a single \`${tableTypeName}\` using a unique key.`,
+                          description:
+                            mode === "update"
+                              ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
+                              : `Deletes a single \`${tableTypeName}\` using a unique key.`,
                           type: PayloadType,
                           args: {
                             input: {
