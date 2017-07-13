@@ -81,6 +81,7 @@ const {
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
+  extendedErrors = [],
   bodySizeLimit,
 // tslint:disable-next-line no-any
 } = program as any
@@ -122,6 +123,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   pgDefaultRole,
   watchPg,
   showErrorStack,
+  extendedErrors,
   disableQueryLog: false,
   enableCors,
   exportJsonSchemaPath,
