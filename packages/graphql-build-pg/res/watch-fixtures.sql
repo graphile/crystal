@@ -36,7 +36,7 @@ begin
       'type',
       'drop',
       'payload',
-      (select json_agg(row_to_json(x)) from pg_event_trigger_dropped_objects() as x)
+      (select json_agg(distinct x.schema_name) from pg_event_trigger_dropped_objects() as x)
     )::text
   );
 end;

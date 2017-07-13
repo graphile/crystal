@@ -201,13 +201,14 @@ module.exports = async function PgIntrospectionPlugin(
 
     await pgClient.query("listen postgraphql_watch");
 
-    listener = async () => {
+    const handleChange = async () => {
       debug(`Schema change detected: re-inspecting schema...`);
       introspectionResultsByKind = await introspect();
       debug(`Schema change detected: re-inspecting schema complete`);
       triggerRebuild();
     };
-    pgClient.on("notification", notification => {
+
+    listener = async notification => {
       if (notification.channel !== "postgraphql_watch") {
         return;
       }
@@ -221,14 +222,14 @@ module.exports = async function PgIntrospectionPlugin(
             )
             .map(({ command }) => command);
           if (commands.length) {
-            listener();
+            handleChange();
           }
         } else if (payload.type === "drop") {
           const affectsOurSchemas = payload.payload.some(
-            entry => schemas.indexOf(entry.schema_name) >= 0
+            schemaName => schemas.indexOf(schemaName) >= 0
           );
           if (affectsOurSchemas) {
-            listener();
+            handleChange();
           }
         } else {
           throw new Error(`Payload type '${payload.type}' not recognised`);
@@ -236,7 +237,8 @@ module.exports = async function PgIntrospectionPlugin(
       } catch (e) {
         debug(`Error occurred parsing notification payload: ${e}`);
       }
-    });
+    };
+    pgClient.on("notification", listener);
     introspectionResultsByKind = await introspect();
   }, stopListening);
 
