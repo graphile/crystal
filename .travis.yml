@@ -22,7 +22,7 @@ cache:
     - packages/pg-sql2/node_modules
 
 install:
-  - yarn --frozen-lockfile
+  - yarn
   - lerna bootstrap
 
 script:
