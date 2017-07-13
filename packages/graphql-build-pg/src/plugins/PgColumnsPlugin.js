@@ -153,7 +153,7 @@ module.exports = function PgColumnsPlugin(
             const fieldName = inflection.column(
               attr.name,
               table.name,
-              table.namespace.name
+              table.namespace && table.namespace.name
             );
             memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
               description: attr.description,
