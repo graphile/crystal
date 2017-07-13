@@ -1,6 +1,6 @@
 {
   "name": "postgraphql-build",
-  "version": "0.0.1-alpha6.0",
+  "version": "0.0.1-alpha6.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "graphql-build": "^0.0.1-alpha6.0",
-    "graphql-build-pg": "^0.0.1-alpha6.0"
+    "graphql-build-pg": "^0.0.1-alpha6.1"
   },
   "peerDependencies": {
     "babel-polyfill": ">=6 <7"
