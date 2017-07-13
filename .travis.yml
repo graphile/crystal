@@ -8,7 +8,7 @@ addons:
   postgresql: "9.4"
 
 env:
-  TEST_PG_URL: postgres://localhost:5432/travis
+  TEST_DATABASE_URL: postgres://localhost:5432/travis
 
 cache:
   yarn: true
