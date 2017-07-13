@@ -4,7 +4,11 @@ module.exports = async function MutationPlugin(builder) {
   builder.hook("GraphQLSchema", (schema, { buildObjectWithHooks, extend }) => {
     const Mutation = buildObjectWithHooks(
       GraphQLObjectType,
-      { name: "Mutation" },
+      {
+        name: "Mutation",
+        description:
+          "The root mutation type which contains root level fields which mutate data.",
+      },
       { isRootMutation: true },
       true
     );

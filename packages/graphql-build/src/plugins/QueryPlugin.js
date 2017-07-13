@@ -12,6 +12,8 @@ module.exports = async function QueryPlugin(builder) {
       const queryType = buildObjectWithHooks(
         GraphQLObjectType,
         {
+          description:
+            "The root query type which gives access points into the data universe.",
           name: "Query",
           isTypeOf: (value, _context, info) =>
             info.parentType == null || value === $$isQuery,

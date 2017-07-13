@@ -73,17 +73,20 @@ module.exports = function PgTablesPlugin(
                 proc.name,
                 proc.namespace.name
               ),
+              description: `A connection to a list of \`${NodeType.name}\` values.`,
               fields: ({ recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("edges");
                 recurseDataGeneratorsForField("nodes");
                 return {
                   nodes: {
+                    description: `A list of \`${NodeType.name}\` objects.`,
                     type: new GraphQLNonNull(new GraphQLList(NodeType)),
                     resolve(data) {
                       return data.data.map(entry => entry.value);
                     },
                   },
                   edges: {
+                    description: `A list of edges which contains the \`${NodeType.name}\` and cursor to aid in pagination.`,
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),

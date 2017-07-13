@@ -146,53 +146,44 @@ module.exports = function PgTypesPlugin(
           rangeSubTypeId: null }
       */
 
-    const GQLInterval = new GraphQLObjectType({
-      name: "Interval",
-      fields: {
+    const makeIntervalFields = () => {
+      return {
         seconds: {
+          description:
+            "A quantity of seconds. This is the only non-integer field, as all the other fields will dump their overflow into a smaller unit of time. Intervals don’t have a smaller unit than seconds.",
           type: GraphQLFloat,
         },
         minutes: {
+          description: "A quantity of minutes.",
           type: GraphQLInt,
         },
         hours: {
+          description: "A quantity of hours.",
           type: GraphQLInt,
         },
         days: {
+          description: "A quantity of days.",
           type: GraphQLInt,
         },
         months: {
+          description: "A quantity of months.",
           type: GraphQLInt,
         },
         years: {
+          description: "A quantity of years.",
           type: GraphQLInt,
         },
-      },
+      };
+    };
+    const GQLInterval = new GraphQLObjectType({
+      name: "Interval",
+      fields: makeIntervalFields(),
     });
     addType(GQLInterval);
 
     const GQLIntervalInput = new GraphQLInputObjectType({
       name: "IntervalInput",
-      fields: {
-        seconds: {
-          type: GraphQLFloat,
-        },
-        minutes: {
-          type: GraphQLInt,
-        },
-        hours: {
-          type: GraphQLInt,
-        },
-        days: {
-          type: GraphQLInt,
-        },
-        months: {
-          type: GraphQLInt,
-        },
-        years: {
-          type: GraphQLInt,
-        },
-      },
+      fields: makeIntervalFields(),
     });
     addType(GQLIntervalInput);
 
