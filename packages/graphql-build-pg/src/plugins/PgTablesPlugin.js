@@ -142,6 +142,7 @@ module.exports = function PgTablesPlugin(
           },
           {
             pgIntrospection: table,
+            isInputType: true,
             isPgRowType: table.isSelectable,
             isPgCompoundType: !table.isSelectable,
             pgAddSubfield(fieldName, attrName, pgType, spec) {

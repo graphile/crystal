@@ -7,11 +7,17 @@ module.exports = function PgComputedColumnsPlugin(builder) {
       fields,
       build,
       {
-        scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
+        scope: {
+          isPgRowType,
+          isPgCompoundType,
+          isInputType,
+          pgIntrospection: table,
+        },
         buildFieldWithHooks,
       }
     ) => {
       if (
+        isInputType ||
         !(isPgRowType || isPgCompoundType) ||
         !table ||
         table.kind !== "class"
