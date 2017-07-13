@@ -45,7 +45,7 @@ exports.defaultInflection = {
     return camelcase(pluralize.singular(name));
   },
   tableNode(name, _schema) {
-    return camelcase(name);
+    return camelcase(pluralize.singular(name));
   },
   allRows(name, schema) {
     return camelcase(`all-${this.pluralize(this.tableName(name, schema))}`);
