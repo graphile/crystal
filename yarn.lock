@@ -2678,9 +2678,9 @@ graphiql@^0.11.2:
     codemirror-graphql "^0.6.8"
     marked "0.3.6"
 
-graphql-build-pg@^0.0.1-alpha6.0:
-  version "0.0.1-alpha6.0"
-  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha6.0.tgz#09ccbf1a6d78a2c84b8651b7be65ac881a40ea13"
+graphql-build-pg@^0.0.1-alpha6.1:
+  version "0.0.1-alpha6.1"
+  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha6.1.tgz#abf051118617b16a1337da05c33f1f61b5143e37"
   dependencies:
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
@@ -4820,12 +4820,12 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphql-build@0.0.1-alpha6.0:
-  version "0.0.1-alpha6.0"
-  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.0.1-alpha6.0.tgz#fb039c710584de9bc2b6447520fc9ca0cf0f2abd"
+postgraphql-build@0.0.1-alpha6.1:
+  version "0.0.1-alpha6.1"
+  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.0.1-alpha6.1.tgz#04355ea5bf3c956c43473daf6f223ae174e9f1d5"
   dependencies:
     graphql-build "^0.0.1-alpha6.0"
-    graphql-build-pg "^0.0.1-alpha6.0"
+    graphql-build-pg "^0.0.1-alpha6.1"
 
 postgres-array@~1.0.0:
   version "1.0.2"
