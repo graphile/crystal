@@ -15,7 +15,7 @@ goodNames.forEach(goodName => {
     let tokenType = getPgTokenTypeFromIdentifier(catalog, `${goodName}.jwt_token`)
 
     expect(tokenType.name).toBe('jwt_token')
-  })
+  }))
 })
 
 // schema, type, etc... names are not allowed to start with numbers
@@ -35,5 +35,5 @@ badNames.forEach(badName => {
 
     // unfortunately we only get a generic error with the text "syntax error" from the client
     expect(badQuery instanceof Error && /syntax/.test(badQuery)).toBe(true)
-  })
-}
+  }))
+})
