@@ -13,9 +13,6 @@ const gqlSchemaPromise = withPgClient(async pgClient => {
   return await createPostGraphQLSchema(pgClient, ['a', 'b', 'c'])
 })()
 
-/*
- * This test had to be disabled because jest baulked at the size of the diff.
-
 test('exports a schema as JSON', async () => {
   writeFile.mockClear()
   const gqlSchema = await gqlSchemaPromise
@@ -24,8 +21,6 @@ test('exports a schema as JSON', async () => {
   expect(writeFile.mock.calls[0][0]).toBe('/schema.json')
   expect(writeFile.mock.calls[0][1]).toMatchSnapshot()
 })
-
-*/
 
 test('exports a schema as GQL', async () => {
   writeFile.mockClear()
