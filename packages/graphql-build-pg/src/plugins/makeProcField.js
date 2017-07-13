@@ -331,7 +331,10 @@ module.exports = function makeProcField(
       }
 
       return {
-        description: proc.description,
+        description:
+          proc.description ||
+            (isTableLike &&
+              `Reads and enables pagination through a set of \`${TableType.name}\`.`),
         type: ReturnType,
         args: args,
         resolve: computed

@@ -36,7 +36,8 @@ Object {
 `;
 
 exports[`generated schema 1`] = `
-"scalar Cursor
+"# A location in a connection that can be used for resuming pagination.
+scalar Cursor
 
 type Dummy {
   id: String!
@@ -61,6 +62,7 @@ type DummyEdge {
   node: Dummy
 }
 
+# An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
@@ -72,7 +74,7 @@ type Query implements Node {
   # which can only query top level fields if they are in a particular form.
   query: Query!
 
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
   node(nodeId: ID!): Node
   dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection

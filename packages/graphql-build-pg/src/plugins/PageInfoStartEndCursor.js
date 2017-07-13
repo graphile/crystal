@@ -8,9 +8,11 @@ module.exports = function PageInfoStartEndCursor(builder) {
       const Cursor = getTypeByName("Cursor");
       return extend(fields, {
         startCursor: {
+          description: "When paginating backwards, the cursor to continue.",
           type: Cursor,
         },
         endCursor: {
+          description: "When paginating forwards, the cursor to continue.",
           type: Cursor,
         },
       });

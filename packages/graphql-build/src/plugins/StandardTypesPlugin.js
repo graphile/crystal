@@ -23,7 +23,10 @@ const stringType = (name, description) =>
 
 module.exports = function StandardTypesPlugin(builder) {
   builder.hook("build", build => {
-    const Cursor = stringType("Cursor");
+    const Cursor = stringType(
+      "Cursor",
+      "A location in a connection that can be used for resuming pagination."
+    );
     build.addType(Cursor);
     const UUID = stringType(
       "UUID",
@@ -38,6 +41,7 @@ module.exports = function StandardTypesPlugin(builder) {
     /* const PageInfo = */
     buildObjectWithHooks(GraphQLObjectType, {
       name: "PageInfo",
+      description: "Information about pagination in a connection.",
       fields: ({ buildFieldWithHooks }) => ({
         hasNextPage: buildFieldWithHooks(
           "hasNextPage",
@@ -48,6 +52,7 @@ module.exports = function StandardTypesPlugin(builder) {
               };
             });
             return {
+              description: "When paginating forwards, are there more items?",
               type: new GraphQLNonNull(GraphQLBoolean),
             };
           }
@@ -61,6 +66,7 @@ module.exports = function StandardTypesPlugin(builder) {
               };
             });
             return {
+              description: "When paginating backwards, are there more items?",
               type: new GraphQLNonNull(GraphQLBoolean),
             };
           }

@@ -49,6 +49,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   ) {
     buildObjectWithHooks(GraphQLInterfaceType, {
       name: "Node",
+      description: "An object with a globally unique `ID`.",
       resolveType: value => {
         if (value === $$isQuery) {
           return getTypeByName("Query");
@@ -97,7 +98,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
     return extend(fields, {
       [nodeIdFieldName]: {
         description:
-          "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+          "The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.",
         type: new GraphQLNonNull(GraphQLID),
         resolve() {
           return "query";

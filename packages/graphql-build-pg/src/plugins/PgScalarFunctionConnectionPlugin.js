@@ -42,15 +42,18 @@ module.exports = function PgTablesPlugin(
                 proc.name,
                 proc.namespace.name
               ),
+              description: `A \`${NodeType.name}\` edge in the connection.`,
               fields: () => {
                 return {
                   cursor: {
+                    description: "A cursor for use in pagination.",
                     type: Cursor,
                     resolve(data) {
                       return base64(JSON.stringify(data.__cursor));
                     },
                   },
                   node: {
+                    description: `The \`${NodeType.name}\` at the end of the edge.`,
                     type: NodeType,
                     resolve(data) {
                       return data.value;

@@ -55,6 +55,10 @@ module.exports = function PgMutationCreatePlugin(
               );
               return memo;
             }
+            const tableTypeName = inflection.tableType(
+              table.name,
+              table.namespace.name
+            );
             const InputType = buildObjectWithHooks(
               GraphQLInputObjectType,
               {
@@ -62,11 +66,15 @@ module.exports = function PgMutationCreatePlugin(
                   table.name,
                   table.namespace.name
                 ),
+                description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: {
                   clientMutationId: {
+                    description:
+                      "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
                     type: GraphQLString,
                   },
                   [inflection.tableName(table.name, table.namespace.name)]: {
+                    description: `The \`${tableTypeName}\` to be created by this mutation.`,
                     type: new GraphQLNonNull(TableInput),
                   },
                 },
@@ -83,6 +91,7 @@ module.exports = function PgMutationCreatePlugin(
                   table.name,
                   table.namespace.name
                 ),
+                description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ recurseDataGeneratorsForField }) => {
                   const tableName = inflection.tableName(
                     table.name,
@@ -91,9 +100,12 @@ module.exports = function PgMutationCreatePlugin(
                   recurseDataGeneratorsForField(tableName);
                   return {
                     clientMutationId: {
+                      description:
+                        "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
                       type: GraphQLString,
                     },
                     [tableName]: {
+                      description: `The \`${tableTypeName}\` that was created by this mutation.`,
                       type: Table,
                       resolve(data) {
                         return data.data;
@@ -107,10 +119,6 @@ module.exports = function PgMutationCreatePlugin(
                 isPgCreatePayloadType: true,
                 pgIntrospection: table,
               }
-            );
-            const tableTypeName = inflection.tableType(
-              table.name,
-              table.namespace.name
             );
             const fieldName = inflection.createField(
               table.name,

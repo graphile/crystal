@@ -5,6 +5,7 @@ exports[`generated schema n = 0, n = 3 1`] = `
   n: Int!
 }
 
+# An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
@@ -16,7 +17,7 @@ type Query implements Node {
   # which can only query top level fields if they are in a particular form.
   query: Query!
 
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
   node(nodeId: ID!): Node
   dummy: Dummy0
@@ -29,6 +30,7 @@ exports[`generated schema n = 0, n = 3 2`] = `
   n: Int!
 }
 
+# An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
@@ -40,7 +42,7 @@ type Query implements Node {
   # which can only query top level fields if they are in a particular form.
   query: Query!
 
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
   node(nodeId: ID!): Node
   dummy: Dummy3

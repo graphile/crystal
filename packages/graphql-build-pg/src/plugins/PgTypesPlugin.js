@@ -13,9 +13,10 @@ const {
 } = require("graphql");
 const { Kind } = require("graphql/language");
 const { types: pgTypes } = require("pg");
-const stringType = name =>
+const stringType = (name, description) =>
   new GraphQLScalarType({
     name,
+    description,
     serialize: value => String(value),
     parseValue: value => String(value),
     parseLiteral: ast => {
@@ -242,14 +243,29 @@ module.exports = function PgTypesPlugin(
 
         We only need to add oidLookups for types that don't have the correct fallback
       */
-    const SimpleDate = stringType("Date");
-    const SimpleDatetime = stringType("Datetime");
-    const SimpleTime = stringType("Time");
-    const SimpleJSON = stringType("JSON");
-    const SimpleUUID = stringType("UUID");
+    const SimpleDate = stringType("Date", "The day, does not include a time.");
+    const SimpleDatetime = stringType(
+      "Datetime",
+      "A point in time as described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone."
+    );
+    const SimpleTime = stringType(
+      "Time",
+      "The exact time of day, does not include the date. May or may not have a timezone offset."
+    );
+    const SimpleJSON = stringType(
+      "JSON",
+      "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)."
+    );
+    const SimpleUUID = stringType(
+      "UUID",
+      "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
+    );
     const oidLookup = Object.assign(
       {
-        20: stringType("BigInt"), // bitint - even though this is int8, it's too big for JS int, so cast to string.
+        20: stringType(
+          "BigInt",
+          "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
+        ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
         21: GraphQLInt, // int2
         23: GraphQLInt, // int4
         790: GraphQLFloat, // money
@@ -378,22 +394,30 @@ module.exports = function PgTypesPlugin(
           });
           const RangeBoundInput = new GraphQLInputObjectType({
             name: inflection.inputType(RangeBound.name),
+            description:
+              "The value at one end of a range. A range can either include this value, or not.",
             fields: {
               value: {
+                description: "The value at one end of our range.",
                 type: new GraphQLNonNull(gqlRangeSubType),
               },
               inclusive: {
+                description:
+                  "Whether or not the value of this bound is included in the range.",
                 type: new GraphQLNonNull(GraphQLBoolean),
               },
             },
           });
           Range = new GraphQLObjectType({
             name: inflection.rangeType(gqlRangeSubType.name),
+            description: "A range of `${gqlRangeSubType.name}`.",
             fields: {
               start: {
+                description: "The starting bound of our range.",
                 type: RangeBound,
               },
               end: {
+                description: "The ending bound of our range.",
                 type: RangeBound,
               },
             },
