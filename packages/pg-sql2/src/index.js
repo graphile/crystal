@@ -9,10 +9,10 @@ const debug = require("debug")("pg-sql2");
 
 const isDev = ["test", "development"].includes(process.env.NODE_ENV);
 
-const debugError = err => {
+function debugError(err) {
   debug(err);
   return err;
-};
+}
 
 const $$trusted = Symbol("trusted");
 /*::
@@ -58,7 +58,7 @@ function makeValueNode(value /*: mixed */) /*: SQLValueNode */ {
   return makeTrustedNode({ type: "VALUE", value });
 }
 
-const ensureNonEmptyArray = (array, allowZeroLength = false) => {
+function ensureNonEmptyArray(array, allowZeroLength = false) {
   if (!Array.isArray(array)) {
     throw debugError(new Error("Expected array"));
   }
@@ -71,7 +71,7 @@ const ensureNonEmptyArray = (array, allowZeroLength = false) => {
     }
   });
   return array;
-};
+}
 
 function compile(sql /*: Array<SQLNode> */) {
   // Join this to generate the SQL query
@@ -157,7 +157,7 @@ function compile(sql /*: Array<SQLNode> */) {
  * Note that using this function, the user *must* specify if they are injecting
  * raw text. This makes a SQL injection vulnerability harder to create.
  */
-const query = (strings /*: mixed */, ...values /*: Array<mixed> */) => {
+function query(strings /*: mixed */, ...values /*: Array<mixed> */) {
   if (!Array.isArray(strings)) {
     throw new Error(
       "sql.query should be used as a template literal, not a function call!"
@@ -196,7 +196,7 @@ const query = (strings /*: mixed */, ...values /*: Array<mixed> */) => {
       return items.concat(makeRawNode(text), value);
     }
   }, []);
-};
+}
 
 /**
  * Creates a Sql item for some raw Sql text. Just plain ol‘ raw Sql. This
@@ -269,7 +269,7 @@ const join = (rawItems /*: mixed */, rawSeparator /*: mixed */ = "") => {
 
 // Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
-const escapeSqlIdentifier = function(str) {
+function escapeSqlIdentifier(str) {
   var escaped = '"';
 
   for (var i = 0; i < str.length; i++) {
@@ -284,7 +284,7 @@ const escapeSqlIdentifier = function(str) {
   escaped += '"';
 
   return escaped;
-};
+}
 
 exports.query = query;
 exports.fragment = query;
