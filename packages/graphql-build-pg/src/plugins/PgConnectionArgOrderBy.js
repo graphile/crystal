@@ -9,10 +9,7 @@ module.exports = function PgConnectionArgOrderBy(
     "init",
     (
       _,
-      {
-        newWithHooks,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-      }
+      { newWithHooks, pgIntrospectionResultsByKind: introspectionResultsByKind }
     ) => {
       introspectionResultsByKind.class.map(table => {
         const tableTypeName = inflection.tableType(

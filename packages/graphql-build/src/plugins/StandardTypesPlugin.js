@@ -43,20 +43,17 @@ module.exports = function StandardTypesPlugin(builder) {
       name: "PageInfo",
       description: "Information about pagination in a connection.",
       fields: ({ fieldWithHooks }) => ({
-        hasNextPage: fieldWithHooks(
-          "hasNextPage",
-          ({ addDataGenerator }) => {
-            addDataGenerator(() => {
-              return {
-                calculateHasNextPage: true,
-              };
-            });
+        hasNextPage: fieldWithHooks("hasNextPage", ({ addDataGenerator }) => {
+          addDataGenerator(() => {
             return {
-              description: "When paginating forwards, are there more items?",
-              type: new GraphQLNonNull(GraphQLBoolean),
+              calculateHasNextPage: true,
             };
-          }
-        ),
+          });
+          return {
+            description: "When paginating forwards, are there more items?",
+            type: new GraphQLNonNull(GraphQLBoolean),
+          };
+        }),
         hasPreviousPage: fieldWithHooks(
           "hasPreviousPage",
           ({ addDataGenerator }) => {

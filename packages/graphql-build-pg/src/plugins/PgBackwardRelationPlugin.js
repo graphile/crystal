@@ -18,10 +18,7 @@ module.exports = function PgBackwardRelationPlugin(
         pgSql: sql,
         getAliasFromResolveInfo,
       },
-      {
-        scope: { isPgRowType, pgIntrospection: foreignTable },
-        fieldWithHooks,
-      }
+      { scope: { isPgRowType, pgIntrospection: foreignTable }, fieldWithHooks }
     ) => {
       if (!isPgRowType || !foreignTable || foreignTable.kind !== "class") {
         return fields;
