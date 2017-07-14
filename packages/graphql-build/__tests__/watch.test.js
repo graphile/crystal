@@ -28,7 +28,7 @@ const makePluginEtc = (defaultCounter = 0) => {
   const eventEmitter = new EventEmitter();
 
   const DummyWatchPlugin = async builder => {
-    builder.addWatcher(
+    builder.registerWatcher(
       triggerRebuild => {
         eventEmitter.on("change", triggerRebuild);
       },

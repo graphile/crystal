@@ -175,7 +175,7 @@ module.exports = async function PgIntrospectionPlugin(
     }
   }
 
-  builder.addWatcher(async triggerRebuild => {
+  builder.registerWatcher(async triggerRebuild => {
     // In case we started listening before, clean up
     await stopListening();
 

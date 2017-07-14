@@ -138,7 +138,7 @@ class SchemaBuilder extends EventEmitter {
     }
   }
 
-  addWatcher(listen, unlisten) {
+  registerWatcher(listen, unlisten) {
     if (!listen || !unlisten) {
       throw new Error("You must provide both a listener and an unlistener");
     }
