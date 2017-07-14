@@ -36,10 +36,10 @@ module.exports = function StandardTypesPlugin(builder) {
     build.addType(GraphQLJSON);
     return build;
   });
-  builder.hook("init", (_, { buildObjectWithHooks }) => {
+  builder.hook("init", (_, { newWithHooks }) => {
     // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
     /* const PageInfo = */
-    buildObjectWithHooks(GraphQLObjectType, {
+    newWithHooks(GraphQLObjectType, {
       name: "PageInfo",
       description: "Information about pagination in a connection.",
       fields: ({ buildFieldWithHooks }) => ({

@@ -52,7 +52,7 @@ module.exports = function makeProcField(
     getAliasFromResolveInfo,
     gql2pg,
     pg2gql,
-    buildObjectWithHooks,
+    newWithHooks,
     pgInflection: inflection,
     pgStrictFunctions: strictFunctions,
     pgTweakFragmentForType,
@@ -267,7 +267,7 @@ module.exports = function makeProcField(
         );
         const isNotVoid = String(returnType.id) !== "2278";
         // If set then plural name
-        PayloadType = buildObjectWithHooks(
+        PayloadType = newWithHooks(
           GraphQLObjectType,
           {
             name: inflection.functionPayloadType(
@@ -308,7 +308,7 @@ module.exports = function makeProcField(
           )
         );
         ReturnType = new GraphQLNonNull(PayloadType);
-        const InputType = buildObjectWithHooks(
+        const InputType = newWithHooks(
           GraphQLInputObjectType,
           {
             name: inflection.functionInputType(proc.name, proc.namespace.name),

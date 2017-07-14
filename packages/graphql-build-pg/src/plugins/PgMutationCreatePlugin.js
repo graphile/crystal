@@ -22,7 +22,7 @@ module.exports = function PgMutationCreatePlugin(
       {
         extend,
         getTypeByName,
-        buildObjectWithHooks,
+        newWithHooks,
         parseResolveInfo,
         pgIntrospectionResultsByKind,
         pgSql: sql,
@@ -63,7 +63,7 @@ module.exports = function PgMutationCreatePlugin(
               table.name,
               table.namespace.name
             );
-            const InputType = buildObjectWithHooks(
+            const InputType = newWithHooks(
               GraphQLInputObjectType,
               {
                 name: inflection.createInputType(
@@ -88,7 +88,7 @@ module.exports = function PgMutationCreatePlugin(
                 pgInflection: table,
               }
             );
-            const PayloadType = buildObjectWithHooks(
+            const PayloadType = newWithHooks(
               GraphQLObjectType,
               {
                 name: inflection.createPayloadType(

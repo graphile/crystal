@@ -29,7 +29,7 @@ class SchemaBuilder extends EventEmitter {
       // Add 'query', 'mutation' or 'subscription' types in this hook:
       GraphQLSchema: [],
 
-      // When creating a GraphQLObjectType via `buildObjectWithHooks`, we'll
+      // When creating a GraphQLObjectType via `newWithHooks`, we'll
       // execute, the following hooks:
       // - 'GraphQLObjectType' to add any root-level attributes, e.g. add a description
       // - 'GraphQLObjectType:interfaces' to add additional interfaces to this object type
@@ -40,7 +40,7 @@ class SchemaBuilder extends EventEmitter {
       "GraphQLObjectType:interfaces": [],
       "GraphQLObjectType:fields": [],
 
-      // When creating a GraphQLInputObjectType via `buildObjectWithHooks`, we'll
+      // When creating a GraphQLInputObjectType via `newWithHooks`, we'll
       // execute, the following hooks:
       // - 'GraphQLInputObjectType' to add any root-level attributes, e.g. add a description
       // - 'GraphQLInputObjectType:fields' to add additional fields to this object type (is
@@ -49,7 +49,7 @@ class SchemaBuilder extends EventEmitter {
       GraphQLInputObjectType: [],
       "GraphQLInputObjectType:fields": [],
 
-      // When creating a GraphQLEnumType via `buildObjectWithHooks`, we'll
+      // When creating a GraphQLEnumType via `newWithHooks`, we'll
       // execute, the following hooks:
       // - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
       // - 'GraphQLEnumType:values' to add additional values
@@ -161,7 +161,7 @@ class SchemaBuilder extends EventEmitter {
   buildSchema() {
     if (!this.generatedSchema) {
       const build = this.createBuild();
-      this.generatedSchema = build.buildObjectWithHooks(GraphQLSchema, {});
+      this.generatedSchema = build.newWithHooks(GraphQLSchema, {});
     }
     return this.generatedSchema;
   }

@@ -16,7 +16,7 @@ module.exports = function PgTablesPlugin(
     (
       _,
       {
-        buildObjectWithHooks,
+        newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
         pgGqlTypeByTypeId: gqlTypeByTypeId,
@@ -35,7 +35,7 @@ module.exports = function PgTablesPlugin(
             return;
           }
           const NodeType = gqlTypeByTypeId[returnType.id] || GraphQLString;
-          const EdgeType = buildObjectWithHooks(
+          const EdgeType = newWithHooks(
             GraphQLObjectType,
             {
               name: inflection.scalarFunctionEdge(
@@ -69,7 +69,7 @@ module.exports = function PgTablesPlugin(
             }
           );
           /*const ConnectionType = */
-          buildObjectWithHooks(
+          newWithHooks(
             GraphQLObjectType,
             {
               name: inflection.scalarFunctionConnection(

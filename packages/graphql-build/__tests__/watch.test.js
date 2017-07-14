@@ -49,14 +49,14 @@ const makePluginEtc = (defaultCounter = 0) => {
           dummyCounter,
           extend,
           getTypeByName,
-          buildObjectWithHooks,
+          newWithHooks,
           parseResolveInfo,
           resolveAlias,
         },
         { scope: { isRootQuery }, buildFieldWithHooks }
       ) => {
         if (!isRootQuery) return fields;
-        const Dummy = buildObjectWithHooks(GraphQLObjectType, {
+        const Dummy = newWithHooks(GraphQLObjectType, {
           name: `Dummy${dummyCounter}`,
           fields: ({ addDataGeneratorForField }) => {
             return {

@@ -120,8 +120,8 @@ module.exports = function makeNewBuild(builder) {
       }
       return Object.assign({}, obj, obj2);
     },
-    buildObjectWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
-      if (!this.buildObjectWithHooks || !Object.isFrozen(this)) {
+    newWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
+      if (!this.newWithHooks || !Object.isFrozen(this)) {
         throw new Error(
           "Please do not generate the schema during the build building phase, use 'init' instead"
         );

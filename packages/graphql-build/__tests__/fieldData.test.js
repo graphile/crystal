@@ -37,7 +37,7 @@ const DummyConnectionPlugin = async builder => {
       {
         extend,
         getTypeByName,
-        buildObjectWithHooks,
+        newWithHooks,
         parseResolveInfo,
         resolveAlias,
       },
@@ -45,7 +45,7 @@ const DummyConnectionPlugin = async builder => {
     ) => {
       if (!isRootQuery) return fields;
       const Cursor = getTypeByName("Cursor");
-      const Dummy = buildObjectWithHooks(GraphQLObjectType, {
+      const Dummy = newWithHooks(GraphQLObjectType, {
         name: "Dummy",
         fields: ({ addDataGeneratorForField }) => {
           addDataGeneratorForField("id", ({ alias }) => {
@@ -131,7 +131,7 @@ const DummyConnectionPlugin = async builder => {
               }
             });
             return {
-              type: buildObjectWithHooks(GraphQLObjectType, {
+              type: newWithHooks(GraphQLObjectType, {
                 name: "DummyConnection",
                 fields: ({ recurseDataGeneratorsForField }) => {
                   recurseDataGeneratorsForField("edges");
@@ -140,7 +140,7 @@ const DummyConnectionPlugin = async builder => {
                     edges: {
                       type: new GraphQLList(
                         new GraphQLNonNull(
-                          buildObjectWithHooks(GraphQLObjectType, {
+                          newWithHooks(GraphQLObjectType, {
                             name: "DummyEdge",
                             fields: ({
                               addDataGeneratorForField,

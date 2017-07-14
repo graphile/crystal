@@ -8,7 +8,7 @@ module.exports = function PgConnectionArgCondition(
     (
       _,
       {
-        buildObjectWithHooks,
+        newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgGqlInputTypeByTypeId: gqlTypeByTypeId,
       }
@@ -19,7 +19,7 @@ module.exports = function PgConnectionArgCondition(
           table.namespace && table.namespace.name
         );
         /* const TableConditionType = */
-        buildObjectWithHooks(
+        newWithHooks(
           GraphQLInputObjectType,
           {
             description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,

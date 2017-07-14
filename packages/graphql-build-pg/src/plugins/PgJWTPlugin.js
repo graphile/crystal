@@ -10,7 +10,7 @@ module.exports = function PgJWTPlugin(
     (
       _,
       {
-        buildObjectWithHooks,
+        newWithHooks,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgGqlTypeByTypeId,
@@ -68,7 +68,7 @@ module.exports = function PgJWTPlugin(
         compositeClass.namespace.name
       );
 
-      const JWTType = buildObjectWithHooks(
+      const JWTType = newWithHooks(
         GraphQLScalarType,
         {
           name: compositeTypeName,

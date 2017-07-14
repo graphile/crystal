@@ -109,7 +109,7 @@ Hooks
   `mutation`, `subscription` or similar GraphQL fields.
 
 - `GraphQLObjectType*`: When creating a GraphQLObjectType via
-  `buildObjectWithHooks`, we'll execute, the following hooks:
+  `newWithHooks`, we'll execute, the following hooks:
 
   - `GraphQLObjectType` to add any root-level attributes, e.g. add a description
   - `GraphQLObjectType:interfaces` to add additional interfaces to this object type
@@ -118,14 +118,14 @@ Hooks
     `Self` in the context)
 
 - `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType via
-  `buildObjectWithHooks`, we'll execute, the following hooks:
+  `newWithHooks`, we'll execute, the following hooks:
 
   - `GraphQLInputObjectType` to add any root-level attributes, e.g. add a description
   - `GraphQLInputObjectType:fields` to add additional fields to this object type (is
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
 
-- `GraphQLEnumType*`: When creating a GraphQLEnumType via `buildObjectWithHooks`,
+- `GraphQLEnumType*`: When creating a GraphQLEnumType via `newWithHooks`,
   we'll execute, the following hooks:
 
   - `GraphQLEnumType` to add any root-level attributes, e.g. add a description
@@ -145,7 +145,7 @@ Conventions
 -----------
 
 If you extend the build object (in the `build` event) or add details to the
-scope of a `buildObjectWithHooks` or `buildFieldWithHooks`, please prefix all
+scope of a `newWithHooks` or `buildFieldWithHooks`, please prefix all
 keys with a namespace; for example `graphql-build-pg` uses the `pg` namespace
 prefix. Do not pollute other namespaces (unless you have their permission).
 
