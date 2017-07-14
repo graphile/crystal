@@ -42,8 +42,8 @@ module.exports = function StandardTypesPlugin(builder) {
     newWithHooks(GraphQLObjectType, {
       name: "PageInfo",
       description: "Information about pagination in a connection.",
-      fields: ({ buildFieldWithHooks }) => ({
-        hasNextPage: buildFieldWithHooks(
+      fields: ({ fieldWithHooks }) => ({
+        hasNextPage: fieldWithHooks(
           "hasNextPage",
           ({ addDataGenerator }) => {
             addDataGenerator(() => {
@@ -57,7 +57,7 @@ module.exports = function StandardTypesPlugin(builder) {
             };
           }
         ),
-        hasPreviousPage: buildFieldWithHooks(
+        hasPreviousPage: fieldWithHooks(
           "hasPreviousPage",
           ({ addDataGenerator }) => {
             addDataGenerator(() => {

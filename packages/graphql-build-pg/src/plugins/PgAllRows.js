@@ -17,7 +17,7 @@ module.exports = async function PgAllRows(
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       },
-      { buildFieldWithHooks, scope: { isRootQuery } }
+      { fieldWithHooks, scope: { isRootQuery } }
     ) => {
       if (!isRootQuery) {
         return fields;
@@ -61,7 +61,7 @@ module.exports = async function PgAllRows(
             const sqlFullTableName = sql.identifier(schema.name, table.name);
             if (TableType && ConnectionType) {
               const fieldName = inflection.allRows(table.name, schema.name);
-              memo[fieldName] = buildFieldWithHooks(
+              memo[fieldName] = fieldWithHooks(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {

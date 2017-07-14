@@ -53,7 +53,7 @@ const makePluginEtc = (defaultCounter = 0) => {
           parseResolveInfo,
           resolveAlias,
         },
-        { scope: { isRootQuery }, buildFieldWithHooks }
+        { scope: { isRootQuery }, fieldWithHooks }
       ) => {
         if (!isRootQuery) return fields;
         const Dummy = newWithHooks(GraphQLObjectType, {
@@ -68,7 +68,7 @@ const makePluginEtc = (defaultCounter = 0) => {
           },
         });
         return extend(fields, {
-          dummy: buildFieldWithHooks(
+          dummy: fieldWithHooks(
             "dummy",
             ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
               return {

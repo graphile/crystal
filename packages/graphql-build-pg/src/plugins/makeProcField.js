@@ -57,7 +57,7 @@ module.exports = function makeProcField(
     pgStrictFunctions: strictFunctions,
     pgTweakFragmentForType,
   },
-  { buildFieldWithHooks, computed = false, isMutation = false }
+  { fieldWithHooks, computed = false, isMutation = false }
 ) {
   if (computed && isMutation) {
     throw new Error("Mutation procedure cannot be computed");
@@ -158,7 +158,7 @@ module.exports = function makeProcField(
       }
     }
   }
-  return buildFieldWithHooks(
+  return fieldWithHooks(
     fieldName,
     ({
       addDataGenerator,

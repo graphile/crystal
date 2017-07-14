@@ -132,20 +132,20 @@ Hooks
   - `GraphQLEnumType:values` to add additional values
 
 - `field*`: When you add a field to a GraphQLObjectType, wrap the call with
-  `buildFieldWithHooks` in order to fire these hooks:
+  `fieldWithHooks` in order to fire these hooks:
 
   - `field`: to add any root-level attributes, e.g. add a description
   - `field:args` to add arguments
 
 - `inputField`: When you add a field to a GraphQLInputObjectType, wrap the call
-  with `buildFieldWithHooks` in order to fire this hook
+  with `fieldWithHooks` in order to fire this hook
 
 
 Conventions
 -----------
 
 If you extend the build object (in the `build` event) or add details to the
-scope of a `newWithHooks` or `buildFieldWithHooks`, please prefix all
+scope of a `newWithHooks` or `fieldWithHooks`, please prefix all
 keys with a namespace; for example `graphql-build-pg` uses the `pg` namespace
 prefix. Do not pollute other namespaces (unless you have their permission).
 

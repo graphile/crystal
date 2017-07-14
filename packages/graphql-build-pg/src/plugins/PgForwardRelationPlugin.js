@@ -26,7 +26,7 @@ module.exports = function PgForwardRelationPlugin(
           pgIntrospection,
           pgIntrospectionTable,
         },
-        buildFieldWithHooks,
+        fieldWithHooks,
       }
     ) => {
       const table = pgIntrospectionTable || pgIntrospection;
@@ -108,7 +108,7 @@ module.exports = function PgForwardRelationPlugin(
 
           memo[
             fieldName
-          ] = buildFieldWithHooks(
+          ] = fieldWithHooks(
             fieldName,
             ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
               addDataGenerator(parsedResolveInfoFragment => {

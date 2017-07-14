@@ -3,7 +3,7 @@ const makeProcField = require("./makeProcField");
 module.exports = function PgMutationProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
-    (fields, build, { scope: { isRootMutation }, buildFieldWithHooks }) => {
+    (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
       if (!isRootMutation) {
         return fields;
       }
@@ -49,7 +49,7 @@ module.exports = function PgMutationProceduresPlugin(builder) {
               proc.namespace.name
             );
             memo[fieldName] = makeProcField(fieldName, proc, build, {
-              buildFieldWithHooks,
+              fieldWithHooks,
               isMutation: true,
             });
             return memo;

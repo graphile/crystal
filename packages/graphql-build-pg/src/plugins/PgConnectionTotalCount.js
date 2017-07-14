@@ -8,7 +8,7 @@ module.exports = function PgConnectionTotalCount(builder) {
       { extend, pgInflection: inflection },
       {
         scope: { isPgRowConnectionType, pgIntrospection: table },
-        buildFieldWithHooks,
+        fieldWithHooks,
       }
     ) => {
       if (
@@ -24,7 +24,7 @@ module.exports = function PgConnectionTotalCount(builder) {
         table.namespace.name
       );
       return extend(fields, {
-        totalCount: buildFieldWithHooks(
+        totalCount: fieldWithHooks(
           "totalCount",
           ({ addDataGenerator }) => {
             addDataGenerator(() => {

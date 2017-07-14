@@ -29,7 +29,7 @@ module.exports = function PgConnectionArgCondition(
                 table.namespace && table.namespace.name
               )
             ),
-            fields: ({ buildFieldWithHooks }) =>
+            fields: ({ fieldWithHooks }) =>
               introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
                 .reduce((memo, attr) => {
@@ -38,7 +38,7 @@ module.exports = function PgConnectionArgCondition(
                     table.name,
                     table.namespace && table.namespace.name
                   );
-                  memo[fieldName] = buildFieldWithHooks(
+                  memo[fieldName] = fieldWithHooks(
                     fieldName,
                     {
                       description: `Checks for equality with the object’s \`${fieldName}\` field.`,

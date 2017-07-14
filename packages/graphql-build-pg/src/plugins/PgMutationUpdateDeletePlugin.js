@@ -36,7 +36,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         getNodeType,
       },
-      { scope: { isRootMutation }, buildFieldWithHooks }
+      { scope: { isRootMutation }, fieldWithHooks }
     ) => {
       if (!isRootMutation) {
         return fields;
@@ -285,7 +285,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
 
                     memo[
                       fieldName
-                    ] = buildFieldWithHooks(
+                    ] = fieldWithHooks(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
@@ -420,7 +420,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
 
                     memo[
                       fieldName
-                    ] = buildFieldWithHooks(
+                    ] = fieldWithHooks(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {

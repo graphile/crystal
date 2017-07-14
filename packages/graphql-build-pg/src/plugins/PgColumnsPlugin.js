@@ -23,7 +23,7 @@ module.exports = function PgColumnsPlugin(
       },
       {
         scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
-        buildFieldWithHooks,
+        fieldWithHooks,
       }
     ) => {
       if (
@@ -56,7 +56,7 @@ module.exports = function PgColumnsPlugin(
             );
             memo[
               fieldName
-            ] = buildFieldWithHooks(
+            ] = fieldWithHooks(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
                 const ReturnType =

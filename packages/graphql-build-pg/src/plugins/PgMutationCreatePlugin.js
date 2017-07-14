@@ -28,7 +28,7 @@ module.exports = function PgMutationCreatePlugin(
         pgSql: sql,
         gql2pg,
       },
-      { scope: { isRootMutation }, buildFieldWithHooks }
+      { scope: { isRootMutation }, fieldWithHooks }
     ) => {
       if (!isRootMutation) {
         return fields;
@@ -130,7 +130,7 @@ module.exports = function PgMutationCreatePlugin(
             );
             memo[
               fieldName
-            ] = buildFieldWithHooks(
+            ] = fieldWithHooks(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment }) => ({
                 description: `Creates a single \`${tableTypeName}\`.`,

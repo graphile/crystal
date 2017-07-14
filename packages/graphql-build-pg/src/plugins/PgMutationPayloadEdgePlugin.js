@@ -11,7 +11,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
       { extend, getTypeByName, pgSql: sql },
       {
         scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
-        buildFieldWithHooks,
+        fieldWithHooks,
         recurseDataGeneratorsForField,
       }
     ) => {
@@ -40,7 +40,7 @@ module.exports = function PgMutationPayloadEdgePlugin(
       const fieldName = inflection.edgeField(table.name, table.namespace.name);
       recurseDataGeneratorsForField(fieldName);
       return extend(fields, {
-        [fieldName]: buildFieldWithHooks(
+        [fieldName]: fieldWithHooks(
           fieldName,
           ({ addArgDataGenerator }) => {
             addArgDataGenerator(function connectionOrderBy({ orderBy }) {

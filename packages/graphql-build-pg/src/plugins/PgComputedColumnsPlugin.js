@@ -13,7 +13,7 @@ module.exports = function PgComputedColumnsPlugin(builder) {
           isInputType,
           pgIntrospection: table,
         },
-        buildFieldWithHooks,
+        fieldWithHooks,
       }
     ) => {
       if (
@@ -83,7 +83,7 @@ module.exports = function PgComputedColumnsPlugin(builder) {
               table.namespace.name
             );
             memo[fieldName] = makeProcField(fieldName, proc, build, {
-              buildFieldWithHooks,
+              fieldWithHooks,
               computed: true,
             });
             return memo;

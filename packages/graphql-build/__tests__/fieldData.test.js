@@ -41,7 +41,7 @@ const DummyConnectionPlugin = async builder => {
         parseResolveInfo,
         resolveAlias,
       },
-      { scope: { isRootQuery }, buildFieldWithHooks }
+      { scope: { isRootQuery }, fieldWithHooks }
     ) => {
       if (!isRootQuery) return fields;
       const Cursor = getTypeByName("Cursor");
@@ -80,7 +80,7 @@ const DummyConnectionPlugin = async builder => {
         },
       });
       return extend(fields, {
-        dummyConnection: buildFieldWithHooks(
+        dummyConnection: fieldWithHooks(
           "dummyConnection",
           ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
             addArgDataGenerator(function connectionFirst({ first }) {

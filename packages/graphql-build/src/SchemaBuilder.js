@@ -57,12 +57,12 @@ class SchemaBuilder extends EventEmitter {
       "GraphQLEnumType:values": [],
 
       // When you add a field to a GraphQLObjectType, wrap the call with
-      // `buildFieldWithHooks` in order to fire these hooks:
+      // `fieldWithHooks` in order to fire these hooks:
       field: [],
       "field:args": [],
 
       // When you add a field to a GraphQLInputObjectType, wrap the call with
-      // `buildFieldWithHooks` in order to fire this hook:
+      // `fieldWithHooks` in order to fire this hook:
       inputField: [],
     };
   }
