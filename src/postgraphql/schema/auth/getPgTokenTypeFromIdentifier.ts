@@ -43,7 +43,9 @@ export default function getPgTokenTypeFromIdentifier (
  * @private
  */
 function parseTypeIdentifier (typeIdentifier: string): { namespaceName: string, typeName: string } {
-  const match = typeIdentifier.match(/^(?:([a-zA-Z1-2_]+)|"([^"]*)")\.(?:([a-zA-Z1-2_]+)|"([^"]*)")$/)
+  // schema and type names can begin with a letter or underscore, but not a number
+  // numbers are allowed in the rest of the name
+  const match = typeIdentifier.match(/^(?:([a-zA-Z_][a-zA-Z0-9_]*)|"([^"]*)")\.(?:([a-zA-Z_][a-zA-Z0-9_]*)|"([^"]*)")$/)
 
   if (!match)
     throw new Error(`Type identifier '${typeIdentifier}' is of the incorrect form.`)
