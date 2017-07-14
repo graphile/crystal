@@ -454,16 +454,12 @@ module.exports = function makeNewBuild(builder) {
       const finalSpec = newSpec;
 
       let Self;
-      try {
-        Self = new Type(finalSpec);
-      } catch (e) {
-        // For certain things, rather than throwing an error we should handle it
-        // silently, for example if there's no fields on the root mutation object
-        // then simply don't add it to the schema!
-        if (returnNullOnInvalid) {
+      Self = new Type(finalSpec);
+      if (returnNullOnInvalid && Self.getFields) {
+        try {
+          Self.getFields();
+        } catch (e) {
           return null;
-        } else {
-          throw e;
         }
       }
 

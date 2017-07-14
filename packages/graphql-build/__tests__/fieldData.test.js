@@ -8,15 +8,7 @@ const {
   GraphQLList,
 } = require("graphql");
 const { printSchema } = require("graphql/utilities");
-const {
-  buildSchema,
-  defaultPlugins: allDefaultPlugins,
-  MutationPlugin,
-} = require("../");
-
-const defaultPlugins = allDefaultPlugins.filter(
-  plugin => plugin !== MutationPlugin
-);
+const { buildSchema, defaultPlugins, MutationPlugin } = require("../");
 
 const base64 = str => new Buffer(String(str)).toString("base64");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");

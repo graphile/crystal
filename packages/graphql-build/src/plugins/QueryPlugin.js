@@ -8,7 +8,7 @@ module.exports = async function QueryPlugin(builder) {
   );
   builder.hook(
     "GraphQLSchema",
-    (spec, { $$isQuery, buildObjectWithHooks, extend }) => {
+    (schema, { $$isQuery, buildObjectWithHooks, extend }) => {
       const queryType = buildObjectWithHooks(
         GraphQLObjectType,
         {
@@ -28,11 +28,16 @@ module.exports = async function QueryPlugin(builder) {
             },
           }),
         },
-        { isRootQuery: true }
+        { isRootQuery: true },
+        true
       );
-      return extend(spec, {
-        query: queryType,
-      });
+      if (queryType) {
+        return extend(schema, {
+          query: queryType,
+        });
+      } else {
+        return schema;
+      }
     }
   );
 };
