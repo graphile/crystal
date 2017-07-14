@@ -249,23 +249,20 @@ const literal = (val /*: mixed */) => {
  * Join some Sql items together seperated by a string. Useful when dealing
  * with lists of Sql items that doesn’t make sense as a Sql query.
  */
-const join = (items /*: mixed */, separator /*: mixed */ = "") => {
-  if (!Array.isArray(items)) {
+const join = (rawItems /*: mixed */, rawSeparator /*: mixed */ = "") => {
+  if (!Array.isArray(rawItems)) {
     throw new Error("Items to join must be an array");
   }
-  if (typeof separator !== "string") {
+  const items = rawItems;
+  if (typeof rawSeparator !== "string") {
     throw new Error("Invalid separator - must be a string");
   }
+  const separator = rawSeparator;
   return ensureNonEmptyArray(items, true).reduce((currentItems, item, i) => {
     if (i === 0 || !separator) {
       return currentItems.concat(item);
     } else {
-      // Comments below are hacks because flow doesn't realise separator has been validated above
-      /*:: if (typeof separator === "string") { */
       return currentItems.concat(makeRawNode(separator), item);
-      /*:: } else {
-        throw new Error("Invalid separator")
-      }*/
     }
   }, []);
 };
