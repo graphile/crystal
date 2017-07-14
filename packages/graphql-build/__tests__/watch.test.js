@@ -28,7 +28,7 @@ const makePluginEtc = (defaultCounter = 0) => {
   const eventEmitter = new EventEmitter();
 
   const DummyWatchPlugin = async builder => {
-    builder.addWatcher(
+    builder.registerWatcher(
       triggerRebuild => {
         eventEmitter.on("change", triggerRebuild);
       },
@@ -49,14 +49,14 @@ const makePluginEtc = (defaultCounter = 0) => {
           dummyCounter,
           extend,
           getTypeByName,
-          buildObjectWithHooks,
+          newWithHooks,
           parseResolveInfo,
           resolveAlias,
         },
-        { scope: { isRootQuery }, buildFieldWithHooks }
+        { scope: { isRootQuery }, fieldWithHooks }
       ) => {
         if (!isRootQuery) return fields;
-        const Dummy = buildObjectWithHooks(GraphQLObjectType, {
+        const Dummy = newWithHooks(GraphQLObjectType, {
           name: `Dummy${dummyCounter}`,
           fields: ({ addDataGeneratorForField }) => {
             return {
@@ -68,7 +68,7 @@ const makePluginEtc = (defaultCounter = 0) => {
           },
         });
         return extend(fields, {
-          dummy: buildFieldWithHooks(
+          dummy: fieldWithHooks(
             "dummy",
             ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
               return {

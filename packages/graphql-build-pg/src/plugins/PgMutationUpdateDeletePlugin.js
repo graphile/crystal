@@ -24,7 +24,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
     (
       fields,
       {
-        buildObjectWithHooks,
+        newWithHooks,
         getNodeIdForTypeAndIdentifiers,
         nodeIdFieldName,
         extend,
@@ -36,7 +36,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         getNodeType,
       },
-      { scope: { isRootMutation }, buildFieldWithHooks }
+      { scope: { isRootMutation }, fieldWithHooks }
     ) => {
       if (!isRootMutation) {
         return fields;
@@ -166,7 +166,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                   const TablePatch = getTypeByName(
                     inflection.patchType(Table.name)
                   );
-                  const PayloadType = buildObjectWithHooks(
+                  const PayloadType = newWithHooks(
                     GraphQLObjectType,
                     {
                       name: inflection[
@@ -239,7 +239,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                     const fieldName = inflection[
                       mode === "update" ? "updateNode" : "deleteNode"
                     ](table.name, table.namespace.name);
-                    const InputType = buildObjectWithHooks(
+                    const InputType = newWithHooks(
                       GraphQLInputObjectType,
                       {
                         description: `All input for the \`${fieldName}\` mutation.`,
@@ -285,7 +285,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
 
                     memo[
                       fieldName
-                    ] = buildFieldWithHooks(
+                    ] = fieldWithHooks(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {
@@ -365,7 +365,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                     const fieldName = inflection[
                       mode === "update" ? "updateByKeys" : "deleteByKeys"
                     ](simpleKeys, table.name, table.namespace.name);
-                    const InputType = buildObjectWithHooks(
+                    const InputType = newWithHooks(
                       GraphQLInputObjectType,
                       {
                         description: `All input for the \`${fieldName}\` mutation.`,
@@ -420,7 +420,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
 
                     memo[
                       fieldName
-                    ] = buildFieldWithHooks(
+                    ] = fieldWithHooks(
                       fieldName,
                       ({ getDataFromParsedResolveInfoFragment }) => {
                         return {

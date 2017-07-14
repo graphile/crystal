@@ -22,13 +22,13 @@ module.exports = function PgMutationCreatePlugin(
       {
         extend,
         getTypeByName,
-        buildObjectWithHooks,
+        newWithHooks,
         parseResolveInfo,
         pgIntrospectionResultsByKind,
         pgSql: sql,
         gql2pg,
       },
-      { scope: { isRootMutation }, buildFieldWithHooks }
+      { scope: { isRootMutation }, fieldWithHooks }
     ) => {
       if (!isRootMutation) {
         return fields;
@@ -63,7 +63,7 @@ module.exports = function PgMutationCreatePlugin(
               table.name,
               table.namespace.name
             );
-            const InputType = buildObjectWithHooks(
+            const InputType = newWithHooks(
               GraphQLInputObjectType,
               {
                 name: inflection.createInputType(
@@ -88,7 +88,7 @@ module.exports = function PgMutationCreatePlugin(
                 pgInflection: table,
               }
             );
-            const PayloadType = buildObjectWithHooks(
+            const PayloadType = newWithHooks(
               GraphQLObjectType,
               {
                 name: inflection.createPayloadType(
@@ -130,7 +130,7 @@ module.exports = function PgMutationCreatePlugin(
             );
             memo[
               fieldName
-            ] = buildFieldWithHooks(
+            ] = fieldWithHooks(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment }) => ({
                 description: `Creates a single \`${tableTypeName}\`.`,

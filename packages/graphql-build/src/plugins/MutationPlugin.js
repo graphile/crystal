@@ -1,8 +1,8 @@
 const { GraphQLObjectType } = require("graphql");
 
 module.exports = async function MutationPlugin(builder) {
-  builder.hook("GraphQLSchema", (schema, { buildObjectWithHooks, extend }) => {
-    const Mutation = buildObjectWithHooks(
+  builder.hook("GraphQLSchema", (schema, { newWithHooks, extend }) => {
+    const Mutation = newWithHooks(
       GraphQLObjectType,
       {
         name: "Mutation",

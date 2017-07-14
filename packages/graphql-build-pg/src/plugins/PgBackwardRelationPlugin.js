@@ -18,10 +18,7 @@ module.exports = function PgBackwardRelationPlugin(
         pgSql: sql,
         getAliasFromResolveInfo,
       },
-      {
-        scope: { isPgRowType, pgIntrospection: foreignTable },
-        buildFieldWithHooks,
-      }
+      { scope: { isPgRowType, pgIntrospection: foreignTable }, fieldWithHooks }
     ) => {
       if (!isPgRowType || !foreignTable || foreignTable.kind !== "class") {
         return fields;
@@ -101,7 +98,7 @@ module.exports = function PgBackwardRelationPlugin(
               num => attributes.filter(attr => attr.num === num)[0]
             );
 
-          memo[fieldName] = buildFieldWithHooks(
+          memo[fieldName] = fieldWithHooks(
             fieldName,
             ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
               addDataGenerator(parsedResolveInfoFragment => {

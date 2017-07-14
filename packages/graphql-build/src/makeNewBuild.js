@@ -120,8 +120,8 @@ module.exports = function makeNewBuild(builder) {
       }
       return Object.assign({}, obj, obj2);
     },
-    buildObjectWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
-      if (!this.buildObjectWithHooks || !Object.isFrozen(this)) {
+    newWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
+      if (!this.newWithHooks || !Object.isFrozen(this)) {
         throw new Error(
           "Please do not generate the schema during the build building phase, use 'init' instead"
         );
@@ -220,10 +220,10 @@ module.exports = function makeNewBuild(builder) {
               recurseDataGeneratorsForField,
               Self,
               GraphQLObjectType: rawSpec,
-              buildFieldWithHooks: (fieldName, spec, fieldScope = {}) => {
+              fieldWithHooks: (fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
-                    "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
                 let argDataGenerators = [];
@@ -344,7 +344,7 @@ module.exports = function makeNewBuild(builder) {
               const fieldSpec = fieldsSpec[fieldName];
               if (!processedFields.indexOf(fieldSpec) >= 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[fieldName] = fieldsContext.buildFieldWithHooks(
+                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
                   fieldName,
                   fieldSpec
                 );
@@ -373,10 +373,10 @@ module.exports = function makeNewBuild(builder) {
               scope,
               Self,
               GraphQLObjectType: rawSpec,
-              buildFieldWithHooks: (fieldName, spec, fieldScope = {}) => {
+              fieldWithHooks: (fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
-                    "It looks like you forgot to pass the fieldName to `buildFieldWithHooks`, we're sorry this is current necessary."
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
                 let context = {
@@ -421,7 +421,7 @@ module.exports = function makeNewBuild(builder) {
               const fieldSpec = fieldsSpec[fieldName];
               if (!processedFields.indexOf(fieldSpec) >= 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[fieldName] = fieldsContext.buildFieldWithHooks(
+                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
                   fieldName,
                   fieldSpec
                 );

@@ -8,7 +8,7 @@ module.exports = function PgConnectionTotalCount(builder) {
       { extend, pgInflection: inflection },
       {
         scope: { isPgRowConnectionType, pgIntrospection: table },
-        buildFieldWithHooks,
+        fieldWithHooks,
       }
     ) => {
       if (
@@ -24,20 +24,17 @@ module.exports = function PgConnectionTotalCount(builder) {
         table.namespace.name
       );
       return extend(fields, {
-        totalCount: buildFieldWithHooks(
-          "totalCount",
-          ({ addDataGenerator }) => {
-            addDataGenerator(() => {
-              return {
-                pgCalculateTotalCount: true,
-              };
-            });
+        totalCount: fieldWithHooks("totalCount", ({ addDataGenerator }) => {
+          addDataGenerator(() => {
             return {
-              description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
-              type: GraphQLInt,
+              pgCalculateTotalCount: true,
             };
-          }
-        ),
+          });
+          return {
+            description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
+            type: GraphQLInt,
+          };
+        }),
       });
     }
   );

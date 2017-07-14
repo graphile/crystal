@@ -36,28 +36,25 @@ module.exports = function StandardTypesPlugin(builder) {
     build.addType(GraphQLJSON);
     return build;
   });
-  builder.hook("init", (_, { buildObjectWithHooks }) => {
+  builder.hook("init", (_, { newWithHooks }) => {
     // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
     /* const PageInfo = */
-    buildObjectWithHooks(GraphQLObjectType, {
+    newWithHooks(GraphQLObjectType, {
       name: "PageInfo",
       description: "Information about pagination in a connection.",
-      fields: ({ buildFieldWithHooks }) => ({
-        hasNextPage: buildFieldWithHooks(
-          "hasNextPage",
-          ({ addDataGenerator }) => {
-            addDataGenerator(() => {
-              return {
-                calculateHasNextPage: true,
-              };
-            });
+      fields: ({ fieldWithHooks }) => ({
+        hasNextPage: fieldWithHooks("hasNextPage", ({ addDataGenerator }) => {
+          addDataGenerator(() => {
             return {
-              description: "When paginating forwards, are there more items?",
-              type: new GraphQLNonNull(GraphQLBoolean),
+              calculateHasNextPage: true,
             };
-          }
-        ),
-        hasPreviousPage: buildFieldWithHooks(
+          });
+          return {
+            description: "When paginating forwards, are there more items?",
+            type: new GraphQLNonNull(GraphQLBoolean),
+          };
+        }),
+        hasPreviousPage: fieldWithHooks(
           "hasPreviousPage",
           ({ addDataGenerator }) => {
             addDataGenerator(() => {

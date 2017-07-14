@@ -3,7 +3,7 @@ const makeProcField = require("./makeProcField");
 module.exports = function PgQueryProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
-    (fields, build, { scope: { isRootQuery }, buildFieldWithHooks }) => {
+    (fields, build, { scope: { isRootQuery }, fieldWithHooks }) => {
       if (!isRootQuery) {
         return fields;
       }
@@ -60,7 +60,7 @@ module.exports = function PgQueryProceduresPlugin(builder) {
               proc.namespace.name
             );
             memo[fieldName] = makeProcField(fieldName, proc, build, {
-              buildFieldWithHooks,
+              fieldWithHooks,
             });
             return memo;
           }, {})

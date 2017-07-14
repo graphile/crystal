@@ -19,7 +19,7 @@ module.exports = function PgTablesPlugin(
       {
         getNodeIdForTypeAndIdentifiers,
         nodeIdFieldName,
-        buildObjectWithHooks,
+        newWithHooks,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
@@ -75,7 +75,7 @@ module.exports = function PgTablesPlugin(
           table.name,
           schema && schema.name
         );
-        const TableType = buildObjectWithHooks(
+        const TableType = newWithHooks(
           GraphQLObjectType,
           {
             description: table.description || tablePgType.description,
@@ -134,7 +134,7 @@ module.exports = function PgTablesPlugin(
           }
         );
         const pgInputFields = {};
-        const TableInputType = buildObjectWithHooks(
+        const TableInputType = newWithHooks(
           GraphQLInputObjectType,
           {
             description: `An input for mutations affecting \`${tableTypeName}\``,
@@ -187,7 +187,7 @@ module.exports = function PgTablesPlugin(
 
         if (table.isSelectable) {
           /* const TablePatchType = */
-          buildObjectWithHooks(
+          newWithHooks(
             GraphQLInputObjectType,
             {
               description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
@@ -204,7 +204,7 @@ module.exports = function PgTablesPlugin(
               },
             }
           );
-          const EdgeType = buildObjectWithHooks(
+          const EdgeType = newWithHooks(
             GraphQLObjectType,
             {
               description: `A \`${tableTypeName}\` edge in the connection.`,
@@ -240,7 +240,7 @@ module.exports = function PgTablesPlugin(
           );
           const PageInfo = getTypeByName("PageInfo");
           /*const ConnectionType = */
-          buildObjectWithHooks(
+          newWithHooks(
             GraphQLObjectType,
             {
               description: `A connection to a list of \`${tableTypeName}\` values.`,

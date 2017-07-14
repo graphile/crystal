@@ -89,7 +89,7 @@ module.exports = async function PgRowByUniqueConstraint(
         gql2pg,
         getNodeType,
       },
-      { scope: { isRootQuery }, buildFieldWithHooks }
+      { scope: { isRootQuery }, fieldWithHooks }
     ) => {
       if (!isRootQuery || !nodeIdFieldName) {
         return fields;
@@ -127,7 +127,7 @@ module.exports = async function PgRowByUniqueConstraint(
               );
               memo[
                 fieldName
-              ] = buildFieldWithHooks(
+              ] = fieldWithHooks(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {

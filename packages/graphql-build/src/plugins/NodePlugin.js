@@ -45,9 +45,9 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
 
   builder.hook("init", function defineNodeInterfaceType(
     _,
-    { $$isQuery, $$nodeType, getTypeByName, buildObjectWithHooks }
+    { $$isQuery, $$nodeType, getTypeByName, newWithHooks }
   ) {
-    buildObjectWithHooks(GraphQLInterfaceType, {
+    newWithHooks(GraphQLInterfaceType, {
       name: "Node",
       description: "An object with a globally unique `ID`.",
       resolveType: value => {

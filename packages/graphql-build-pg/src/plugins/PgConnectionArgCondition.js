@@ -8,7 +8,7 @@ module.exports = function PgConnectionArgCondition(
     (
       _,
       {
-        buildObjectWithHooks,
+        newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgGqlInputTypeByTypeId: gqlTypeByTypeId,
       }
@@ -19,7 +19,7 @@ module.exports = function PgConnectionArgCondition(
           table.namespace && table.namespace.name
         );
         /* const TableConditionType = */
-        buildObjectWithHooks(
+        newWithHooks(
           GraphQLInputObjectType,
           {
             description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
@@ -29,7 +29,7 @@ module.exports = function PgConnectionArgCondition(
                 table.namespace && table.namespace.name
               )
             ),
-            fields: ({ buildFieldWithHooks }) =>
+            fields: ({ fieldWithHooks }) =>
               introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
                 .reduce((memo, attr) => {
@@ -38,7 +38,7 @@ module.exports = function PgConnectionArgCondition(
                     table.name,
                     table.namespace && table.namespace.name
                   );
-                  memo[fieldName] = buildFieldWithHooks(
+                  memo[fieldName] = fieldWithHooks(
                     fieldName,
                     {
                       description: `Checks for equality with the object’s \`${fieldName}\` field.`,

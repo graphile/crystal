@@ -9,10 +9,7 @@ module.exports = function PgConnectionArgOrderBy(
     "init",
     (
       _,
-      {
-        buildObjectWithHooks,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-      }
+      { newWithHooks, pgIntrospectionResultsByKind: introspectionResultsByKind }
     ) => {
       introspectionResultsByKind.class.map(table => {
         const tableTypeName = inflection.tableType(
@@ -20,7 +17,7 @@ module.exports = function PgConnectionArgOrderBy(
           table.namespace && table.namespace.name
         );
         /* const TableOrderByType = */
-        buildObjectWithHooks(
+        newWithHooks(
           GraphQLEnumType,
           {
             name: inflection.orderByType(tableTypeName),
