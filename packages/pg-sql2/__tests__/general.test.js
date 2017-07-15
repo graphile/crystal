@@ -46,6 +46,35 @@ describe("sql.query", () => {
   });
 });
 
+describe("sql.join", () => {
+  it("various sub-parts", () => {
+    const node = sql.query`select ${sql.join(
+      [
+        sql.value(1),
+        sql.identifier("foo", "bar"),
+        sql.query`baz.qux(1, 2, 3)`,
+        sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+      ],
+      ", "
+    )}`;
+    expect(node).toEqual([
+      { type: "RAW", text: "select " },
+      { type: "VALUE", value: 1 },
+      { type: "RAW", text: ", " },
+      { type: "IDENTIFIER", names: ["foo", "bar"] },
+      { type: "RAW", text: ", " },
+      { type: "RAW", text: "baz.qux(1, 2, 3)" },
+      { type: "RAW", text: ", " },
+      { type: "RAW", text: "baz.qux(" },
+      { type: "VALUE", value: 1 },
+      { type: "RAW", text: ", " },
+      { type: "RAW", text: "2" },
+      { type: "RAW", text: ", 3)" },
+      { type: "RAW", text: "" },
+    ]);
+  });
+});
+
 describe("sql.compile", () => {
   it("simple", () => {
     const node = sql.query`select 1`;
@@ -75,6 +104,22 @@ describe("sql.compile", () => {
     expect(sql.compile(node)).toEqual({
       text: 'select $1 from "foo"."b""z"',
       values: [1],
+    });
+  });
+
+  it("including a join", () => {
+    const node = sql.query`select ${sql.join(
+      [
+        sql.value(1),
+        sql.identifier("foo", "bar"),
+        sql.query`baz.qux(1, 2, 3)`,
+        sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+      ],
+      ", "
+    )}`;
+    expect(sql.compile(node)).toEqual({
+      text: 'select $1, "foo"."bar", baz.qux(1, 2, 3), baz.qux($2, 2, 3)',
+      values: [1, 1],
     });
   });
 });
