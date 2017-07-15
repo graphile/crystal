@@ -89,6 +89,7 @@ module.exports = function PgTypesPlugin(
   builder,
   { pgExtendedTypes = true, pgInflection: inflection }
 ) {
+  // XXX: most of this should be in an "init" hook, not a "build" hook
   builder.hook("build", build => {
     const {
       pgIntrospectionResultsByKind: introspectionResultsByKind,

@@ -22,6 +22,7 @@ const stringType = (name, description) =>
   });
 
 module.exports = function StandardTypesPlugin(builder) {
+  // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
   builder.hook("build", build => {
     const Cursor = stringType(
       "Cursor",
