@@ -1,6 +1,6 @@
 {
   "name": "graphql-build",
-  "version": "0.0.1-alpha8.3",
+  "version": "0.0.1-alpha9.0",
   "description": "Build a GraphQL schema from plugins",
   "main": "index.js",
   "scripts": {
