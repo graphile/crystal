@@ -224,7 +224,7 @@ babel-register@^6.24.1:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
-babel-runtime@^6.22.0:
+"babel-runtime@>=6 <7", babel-runtime@^6.22.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.23.0.tgz#0a9489f144de70efb3ce4300accdb329e2fc543b"
   dependencies:
@@ -684,9 +684,9 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphql-build-pg@^0.0.1-alpha9.0:
-  version "0.0.1-alpha9.0"
-  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha9.0.tgz#c356122894db8d4c589a7158b1ce65cf307a0d99"
+graphql-build-pg@^0.0.1-alpha9.1:
+  version "0.0.1-alpha9.1"
+  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha9.1.tgz#76bba66b15a8c503462215304f66b4fa357b1243"
   dependencies:
     debug ">=2 <3"
     graphql-iso-date "^3.2.0"
@@ -695,24 +695,24 @@ graphql-build-pg@^0.0.1-alpha9.0:
     lodash ">=4 <5"
     lru-cache "4.1.1"
     pg-range-parser "^1.0.0"
-    pg-sql2 "^0.0.1-alpha8.3"
+    pg-sql2 "^0.0.1-alpha9.1"
     pluralize "^5.0.0"
 
-graphql-build@^0.0.1-alpha9.0:
-  version "0.0.1-alpha9.0"
-  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.0.1-alpha9.0.tgz#fa3ef1c41f5e454e39ec59170e82841e8f27e0c8"
+graphql-build@^0.0.1-alpha9.1:
+  version "0.0.1-alpha9.1"
+  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.0.1-alpha9.1.tgz#35e106b36d373a65abd1221d4e4f4f02a3df44b0"
   dependencies:
     debug ">=2 <3"
-    graphql-parse-resolve-info "^0.0.1-alpha8.3"
+    graphql-parse-resolve-info "^0.0.1-alpha9.1"
     graphql-type-json "^0.1.4"
 
 graphql-iso-date@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.2.0.tgz#21f9352d165e624599ec4ea249e806966197f1dc"
 
-graphql-parse-resolve-info@^0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.0.1-alpha8.3.tgz#330be7e70ec86bca7ca2adce13a0d59888c63608"
+graphql-parse-resolve-info@^0.0.1-alpha9.1:
+  version "0.0.1-alpha9.1"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.0.1-alpha9.1.tgz#e16959708b38c6c06d2e53d0b3a3fed847072cfa"
   dependencies:
     debug ">=2 <3"
 
@@ -1609,9 +1609,9 @@ pg-range-parser@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pg-range-parser/-/pg-range-parser-1.0.0.tgz#561e8c4c3dee98a1caa8288c5c7e4300861819bb"
 
-pg-sql2@^0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-0.0.1-alpha8.3.tgz#9c32a1750e9fa2a3d133bcc73a36e29b2382bd54"
+pg-sql2@^0.0.1-alpha9.1:
+  version "0.0.1-alpha9.1"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-0.0.1-alpha9.1.tgz#9246d071f6335cbcdacd22094d8a433af7569888"
   dependencies:
     debug ">=2 <3"
     lodash ">=4 <5"

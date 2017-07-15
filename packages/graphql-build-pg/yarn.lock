@@ -224,7 +224,7 @@ babel-register@^6.24.1:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
-babel-runtime@^6.22.0:
+"babel-runtime@>=6 <7", babel-runtime@^6.22.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.23.0.tgz#0a9489f144de70efb3ce4300accdb329e2fc543b"
   dependencies:
@@ -1581,9 +1581,9 @@ pg-range-parser@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pg-range-parser/-/pg-range-parser-1.0.0.tgz#561e8c4c3dee98a1caa8288c5c7e4300861819bb"
 
-pg-sql2@^0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-0.0.1-alpha8.3.tgz#9c32a1750e9fa2a3d133bcc73a36e29b2382bd54"
+pg-sql2@^0.0.1-alpha9.1:
+  version "0.0.1-alpha9.1"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-0.0.1-alpha9.1.tgz#9246d071f6335cbcdacd22094d8a433af7569888"
   dependencies:
     debug ">=2 <3"
     lodash ">=4 <5"

@@ -17,6 +17,7 @@
     "url": "https://github.com/benjie/graphql-build/issues"
   },
   "dependencies": {
+    "babel-runtime": ">=6 <7",
     "graphql-build": "^0.0.1-alpha9.1",
     "graphql-build-pg": "^0.0.1-alpha9.1"
   },
