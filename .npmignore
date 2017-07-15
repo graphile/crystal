@@ -7,7 +7,9 @@ tsconfig.json
 tslint.json
 .vscode
 src
+build/__tests__
 build/**/__tests__
+build/__mocks__
 build/**/__mocks__
 typings
 scripts

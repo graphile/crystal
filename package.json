@@ -29,7 +29,8 @@
     "build": "./scripts/build",
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
-    "test": "./scripts/test"
+    "test": "./scripts/test",
+    "prepublishOnly": "./scripts/build"
   },
   "dependencies": {
     "babel-polyfill": "6.23.0",
@@ -47,6 +48,7 @@
     "pg": "^6.1.0",
     "pg-connection-string": "^0.1.3",
     "pg-minify": "^0.4.1",
+    "pg-sql2": "^0.0.1-alpha8.3",
     "pluralize": "^3.0.0",
     "postgraphql-build": "0.0.1-alpha9.0",
     "postgres-interval": "^1.0.2",
@@ -95,5 +97,9 @@
       "<rootDir>/src"
     ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
-  }
+  },
+  "files": [
+    "build",
+    "resources"
+  ]
 }

@@ -2,7 +2,7 @@ import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
 import { Pool, Client } from 'pg'
 import { ExecutionResult } from 'graphql'
-import { sql } from '../postgres/utils'
+import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
 /**
