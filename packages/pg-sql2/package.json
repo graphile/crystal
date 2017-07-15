@@ -1,6 +1,6 @@
 {
   "name": "pg-sql2",
-  "version": "0.0.1-alpha8.3",
+  "version": "0.0.1-alpha9.1",
   "description": "Generate safe SQL with tagged template literals",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,6 @@
     "url": "https://github.com/benjie/graphql-build/issues"
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
-  "peerDependencies": {},
   "devDependencies": {
     "jest": "20.0.4",
     "markdown-doctest": "^0.9.1"
