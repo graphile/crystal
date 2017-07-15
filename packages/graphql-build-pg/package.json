@@ -52,5 +52,11 @@
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
-  }
+  },
+  "files": [
+    "src",
+    "lib",
+    "res",
+    "index.js"
+  ]
 }
