@@ -40,6 +40,8 @@ program
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
   .option('--jwt-role <string>', 'a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
+  .option('--append-plugin <string>', 'appends a plugin to the list of GraphQL schema plugins')
+  .option('--prepend-plugin <string>', 'prepends a plugin to the list of GraphQL schema plugins')
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
@@ -82,6 +84,9 @@ const {
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
   bodySizeLimit,
+  appendPlugin: appendPluginNames,
+  prependPlugin: prependPluginNames,
+  // replaceAllPlugins is NOT exposed via the CLI
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -106,6 +111,42 @@ const pgConfig = Object.assign(
   { max: maxPoolSize },
 )
 
+const loadPlugins = (rawNames: mixed) => {
+  if (!rawNames) {
+    return undefined
+  }
+  const names = Array.isArray(rawNames) ? rawNames : [rawNames]
+  return names.map(
+    rawName => {
+      const name = String(rawName)
+      const parts = name.split(':')
+      let root
+      try {
+        root = require(String(parts.shift()))
+      } catch (e) {
+        // tslint:disable-next-line no-console
+        console.error(`Failed to load plugin '${name}'`)
+        throw e
+      }
+      let plugin = root
+      let part
+      while (part = parts.shift()) {
+        plugin = root[part]
+        if (plugin == null) {
+          throw new Error(`No plugin found matching spec '${name}' - failed at '${part}'`)
+        }
+      }
+      if (typeof plugin === 'function') {
+        return plugin
+      } else if (plugin === root && typeof plugin.default === 'function') {
+        return plugin.default // ES6 workaround
+      } else {
+        throw new Error(`No plugin found matching spec '${name}' - expected function, found '${typeof plugin}'`)
+      }
+    }
+  );
+}
+
 // Create’s our PostGraphQL server and provides all the appropriate
 // configuration options.
 const server = createServer(postgraphql(pgConfig, schemas, {
@@ -127,6 +168,8 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   exportJsonSchemaPath,
   exportGqlSchemaPath,
   bodySizeLimit,
+  appendPlugins: loadPlugins(appendPluginNames),
+  prependPlugins: loadPlugins(prependPluginNames),
 }))
 
 // Start our server by listening to a specific port and host name. Also log
