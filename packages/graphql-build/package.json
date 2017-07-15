@@ -1,6 +1,6 @@
 {
   "name": "graphql-build",
-  "version": "0.0.1-alpha9.1",
+  "version": "0.0.1-alpha9.2",
   "description": "Build a GraphQL schema from plugins",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "dependencies": {
     "babel-runtime": ">=6 <7",
     "debug": ">=2 <3",
-    "graphql-parse-resolve-info": "^0.0.1-alpha9.1",
+    "graphql-parse-resolve-info": "^0.0.1-alpha9.2",
     "graphql-type-json": "^0.1.4"
   },
   "engines": {
