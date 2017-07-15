@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sqli including a join 1`] = `"Expected SQL item, instead received '3'."`;
+
+exports[`sqli subbing an object of similar layout 1`] = `"Expected SQL item, instead received '[object Object]'."`;

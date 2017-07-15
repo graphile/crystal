@@ -7,7 +7,7 @@ const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
 const debug = require("debug")("pg-sql2");
 
-const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
+const isDev = ["development"].indexOf(process.env.NODE_ENV) >= 0;
 
 function debugError(err) {
   debug(err);
@@ -92,7 +92,7 @@ function compile(sql /*: Array<SQLNode> */) {
 
   for (const item of items) {
     if (!item[$$trusted]) {
-      throw new Error(`Expecte sql item, instead got '${String(item)}'.`);
+      throw new Error(`Expected SQL item, instead received '${String(item)}'.`);
     }
     switch (item.type) {
       case "RAW":
