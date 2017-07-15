@@ -154,7 +154,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                 if (TableType) {
                   const uniqueConstraints = introspectionResultsByKind.constraint
                     .filter(con => con.classId === table.id)
-                    .filter(con => ["u", "p"].includes(con.type));
+                    .filter(con => con.type === "u" || con.type === "p");
                   const attributes = introspectionResultsByKind.attribute
                     .filter(attr => attr.classId === table.id)
                     .sort((a, b) => a.num - b.num);
@@ -227,7 +227,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                   if (nodeIdFieldName) {
                     const primaryKeyConstraint = introspectionResultsByKind.constraint
                       .filter(con => con.classId === table.id)
-                      .filter(con => ["p"].includes(con.type))[0];
+                      .filter(con => con.type === "p")[0];
                     if (!primaryKeyConstraint) {
                       return memo;
                     }

@@ -39,7 +39,7 @@ module.exports = async function PgRowByUniqueConstraint(
             if (TableType) {
               const uniqueConstraints = introspectionResultsByKind.constraint
                 .filter(con => con.classId === table.id)
-                .filter(con => ["u", "p"].includes(con.type));
+                .filter(con => con.type === "u" || con.type === "p");
               const attributes = introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
                 .sort((a, b) => a.num - b.num);

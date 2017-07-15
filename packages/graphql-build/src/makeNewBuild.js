@@ -11,7 +11,7 @@ const {
   getAliasFromResolveInfo,
 } = require("graphql-parse-resolve-info");
 const isString = str => typeof str === "string";
-const isDev = ["test", "development"].includes(process.env.NODE_ENV);
+const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = require("debug")("graphql-build");
 
 const mergeData = (data, gen, ReturnType, arg) => {
@@ -42,7 +42,7 @@ const ensureArray = val =>
   val == null ? val : Array.isArray(val) ? val : [val];
 
 let ensureName = () => {};
-if (["development", "test"].includes(process.env.NODE_ENV)) {
+if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   ensureName = fn => {
     if (isDev && !fn.displayName && !fn.name) {
       // eslint-disable-next-line no-console
@@ -114,7 +114,7 @@ module.exports = function makeNewBuild(builder) {
       const keysA = Object.keys(obj);
       const keysB = Object.keys(obj2);
       for (const key of keysB) {
-        if (keysA.includes(key)) {
+        if (keysA.indexOf(key) >= 0) {
           throw new Error(`Overwriting key '${key}' is not allowed!`);
         }
       }
@@ -128,7 +128,10 @@ module.exports = function makeNewBuild(builder) {
       }
       const fieldDataGeneratorsByFieldName = {};
       let newSpec = spec;
-      if (!knownTypes.includes(Type) && knownTypeNames.includes(Type.name)) {
+      if (
+        knownTypes.indexOf(Type) === -1 &&
+        knownTypeNames.indexOf(Type.name) >= 0
+      ) {
         throw new Error(
           `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
         );

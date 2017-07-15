@@ -46,7 +46,7 @@ module.exports = async function PgAllRows(
             );
             const primaryKeyConstraint = introspectionResultsByKind.constraint
               .filter(con => con.classId === table.id)
-              .filter(con => ["p"].includes(con.type))[0];
+              .filter(con => con.type === "p")[0];
             const primaryKeys =
               primaryKeyConstraint &&
               primaryKeyConstraint.keyAttributeNums.map(

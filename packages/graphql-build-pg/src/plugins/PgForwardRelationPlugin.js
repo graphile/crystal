@@ -40,7 +40,7 @@ module.exports = function PgForwardRelationPlugin(
       // This is a relation in which we (table) are local, and there's a foreign table
 
       const foreignKeyConstraints = introspectionResultsByKind.constraint
-        .filter(con => ["f"].includes(con.type))
+        .filter(con => con.type === "f")
         .filter(con => con.classId === table.id);
       const attributes = introspectionResultsByKind.attribute
         .filter(attr => attr.classId === table.id)

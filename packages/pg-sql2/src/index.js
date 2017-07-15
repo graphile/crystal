@@ -7,7 +7,7 @@ const isPlainObject = require("lodash/isPlainObject");
 const lodashIsFinite = require("lodash/isFinite");
 const debug = require("debug")("pg-sql2");
 
-const isDev = ["test", "development"].includes(process.env.NODE_ENV);
+const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 
 function debugError(err) {
   debug(err);

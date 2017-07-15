@@ -1,5 +1,5 @@
 const sql = require("pg-sql2");
-const isDev = ["test", "development"].includes(process.env.NODE_ENV);
+const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const isSafeInteger = require("lodash/isSafeInteger");
 
 const callIfNecessary = o => {

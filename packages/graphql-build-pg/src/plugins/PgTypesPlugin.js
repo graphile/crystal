@@ -457,9 +457,10 @@ module.exports = function PgTypesPlugin(
             // Since the value we will get from `parsed.(start|end).value` is a
             // string but our code will expect it to be the value after `pg`
             // parsed it, we pass through to `pg-types` for parsing.
-            const pgParse = rawTypes.includes(parseInt(subtype.id, 10))
-              ? identity
-              : pgTypes.getTypeParser(subtype.id);
+            const pgParse =
+              rawTypes.indexOf(parseInt(subtype.id, 10)) >= 0
+                ? identity
+                : pgTypes.getTypeParser(subtype.id);
             return {
               start: parsed.start && {
                 value: pg2gql(pgParse(parsed.start.value), subtype),

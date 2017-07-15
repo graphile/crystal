@@ -30,7 +30,7 @@ module.exports = async function PgRowByUniqueConstraint(
       );
       const primaryKeyConstraint = introspectionResultsByKind.constraint
         .filter(con => con.classId === table.id)
-        .filter(con => ["p"].includes(con.type))[0];
+        .filter(con => con.type === "p")[0];
       if (!primaryKeyConstraint) {
         return object;
       }
@@ -112,7 +112,7 @@ module.exports = async function PgRowByUniqueConstraint(
               );
               const primaryKeyConstraint = introspectionResultsByKind.constraint
                 .filter(con => con.classId === table.id)
-                .filter(con => ["p"].includes(con.type))[0];
+                .filter(con => con.type === "p")[0];
               if (!primaryKeyConstraint) {
                 return memo;
               }

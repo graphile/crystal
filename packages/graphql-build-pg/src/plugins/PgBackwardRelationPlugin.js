@@ -25,7 +25,7 @@ module.exports = function PgBackwardRelationPlugin(
       }
       // This is a relation in which WE are foreign
       const foreignKeyConstraints = introspectionResultsByKind.constraint
-        .filter(con => ["f"].includes(con.type))
+        .filter(con => con.type === "f")
         .filter(con => con.foreignClassId === foreignTable.id);
       const foreignAttributes = introspectionResultsByKind.attribute
         .filter(attr => attr.classId === foreignTable.id)
@@ -91,7 +91,7 @@ module.exports = function PgBackwardRelationPlugin(
           );
           const primaryKeyConstraint = introspectionResultsByKind.constraint
             .filter(con => con.classId === table.id)
-            .filter(con => ["p"].includes(con.type))[0];
+            .filter(con => con.type === "p")[0];
           const primaryKeys =
             primaryKeyConstraint &&
             primaryKeyConstraint.keyAttributeNums.map(
