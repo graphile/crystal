@@ -6,18 +6,26 @@ const {
 
 const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
   const { dynamicJson, classicIds, nodeIdFieldName } = options;
-  return getBuilder([...defaultPlugins, ...pgDefaultPlugins], {
-    pgConfig: pgConfig,
-    pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
-    pgExtendedTypes: !!dynamicJson,
-    pgInflection: classicIds
-      ? inflections.postGraphQLClassicIdsInflection
-      : inflections.postGraphQLInflection,
-    nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
-    pgJwtTypeIdentifier: options.jwtPgTypeIdentifier,
-    pgJwtSecret: options.jwtSecret,
-    pgDisableDefaultMutations: options.disableDefaultMutations,
-  });
+  return getBuilder(
+    [
+      ...(options.prependPlugins || []),
+      ...defaultPlugins,
+      ...pgDefaultPlugins,
+      ...(options.appendPlugins || []),
+    ],
+    {
+      pgConfig: pgConfig,
+      pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
+      pgExtendedTypes: !!dynamicJson,
+      pgInflection: classicIds
+        ? inflections.postGraphQLClassicIdsInflection
+        : inflections.postGraphQLInflection,
+      nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
+      pgJwtTypeIdentifier: options.jwtPgTypeIdentifier,
+      pgJwtSecret: options.jwtSecret,
+      pgDisableDefaultMutations: options.disableDefaultMutations,
+    }
+  );
 };
 
 exports.createPostGraphQLSchema = async (pgConfig, schemas, options) => {
