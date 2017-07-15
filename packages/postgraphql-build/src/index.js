@@ -4,27 +4,60 @@ const {
   inflections,
 } = require("graphql-build-pg");
 
+const ensureValidPlugins = (name, arr) => {
+  if (!Array.isArray(arr)) {
+    throw new Error(`Option '${name}' should be an array`);
+  }
+  for (let i = 0, l = arr.length; i < l; i++) {
+    const fn = arr[i];
+    if (typeof fn !== "function") {
+      throw new Error(
+        `Option '${name}' should be an array of functions, found '${typeof fn}' at index ${i}`
+      );
+    }
+  }
+};
+
 const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
   const { dynamicJson, classicIds, nodeIdFieldName } = options;
+  const {
+    replaceAllPlugins,
+    appendPlugins = [],
+    prependPlugins = [],
+    jwtPgTypeIdentifier,
+    jwtSecret,
+    disableDefaultMutations,
+    graphqlBuildOptions,
+  } = options;
+  if (replaceAllPlugins) {
+    ensureValidPlugins("replaceAllPlugins", replaceAllPlugins);
+  }
+  ensureValidPlugins("prependPlugins", prependPlugins);
+  ensureValidPlugins("appendPlugins", appendPlugins);
   return getBuilder(
-    [
-      ...(options.prependPlugins || []),
-      ...defaultPlugins,
-      ...pgDefaultPlugins,
-      ...(options.appendPlugins || []),
-    ],
-    {
-      pgConfig: pgConfig,
-      pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
-      pgExtendedTypes: !!dynamicJson,
-      pgInflection: classicIds
-        ? inflections.postGraphQLClassicIdsInflection
-        : inflections.postGraphQLInflection,
-      nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
-      pgJwtTypeIdentifier: options.jwtPgTypeIdentifier,
-      pgJwtSecret: options.jwtSecret,
-      pgDisableDefaultMutations: options.disableDefaultMutations,
-    }
+    replaceAllPlugins
+      ? [...prependPlugins, ...replaceAllPlugins, ...appendPlugins]
+      : [
+          ...prependPlugins,
+          ...defaultPlugins,
+          ...pgDefaultPlugins,
+          ...appendPlugins,
+        ],
+    Object.assign(
+      {
+        pgConfig: pgConfig,
+        pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
+        pgExtendedTypes: !!dynamicJson,
+        pgInflection: classicIds
+          ? inflections.postGraphQLClassicIdsInflection
+          : inflections.postGraphQLInflection,
+        nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
+        pgJwtTypeIdentifier: jwtPgTypeIdentifier,
+        pgJwtSecret: jwtSecret,
+        pgDisableDefaultMutations: disableDefaultMutations,
+      },
+      graphqlBuildOptions
+    )
   );
 };
 
