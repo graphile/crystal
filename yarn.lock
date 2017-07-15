@@ -2678,9 +2678,9 @@ graphiql@^0.11.2:
     codemirror-graphql "^0.6.8"
     marked "0.3.6"
 
-graphql-build-pg@^0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha8.3.tgz#bb40cde2ef4461e4ab3dbf42c665fcb89ebd4cb9"
+graphql-build-pg@^0.0.1-alpha9.0:
+  version "0.0.1-alpha9.0"
+  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha9.0.tgz#c356122894db8d4c589a7158b1ce65cf307a0d99"
   dependencies:
     debug ">=2 <3"
     graphql-iso-date "^3.2.0"
@@ -2692,9 +2692,9 @@ graphql-build-pg@^0.0.1-alpha8.3:
     pg-sql2 "^0.0.1-alpha8.3"
     pluralize "^5.0.0"
 
-graphql-build@^0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.0.1-alpha8.3.tgz#1f0b9ca30fda5bc29480b8d8c39a678de1a7a63e"
+graphql-build@^0.0.1-alpha9.0:
+  version "0.0.1-alpha9.0"
+  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.0.1-alpha9.0.tgz#fa3ef1c41f5e454e39ec59170e82841e8f27e0c8"
   dependencies:
     debug ">=2 <3"
     graphql-parse-resolve-info "^0.0.1-alpha8.3"
@@ -4828,12 +4828,12 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphql-build@0.0.1-alpha8.3:
-  version "0.0.1-alpha8.3"
-  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.0.1-alpha8.3.tgz#ece6d67f6776b2198844f774818874379fbb5c6e"
+postgraphql-build@0.0.1-alpha9.0:
+  version "0.0.1-alpha9.0"
+  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.0.1-alpha9.0.tgz#07d084bee86ba468f42d59e976d4f016240aa177"
   dependencies:
-    graphql-build "^0.0.1-alpha8.3"
-    graphql-build-pg "^0.0.1-alpha8.3"
+    graphql-build "^0.0.1-alpha9.0"
+    graphql-build-pg "^0.0.1-alpha9.0"
 
 postgres-array@~1.0.0:
   version "1.0.2"
