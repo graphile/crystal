@@ -29,7 +29,7 @@ function MyRandomFieldPlugin(
         },
         resolve(_, { sides = myDefaultMax }) {
           return (
-            Math.floor(Math.random() * (sides - myDefaultMin)) + myDefaultMin
+            Math.floor(Math.random() * (sides + 1 - myDefaultMin)) + myDefaultMin
           );
         },
       },
