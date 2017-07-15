@@ -30,7 +30,7 @@
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
     "test": "./scripts/test",
-    "prepublishOnly": "./scripts/build"
+    "prepack": "./scripts/build"
   },
   "dependencies": {
     "babel-polyfill": "6.23.0",
