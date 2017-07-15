@@ -1,10 +1,15 @@
+"use strict";
 // @flow
 
-// Full credit: https://raw.githubusercontent.com/postgraphql/postgraphql/master/src/postgres/utils/sql.ts
-const isSymbol = require("lodash/isSymbol");
-const isNil = require("lodash/isNil");
-const isPlainObject = require("lodash/isPlainObject");
-const lodashIsFinite = require("lodash/isFinite");
+if (parseFloat(process.versions.node) < 4) {
+  throw new Error(
+    "This library requires Node v4 or above; we've detected v${parseFloat(process.versions.node)}"
+  );
+}
+
+const isSymbol = sym => typeof sym === "symbol";
+const isNil = o => o === null || o === undefined;
+const isObject = o => typeof o === "object";
 const debug = require("debug")("pg-sql2");
 
 const isDev = ["development"].indexOf(process.env.NODE_ENV) >= 0;
@@ -177,7 +182,7 @@ function query(strings /*: mixed */, ...values /*: Array<mixed> */) {
         // These errors don't give you additional safety, they just catch
         // mistakes earlier to aid debugging, so they're fine to disable in
         // production
-        if (!Array.isArray(value) && !isPlainObject(value)) {
+        if (!Array.isArray(value) && !isObject(value)) {
           if (typeof value === "string") {
             throw new Error(
               `Raw string passed into SQL query: '${String(value)}'.`
@@ -226,7 +231,7 @@ const value = (val /*: mixed */) => makeValueNode(val);
 const literal = (val /*: mixed */) => {
   if (typeof val === "string" && val.match(/^[a-zA-Z0-9_-]*$/)) {
     return raw(`'${val}'`);
-  } else if (typeof val === "number" && lodashIsFinite(val)) {
+  } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
       return raw(String(val));
     } else {
