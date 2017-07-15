@@ -669,9 +669,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphql-parse-resolve-info@^0.0.1-alpha5.1:
-  version "0.0.1-alpha5.1"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.0.1-alpha5.1.tgz#6421c259bad75c14a3ede99f609affbe8f1da659"
+graphql-parse-resolve-info@^0.0.1-alpha8.3:
+  version "0.0.1-alpha8.3"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.0.1-alpha8.3.tgz#330be7e70ec86bca7ca2adce13a0d59888c63608"
+  dependencies:
+    debug ">=2 <3"
 
 graphql-type-json@^0.1.4:
   version "0.1.4"

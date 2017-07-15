@@ -29,9 +29,7 @@
     "url": "https://github.com/benjie/graphql-build/issues"
   },
   "homepage": "https://github.com/benjie/graphql-build#readme",
-  "peerDependencies": {
-    "babel-polyfill": ">=6 <7"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "jest": "20.0.4",
     "markdown-doctest": "^0.9.1"
