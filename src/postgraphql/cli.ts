@@ -115,36 +115,37 @@ const loadPlugins = (rawNames: mixed) => {
   if (!rawNames) {
     return undefined
   }
-  const names = String(rawNames).split(",")
-  return names.map(
-    rawName => {
-      const name = String(rawName)
-      const parts = name.split(':')
-      let root
-      try {
-        root = require(String(parts.shift()))
-      } catch (e) {
-        // tslint:disable-next-line no-console
-        console.error(`Failed to load plugin '${name}'`)
-        throw e
+  const names = String(rawNames).split(',')
+  return names.map(rawName => {
+    const name = String(rawName)
+    const parts = name.split(':')
+    let root
+    try {
+      root = require(String(parts.shift()))
+    } catch (e) {
+      // tslint:disable-next-line no-console
+      console.error(`Failed to load plugin '${name}'`)
+      throw e
+    }
+    let plugin = root
+    while (true) {
+      const part = parts.shift()
+      if (part == null) {
+        break
       }
-      let plugin = root
-      let part
-      while (part = parts.shift()) {
-        plugin = root[part]
-        if (plugin == null) {
-          throw new Error(`No plugin found matching spec '${name}' - failed at '${part}'`)
-        }
-      }
-      if (typeof plugin === 'function') {
-        return plugin
-      } else if (plugin === root && typeof plugin.default === 'function') {
-        return plugin.default // ES6 workaround
-      } else {
-        throw new Error(`No plugin found matching spec '${name}' - expected function, found '${typeof plugin}'`)
+      plugin = root[part]
+      if (plugin == null) {
+        throw new Error(`No plugin found matching spec '${name}' - failed at '${part}'`)
       }
     }
-  );
+    if (typeof plugin === 'function') {
+      return plugin
+    } else if (plugin === root && typeof plugin.default === 'function') {
+      return plugin.default // ES6 workaround
+    } else {
+      throw new Error(`No plugin found matching spec '${name}' - expected function, found '${typeof plugin}'`)
+    }
+  })
 }
 
 // Create’s our PostGraphQL server and provides all the appropriate
