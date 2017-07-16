@@ -21,10 +21,6 @@ This repository is a monorepo (managed by [lerna][]) which comprises the followi
   GraphQL schema (e.g. we use it to determine which fields are required from the
   SQL database)
 
-**[pg-sql2][]**: A port of Caleb's [pg-sql][] and the
-  [similar functionality in PostGraphQL][postgraphql-sql] with enhancements for
-  developer happiness and greater expressiveness.
-
 Status
 ------
 
@@ -35,11 +31,9 @@ Status
   integration tests for queries and mutations, no descriptions are added to
   fields yet
 
-- [pg-sql2][] - complete (but needs dedicated tests because it's currently only
-  tested by virtue of the postgraphql-build tests depending on it)
-
-- [graphql-parse-resolve-info][] - complete (but needs tests for similar reasons to
-  `pg-sql2`)
+- [graphql-parse-resolve-info][] - complete (but needs dedicated tests because
+  it's currently only tested by virtue of the postgraphql-build tests depending
+  on it)
 
 Running on Node less than v8
 ----------------------------
@@ -102,10 +96,8 @@ lerna bootstrap
 [PostGraphQL]: https://github.com/postgraphql/postgraphql
 [Caleb Meredith]: https://github.com/calebmer
 [lerna]: https://github.com/lerna/lerna
-[pg-sql]: https://github.com/calebmer/pg-sql
 [postgraphql-sql]: https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts
 [graphql-build]: packages/graphql-build/
 [graphql-build-pg]: packages/graphql-build-pg/
 [postgraphql-build]: packages/postgraphql-build/
 [graphql-parse-resolve-info]: packages/graphql-parse-resolve-info/
-[pg-sql2]: packages/pg-sql2/
