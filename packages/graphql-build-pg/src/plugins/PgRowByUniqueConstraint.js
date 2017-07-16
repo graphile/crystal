@@ -1,5 +1,4 @@
 const queryFromResolveData = require("../queryFromResolveData");
-const { GraphQLNonNull } = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
 
 module.exports = async function PgRowByUniqueConstraint(
@@ -18,6 +17,7 @@ module.exports = async function PgRowByUniqueConstraint(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+        graphql: { GraphQLNonNull },
       },
       { scope: { isRootQuery }, fieldWithHooks }
     ) => {

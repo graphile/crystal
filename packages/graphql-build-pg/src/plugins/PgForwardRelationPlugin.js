@@ -1,8 +1,5 @@
 const debug = require("debug")("graphql-build-pg");
 const queryFromResolveData = require("../queryFromResolveData");
-const { GraphQLNonNull } = require("graphql");
-const nullableIf = (condition, Type) =>
-  condition ? Type : new GraphQLNonNull(Type);
 
 module.exports = function PgForwardRelationPlugin(
   builder,
@@ -18,6 +15,7 @@ module.exports = function PgForwardRelationPlugin(
         getAliasFromResolveInfo,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
+        graphql: { GraphQLNonNull },
       },
       {
         scope: {
@@ -29,6 +27,8 @@ module.exports = function PgForwardRelationPlugin(
         fieldWithHooks,
       }
     ) => {
+      const nullableIf = (condition, Type) =>
+        condition ? Type : new GraphQLNonNull(Type);
       const table = pgIntrospectionTable || pgIntrospection;
       if (
         !(isPgRowType || isMutationPayload) ||

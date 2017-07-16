@@ -1,11 +1,3 @@
-const {
-  GraphQLObjectType,
-  GraphQLNonNull,
-  GraphQLID,
-  GraphQLList,
-  GraphQLInputObjectType,
-} = require("graphql");
-
 const base64 = str => new Buffer(String(str)).toString("base64");
 
 module.exports = function PgTablesPlugin(
@@ -27,6 +19,13 @@ module.exports = function PgTablesPlugin(
         pgGqlInputTypeByTypeId,
         pg2GqlMapper,
         gql2pg,
+        graphql: {
+          GraphQLObjectType,
+          GraphQLNonNull,
+          GraphQLID,
+          GraphQLList,
+          GraphQLInputObjectType,
+        },
       }
     ) => {
       const Cursor = getTypeByName("Cursor");

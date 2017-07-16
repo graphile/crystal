@@ -1,4 +1,3 @@
-const { GraphQLScalarType } = require("graphql");
 const { sign: signJwt } = require("jsonwebtoken");
 
 module.exports = function PgJWTPlugin(
@@ -17,6 +16,7 @@ module.exports = function PgJWTPlugin(
         pgGqlInputTypeByTypeId,
         pg2GqlMapper,
         pgTweaksByTypeId,
+        graphql: { GraphQLScalarType },
       }
     ) => {
       if (!pgJwtTypeIdentifier) {

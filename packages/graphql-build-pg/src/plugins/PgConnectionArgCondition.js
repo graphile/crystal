@@ -1,4 +1,3 @@
-const { GraphQLInputObjectType, GraphQLString } = require("graphql");
 module.exports = function PgConnectionArgCondition(
   builder,
   { pgInflection: inflection }
@@ -11,6 +10,7 @@ module.exports = function PgConnectionArgCondition(
         newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgGqlInputTypeByTypeId: gqlTypeByTypeId,
+        graphql: { GraphQLInputObjectType, GraphQLString },
       }
     ) => {
       introspectionResultsByKind.class.map(table => {

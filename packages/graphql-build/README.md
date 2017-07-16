@@ -11,31 +11,38 @@ object everywhere (including the root Query).
 ```js
 const { buildSchema, defaultPlugins } = require("graphql-build");
 // or import { buildSchema, defaultPlugins } from 'graphql-build';
-const { graphql, GraphQLInt } = require("graphql");
 
 // Create a simple plugin that adds a random field to every GraphQLObject
 function MyRandomFieldPlugin(
   builder,
   { myDefaultMin = 1, myDefaultMax = 100 }
 ) {
-  builder.hook("GraphQLObjectType:fields", (fields, { extend }) => {
-    return extend(fields, {
-      random: {
-        type: GraphQLInt,
-        args: {
-          sides: {
-            type: GraphQLInt,
+  builder.hook(
+    "GraphQLObjectType:fields",
+    (fields, { extend, graphql: { GraphQLInt } }) => {
+      return extend(fields, {
+        random: {
+          type: GraphQLInt,
+          args: {
+            sides: {
+              type: GraphQLInt,
+            },
+          },
+          resolve(_, { sides = myDefaultMax }) {
+            return (
+              Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
+              myDefaultMin
+            );
           },
         },
-        resolve(_, { sides = myDefaultMax }) {
-          return (
-            Math.floor(Math.random() * (sides + 1 - myDefaultMin)) + myDefaultMin
-          );
-        },
-      },
-    });
-  });
+      });
+    }
+  );
 }
+
+// ----------------------------------------
+
+const { graphql } = require("graphql");
 
 (async function() {
   // Create our GraphQL schema by applying all the plugins

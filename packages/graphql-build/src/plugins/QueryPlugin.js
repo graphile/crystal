@@ -1,5 +1,3 @@
-const { GraphQLObjectType, GraphQLNonNull } = require("graphql");
-
 module.exports = async function QueryPlugin(builder) {
   builder.hook("build", build =>
     build.extend(build, {
@@ -8,7 +6,15 @@ module.exports = async function QueryPlugin(builder) {
   );
   builder.hook(
     "GraphQLSchema",
-    (schema, { $$isQuery, newWithHooks, extend }) => {
+    (
+      schema,
+      {
+        $$isQuery,
+        newWithHooks,
+        extend,
+        graphql: { GraphQLObjectType, GraphQLNonNull },
+      }
+    ) => {
       const queryType = newWithHooks(
         GraphQLObjectType,
         {

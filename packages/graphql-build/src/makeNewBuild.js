@@ -1,10 +1,4 @@
-const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLEnumType,
-  getNamedType,
-} = require("graphql");
+const graphql = require("graphql");
 const {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
@@ -13,6 +7,14 @@ const {
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = require("debug")("graphql-build");
+
+const {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLInputObjectType,
+  GraphQLEnumType,
+  getNamedType,
+} = graphql;
 
 const mergeData = (data, gen, ReturnType, arg) => {
   const results = ensureArray(gen(arg, ReturnType, data));
@@ -71,6 +73,7 @@ module.exports = function makeNewBuild(builder) {
   const fieldDataGeneratorsByType = new Map();
 
   return {
+    graphql,
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,
     getAliasFromResolveInfo,
@@ -121,6 +124,9 @@ module.exports = function makeNewBuild(builder) {
       return Object.assign({}, obj, obj2);
     },
     newWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
+      if (!Type) {
+        throw new Error("No type specified!");
+      }
       if (!this.newWithHooks || !Object.isFrozen(this)) {
         throw new Error(
           "Please do not generate the schema during the build building phase, use 'init' instead"

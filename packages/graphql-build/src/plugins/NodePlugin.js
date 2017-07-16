@@ -1,9 +1,3 @@
-const {
-  GraphQLNonNull,
-  GraphQLID,
-  GraphQLInterfaceType,
-  getNullableType,
-} = require("graphql");
 const base64 = str => new Buffer(String(str)).toString("base64");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
@@ -45,7 +39,18 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
 
   builder.hook("init", function defineNodeInterfaceType(
     _,
-    { $$isQuery, $$nodeType, getTypeByName, newWithHooks }
+    {
+      $$isQuery,
+      $$nodeType,
+      getTypeByName,
+      newWithHooks,
+      graphql: {
+        GraphQLNonNull,
+        GraphQLID,
+        GraphQLInterfaceType,
+        getNullableType,
+      },
+    }
   ) {
     newWithHooks(GraphQLInterfaceType, {
       name: "Node",
@@ -89,6 +94,7 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
       extend,
       nodeFetcherByTypeName,
       getNodeType,
+      graphql: { GraphQLNonNull, GraphQLID },
     },
     { scope: { isRootQuery } }
   ) {

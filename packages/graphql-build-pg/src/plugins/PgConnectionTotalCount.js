@@ -1,11 +1,9 @@
-const { GraphQLInt } = require("graphql");
-
 module.exports = function PgConnectionTotalCount(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
       fields,
-      { extend, pgInflection: inflection },
+      { extend, pgInflection: inflection, graphql: { GraphQLInt } },
       {
         scope: { isPgRowConnectionType, pgIntrospection: table },
         fieldWithHooks,

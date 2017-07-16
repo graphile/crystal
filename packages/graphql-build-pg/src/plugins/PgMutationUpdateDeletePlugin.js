@@ -1,11 +1,4 @@
 const queryFromResolveData = require("../queryFromResolveData");
-const {
-  GraphQLNonNull,
-  GraphQLInputObjectType,
-  GraphQLString,
-  GraphQLObjectType,
-  GraphQLID,
-} = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
 const debug = require("debug")("graphql-build-pg");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
@@ -35,6 +28,13 @@ module.exports = async function PgMutationUpdateDeletePlugin(
         pgSql: sql,
         pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         getNodeType,
+        graphql: {
+          GraphQLNonNull,
+          GraphQLInputObjectType,
+          GraphQLString,
+          GraphQLObjectType,
+          GraphQLID,
+        },
       },
       { scope: { isRootMutation }, fieldWithHooks }
     ) => {

@@ -1,9 +1,3 @@
-const {
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLNonNull,
-  GraphQLString,
-} = require("graphql");
 const queryFromResolveData = require("../queryFromResolveData");
 const debugSql = require("debug")("graphql-build-pg:sql");
 const debug = require("debug")("graphql-build-pg");
@@ -27,6 +21,12 @@ module.exports = function PgMutationCreatePlugin(
         pgIntrospectionResultsByKind,
         pgSql: sql,
         gql2pg,
+        graphql: {
+          GraphQLObjectType,
+          GraphQLInputObjectType,
+          GraphQLNonNull,
+          GraphQLString,
+        },
       },
       { scope: { isRootMutation }, fieldWithHooks }
     ) => {

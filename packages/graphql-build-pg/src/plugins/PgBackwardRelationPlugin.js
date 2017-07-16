@@ -1,6 +1,5 @@
 const debug = require("debug")("graphql-build-pg");
 const queryFromResolveData = require("../queryFromResolveData");
-const { GraphQLNonNull } = require("graphql");
 const addStartEndCursor = require("./addStartEndCursor");
 
 module.exports = function PgBackwardRelationPlugin(
@@ -17,6 +16,7 @@ module.exports = function PgBackwardRelationPlugin(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         getAliasFromResolveInfo,
+        graphql: { GraphQLNonNull },
       },
       { scope: { isPgRowType, pgIntrospection: foreignTable }, fieldWithHooks }
     ) => {

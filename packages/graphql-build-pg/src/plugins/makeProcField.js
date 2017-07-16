@@ -1,15 +1,3 @@
-const {
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  getNamedType,
-  isCompositeType,
-} = require("graphql");
 const debugSql = require("debug")("graphql-build-pg:sql");
 const camelCase = require("lodash/camelCase");
 const pluralize = require("pluralize");
@@ -23,22 +11,6 @@ const firstValue = obj => {
 };
 const addStartEndCursor = require("./addStartEndCursor");
 
-function getResultFieldName(gqlType, type, returnsSet) {
-  const gqlNamedType = getNamedType(gqlType);
-  let name;
-  if (gqlNamedType === GraphQLInt) {
-    name = "integer";
-  } else if (gqlNamedType === GraphQLFloat) {
-    name = "float";
-  } else if (gqlNamedType === GraphQLBoolean) {
-    name = "boolean";
-  } else if (gqlNamedType === GraphQLString) {
-    name = "string";
-  } else {
-    name = camelCase(gqlNamedType.name);
-  }
-  return returnsSet || type.arrayItemType ? pluralize(name) : name;
-}
 module.exports = function makeProcField(
   fieldName,
   proc,
@@ -56,9 +28,37 @@ module.exports = function makeProcField(
     pgInflection: inflection,
     pgStrictFunctions: strictFunctions,
     pgTweakFragmentForType,
+    graphql: {
+      GraphQLNonNull,
+      GraphQLList,
+      GraphQLString,
+      GraphQLInt,
+      GraphQLFloat,
+      GraphQLBoolean,
+      GraphQLObjectType,
+      GraphQLInputObjectType,
+      getNamedType,
+      isCompositeType,
+    },
   },
   { fieldWithHooks, computed = false, isMutation = false }
 ) {
+  function getResultFieldName(gqlType, type, returnsSet) {
+    const gqlNamedType = getNamedType(gqlType);
+    let name;
+    if (gqlNamedType === GraphQLInt) {
+      name = "integer";
+    } else if (gqlNamedType === GraphQLFloat) {
+      name = "float";
+    } else if (gqlNamedType === GraphQLBoolean) {
+      name = "boolean";
+    } else if (gqlNamedType === GraphQLString) {
+      name = "string";
+    } else {
+      name = camelCase(gqlNamedType.name);
+    }
+    return returnsSet || type.arrayItemType ? pluralize(name) : name;
+  }
   if (computed && isMutation) {
     throw new Error("Mutation procedure cannot be computed");
   }

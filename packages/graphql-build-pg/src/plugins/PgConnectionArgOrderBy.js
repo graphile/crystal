@@ -1,4 +1,3 @@
-const { GraphQLEnumType } = require("graphql");
 const isString = require("lodash/isString");
 
 module.exports = function PgConnectionArgOrderBy(
@@ -9,7 +8,11 @@ module.exports = function PgConnectionArgOrderBy(
     "init",
     (
       _,
-      { newWithHooks, pgIntrospectionResultsByKind: introspectionResultsByKind }
+      {
+        newWithHooks,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        graphql: { GraphQLEnumType },
+      }
     ) => {
       introspectionResultsByKind.class.map(table => {
         const tableTypeName = inflection.tableType(

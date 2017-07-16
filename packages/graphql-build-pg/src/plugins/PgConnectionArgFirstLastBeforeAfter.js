@@ -1,12 +1,11 @@
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
-const { GraphQLInt } = require("graphql");
 
 module.exports = function PgConnectionArgs(builder) {
   builder.hook(
     "field:args",
     (
       args,
-      { extend, getTypeByName },
+      { extend, getTypeByName, graphql: { GraphQLInt } },
       {
         scope: { isPgConnectionField, pgIntrospection: source },
         addArgDataGenerator,
