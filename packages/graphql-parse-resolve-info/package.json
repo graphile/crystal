@@ -28,6 +28,7 @@
     "graphql": ">=0.9 <1"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "jest": "20.0.4"
   },
   "jest": {
