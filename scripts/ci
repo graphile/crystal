@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -Rf packages/pg-sql2
+
 set -e
 echo "[1/4]: Building Code"
 lerna run prepublish
