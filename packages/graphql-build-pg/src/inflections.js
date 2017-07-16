@@ -1,14 +1,24 @@
-const upperFirst = require("lodash/upperFirst");
-const lowerFirst = require("lodash/lowerFirst");
-const camelCase = require("lodash/camelCase");
 const pluralize = require("pluralize");
+const upperFirstAll = require("lodash/upperFirst");
+const lowerFirstAll = require("lodash/lowerFirst");
+const camelCaseAll = require("lodash/camelCase");
 
-const constantCase = str =>
+const constantCaseAll = str =>
   lowerFirst(str.replace(/^[^a-z0-9_]+/gi, ""))
     .replace(/[^a-z0-9_]+/gi, "_")
     .replace(/[A-Z]/g, str => `_${str.toLowerCase()}`)
     .replace(/__+/g, "_")
     .toUpperCase();
+
+const formatInsideUnderscores = fn => str => {
+  const [, start, middle, end] = str.match(/^(_*)([\s\S]*?)(_*)$/);
+  return `${start}${fn(middle)}${end}`;
+};
+
+const upperFirst = formatInsideUnderscores(upperFirstAll);
+const lowerFirst = formatInsideUnderscores(lowerFirstAll);
+const camelCase = formatInsideUnderscores(camelCaseAll);
+const constantCase = formatInsideUnderscores(constantCaseAll);
 
 exports.defaultInflection = {
   pluralize,
