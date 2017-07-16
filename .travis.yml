@@ -19,7 +19,6 @@ cache:
     - packages/graphql-parse-resolve-info/node_modules
     - packages/postgraphql-build/node_modules
     - packages/graphql-build/node_modules
-    - packages/pg-sql2/node_modules
 
 install:
   - yarn
