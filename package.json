@@ -29,7 +29,8 @@
     "build": "./scripts/build",
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
-    "test": "./scripts/test"
+    "test": "./scripts/test",
+    "prepack": "./scripts/build"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -94,5 +95,9 @@
       "<rootDir>/src"
     ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
-  }
+  },
+  "files": [
+    "build",
+    "resources"
+  ]
 }
