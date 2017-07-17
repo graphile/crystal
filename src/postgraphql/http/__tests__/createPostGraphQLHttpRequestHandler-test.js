@@ -39,6 +39,16 @@ const gqlSchema = new GraphQLSchema({
         resolve: (source, args, context) =>
           context[$$pgClient].query('EXECUTE'),
       },
+      testError: {
+        type: GraphQLString,
+        resolve: (source, args, context) => {
+          const err = new Error('test message')
+          err.detail = 'test detail'
+          err.hint = 'test hint'
+          err.code = '12345'
+          throw err
+        },
+      },
     },
   }),
   mutation: new GraphQLObjectType({
@@ -106,6 +116,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     createServerFromHandler(createPostGraphQLHttpRequestHandler(Object.assign({}, defaultOptions, options)))
 
   describe(name, () => {
+
     test('will 404 for route other than that specified', async () => {
       const server1 = createServer()
       const server2 = createServer({ graphqlRoute: '/x' })
@@ -386,6 +397,47 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .send({ query: '{hello}', operationName: 2 })
         .expect(400)
         .expect({ errors: [{ message: 'Operation name must be a string, not \'number\'.' }] })
+      )
+    })
+
+    test('will report a simple error in the default case', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer()
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { testError: null }, errors: [ {
+          message: 'test message',
+          locations: [{ line: 1, column: 2 }],
+          path: ['testError'],
+        } ] })
+      )
+    })
+
+    test('will report an extended error when extendedErrors is enabled', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({ extendedErrors: ['hint', 'detail', 'errcode'] })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { testError: null }, errors: [ {
+          message: 'test message',
+          locations: [{ line: 1, column: 2 }],
+          path: ['testError'],
+          hint: 'test hint',
+          detail: 'test detail',
+          errcode: '12345',
+        } ] })
       )
     })
 

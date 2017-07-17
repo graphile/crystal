@@ -11,7 +11,6 @@ export function extendedFormatError(error: GraphQLError, fields: Array<String>):
     throw new Error('Received null or undefined error.')
   }
   const originalError = error.originalError as GraphQLErrorExtended
-  fields = fields.map(field => field.toLowerCase())
   return {
     message: error.message,
     locations: error.locations,
