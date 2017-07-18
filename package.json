@@ -98,6 +98,8 @@
   },
   "files": [
     "build",
-    "resources"
+    "resources/favicon.ico",
+    "resources/introspection-query.sql",
+    "resources/watch-fixtures.sql"
   ]
 }
