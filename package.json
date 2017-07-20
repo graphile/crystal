@@ -24,7 +24,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.50.0",
-    "graphql": "^0.10.3",
+    "graphql": "^0.10.5",
     "pg": ">=6 < 7",
     "sql-formatter": "^1.2.2"
   }
