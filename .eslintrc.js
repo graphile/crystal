@@ -1,5 +1,8 @@
 module.exports = {
   parser: "babel-eslint",
+  parserOptions: {
+    sourceType: "module",
+  },
   extends: ["eslint:recommended", "prettier"],
   plugins: ["jest", "prettier"],
   env: {

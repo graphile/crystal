@@ -3,6 +3,7 @@
     "babel-cli": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-preset-env": "^1.6.0",
+    "concurrently": "^3.5.0",
     "eslint": "^4.0.0",
     "eslint-config-prettier": "2.3.0",
     "eslint-plugin-jest": "^20.0.3",
@@ -15,12 +16,15 @@
     "lint": "eslint packages",
     "flow": "flow",
     "flow:check": "flow check",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "prepublish": "for I in packages/*/; do echo \"cd $I && npm run prepublish\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently",
+    "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
   "dependencies": {
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.50.0",

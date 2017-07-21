@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest .",
-    "prepublish": "babel --out-dir lib src"
+    "prepublish": "mkdir -p node8plus node7minus && babel --out-dir node8plus src && BABEL_ENV=node7minus babel --out-dir node7minus src",
+    "watch": "mkdir -p node8plus && babel --watch --out-dir node8plus src"
   },
   "repository": {
     "type": "git",
@@ -39,8 +40,8 @@
     "debug": ">=2 <3"
   },
   "files": [
-    "src",
-    "lib",
+    "node8plus",
+    "node7minus",
     "index.js"
   ]
 }

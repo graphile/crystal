@@ -2,7 +2,7 @@
 
 set -e
 echo "[1/4]: Building Code"
-lerna run prepublish
+npm run prepublish
 
 echo "[2/4]: Linting Code"
 npm run lint

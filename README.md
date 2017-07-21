@@ -38,19 +38,18 @@ Status
 Running on Node less than v8
 ----------------------------
 
-On Node v8 and above, we run the code in the `src` folders directly as modern
-Node has basically everything you need (except [object
-splatting](https://github.com/tc39/proposal-object-rest-spread), but we make
-do), including async/await, so there's no need for source transpiling, source
-maps, polyfills, and other such workarounds.
+We actually bundle two copies of each module - one compiled for Node v8+ and
+one for Node v4+. This is accomplished using [Babel's env
+preset](https://babeljs.io/docs/plugins/preset-env/). You can see the
+switching code in, e.g.,
+[packages/graphql-build/index.js](packages/graphql-build/index.js). This has a
+couple consequences:
 
-However before Node v8 we need various helpers, even such simple things as
-`Array.prototype.includes`, and so we bundle
-[`babel-polyfill`](http://babeljs.io/docs/usage/polyfill/). It's marked as a
-peer-dependency, so we'll use the version you provide (to avoid it being
-installed too many times!) and it is **only loaded** if you're on a Node
-version before v8 - you can see the switching code in, e.g.,
-[packages/graphql-build/index.js](packages/graphql-build/index.js).
+- We'll run a lot faster on Node v8 because most of the code is passed through
+  verbatim - for example we can use Node v8+'s built in `async/await` rather
+  than emulating with generators/promises/etc
+- When we're developing we only compile the Node v8+ version so we can minimize
+  latency, so if you wish to contribute keep your Node up to date!
 
 You're highly encouraged to upgrade to Node v8, not just for the fancy new
 features but also the performance improvements!
