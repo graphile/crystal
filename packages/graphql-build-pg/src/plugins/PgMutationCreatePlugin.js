@@ -1,8 +1,10 @@
-const queryFromResolveData = require("../queryFromResolveData");
-const debugSql = require("debug")("graphql-build-pg:sql");
-const debug = require("debug")("graphql-build-pg");
+import queryFromResolveData from "../queryFromResolveData";
+import debugFactory from "debug";
 
-module.exports = function PgMutationCreatePlugin(
+const debug = debugFactory("graphql-build-pg");
+const debugSql = debugFactory("graphql-build-pg:sql");
+
+export default function PgMutationCreatePlugin(
   builder,
   { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
@@ -189,8 +191,7 @@ module.exports = function PgMutationCreatePlugin(
                     ) ${query}
                     `;
                   const { text, values } = sql.compile(queryWithInsert);
-                  if (debugSql.enabled)
-                    debugSql(require("sql-formatter").format(text));
+                  if (debugSql.enabled) debugSql(text);
                   const { rows: [row] } = await pgClient.query(text, values);
                   return {
                     clientMutationId: input.clientMutationId,
@@ -204,4 +205,4 @@ module.exports = function PgMutationCreatePlugin(
       );
     }
   );
-};
+}

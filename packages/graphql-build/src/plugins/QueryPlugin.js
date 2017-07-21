@@ -1,4 +1,4 @@
-module.exports = async function QueryPlugin(builder) {
+export default async function QueryPlugin(builder) {
   builder.hook("build", build =>
     build.extend(build, {
       $$isQuery: Symbol("isQuery"),
@@ -46,4 +46,4 @@ module.exports = async function QueryPlugin(builder) {
       }
     }
   );
-};
+}

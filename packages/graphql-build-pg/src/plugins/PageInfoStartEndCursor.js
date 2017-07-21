@@ -1,4 +1,4 @@
-module.exports = function PageInfoStartEndCursor(builder) {
+export default function PageInfoStartEndCursor(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (fields, { extend, getTypeByName }, { Self }) => {
@@ -18,4 +18,4 @@ module.exports = function PageInfoStartEndCursor(builder) {
       });
     }
   );
-};
+}

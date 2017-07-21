@@ -1,7 +1,10 @@
-const debugSql = require("debug")("graphql-build-pg:sql");
-const camelCase = require("lodash/camelCase");
-const pluralize = require("pluralize");
-const queryFromResolveData = require("../queryFromResolveData");
+import debugFactory from "debug";
+import camelCase from "lodash/camelCase";
+import pluralize from "pluralize";
+import queryFromResolveData from "../queryFromResolveData";
+import addStartEndCursor from "./addStartEndCursor";
+
+const debugSql = debugFactory("graphql-build-pg:sql");
 const firstValue = obj => {
   let firstKey;
   for (const k in obj) {
@@ -9,9 +12,8 @@ const firstValue = obj => {
   }
   return obj[firstKey];
 };
-const addStartEndCursor = require("./addStartEndCursor");
 
-module.exports = function makeProcField(
+export default function makeProcField(
   fieldName,
   proc,
   {
@@ -372,8 +374,7 @@ module.exports = function makeProcField(
               );
 
               const { text, values } = sql.compile(query);
-              if (debugSql.enabled)
-                debugSql(require("sql-formatter").format(text));
+              if (debugSql.enabled) debugSql(text);
               const { rows } = await pgClient.query(text, values);
               const [row] = rows;
               const result = (() => {
@@ -411,4 +412,4 @@ module.exports = function makeProcField(
     },
     scope
   );
-};
+}

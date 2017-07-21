@@ -1,12 +1,14 @@
-const graphql = require("graphql");
-const {
+import * as graphql from "graphql";
+import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo,
-} = require("graphql-parse-resolve-info");
+} from "graphql-parse-resolve-info";
+import debugFactory from "debug";
+
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
-const debug = require("debug")("graphql-build");
+const debug = debugFactory("graphql-build");
 
 const {
   GraphQLSchema,
@@ -55,7 +57,7 @@ if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   };
 }
 
-module.exports = function makeNewBuild(builder) {
+export default function makeNewBuild(builder) {
   const allTypes = {};
 
   // Every object type gets fieldData associated with each of its
@@ -484,4 +486,4 @@ module.exports = function makeNewBuild(builder) {
       return Self;
     },
   };
-};
+}

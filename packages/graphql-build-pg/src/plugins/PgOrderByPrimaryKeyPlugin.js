@@ -1,4 +1,4 @@
-module.exports = function PgOrderByPrimaryKeyPlugin(builder) {
+export default function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
     "GraphQLEnumType:values",
     (
@@ -41,4 +41,4 @@ module.exports = function PgOrderByPrimaryKeyPlugin(builder) {
       });
     }
   );
-};
+}

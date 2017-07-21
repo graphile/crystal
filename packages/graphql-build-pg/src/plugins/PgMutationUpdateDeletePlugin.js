@@ -1,11 +1,13 @@
-const queryFromResolveData = require("../queryFromResolveData");
-const debugSql = require("debug")("graphql-build-pg:sql");
-const debug = require("debug")("graphql-build-pg");
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
-const camelCase = require("lodash/camelCase");
-const pluralize = require("pluralize");
+import queryFromResolveData from "../queryFromResolveData";
+import debugFactory from "debug";
+import camelCase from "lodash/camelCase";
+import pluralize from "pluralize";
 
-module.exports = async function PgMutationUpdateDeletePlugin(
+const debugSql = debugFactory("graphql-build-pg:sql");
+const debug = debugFactory("graphql-build-pg");
+const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
+
+export default async function PgMutationUpdateDeletePlugin(
   builder,
   { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
@@ -136,8 +138,7 @@ module.exports = async function PgMutationUpdateDeletePlugin(
                       `;
                   }
                   const { text, values } = sql.compile(queryWithMutation);
-                  if (debugSql.enabled)
-                    debugSql(require("sql-formatter").format(text));
+                  if (debugSql.enabled) debugSql(text);
                   const { rows: [row] } = await pgClient.query(text, values);
                   if (!row) {
                     throw new Error(
@@ -478,4 +479,4 @@ module.exports = async function PgMutationUpdateDeletePlugin(
       );
     }
   );
-};
+}

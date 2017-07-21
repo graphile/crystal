@@ -1,11 +1,10 @@
-const queryFromResolveData = require("../queryFromResolveData");
-const debugSql = require("debug")("graphql-build-pg:sql");
-const addStartEndCursor = require("./addStartEndCursor");
+import queryFromResolveData from "../queryFromResolveData";
+import debugFactory from "debug";
+import addStartEndCursor from "./addStartEndCursor";
 
-module.exports = async function PgAllRows(
-  builder,
-  { pgInflection: inflection }
-) {
+const debugSql = debugFactory("graphql-build-pg:sql");
+
+export default async function PgAllRows(builder, { pgInflection: inflection }) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -104,8 +103,7 @@ module.exports = async function PgAllRows(
                         }
                       );
                       const { text, values } = sql.compile(query);
-                      if (debugSql.enabled)
-                        debugSql(require("sql-formatter").format(text));
+                      if (debugSql.enabled) debugSql(text);
                       const { rows: [row] } = await pgClient.query(
                         text,
                         values
@@ -125,4 +123,4 @@ module.exports = async function PgAllRows(
       );
     }
   );
-};
+}

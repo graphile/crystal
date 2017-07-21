@@ -5,4 +5,4 @@ const bindAll = (obj, keys) => {
   return obj;
 };
 
-exports.bindAll = bindAll;
+export { bindAll };

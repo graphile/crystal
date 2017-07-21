@@ -1,8 +1,9 @@
-const debug = require("debug")("graphql-builder");
-const makeNewBuild = require("./makeNewBuild");
-const { bindAll } = require("./utils");
-const { GraphQLSchema } = require("graphql");
-const EventEmitter = require("events");
+import debugFactory from "debug";
+const debug = debugFactory("graphql-builder");
+import makeNewBuild from "./makeNewBuild";
+import { bindAll } from "./utils";
+import { GraphQLSchema } from "graphql";
+import EventEmitter from "events";
 
 const INDENT = "  ";
 
@@ -213,4 +214,4 @@ class SchemaBuilder extends EventEmitter {
   }
 }
 
-module.exports = SchemaBuilder;
+export default SchemaBuilder;

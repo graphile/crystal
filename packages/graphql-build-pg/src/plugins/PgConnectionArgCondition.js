@@ -1,4 +1,4 @@
-module.exports = function PgConnectionArgCondition(
+export default function PgConnectionArgCondition(
   builder,
   { pgInflection: inflection }
 ) {
@@ -123,4 +123,4 @@ module.exports = function PgConnectionArgCondition(
       });
     }
   );
-};
+}

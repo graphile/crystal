@@ -1,8 +1,15 @@
-exports[
-  "ClientMutationIdDescriptionPlugin"
-] = require("./ClientMutationIdDescriptionPlugin");
-exports["MutationPayloadQueryPlugin"] = require("./MutationPayloadQueryPlugin");
-exports["MutationPlugin"] = require("./MutationPlugin");
-exports["NodePlugin"] = require("./NodePlugin");
-exports["QueryPlugin"] = require("./QueryPlugin");
-exports["StandardTypesPlugin"] = require("./StandardTypesPlugin");
+import ClientMutationIdDescriptionPlugin from "./ClientMutationIdDescriptionPlugin";
+import MutationPayloadQueryPlugin from "./MutationPayloadQueryPlugin";
+import MutationPlugin from "./MutationPlugin";
+import NodePlugin from "./NodePlugin";
+import QueryPlugin from "./QueryPlugin";
+import StandardTypesPlugin from "./StandardTypesPlugin";
+
+export {
+  ClientMutationIdDescriptionPlugin,
+  MutationPayloadQueryPlugin,
+  MutationPlugin,
+  NodePlugin,
+  QueryPlugin,
+  StandardTypesPlugin,
+};

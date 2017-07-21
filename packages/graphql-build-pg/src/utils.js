@@ -1,6 +1,6 @@
-const sql = require("pg-sql2");
+import sql from "pg-sql2";
 
-exports.sqlJsonBuildObjectFromFragments = fragments => {
+export const sqlJsonBuildObjectFromFragments = fragments => {
   return sql.fragment`
     json_build_object(
       ${sql.join(

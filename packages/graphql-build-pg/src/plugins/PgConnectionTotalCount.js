@@ -1,4 +1,4 @@
-module.exports = function PgConnectionTotalCount(builder) {
+export default function PgConnectionTotalCount(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -36,4 +36,4 @@ module.exports = function PgConnectionTotalCount(builder) {
       });
     }
   );
-};
+}

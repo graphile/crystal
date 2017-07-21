@@ -1,4 +1,4 @@
-module.exports = function PgOrderAllColumnsPlugin(
+export default function PgOrderAllColumnsPlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -46,4 +46,4 @@ module.exports = function PgOrderAllColumnsPlugin(
       );
     }
   );
-};
+}

@@ -1,9 +1,6 @@
 const base64 = str => new Buffer(String(str)).toString("base64");
 
-module.exports = function PgTablesPlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+export default function PgTablesPlugin(builder, { pgInflection: inflection }) {
   builder.hook(
     "init",
     (
@@ -110,4 +107,4 @@ module.exports = function PgTablesPlugin(
       return _;
     }
   );
-};
+}

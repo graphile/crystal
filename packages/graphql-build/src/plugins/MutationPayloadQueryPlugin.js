@@ -1,4 +1,4 @@
-module.exports = function MutationPayloadQueryPlugin(builder) {
+export default function MutationPayloadQueryPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -22,4 +22,4 @@ module.exports = function MutationPayloadQueryPlugin(builder) {
       });
     }
   );
-};
+}

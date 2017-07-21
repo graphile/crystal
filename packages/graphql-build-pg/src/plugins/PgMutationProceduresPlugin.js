@@ -1,6 +1,6 @@
-const makeProcField = require("./makeProcField");
+import makeProcField from "./makeProcField";
 
-module.exports = function PgMutationProceduresPlugin(builder) {
+export default function PgMutationProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
@@ -57,4 +57,4 @@ module.exports = function PgMutationProceduresPlugin(builder) {
       );
     }
   );
-};
+}

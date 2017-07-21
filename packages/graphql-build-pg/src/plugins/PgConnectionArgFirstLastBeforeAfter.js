@@ -1,6 +1,6 @@
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
-module.exports = function PgConnectionArgs(builder) {
+export default function PgConnectionArgs(builder) {
   builder.hook(
     "field:args",
     (
@@ -84,4 +84,4 @@ module.exports = function PgConnectionArgs(builder) {
       });
     }
   );
-};
+}

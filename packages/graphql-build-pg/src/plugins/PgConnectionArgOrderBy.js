@@ -1,6 +1,6 @@
-const isString = require("lodash/isString");
+import isString from "lodash/isString";
 
-module.exports = function PgConnectionArgOrderBy(
+export default function PgConnectionArgOrderBy(
   builder,
   { pgInflection: inflection }
 ) {
@@ -101,4 +101,4 @@ module.exports = function PgConnectionArgOrderBy(
       });
     }
   );
-};
+}

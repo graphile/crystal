@@ -1,6 +1,6 @@
-const { sign: signJwt } = require("jsonwebtoken");
+import { sign as signJwt } from "jsonwebtoken";
 
-module.exports = function PgJWTPlugin(
+export default function PgJWTPlugin(
   builder,
   { pgInflection: inflection, pgJwtTypeIdentifier, pgJwtSecret }
 ) {
@@ -107,7 +107,7 @@ module.exports = function PgJWTPlugin(
       return _;
     }
   );
-};
+}
 
 function parseTypeIdentifier(typeIdentifier) {
   const match = typeIdentifier.match(

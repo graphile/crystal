@@ -1,8 +1,10 @@
-const queryFromResolveData = require("../queryFromResolveData");
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
-const debugSql = require("debug")("graphql-build-pg:sql");
+import queryFromResolveData from "../queryFromResolveData";
+import debugFactory from "debug";
 
-module.exports = async function PgRowByUniqueConstraint(
+const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
+const debugSql = debugFactory("graphql-build-pg:sql");
+
+export default async function PgRowByUniqueConstraint(
   builder,
   { pgInflection: inflection }
 ) {
@@ -65,7 +67,7 @@ module.exports = async function PgRowByUniqueConstraint(
             }
           );
           const { text, values } = sql.compile(query);
-          if (debugSql.enabled) debugSql(require("sql-formatter").format(text));
+          if (debugSql.enabled) debugSql(text);
           const { rows: [row] } = await pgClient.query(text, values);
           return row;
         }
@@ -179,8 +181,7 @@ module.exports = async function PgRowByUniqueConstraint(
                           }
                         );
                         const { text, values } = sql.compile(query);
-                        if (debugSql.enabled)
-                          debugSql(require("sql-formatter").format(text));
+                        if (debugSql.enabled) debugSql(text);
                         const { rows: [row] } = await pgClient.query(
                           text,
                           values
@@ -199,4 +200,4 @@ module.exports = async function PgRowByUniqueConstraint(
       );
     }
   );
-};
+}

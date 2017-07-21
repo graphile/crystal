@@ -1,7 +1,8 @@
-const withPgClient = require("../withPgClient");
-const { readFile: rawReadFile } = require("fs");
-const pg = require("pg");
-const debug = require("debug")("graphql-build-pg");
+import withPgClient from "../withPgClient";
+import { readFile as rawReadFile } from "fs";
+import pg from "pg";
+import debugFactory from "debug";
+const debug = debugFactory("graphql-build-pg");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
@@ -14,7 +15,7 @@ function readFile(filename, encoding) {
   });
 }
 
-module.exports = async function PgIntrospectionPlugin(
+export default async function PgIntrospectionPlugin(
   builder,
   { pgConfig, pgSchemas: schemas }
 ) {
@@ -264,4 +265,4 @@ module.exports = async function PgIntrospectionPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
     });
   });
-};
+}

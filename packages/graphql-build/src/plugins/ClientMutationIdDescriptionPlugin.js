@@ -1,4 +1,4 @@
-module.exports = function ClientMutationIdDescriptionPlugin(builder) {
+export default function ClientMutationIdDescriptionPlugin(builder) {
   builder.hook(
     "inputField",
     (field, { extend }, { scope: { isMutationInput, fieldName } }) => {
@@ -47,4 +47,4 @@ module.exports = function ClientMutationIdDescriptionPlugin(builder) {
       });
     }
   );
-};
+}

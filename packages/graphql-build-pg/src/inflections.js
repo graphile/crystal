@@ -1,7 +1,7 @@
-const pluralize = require("pluralize");
-const upperFirstAll = require("lodash/upperFirst");
-const lowerFirstAll = require("lodash/lowerFirst");
-const camelCaseAll = require("lodash/camelCase");
+import pluralize from "pluralize";
+import upperFirstAll from "lodash/upperFirst";
+import lowerFirstAll from "lodash/lowerFirst";
+import camelCaseAll from "lodash/camelCase";
 
 const constantCaseAll = str =>
   lowerFirst(str.replace(/^[^a-z0-9_]+/gi, ""))
@@ -20,7 +20,7 @@ const lowerFirst = formatInsideUnderscores(lowerFirstAll);
 const camelCase = formatInsideUnderscores(camelCaseAll);
 const constantCase = formatInsideUnderscores(constantCaseAll);
 
-exports.defaultInflection = {
+export const defaultInflection = {
   pluralize,
   argument(name, index) {
     return camelCase(name || `arg${index}`);
@@ -174,15 +174,15 @@ exports.defaultInflection = {
   },
 };
 
-exports.postGraphQLInflection = Object.assign({}, exports.defaultInflection, {
+export const postGraphQLInflection = Object.assign({}, defaultInflection, {
   enumName(value) {
     return constantCase(value);
   },
 });
 
-exports.postGraphQLClassicIdsInflection = Object.assign(
+export const postGraphQLClassicIdsInflection = Object.assign(
   {},
-  exports.postGraphQLInflection,
+  postGraphQLInflection,
   {
     column(name, _table, _schema) {
       return name === "id" ? "rowId" : camelCase(name);

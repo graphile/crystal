@@ -1,6 +1,6 @@
-const sql = require("pg-sql2");
+import sql from "pg-sql2";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
-const isSafeInteger = require("lodash/isSafeInteger");
+import isSafeInteger from "lodash/isSafeInteger";
 
 const callIfNecessary = o => {
   if (typeof o === "function") {
@@ -311,4 +311,4 @@ class QueryBuilder {
   }
 }
 
-module.exports = QueryBuilder;
+export default QueryBuilder;

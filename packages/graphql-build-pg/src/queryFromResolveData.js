@@ -1,8 +1,8 @@
-const QueryBuilder = require("./QueryBuilder");
-const sql = require("pg-sql2");
-const isSafeInteger = require("lodash/isSafeInteger");
+import QueryBuilder from "./QueryBuilder";
+import sql from "pg-sql2";
+import isSafeInteger from "lodash/isSafeInteger";
 
-module.exports = (from, fromAlias, resolveData, options, withBuilder) => {
+export default (from, fromAlias, resolveData, options, withBuilder) => {
   const {
     pgQuery,
     pgCursorPrefix: reallyRawCursorPrefix,

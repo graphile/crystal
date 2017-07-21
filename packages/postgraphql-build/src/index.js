@@ -1,8 +1,8 @@
-const { defaultPlugins, getBuilder } = require("graphql-build");
-const {
-  defaultPlugins: pgDefaultPlugins,
+import { defaultPlugins, getBuilder } from "graphql-build";
+import {
+  defaultPlugins as pgDefaultPlugins,
   inflections,
-} = require("graphql-build-pg");
+} from "graphql-build-pg";
 
 const ensureValidPlugins = (name, arr) => {
   if (!Array.isArray(arr)) {
@@ -61,7 +61,7 @@ const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
   );
 };
 
-exports.createPostGraphQLSchema = async (pgConfig, schemas, options) => {
+export const createPostGraphQLSchema = async (pgConfig, schemas, options) => {
   const builder = await getPostGraphQLBuilder(pgConfig, schemas, options);
   return builder.buildSchema();
 };
@@ -69,7 +69,7 @@ exports.createPostGraphQLSchema = async (pgConfig, schemas, options) => {
 /*
  * Unless an error occurs, `onNewSchema` is guaranteed to be called before this promise resolves
  */
-exports.watchPostGraphQLSchema = async (
+export const watchPostGraphQLSchema = async (
   pgConfig,
   schemas,
   options,

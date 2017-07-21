@@ -1,6 +1,6 @@
-const isString = require("lodash/isString");
+import isString from "lodash/isString";
 
-module.exports = function PgMutationPayloadEdgePlugin(
+export default function PgMutationPayloadEdgePlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -89,4 +89,4 @@ module.exports = function PgMutationPayloadEdgePlugin(
       });
     }
   );
-};
+}

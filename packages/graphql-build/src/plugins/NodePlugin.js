@@ -1,7 +1,7 @@
 const base64 = str => new Buffer(String(str)).toString("base64");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
-module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
+export default function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
   builder.hook("build", build => {
     const nodeFetcherByTypeName = {};
     const nodeAliasByTypeName = {};
@@ -149,4 +149,4 @@ module.exports = function NodePlugin(builder, { nodeIdFieldName = "nodeId" }) {
       },
     });
   });
-};
+}

@@ -1,4 +1,4 @@
-module.exports = async function MutationPlugin(builder) {
+export default async function MutationPlugin(builder) {
   builder.hook(
     "GraphQLSchema",
     (schema, { newWithHooks, extend, graphql: { GraphQLObjectType } }) => {
@@ -21,4 +21,4 @@ module.exports = async function MutationPlugin(builder) {
       }
     }
   );
-};
+}

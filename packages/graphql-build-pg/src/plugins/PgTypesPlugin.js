@@ -1,4 +1,4 @@
-const {
+import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLInt,
@@ -10,9 +10,9 @@ const {
   GraphQLInputObjectType,
   GraphQLScalarType,
   isInputType,
-} = require("graphql");
-const { Kind } = require("graphql/language");
-const { types: pgTypes } = require("pg");
+} from "graphql";
+import { Kind } from "graphql/language";
+import { types as pgTypes } from "pg";
 const stringType = (name, description) =>
   new GraphQLScalarType({
     name,
@@ -26,8 +26,8 @@ const stringType = (name, description) =>
       return ast.value;
     },
   });
-const rawParseInterval = require("postgres-interval");
-const LRU = require("lru-cache");
+import rawParseInterval from "postgres-interval";
+import LRU from "lru-cache";
 /*
 const {
   GraphQLDate,
@@ -85,7 +85,7 @@ const pgRangeParser = {
   },
 };
 
-module.exports = function PgTypesPlugin(
+export default function PgTypesPlugin(
   builder,
   { pgExtendedTypes = true, pgInflection: inflection }
 ) {
@@ -546,4 +546,4 @@ module.exports = function PgTypesPlugin(
       pgTweaksByTypeId,
     });
   });
-};
+}

@@ -1,6 +1,6 @@
-const sql = require("pg-sql2");
+import sql from "pg-sql2";
 
-module.exports = function PgBasicsPlugin(
+export default function PgBasicsPlugin(
   builder,
   { pgInflection, pgStrictFunctions = false }
 ) {
@@ -11,4 +11,4 @@ module.exports = function PgBasicsPlugin(
       pgStrictFunctions,
     });
   });
-};
+}

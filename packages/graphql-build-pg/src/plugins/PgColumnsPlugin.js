@@ -1,13 +1,10 @@
-const { GraphQLNonNull, GraphQLString } = require("graphql");
-const queryFromResolveData = require("../queryFromResolveData");
+import { GraphQLNonNull, GraphQLString } from "graphql";
+import queryFromResolveData from "../queryFromResolveData";
 
 const nullableIf = (condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 
-module.exports = function PgColumnsPlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+export default function PgColumnsPlugin(builder, { pgInflection: inflection }) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -167,4 +164,4 @@ module.exports = function PgColumnsPlugin(
       );
     }
   );
-};
+}

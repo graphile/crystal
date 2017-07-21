@@ -1,5 +1,6 @@
-const pg = require("pg");
-const debug = require("debug")("graphql-build-pg");
+import pg from "pg";
+import debugFactory from "debug";
+const debug = debugFactory("graphql-build-pg");
 
 const withPgClient = async (pgConfig = process.env.DATABASE_URL, fn) => {
   if (!fn) {
@@ -45,4 +46,4 @@ const withPgClient = async (pgConfig = process.env.DATABASE_URL, fn) => {
   return result;
 };
 
-module.exports = withPgClient;
+export default withPgClient;
