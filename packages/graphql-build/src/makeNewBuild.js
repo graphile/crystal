@@ -1,4 +1,7 @@
+// @flow
+
 import * as graphql from "graphql";
+import type { GraphQLNamedType } from "graphql";
 import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
@@ -6,9 +9,19 @@ import {
 } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 
+import type SchemaBuilder, { Build, Scope } from "./SchemaBuilder";
+
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphql-build");
+
+function getNameFromType(Type: GraphQLNamedType | GraphQLSchema) {
+  if (Type instanceof GraphQLSchema) {
+    return "schema";
+  } else {
+    return Type.name;
+  }
+}
 
 const {
   GraphQLSchema,
@@ -16,6 +29,8 @@ const {
   GraphQLInputObjectType,
   GraphQLEnumType,
   getNamedType,
+  isCompositeType,
+  isAbstractType,
 } = graphql;
 
 const mergeData = (data, gen, ReturnType, arg) => {
@@ -45,7 +60,8 @@ const knownTypeNames = knownTypes.map(k => k.name);
 const ensureArray = val =>
   val == null ? val : Array.isArray(val) ? val : [val];
 
-let ensureName = () => {};
+// eslint-disable-next-line no-unused-vars
+let ensureName = fn => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   ensureName = fn => {
     if (isDev && !fn.displayName && !fn.name) {
@@ -57,7 +73,7 @@ if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   };
 }
 
-export default function makeNewBuild(builder) {
+export default function makeNewBuild(builder: SchemaBuilder): Build {
   const allTypes = {};
 
   // Every object type gets fieldData associated with each of its
@@ -109,23 +125,37 @@ export default function makeNewBuild(builder) {
       const alias = getAliasFromResolveInfo(resolveInfo);
       return data[alias];
     },
-    addType(type) {
+    addType(type: GraphQLNamedType): void {
       allTypes[type.name] = type;
     },
     getTypeByName(typeName) {
       return allTypes[typeName];
     },
-    extend(obj, obj2) {
-      const keysA = Object.keys(obj);
-      const keysB = Object.keys(obj2);
+    extend<Obj1: *, Obj2: *>(base: Obj1, extra: Obj2): Obj1 & Obj2 {
+      const keysA = Object.keys(base);
+      const keysB = Object.keys(extra);
       for (const key of keysB) {
         if (keysA.indexOf(key) >= 0) {
           throw new Error(`Overwriting key '${key}' is not allowed!`);
         }
       }
-      return Object.assign({}, obj, obj2);
+      return Object.assign({}, base, extra);
     },
-    newWithHooks(Type, spec, scope = {}, returnNullOnInvalid = false) {
+    newWithHooks<T: GraphQLNamedType | GraphQLSchema, ConfigType: *>(
+      Type: Class<T>,
+      spec: ConfigType,
+      inScope: Scope,
+      returnNullOnInvalid = false
+    ): ?T {
+      const scope = inScope || {};
+      if (!inScope) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `No scope was provided to new ${getNameFromType(
+            Type
+          )}[name=${spec.name}], please check usage of 'newWithHooks'`
+        );
+      }
       if (!Type) {
         throw new Error("No type specified!");
       }
@@ -152,7 +182,7 @@ export default function makeNewBuild(builder) {
         const addDataGeneratorForField = (fieldName, fn) => {
           fn.displayName =
             fn.displayName ||
-            `${Self.name}:${fieldName}[${fn.name || "anonymous"}]`;
+            `${getNameFromType(Self)}:${fieldName}[${fn.name || "anonymous"}]`;
           fieldDataGeneratorsByFieldName[fieldName] =
             fieldDataGeneratorsByFieldName[fieldName] || [];
           fieldDataGeneratorsByFieldName[fieldName].push(fn);
@@ -186,7 +216,9 @@ export default function makeNewBuild(builder) {
             }
             return results;
           };
-          fn.displayName = `recurseDataGeneratorsForField(${Self.name}:${fieldName})`;
+          fn.displayName = `recurseDataGeneratorsForField(${getNameFromType(
+            Self
+          )}:${fieldName})`;
           addDataGeneratorForField(fieldName, fn);
           // get type from field, get
         };
@@ -220,7 +252,7 @@ export default function makeNewBuild(builder) {
               "GraphQLObjectType:interfaces",
               rawInterfaces,
               interfacesContext,
-              `|${Self.name}`
+              `|${getNameFromType(Self)}`
             );
           },
           fields: () => {
@@ -271,7 +303,7 @@ export default function makeNewBuild(builder) {
                           "Failed to execute argDataGenerator '%s' on %s of %s",
                           gen.displayName || gen.name || "anonymous",
                           fieldName,
-                          Self.name
+                          getNameFromType(Self)
                         );
                         throw e;
                       }
@@ -319,7 +351,7 @@ export default function makeNewBuild(builder) {
                   "field",
                   newSpec,
                   context,
-                  `|${Self.name}.fields.${fieldName}`
+                  `|${getNameFromType(Self)}.fields.${fieldName}`
                 );
                 newSpec.args = newSpec.args || {};
                 newSpec = Object.assign({}, newSpec, {
@@ -331,7 +363,7 @@ export default function makeNewBuild(builder) {
                       field: newSpec,
                       returnType: newSpec.type,
                     }),
-                    `|${Self.name}.fields.${fieldName}`
+                    `|${getNameFromType(Self)}.fields.${fieldName}`
                   ),
                 });
                 const finalSpec = newSpec;
@@ -353,7 +385,7 @@ export default function makeNewBuild(builder) {
             // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
             for (const fieldName in fieldsSpec) {
               const fieldSpec = fieldsSpec[fieldName];
-              if (!processedFields.indexOf(fieldSpec) >= 0) {
+              if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
                 fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
                   fieldName,
@@ -409,7 +441,7 @@ export default function makeNewBuild(builder) {
                   "inputField",
                   newSpec,
                   context,
-                  `|${Self.name}.fields.${fieldName}`
+                  `|${getNameFromType(Self)}.fields.${fieldName}`
                 );
                 const finalSpec = newSpec;
                 processedFields.push(finalSpec);
@@ -425,12 +457,12 @@ export default function makeNewBuild(builder) {
               "GraphQLInputObjectType:fields",
               rawFields,
               fieldsContext,
-              `|${Self.name}`
+              `|${getNameFromType(Self)}`
             );
             // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
             for (const fieldName in fieldsSpec) {
               const fieldSpec = fieldsSpec[fieldName];
-              if (!processedFields.indexOf(fieldSpec) >= 0) {
+              if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
                 fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
                   fieldName,
@@ -462,13 +494,14 @@ export default function makeNewBuild(builder) {
           `|${newSpec.name}`
         );
       }
-      const finalSpec = newSpec;
+      const finalSpec: ConfigType = newSpec;
 
-      let Self;
-      Self = new Type(finalSpec);
-      if (returnNullOnInvalid && Self.getFields) {
+      const Self: T = new Type(finalSpec);
+      if (!(Self instanceof GraphQLSchema) && returnNullOnInvalid) {
         try {
-          Self.getFields();
+          if (isCompositeType(Self) && !isAbstractType(Self)) {
+            Self.getFields();
+          }
         } catch (e) {
           return null;
         }

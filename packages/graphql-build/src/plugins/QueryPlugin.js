@@ -1,5 +1,12 @@
-export default async function QueryPlugin(builder) {
-  builder.hook("build", build =>
+// @flow
+import type { Plugin, Build } from "../SchemaBuilder";
+
+export type BuildExtensionQuery = {|
+  $$isQuery: Symbol,
+|};
+
+const QueryPlugin: Plugin = async function QueryPlugin(builder) {
+  builder.hook("build", (build: Build): Build & BuildExtensionQuery =>
     build.extend(build, {
       $$isQuery: Symbol("isQuery"),
     })
@@ -7,7 +14,7 @@ export default async function QueryPlugin(builder) {
   builder.hook(
     "GraphQLSchema",
     (
-      schema,
+      schema: {},
       {
         $$isQuery,
         newWithHooks,
@@ -46,4 +53,5 @@ export default async function QueryPlugin(builder) {
       }
     }
   );
-}
+};
+export default QueryPlugin;

@@ -34,51 +34,49 @@ const DummyConnectionPlugin = async builder => {
     "GraphQLObjectType:fields",
     (
       fields,
-      {
-        extend,
-        getTypeByName,
-        newWithHooks,
-        parseResolveInfo,
-        resolveAlias,
-      },
+      { extend, getTypeByName, newWithHooks, parseResolveInfo, resolveAlias },
       { scope: { isRootQuery }, fieldWithHooks }
     ) => {
       if (!isRootQuery) return fields;
       const Cursor = getTypeByName("Cursor");
-      const Dummy = newWithHooks(GraphQLObjectType, {
-        name: "Dummy",
-        fields: ({ addDataGeneratorForField }) => {
-          addDataGeneratorForField("id", ({ alias }) => {
+      const Dummy = newWithHooks(
+        GraphQLObjectType,
+        {
+          name: "Dummy",
+          fields: ({ addDataGeneratorForField }) => {
+            addDataGeneratorForField("id", ({ alias }) => {
+              return {
+                map: obj => ({ [alias]: obj.ID }),
+              };
+            });
+            addDataGeneratorForField("caps", ({ alias }) => {
+              return {
+                map: obj => ({ [alias]: obj.CAPS }),
+              };
+            });
+            addDataGeneratorForField("random", ({ alias }) => {
+              return {
+                map: () => ({ [alias]: Math.floor(Math.random() * 10000) }),
+              };
+            });
             return {
-              map: obj => ({ [alias]: obj.ID }),
+              id: {
+                type: new GraphQLNonNull(GraphQLString),
+                resolve: resolveAlias,
+              },
+              caps: {
+                type: new GraphQLNonNull(GraphQLString),
+                resolve: resolveAlias,
+              },
+              random: {
+                type: new GraphQLNonNull(GraphQLInt),
+                resolve: resolveAlias,
+              },
             };
-          });
-          addDataGeneratorForField("caps", ({ alias }) => {
-            return {
-              map: obj => ({ [alias]: obj.CAPS }),
-            };
-          });
-          addDataGeneratorForField("random", ({ alias }) => {
-            return {
-              map: () => ({ [alias]: Math.floor(Math.random() * 10000) }),
-            };
-          });
-          return {
-            id: {
-              type: new GraphQLNonNull(GraphQLString),
-              resolve: resolveAlias,
-            },
-            caps: {
-              type: new GraphQLNonNull(GraphQLString),
-              resolve: resolveAlias,
-            },
-            random: {
-              type: new GraphQLNonNull(GraphQLInt),
-              resolve: resolveAlias,
-            },
-          };
+          },
         },
-      });
+        {}
+      );
       return extend(fields, {
         dummyConnection: fieldWithHooks(
           "dummyConnection",
@@ -131,79 +129,89 @@ const DummyConnectionPlugin = async builder => {
               }
             });
             return {
-              type: newWithHooks(GraphQLObjectType, {
-                name: "DummyConnection",
-                fields: ({ recurseDataGeneratorsForField }) => {
-                  recurseDataGeneratorsForField("edges");
-                  recurseDataGeneratorsForField("nodes");
-                  return {
-                    edges: {
-                      type: new GraphQLList(
-                        new GraphQLNonNull(
-                          newWithHooks(GraphQLObjectType, {
-                            name: "DummyEdge",
-                            fields: ({
-                              addDataGeneratorForField,
-                              recurseDataGeneratorsForField,
-                            }) => {
-                              recurseDataGeneratorsForField("node");
-                              addDataGeneratorForField(
-                                "cursor",
-                                (
-                                  parsedResolveInfoFragment,
-                                  ReturnType,
-                                  data
-                                ) => {
-                                  if (data.sort) {
-                                    return {
-                                      map: obj => ({
-                                        __cursor: base64(
-                                          JSON.stringify(
-                                            data.sort.map(([key]) => obj[key])
-                                          )
-                                        ),
-                                      }),
-                                    };
-                                  } else {
-                                    return {
-                                      map: (obj, idx) => ({
-                                        __cursor: String(idx),
-                                      }),
-                                    };
-                                  }
-                                }
-                              );
-                              return {
-                                cursor: {
-                                  type: Cursor,
-                                  resolve(data) {
-                                    return data.__cursor;
-                                  },
+              type: newWithHooks(
+                GraphQLObjectType,
+                {
+                  name: "DummyConnection",
+                  fields: ({ recurseDataGeneratorsForField }) => {
+                    recurseDataGeneratorsForField("edges");
+                    recurseDataGeneratorsForField("nodes");
+                    return {
+                      edges: {
+                        type: new GraphQLList(
+                          new GraphQLNonNull(
+                            newWithHooks(
+                              GraphQLObjectType,
+                              {
+                                name: "DummyEdge",
+                                fields: ({
+                                  addDataGeneratorForField,
+                                  recurseDataGeneratorsForField,
+                                }) => {
+                                  recurseDataGeneratorsForField("node");
+                                  addDataGeneratorForField(
+                                    "cursor",
+                                    (
+                                      parsedResolveInfoFragment,
+                                      ReturnType,
+                                      data
+                                    ) => {
+                                      if (data.sort) {
+                                        return {
+                                          map: obj => ({
+                                            __cursor: base64(
+                                              JSON.stringify(
+                                                data.sort.map(
+                                                  ([key]) => obj[key]
+                                                )
+                                              )
+                                            ),
+                                          }),
+                                        };
+                                      } else {
+                                        return {
+                                          map: (obj, idx) => ({
+                                            __cursor: String(idx),
+                                          }),
+                                        };
+                                      }
+                                    }
+                                  );
+                                  return {
+                                    cursor: {
+                                      type: Cursor,
+                                      resolve(data) {
+                                        return data.__cursor;
+                                      },
+                                    },
+                                    node: {
+                                      type: Dummy,
+                                      resolve(data) {
+                                        return data;
+                                      },
+                                    },
+                                  };
                                 },
-                                node: {
-                                  type: Dummy,
-                                  resolve(data) {
-                                    return data;
-                                  },
-                                },
-                              };
-                            },
-                          })
-                        )
-                      ),
-                      resolve(data) {
-                        return data;
+                              },
+                              {}
+                            )
+                          )
+                        ),
+                        resolve(data) {
+                          return data;
+                        },
                       },
-                    },
-                    nodes: {
-                      type: new GraphQLList(new GraphQLNonNull(Dummy)),
-                      resolve(data) {
-                        return data;
+                      nodes: {
+                        type: new GraphQLList(new GraphQLNonNull(Dummy)),
+                        resolve(data) {
+                          return data;
+                        },
                       },
-                    },
-                  };
+                    };
+                  },
                 },
-              }),
+                {}
+              ),
               args: {
                 first: {
                   type: GraphQLInt,

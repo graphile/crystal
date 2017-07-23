@@ -1,7 +1,12 @@
-export default function ClientMutationIdDescriptionPlugin(builder) {
+// @flow
+import type SchemaBuilder, { Plugin } from "../SchemaBuilder";
+
+const ClientMutationIdDescriptionPlugin: Plugin = function ClientMutationIdDescriptionPlugin(
+  builder: SchemaBuilder
+) {
   builder.hook(
     "inputField",
-    (field, { extend }, { scope: { isMutationInput, fieldName } }) => {
+    (field: {}, { extend }, { scope: { isMutationInput, fieldName } }) => {
       if (
         !isMutationInput ||
         fieldName !== "clientMutationId" ||
@@ -18,7 +23,7 @@ export default function ClientMutationIdDescriptionPlugin(builder) {
 
   builder.hook(
     "field",
-    (field, { extend }, { scope: { isMutationPayload, fieldName } }) => {
+    (field: {}, { extend }, { scope: { isMutationPayload, fieldName } }) => {
       if (
         !isMutationPayload ||
         fieldName !== "clientMutationId" ||
@@ -35,7 +40,7 @@ export default function ClientMutationIdDescriptionPlugin(builder) {
 
   builder.hook(
     "field:args",
-    (args, { extend }, { scope: { isRootMutation } }) => {
+    (args: {}, { extend }, { scope: { isRootMutation } }) => {
       if (!isRootMutation || !args.input || args.input.description) {
         return args;
       }
@@ -47,4 +52,6 @@ export default function ClientMutationIdDescriptionPlugin(builder) {
       });
     }
   );
-}
+};
+
+export default ClientMutationIdDescriptionPlugin;

@@ -1,32 +1,32 @@
 {
   "plugins": ["transform-runtime", "transform-es2015-modules-commonjs"],
   "presets": [
-    "flow",
     ["env", {
       "targets": {
         "node": 8
       }
-    }]
+    }],
+    "flow"
   ],
   "env": {
     "node7minus": {
       "presets": [
-        "flow",
         ["env", {
           "targets": {
             "node": 4
           }
-        }]
+        }],
+        "flow"
       ]
     },
     "test": {
       "presets": [
-        "flow",
         ["env", {
           "targets": {
             "node": "current"
           }
-        }]
+        }],
+        "flow"
       ]
     }
   }

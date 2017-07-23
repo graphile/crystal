@@ -1,3 +1,5 @@
+// @flow
+
 import ClientMutationIdDescriptionPlugin from "./ClientMutationIdDescriptionPlugin";
 import MutationPayloadQueryPlugin from "./MutationPayloadQueryPlugin";
 import MutationPlugin from "./MutationPlugin";

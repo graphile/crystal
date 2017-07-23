@@ -1,6 +1,5 @@
-"use strict";
-
 // @flow
+
 import assert from "assert";
 import { getArgumentValues } from "graphql/execution/values";
 import {

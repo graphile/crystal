@@ -1,3 +1,5 @@
+// @flow
+
 import SchemaBuilder from "./SchemaBuilder";
 import {
   StandardTypesPlugin,
@@ -8,8 +10,12 @@ import {
   MutationPayloadQueryPlugin,
 } from "./plugins";
 
-const getBuilder = async (plugins, options = {}) => {
-  const builder = new SchemaBuilder(options);
+import type { Plugin, Options } from "./SchemaBuilder";
+
+export type { Plugin };
+
+const getBuilder = async (plugins: Array<Plugin>, options: Options = {}) => {
+  const builder = new SchemaBuilder();
   for (const plugin of plugins) {
     builder._setPluginName(plugin.displayName || plugin.name);
     await plugin(builder, options);
@@ -18,7 +24,7 @@ const getBuilder = async (plugins, options = {}) => {
   return builder;
 };
 
-const buildSchema = async (plugins, options = {}) => {
+const buildSchema = async (plugins: Array<Plugin>, options: {} = {}) => {
   const builder = await getBuilder(plugins, options);
   return builder.buildSchema();
 };

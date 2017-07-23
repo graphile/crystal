@@ -1,11 +1,21 @@
-export default function MutationPayloadQueryPlugin(builder) {
+// @flow
+import type { Plugin, Build } from "../SchemaBuilder";
+import type { BuildExtensionQuery } from "./QueryPlugin";
+
+const MutationPayloadQueryPlugin: Plugin = function MutationPayloadQueryPlugin(
+  builder
+) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
-      fields,
-      { $$isQuery, extend, getTypeByName },
+      fields: {},
+      {
+        $$isQuery,
+        extend,
+        getTypeByName,
+      }: {| ...Build, ...BuildExtensionQuery |},
       { scope: { isMutationPayload } }
-    ) => {
+    ): {} => {
       if (!isMutationPayload) {
         return fields;
       }
@@ -22,4 +32,5 @@ export default function MutationPayloadQueryPlugin(builder) {
       });
     }
   );
-}
+};
+export default MutationPayloadQueryPlugin;

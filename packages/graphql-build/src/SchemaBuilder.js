@@ -1,15 +1,164 @@
+// @flow
 import debugFactory from "debug";
-const debug = debugFactory("graphql-builder");
 import makeNewBuild from "./makeNewBuild";
 import { bindAll } from "./utils";
-import { GraphQLSchema } from "graphql";
+import * as graphql from "graphql";
+import type {
+  GraphQLType,
+  GraphQLNamedType,
+  GraphQLInterfaceType,
+} from "graphql";
 import EventEmitter from "events";
+import type {
+  parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType,
+  getAliasFromResolveInfo,
+} from "graphql-parse-resolve-info";
+import type { ResolveTree } from "graphql-parse-resolve-info";
+import type { GraphQLResolveInfo } from "graphql/type/definition";
+
+const { GraphQLSchema } = graphql;
+
+const debug = debugFactory("graphql-builder");
 
 const INDENT = "  ";
 
+export type Options = {
+  [string]: mixed,
+};
+
+export type Plugin = (
+  builder: SchemaBuilder,
+  options: Options
+) => Promise<void> | void;
+
+type TriggerChangeType = () => void;
+
+export type DataForType = {
+  [string]: Array<mixed>,
+};
+
+export type Build = {|
+  graphql: {
+    GraphQLSchema: typeof graphql.GraphQLSchema,
+    GraphQLScalarType: typeof graphql.GraphQLScalarType,
+    GraphQLObjectType: typeof graphql.GraphQLObjectType,
+    GraphQLInterfaceType: typeof graphql.GraphQLInterfaceType,
+    GraphQLUnionType: typeof graphql.GraphQLUnionType,
+    GraphQLEnumType: typeof graphql.GraphQLEnumType,
+    GraphQLInputObjectType: typeof graphql.GraphQLInputObjectType,
+    GraphQLList: typeof graphql.GraphQLList,
+    GraphQLNonNull: typeof graphql.GraphQLNonNull,
+    GraphQLDirective: typeof graphql.GraphQLDirective,
+    TypeKind: typeof graphql.TypeKind,
+    DirectiveLocation: typeof graphql.DirectiveLocation,
+    GraphQLInt: typeof graphql.GraphQLInt,
+    GraphQLFloat: typeof graphql.GraphQLFloat,
+    GraphQLString: typeof graphql.GraphQLString,
+    GraphQLBoolean: typeof graphql.GraphQLBoolean,
+    GraphQLID: typeof graphql.GraphQLID,
+    specifiedDirectives: typeof graphql.specifiedDirectives,
+    GraphQLIncludeDirective: typeof graphql.GraphQLIncludeDirective,
+    GraphQLSkipDirective: typeof graphql.GraphQLSkipDirective,
+    GraphQLDeprecatedDirective: typeof graphql.GraphQLDeprecatedDirective,
+    DEFAULT_DEPRECATION_REASON: typeof graphql.DEFAULT_DEPRECATION_REASON,
+    SchemaMetaFieldDef: typeof graphql.SchemaMetaFieldDef,
+    TypeMetaFieldDef: typeof graphql.TypeMetaFieldDef,
+    TypeNameMetaFieldDef: typeof graphql.TypeNameMetaFieldDef,
+    __Schema: typeof graphql.__Schema,
+    __Directive: typeof graphql.__Directive,
+    __DirectiveLocation: typeof graphql.__DirectiveLocation,
+    __Type: typeof graphql.__Type,
+    __Field: typeof graphql.__Field,
+    __InputValue: typeof graphql.__InputValue,
+    __EnumValue: typeof graphql.__EnumValue,
+    __TypeKind: typeof graphql.__TypeKind,
+    isType: (type: mixed) => boolean,
+    isInputType: (type: GraphQLType) => boolean,
+    isOutputType: (type: GraphQLType) => boolean,
+    isLeafType: (type: GraphQLType) => boolean,
+    isCompositeType: (type: GraphQLType) => boolean,
+    isAbstractType: (type: GraphQLType) => boolean,
+    isNamedType: (type: GraphQLType) => boolean,
+    assertType: typeof graphql.assertType,
+    assertInputType: typeof graphql.assertInputType,
+    assertOutputType: typeof graphql.assertOutputType,
+    assertLeafType: typeof graphql.assertLeafType,
+    assertCompositeType: typeof graphql.assertCompositeType,
+    assertAbstractType: typeof graphql.assertAbstractType,
+    assertNamedType: typeof graphql.assertNamedType,
+    //getNullableType<T: GraphQLType>(type: ?T): ?(T & GraphQLNullableType),
+    getNullableType<T: GraphQLType>(type: ?T): mixed,
+    getNamedType: (type: GraphQLType) => GraphQLNamedType,
+  },
+  parseResolveInfo: parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType: simplifyParsedResolveInfoFragmentWithType,
+  getAliasFromResolveInfo: getAliasFromResolveInfo,
+  generateDataForType(
+    Type: GraphQLType,
+    parsedResolveInfoFragment: ResolveTree
+  ): DataForType,
+  resolveAlias(
+    data: {},
+    _args: mixed,
+    _context: mixed,
+    resolveInfo: GraphQLResolveInfo
+  ): string,
+  addType(type: GraphQLNamedType): void,
+  getTypeByName(typeName: string): ?GraphQLType,
+  extend<Obj1: *, Obj2: *>(base: Obj1, extra: Obj2): Obj1 & Obj2,
+  newWithHooks<T: GraphQLNamedType | GraphQLSchema>(
+    Class<T>,
+    spec: {},
+    scope: {},
+    returnNullOnInvalid?: boolean
+  ): ?T,
+|};
+
+export type BuildExtensionQuery = {|
+  $$isQuery: Symbol,
+|};
+
+export type Scope = {
+  [string]: mixed,
+};
+
+export type Context = {
+  scope: Scope,
+};
+
+type SupportedHookTypes = {} | Build | Array<GraphQLInterfaceType>;
+
+export type Hook<Type: SupportedHookTypes, BuildExtensions: {}> = (
+  input: Type,
+  build: {| ...Build, ...BuildExtensions |},
+  context: Context
+) => Type;
+
+export type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
+
+export type SchemaListener = (newSchema: GraphQLSchema) => void;
+
 class SchemaBuilder extends EventEmitter {
+  watchers: Array<WatchUnwatch>;
+  unwatchers: Array<WatchUnwatch>;
+  triggerChange: ?TriggerChangeType;
+  depth: number;
+  hooks: {
+    [string]: Array<Hook<*, *>>,
+  };
+
+  _currentPluginName: ?string;
+  _generatedSchema: ?GraphQLSchema;
+  _explicitSchemaListener: ?SchemaListener;
+  _busy: boolean;
+  _watching: boolean;
+
   constructor() {
     super();
+
+    this._busy = false;
+    this._watching = false;
 
     this.watchers = [];
     this.unwatchers = [];
@@ -68,8 +217,8 @@ class SchemaBuilder extends EventEmitter {
     };
   }
 
-  _setPluginName(name) {
-    this.currentPluginName = name;
+  _setPluginName(name: ?string) {
+    this._currentPluginName = name;
   }
 
   /*
@@ -80,31 +229,37 @@ class SchemaBuilder extends EventEmitter {
    *
    * The function must either return a replacement object for `obj` or `obj` itself
    */
-  hook(hookName, fn) {
+  hook<T: *>(hookName: string, fn: Hook<T, *>) {
     if (!this.hooks[hookName]) {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
-    if (this.currentPluginName && !fn.displayName) {
+    if (this._currentPluginName && !fn.displayName) {
       fn.displayName = `${this
-        .currentPluginName}/${hookName}/${fn.displayName ||
+        ._currentPluginName}/${hookName}/${fn.displayName ||
         fn.name ||
         "anonymous"}`;
     }
     this.hooks[hookName].push(fn);
   }
 
-  applyHooks(build, hookName, oldObj, context, debugStr = "") {
+  applyHooks<T: *>(
+    build: Build,
+    hookName: string,
+    input: T,
+    context: Context,
+    debugStr: string = ""
+  ): T {
     this.depth++;
     try {
       debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
 
-      const hooks = this.hooks[hookName];
+      const hooks: Array<Hook<T, *>> = this.hooks[hookName];
       if (!hooks) {
         throw new Error(`Sorry, '${hookName}' is not a registered hook`);
       }
 
-      let newObj = oldObj;
-      for (const hook of hooks) {
+      let newObj = input;
+      for (const hook: Hook<T, *> of hooks) {
         this.depth++;
         try {
           const hookDisplayName = hook.displayName || hook.name || "anonymous";
@@ -139,7 +294,7 @@ class SchemaBuilder extends EventEmitter {
     }
   }
 
-  registerWatcher(listen, unlisten) {
+  registerWatcher(listen: WatchUnwatch, unlisten: WatchUnwatch) {
     if (!listen || !unlisten) {
       throw new Error("You must provide both a listener and an unlistener");
     }
@@ -147,36 +302,43 @@ class SchemaBuilder extends EventEmitter {
     this.unwatchers.push(unlisten);
   }
 
-  createBuild() {
-    const build = this.applyHooks(null, "build", makeNewBuild(this));
+  createBuild(): Build {
+    const initialBuild: Build = makeNewBuild(this);
+    const build: Build = this.applyHooks(initialBuild, "build", initialBuild, {
+      scope: {},
+    });
     // Bind all functions so they can be dereferenced
     bindAll(
       build,
       Object.keys(build).filter(key => typeof build[key] === "function")
     );
     Object.freeze(build);
-    this.applyHooks(build, "init", {});
+    this.applyHooks(build, "init", {}, { scope: {} });
     return build;
   }
 
-  buildSchema() {
-    if (!this.generatedSchema) {
+  buildSchema(): ?GraphQLSchema {
+    if (!this._generatedSchema) {
       const build = this.createBuild();
-      this.generatedSchema = build.newWithHooks(GraphQLSchema, {});
+      this._generatedSchema = build.newWithHooks(
+        GraphQLSchema,
+        {},
+        { isSchema: true }
+      );
     }
-    return this.generatedSchema;
+    return this._generatedSchema;
   }
 
-  async watchSchema(listener) {
-    if (this.watching || this.busy) {
+  async watchSchema(listener: SchemaListener) {
+    if (this._watching || this._busy) {
       throw new Error("We're already watching this schema!");
     }
     try {
-      this.busy = true;
-      this.watching = true;
-      this.explicitSchemaListener = listener;
+      this._busy = true;
+      this._watching = true;
+      this._explicitSchemaListener = listener;
       this.triggerChange = () => {
-        this.generatedSchema = null;
+        this._generatedSchema = null;
         // XXX: optionally debounce
         this.emit("schema", this.buildSchema());
       };
@@ -188,28 +350,30 @@ class SchemaBuilder extends EventEmitter {
       }
       this.emit("schema", this.buildSchema());
     } finally {
-      this.busy = false;
+      this._busy = false;
     }
   }
 
   async unwatchSchema() {
-    if (!this.watching || this.busy) {
+    if (!this._watching || this._busy) {
       throw new Error("We're not watching this schema!");
     }
-    this.busy = true;
+    this._busy = true;
     try {
-      const listener = this.explicitSchemaListener;
-      this.explicitSchemaListener = null;
+      const listener = this._explicitSchemaListener;
+      this._explicitSchemaListener = null;
       if (listener) {
-        this.removeEventListener("schema", listener);
+        this.removeListener("schema", listener);
       }
-      for (const fn of this.unwatchers) {
-        await fn(this.triggerChange);
+      if (this.triggerChange) {
+        for (const fn of this.unwatchers) {
+          await fn(this.triggerChange);
+        }
       }
       this.triggerChange = null;
-      this.watching = false;
+      this._watching = false;
     } finally {
-      this.busy = false;
+      this._busy = false;
     }
   }
 }

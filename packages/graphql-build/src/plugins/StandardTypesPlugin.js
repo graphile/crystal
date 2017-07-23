@@ -1,9 +1,11 @@
+// @flow
+import type { Plugin, Build } from "../SchemaBuilder";
 import { Kind } from "graphql/language";
 import GraphQLJSON from "graphql-type-json";
 
-export default function StandardTypesPlugin(builder) {
+const StandardTypesPlugin: Plugin = function StandardTypesPlugin(builder) {
   // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
-  builder.hook("build", build => {
+  builder.hook("build", (build: Build): Build => {
     const stringType = (name, description) =>
       new build.graphql.GraphQLScalarType({
         name,
@@ -34,7 +36,7 @@ export default function StandardTypesPlugin(builder) {
   builder.hook(
     "init",
     (
-      _,
+      _: {},
       {
         newWithHooks,
         graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
@@ -42,38 +44,50 @@ export default function StandardTypesPlugin(builder) {
     ) => {
       // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
       /* const PageInfo = */
-      newWithHooks(GraphQLObjectType, {
-        name: "PageInfo",
-        description: "Information about pagination in a connection.",
-        fields: ({ fieldWithHooks }) => ({
-          hasNextPage: fieldWithHooks("hasNextPage", ({ addDataGenerator }) => {
-            addDataGenerator(() => {
-              return {
-                calculateHasNextPage: true,
-              };
-            });
-            return {
-              description: "When paginating forwards, are there more items?",
-              type: new GraphQLNonNull(GraphQLBoolean),
-            };
-          }),
-          hasPreviousPage: fieldWithHooks(
-            "hasPreviousPage",
-            ({ addDataGenerator }) => {
-              addDataGenerator(() => {
+      newWithHooks(
+        GraphQLObjectType,
+        {
+          name: "PageInfo",
+          description: "Information about pagination in a connection.",
+          fields: ({ fieldWithHooks }) => ({
+            hasNextPage: fieldWithHooks(
+              "hasNextPage",
+              ({ addDataGenerator }) => {
+                addDataGenerator(() => {
+                  return {
+                    calculateHasNextPage: true,
+                  };
+                });
                 return {
-                  calculateHasPreviousPage: true,
+                  description:
+                    "When paginating forwards, are there more items?",
+                  type: new GraphQLNonNull(GraphQLBoolean),
                 };
-              });
-              return {
-                description: "When paginating backwards, are there more items?",
-                type: new GraphQLNonNull(GraphQLBoolean),
-              };
-            }
-          ),
-        }),
-      });
+              }
+            ),
+            hasPreviousPage: fieldWithHooks(
+              "hasPreviousPage",
+              ({ addDataGenerator }) => {
+                addDataGenerator(() => {
+                  return {
+                    calculateHasPreviousPage: true,
+                  };
+                });
+                return {
+                  description:
+                    "When paginating backwards, are there more items?",
+                  type: new GraphQLNonNull(GraphQLBoolean),
+                };
+              }
+            ),
+          }),
+        },
+        {
+          isPageInfo: true,
+        }
+      );
       return _;
     }
   );
-}
+};
+export default StandardTypesPlugin;
