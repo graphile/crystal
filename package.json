@@ -49,7 +49,7 @@
     "pg-minify": "^0.4.1",
     "pg-sql2": "^1.0.0-alpha1.0",
     "pluralize": "^3.0.0",
-    "postgraphql-build": "0.0.1-alpha9.3",
+    "postgraphql-build": "0.0.1-alpha10.0",
     "postgres-interval": "^1.0.2",
     "send": "^0.14.1",
     "tslib": "^1.5.0"
