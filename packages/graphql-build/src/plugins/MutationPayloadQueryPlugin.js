@@ -2,9 +2,7 @@
 import type { Plugin, Build } from "../SchemaBuilder";
 import type { BuildExtensionQuery } from "./QueryPlugin";
 
-const MutationPayloadQueryPlugin: Plugin = function MutationPayloadQueryPlugin(
-  builder
-) {
+export default (function MutationPayloadQueryPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -32,5 +30,4 @@ const MutationPayloadQueryPlugin: Plugin = function MutationPayloadQueryPlugin(
       });
     }
   );
-};
-export default MutationPayloadQueryPlugin;
+}: Plugin);

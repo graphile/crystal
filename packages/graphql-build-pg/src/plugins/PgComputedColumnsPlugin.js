@@ -1,6 +1,9 @@
+// @flow
 import makeProcField from "./makeProcField";
 
-export default function PgComputedColumnsPlugin(builder) {
+import type { Plugin } from "graphql-build";
+
+export default (function PgComputedColumnsPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -91,4 +94,4 @@ export default function PgComputedColumnsPlugin(builder) {
       );
     }
   );
-}
+}: Plugin);

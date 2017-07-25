@@ -1,4 +1,7 @@
-export default function PgConnectionTotalCount(builder) {
+// @flow
+import type { Plugin } from "graphql-build";
+
+export default (function PgConnectionTotalCount(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -36,4 +39,4 @@ export default function PgConnectionTotalCount(builder) {
       });
     }
   );
-}
+}: Plugin);

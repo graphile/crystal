@@ -1,8 +1,24 @@
+// @flow
 import QueryBuilder from "./QueryBuilder";
 import sql from "pg-sql2";
+import type { SQL } from "pg-sql2";
+import type { DataForType } from "graphql-build";
 import isSafeInteger from "lodash/isSafeInteger";
 
-export default (from, fromAlias, resolveData, options, withBuilder) => {
+export default (
+  from: SQL,
+  fromAlias: ?SQL,
+  resolveData: DataForType,
+  options: {
+    withPagination?: boolean,
+    withPaginationAsFields?: boolean,
+    asJson?: boolean,
+    asJsonAggregate?: boolean,
+    addNullCase?: boolean,
+    onlyJsonField?: boolean,
+  },
+  withBuilder?: (builder: QueryBuilder) => void
+) => {
   const {
     pgQuery,
     pgCursorPrefix: reallyRawCursorPrefix,
@@ -14,7 +30,7 @@ export default (from, fromAlias, resolveData, options, withBuilder) => {
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(_ => _);
 
   const queryBuilder = new QueryBuilder();
-  queryBuilder.from(from, fromAlias);
+  queryBuilder.from(from, fromAlias ? fromAlias : undefined);
 
   for (const fn of pgQuery || []) {
     fn(queryBuilder, resolveData);
@@ -34,7 +50,7 @@ export default (from, fromAlias, resolveData, options, withBuilder) => {
     // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
     const sqlCommon = sql.fragment`
       select 1
-      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+      from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
       where ${queryBuilder.buildWhereClause(!invert, invert, options)}
     `;
     if (!queryHasBefore && !queryHasFirst && (!invert || offset === 0)) {
@@ -51,8 +67,7 @@ export default (from, fromAlias, resolveData, options, withBuilder) => {
       // Drop the limit, see if there are any records that aren't already in the list we've fetched
       return sql.fragment`exists(
         ${sqlCommon}
-        and (${queryBuilder.data
-          .selectCursor})::text not in (select __cursor::text from ${sqlQueryAlias})
+        and (${queryBuilder.getSelectCursor()})::text not in (select __cursor::text from ${sqlQueryAlias})
         ${offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`}
       )`;
     } else {
@@ -120,7 +135,9 @@ export default (from, fromAlias, resolveData, options, withBuilder) => {
           // If ascending and isAfter then >
           // If ascending and isBefore then <
           const comparison =
-            ascending ^ !isAfter ? sql.fragment`>` : sql.fragment`<`;
+            Number(ascending) ^ Number(!isAfter)
+              ? sql.fragment`>`
+              : sql.fragment`<`;
 
           const sqlOldFilter = sqlFilter;
           sqlFilter = sql.fragment`
@@ -179,7 +196,7 @@ export default (from, fromAlias, resolveData, options, withBuilder) => {
 
     const totalCount = sql.fragment`(
       select count(*)
-      from ${queryBuilder.data.from[0]} as ${queryBuilder.getTableAlias()}
+      from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
       where ${queryBuilder.buildWhereClause(false, false, options)}
     )`;
     const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;

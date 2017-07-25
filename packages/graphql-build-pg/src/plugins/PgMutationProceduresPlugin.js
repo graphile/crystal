@@ -1,6 +1,8 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import makeProcField from "./makeProcField";
 
-export default function PgMutationProceduresPlugin(builder) {
+export default (function PgMutationProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
@@ -57,4 +59,4 @@ export default function PgMutationProceduresPlugin(builder) {
       );
     }
   );
-}
+}: Plugin);

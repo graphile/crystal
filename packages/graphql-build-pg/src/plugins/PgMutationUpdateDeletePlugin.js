@@ -1,3 +1,5 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
 import camelCase from "lodash/camelCase";
@@ -7,7 +9,7 @@ const debugSql = debugFactory("graphql-build-pg:sql");
 const debug = debugFactory("graphql-build-pg");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
-export default async function PgMutationUpdateDeletePlugin(
+export default (async function PgMutationUpdateDeletePlugin(
   builder,
   { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
@@ -197,22 +199,24 @@ export default async function PgMutationUpdateDeletePlugin(
                               },
                             },
                           },
-                          mode === "delete" && {
-                            [camelCase(
-                              `deleted-${pluralize.singular(table.name)}-id`
-                            )]: {
-                              type: GraphQLID,
-                              resolve(data) {
-                                return (
-                                  data.data.__identifiers &&
-                                  getNodeIdForTypeAndIdentifiers(
-                                    Table,
-                                    ...data.data.__identifiers
-                                  )
-                                );
-                              },
-                            },
-                          }
+                          mode === "delete"
+                            ? {
+                                [camelCase(
+                                  `deleted-${pluralize.singular(table.name)}-id`
+                                )]: {
+                                  type: GraphQLID,
+                                  resolve(data) {
+                                    return (
+                                      data.data.__identifiers &&
+                                      getNodeIdForTypeAndIdentifiers(
+                                        Table,
+                                        ...data.data.__identifiers
+                                      )
+                                    );
+                                  },
+                                },
+                              }
+                            : null
                         );
                       },
                     },
@@ -261,17 +265,19 @@ export default async function PgMutationUpdateDeletePlugin(
                               type: new GraphQLNonNull(GraphQLID),
                             },
                           },
-                          mode === "update" && {
-                            [inflection.patchField(
-                              inflection.tableName(
-                                table.name,
-                                table.namespace.name
-                              )
-                            )]: {
-                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
-                              type: new GraphQLNonNull(TablePatch),
-                            },
-                          }
+                          mode === "update"
+                            ? {
+                                [inflection.patchField(
+                                  inflection.tableName(
+                                    table.name,
+                                    table.namespace.name
+                                  )
+                                )]: {
+                                  description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                  type: new GraphQLNonNull(TablePatch),
+                                },
+                              }
+                            : null
                         ),
                       },
                       {
@@ -381,17 +387,19 @@ export default async function PgMutationUpdateDeletePlugin(
                               type: GraphQLString,
                             },
                           },
-                          mode === "update" && {
-                            [inflection.patchField(
-                              inflection.tableName(
-                                table.name,
-                                table.namespace.name
-                              )
-                            )]: {
-                              description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
-                              type: new GraphQLNonNull(TablePatch),
-                            },
-                          },
+                          mode === "update"
+                            ? {
+                                [inflection.patchField(
+                                  inflection.tableName(
+                                    table.name,
+                                    table.namespace.name
+                                  )
+                                )]: {
+                                  description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                  type: new GraphQLNonNull(TablePatch),
+                                },
+                              }
+                            : null,
                           keys.reduce((memo, key) => {
                             memo[
                               inflection.column(
@@ -479,4 +487,4 @@ export default async function PgMutationUpdateDeletePlugin(
       );
     }
   );
-}
+}: Plugin);

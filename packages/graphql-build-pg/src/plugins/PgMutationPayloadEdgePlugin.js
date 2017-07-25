@@ -1,6 +1,8 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import isString from "lodash/isString";
 
-export default function PgMutationPayloadEdgePlugin(
+export default (function PgMutationPayloadEdgePlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -89,4 +91,4 @@ export default function PgMutationPayloadEdgePlugin(
       });
     }
   );
-}
+}: Plugin);

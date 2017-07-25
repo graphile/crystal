@@ -1,8 +1,11 @@
+// @flow
 import { defaultPlugins, getBuilder } from "graphql-build";
 import {
   defaultPlugins as pgDefaultPlugins,
   inflections,
 } from "graphql-build-pg";
+import type { Pool, Client } from "pg";
+import type { Plugin, Options, SchemaListener } from "graphql-build";
 
 const ensureValidPlugins = (name, arr) => {
   if (!Array.isArray(arr)) {
@@ -18,7 +21,26 @@ const ensureValidPlugins = (name, arr) => {
   }
 };
 
-const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
+type PostGraphQLOptions = {
+  dynamicJson?: boolean,
+  classicIds?: boolean,
+  disableDefaultMutations?: string,
+  nodeIdFieldName?: string,
+  graphqlBuildOptions?: Options,
+  replaceAllPlugins?: Array<Plugin>,
+  appendPlugins?: Array<Plugin>,
+  prependPlugins?: Array<Plugin>,
+  jwtPgTypeIdentifier?: string,
+  jwtSecret?: string,
+};
+
+type PgConfig = Client | Pool | string;
+
+const getPostGraphQLBuilder = async (
+  pgConfig,
+  schemas,
+  options: PostGraphQLOptions = {}
+) => {
   const { dynamicJson, classicIds, nodeIdFieldName } = options;
   const {
     replaceAllPlugins,
@@ -61,7 +83,11 @@ const getPostGraphQLBuilder = async (pgConfig, schemas, options = {}) => {
   );
 };
 
-export const createPostGraphQLSchema = async (pgConfig, schemas, options) => {
+export const createPostGraphQLSchema = async (
+  pgConfig: PgConfig,
+  schemas: Array<string> | string,
+  options: PostGraphQLOptions = {}
+) => {
   const builder = await getPostGraphQLBuilder(pgConfig, schemas, options);
   return builder.buildSchema();
 };
@@ -70,10 +96,10 @@ export const createPostGraphQLSchema = async (pgConfig, schemas, options) => {
  * Unless an error occurs, `onNewSchema` is guaranteed to be called before this promise resolves
  */
 export const watchPostGraphQLSchema = async (
-  pgConfig,
-  schemas,
-  options,
-  onNewSchema
+  pgConfig: PgConfig,
+  schemas: Array<string> | string,
+  options: PostGraphQLOptions = {},
+  onNewSchema: SchemaListener
 ) => {
   if (typeof onNewSchema !== "function") {
     throw new Error(

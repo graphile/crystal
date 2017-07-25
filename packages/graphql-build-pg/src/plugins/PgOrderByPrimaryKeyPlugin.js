@@ -1,4 +1,7 @@
-export default function PgOrderByPrimaryKeyPlugin(builder) {
+// @flow
+import type { Plugin } from "graphql-build";
+
+export default (function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
     "GraphQLEnumType:values",
     (
@@ -41,4 +44,4 @@ export default function PgOrderByPrimaryKeyPlugin(builder) {
       });
     }
   );
-}
+}: Plugin);

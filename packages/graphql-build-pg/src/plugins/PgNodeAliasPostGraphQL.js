@@ -1,8 +1,9 @@
-// Use of this plugin is not recommended; it's only included for backwards compatibility with PostGraphQL
+// @flow
+import type { Plugin } from "graphql-build";
 
 import pluralize from "pluralize";
 
-export default async function PgNodeAliasPostGraphQL(builder) {
+export default (async function PgNodeAliasPostGraphQL(builder) {
   builder.hook(
     "GraphQLObjectType",
     (
@@ -16,4 +17,4 @@ export default async function PgNodeAliasPostGraphQL(builder) {
       return object;
     }
   );
-}
+}: Plugin);

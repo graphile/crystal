@@ -18,7 +18,7 @@
     "flow": "flow",
     "flow:check": "flow check",
     "test": "lerna run test",
-    "prepublish": "for I in packages/*/; do echo \"cd $I && npm run prepublish\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently",
+    "prepublish:all": "for I in packages/*/; do echo \"cd $I && npm run prepublish\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently",
     "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others"
   },
   "jest": {

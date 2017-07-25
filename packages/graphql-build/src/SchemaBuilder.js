@@ -10,11 +10,11 @@ import type {
 } from "graphql";
 import EventEmitter from "events";
 import type {
-  parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo,
+  ResolveTree,
+  parseResolveInfo,
 } from "graphql-parse-resolve-info";
-import type { ResolveTree } from "graphql-parse-resolve-info";
 import type { GraphQLResolveInfo } from "graphql/type/definition";
 
 const { GraphQLSchema } = graphql;
@@ -249,6 +249,9 @@ class SchemaBuilder extends EventEmitter {
     context: Context,
     debugStr: string = ""
   ): T {
+    if (!input) {
+      throw new Error("applyHooks was called with falsy input");
+    }
     this.depth++;
     try {
       debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
@@ -273,7 +276,7 @@ class SchemaBuilder extends EventEmitter {
             throw new Error(
               `Hook '${hook.displayName ||
                 hook.name ||
-                "anonymous"}' for '${hookName}' returned falsy value`
+                "anonymous"}' for '${hookName}' returned falsy value '${newObj}'`
             );
           }
           debug(
@@ -317,7 +320,7 @@ class SchemaBuilder extends EventEmitter {
     return build;
   }
 
-  buildSchema(): ?GraphQLSchema {
+  buildSchema(): GraphQLSchema {
     if (!this._generatedSchema) {
       const build = this.createBuild();
       this._generatedSchema = build.newWithHooks(
@@ -325,6 +328,9 @@ class SchemaBuilder extends EventEmitter {
         {},
         { isSchema: true }
       );
+    }
+    if (!this._generatedSchema) {
+      throw new Error("Schema generation failed");
     }
     return this._generatedSchema;
   }

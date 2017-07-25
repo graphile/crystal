@@ -1,3 +1,4 @@
+// @flow
 import pluralize from "pluralize";
 import upperFirstAll from "lodash/upperFirst";
 import lowerFirstAll from "lodash/lowerFirst";
@@ -10,8 +11,14 @@ const constantCaseAll = str =>
     .replace(/__+/g, "_")
     .toUpperCase();
 
-const formatInsideUnderscores = fn => str => {
-  const [, start, middle, end] = str.match(/^(_*)([\s\S]*?)(_*)$/);
+const formatInsideUnderscores = (fn: (input: string) => string) => (
+  str: string
+) => {
+  const matches = str.match(/^(_*)([\s\S]*?)(_*)$/);
+  if (!matches) {
+    throw new Error("Impossible?"); // Satiate Flow
+  }
+  const [, start, middle, end] = matches;
   return `${start}${fn(middle)}${end}`;
 };
 
@@ -20,96 +27,107 @@ const lowerFirst = formatInsideUnderscores(lowerFirstAll);
 const camelCase = formatInsideUnderscores(camelCaseAll);
 const constantCase = formatInsideUnderscores(constantCaseAll);
 
+type Keys = Array<{
+  column: string,
+  table: string,
+  schema: ?string,
+}>;
+
 export const defaultInflection = {
   pluralize,
-  argument(name, index) {
+  argument(name: ?string, index: number) {
     return camelCase(name || `arg${index}`);
   },
-  orderByType(typeName) {
+  orderByType(typeName: string) {
     return upperFirst(camelCase(`${pluralize(typeName)}-order-by`));
   },
-  orderByEnum(name, ascending, _table, _schema) {
+  orderByEnum(
+    name: string,
+    ascending: boolean,
+    _table: string,
+    _schema: ?string
+  ) {
     return constantCase(`${name}_${ascending ? "asc" : "desc"}`);
   },
-  domainType(name) {
+  domainType(name: string) {
     return upperFirst(camelCase(name));
   },
-  enumName(value) {
+  enumName(value: string) {
     return value;
   },
-  enumType(name) {
+  enumType(name: string) {
     return upperFirst(camelCase(name));
   },
-  conditionType(typeName) {
+  conditionType(typeName: string) {
     return upperFirst(camelCase(`${typeName}-condition`));
   },
-  inputType(typeName) {
+  inputType(typeName: string) {
     return upperFirst(camelCase(`${typeName}-input`));
   },
-  rangeBoundType(typeName) {
+  rangeBoundType(typeName: string) {
     return upperFirst(camelCase(`${typeName}-range-bound`));
   },
-  rangeType(typeName) {
+  rangeType(typeName: string) {
     return upperFirst(camelCase(`${typeName}-range`));
   },
-  patchType(typeName) {
+  patchType(typeName: string) {
     return upperFirst(camelCase(`${typeName}-patch`));
   },
-  patchField(itemName) {
+  patchField(itemName: string) {
     return camelCase(`${itemName}-patch`);
   },
-  tableName(name, _schema) {
+  tableName(name: string, _schema: ?string) {
     return camelCase(pluralize.singular(name));
   },
-  tableNode(name, _schema) {
+  tableNode(name: string, _schema: ?string) {
     return camelCase(pluralize.singular(name));
   },
-  allRows(name, schema) {
+  allRows(name: string, schema: ?string) {
     return camelCase(`all-${this.pluralize(this.tableName(name, schema))}`);
   },
-  functionName(name, _schema) {
+  functionName(name: string, _schema: ?string) {
     return camelCase(name);
   },
-  functionPayloadType(name, _schema) {
+  functionPayloadType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`${name}-payload`));
   },
-  functionInputType(name, _schema) {
+  functionInputType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`${name}-input`));
   },
-  tableType(name, schema) {
+  tableType(name: string, schema: ?string) {
     return upperFirst(this.tableName(name, schema));
   },
-  column(name, _table, _schema) {
+  column(name: string, _table: string, _schema: ?string) {
     return camelCase(name);
   },
-  singleRelationByKeys(detailedKeys, table, schema) {
+  singleRelationByKeys(detailedKeys: Keys, table: string, schema: ?string) {
     return camelCase(
       `${this.tableName(table, schema)}-by-${detailedKeys
         .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
   },
-  updateByKeys(detailedKeys, table, schema) {
+  updateByKeys(detailedKeys: Keys, table: string, schema: ?string) {
     return camelCase(
       `update-${this.tableName(table, schema)}-by-${detailedKeys
         .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
   },
-  deleteByKeys(detailedKeys, table, schema) {
+  deleteByKeys(detailedKeys: Keys, table: string, schema: ?string) {
     return camelCase(
       `delete-${this.tableName(table, schema)}-by-${detailedKeys
         .map(key => this.column(key.column, key.table, key.schema))
         .join("-and-")}`
     );
   },
-  updateNode(name, _schema) {
+  updateNode(name: string, _schema: ?string) {
     return camelCase(`update-${pluralize.singular(name)}`);
   },
-  deleteNode(name, _schema) {
+  deleteNode(name: string, _schema: ?string) {
     return camelCase(`delete-${pluralize.singular(name)}`);
   },
-  updateByKeysInputType(detailedKeys, name, _schema) {
+  updateByKeysInputType(detailedKeys: Keys, name: string, _schema: ?string) {
     return upperFirst(
       camelCase(
         `update-${pluralize.singular(name)}-by-${detailedKeys
@@ -118,7 +136,7 @@ export const defaultInflection = {
       )
     );
   },
-  deleteByKeysInputType(detailedKeys, name, _schema) {
+  deleteByKeysInputType(detailedKeys: Keys, name: string, _schema: ?string) {
     return upperFirst(
       camelCase(
         `delete-${pluralize.singular(name)}-by-${detailedKeys
@@ -127,13 +145,13 @@ export const defaultInflection = {
       )
     );
   },
-  updateNodeInputType(name, _schema) {
+  updateNodeInputType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`update-${pluralize.singular(name)}-input`));
   },
-  deleteNodeInputType(name, _schema) {
+  deleteNodeInputType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`delete-${pluralize.singular(name)}-input`));
   },
-  manyRelationByKeys(detailedKeys, table, schema) {
+  manyRelationByKeys(detailedKeys: Keys, table: string, schema: ?string) {
     return camelCase(
       `${this.pluralize(
         this.tableName(table, schema)
@@ -142,34 +160,34 @@ export const defaultInflection = {
         .join("-and-")}`
     );
   },
-  edge(typeName) {
+  edge(typeName: string) {
     return upperFirst(camelCase(`${pluralize(typeName)}-edge`));
   },
-  edgeField(name, _schema) {
+  edgeField(name: string, _schema: ?string) {
     return camelCase(`${pluralize.singular(name)}-edge`);
   },
-  connection(typeName) {
+  connection(typeName: string) {
     return upperFirst(camelCase(`${this.pluralize(typeName)}-connection`));
   },
-  scalarFunctionConnection(procName, _procSchema) {
+  scalarFunctionConnection(procName: string, _procSchema: ?string) {
     return upperFirst(camelCase(`${procName}-connection`));
   },
-  scalarFunctionEdge(procName, _procSchema) {
+  scalarFunctionEdge(procName: string, _procSchema: ?string) {
     return upperFirst(camelCase(`${procName}-edge`));
   },
-  createField(name, _schema) {
+  createField(name: string, _schema: ?string) {
     return camelCase(`create-${pluralize.singular(name)}`);
   },
-  createInputType(name, _schema) {
+  createInputType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`create-${pluralize.singular(name)}-input`));
   },
-  createPayloadType(name, _schema) {
+  createPayloadType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`create-${pluralize.singular(name)}-payload`));
   },
-  updatePayloadType(name, _schema) {
+  updatePayloadType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`update-${pluralize.singular(name)}-payload`));
   },
-  deletePayloadType(name, _schema) {
+  deletePayloadType(name: string, _schema: ?string) {
     return upperFirst(camelCase(`delete-${pluralize.singular(name)}-payload`));
   },
 };
@@ -184,7 +202,7 @@ export const postGraphQLClassicIdsInflection = Object.assign(
   {},
   postGraphQLInflection,
   {
-    column(name, _table, _schema) {
+    column(name: string, _table: string, _schema) {
       return name === "id" ? "rowId" : camelCase(name);
     },
   }

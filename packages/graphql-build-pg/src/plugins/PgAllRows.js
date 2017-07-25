@@ -1,10 +1,16 @@
+// @flow
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
 import addStartEndCursor from "./addStartEndCursor";
 
+import type { Plugin } from "graphql-build";
+
 const debugSql = debugFactory("graphql-build-pg:sql");
 
-export default async function PgAllRows(builder, { pgInflection: inflection }) {
+export default (async function PgAllRows(
+  builder,
+  { pgInflection: inflection }
+) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -123,4 +129,4 @@ export default async function PgAllRows(builder, { pgInflection: inflection }) {
       );
     }
   );
-}
+}: Plugin);

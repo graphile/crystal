@@ -1,3 +1,5 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import {
   GraphQLNonNull,
   GraphQLString,
@@ -85,7 +87,7 @@ const pgRangeParser = {
   },
 };
 
-export default function PgTypesPlugin(
+export default (function PgTypesPlugin(
   builder,
   { pgExtendedTypes = true, pgInflection: inflection }
 ) {
@@ -224,11 +226,11 @@ export default function PgTypesPlugin(
       }, {}),
       {
         // to_json all dates to make them ISO (overrides rawTypes above)
-        1082: tweakToJson,
-        1114: tweakToJson,
-        1184: tweakToJson,
-        1083: tweakToJson,
-        1266: tweakToJson,
+        "1082": tweakToJson,
+        "1114": tweakToJson,
+        "1184": tweakToJson,
+        "1083": tweakToJson,
+        "1266": tweakToJson,
       }
     );
     const pgTweakFragmentForType = (fragment, type) => {
@@ -267,38 +269,38 @@ export default function PgTypesPlugin(
     );
     const oidLookup = Object.assign(
       {
-        20: stringType(
+        "20": stringType(
           "BigInt",
           "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
         ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
-        21: GraphQLInt, // int2
-        23: GraphQLInt, // int4
-        790: GraphQLFloat, // money
-        1186: GQLInterval, // interval
-        1082: SimpleDate, // date
-        1114: SimpleDatetime, // timestamp
-        1184: SimpleDatetime, // timestamptz
-        1083: SimpleTime, // time
-        1266: SimpleTime, // timetz
-        114: SimpleJSON, // json
-        3802: SimpleJSON, // jsonb
-        2950: SimpleUUID, // uuid
+        "21": GraphQLInt, // int2
+        "23": GraphQLInt, // int4
+        "790": GraphQLFloat, // money
+        "1186": GQLInterval, // interval
+        "1082": SimpleDate, // date
+        "1114": SimpleDatetime, // timestamp
+        "1184": SimpleDatetime, // timestamptz
+        "1083": SimpleTime, // time
+        "1266": SimpleTime, // timetz
+        "114": SimpleJSON, // json
+        "3802": SimpleJSON, // jsonb
+        "2950": SimpleUUID, // uuid
       },
       pgExtendedTypes && {
-        114: GraphQLJSON,
-        3802: GraphQLJSON,
-        2950: GraphQLUUID,
+        "114": GraphQLJSON,
+        "3802": GraphQLJSON,
+        "2950": GraphQLUUID,
         /*
-        1082: GraphQLDate, // date
-        1114: GraphQLDateTime, // timestamp
-        1184: GraphQLDateTime, // timestamptz
-        1083: GraphQLTime, // time
-        1266: GraphQLTime, // timetz
+        '1082': GraphQLDate, // date
+        '1114': GraphQLDateTime, // timestamp
+        '1184': GraphQLDateTime, // timestamptz
+        '1083': GraphQLTime, // time
+        '1266': GraphQLTime, // timetz
         */
       }
     );
     const oidInputLookup = {
-      1186: GQLIntervalInput, // interval
+      "1186": GQLIntervalInput, // interval
     };
     const identity = _ => _;
     const jsonStringify = o => JSON.stringify(o);
@@ -461,15 +463,20 @@ export default function PgTypesPlugin(
               rawTypes.indexOf(parseInt(subtype.id, 10)) >= 0
                 ? identity
                 : pgTypes.getTypeParser(subtype.id);
+            const { start, end } = parsed;
             return {
-              start: parsed.start && {
-                value: pg2gql(pgParse(parsed.start.value), subtype),
-                inclusive: parsed.start.inclusive,
-              },
-              end: parsed.end && {
-                value: pg2gql(pgParse(parsed.end.value), subtype),
-                inclusive: parsed.end.inclusive,
-              },
+              start: start
+                ? {
+                    value: pg2gql(pgParse(start.value), subtype),
+                    inclusive: start.inclusive,
+                  }
+                : null,
+              end: end
+                ? {
+                    value: pg2gql(pgParse(end.value), subtype),
+                    inclusive: end.inclusive,
+                  }
+                : null,
             };
           },
           unmap: ({ start, end }) => {
@@ -546,4 +553,4 @@ export default function PgTypesPlugin(
       pgTweaksByTypeId,
     });
   });
-}
+}: Plugin);

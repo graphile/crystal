@@ -1,8 +1,12 @@
+// @flow
 import pg from "pg";
 import debugFactory from "debug";
 const debug = debugFactory("graphql-build-pg");
 
-const withPgClient = async (pgConfig = process.env.DATABASE_URL, fn) => {
+const withPgClient = async (
+  pgConfig: pg.Client | pg.Pool | string = process.env.DATABASE_URL,
+  fn: (pgClient: pg.Client) => Promise<void>
+) => {
   if (!fn) {
     throw new Error("Nothing to do!");
   }

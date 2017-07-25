@@ -5,7 +5,7 @@ export type BuildExtensionQuery = {|
   $$isQuery: Symbol,
 |};
 
-const QueryPlugin: Plugin = async function QueryPlugin(builder) {
+export default (async function QueryPlugin(builder) {
   builder.hook("build", (build: Build): Build & BuildExtensionQuery =>
     build.extend(build, {
       $$isQuery: Symbol("isQuery"),
@@ -53,5 +53,4 @@ const QueryPlugin: Plugin = async function QueryPlugin(builder) {
       }
     }
   );
-};
-export default QueryPlugin;
+}: Plugin);

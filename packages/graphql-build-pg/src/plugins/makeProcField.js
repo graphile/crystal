@@ -1,8 +1,12 @@
+// @flow
 import debugFactory from "debug";
 import camelCase from "lodash/camelCase";
 import pluralize from "pluralize";
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
+
+import type { Build, FieldWithHooksFunction } from "graphql-build";
+import type { Proc } from "./PgIntrospectionPlugin";
 
 const debugSql = debugFactory("graphql-build-pg:sql");
 const firstValue = obj => {
@@ -14,8 +18,8 @@ const firstValue = obj => {
 };
 
 export default function makeProcField(
-  fieldName,
-  proc,
+  fieldName: string,
+  proc: Proc,
   {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
     pgGqlTypeByTypeId,
@@ -42,8 +46,16 @@ export default function makeProcField(
       getNamedType,
       isCompositeType,
     },
-  },
-  { fieldWithHooks, computed = false, isMutation = false }
+  }: {| ...Build |},
+  {
+    fieldWithHooks,
+    computed = false,
+    isMutation = false,
+  }: {
+    fieldWithHooks: FieldWithHooksFunction,
+    computed?: boolean,
+    isMutation?: boolean,
+  }
 ) {
   function getResultFieldName(gqlType, type, returnsSet) {
     const gqlNamedType = getNamedType(gqlType);
@@ -98,9 +110,8 @@ export default function makeProcField(
     );
   }
   let type;
-  const scope = {
-    pgIntrospection: proc,
-  };
+  const scope = {};
+  scope.pgIntrospection = proc;
   let returnFirstValueAsValue = false;
   const TableType =
     returnTypeTable &&
@@ -285,24 +296,28 @@ export default function makeProcField(
                 recurseDataGeneratorsForField(resultFieldName);
               }
               return Object.assign(
+                {},
                 {
                   clientMutationId: {
                     type: GraphQLString,
                   },
                 },
-                isNotVoid && {
-                  [resultFieldName]: {
-                    type: type,
-                    resolve(data) {
-                      return data.data;
-                    },
-                  },
-                  // Result
-                }
+                isNotVoid
+                  ? {
+                      [resultFieldName]: {
+                        type: type,
+                        resolve(data) {
+                          return data.data;
+                        },
+                      },
+                      // Result
+                    }
+                  : null
               );
             },
           },
           Object.assign(
+            {},
             {
               isMutationPayload: true,
             },

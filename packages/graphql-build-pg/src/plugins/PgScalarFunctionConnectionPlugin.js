@@ -1,6 +1,8 @@
+// @flow
+import type { Plugin } from "graphql-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
-export default function PgTablesPlugin(builder, { pgInflection: inflection }) {
+export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
   builder.hook(
     "init",
     (
@@ -107,4 +109,4 @@ export default function PgTablesPlugin(builder, { pgInflection: inflection }) {
       return _;
     }
   );
-}
+}: Plugin);

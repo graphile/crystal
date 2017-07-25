@@ -1,4 +1,7 @@
-export default function PgOrderAllColumnsPlugin(
+// @flow
+import type { Plugin } from "graphql-build";
+
+export default (function PgOrderAllColumnsPlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -46,4 +49,4 @@ export default function PgOrderAllColumnsPlugin(
       );
     }
   );
-}
+}: Plugin);

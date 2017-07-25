@@ -29,7 +29,7 @@ export type BuildExtensionNode = {|
   setNodeAlias(typeName: string, alias: string): void,
 |};
 
-const NodePlugin: Plugin = function NodePlugin(
+export default (function NodePlugin(
   builder,
   { nodeIdFieldName: inNodeIdFieldName }
 ) {
@@ -202,6 +202,4 @@ const NodePlugin: Plugin = function NodePlugin(
       });
     }
   );
-};
-
-export default NodePlugin;
+}: Plugin);

@@ -26,13 +26,13 @@ import type {
   InlineFragmentNode,
 } from "graphql/language/ast";
 
-type FieldsByTypeName = {
+export type FieldsByTypeName = {
   [string]: {
     [string]: ResolveTree,
   },
 };
 
-type ResolveTree = {
+export type ResolveTree = {
   name: string,
   alias: string,
   args: {
@@ -45,9 +45,11 @@ const debug = debugFactory("graphql-parse-resolve-info");
 
 // Originally based on https://github.com/tjmehta/graphql-parse-fields
 
-function getAliasFromResolveInfo(resolveInfo: GraphQLResolveInfo): ?string {
+export function getAliasFromResolveInfo(
+  resolveInfo: GraphQLResolveInfo
+): string {
   const asts = resolveInfo.fieldNodes || resolveInfo.fieldASTs;
-  return asts.reduce(function(alias, val) {
+  const alias = asts.reduce(function(alias, val) {
     if (!alias) {
       if (val.kind === "Field") {
         alias = val.alias ? val.alias.value : val.name && val.name.value;
@@ -55,9 +57,13 @@ function getAliasFromResolveInfo(resolveInfo: GraphQLResolveInfo): ?string {
     }
     return alias;
   }, null);
+  if (!alias) {
+    throw new Error("Could not determine alias?!");
+  }
+  return alias;
 }
 
-function parseResolveInfo(
+export function parseResolveInfo(
   resolveInfo: GraphQLResolveInfo,
   options: { keepRoot?: boolean, deep?: boolean } = {}
 ): ResolveTree | FieldsByTypeName | null | void {
@@ -276,7 +282,7 @@ function getType(resolveInfo, typeCondition) {
   }
 }
 
-function simplifyParsedResolveInfoFragmentWithType(
+export function simplifyParsedResolveInfoFragmentWithType(
   parsedResolveInfoFragment: ResolveTree,
   Type: GraphQLType
 ) {
@@ -298,11 +304,6 @@ function simplifyParsedResolveInfoFragmentWithType(
   });
 }
 
-export {
-  parseResolveInfo,
-  parseResolveInfo as parse,
-  simplifyParsedResolveInfoFragmentWithType,
-  simplifyParsedResolveInfoFragmentWithType as simplify,
-  getAliasFromResolveInfo,
-  getAliasFromResolveInfo as getAlias,
-};
+export const parse = parseResolveInfo;
+export const simplify = simplifyParsedResolveInfoFragmentWithType;
+export const getAlias = getAliasFromResolveInfo;

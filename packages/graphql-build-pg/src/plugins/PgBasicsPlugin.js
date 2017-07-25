@@ -1,6 +1,8 @@
+// @flow
 import sql from "pg-sql2";
+import type { Plugin } from "graphql-build";
 
-export default function PgBasicsPlugin(
+export default (function PgBasicsPlugin(
   builder,
   { pgInflection, pgStrictFunctions = false }
 ) {
@@ -11,4 +13,4 @@ export default function PgBasicsPlugin(
       pgStrictFunctions,
     });
   });
-}
+}: Plugin);

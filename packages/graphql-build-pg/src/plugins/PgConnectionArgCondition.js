@@ -1,4 +1,6 @@
-export default function PgConnectionArgCondition(
+// @flow
+import type { Plugin } from "graphql-build";
+export default (function PgConnectionArgCondition(
   builder,
   { pgInflection: inflection }
 ) {
@@ -123,4 +125,4 @@ export default function PgConnectionArgCondition(
       });
     }
   );
-}
+}: Plugin);

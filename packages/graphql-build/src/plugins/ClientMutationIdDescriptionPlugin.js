@@ -1,7 +1,7 @@
 // @flow
 import type SchemaBuilder, { Plugin } from "../SchemaBuilder";
 
-const ClientMutationIdDescriptionPlugin: Plugin = function ClientMutationIdDescriptionPlugin(
+export default (function ClientMutationIdDescriptionPlugin(
   builder: SchemaBuilder
 ) {
   builder.hook(
@@ -52,6 +52,4 @@ const ClientMutationIdDescriptionPlugin: Plugin = function ClientMutationIdDescr
       });
     }
   );
-};
-
-export default ClientMutationIdDescriptionPlugin;
+}: Plugin);

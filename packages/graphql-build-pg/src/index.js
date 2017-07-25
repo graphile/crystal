@@ -1,3 +1,4 @@
+// @flow
 import PgBasicsPlugin from "./plugins/PgBasicsPlugin";
 import PgIntrospectionPlugin from "./plugins/PgIntrospectionPlugin";
 import PgTypesPlugin from "./plugins/PgTypesPlugin";

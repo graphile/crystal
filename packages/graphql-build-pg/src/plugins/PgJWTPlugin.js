@@ -1,6 +1,8 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import { sign as signJwt } from "jsonwebtoken";
 
-export default function PgJWTPlugin(
+export default (function PgJWTPlugin(
   builder,
   { pgInflection: inflection, pgJwtTypeIdentifier, pgJwtSecret }
 ) {
@@ -107,7 +109,7 @@ export default function PgJWTPlugin(
       return _;
     }
   );
-}
+}: Plugin);
 
 function parseTypeIdentifier(typeIdentifier) {
   const match = typeIdentifier.match(

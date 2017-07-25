@@ -1,6 +1,8 @@
+// @flow
 import isString from "lodash/isString";
+import type { Plugin } from "graphql-build";
 
-export default function PgConnectionArgOrderBy(
+export default (function PgConnectionArgOrderBy(
   builder,
   { pgInflection: inflection }
 ) {
@@ -101,4 +103,4 @@ export default function PgConnectionArgOrderBy(
       });
     }
   );
-}
+}: Plugin);

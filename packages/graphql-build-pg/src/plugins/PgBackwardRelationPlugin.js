@@ -1,10 +1,13 @@
+// @flow
 import debugFactory from "debug";
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
 
+import type { Plugin } from "graphql-build";
+
 const debug = debugFactory("graphql-build-pg");
 
-export default function PgBackwardRelationPlugin(
+export default (function PgBackwardRelationPlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -181,4 +184,4 @@ export default function PgBackwardRelationPlugin(
       );
     }
   );
-}
+}: Plugin);

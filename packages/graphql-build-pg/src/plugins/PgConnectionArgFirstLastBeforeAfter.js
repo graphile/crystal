@@ -1,6 +1,9 @@
+// @flow
+import type { Plugin } from "graphql-build";
+
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
-export default function PgConnectionArgs(builder) {
+export default (function PgConnectionArgs(builder) {
   builder.hook(
     "field:args",
     (
@@ -84,4 +87,4 @@ export default function PgConnectionArgs(builder) {
       });
     }
   );
-}
+}: Plugin);

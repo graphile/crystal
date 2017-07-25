@@ -1,7 +1,11 @@
 // @flow
 
 import * as graphql from "graphql";
-import type { GraphQLNamedType } from "graphql";
+import type {
+  GraphQLNamedType,
+  GraphQLField,
+  GraphQLInputField,
+} from "graphql";
 import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
@@ -9,11 +13,23 @@ import {
 } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 
-import type SchemaBuilder, { Build, Scope } from "./SchemaBuilder";
+import type SchemaBuilder, { Build, Scope, DataForType } from "./SchemaBuilder";
 
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphql-build");
+
+export type FieldWithHooksFunction = (
+  fieldName: string,
+  spec: GraphQLField<*, *>,
+  fieldScope?: {}
+) => GraphQLField<*, *>;
+
+export type InputFieldWithHooksFunction = (
+  fieldName: string,
+  spec: GraphQLInputField,
+  fieldScope?: {}
+) => GraphQLInputField;
 
 function getNameFromType(Type: GraphQLNamedType | GraphQLSchema) {
   if (Type instanceof GraphQLSchema) {
@@ -263,7 +279,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               recurseDataGeneratorsForField,
               Self,
               GraphQLObjectType: rawSpec,
-              fieldWithHooks: (fieldName, spec, fieldScope = {}) => {
+              fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
@@ -283,7 +299,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                   getDataFromParsedResolveInfoFragment: (
                     parsedResolveInfoFragment,
                     ReturnType
-                  ) => {
+                  ): DataForType => {
                     const data = {};
 
                     const {
@@ -315,11 +331,15 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                         "It's too early to call this! Call from within resolve"
                       );
                     }
-                    const Type = getNamedType(finalSpec.type);
+                    const Type: GraphQLNamedType = getNamedType(finalSpec.type);
                     const fieldDataGenerators = fieldDataGeneratorsByType.get(
                       Type
                     );
-                    if (fieldDataGenerators) {
+                    if (
+                      fieldDataGenerators &&
+                      isCompositeType(Type) &&
+                      !isAbstractType(Type)
+                    ) {
                       const typeFields = Type.getFields();
                       for (const alias of Object.keys(fields)) {
                         const field = fields[alias];
@@ -369,7 +389,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 const finalSpec = newSpec;
                 processedFields.push(finalSpec);
                 return finalSpec;
-              },
+              }: FieldWithHooksFunction),
             };
             let rawFields = rawSpec.fields || {};
             if (typeof rawFields === "function") {
@@ -416,7 +436,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               scope,
               Self,
               GraphQLObjectType: rawSpec,
-              fieldWithHooks: (fieldName, spec, fieldScope = {}) => {
+              fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
@@ -446,7 +466,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 const finalSpec = newSpec;
                 processedFields.push(finalSpec);
                 return finalSpec;
-              },
+              }: InputFieldWithHooksFunction),
             };
             let rawFields = rawSpec.fields;
             if (typeof rawFields === "function") {
@@ -503,6 +523,20 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
             Self.getFields();
           }
         } catch (e) {
+          // This is the error we're expecting to handle:
+          // https://github.com/graphql/graphql-js/blob/831598ba76f015078ecb6c5c1fbaf133302f3f8e/src/type/definition.js#L526-L531
+          const isProbablyAnEmptyObjectError = !!e.message.match(
+            /function which returns such an object/
+          );
+          if (!isProbablyAnEmptyObjectError) {
+            // XXX: Improve this
+            // eslint-disable-next-line no-console
+            console.warn(
+              "An error occurred, it might be okay but it doesn't look like the error we were expecting..."
+            );
+            // eslint-disable-next-line no-console
+            console.warn(e);
+          }
           return null;
         }
       }

@@ -1,10 +1,12 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
 
 const debug = debugFactory("graphql-build-pg");
 const debugSql = debugFactory("graphql-build-pg:sql");
 
-export default function PgMutationCreatePlugin(
+export default (function PgMutationCreatePlugin(
   builder,
   { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
@@ -205,4 +207,4 @@ export default function PgMutationCreatePlugin(
       );
     }
   );
-}
+}: Plugin);

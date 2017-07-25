@@ -1,9 +1,11 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import debugFactory from "debug";
 import queryFromResolveData from "../queryFromResolveData";
 
 const debug = debugFactory("graphql-build-pg");
 
-export default function PgForwardRelationPlugin(
+export default (function PgForwardRelationPlugin(
   builder,
   { pgInflection: inflection }
 ) {
@@ -163,4 +165,4 @@ export default function PgForwardRelationPlugin(
       );
     }
   );
-}
+}: Plugin);

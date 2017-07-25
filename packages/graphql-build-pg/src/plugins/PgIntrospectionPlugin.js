@@ -1,3 +1,5 @@
+// @flow
+import type { Plugin } from "graphql-build";
 import withPgClient from "../withPgClient";
 import { readFile as rawReadFile } from "fs";
 import pg from "pg";
@@ -5,6 +7,30 @@ import debugFactory from "debug";
 const debug = debugFactory("graphql-build-pg");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
+
+// Ref: https://github.com/postgraphql/postgraphql/tree/master/src/postgres/introspection/object
+
+export type Namespace = {
+  kind: "namespace",
+  id: string,
+  name: string,
+  description: string,
+};
+
+export type Proc = {
+  kind: "procedure",
+  name: string,
+  description: ?string,
+  namespaceId: string,
+  isStrict: boolean,
+  returnsSet: boolean,
+  isStable: boolean,
+  returnTypeId: string,
+  argTypeIds: Array<string>,
+  argNames: Array<string>,
+  argDefaultsNum: number,
+  namespace: Namespace,
+};
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -15,7 +41,7 @@ function readFile(filename, encoding) {
   });
 }
 
-export default async function PgIntrospectionPlugin(
+export default (async function PgIntrospectionPlugin(
   builder,
   { pgConfig, pgSchemas: schemas }
 ) {
@@ -183,19 +209,24 @@ export default async function PgIntrospectionPlugin(
     // Check we can get a pgClient
     if (pgConfig instanceof pg.Pool) {
       pgClient = await pgConfig.connect();
-      releasePgClient = () => pgClient.release();
+      releasePgClient = () => pgClient && pgClient.release();
     } else if (typeof pgConfig === "string") {
       pgClient = new pg.Client(pgConfig);
       pgClient.on("error", e => {
         debug("pgClient error occurred: %s", e);
       });
       releasePgClient = () =>
-        new Promise((resolve, reject) =>
-          pgClient.end(err => (err ? reject(err) : resolve()))
-        );
-      await new Promise((resolve, reject) =>
-        pgClient.connect(err => (err ? reject(err) : resolve()))
-      );
+        new Promise((resolve, reject) => {
+          if (pgClient) pgClient.end(err => (err ? reject(err) : resolve()));
+          else resolve();
+        });
+      await new Promise((resolve, reject) => {
+        if (pgClient) {
+          pgClient.connect(err => (err ? reject(err) : resolve()));
+        } else {
+          resolve();
+        }
+      });
     } else {
       throw new Error(
         "Cannot watch schema with this configuration - need a string or pg.Pool"
@@ -265,4 +296,4 @@ export default async function PgIntrospectionPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
     });
   });
-}
+}: Plugin);

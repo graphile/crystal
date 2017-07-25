@@ -1,10 +1,15 @@
+// @flow
 import { GraphQLNonNull, GraphQLString } from "graphql";
 import queryFromResolveData from "../queryFromResolveData";
+import type { Plugin } from "graphql-build";
 
 const nullableIf = (condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 
-export default function PgColumnsPlugin(builder, { pgInflection: inflection }) {
+export default (function PgColumnsPlugin(
+  builder,
+  { pgInflection: inflection }
+) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -75,7 +80,7 @@ export default function PgColumnsPlugin(builder, { pgInflection: inflection }) {
                           ReturnType
                         );
                         const jsonBuildObject = queryFromResolveData(
-                          Symbol(), // Ignore!
+                          sql.identifier(Symbol()), // Ignore!
                           sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
                             attr.name
                           )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
@@ -164,4 +169,4 @@ export default function PgColumnsPlugin(builder, { pgInflection: inflection }) {
       );
     }
   );
-}
+}: Plugin);
