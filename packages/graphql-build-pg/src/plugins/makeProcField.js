@@ -131,6 +131,13 @@ export default function makeProcField(
         const ConnectionType = getTypeByName(
           inflection.connection(TableType.name)
         );
+        if (!ConnectionType) {
+          throw new Error(
+            `Do not have a connection type '${inflection.connection(
+              TableType.name
+            )}' for '${TableType.name}' so cannot create procedure field`
+          );
+        }
         type = new GraphQLNonNull(ConnectionType);
         scope.isPgConnectionField = true;
       }

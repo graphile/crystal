@@ -63,6 +63,8 @@ with
       pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace) and
       -- Do not expose trigger functions (type trigger has oid 2279)
       pro.prorettype <> 2279 and
+      -- We don't want functions that will clash with GraphQL (treat them as private)
+      pro.proname not like '\_\_%' and
       -- We also don’t want procedures that have been defined in our namespace
       -- twice. This leads to duplicate fields in the API which throws an
       -- error. In the future we may support this case. For now though, it is
@@ -108,6 +110,8 @@ with
         rel.reltype in (select unnest("argTypeIds") from procedure)
       ) and
       rel.relpersistence in ('p') and
+      -- We don't want classes that will clash with GraphQL (treat them as private)
+      rel.relname not like '\_\_%' and
       rel.relkind in ('r', 'v', 'm', 'c', 'f')
     order by
       rel.relnamespace, rel.relname
@@ -129,6 +133,8 @@ with
     where
       att.attrelid in (select "id" from class) and
       att.attnum > 0 and
+      -- We don't want attributes that will clash with GraphQL (treat them as private)
+      att.attname not like '\_\_%' and
       not att.attisdropped
     order by
       att.attrelid, att.attnum

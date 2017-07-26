@@ -5,6 +5,10 @@ create schema a;
 create schema b;
 create schema c;
 
+-- Troublesome extensions install annoying things in our schema; we want to
+-- ensure this doesn't make us crash.
+create extension tablefunc with schema a;
+
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
 

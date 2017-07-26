@@ -1,6 +1,9 @@
 // @flow
 import type { Plugin } from "graphql-build";
 import makeProcField from "./makeProcField";
+import debugFactory from "debug";
+
+const debugWarn = debugFactory("graphql-build-pg:warn");
 
 export default (function PgQueryProceduresPlugin(builder) {
   builder.hook(
@@ -61,9 +64,16 @@ export default (function PgQueryProceduresPlugin(builder) {
               proc.name,
               proc.namespace.name
             );
-            memo[fieldName] = makeProcField(fieldName, proc, build, {
-              fieldWithHooks,
-            });
+            try {
+              memo[fieldName] = makeProcField(fieldName, proc, build, {
+                fieldWithHooks,
+              });
+            } catch (e) {
+              debugWarn(
+                `Failed to add function '${proc.namespace.name}.${proc.name}':`
+              );
+              debugWarn(e);
+            }
             return memo;
           }, {})
       );
