@@ -63,7 +63,7 @@ export default (function PgConnectionArgCondition(
     }
   );
   builder.hook(
-    "field:args",
+    "GraphQLObjectType:fields:field:args",
     (
       args,
       {

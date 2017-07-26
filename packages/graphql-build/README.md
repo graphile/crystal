@@ -123,6 +123,9 @@ Hooks
   - `GraphQLObjectType:fields` to add additional fields to this object type (is
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
+  - `GraphQLObjectType:fields:field`: to add any root-level attributes to an
+    individual field, e.g. add a description
+  - `GraphQLObjectType:fields:field:args` to add arguments to an individual field
 
 - `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType via
   `newWithHooks`, we'll execute, the following hooks:
@@ -131,21 +134,13 @@ Hooks
   - `GraphQLInputObjectType:fields` to add additional fields to this object type (is
     ran asynchronously and gets a reference to the final GraphQL Object as
     `Self` in the context)
+  - `GraphQLInputObjectType:fields:field`: to customize an individual field from above
 
 - `GraphQLEnumType*`: When creating a GraphQLEnumType via `newWithHooks`,
   we'll execute, the following hooks:
 
   - `GraphQLEnumType` to add any root-level attributes, e.g. add a description
   - `GraphQLEnumType:values` to add additional values
-
-- `field*`: When you add a field to a GraphQLObjectType, wrap the call with
-  `fieldWithHooks` in order to fire these hooks:
-
-  - `field`: to add any root-level attributes, e.g. add a description
-  - `field:args` to add arguments
-
-- `inputField`: When you add a field to a GraphQLInputObjectType, wrap the call
-  with `fieldWithHooks` in order to fire this hook
 
 
 Conventions

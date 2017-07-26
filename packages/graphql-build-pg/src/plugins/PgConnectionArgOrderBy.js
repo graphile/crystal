@@ -46,7 +46,7 @@ export default (function PgConnectionArgOrderBy(
     }
   );
   builder.hook(
-    "field:args",
+    "GraphQLObjectType:fields:field:args",
     (
       args,
       { extend, getTypeByName, pgSql: sql },

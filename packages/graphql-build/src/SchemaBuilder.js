@@ -186,9 +186,13 @@ class SchemaBuilder extends EventEmitter {
       // - 'GraphQLObjectType:fields' to add additional fields to this object type (is
       //   ran asynchronously and gets a reference to the final GraphQL Object as
       //   `Self` in the context)
+      // - 'GraphQLObjectType:fields:field' to customise an individual field from above
+      // - 'GraphQLObjectType:fields:field:args' to customize the arguments to a field
       GraphQLObjectType: [],
       "GraphQLObjectType:interfaces": [],
       "GraphQLObjectType:fields": [],
+      "GraphQLObjectType:fields:field": [],
+      "GraphQLObjectType:fields:field:args": [],
 
       // When creating a GraphQLInputObjectType via `newWithHooks`, we'll
       // execute, the following hooks:
@@ -196,8 +200,10 @@ class SchemaBuilder extends EventEmitter {
       // - 'GraphQLInputObjectType:fields' to add additional fields to this object type (is
       //   ran asynchronously and gets a reference to the final GraphQL Object as
       //   `Self` in the context)
+      // - 'GraphQLInputObjectType:fields:field' to customise an individual field from above
       GraphQLInputObjectType: [],
       "GraphQLInputObjectType:fields": [],
+      "GraphQLInputObjectType:fields:field": [],
 
       // When creating a GraphQLEnumType via `newWithHooks`, we'll
       // execute, the following hooks:
@@ -205,15 +211,6 @@ class SchemaBuilder extends EventEmitter {
       // - 'GraphQLEnumType:values' to add additional values
       GraphQLEnumType: [],
       "GraphQLEnumType:values": [],
-
-      // When you add a field to a GraphQLObjectType, wrap the call with
-      // `fieldWithHooks` in order to fire these hooks:
-      field: [],
-      "field:args": [],
-
-      // When you add a field to a GraphQLInputObjectType, wrap the call with
-      // `fieldWithHooks` in order to fire this hook:
-      inputField: [],
     };
   }
 

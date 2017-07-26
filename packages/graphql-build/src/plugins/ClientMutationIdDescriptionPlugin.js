@@ -5,7 +5,7 @@ export default (function ClientMutationIdDescriptionPlugin(
   builder: SchemaBuilder
 ) {
   builder.hook(
-    "inputField",
+    "GraphQLInputObjectType:fields:field",
     (field: {}, { extend }, { scope: { isMutationInput, fieldName } }) => {
       if (
         !isMutationInput ||
@@ -22,7 +22,7 @@ export default (function ClientMutationIdDescriptionPlugin(
   );
 
   builder.hook(
-    "field",
+    "GraphQLObjectType:fields:field",
     (field: {}, { extend }, { scope: { isMutationPayload, fieldName } }) => {
       if (
         !isMutationPayload ||
@@ -39,7 +39,7 @@ export default (function ClientMutationIdDescriptionPlugin(
   );
 
   builder.hook(
-    "field:args",
+    "GraphQLObjectType:fields:field:args",
     (args: {}, { extend }, { scope: { isRootMutation } }) => {
       if (!isRootMutation || !args.input || args.input.description) {
         return args;

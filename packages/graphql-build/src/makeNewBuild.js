@@ -368,7 +368,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 }
                 newSpec = builder.applyHooks(
                   this,
-                  "field",
+                  "GraphQLObjectType:fields:field",
                   newSpec,
                   context,
                   `|${getNameFromType(Self)}.fields.${fieldName}`
@@ -377,7 +377,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 newSpec = Object.assign({}, newSpec, {
                   args: builder.applyHooks(
                     this,
-                    "field:args",
+                    "GraphQLObjectType:fields:field:args",
                     newSpec.args,
                     Object.assign({}, context, {
                       field: newSpec,
@@ -458,7 +458,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 }
                 newSpec = builder.applyHooks(
                   this,
-                  "inputField",
+                  "GraphQLInputObjectType:fields:field",
                   newSpec,
                   context,
                   `|${getNameFromType(Self)}.fields.${fieldName}`
