@@ -236,7 +236,7 @@ class QueryBuilder {
     return sql.join(
       this.compiledData.select.map(
         ([sqlFragment, alias]) =>
-          sql.fragment`${sqlFragment} as ${sql.identifier(alias)}`
+          sql.fragment`to_json(${sqlFragment}) as ${sql.identifier(alias)}`
       ),
       ", "
     );

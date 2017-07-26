@@ -9,6 +9,7 @@ mutation {
       boolean: false
       varchar: "abc"
       enum: RED
+      enumArray: [RED, GREEN]
       domain: 6
       domain2: 5
       textArray: ["have", "you", "ever", "been", "down", "the", "water", "spout", "?"]
@@ -75,6 +76,7 @@ mutation {
       boolean
       varchar
       enum
+      enumArray
       domain
       domain2
       textArray

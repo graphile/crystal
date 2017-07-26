@@ -1,35 +1,11 @@
 query {
   allTypes {
     nodes {
-      smallint
-      bigint
-      boolean
-      enum
-      domain
-      domain2
-      textArray
-      json
-      jsonb
-      nullableRange {
-        start { value inclusive }
-        end { value inclusive }
-      }
-      numrange {
-        start { value inclusive }
-        end { value inclusive }
-      }
-      anIntRange {
-        start { value inclusive }
-        end { value inclusive }
-      }
-      money
-      compoundType { ...compoundType }
-      nestedCompoundType {
-        a { ...compoundType }
-        b { ...compoundType }
-        bazBuz
-      }
+      ...type
     }
+  }
+  typeById(id: 12) {
+    ...type
   }
 }
 
@@ -39,4 +15,36 @@ fragment compoundType on CompoundType {
   c
   d
   fooBar
+}
+
+fragment type on Type {
+  smallint
+  bigint
+  boolean
+  enum
+  enumArray
+  domain
+  domain2
+  textArray
+  json
+  jsonb
+  nullableRange {
+    start { value inclusive }
+    end { value inclusive }
+  }
+  numrange {
+    start { value inclusive }
+    end { value inclusive }
+  }
+  anIntRange {
+    start { value inclusive }
+    end { value inclusive }
+  }
+  money
+  compoundType { ...compoundType }
+  nestedCompoundType {
+    a { ...compoundType }
+    b { ...compoundType }
+    bazBuz
+  }
 }

@@ -216,7 +216,7 @@ export default (function PgTypesPlugin(
       1266, // timetz
     ];
 
-    const tweakToJson = fragment => sql.fragment`to_json(${fragment})`;
+    const tweakToJson = fragment => fragment; // Since everything is to_json'd now, just pass through
     const tweakToText = fragment => sql.fragment`(${fragment})::text`;
     const pgTweaksByTypeId = Object.assign(
       // ::text rawTypes

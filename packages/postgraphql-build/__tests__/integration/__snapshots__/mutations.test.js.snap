@@ -40,6 +40,10 @@ Object {
         "domain": 6,
         "domain2": 5,
         "enum": "RED",
+        "enumArray": Array [
+          "RED",
+          "GREEN",
+        ],
         "id": 201,
         "interval": Object {
           "days": 4,

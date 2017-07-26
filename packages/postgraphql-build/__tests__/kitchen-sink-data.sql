@@ -44,6 +44,7 @@ insert into b.types values (
   true,
   'xyz',
   'green',
+  ARRAY['green', 'red']::b.color[],
   5,
   6,
   array['hey', 'i', 'just', 'met', 'you'],

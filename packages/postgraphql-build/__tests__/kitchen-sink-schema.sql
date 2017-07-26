@@ -106,6 +106,7 @@ create table b.types (
   "boolean" boolean not null,
   "varchar" varchar not null,
   "enum" b.color not null,
+  "enum_array" b.color[] not null,
   "domain" a.an_int not null,
   "domain2" b.another_int not null,
   "text_array" text[] not null,
