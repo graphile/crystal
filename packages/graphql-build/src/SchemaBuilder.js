@@ -209,8 +209,10 @@ class SchemaBuilder extends EventEmitter {
       // execute, the following hooks:
       // - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
       // - 'GraphQLEnumType:values' to add additional values
+      // - 'GraphQLEnumType:values:value' to change an individual value
       GraphQLEnumType: [],
       "GraphQLEnumType:values": [],
+      "GraphQLEnumType:values:value": [],
     };
   }
 

@@ -514,6 +514,21 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           },
           `|${newSpec.name}`
         );
+        const values = newSpec.values;
+        newSpec.values = Object.keys(values).reduce((memo, valueKey) => {
+          const value = values[valueKey];
+          const newValue = builder.applyHooks(
+            this,
+            "GraphQLEnumType:values:value",
+            value,
+            {
+              scope,
+            },
+            `|${newSpec.name}|${valueKey}`
+          );
+          memo[valueKey] = newValue;
+          return memo;
+        }, {});
       }
       const finalSpec: ConfigType = newSpec;
 
