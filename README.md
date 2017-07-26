@@ -60,7 +60,7 @@ docker run postgraphql/postgraphql --help
 To connect to a database and expose the PostGraphQL port try this:
 
 ```bash
-docker run -p 5000:5000 postgraphql/postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_SCHEMA
+docker run -p 5000:5000 postgraphql/postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE
 ```
 
 Also make sure to check out the **[forum example][]** and especially **[step by step tutorial][]** for a demo of a PostGraphQL compliant schema and authentication.
