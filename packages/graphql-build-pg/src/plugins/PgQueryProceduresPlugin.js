@@ -69,8 +69,10 @@ export default (function PgQueryProceduresPlugin(builder) {
                 fieldWithHooks,
               });
             } catch (e) {
-              debugWarn(
-                `Failed to add function '${proc.namespace.name}.${proc.name}':`
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Failed to add function '${proc.namespace
+                  .name}.${proc.name}'; run with 'DEBUG="graphql-build-pg:warn"' to view the error`
               );
               debugWarn(e);
             }
