@@ -35,7 +35,7 @@ export default (function NodePlugin(
 ) {
   const nodeIdFieldName: string = inNodeIdFieldName
     ? String(inNodeIdFieldName)
-    : "nodeId";
+    : "id";
   builder.hook("build", (build: Build): Build & BuildExtensionNode => {
     const nodeFetcherByTypeName = {};
     const nodeAliasByTypeName = {};

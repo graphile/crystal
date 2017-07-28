@@ -8,7 +8,7 @@ exports[`generated schema n = 0, n = 3 1`] = `
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+  id: ID!
 }
 
 # The root query type which gives access points into the data universe.
@@ -18,12 +18,12 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  nodeId: ID!
+  id: ID!
 
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    nodeId: ID!
+    id: ID!
   ): Node
   dummy: Dummy0
 }
@@ -38,7 +38,7 @@ exports[`generated schema n = 0, n = 3 2`] = `
 # An object with a globally unique \`ID\`.
 interface Node {
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+  id: ID!
 }
 
 # The root query type which gives access points into the data universe.
@@ -48,12 +48,12 @@ type Query implements Node {
   query: Query!
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  nodeId: ID!
+  id: ID!
 
   # Fetches an object given its globally unique \`ID\`.
   node(
     # The globally unique \`ID\`.
-    nodeId: ID!
+    id: ID!
   ): Node
   dummy: Dummy3
 }
