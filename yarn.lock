@@ -2670,28 +2670,29 @@ graphiql@^0.11.2:
     codemirror-graphql "^0.6.8"
     marked "0.3.6"
 
-graphql-build-pg@^0.0.1-alpha11.1:
-  version "0.0.1-alpha9.3"
-  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.0.1-alpha9.3.tgz#b80aa7126ced150c4b262586045d82f8a476afc6"
+graphql-build-pg@^0.1.0-alpha.13:
+  version "0.1.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/graphql-build-pg/-/graphql-build-pg-0.1.0-alpha.13.tgz#a86f685d89d26ae8f07295158cbbe56d144b966b"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
+    graphql-build "^0.1.0-alpha.13"
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
     jsonwebtoken "^7.4.1"
     lodash ">=4 <5"
     lru-cache "4.1.1"
     pg-range-parser "^1.0.0"
-    pg-sql2 "1.0.0-alpha1.0"
+    pg-sql2 "1.0.0-alpha1.4"
     pluralize "^5.0.0"
 
-graphql-build@^0.0.1-alpha11.1:
-  version "0.0.1-alpha9.3"
-  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.0.1-alpha9.3.tgz#5add832a92512c0b181bd6be97fe2862cad9713e"
+graphql-build@^0.1.0-alpha.13:
+  version "0.1.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/graphql-build/-/graphql-build-0.1.0-alpha.13.tgz#78405b75408f93e576b249bea51ecfb8ed9bdd43"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
-    graphql-parse-resolve-info "^0.0.1-alpha9.3"
+    graphql-parse-resolve-info "^0.1.0-alpha.13"
     graphql-type-json "^0.1.4"
 
 graphql-iso-date@^3.2.0:
@@ -2733,9 +2734,9 @@ graphql-language-service-utils@0.0.17:
     graphql "^0.10.1"
     graphql-language-service-types "0.0.21"
 
-graphql-parse-resolve-info@^0.0.1-alpha9.3:
-  version "0.0.1-alpha9.3"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.0.1-alpha9.3.tgz#81dc4bf8ca94d8002c512bfed1f0ba739c26efa7"
+graphql-parse-resolve-info@^0.1.0-alpha.13:
+  version "0.1.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-0.1.0-alpha.13.tgz#ff52c2e9cbe80ddff9340f5fe1db2880a61e5da1"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
@@ -4472,7 +4473,13 @@ pg-range-parser@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/pg-range-parser/-/pg-range-parser-1.0.0.tgz#561e8c4c3dee98a1caa8288c5c7e4300861819bb"
 
-pg-sql2@1.0.0-alpha1.0, pg-sql2@^1.0.0-alpha1.0:
+pg-sql2@1.0.0-alpha1.4:
+  version "1.0.0-alpha1.4"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-1.0.0-alpha1.4.tgz#a2b8ffd396a746020879281d16a3cd976c854c37"
+  dependencies:
+    debug ">=2 <3"
+
+pg-sql2@^1.0.0-alpha1.0:
   version "1.0.0-alpha1.0"
   resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-1.0.0-alpha1.0.tgz#13c34041f82fa895bb1fb94eed7ed70a060c394d"
   dependencies:
@@ -4822,13 +4829,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphql-build@0.0.1-alpha11.1:
-  version "0.0.1-alpha11.1"
-  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.0.1-alpha11.1.tgz#8e0dd9fa66c861fa9d485048e00e2f38bf5d17aa"
+postgraphql-build@0.1.0-alpha.13:
+  version "0.1.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/postgraphql-build/-/postgraphql-build-0.1.0-alpha.13.tgz#e0d8cd9e176fb5d54a7e0916ee456b9eae9d5490"
   dependencies:
     babel-runtime ">=6 <7"
-    graphql-build "^0.0.1-alpha11.1"
-    graphql-build-pg "^0.0.1-alpha11.1"
+    graphql-build "^0.1.0-alpha.13"
+    graphql-build-pg "^0.1.0-alpha.13"
 
 postgres-array@~1.0.0:
   version "1.0.2"
