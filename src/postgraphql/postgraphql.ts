@@ -2,7 +2,7 @@ import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
-import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphql-build'
+import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphile-core'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 

@@ -1,4 +1,4 @@
-declare module 'postgraphql-build' {
+declare module 'postgraphile-core' {
   import { Pool, Client, ClientConfig } from 'pg'
   import { GraphQLSchema } from 'graphql'
   export function createPostGraphQLSchema (

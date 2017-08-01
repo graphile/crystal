@@ -1,4 +1,4 @@
-jest.unmock('postgraphql-build')
+jest.unmock('postgraphile-core')
 
 import { resolve as resolvePath } from 'path'
 import { readFile, readdirSync } from 'fs'

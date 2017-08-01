@@ -1,6 +1,6 @@
 jest.mock('pg')
 jest.mock('pg-connection-string')
-jest.mock('postgraphql-build')
+jest.mock('postgraphile-core')
 jest.mock('../http/createPostGraphQLHttpRequestHandler')
 
 import { Pool } from 'pg'

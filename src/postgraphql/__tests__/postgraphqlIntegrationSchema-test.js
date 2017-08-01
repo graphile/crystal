@@ -1,7 +1,7 @@
 // TODO: There may be some excessive waste, if we could somehow filter what
 // these guys see, that would be great 👍
 
-jest.unmock('postgraphql-build')
+jest.unmock('postgraphile-core')
 
 import printSchemaOrdered from '../../__tests__/utils/printSchemaOrdered'
 import withPgClient from '../../__tests__/utils/withPgClient'
