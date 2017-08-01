@@ -26,6 +26,10 @@ create table c.person (
 comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
 
+create function c.person_exists(person c.person, email b.email) returns boolean as $$
+select exists(select 1 from c.person where person.email = person_exists.email);
+$$ language sql stable;
+
 create table a.post (
   id serial primary key,
   headline text not null,

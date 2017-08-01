@@ -4,8 +4,8 @@ import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
 import camelCase from "lodash/camelCase";
 import pluralize from "pluralize";
+import viaTemporaryTable from "./viaTemporaryTable";
 
-const debugSql = debugFactory("graphql-build-pg:sql");
 const debug = debugFactory("graphql-build-pg");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
@@ -75,14 +75,13 @@ export default (async function PgMutationUpdateDeletePlugin(
                     parsedResolveInfoFragment,
                     PayloadType
                   );
-                  const modifiedRowAlias = sql.identifier(Symbol());
-                  const query = queryFromResolveData(
-                    modifiedRowAlias,
-                    modifiedRowAlias,
-                    resolveData,
-                    {}
+
+                  const sqlTypeIdentifier = sql.identifier(
+                    table.namespace.name,
+                    table.name
                   );
-                  let queryWithMutation;
+
+                  let sqlMutationQuery;
                   if (mode === "update") {
                     const sqlColumns = [];
                     const sqlValues = [];
@@ -112,39 +111,45 @@ export default (async function PgMutationUpdateDeletePlugin(
                     if (sqlColumns.length === 0) {
                       return null;
                     }
-                    queryWithMutation = sql.query`
-                          with ${modifiedRowAlias} as (
-                            update ${sql.identifier(
-                              table.namespace.name,
-                              table.name
-                            )} set ${sql.join(
+                    sqlMutationQuery = sql.query`
+                      update ${sql.identifier(
+                        table.namespace.name,
+                        table.name
+                      )} set ${sql.join(
                       sqlColumns.map(
                         (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
                       ),
                       ", "
                     )}
-                            where ${condition}
-                            returning *
-                          ) ${query}
-                          `;
+                      where ${condition}
+                      returning *`;
                   } else {
-                    queryWithMutation = sql.query`
-                      with ${modifiedRowAlias} as (
-                        delete from ${sql.identifier(
-                          table.namespace.name,
-                          table.name
-                        )}
-                        where ${condition}
-                        returning *
-                      ) ${query}
-                      `;
+                    sqlMutationQuery = sql.query`
+                      delete from ${sql.identifier(
+                        table.namespace.name,
+                        table.name
+                      )}
+                      where ${condition}
+                      returning *`;
                   }
-                  const { text, values } = sql.compile(queryWithMutation);
-                  if (debugSql.enabled) debugSql(text);
-                  const { rows: [row] } = await pgClient.query(text, values);
+
+                  const modifiedRowAlias = sql.identifier(Symbol());
+                  const query = queryFromResolveData(
+                    modifiedRowAlias,
+                    modifiedRowAlias,
+                    resolveData,
+                    {}
+                  );
+                  const { rows: [row] } = await viaTemporaryTable(
+                    pgClient,
+                    sqlTypeIdentifier,
+                    sqlMutationQuery,
+                    modifiedRowAlias,
+                    query
+                  );
                   if (!row) {
                     throw new Error(
-                      `No values were deleted in collection '${pluralize(
+                      `No values were ${mode}d in collection '${pluralize(
                         table.name
                       )}' because no values were found.`
                     );

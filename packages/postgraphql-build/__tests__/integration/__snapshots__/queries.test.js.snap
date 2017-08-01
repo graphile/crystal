@@ -68,14 +68,22 @@ Object {
             "name": "Joe Tucker",
           },
         },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphql-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
       ],
       "pageInfo": Object {
-        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
         "hasNextPage": false,
         "hasPreviousPage": false,
         "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "b": Object {
       "edges": Array [
@@ -102,18 +110,10 @@ Object {
         "hasPreviousPage": false,
         "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "c": Object {
       "edges": Array [
-        Object {
-          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-          "node": Object {
-            "email": "kathryn.ramirez@email.com",
-            "id": 4,
-            "name": "Kathryn Ramirez",
-          },
-        },
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
@@ -122,14 +122,22 @@ Object {
             "name": "Joe Tucker",
           },
         },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphql-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
       ],
       "pageInfo": Object {
-        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
         "hasNextPage": false,
         "hasPreviousPage": true,
-        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "d": Object {
       "edges": Array [
@@ -173,17 +181,33 @@ Object {
             "name": "Sara Smith",
           },
         },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
+          "node": Object {
+            "email": "graphql-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
       ],
       "pageInfo": Object {
-        "endCursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
+        "endCursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
         "hasNextPage": false,
         "hasPreviousPage": false,
         "startCursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "e": Object {
       "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
+          "node": Object {
+            "email": "graphql-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
           "node": Object {
@@ -229,9 +253,9 @@ Object {
         "endCursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
         "hasNextPage": false,
         "hasPreviousPage": false,
-        "startCursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
+        "startCursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "f": Object {
       "edges": Array [
@@ -250,7 +274,7 @@ Object {
         "hasPreviousPage": false,
         "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "g": Object {
       "edges": Array [
@@ -278,14 +302,22 @@ Object {
             "name": "Joe Tucker",
           },
         },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphql-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
       ],
       "pageInfo": Object {
-        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
         "hasNextPage": false,
         "hasPreviousPage": true,
         "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "h": Object {
       "edges": Array [
@@ -327,6 +359,14 @@ Object {
             "constant": 2,
             "name": "Joe Tucker",
             "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
           },
         },
       ],
@@ -371,6 +411,14 @@ Object {
             "constant": 2,
             "name": "Joe Tucker",
             "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
           },
         },
       ],
@@ -483,7 +531,7 @@ Object {
         "hasPreviousPage": true,
         "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "n": Object {
       "edges": Array [],
@@ -493,7 +541,7 @@ Object {
         "hasPreviousPage": false,
         "startCursor": null,
       },
-      "totalCount": 5,
+      "totalCount": 6,
     },
     "o": Object {
       "nodes": Array [
@@ -653,6 +701,12 @@ Object {
           "id": 5,
           "name": "Joe Tucker",
           "nodeId": "WyJwZW9wbGUiLDVd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "nodeId": "WyJwZW9wbGUiLDZd",
         },
       ],
     },
@@ -977,11 +1031,17 @@ Object {
                 "id": 5,
               },
               "friends": Object {
-                "nodes": Array [],
+                "nodes": Array [
+                  Object {
+                    "firstName": "Twenty",
+                    "id": 6,
+                    "name": "Twenty Seventwo",
+                  },
+                ],
                 "pageInfo": Object {
-                  "startCursor": null,
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
                 },
-                "totalCount": 0,
+                "totalCount": 1,
               },
               "id": 5,
               "name": "Joe Tucker",
@@ -1362,7 +1422,12 @@ Object {
               Object {
                 "firstName": "Joe",
                 "friends": Object {
-                  "nodes": Array [],
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Twenty",
+                      "name": "Twenty Seventwo",
+                    },
+                  ],
                 },
                 "name": "Joe Tucker",
               },
@@ -1378,9 +1443,21 @@ Object {
               Object {
                 "firstName": "Joe",
                 "friends": Object {
-                  "nodes": Array [],
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Twenty",
+                      "name": "Twenty Seventwo",
+                    },
+                  ],
                 },
                 "name": "Joe Tucker",
+              },
+              Object {
+                "firstName": "Twenty",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Twenty Seventwo",
               },
             ],
           },
@@ -1393,9 +1470,25 @@ Object {
             "id": 5,
           },
           "friends": Object {
-            "nodes": Array [],
+            "nodes": Array [
+              Object {
+                "firstName": "Twenty",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Twenty Seventwo",
+              },
+            ],
           },
           "name": "Joe Tucker",
+        },
+        Object {
+          "firstName": "Twenty",
+          "firstPost": null,
+          "friends": Object {
+            "nodes": Array [],
+          },
+          "name": "Twenty Seventwo",
         },
       ],
     },
@@ -1580,6 +1673,12 @@ Object {
           "cursor": "WyJuYXR1cmFsIiw1XQ==",
           "node": Object {
             "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "name": "Twenty Seventwo",
           },
         },
       ],
@@ -1867,6 +1966,22 @@ Object {
                 "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
               },
             ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [],
+          },
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
           },
           "roundOnePost": Object {
             "nodes": Array [],

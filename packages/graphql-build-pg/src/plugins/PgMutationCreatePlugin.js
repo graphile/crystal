@@ -2,9 +2,9 @@
 import type { Plugin } from "graphql-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
+import viaTemporaryTable from "./viaTemporaryTable";
 
 const debug = debugFactory("graphql-build-pg");
-const debugSql = debugFactory("graphql-build-pg:sql");
 
 export default (function PgMutationCreatePlugin(
   builder,
@@ -179,22 +179,24 @@ export default (function PgMutationCreatePlugin(
                         sqlValues.push(gql2pg(val, attr.type));
                       }
                     });
-                  const queryWithInsert = sql.query`
-                    with ${insertedRowAlias} as (
-                      insert into ${sql.identifier(
-                        table.namespace.name,
-                        table.name
-                      )} ${sqlColumns.length
+
+                  const mutationQuery = sql.query`
+                    insert into ${sql.identifier(
+                      table.namespace.name,
+                      table.name
+                    )} ${sqlColumns.length
                     ? sql.fragment`(
                         ${sql.join(sqlColumns, ", ")}
                       ) values(${sql.join(sqlValues, ", ")})`
-                    : sql.fragment`default values`}
-                      returning *
-                    ) ${query}
-                    `;
-                  const { text, values } = sql.compile(queryWithInsert);
-                  if (debugSql.enabled) debugSql(text);
-                  const { rows: [row] } = await pgClient.query(text, values);
+                    : sql.fragment`default values`} returning *`;
+
+                  const { rows: [row] } = await viaTemporaryTable(
+                    pgClient,
+                    sql.identifier(table.namespace.name, table.name),
+                    mutationQuery,
+                    insertedRowAlias,
+                    query
+                  );
                   return {
                     clientMutationId: input.clientMutationId,
                     data: row,

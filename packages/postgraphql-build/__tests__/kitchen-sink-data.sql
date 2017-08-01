@@ -3,7 +3,8 @@ insert into c.person (id, name, email, about, created_at) values
   (2, 'Sara Smith', 'sara.smith@email.com', null, null),
   (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null),
   (4, 'Kathryn Ramirez', 'kathryn.ramirez@email.com', null, null),
-  (5, 'Joe Tucker', 'joe.tucker@email.com', null, null);
+  (5, 'Joe Tucker', 'joe.tucker@email.com', null, null),
+  (6, 'Twenty Seventwo', 'graphql-build.issue.27.exists@example.com', null, null);
 
 alter sequence c.person_id_seq restart with 10;
 

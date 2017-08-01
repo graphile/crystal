@@ -666,6 +666,7 @@ type Person implements Node {
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
+  exists(email: Email): Boolean
   firstName: String
 
   # Reads and enables pagination through a set of \`Post\`.
@@ -3875,6 +3876,7 @@ type Person implements Node {
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
+  exists(email: Email): Boolean
   firstName: String
 
   # Reads and enables pagination through a set of \`Post\`.
@@ -5716,6 +5718,7 @@ type Person implements Node {
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
+  exists(email: Email): Boolean
   firstName: String
 
   # Reads and enables pagination through a set of \`Post\`.

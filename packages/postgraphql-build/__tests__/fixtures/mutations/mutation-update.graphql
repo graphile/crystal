@@ -64,6 +64,12 @@ mutation {
       extra: false
     }
   }) { ...updateCompoundKeyPayload }
+  j: updatePersonByEmail(input: {
+    email: "graphql-build.issue.27.exists@example.com"
+    personPatch: {
+      email: "somethingelse@example.com"
+    }
+  }) { ...updatePersonPayload }
 }
 
 fragment updatePersonPayload on UpdatePersonPayload {
@@ -74,6 +80,7 @@ fragment updatePersonPayload on UpdatePersonPayload {
     name
     email
     about
+    issue27UserExists: exists(email: "graphql-build.issue.27.exists@example.com")
   }
   query { nodeId }
 }

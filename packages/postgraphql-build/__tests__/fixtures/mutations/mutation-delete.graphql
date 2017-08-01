@@ -10,6 +10,7 @@ mutation {
   i: deleteCompoundKey(input: { nodeId: "WyJjb21wb3VuZF9rZXlzIiw0LDNd" }) { ...deleteCompoundKeyPayload }
   j: deleteCompoundKeyByPersonId1AndPersonId2(input: { personId1: 2, personId2:3 }) { ...deleteCompoundKeyPayload }
 	k: deletePersonByEmail(input: { email: "budd.deey@email.com" }) { ...deletePersonPayload }
+	l: deletePersonByEmail(input: { email: "graphql-build.issue.27.exists@example.com" }) { ...deletePersonPayload }
 }
 
 fragment deletePostPayload on DeletePostPayload {
@@ -51,6 +52,7 @@ fragment deletePersonPayload on DeletePersonPayload {
     id
     name
     email
+    issue27UserExists: exists(email: "graphql-build.issue.27.exists@example.com")
   }
   query { nodeId }
 }

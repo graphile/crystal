@@ -4,9 +4,11 @@ import camelCase from "lodash/camelCase";
 import pluralize from "pluralize";
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
+import viaTemporaryTable from "./viaTemporaryTable";
 
 import type { Build, FieldWithHooksFunction } from "graphql-build";
 import type { Proc } from "./PgIntrospectionPlugin";
+import type { SQL } from "pg-sql2";
 
 const debugSql = debugFactory("graphql-build-pg:sql");
 const firstValue = obj => {
@@ -122,7 +124,8 @@ export default function makeProcField(
       )
     );
 
-  const isTableLike = TableType && isCompositeType(TableType);
+  const isTableLike: boolean =
+    (TableType && isCompositeType(TableType)) || false;
   if (isTableLike) {
     if (proc.returnsSet) {
       if (isMutation) {
@@ -198,15 +201,11 @@ export default function makeProcField(
           };
         });
       }
-      function makeQuery(
+      function makeMutationCall(
         parsedResolveInfoFragment,
         ReturnType,
         { implicitArgs = [] } = {}
-      ) {
-        const resolveData = getDataFromParsedResolveInfoFragment(
-          parsedResolveInfoFragment,
-          ReturnType
-        );
+      ): SQL {
         const { args: rawArgs = {} } = parsedResolveInfoFragment;
         const args = isMutation ? rawArgs.input : rawArgs;
         const sqlArgValues = argNames.map((argName, argIndex) => {
@@ -219,12 +218,23 @@ export default function makeProcField(
         ) {
           sqlArgValues.pop();
         }
-        const functionAlias = sql.identifier(Symbol());
+        return sql.fragment`${sql.identifier(
+          proc.namespace.name,
+          proc.name
+        )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`;
+      }
+      function makeQuery(
+        parsedResolveInfoFragment,
+        ReturnType,
+        sqlMutationQuery,
+        functionAlias
+      ) {
+        const resolveData = getDataFromParsedResolveInfoFragment(
+          parsedResolveInfoFragment,
+          ReturnType
+        );
         const query = queryFromResolveData(
-          sql.fragment`${sql.identifier(
-            proc.namespace.name,
-            proc.name
-          )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`,
+          sqlMutationQuery,
           functionAlias,
           resolveData,
           {
@@ -260,9 +270,20 @@ export default function makeProcField(
             pgQuery: queryBuilder => {
               queryBuilder.select(() => {
                 const parentTableAlias = queryBuilder.getTableAlias();
-                const query = makeQuery(parsedResolveInfoFragment, ReturnType, {
-                  implicitArgs: [parentTableAlias],
-                });
+                const functionAlias = sql.identifier(Symbol());
+                const sqlMutationQuery = makeMutationCall(
+                  parsedResolveInfoFragment,
+                  ReturnType,
+                  {
+                    implicitArgs: [parentTableAlias],
+                  }
+                );
+                const query = makeQuery(
+                  parsedResolveInfoFragment,
+                  ReturnType,
+                  sqlMutationQuery,
+                  functionAlias
+                );
                 return sql.fragment`(${query})`;
               }, parsedResolveInfoFragment.alias);
             },
@@ -389,15 +410,50 @@ export default function makeProcField(
             }
           : async (data, args, { pgClient }, resolveInfo) => {
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-              const query = makeQuery(
+              const functionAlias = sql.identifier(Symbol());
+              const sqlMutationQuery = makeMutationCall(
                 parsedResolveInfoFragment,
                 resolveInfo.returnType,
                 {}
               );
 
-              const { text, values } = sql.compile(query);
-              if (debugSql.enabled) debugSql(text);
-              const { rows } = await pgClient.query(text, values);
+              let queryResult;
+              if (isMutation) {
+                const query = makeQuery(
+                  parsedResolveInfoFragment,
+                  resolveInfo.returnType,
+                  functionAlias,
+                  functionAlias
+                );
+                const returnType = rawReturnType;
+                const intermediateIdentifier = sql.identifier(Symbol());
+                const isVoid = returnType.id === "2278";
+                const isPgClass =
+                  !returnFirstValueAsValue || returnTypeTable || false;
+                queryResult = await viaTemporaryTable(
+                  pgClient,
+                  isVoid
+                    ? null
+                    : sql.identifier(returnType.namespaceName, returnType.name),
+                  sql.query`select ${isPgClass
+                    ? sql.query`${intermediateIdentifier}.*`
+                    : sql.query`${intermediateIdentifier}.${intermediateIdentifier} as ${functionAlias}`} from ${sqlMutationQuery} ${intermediateIdentifier}`,
+                  functionAlias,
+                  query,
+                  isPgClass
+                );
+              } else {
+                const query = makeQuery(
+                  parsedResolveInfoFragment,
+                  resolveInfo.returnType,
+                  sqlMutationQuery,
+                  functionAlias
+                );
+                const { text, values } = sql.compile(query);
+                if (debugSql.enabled) debugSql(text);
+                queryResult = await pgClient.query(text, values);
+              }
+              const { rows } = queryResult;
               const [row] = rows;
               const result = (() => {
                 if (returnFirstValueAsValue) {
