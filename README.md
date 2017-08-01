@@ -5,15 +5,15 @@ Build a high-performance easily-extensible GraphQL schema by combining plugins.
 
 This repository is a monorepo (managed by [lerna][]) which comprises the following packages:
 
-**[graphql-build][]**: The core package: a simple plugin system that enables you to build a GraphQL schema out of plugins
+**[graphile-build][]**: The core package: a simple plugin system that enables you to build a GraphQL schema out of plugins
 
-**[graphql-build-pg][]**: A selection of plugins related to PostgreSQL: schema
+**[graphile-build-pg][]**: A selection of plugins related to PostgreSQL: schema
   introspection, generation of fields and types for all tables, computed columns,
   query procedures, etc - if there's certain features you don't want, simply
   don't use that plugin! (Surfacing plugin dependencies has not been built yet,
   so be careful when you disable a plugin.)
 
-**[postgraphql-build][]**: Intended to be used by [PostGraphQL][] in
+**[postgraphile-build][]**: Intended to be used by [PostGraphQL][] in
   order to provide its schema functionality (excluding HTTP handling, etc)
 
 **[graphql-parse-resolve-info][]**: Parses a GraphQLResolveInfo object into a
@@ -24,15 +24,15 @@ This repository is a monorepo (managed by [lerna][]) which comprises the followi
 Status
 ------
 
-- [graphql-build][] - working (but needs tests, more documentation, refactoring,
+- [graphile-build][] - working (but needs tests, more documentation, refactoring,
   and probably needs to support more hooks)
 
-- [graphql-build-pg][] / [postgraphql-build][] - working - passes the PostGraphQL
+- [graphile-build-pg][] / [postgraphile-build][] - working - passes the PostGraphQL
   integration tests for queries and mutations, no descriptions are added to
   fields yet
 
 - [graphql-parse-resolve-info][] - complete (but needs dedicated tests because
-  it's currently only tested by virtue of the postgraphql-build tests depending
+  it's currently only tested by virtue of the postgraphile-build tests depending
   on it)
 
 Running on Node less than v8
@@ -42,7 +42,7 @@ We actually bundle two copies of each module - one compiled for Node v8+ and
 one for Node v4+. This is accomplished using [Babel's env
 preset](https://babeljs.io/docs/plugins/preset-env/). You can see the
 switching code in, e.g.,
-[packages/graphql-build/index.js](packages/graphql-build/index.js). This has a
+[packages/graphile-build/index.js](packages/graphile-build/index.js). This has a
 couple consequences:
 
 - We'll run a lot faster on Node v8 because most of the code is passed through
@@ -96,7 +96,7 @@ lerna bootstrap
 [Caleb Meredith]: https://github.com/calebmer
 [lerna]: https://github.com/lerna/lerna
 [postgraphql-sql]: https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts
-[graphql-build]: packages/graphql-build/
-[graphql-build-pg]: packages/graphql-build-pg/
-[postgraphql-build]: packages/postgraphql-build/
+[graphile-build]: packages/graphile-build/
+[graphile-build-pg]: packages/graphile-build-pg/
+[postgraphile-build]: packages/postgraphile-build/
 [graphql-parse-resolve-info]: packages/graphql-parse-resolve-info/

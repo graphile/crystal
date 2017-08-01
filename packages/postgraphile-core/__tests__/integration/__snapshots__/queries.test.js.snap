@@ -1,0 +1,2289 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`classic-ids.graphql 1`] = `
+Object {
+  "data": Object {
+    "allEdgeCases": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": "WyJwb3N0cyIsMV0=",
+          "rowId": 1,
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`connections.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "b": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "c": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+      },
+      "totalCount": 6,
+    },
+    "d": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2UgVHVja2VyIiw1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
+      },
+      "totalCount": 6,
+    },
+    "e": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9lIFR1Y2tlciIsNV1d",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
+      },
+      "totalCount": 6,
+    },
+    "f": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "email": "john.smith@email.com",
+            "id": 1,
+            "name": "John Smith",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "g": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+      },
+      "totalCount": 6,
+    },
+    "h": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Joe Tucker",
+            "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
+          },
+        },
+      ],
+    },
+    "i": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Joe Tucker",
+            "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
+          },
+        },
+      ],
+    },
+    "j": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+          "node": Object {
+            "authorId": 2,
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 3,
+    },
+    "k": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 3,
+    },
+    "l": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+          "node": Object {
+            "authorId": 1,
+            "headline": "You hit me with a cricket bat.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+      },
+      "totalCount": 4,
+    },
+    "m": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+      },
+      "totalCount": 6,
+    },
+    "n": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+      "totalCount": 6,
+    },
+    "o": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`dynamic-json.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": true,
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "json": Object {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": Object {
+              "e": 4,
+              "f": 5,
+              "g": Array [
+                6,
+                7,
+                8,
+                "x",
+                false,
+                null,
+              ],
+            },
+          },
+          "jsonb": Object {
+            "1": "a",
+            "2": "b",
+            "3": "c",
+            "4": Object {
+              "5": "d",
+              "6": "e",
+              "7": Array [
+                "f",
+                "g",
+                "h",
+                42,
+                true,
+                null,
+              ],
+            },
+          },
+        },
+      ],
+    },
+    "b": false,
+    "c": 42,
+    "d": 3.1415,
+    "e": "hello, world!",
+    "f": Object {
+      "a": 1,
+      "b": 2,
+      "c": 3,
+    },
+    "g": Array [
+      1,
+      2,
+      3,
+      4,
+    ],
+    "h": Object {
+      "array": Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+      "boolean": true,
+      "float": 3.1415,
+      "integer": 42,
+      "object": Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+    },
+    "i": Array [
+      true,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        3,
+        4,
+      ],
+    ],
+    "j": Array [
+      true,
+      null,
+      42,
+      3.1415,
+      Object {
+        "a": 1,
+        "b": null,
+        "c": 3,
+      },
+      Array [
+        1,
+        2,
+        null,
+        3,
+        4,
+      ],
+    ],
+  },
+}
+`;
+
+exports[`node.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "nodes": Array [
+        Object {
+          "__typename": "Person",
+          "id": 1,
+          "name": "John Smith",
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 2,
+          "name": "Sara Smith",
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 3,
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 4,
+          "name": "Kathryn Ramirez",
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 5,
+          "name": "Joe Tucker",
+          "nodeId": "WyJwZW9wbGUiLDVd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+    },
+    "b": Object {
+      "nodes": Array [
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+          "personId1": 1,
+          "personId2": 2,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
+          "personId1": 2,
+          "personId2": 1,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+          "personId1": 2,
+          "personId2": 3,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
+          "personId1": 2,
+          "personId2": 5,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+          "personId1": 4,
+          "personId2": 3,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
+          "personId1": 4,
+          "personId2": 4,
+        },
+      ],
+    },
+    "c": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "personId1": 2,
+      "personId2": 3,
+    },
+    "d": Object {
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+    "e": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "personId1": 1,
+      "personId2": 2,
+    },
+    "f": Object {
+      "__typename": "Person",
+      "id": 5,
+      "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
+    },
+    "g": null,
+    "h": null,
+    "i": Object {
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+    "j": Object {
+      "__typename": "Person",
+      "id": 5,
+      "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
+    },
+    "k": null,
+    "l": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "personId1": 2,
+      "personId2": 3,
+    },
+    "m": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "personId1": 1,
+      "personId2": 2,
+    },
+    "n": null,
+    "o": Object {
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+    },
+    "p": Object {
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+    },
+    "q": Object {
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+    },
+    "r": Object {
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+    },
+  },
+}
+`;
+
+exports[`nonexistant-record-from-function.graphql 1`] = `
+Object {
+  "data": Object {
+    "tableQuery": null,
+  },
+}
+`;
+
+exports[`posts.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPosts": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "headlineTrimmed": "No… It’s …",
+            "id": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "headlineTrimmed": "I hate yo…",
+            "id": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "Is that a cooking show?",
+            "headlineTrimmed": "Is that a…",
+            "id": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "You hit me with a cricket bat.",
+            "headlineTrimmed": "You hit m…",
+            "id": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Joe",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Joe",
+                  "id": 5,
+                  "name": "Joe Tucker",
+                },
+                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+                "headlineTrimmed": "Please, D…",
+                "id": 5,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Twenty",
+                    "id": 6,
+                    "name": "Twenty Seventwo",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 1,
+              },
+              "id": 5,
+              "name": "Joe Tucker",
+            },
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            "headlineTrimmed": "Please, D…",
+            "id": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "Stop talking, brain thinking. Hush.",
+            "headlineTrimmed": "Stop talk…",
+            "id": 6,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "Large bet on myself in round one.",
+            "headlineTrimmed": "Large bet…",
+            "id": 7,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+            "headlineTrimmed": "It’s a fe…",
+            "id": 8,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "You know how I sometimes have really brilliant ideas?",
+            "headlineTrimmed": "You know …",
+            "id": 9,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+            "headlineTrimmed": "What’s wi…",
+            "id": 10,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMV1d",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "They’re not aliens, they’re Earth…liens!",
+            "headlineTrimmed": "They’re n…",
+            "id": 11,
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`procedure-computed-fields.graphql 1`] = `
+Object {
+  "data": Object {
+    "allEdgeCases": Object {
+      "nodes": Array [
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": false,
+          "wontCastEasy": 20,
+        },
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": true,
+          "wontCastEasy": null,
+        },
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": false,
+          "wontCastEasy": -512,
+        },
+      ],
+    },
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "firstName": "John",
+          "firstPost": Object {
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "id": 2,
+          },
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Sara",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Budd",
+                      "name": "Budd Deey",
+                    },
+                  ],
+                },
+                "name": "Sara Smith",
+              },
+              Object {
+                "firstName": "Budd",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Kathryn",
+                      "name": "Kathryn Ramirez",
+                    },
+                  ],
+                },
+                "name": "Budd Deey",
+              },
+            ],
+          },
+          "name": "John Smith",
+        },
+        Object {
+          "firstName": "Sara",
+          "firstPost": Object {
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "id": 1,
+          },
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Budd",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Kathryn",
+                      "name": "Kathryn Ramirez",
+                    },
+                  ],
+                },
+                "name": "Budd Deey",
+              },
+              Object {
+                "firstName": "Kathryn",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Joe",
+                      "name": "Joe Tucker",
+                    },
+                  ],
+                },
+                "name": "Kathryn Ramirez",
+              },
+            ],
+          },
+          "name": "Sara Smith",
+        },
+        Object {
+          "firstName": "Budd",
+          "firstPost": Object {
+            "headline": "Stop talking, brain thinking. Hush.",
+            "id": 6,
+          },
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Kathryn",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Joe",
+                      "name": "Joe Tucker",
+                    },
+                  ],
+                },
+                "name": "Kathryn Ramirez",
+              },
+              Object {
+                "firstName": "Joe",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Twenty",
+                      "name": "Twenty Seventwo",
+                    },
+                  ],
+                },
+                "name": "Joe Tucker",
+              },
+            ],
+          },
+          "name": "Budd Deey",
+        },
+        Object {
+          "firstName": "Kathryn",
+          "firstPost": null,
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Joe",
+                "friends": Object {
+                  "nodes": Array [
+                    Object {
+                      "firstName": "Twenty",
+                      "name": "Twenty Seventwo",
+                    },
+                  ],
+                },
+                "name": "Joe Tucker",
+              },
+              Object {
+                "firstName": "Twenty",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Twenty Seventwo",
+              },
+            ],
+          },
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "firstName": "Joe",
+          "firstPost": Object {
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            "id": 5,
+          },
+          "friends": Object {
+            "nodes": Array [
+              Object {
+                "firstName": "Twenty",
+                "friends": Object {
+                  "nodes": Array [],
+                },
+                "name": "Twenty Seventwo",
+              },
+            ],
+          },
+          "name": "Joe Tucker",
+        },
+        Object {
+          "firstName": "Twenty",
+          "firstPost": null,
+          "friends": Object {
+            "nodes": Array [],
+          },
+          "name": "Twenty Seventwo",
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "a": "No… It’s …",
+          "b": "No… It’s a thi…",
+          "c": "No… It’s a thing; i[...]",
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+        },
+        Object {
+          "a": "I hate yo…",
+          "b": "I hate yogurt.…",
+          "c": "I hate yogurt. It’s[...]",
+          "headline": "I hate yogurt. It’s just stuff with bits in.",
+        },
+        Object {
+          "a": "Is that a…",
+          "b": "Is that a cook…",
+          "c": "Is that a cooking s[...]",
+          "headline": "Is that a cooking show?",
+        },
+        Object {
+          "a": "You hit m…",
+          "b": "You hit me wit…",
+          "c": "You hit me with a c[...]",
+          "headline": "You hit me with a cricket bat.",
+        },
+        Object {
+          "a": "Please, D…",
+          "b": "Please, Don-Bo…",
+          "c": "Please, Don-Bot… lo[...]",
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        },
+        Object {
+          "a": "Stop talk…",
+          "b": "Stop talking, …",
+          "c": "Stop talking, brain[...]",
+          "headline": "Stop talking, brain thinking. Hush.",
+        },
+        Object {
+          "a": "Large bet…",
+          "b": "Large bet on m…",
+          "c": "Large bet on myself[...]",
+          "headline": "Large bet on myself in round one.",
+        },
+        Object {
+          "a": "It’s a fe…",
+          "b": "It’s a fez. I …",
+          "c": "It’s a fez. I wear [...]",
+          "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+        },
+        Object {
+          "a": "You know …",
+          "b": "You know how I…",
+          "c": "You know how I some[...]",
+          "headline": "You know how I sometimes have really brilliant ideas?",
+        },
+        Object {
+          "a": "What’s wi…",
+          "b": "What’s with yo…",
+          "c": "What’s with you kid[...]",
+          "headline": "What’s with you kids? Every other day it’s food, food, food.",
+        },
+        Object {
+          "a": "They’re n…",
+          "b": "They’re not al…",
+          "c": "They’re not aliens,[...]",
+          "headline": "They’re not aliens, they’re Earth…liens!",
+        },
+      ],
+    },
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "compoundType": Object {
+            "a": 1,
+            "computedField": 9,
+            "fooBar": 8,
+          },
+          "nestedCompoundType": Object {
+            "a": Object {
+              "a": 3,
+              "computedField": 96,
+              "fooBar": 93,
+            },
+            "b": Object {
+              "a": 42,
+              "computedField": 37,
+              "fooBar": -5,
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`procedure-query.graphql 1`] = `
+Object {
+  "data": Object {
+    "add1Query": 3,
+    "add2Query": 4,
+    "add3Query": null,
+    "add4Query": 4,
+    "compoundTypeQuery": Object {
+      "a": 420,
+      "b": "easy cheesy baked potatoes",
+      "c": "RED",
+      "d": null,
+      "fooBar": 8,
+    },
+    "empty": false,
+    "intSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": 1,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": 2,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": 3,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": 4,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": 5,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": null,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw3XQ==",
+          "node": 6,
+        },
+      ],
+    },
+    "noArgsQuery": 2,
+    "tableQuery": Object {
+      "authorId": 5,
+      "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      "id": 5,
+      "nodeId": "WyJwb3N0cyIsNV0=",
+    },
+    "tableSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+    },
+    "typesQuery": false,
+  },
+}
+`;
+
+exports[`query.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": null,
+    "b": Object {
+      "__typename": "Query",
+      "a": null,
+      "b": Object {
+        "__typename": "Query",
+        "nodeId": "query",
+      },
+      "nodeId": "query",
+    },
+    "nodeId": "query",
+    "query": Object {
+      "a": null,
+      "b": Object {
+        "__typename": "Query",
+        "nodeId": "query",
+      },
+      "nodeId": "query",
+      "query": Object {
+        "a": null,
+        "b": Object {
+          "__typename": "Query",
+          "nodeId": "query",
+        },
+        "nodeId": "query",
+        "query": Object {
+          "a": null,
+          "b": Object {
+            "__typename": "Query",
+            "nodeId": "query",
+          },
+          "nodeId": "query",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`relation-head-tail.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeys": Object {
+      "nodes": Array [
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 1,
+          "personId2": 2,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [
+              Object {
+                "compoundKey1": 2,
+                "compoundKey2": 1,
+                "personId": 5,
+              },
+              Object {
+                "compoundKey1": 2,
+                "compoundKey2": 1,
+                "personId": null,
+              },
+            ],
+          },
+          "personId1": 2,
+          "personId2": 1,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 2,
+          "personId2": 3,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 2,
+          "personId2": 5,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 4,
+          "personId2": 3,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [
+              Object {
+                "compoundKey1": 4,
+                "compoundKey2": 4,
+                "personId": null,
+              },
+            ],
+          },
+          "personId1": 4,
+          "personId2": 4,
+        },
+      ],
+    },
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+            ],
+          },
+          "id": 1,
+          "name": "John Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "headline": "You hit me with a cricket bat.",
+              },
+              Object {
+                "authorId": 1,
+                "headline": "Large bet on myself in round one.",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "headline": "Large bet on myself in round one.",
+              },
+            ],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "id": 2,
+          "name": "Sara Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 2,
+                "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+              },
+              Object {
+                "authorId": 2,
+                "headline": "What’s with you kids? Every other day it’s food, food, food.",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+            ],
+          },
+          "id": 3,
+          "name": "Budd Deey",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 3,
+                "headline": "You know how I sometimes have really brilliant ideas?",
+              },
+              Object {
+                "authorId": 3,
+                "headline": "They’re not aliens, they’re Earth…liens!",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "id": 4,
+          "name": "Kathryn Ramirez",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "id": 5,
+          "name": "Joe Tucker",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 5,
+                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [],
+          },
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`relation-tail-head.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeys": Object {
+      "nodes": Array [
+        Object {
+          "extra": null,
+          "personByPersonId1": Object {
+            "email": "john.smith@email.com",
+            "name": "John Smith",
+          },
+          "personByPersonId2": Object {
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith",
+          },
+          "personId1": 1,
+          "personId2": 2,
+        },
+        Object {
+          "extra": false,
+          "personByPersonId1": Object {
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith",
+          },
+          "personByPersonId2": Object {
+            "email": "john.smith@email.com",
+            "name": "John Smith",
+          },
+          "personId1": 2,
+          "personId2": 1,
+        },
+        Object {
+          "extra": null,
+          "personByPersonId1": Object {
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith",
+          },
+          "personByPersonId2": Object {
+            "email": "budd.deey@email.com",
+            "name": "Budd Deey",
+          },
+          "personId1": 2,
+          "personId2": 3,
+        },
+        Object {
+          "extra": true,
+          "personByPersonId1": Object {
+            "email": "sara.smith@email.com",
+            "name": "Sara Smith",
+          },
+          "personByPersonId2": Object {
+            "email": "joe.tucker@email.com",
+            "name": "Joe Tucker",
+          },
+          "personId1": 2,
+          "personId2": 5,
+        },
+        Object {
+          "extra": true,
+          "personByPersonId1": Object {
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez",
+          },
+          "personByPersonId2": Object {
+            "email": "budd.deey@email.com",
+            "name": "Budd Deey",
+          },
+          "personId1": 4,
+          "personId2": 3,
+        },
+        Object {
+          "extra": false,
+          "personByPersonId1": Object {
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez",
+          },
+          "personByPersonId2": Object {
+            "email": "kathryn.ramirez@email.com",
+            "name": "Kathryn Ramirez",
+          },
+          "personId1": 4,
+          "personId2": 4,
+        },
+      ],
+    },
+    "allForeignKeys": Object {
+      "nodes": Array [
+        Object {
+          "compoundKey1": 2,
+          "compoundKey2": 1,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 2,
+            "personId2": 1,
+          },
+          "personByPersonId": Object {
+            "email": "joe.tucker@email.com",
+            "name": "Joe Tucker",
+          },
+          "personId": 5,
+        },
+        Object {
+          "compoundKey1": 4,
+          "compoundKey2": 4,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 4,
+            "personId2": 4,
+          },
+          "personByPersonId": null,
+          "personId": null,
+        },
+        Object {
+          "compoundKey1": 2,
+          "compoundKey2": 1,
+          "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+            "extra": false,
+            "personId1": 2,
+            "personId2": 1,
+          },
+          "personByPersonId": null,
+          "personId": null,
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`types.graphql 1`] = `
+Object {
+  "data": Object {
+    "allTypes": Object {
+      "nodes": Array [
+        Object {
+          "anIntRange": Object {
+            "end": Object {
+              "inclusive": true,
+              "value": 53,
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": 20,
+            },
+          },
+          "bigint": "467131188225",
+          "boolean": true,
+          "compoundType": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+            "d": "4be8a712-3ff7-432e-aa34-fdb43fbd838d",
+            "fooBar": 8,
+          },
+          "domain": 5,
+          "domain2": 6,
+          "enum": "GREEN",
+          "enumArray": Array [
+            "GREEN",
+            "RED",
+          ],
+          "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
+          "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+          "money": 1000,
+          "nestedCompoundType": Object {
+            "a": Object {
+              "a": 3,
+              "b": "456",
+              "c": "RED",
+              "d": "aed18400-2a92-46df-8204-b70c728b3520",
+              "fooBar": 93,
+            },
+            "b": Object {
+              "a": 42,
+              "b": "Hello, world!",
+              "c": "BLUE",
+              "d": "d34df5e0-83f1-11e6-8dd0-abee917ffd1e",
+              "fooBar": -5,
+            },
+            "bazBuz": 7,
+          },
+          "nullableRange": null,
+          "numrange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": 52,
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": -10,
+            },
+          },
+          "smallint": 50,
+          "textArray": Array [
+            "hey",
+            "i",
+            "just",
+            "met",
+            "you",
+          ],
+        },
+      ],
+    },
+    "typeById": Object {
+      "anIntRange": Object {
+        "end": Object {
+          "inclusive": true,
+          "value": 53,
+        },
+        "start": Object {
+          "inclusive": true,
+          "value": 20,
+        },
+      },
+      "bigint": "467131188225",
+      "boolean": true,
+      "compoundType": Object {
+        "a": 1,
+        "b": "2",
+        "c": "BLUE",
+        "d": "4be8a712-3ff7-432e-aa34-fdb43fbd838d",
+        "fooBar": 8,
+      },
+      "domain": 5,
+      "domain2": 6,
+      "enum": "GREEN",
+      "enumArray": Array [
+        "GREEN",
+        "RED",
+      ],
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
+      "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+      "money": 1000,
+      "nestedCompoundType": Object {
+        "a": Object {
+          "a": 3,
+          "b": "456",
+          "c": "RED",
+          "d": "aed18400-2a92-46df-8204-b70c728b3520",
+          "fooBar": 93,
+        },
+        "b": Object {
+          "a": 42,
+          "b": "Hello, world!",
+          "c": "BLUE",
+          "d": "d34df5e0-83f1-11e6-8dd0-abee917ffd1e",
+          "fooBar": -5,
+        },
+        "bazBuz": 7,
+      },
+      "nullableRange": null,
+      "numrange": Object {
+        "end": Object {
+          "inclusive": false,
+          "value": 52,
+        },
+        "start": Object {
+          "inclusive": true,
+          "value": -10,
+        },
+      },
+      "smallint": 50,
+      "textArray": Array [
+        "hey",
+        "i",
+        "just",
+        "met",
+        "you",
+      ],
+    },
+  },
+}
+`;
+
+exports[`unique-constraints.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "email": "sara.smith@email.com",
+      "name": "Sara Smith",
+    },
+    "b": null,
+    "c": Object {
+      "personId1": 1,
+      "personId2": 2,
+    },
+    "d": Object {
+      "personId1": 4,
+      "personId2": 4,
+    },
+    "e": null,
+  },
+}
+`;

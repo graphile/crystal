@@ -15,10 +15,10 @@ cache:
   directories:
     - node_modules
     - $NVM_DIR
-    - packages/graphql-build-pg/node_modules
+    - packages/graphile-build-pg/node_modules
     - packages/graphql-parse-resolve-info/node_modules
-    - packages/postgraphql-build/node_modules
-    - packages/graphql-build/node_modules
+    - packages/postgraphile-core/node_modules
+    - packages/graphile-build/node_modules
 
 install:
   - yarn

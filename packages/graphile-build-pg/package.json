@@ -1,10 +1,10 @@
 {
-  "name": "graphql-parse-resolve-info",
+  "name": "graphile-build-pg",
   "version": "0.1.0-alpha.14",
-  "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
+  "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
   "main": "index.js",
   "scripts": {
-    "test": "jest .",
+    "test": "jest",
     "prepublish": "mkdir -p node8plus node7minus && babel -s true --out-dir node8plus src && BABEL_ENV=node7minus babel -s true --out-dir node7minus src && flow-copy-source src node8plus",
     "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
   },
@@ -14,10 +14,18 @@
   },
   "keywords": [
     "graphql",
-    "resolveinfo",
-    "graphqljs",
-    "graphql-js",
-    "graphqlresolveinfo"
+    "pg",
+    "postgres",
+    "postgresql",
+    "gql",
+    "generate",
+    "reflection",
+    "build",
+    "schema",
+    "apollo",
+    "relay",
+    "plugins",
+    "extensible"
   ],
   "author": "Benjie Gillam <benjie@jemjie.com>",
   "license": "MIT",
@@ -25,8 +33,21 @@
     "url": "https://github.com/graphile/graphile-build/issues"
   },
   "homepage": "https://github.com/graphile/graphile-build#readme",
+  "dependencies": {
+    "babel-runtime": ">=6 <7",
+    "debug": ">=2 <3",
+    "graphile-build": "^0.1.0-alpha.14",
+    "graphql-iso-date": "^3.2.0",
+    "graphql-type-json": "^0.1.4",
+    "jsonwebtoken": "^7.4.1",
+    "lodash": ">=4 <5",
+    "lru-cache": "4.1.1",
+    "pg-range-parser": "^1.0.0",
+    "pg-sql2": "1.0.0-alpha1.4",
+    "pluralize": "^5.0.0"
+  },
   "peerDependencies": {
-    "graphql": ">=0.9 <1"
+    "pg": ">=6 <7"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -36,13 +57,10 @@
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
-  "dependencies": {
-    "babel-runtime": ">=6 <7",
-    "debug": ">=2 <3"
-  },
   "files": [
     "node8plus",
     "node7minus",
+    "res",
     "index.js"
   ]
 }
