@@ -1,5 +1,11 @@
 // @flow
-import type { Plugin, Build } from "../SchemaBuilder";
+import type {
+  Plugin,
+  Build,
+  DataForType,
+  Context,
+  ContextGraphQLObjectTypeFields,
+} from "../SchemaBuilder";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import type { GraphQLType, GraphQLInterfaceType } from "graphql";
 import type { BuildExtensionQuery } from "./QueryPlugin";
@@ -12,7 +18,8 @@ export type NodeFetcher = (
   identifiers: Array<mixed>,
   context: mixed,
   parsedResolveInfoFragment: ResolveTree,
-  type: GraphQLType
+  type: GraphQLType,
+  resolveData: DataForType
 ) => {};
 
 export type BuildExtensionNode = {|
@@ -141,7 +148,10 @@ export default (function NodePlugin(
         getNodeType,
         graphql: { GraphQLNonNull, GraphQLID, getNamedType },
       }: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |},
-      { scope: { isRootQuery } }
+      {
+        scope: { isRootQuery },
+        fieldWithHooks,
+      }: {| ...Context, ...ContextGraphQLObjectTypeFields |}
     ) => {
       if (!isRootQuery) {
         return fields;
@@ -155,50 +165,60 @@ export default (function NodePlugin(
             return "query";
           },
         },
-        node: {
-          description: "Fetches an object given its globally unique `ID`.",
-          type: getTypeByName("Node"),
-          args: {
-            [nodeIdFieldName]: {
-              description: "The globally unique `ID`.",
-              type: new GraphQLNonNull(GraphQLID),
+        node: fieldWithHooks(
+          "node",
+          ({ getDataFromParsedResolveInfoFragment }) => ({
+            description: "Fetches an object given its globally unique `ID`.",
+            type: getTypeByName("Node"),
+            args: {
+              [nodeIdFieldName]: {
+                description: "The globally unique `ID`.",
+                type: new GraphQLNonNull(GraphQLID),
+              },
             },
-          },
-          async resolve(data, args, context, resolveInfo) {
-            const nodeId = args[nodeIdFieldName];
-            if (nodeId === "query") {
-              return $$isQuery;
-            }
-            try {
-              const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
-              const Type = getNodeType(alias);
-              if (!Type) {
-                throw new Error("Type not found");
+            async resolve(data, args, context, resolveInfo) {
+              const nodeId = args[nodeIdFieldName];
+              if (nodeId === "query") {
+                return $$isQuery;
               }
-              const resolver = nodeFetcherByTypeName[getNamedType(Type).name];
-              const parsedResolveInfoFragment = parseResolveInfo(
-                resolveInfo,
-                {},
-                Type
-              );
-              const node = await resolver(
-                data,
-                identifiers,
-                context,
-                parsedResolveInfoFragment,
-                resolveInfo.returnType
-              );
-              Object.defineProperty(node, $$nodeType, {
-                enumerable: false,
-                configurable: false,
-                value: Type,
-              });
-              return node;
-            } catch (e) {
-              return null;
-            }
-          },
-        },
+              try {
+                const [alias, ...identifiers] = JSON.parse(
+                  base64Decode(nodeId)
+                );
+                const Type = getNodeType(alias);
+                if (!Type) {
+                  throw new Error("Type not found");
+                }
+                const resolver = nodeFetcherByTypeName[getNamedType(Type).name];
+                const parsedResolveInfoFragment = parseResolveInfo(
+                  resolveInfo,
+                  {},
+                  Type
+                );
+                const resolveData = getDataFromParsedResolveInfoFragment(
+                  parsedResolveInfoFragment,
+                  getNamedType(Type)
+                );
+                const node = await resolver(
+                  data,
+                  identifiers,
+                  context,
+                  parsedResolveInfoFragment,
+                  resolveInfo.returnType,
+                  resolveData
+                );
+                Object.defineProperty(node, $$nodeType, {
+                  enumerable: false,
+                  configurable: false,
+                  value: Type,
+                });
+                return node;
+              } catch (e) {
+                return null;
+              }
+            },
+          })
+        ),
       });
     }
   );

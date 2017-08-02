@@ -7,16 +7,17 @@ import type {
   GraphQLType,
   GraphQLNamedType,
   GraphQLInterfaceType,
+  GraphQLObjectTypeConfig,
 } from "graphql";
 import EventEmitter from "events";
 import type {
   simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo,
-  ResolveTree,
   parseResolveInfo,
 } from "graphql-parse-resolve-info";
 import type { GraphQLResolveInfo } from "graphql/type/definition";
 
+import type { FieldWithHooksFunction } from "./makeNewBuild";
 const { GraphQLSchema } = graphql;
 
 const debug = debugFactory("graphile-builder");
@@ -94,10 +95,6 @@ export type Build = {|
   parseResolveInfo: parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType: simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo: getAliasFromResolveInfo,
-  generateDataForType(
-    Type: GraphQLType,
-    parsedResolveInfoFragment: ResolveTree
-  ): DataForType,
   resolveAlias(
     data: {},
     _args: mixed,
@@ -123,16 +120,34 @@ export type Scope = {
   [string]: mixed,
 };
 
-export type Context = {
+export type Context = {|
   scope: Scope,
-};
+  [string]: mixed,
+|};
+
+type DataGeneratorFunction = () => {};
+
+export type ContextGraphQLObjectTypeFields = {|
+  addDataGeneratorForField: (
+    fieldName: string,
+    fn: DataGeneratorFunction
+  ) => void,
+  recurseDataGeneratorsForField: (fieldName: string) => void,
+  Self: GraphQLNamedType,
+  GraphQLObjectType: GraphQLObjectTypeConfig<*, *>,
+  fieldWithHooks: FieldWithHooksFunction,
+|};
 
 type SupportedHookTypes = {} | Build | Array<GraphQLInterfaceType>;
 
-export type Hook<Type: SupportedHookTypes, BuildExtensions: {}> = (
+export type Hook<
+  Type: SupportedHookTypes,
+  BuildExtensions: {},
+  ContextExtensions: {}
+> = (
   input: Type,
   build: {| ...Build, ...BuildExtensions |},
-  context: Context
+  context: {| ...Context, ...ContextExtensions |}
 ) => Type;
 
 export type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
@@ -145,7 +160,7 @@ class SchemaBuilder extends EventEmitter {
   triggerChange: ?TriggerChangeType;
   depth: number;
   hooks: {
-    [string]: Array<Hook<*, *>>,
+    [string]: Array<Hook<*, *, *>>,
   };
 
   _currentPluginName: ?string;
@@ -228,7 +243,7 @@ class SchemaBuilder extends EventEmitter {
    *
    * The function must either return a replacement object for `obj` or `obj` itself
    */
-  hook<T: *>(hookName: string, fn: Hook<T, *>) {
+  hook<T: *>(hookName: string, fn: Hook<T, *, *>) {
     if (!this.hooks[hookName]) {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
@@ -241,7 +256,7 @@ class SchemaBuilder extends EventEmitter {
     this.hooks[hookName].push(fn);
   }
 
-  applyHooks<T: *>(
+  applyHooks<T: *, Context>(
     build: Build,
     hookName: string,
     input: T,
@@ -255,13 +270,13 @@ class SchemaBuilder extends EventEmitter {
     try {
       debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
 
-      const hooks: Array<Hook<T, *>> = this.hooks[hookName];
+      const hooks: Array<Hook<T, *, *>> = this.hooks[hookName];
       if (!hooks) {
         throw new Error(`Sorry, '${hookName}' is not a registered hook`);
       }
 
       let newObj = input;
-      for (const hook: Hook<T, *> of hooks) {
+      for (const hook: Hook<T, *, *> of hooks) {
         this.depth++;
         try {
           const hookDisplayName = hook.displayName || hook.name || "anonymous";

@@ -16,8 +16,6 @@ export default (async function PgRowByUniqueConstraint(
       object,
       {
         addNodeFetcherForTypeName,
-        getTypeByName,
-        generateDataForType,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         gql2pg,
@@ -44,15 +42,17 @@ export default (async function PgRowByUniqueConstraint(
         );
       addNodeFetcherForTypeName(
         object.name,
-        async (data, identifiers, { pgClient }, parsedResolveInfoFragment) => {
+        async (
+          data,
+          identifiers,
+          { pgClient },
+          parsedResolveInfoFragment,
+          ReturnType,
+          resolveData
+        ) => {
           if (identifiers.length !== primaryKeys.length) {
             throw new Error("Invalid ID");
           }
-          const Type = getTypeByName(object.name);
-          const resolveData = generateDataForType(
-            Type,
-            parsedResolveInfoFragment
-          );
           const query = queryFromResolveData(
             sqlFullTableName,
             undefined,
