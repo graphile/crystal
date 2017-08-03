@@ -1,5 +1,5 @@
 import { readFile } from 'fs'
-import minify = require('pg-minify')
+import * as minify from 'pg-minify'
 
 const kitchenSinkSchemaSql = new Promise<string>((resolve, reject) => {
   readFile('examples/kitchen-sink/schema.sql', (error, data) => {

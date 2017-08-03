@@ -2,7 +2,7 @@ import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import chalk = require('chalk')
 import { Pool } from 'pg'
-import minify = require('pg-minify')
+import * as minify from 'pg-minify'
 
 /**
  * This query creates some fixtures required to watch a Postgres database.

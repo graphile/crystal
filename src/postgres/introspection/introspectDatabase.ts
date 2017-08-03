@@ -1,7 +1,7 @@
 import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import { Pool, Client } from 'pg'
-import minify = require('pg-minify')
+import * as minify from 'pg-minify'
 import PgCatalog from './PgCatalog'
 
 /**
