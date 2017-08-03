@@ -1,12 +1,30 @@
 graphile-build
-=============
+==============
+
+graphile-build provides you with a framework to build high-performance
+extensible GraphQL APIs by combining plugins and using advanced look-ahead
+features. Plugins may implement best practices (such as the Node interface) or
+might build parts of your schema automatically (e.g. `graphile-build-pg` which
+will automatically generate types and fields based on your PostgreSQL database
+schema).
+
+An example of an application built on `graphile-build` is [PostGraphQL
+v4+](https://github.com/postgraphql/postgraphql) which allows you to run just
+one command to instantly get a fully working and secure GraphQL API up and
+running based on your PostgreSQL database schema.
+
+**For in-depth documentation about `graphile-build`, please see [the graphile
+documentation website](https://www.graphile.com/).**
+
+The below just serves as a limited quick-reference for people already familiar
+with the library.
 
 Usage
 -----
 
 The following [runnable example][] creates a plugin that hooks the
-'GraphQLObjectType:fields' event in the system and adds a 'random' field to every
-object everywhere (including the root Query).
+'GraphQLObjectType:fields' event in the system and adds a 'random' field to
+every object everywhere (including the root Query).
 
 ```js
 const { buildSchema, defaultPlugins } = require("graphile-build");
@@ -98,57 +116,5 @@ function MyRandomPlugin(builder) {
   );
 }
 ```
-
-Hooks
------
-
-[(See hooks in the source)](https://github.com/graphile/graphile-build/blob/996e28f0af68f53e264170bd4528b6500ff3ef25/packages/graphile-build/SchemaBuilder.js#L11-L59)
-
-- `build`: The build object represents the current schema build and is passed
-  to all hooks, hook the 'build' event to extend this object.
-
-- `init`: The init event is triggered after `build` (which should not generate
-  any GraphQL objects) and can be used to build common object types that may be
-  useful later. The argument to this is an empty object and should be passed
-  through unmodified (it is ignored currently).
-
-- `GraphQLSchema`: This event defines the root-level schema; hook it to add `query`,
-  `mutation`, `subscription` or similar GraphQL fields.
-
-- `GraphQLObjectType*`: When creating a GraphQLObjectType via
-  `newWithHooks`, we'll execute, the following hooks:
-
-  - `GraphQLObjectType` to add any root-level attributes, e.g. add a description
-  - `GraphQLObjectType:interfaces` to add additional interfaces to this object type
-  - `GraphQLObjectType:fields` to add additional fields to this object type (is
-    ran asynchronously and gets a reference to the final GraphQL Object as
-    `Self` in the context)
-  - `GraphQLObjectType:fields:field`: to add any root-level attributes to an
-    individual field, e.g. add a description
-  - `GraphQLObjectType:fields:field:args` to add arguments to an individual field
-
-- `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType via
-  `newWithHooks`, we'll execute, the following hooks:
-
-  - `GraphQLInputObjectType` to add any root-level attributes, e.g. add a description
-  - `GraphQLInputObjectType:fields` to add additional fields to this object type (is
-    ran asynchronously and gets a reference to the final GraphQL Object as
-    `Self` in the context)
-  - `GraphQLInputObjectType:fields:field`: to customize an individual field from above
-
-- `GraphQLEnumType*`: When creating a GraphQLEnumType via `newWithHooks`,
-  we'll execute, the following hooks:
-
-  - `GraphQLEnumType` to add any root-level attributes, e.g. add a description
-  - `GraphQLEnumType:values` to add additional values
-
-
-Conventions
------------
-
-If you extend the build object (in the `build` event) or add details to the
-scope of a `newWithHooks` or `fieldWithHooks`, please prefix all
-keys with a namespace; for example `graphile-build-pg` uses the `pg` namespace
-prefix. Do not pollute other namespaces (unless you have their permission).
 
 [runnable example]: examples/README-1.js
