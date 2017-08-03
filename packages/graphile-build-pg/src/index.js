@@ -62,3 +62,32 @@ export const defaultPlugins = [
 ];
 
 export { inflections };
+
+export {
+  PgBasicsPlugin,
+  PgIntrospectionPlugin,
+  PgTypesPlugin,
+  PgJWTPlugin,
+  PgTablesPlugin,
+  PgConnectionArgFirstLastBeforeAfter,
+  PgConnectionArgOrderBy,
+  PgConnectionArgCondition,
+  PgAllRows,
+  PgColumnsPlugin,
+  PgForwardRelationPlugin,
+  PgBackwardRelationPlugin,
+  PgRowByUniqueConstraint,
+  PgComputedColumnsPlugin,
+  PgQueryProceduresPlugin,
+  PgOrderAllColumnsPlugin,
+  PgOrderByPrimaryKeyPlugin,
+  PgRowNode,
+  PgNodeAliasPostGraphQL,
+  PgScalarFunctionConnectionPlugin,
+  PageInfoStartEndCursor,
+  PgConnectionTotalCount,
+  PgMutationCreatePlugin,
+  PgMutationUpdateDeletePlugin,
+  PgMutationProceduresPlugin,
+  PgMutationPayloadEdgePlugin,
+};
