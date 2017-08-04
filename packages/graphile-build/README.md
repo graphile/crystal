@@ -14,7 +14,7 @@ one command to instantly get a fully working and secure GraphQL API up and
 running based on your PostgreSQL database schema.
 
 **For in-depth documentation about `graphile-build`, please see [the graphile
-documentation website](https://www.graphile.com/).**
+documentation website](https://www.graphile.org/).**
 
 The below just serves as a limited quick-reference for people already familiar
 with the library.
