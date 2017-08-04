@@ -1,5 +1,5 @@
 import { QueryConfig } from 'pg'
-import minify = require('pg-minify')
+import * as minify from 'pg-minify'
 
 namespace sql {
   type NestedArray<T> = Array<T> | Array<Array<T>> | Array<Array<Array<T>>> | Array<Array<Array<Array<T>>>>
