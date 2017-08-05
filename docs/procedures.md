@@ -32,7 +32,7 @@ create function add(a int, b int) returns int as $$
 $$ language sql immutable strict;
 ```
 
-The samle procedure with PL/pgSQL would look like this:
+The sample procedure with PL/pgSQL would look like this:
 
 ```sql
 create function add(a int, b int) returns int as $$
