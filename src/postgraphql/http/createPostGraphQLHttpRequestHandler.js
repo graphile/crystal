@@ -10,6 +10,7 @@ import {
   formatError as defaultFormatError,
   print as printGraphql,
 } from 'graphql'
+import { extendedFormatError } from '../extendedFormatError'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import debugPgClient from './debugPgClient'
@@ -78,8 +79,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
   const formatError = error => {
-    // Get the default formatted error object.
-    const formattedError = defaultFormatError(error)
+    // Get the appropriate formatted error object, including any extended error
+    // fields if the user wants them.
+    const formattedError = options.extendedErrors && options.extendedErrors.length ?
+      extendedFormatError(error, options.extendedErrors) : defaultFormatError(error)
 
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.

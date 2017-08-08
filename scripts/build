@@ -14,6 +14,10 @@ echo "Compiling with TypeScript"
 find build -wholename '*/__tests__/*' -delete
 find build -name '__tests__' -delete
 
+echo "Removing tests/mocks"
+find build -wholename '*/__tests__/*' -delete
+find build -name '__tests__' -delete
+
 echo "Building GraphiQL"
 (cd src/postgraphql/graphiql && "$npm_bin"/react-scripts build)
 

@@ -19,6 +19,7 @@ type PostGraphQLOptions = {
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
+  extendedErrors?: Array<string>,
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
