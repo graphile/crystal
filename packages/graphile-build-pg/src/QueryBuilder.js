@@ -245,6 +245,10 @@ class QueryBuilder {
     this.lock("orderBy");
     return this.compiledData.orderBy;
   }
+  getSelectFieldsCount() {
+    this.lockEverything();
+    return this.compiledData.select.length;
+  }
   buildSelectFields() {
     this.lockEverything();
     return sql.join(

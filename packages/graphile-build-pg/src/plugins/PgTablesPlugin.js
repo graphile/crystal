@@ -207,18 +207,23 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
             {
               description: `A \`${tableTypeName}\` edge in the connection.`,
               name: inflection.edge(TableType.name),
-              fields: ({ recurseDataGeneratorsForField }) => {
+              fields: ({ fieldWithHooks, recurseDataGeneratorsForField }) => {
                 recurseDataGeneratorsForField("node");
                 return {
-                  cursor: {
-                    description: "A cursor for use in pagination.",
-                    type: Cursor,
-                    resolve(data) {
-                      return (
-                        data.__cursor && base64(JSON.stringify(data.__cursor))
-                      );
-                    },
-                  },
+                  cursor: fieldWithHooks("cursor", ({ addDataGenerator }) => {
+                    addDataGenerator(() => ({
+                      usesCursor: [true],
+                    }));
+                    return {
+                      description: "A cursor for use in pagination.",
+                      type: Cursor,
+                      resolve(data) {
+                        return (
+                          data.__cursor && base64(JSON.stringify(data.__cursor))
+                        );
+                      },
+                    };
+                  }),
                   node: {
                     description: `The \`${tableTypeName}\` at the end of the edge.`,
                     type: new GraphQLNonNull(TableType),

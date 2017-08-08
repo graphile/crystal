@@ -25,7 +25,14 @@ export default (
     pgCalculateTotalCount,
     calculateHasNextPage,
     calculateHasPreviousPage,
+    usesCursor: explicitlyUsesCursor,
   } = resolveData;
+
+  const usesCursor: boolean =
+    (explicitlyUsesCursor && explicitlyUsesCursor.length > 0) ||
+    (calculateHasNextPage && calculateHasNextPage.length > 0) ||
+    (calculateHasPreviousPage && calculateHasPreviousPage.length > 0) ||
+    false;
   const rawCursorPrefix =
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(_ => _);
 
@@ -99,25 +106,27 @@ export default (
     options.withCursor
   ) {
     // Sometimes we need a __cursor even if it's not a collection; e.g. to get the edge field on a mutation
-    queryBuilder.selectCursor(() => {
-      const orderBy = queryBuilder
-        .getOrderByExpressionsAndDirections()
-        .map(([expr]) => expr);
-      if (orderBy.length > 0) {
-        return sql.fragment`json_build_array(${sql.join(
-          [
-            ...getPgCursorPrefix(),
-            sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
-          ],
-          ", "
-        )})`;
-      } else {
-        return sql.fragment`json_build_array(${sql.join(
-          getPgCursorPrefix(),
-          ", "
-        )}, (row_number() over (partition by 1)))`;
-      }
-    });
+    if (usesCursor) {
+      queryBuilder.selectCursor(() => {
+        const orderBy = queryBuilder
+          .getOrderByExpressionsAndDirections()
+          .map(([expr]) => expr);
+        if (orderBy.length > 0) {
+          return sql.fragment`json_build_array(${sql.join(
+            [
+              ...getPgCursorPrefix(),
+              sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
+            ],
+            ", "
+          )})`;
+        } else {
+          return sql.fragment`json_build_array(${sql.join(
+            getPgCursorPrefix(),
+            ", "
+          )}, (row_number() over (partition by 1)))`;
+        }
+      });
+    }
   }
   if (options.withPagination || options.withPaginationAsFields) {
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
@@ -176,6 +185,7 @@ export default (
     });
 
     const query = queryBuilder.build(options);
+    const haveFields = queryBuilder.getSelectFieldsCount() > 0;
     const sqlQueryAlias = sql.identifier(Symbol());
     const sqlSummaryAlias = sql.identifier(Symbol());
     const canHaveCursorInWhere =
@@ -212,17 +222,26 @@ export default (
       from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
       where ${queryBuilder.buildWhereClause(false, false, options)}
     )`;
-    const sqlWith = sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`;
+    const sqlWith = haveFields
+      ? sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`
+      : sql.fragment``;
     const sqlFrom = sql.fragment``;
-    const fields = [
-      [
+    const fields: Array<[SQL, string]> = [];
+    if (haveFields) {
+      fields.push([
         sql.fragment`coalesce((select ${sqlSummaryAlias}.data from ${sqlSummaryAlias}), '[]'::json)`,
         "data",
-      ],
-      calculateHasNextPage && [hasNextPage, "hasNextPage"],
-      calculateHasPreviousPage && [hasPreviousPage, "hasPreviousPage"],
-      pgCalculateTotalCount && [totalCount, "totalCount"],
-    ].filter(_ => _);
+      ]);
+      if (calculateHasNextPage) {
+        fields.push([hasNextPage, "hasNextPage"]);
+      }
+      if (calculateHasPreviousPage) {
+        fields.push([hasPreviousPage, "hasPreviousPage"]);
+      }
+    }
+    if (pgCalculateTotalCount) {
+      fields.push([totalCount, "totalCount"]);
+    }
     if (options.withPaginationAsFields) {
       return sql.fragment`${sqlWith} select ${sql.join(
         fields.map(

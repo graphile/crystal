@@ -149,6 +149,9 @@ const DummyConnectionPlugin = async builder => {
                                   recurseDataGeneratorsForField,
                                 }) => {
                                   recurseDataGeneratorsForField("node");
+                                  addDataGeneratorForField("cursor", () => ({
+                                    usesCursor: [true],
+                                  }));
                                   addDataGeneratorForField(
                                     "cursor",
                                     (

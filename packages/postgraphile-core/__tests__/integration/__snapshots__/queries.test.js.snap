@@ -554,6 +554,16 @@ Object {
 }
 `;
 
+exports[`connections-totalCount.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "totalCount": 6,
+    },
+  },
+}
+`;
+
 exports[`dynamic-json.graphql 1`] = `
 Object {
   "data": Object {

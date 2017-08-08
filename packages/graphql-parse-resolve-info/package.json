@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest .",
-    "prepublish": "mkdir -p node8plus node7minus && babel -s true --out-dir node8plus src && BABEL_ENV=node7minus babel -s true --out-dir node7minus src && flow-copy-source src node8plus",
+    "prepublish": "mkdir -p node8plus node7minus && babel -s true --out-dir node8plus src && BABEL_ENV=node7minus babel -s true --out-dir node7minus src && ../../node_modules/.bin/flow-copy-source src node8plus",
     "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
   },
   "repository": {

@@ -3,7 +3,7 @@
 import sql from "pg-sql2";
 import debugFactory from "debug";
 import type { Client } from "pg";
-import type { SQL, OpaqueSQLQuery } from "pg-sql2";
+import type { SQL, SQLQuery } from "pg-sql2";
 
 const debugSql = debugFactory("graphile-build-pg:sql");
 
@@ -45,7 +45,7 @@ export default async function viaTemporaryTable(
   sqlResultQuery: SQL,
   isPgClassLike: boolean = true
 ) {
-  async function performQuery(pgClient: Client, sqlQuery: OpaqueSQLQuery) {
+  async function performQuery(pgClient: Client, sqlQuery: SQLQuery) {
     const { text, values } = sql.compile(sqlQuery);
     if (debugSql.enabled) debugSql(text);
     return pgClient.query(text, values);

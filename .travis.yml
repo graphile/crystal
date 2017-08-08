@@ -11,14 +11,15 @@ env:
   TEST_DATABASE_URL: postgres://localhost:5432/travis
 
 cache:
-  yarn: true
   directories:
     - node_modules
     - $NVM_DIR
-    - packages/graphile-build-pg/node_modules
-    - packages/graphql-parse-resolve-info/node_modules
-    - packages/postgraphile-core/node_modules
-    - packages/graphile-build/node_modules
+    - $HOME/.yarn
+
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.28.1
+  - export PATH="$HOME/.yarn/bin:$PATH"
+
 
 install:
   - yarn
