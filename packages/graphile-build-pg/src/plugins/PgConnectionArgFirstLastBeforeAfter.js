@@ -54,9 +54,7 @@ export default (function PgConnectionArgs(builder) {
 
             function addCursorConstraint(cursor, isAfter) {
               const cursorValues = JSON.parse(base64Decode(cursor));
-              queryBuilder.whereBound(() => {
-                return queryBuilder.cursorCondition(cursorValues, isAfter);
-              }, isAfter);
+              return queryBuilder.addCursorCondition(cursorValues, isAfter);
             }
           },
         };

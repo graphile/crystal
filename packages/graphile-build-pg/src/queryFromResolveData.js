@@ -127,7 +127,7 @@ export default (
           sql.value(val)
         );
         if (!Array.isArray(sqlCursors)) {
-          return sql.literal(false);
+          queryBuilder.whereBound(sql.literal(false), isAfter);
         }
         let sqlFilter = sql.fragment`false`;
         for (let i = orderByExpressionsAndDirections.length - 1; i >= 0; i--) {
@@ -156,7 +156,20 @@ export default (
           )
           `;
         }
-        return sqlFilter;
+        queryBuilder.whereBound(sqlFilter, isAfter);
+      } else if (
+        cursorValue[0] === "natural" &&
+        isSafeInteger(cursorValue[1]) &&
+        cursorValue[1] >= 0
+      ) {
+        if (isAfter) {
+          queryBuilder.offset(() => cursorValue[1]);
+        } else {
+          queryBuilder.limit(() => {
+            const offset = queryBuilder.getOffset();
+            return Math.max(0, cursorValue[1] - offset - 1);
+          });
+        }
       } else {
         throw new Error("Cannot use cursors without orderBy");
       }
@@ -181,7 +194,7 @@ export default (
           canHaveCursorInWhere,
           queryHasBefore,
           queryHasFirst,
-          queryBuilder.data.offset || 0
+          queryBuilder.getOffset() || 0
         );
     const hasPreviousPage = queryHasZeroLimit
       ? sql.literal(false)
@@ -190,7 +203,7 @@ export default (
           canHaveCursorInWhere,
           queryHasAfter,
           queryHasLast,
-          queryBuilder.data.offset || 0,
+          queryBuilder.getOffset() || 0,
           true
         );
 

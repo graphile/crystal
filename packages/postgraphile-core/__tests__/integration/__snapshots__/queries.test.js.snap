@@ -1683,6 +1683,26 @@ Object {
         },
       ],
     },
+    "tableSetQueryWithOffset": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+    },
+    "tableSetQueryWithOffset2": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+    },
     "typesQuery": false,
   },
 }

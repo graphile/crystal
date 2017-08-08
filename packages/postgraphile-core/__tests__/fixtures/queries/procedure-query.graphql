@@ -8,6 +8,8 @@ query {
   compoundTypeQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, fooBar: 8 }) { a b c d fooBar }
   tableQuery(id: 5) { nodeId id headline authorId }
   tableSetQuery { edges { cursor node { name } } }
+  tableSetQueryWithOffset: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", after: "WyJuYXR1cmFsIiwzXQ==") { edges { cursor node { name } } }
+  tableSetQueryWithOffset2: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", before: "WyJuYXR1cmFsIiw1XQ==") { edges { cursor node { name } } }
   intSetQuery(x: 5, z: 6) { edges { cursor node } }
   noArgsQuery
 }

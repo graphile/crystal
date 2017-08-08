@@ -26,8 +26,9 @@ function callIfNecessaryArray<T>(o: Array<Gen<T> | T>): Array<T> {
 type RawAlias = Symbol | string;
 type SQLAlias = SQL;
 type SQLGen = Gen<SQL> | SQL;
+type NumberGen = Gen<number> | number;
 type CursorValue = {};
-type CursorComparator = (val: CursorValue, isAfter: boolean) => SQL;
+type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
 class QueryBuilder {
   locks: {
@@ -47,11 +48,11 @@ class QueryBuilder {
     },
     orderBy: Array<[SQLGen, boolean]>,
     orderIsUnique: boolean,
-    limit: ?number,
-    offset: ?number,
+    limit: ?NumberGen,
+    offset: ?NumberGen,
     flip: boolean,
     beforeLock: {
-      [string]: () => void,
+      [string]: Array<() => void>,
     },
     cursorComparator: ?CursorComparator,
   };
@@ -121,7 +122,14 @@ class QueryBuilder {
         this.select(this.compiledData.selectCursor, "__cursor");
       }
     });
+    // 'whereBound' and 'natural' order might set offset/limit
     this.beforeLock("where", () => {
+      this.lock("whereBound");
+    });
+    this.beforeLock("offset", () => {
+      this.lock("whereBound");
+    });
+    this.beforeLock("limit", () => {
       this.lock("whereBound");
     });
   }
@@ -138,12 +146,14 @@ class QueryBuilder {
     this.data.cursorComparator = fn;
     this.lock("cursorComparator");
   }
-  cursorCondition(cursorValue: CursorValue, isAfter: boolean) {
-    this.lock("cursorComparator");
-    if (!this.compiledData.cursorComparator) {
-      throw new Error("No cursor comparator was set!");
-    }
-    return this.compiledData.cursorComparator(cursorValue, isAfter);
+  addCursorCondition(cursorValue: CursorValue, isAfter: boolean) {
+    this.beforeLock("whereBound", () => {
+      this.lock("cursorComparator");
+      if (!this.compiledData.cursorComparator) {
+        throw new Error("No cursor comparator was set!");
+      }
+      this.compiledData.cursorComparator(cursorValue, isAfter);
+    });
   }
   select(exprGen: SQLGen, alias: RawAlias) {
     this.checkLock("select");
@@ -183,15 +193,19 @@ class QueryBuilder {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending]);
   }
-  limit(limit: number) {
+  limit(limitGen: NumberGen) {
     this.checkLock("limit");
-    this.data.limit = Math.max(0, limit);
-    this.lock("limit");
+    if (this.data.limit != null) {
+      throw new Error("Must only set limit once");
+    }
+    this.data.limit = limitGen;
   }
-  offset(offset: number) {
+  offset(offsetGen: NumberGen) {
     this.checkLock("offset");
-    this.data.offset = Math.max(0, offset);
-    this.lock("offset");
+    if (this.data.offset != null) {
+      throw new Error("Must only set offset once");
+    }
+    this.data.offset = offsetGen;
   }
   flip() {
     this.checkLock("flip");
@@ -378,7 +392,9 @@ class QueryBuilder {
   }
   lock(type: string) {
     if (this.locks[type]) return;
-    for (const fn of this.data.beforeLock[type] || []) {
+    const beforeLocks = this.data.beforeLock[type];
+    this.data.beforeLock[type] = [];
+    for (const fn of beforeLocks || []) {
       fn();
     }
     this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
@@ -417,9 +433,9 @@ class QueryBuilder {
     } else if (type === "orderIsUnique") {
       this.compiledData[type] = this.data[type];
     } else if (type === "limit") {
-      this.compiledData[type] = this.data[type];
+      this.compiledData[type] = callIfNecessary(this.data[type]);
     } else if (type === "offset") {
-      this.compiledData[type] = this.data[type];
+      this.compiledData[type] = callIfNecessary(this.data[type]);
     } else if (type === "flip") {
       this.compiledData[type] = this.data[type];
     } else {
@@ -444,12 +460,14 @@ class QueryBuilder {
     this.lock("from");
     this.lock("flip");
     this.lock("join");
-    this.lock("offset");
-    this.lock("limit");
     this.lock("orderBy");
     // We must execute where after orderBy because cursor queries require all orderBy columns
     this.lock("cursorComparator");
+    this.lock("whereBound");
     this.lock("where");
+    // 'where' -> 'whereBound' can affect 'offset'/'limit'
+    this.lock("offset");
+    this.lock("limit");
     // We must execute select after orderBy otherwise we cannot generate a cursor
     this.lock("selectCursor");
     this.lock("select");
