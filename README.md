@@ -13,7 +13,7 @@ This repository is a monorepo (managed by [lerna][]) which comprises the followi
   don't use that plugin! (Surfacing plugin dependencies has not been built yet,
   so be careful when you disable a plugin.)
 
-**[postgraphile-build][]**: Intended to be used by [PostGraphQL][] in
+**[postgraphile-core][]**: Intended to be used by [PostGraphQL][] in
   order to provide its schema functionality (excluding HTTP handling, etc)
 
 **[graphql-parse-resolve-info][]**: Parses a GraphQLResolveInfo object into a
@@ -27,12 +27,12 @@ Status
 - [graphile-build][] - working (but needs tests, more documentation, refactoring,
   and probably needs to support more hooks)
 
-- [graphile-build-pg][] / [postgraphile-build][] - working - passes the PostGraphQL
+- [graphile-build-pg][] / [postgraphile-core][] - working - passes the PostGraphQL
   integration tests for queries and mutations, no descriptions are added to
   fields yet
 
 - [graphql-parse-resolve-info][] - complete (but needs dedicated tests because
-  it's currently only tested by virtue of the postgraphile-build tests depending
+  it's currently only tested by virtue of the postgraphile-core tests depending
   on it)
 
 Running on Node less than v8
@@ -98,5 +98,5 @@ lerna bootstrap
 [postgraphql-sql]: https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts
 [graphile-build]: packages/graphile-build/
 [graphile-build-pg]: packages/graphile-build-pg/
-[postgraphile-build]: packages/postgraphile-build/
+[postgraphile-core]: packages/postgraphile-core/
 [graphql-parse-resolve-info]: packages/graphql-parse-resolve-info/
