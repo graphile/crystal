@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`jwt authenticate fail 1`] = `
+Object {
+  "data": Object {
+    "authenticateFail": Object {
+      "jwtToken": null,
+    },
+  },
+}
+`;
+
 exports[`jwt normal 1`] = `
 Object {
   "data": Object {

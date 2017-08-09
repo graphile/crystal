@@ -62,6 +62,15 @@ const tests = [
       });
     },
   },
+  {
+    name: "jwt authenticate fail",
+    query: `mutation {
+      authenticateFail(input: {}) {
+        jwtToken
+      }
+    }`,
+    schema: "withJwt",
+  },
 ];
 
 beforeAll(() => {

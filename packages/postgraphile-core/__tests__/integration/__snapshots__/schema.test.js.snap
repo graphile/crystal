@@ -1116,6 +1116,24 @@ input AnIntRangeInput {
 
 scalar AnotherInt
 
+# All input for the \`authenticateFail\` mutation.
+input AuthenticateFailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`authenticateFail\` mutation.
+type AuthenticateFailPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # All input for the \`authenticate\` mutation.
 input AuthenticateInput {
   a: Int
@@ -1538,6 +1556,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload!
+  authenticateFail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateFailInput!
+  ): AuthenticateFailPayload!
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
@@ -2225,6 +2247,24 @@ input AnIntRangeInput {
 }
 
 scalar AnotherInt
+
+# All input for the \`authenticateFail\` mutation.
+input AuthenticateFailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`authenticateFail\` mutation.
+type AuthenticateFailPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
 
 # All input for the \`authenticate\` mutation.
 input AuthenticateInput {
@@ -3403,6 +3443,12 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload!
+
+  # Reads and enables pagination through a set of \`JwtToken\`.
+  authenticateFail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: AuthenticateFailInput!
+  ): AuthenticateFailPayload!
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateMany(

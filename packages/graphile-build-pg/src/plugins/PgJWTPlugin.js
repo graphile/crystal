@@ -94,7 +94,14 @@ export default (function PgJWTPlugin(
       );
 
       pg2GqlMapper[compositeType.id] = {
-        map: _ => _,
+        map: value => {
+          if (!value) return null;
+          const values = Object.keys(value).map(k => value[k]);
+          if (values.every(v => v == null)) {
+            return null;
+          }
+          return value;
+        },
         unmap: () => {
           throw new Error(
             "We don't support passing a JWT token into GraphQL currently"
