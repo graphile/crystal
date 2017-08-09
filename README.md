@@ -69,6 +69,12 @@ Development
 npm install -g lerna yarn
 yarn
 lerna bootstrap
+npm run watch
+```
+
+Watch will keep monitoring and compiling the babel files. Then to run the tests in another terminal:
+
+```
 lerna run test
 ```
 

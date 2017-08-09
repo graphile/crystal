@@ -1,14 +1,15 @@
 // @flow
 import pluralize from "pluralize";
 import upperFirstAll from "lodash/upperFirst";
-import lowerFirstAll from "lodash/lowerFirst";
 import camelCaseAll from "lodash/camelCase";
 
 const constantCaseAll = str =>
-  lowerFirst(str.replace(/^[^a-z0-9_]+/gi, ""))
-    .replace(/[^a-z0-9_]+/gi, "_")
-    .replace(/[A-Z]/g, str => `_${str.toLowerCase()}`)
+  str
+    .replace(/[^a-zA-Z0-9_]+/g, "_")
+    .replace(/[A-Z]+/g, "_$&")
     .replace(/__+/g, "_")
+    .replace(/^[^a-zA-Z0-9]+/, "")
+    .replace(/^[0-9]/, "_$&") // GraphQL enums must not start with a number
     .toUpperCase();
 
 const formatInsideUnderscores = (fn: (input: string) => string) => (
@@ -23,7 +24,6 @@ const formatInsideUnderscores = (fn: (input: string) => string) => (
 };
 
 const upperFirst = formatInsideUnderscores(upperFirstAll);
-const lowerFirst = formatInsideUnderscores(lowerFirstAll);
 const camelCase = formatInsideUnderscores(camelCaseAll);
 const constantCase = formatInsideUnderscores(constantCaseAll);
 

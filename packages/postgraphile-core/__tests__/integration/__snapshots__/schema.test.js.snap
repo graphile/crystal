@@ -1177,6 +1177,7 @@ type CompoundType {
   b: String
   c: Color
   d: UUID
+  e: EnumCaps
   fooBar: Int
 }
 
@@ -1186,6 +1187,7 @@ input CompoundTypeInput {
   b: String
   c: Color
   d: UUID
+  e: EnumCaps
   fooBar: Int
 }
 
@@ -1348,6 +1350,13 @@ type DeleteTypePayload {
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
   ): TypesEdge
+}
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
 }
 
 # A range of \`Float\`.
@@ -2383,6 +2392,7 @@ type CompoundType {
   c: Color
   computedField: Int
   d: UUID
+  e: EnumCaps
   fooBar: Int
 }
 
@@ -2392,6 +2402,7 @@ input CompoundTypeInput {
   b: String
   c: Color
   d: UUID
+  e: EnumCaps
   fooBar: Int
 }
 
@@ -3048,6 +3059,13 @@ enum EdgeCasesOrderBy {
 }
 
 scalar Email
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
 
 # A range of \`Float\`.
 type FloatRange {
