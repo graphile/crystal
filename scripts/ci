@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH="$PATH:`pwd`/node_modules/.bin"
+
 set -e
 echo "[1/4]: Building Code"
 npm run prepublish:all
@@ -13,7 +15,7 @@ npm run flow:check
 echo "[4/4]: Testing Project"
 for I in packages/*/; do
   cd $I
-  yarn test
+  npm run test
   cd -
 done
 
