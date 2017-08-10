@@ -15,5 +15,54 @@ v4+](https://github.com/postgraphql/postgraphql) which allows you to run just
 one command to instantly get a fully working and secure GraphQL API up and
 running based on your PostgreSQL database schema.
 
-**For in-depth documentation about `graphile-build-pg`, please see [the
-graphile documentation website](https://www.graphile.org/).**
+**It is recommended that you use PostGraphQL directly unless you really want to
+get low level access to this library.**
+
+If you prefer to use the plugins yourself it's advised that you use the
+`defaultPlugins` export from `graphile-build-pg` and then create a new array
+based on that into which you may insert or remove specific plugins. This is
+because it is ordered in a way to ensure the plugins work correctly (and we may
+still split up or restructure the plugins within it).
+
+### `defaultPlugins`
+
+An array of graphql-build plugins in the correct order to generate a
+well-thought-out GraphQL object tree based on your PostgreSQL schema. This is
+the array that `postgraphile-core` uses.
+
+### `inflections`
+
+This is a list of inflection engines, we currently have the following:
+
+- `defaultInflection` - a sensible default
+- `postGraphQLInflection` - as above, but enums get converted to `CONSTANT_CASE`
+- `postGraphQLClassicIdsInflection` - as above, but `id` attributes get renamed to `rowId` to prevent conflicts with `id` from the Relay Global Unique Object Specification.
+
+
+### Manual usage
+
+```js
+import { defaultPlugins, getBuilder } from "graphile-build";
+import {
+  defaultPlugins as pgDefaultPlugins,
+  inflections: {
+    defaultInflection,
+  },
+} from "graphile-build-pg";
+
+async function getSchema(pgConfig = process.env.DATABASE_URL, pgSchemas = ['public'], additionalPlugins = []) {
+  return getBuilder(
+    [
+      ...defaultPlugins,
+      ...pgDefaultPlugins,
+      ...additionalPlugins
+    ],
+    {
+      pgConfig,
+      pgSchemas,
+      pgExtendedTypes: true,
+      pgInflection: defaultInflection,
+    }
+  );
+}
+```
