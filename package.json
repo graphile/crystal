@@ -1,17 +1,10 @@
 {
-  "name": "postgraphql",
+  "name": "postgraphile",
   "version": "4.0.0-alpha2.27",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
-  "author": "Caleb Meredith <calebmeredith8@gmail.com>",
+  "author": "Benjie Gillam <benjie@graphile.org>",
   "license": "MIT",
-  "homepage": "https://github.com/calebmer/postgraphql#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/calebmer/postgraphql.git"
-  },
-  "bugs": {
-    "url": "https://github.com/calebmer/postgraphql/issues"
-  },
+  "homepage": "https://www.graphile.org/postgraphile/",
   "keywords": [
     "graphql",
     "postgres",
@@ -19,11 +12,12 @@
     "reflection",
     "server",
     "relay",
-    "connection"
+    "connection",
+    "graphile-build"
   ],
   "main": "build/index.js",
   "bin": {
-    "postgraphql": "build/postgraphql/cli.js"
+    "postgraphile": "build/postgraphql/cli.js"
   },
   "scripts": {
     "build": "./scripts/build",
