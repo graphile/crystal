@@ -276,11 +276,8 @@ type DeletePersonPayload {
   query: Query
 }
 
-type EdgeCase implements Node {
+type EdgeCase {
   computed: String
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  id: ID!
   notNullHasDefault: Boolean!
   rowId: Int
   wontCastEasy: Int
@@ -739,13 +736,10 @@ input PersonPatch {
   rowId: Int
 }
 
-type Post implements Node {
+type Post {
   authorId: Int
   body: String
   headline: String!
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  id: ID!
   rowId: Int!
 }
 
@@ -2002,14 +1996,11 @@ enum TypesOrderBy {
 }
 
 # YOYOYO!!
-type UpdatableView implements Node {
+type UpdatableView {
   # This is constantly 2
   constant: Int
   description: String
   name: String
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
   x: Int
 }
 
@@ -3033,11 +3024,8 @@ type DeleteTypePayload {
   ): TypesEdge
 }
 
-type EdgeCase implements Node {
+type EdgeCase {
   computed: String
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
   notNullHasDefault: Boolean!
   rowId: Int
   wontCastEasy: Int
@@ -3143,15 +3131,12 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
-type ForeignKey implements Node {
+type ForeignKey {
   compoundKey1: Int
   compoundKey2: Int
 
   # Reads a single \`CompoundKey\` that is related to this \`ForeignKey\`.
   compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
 
   # Reads a single \`Person\` that is related to this \`ForeignKey\`.
   personByPersonId: Person
@@ -3762,11 +3747,8 @@ interface Node {
   nodeId: ID!
 }
 
-type NonUpdatableView implements Node {
+type NonUpdatableView {
   column: Int
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
 }
 
 # A condition to be used against \`NonUpdatableView\` object types. All fields are
@@ -5041,14 +5023,11 @@ enum TypesOrderBy {
 }
 
 # YOYOYO!!
-type UpdatableView implements Node {
+type UpdatableView {
   # This is constantly 2
   constant: Int
   description: String
   name: String
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
   x: Int
 }
 
@@ -5476,11 +5455,8 @@ scalar Cursor
 # 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 scalar Datetime
 
-type EdgeCase implements Node {
+type EdgeCase {
   computed: String
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
   notNullHasDefault: Boolean!
   rowId: Int
   wontCastEasy: Int
@@ -5833,14 +5809,11 @@ input PersonCondition {
   name: String
 }
 
-type Post implements Node {
+type Post {
   authorId: Int
   body: String
   headline: String!
   id: Int!
-
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
 }
 
 # The root query type which gives access points into the data universe.

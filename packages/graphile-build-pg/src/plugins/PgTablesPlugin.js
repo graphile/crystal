@@ -73,13 +73,20 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
           table.name,
           schema && schema.name
         );
+        const shouldHaveNodeId: boolean =
+          nodeIdFieldName &&
+          table.isSelectable &&
+          primaryKeys &&
+          primaryKeys.length
+            ? true
+            : false;
         const TableType = newWithHooks(
           GraphQLObjectType,
           {
             description: table.description || tablePgType.description,
             name: tableTypeName,
             interfaces: () => {
-              if (nodeIdFieldName && table.isSelectable) {
+              if (shouldHaveNodeId) {
                 return [getTypeByName("Node")];
               } else {
                 return [];
@@ -87,7 +94,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
             },
             fields: ({ addDataGeneratorForField, Self }) => {
               const fields = {};
-              if (nodeIdFieldName && table.isSelectable) {
+              if (shouldHaveNodeId) {
                 // Enable nodeId interface
                 addDataGeneratorForField(nodeIdFieldName, () => {
                   return {
