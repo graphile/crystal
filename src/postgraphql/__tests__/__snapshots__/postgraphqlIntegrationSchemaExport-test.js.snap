@@ -881,9 +881,7 @@ type DeleteTypePayload {
   ): TypesEdge
 }
 
-type EdgeCase implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+type EdgeCase {
   notNullHasDefault: Boolean!
   wontCastEasy: Int
   rowId: Int
@@ -983,9 +981,7 @@ input FloatRangeInput {
   end: FloatRangeBoundInput
 }
 
-type ForeignKey implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+type ForeignKey {
   personId: Int
   compoundKey1: Int
   compoundKey2: Int
@@ -1587,9 +1583,7 @@ interface Node {
   nodeId: ID!
 }
 
-type NonUpdatableView implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+type NonUpdatableView {
   column: Int
 }
 
@@ -2828,9 +2822,7 @@ enum TypesOrderBy {
 }
 
 # YOYOYO!!
-type UpdatableView implements Node {
-  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  nodeId: ID!
+type UpdatableView {
   x: Int
   name: String
   description: String
@@ -4996,11 +4988,6 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"kind\": \"OBJECT\",
-              \"name\": \"ForeignKey\",
-              \"ofType\": null
-            },
-            {
-              \"kind\": \"OBJECT\",
               \"name\": \"Person\",
               \"ofType\": null
             },
@@ -5016,11 +5003,6 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"kind\": \"OBJECT\",
-              \"name\": \"NonUpdatableView\",
-              \"ofType\": null
-            },
-            {
-              \"kind\": \"OBJECT\",
               \"name\": \"SimilarTable1\",
               \"ofType\": null
             },
@@ -5032,16 +5014,6 @@ exports[`test exports a schema as JSON 1`] = `
             {
               \"kind\": \"OBJECT\",
               \"name\": \"Type\",
-              \"ofType\": null
-            },
-            {
-              \"kind\": \"OBJECT\",
-              \"name\": \"UpdatableView\",
-              \"ofType\": null
-            },
-            {
-              \"kind\": \"OBJECT\",
-              \"name\": \"EdgeCase\",
               \"ofType\": null
             }
           ]
@@ -5259,22 +5231,6 @@ exports[`test exports a schema as JSON 1`] = `
           \"description\": null,
           \"fields\": [
             {
-              \"name\": \"nodeId\",
-              \"description\": \"A globally unique identifier. Can be used in various places throughout the system to identify this single value.\",
-              \"args\": [],
-              \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"SCALAR\",
-                  \"name\": \"ID\",
-                  \"ofType\": null
-                }
-              },
-              \"isDeprecated\": false,
-              \"deprecationReason\": null
-            },
-            {
               \"name\": \"personId\",
               \"description\": null,
               \"args\": [],
@@ -5336,13 +5292,7 @@ exports[`test exports a schema as JSON 1`] = `
             }
           ],
           \"inputFields\": null,
-          \"interfaces\": [
-            {
-              \"kind\": \"INTERFACE\",
-              \"name\": \"Node\",
-              \"ofType\": null
-            }
-          ],
+          \"interfaces\": [],
           \"enumValues\": null,
           \"possibleTypes\": null
         },
@@ -7105,22 +7055,6 @@ exports[`test exports a schema as JSON 1`] = `
           \"description\": null,
           \"fields\": [
             {
-              \"name\": \"nodeId\",
-              \"description\": \"A globally unique identifier. Can be used in various places throughout the system to identify this single value.\",
-              \"args\": [],
-              \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"SCALAR\",
-                  \"name\": \"ID\",
-                  \"ofType\": null
-                }
-              },
-              \"isDeprecated\": false,
-              \"deprecationReason\": null
-            },
-            {
               \"name\": \"column\",
               \"description\": null,
               \"args\": [],
@@ -7134,13 +7068,7 @@ exports[`test exports a schema as JSON 1`] = `
             }
           ],
           \"inputFields\": null,
-          \"interfaces\": [
-            {
-              \"kind\": \"INTERFACE\",
-              \"name\": \"Node\",
-              \"ofType\": null
-            }
-          ],
+          \"interfaces\": [],
           \"enumValues\": null,
           \"possibleTypes\": null
         },
@@ -10192,22 +10120,6 @@ exports[`test exports a schema as JSON 1`] = `
           \"description\": \"YOYOYO!!\",
           \"fields\": [
             {
-              \"name\": \"nodeId\",
-              \"description\": \"A globally unique identifier. Can be used in various places throughout the system to identify this single value.\",
-              \"args\": [],
-              \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"SCALAR\",
-                  \"name\": \"ID\",
-                  \"ofType\": null
-                }
-              },
-              \"isDeprecated\": false,
-              \"deprecationReason\": null
-            },
-            {
               \"name\": \"x\",
               \"description\": null,
               \"args\": [],
@@ -10257,13 +10169,7 @@ exports[`test exports a schema as JSON 1`] = `
             }
           ],
           \"inputFields\": null,
-          \"interfaces\": [
-            {
-              \"kind\": \"INTERFACE\",
-              \"name\": \"Node\",
-              \"ofType\": null
-            }
-          ],
+          \"interfaces\": [],
           \"enumValues\": null,
           \"possibleTypes\": null
         },
@@ -10489,22 +10395,6 @@ exports[`test exports a schema as JSON 1`] = `
           \"description\": null,
           \"fields\": [
             {
-              \"name\": \"nodeId\",
-              \"description\": \"A globally unique identifier. Can be used in various places throughout the system to identify this single value.\",
-              \"args\": [],
-              \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"SCALAR\",
-                  \"name\": \"ID\",
-                  \"ofType\": null
-                }
-              },
-              \"isDeprecated\": false,
-              \"deprecationReason\": null
-            },
-            {
               \"name\": \"notNullHasDefault\",
               \"description\": null,
               \"args\": [],
@@ -10558,13 +10448,7 @@ exports[`test exports a schema as JSON 1`] = `
             }
           ],
           \"inputFields\": null,
-          \"interfaces\": [
-            {
-              \"kind\": \"INTERFACE\",
-              \"name\": \"Node\",
-              \"ofType\": null
-            }
-          ],
+          \"interfaces\": [],
           \"enumValues\": null,
           \"possibleTypes\": null
         },
