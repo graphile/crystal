@@ -1,17 +1,11 @@
 {
-  "name": "postgraphql",
+  "name": "postgraphile",
   "version": "4.0.0-alpha2.32",
-  "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
-  "author": "Caleb Meredith <calebmeredith8@gmail.com>",
+  "description":
+    "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
+  "author": "Benjie Gillam <benjie@graphile.org>",
   "license": "MIT",
-  "homepage": "https://github.com/calebmer/postgraphql#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/calebmer/postgraphql.git"
-  },
-  "bugs": {
-    "url": "https://github.com/calebmer/postgraphql/issues"
-  },
+  "homepage": "https://www.graphile.org/postgraphile/",
   "keywords": [
     "graphql",
     "postgres",
@@ -19,11 +13,12 @@
     "reflection",
     "server",
     "relay",
-    "connection"
+    "connection",
+    "graphile-build"
   ],
   "main": "build/index.js",
   "bin": {
-    "postgraphql": "build/postgraphql/cli.js"
+    "postgraphile": "build/postgraphql/cli.js"
   },
   "scripts": {
     "build": "./scripts/build",
@@ -85,22 +80,12 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": [
-      "<rootDir>/src"
-    ],
+    "testPathDirs": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": [
-    "build",
-    "resources/favicon.ico"
-  ]
+  "files": ["build", "resources/favicon.ico"]
 }
