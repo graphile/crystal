@@ -30,7 +30,7 @@ program
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens')
+  .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
@@ -40,6 +40,7 @@ program
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
   .option('--jwt-role <string>', 'a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
+  .option('-t, --jwt-token-identifier <identifier>', 'the Postgres identifier for a composite type that will be used to create JWT tokens')
   .option('--append-plugins <string>', 'a comma-separated list of plugins to append to the list of GraphQL schema plugins')
   .option('--prepend-plugins <string>', 'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins')
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
@@ -76,7 +77,8 @@ const {
   jwtSecret,
   jwtAudiences = ['postgraphql'],
   jwtRole = ['role'],
-  token: jwtPgTypeIdentifier,
+  token: deprecatedJwtPgTypeIdentifier,
+  jwtTokenIdentifier: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
   dynamicJson = false,
@@ -159,7 +161,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
-  jwtPgTypeIdentifier,
+  jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
   jwtAudiences,
   jwtRole,
