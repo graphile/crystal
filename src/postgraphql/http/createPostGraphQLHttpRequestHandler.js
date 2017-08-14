@@ -401,8 +401,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         jwtRole: options.jwtRole,
         pgDefaultRole: options.pgDefaultRole,
         pgSettings,
+        reqHeaders: req.headers,
       }, context => {
         pgRole = context.pgRole
+        context.reqHeaders = req.headers
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,

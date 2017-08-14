@@ -39,6 +39,7 @@ export default async function withPostGraphQLContext(
     jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
+    reqHeaders,
   }: {
     pgPool: Pool,
     jwtToken?: string,
@@ -47,6 +48,7 @@ export default async function withPostGraphQLContext(
     jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    reqHeaders: { [key: string]: mixed },
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -69,6 +71,7 @@ export default async function withPostGraphQLContext(
       jwtRole,
       pgDefaultRole,
       pgSettings,
+      reqHeaders,
     })
 
     return await callback({
@@ -101,6 +104,7 @@ async function setupPgClientTransaction ({
   jwtRole,
   pgDefaultRole,
   pgSettings,
+  reqHeaders,
 }: {
   pgClient: Client,
   jwtToken?: string,
@@ -109,6 +113,7 @@ async function setupPgClientTransaction ({
   jwtRole: Array<string>,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
+  reqHeaders: { [key: string]: mixed },
 }): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
@@ -177,6 +182,11 @@ async function setupPgClientTransaction ({
   // settings with the namespace `jwt.claims`.
   for (const key of Object.keys(jwtClaims)) {
     localSettings.set(`jwt.claims.${key}`, jwtClaims[key])
+  }
+
+  // If we have headers!
+  for (const key of Object.keys(reqHeaders)) {
+    localSettings.set(`req.headers.${key}`, reqHeaders[key])
   }
 
   // If there is at least one local setting.
