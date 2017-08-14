@@ -14,6 +14,11 @@ query {
       a: headlineTrimmed
       b: headlineTrimmed(length: 15)
       c: headlineTrimmed(length: 20, omission: "[...]")
+      d: headlineTrimmedStrict
+      e: headlineTrimmedStrict(length: 15)
+      f: headlineTrimmedStrict(length: 20, omission: "[...]")
+      g: headlineTrimmedNoDefaults(length: 15) # Expect null
+      h: headlineTrimmedNoDefaults(length: 20, omission: "[...]")
     }
   }
   allPeople {

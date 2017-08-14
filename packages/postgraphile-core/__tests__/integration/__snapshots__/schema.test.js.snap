@@ -2139,7 +2139,7 @@ type Add1MutationPayload {
 # All input for the \`add2Mutation\` mutation.
 input Add2MutationInput {
   a: Int!
-  b: Int!
+  b: Int
 
   # An arbitrary string value with no semantic meaning. Will be included in the
   # payload verbatim. May be used to track mutations by the client.
@@ -4050,6 +4050,8 @@ type Post implements Node {
   body: String
   headline: String!
   headlineTrimmed(length: Int, omission: String): String
+  headlineTrimmedNoDefaults(length: Int, omission: String): String
+  headlineTrimmedStrict(length: Int, omission: String): String
   id: Int!
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -4135,7 +4137,7 @@ type Query implements Node {
   add1Query(arg0: Int!, arg1: Int!): Int
 
   # lol, add some stuff 2 query
-  add2Query(a: Int!, b: Int!): Int
+  add2Query(a: Int!, b: Int): Int
 
   # lol, add some stuff 3 query
   add3Query(a: Int, arg1: Int): Int
