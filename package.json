@@ -46,7 +46,7 @@
     "parseurl": "^1.3.1",
     "pg": "^6.1.0",
     "pg-connection-string": "^0.1.3",
-    "pg-minify": "^0.4.4",
+    "pg-minify": "~0.5.3",
     "pluralize": "^3.0.0",
     "postgres-interval": "^1.0.2",
     "send": "^0.14.1",
