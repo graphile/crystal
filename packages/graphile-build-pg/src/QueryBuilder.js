@@ -157,6 +157,21 @@ class QueryBuilder {
   }
   select(exprGen: SQLGen, alias: RawAlias) {
     this.checkLock("select");
+    if (typeof alias === "string") {
+      // To protect against vulnerabilities such as
+      //
+      // https://github.com/brianc/node-postgres/issues/1408
+      //
+      // we need to ensure column names are safe. Turns out that GraphQL
+      // aliases are fairly strict (`[_A-Za-z][_0-9A-Za-z]*`) anyway:
+      //
+      // https://github.com/graphql/graphql-js/blob/680685dd14bd52c6475305e150e5f295ead2aa7e/src/language/lexer.js#L551-L581
+      //
+      // so this should not cause any issues in practice.
+      if (/^[_A-Za-z][_0-9A-Za-z]*$/.test(alias) !== true) {
+        throw new Error("Disallowed alias.");
+      }
+    }
     this.data.select.push([exprGen, alias]);
   }
   selectCursor(exprGen: SQLGen) {
