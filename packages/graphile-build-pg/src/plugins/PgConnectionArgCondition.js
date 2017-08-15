@@ -55,7 +55,7 @@ export default (function PgConnectionArgCondition(
           },
           {
             pgIntrospection: table,
-            isPgRowSortEnum: true,
+            isPgCondition: true,
           }
         );
       });
