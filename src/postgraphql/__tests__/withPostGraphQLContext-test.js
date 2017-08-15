@@ -284,3 +284,34 @@ test('will set a role provided in the JWT superceding the default role', async (
     ],
   }], ['commit']])
 })
+
+test('will use provided non-empty transaction setup function', async () => {
+  const testQuery = `select set_config('jwt.claims.aud', 'test_value', true);`;
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql', a: 1, b: 2, c: 3, some: { other: { path: 'test_deep_role' } } }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    jwtRole: ['some', 'other', 'path'],
+    pgDefaultRole: 'test_default_role',
+    pgTransactionSetup: async ({ pgClient }) => {
+      pgClient.query(testQuery);
+    }
+  }, () => { });
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [testQuery], ['commit']]);
+});
+
+test('will use provided empty transaction setup function', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql', a: 1, b: 2, c: 3, some: { other: { path: 'test_deep_role' } } }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    jwtRole: ['some', 'other', 'path'],
+    pgDefaultRole: 'test_default_role',
+    pgTransactionSetup: async ({ pgClient }) => { }
+  }, () => { });
+  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']]);
+});

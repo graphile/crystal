@@ -39,6 +39,7 @@ export default async function withPostGraphQLContext(
     jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
+    pgTransactionSetup,
   }: {
     pgPool: Pool,
     jwtToken?: string,
@@ -47,6 +48,7 @@ export default async function withPostGraphQLContext(
     jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    pgTransactionSetup?: (opts: any) => Promise<string | undefined>;
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -61,7 +63,11 @@ export default async function withPostGraphQLContext(
 
   // Run the function with a context object that can be passed through
   try {
-    const pgRole = await setupPgClientTransaction({
+    if (!pgTransactionSetup) {
+      pgTransactionSetup = setupPgClientTransaction;
+    }
+
+    const pgRole = await pgTransactionSetup({
       pgClient,
       jwtToken,
       jwtSecret,

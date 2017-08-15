@@ -26,6 +26,7 @@ type PostGraphQLOptions = {
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
   bodySizeLimit?: string,
+  pgTransactionSetup?: (opts: any) => Promise<string | undefined>,
   pgSettings?: { [key: string]: mixed },
   appendPlugins?: Array<(builder: mixed) => {}>,
   prependPlugins?: Array<(builder: mixed) => {}>,
