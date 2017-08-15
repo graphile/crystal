@@ -5,6 +5,7 @@ import { EventEmitter } from 'events'
 import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphile-core'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
+import { TransactionSetupOpts } from './withPostGraphQLContext'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -26,7 +27,7 @@ type PostGraphQLOptions = {
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
   bodySizeLimit?: string,
-  pgTransactionSetup?: (opts: any) => Promise<string | undefined>,
+  pgTransactionSetup?: (opts: TransactionSetupOpts) => Promise<string | undefined>,
   pgSettings?: { [key: string]: mixed },
   appendPlugins?: Array<(builder: mixed) => {}>,
   prependPlugins?: Array<(builder: mixed) => {}>,
