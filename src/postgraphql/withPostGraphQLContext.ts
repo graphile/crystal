@@ -5,6 +5,16 @@ import { ExecutionResult } from 'graphql'
 import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
+export interface TransactionSetupOpts {
+  pgClient: Client,
+  jwtToken?: string,
+  jwtSecret?: string,
+  jwtAudiences?: Array<string>,
+  jwtRole: Array<string>,
+  pgDefaultRole?: string,
+  pgSettings?: { [key: string]: mixed },
+}
+
 /**
  * Creates a PostGraphQL context object which should be passed into a GraphQL
  * execution. This function will also connect a client from a Postgres pool and
@@ -39,6 +49,7 @@ export default async function withPostGraphQLContext(
     jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
+    pgTransactionSetup,
   }: {
     pgPool: Pool,
     jwtToken?: string,
@@ -47,6 +58,7 @@ export default async function withPostGraphQLContext(
     jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    pgTransactionSetup?: (opts: TransactionSetupOpts) => Promise<string | undefined>;
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -61,7 +73,11 @@ export default async function withPostGraphQLContext(
 
   // Run the function with a context object that can be passed through
   try {
-    const pgRole = await setupPgClientTransaction({
+    if (!pgTransactionSetup) {
+      pgTransactionSetup = setupPgClientTransaction
+    }
+
+    const pgRole = await pgTransactionSetup({
       pgClient,
       jwtToken,
       jwtSecret,
@@ -101,15 +117,7 @@ async function setupPgClientTransaction ({
   jwtRole,
   pgDefaultRole,
   pgSettings,
-}: {
-  pgClient: Client,
-  jwtToken?: string,
-  jwtSecret?: string,
-  jwtAudiences?: Array<string>,
-  jwtRole: Array<string>,
-  pgDefaultRole?: string,
-  pgSettings?: { [key: string]: mixed },
-}): Promise<string | undefined> {
+}: TransactionSetupOpts): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
   let jwtClaims: { [claimName: string]: mixed } = {}
