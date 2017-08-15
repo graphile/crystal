@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "0.1.0-alpha.22",
+  "version": "0.1.0-alpha.23",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
   "main": "index.js",
   "scripts": {
