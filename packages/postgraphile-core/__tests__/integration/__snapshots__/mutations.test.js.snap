@@ -698,6 +698,12 @@ Object {
         "fooBar": 8,
       },
     },
+    "guidFn": Object {
+      "guid": null,
+    },
+    "guidFn2": Object {
+      "guid": "0123456789abcde",
+    },
     "intSetMutation": Object {
       "integers": Array [
         1,

@@ -1407,6 +1407,27 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
+scalar Guid
+
+# All input for the \`guidFn\` mutation.
+input GuidFnInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  g: Guid
+}
+
+# The output of our \`guidFn\` mutation.
+type GuidFnPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  guid: Guid
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # An interval of time that has passed where the smallest distinct unit is a second.
 type Interval {
   # A quantity of days.
@@ -1588,6 +1609,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeleteTypeByIdInput!
   ): DeleteTypePayload
+  guidFn(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: GuidFnInput!
+  ): GuidFnPayload!
   mult1(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult1Input!
@@ -3198,6 +3223,27 @@ enum ForeignKeysOrderBy {
   PERSON_ID_DESC
 }
 
+scalar Guid
+
+# All input for the \`guidFn\` mutation.
+input GuidFnInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  g: Guid
+}
+
+# The output of our \`guidFn\` mutation.
+type GuidFnPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  guid: Guid
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
 # An interval of time that has passed where the smallest distinct unit is a second.
 type Interval {
   # A quantity of days.
@@ -3578,6 +3624,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: DeleteTypeByIdInput!
   ): DeleteTypePayload
+  guidFn(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: GuidFnInput!
+  ): GuidFnPayload!
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!

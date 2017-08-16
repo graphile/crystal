@@ -30,6 +30,15 @@ create function c.person_exists(person c.person, email b.email) returns boolean 
 select exists(select 1 from c.person where person.email = person_exists.email);
 $$ language sql stable;
 
+create domain b.guid
+  as character varying(15)
+  default '000000000000000'::character varying
+  constraint guid_conformity check (value::text ~ '^[a-zA-Z0-9]{15}$'::text);
+
+create or replace function b.guid_fn(g b.guid) returns b.guid as $$
+  select g;
+$$ language sql volatile;
+
 create table a.post (
   id serial primary key,
   headline text not null,

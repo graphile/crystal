@@ -15,4 +15,6 @@ mutation {
   intSetMutation(input: { x: 5, z: 6 }) { integers }
   noArgsMutation(input: { clientMutationId: "x" }) { clientMutationId integer }
   returnVoidMutation(input: {}) { __typename }
+  guidFn(input: {g: null}) { guid }
+  guidFn2: guidFn(input: {g: "0123456789abcde"}) { guid }
 }
