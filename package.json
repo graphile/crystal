@@ -1,6 +1,6 @@
 {
   "name": "postgraphql",
-  "version": "4.0.0-alpha2.11",
+  "version": "4.0.0-alpha2.12",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
@@ -49,7 +49,7 @@
     "pg-minify": "~0.5.3",
     "pg-sql2": "^1.0.0-alpha1.0",
     "pluralize": "^3.0.0",
-    "postgraphile-core": "^0.1.0-alpha.23",
+    "postgraphile-core": "^0.1.0-alpha.24",
     "postgres-interval": "^1.0.2",
     "send": "^0.14.1",
     "tslib": "^1.5.0"
