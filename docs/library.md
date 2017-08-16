@@ -149,7 +149,7 @@ This function sets up a PostGraphQL context, calls (and resolves) the callback f
   - `jwtToken`: An optional JWT token string. This JWT token represents the viewer of your PostGraphQL schema.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify the `jwtToken`.
   - `pgDefaultRole`: The default Postgres role that will be used if no role was found in `jwtToken`. It is a best security practice to always have a value for this option even though it is optional.
-  - `pgSettings`: an object specifying custom config values to set in the PostgreSQL transaction (accessed via `current_setting('my.custom.setting')`) or a function which will return the same (or a Promise to the same).
+  - `pgSettings`: A plain object specifying custom config values to set in the PostgreSQL transaction (accessed via `current_setting('my.custom.setting')`) or a function which will return the same (or a Promise to the same).
 - **`callback`**: The function which is called with the `context` object which was created. Whatever the return value of this function is will be the return value of `withPostGraphQLContext`.
 
 [GraphQL-js]: https://www.npmjs.com/package/graphql
