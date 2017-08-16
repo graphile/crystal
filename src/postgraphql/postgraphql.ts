@@ -7,7 +7,7 @@ import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
-import { IncomingMessage } from 'http';
+import { IncomingMessage } from 'http'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
