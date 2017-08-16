@@ -79,7 +79,7 @@ export default async function viaTemporaryTable(
         select ${isPgClassLike
           ? sql.query`(str::${sqlTypeIdentifier}).*`
           : sql.query`str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}`}
-        from unnest((${sql.value(values)})::${sqlTypeIdentifier}[]) str
+        from unnest((${sql.value(values)})::text[]) str
       )
       ${sqlResultQuery}`
     );
