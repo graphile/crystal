@@ -7,6 +7,7 @@ import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
+import { IncomingMessage } from 'http'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -28,7 +29,7 @@ type PostGraphQLOptions = {
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
   bodySizeLimit?: string,
-  pgSettings?: { [key: string]: mixed },
+  pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{[key: string]: mixed }>),
 }
 
 /**

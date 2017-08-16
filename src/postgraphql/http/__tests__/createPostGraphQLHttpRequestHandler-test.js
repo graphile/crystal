@@ -641,5 +641,42 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       ])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
+
+    test('will correctly hand over pgSettings function to the withPostGraphQLContext call', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        pgSettings: (req) => ({
+          'foo.string': 'test1',
+          'foo.number': 42,
+          'foo.boolean': true,
+        }),
+      })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } })
+      )
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [
+          {
+            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            values: [
+              'foo.string', 'test1',
+              'foo.number', '42',
+              'foo.boolean', 'true',
+            ],
+          },
+        ],
+        ['commit'],
+      ])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+    })
   })
 }
