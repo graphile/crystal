@@ -400,7 +400,8 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         jwtAudiences: options.jwtAudiences,
         jwtRole: options.jwtRole,
         pgDefaultRole: options.pgDefaultRole,
-        pgSettings,
+        pgSettings:
+          typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
         pgRole = context.pgRole
         return executeGraphql(
