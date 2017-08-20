@@ -13,10 +13,10 @@ type CompoundKey implements Node {
   id: ID!
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person!
+  personByPersonId1: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person!
+  personByPersonId2: Person
   personId1: Int!
   personId2: Int!
 }
@@ -2369,10 +2369,10 @@ type CompoundKey implements Node {
   nodeId: ID!
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person!
+  personByPersonId1: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person!
+  personByPersonId2: Person
   personId1: Int!
   personId2: Int!
 }
@@ -5442,10 +5442,10 @@ type CompoundKey implements Node {
   nodeId: ID!
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person!
+  personByPersonId1: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person!
+  personByPersonId2: Person
   personId1: Int!
   personId2: Int!
 }

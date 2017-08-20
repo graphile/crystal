@@ -19,7 +19,6 @@ export default (function PgForwardRelationPlugin(
         getAliasFromResolveInfo,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
-        graphql: { GraphQLNonNull },
       },
       {
         scope: {
@@ -31,8 +30,6 @@ export default (function PgForwardRelationPlugin(
         fieldWithHooks,
       }
     ) => {
-      const nullableIf = (condition, Type) =>
-        condition ? Type : new GraphQLNonNull(Type);
       const table = pgIntrospectionTable || pgIntrospection;
       if (
         !(isPgRowType || isMutationPayload) ||
@@ -148,10 +145,7 @@ export default (function PgForwardRelationPlugin(
               });
               return {
                 description: `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
-                type: nullableIf(
-                  isMutationPayload || !keys.every(key => key.isNotNull),
-                  gqlForeignTableType
-                ),
+                type: gqlForeignTableType, // Nullable since RLS may forbid fetching
                 resolve: (rawData, _args, _context, resolveInfo) => {
                   const data = isMutationPayload ? rawData.data : rawData;
                   const alias = getAliasFromResolveInfo(resolveInfo);
