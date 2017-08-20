@@ -180,10 +180,10 @@ type CompoundKey implements Node {
   extra: Boolean
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId2: Person!
+  personByPersonId2: Person
 
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
-  personByPersonId1: Person!
+  personByPersonId1: Person
 
   # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByCompoundKey1AndCompoundKey2(
@@ -6586,13 +6586,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Reads a single \`Person\` that is related to this \`CompoundKey\`.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Person\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Person\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -6602,13 +6598,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Reads a single \`Person\` that is related to this \`CompoundKey\`.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Person\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Person\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
