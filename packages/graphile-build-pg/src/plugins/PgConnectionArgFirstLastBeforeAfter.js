@@ -32,24 +32,28 @@ export default (function PgConnectionArgs(builder) {
       }) {
         return {
           pgQuery: queryBuilder => {
-            if (first != null) {
-              queryBuilder.limit(first);
-            }
-            if (offset != null) {
-              queryBuilder.offset(offset);
-            }
-            if (first != null && last != null) {
-              throw new Error("We don't support setting both first and last");
-            }
-            if (last != null) {
-              queryBuilder.limit(last);
-              queryBuilder.flip();
-            }
             if (after != null) {
               addCursorConstraint(after, true);
             }
             if (before != null) {
               addCursorConstraint(before, false);
+            }
+            if (first != null) {
+              queryBuilder.first(first);
+            }
+            if (offset != null) {
+              queryBuilder.offset(offset);
+            }
+            if (last != null) {
+              if (first != null) {
+                throw new Error("We don't support setting both first and last");
+              }
+              if (offset != null) {
+                throw new Error(
+                  "We don't support setting both offset and last"
+                );
+              }
+              queryBuilder.last(last);
             }
 
             function addCursorConstraint(cursor, isAfter) {

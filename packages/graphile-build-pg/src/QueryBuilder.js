@@ -50,7 +50,8 @@ class QueryBuilder {
     orderIsUnique: boolean,
     limit: ?NumberGen,
     offset: ?NumberGen,
-    flip: boolean,
+    first: ?number,
+    last: ?number,
     beforeLock: {
       [string]: Array<() => void>,
     },
@@ -71,7 +72,8 @@ class QueryBuilder {
     orderIsUnique: boolean,
     limit: ?number,
     offset: ?number,
-    flip: boolean,
+    first: ?number,
+    last: ?number,
     cursorComparator: ?CursorComparator,
   };
 
@@ -94,7 +96,8 @@ class QueryBuilder {
       orderIsUnique: false,
       limit: null,
       offset: null,
-      flip: false,
+      first: null,
+      last: null,
       beforeLock: {},
       cursorComparator: null,
     };
@@ -113,7 +116,8 @@ class QueryBuilder {
       orderIsUnique: false,
       limit: null,
       offset: null,
-      flip: false,
+      first: null,
+      last: null,
       cursorComparator: null,
     };
     this.beforeLock("select", () => {
@@ -131,6 +135,14 @@ class QueryBuilder {
     });
     this.beforeLock("limit", () => {
       this.lock("whereBound");
+    });
+    this.beforeLock("first", () => {
+      this.lock("limit");
+      this.lock("offset");
+    });
+    this.beforeLock("last", () => {
+      this.lock("limit");
+      this.lock("offset");
     });
   }
 
@@ -210,6 +222,7 @@ class QueryBuilder {
   }
   limit(limitGen: NumberGen) {
     this.checkLock("limit");
+
     if (this.data.limit != null) {
       throw new Error("Must only set limit once");
     }
@@ -222,10 +235,19 @@ class QueryBuilder {
     }
     this.data.offset = offsetGen;
   }
-  flip() {
-    this.checkLock("flip");
-    this.data.flip = true;
-    this.lock("flip");
+  first(first: number) {
+    this.checkLock("first");
+    if (this.data.first != null) {
+      throw new Error("Must only set first once");
+    }
+    this.data.first = first;
+  }
+  last(last: number) {
+    this.checkLock("last");
+    if (this.data.last != null) {
+      throw new Error("Must only set last once");
+    }
+    this.data.last = last;
   }
 
   // ----------------------------------------
@@ -255,6 +277,59 @@ class QueryBuilder {
   getOffset() {
     this.lock("offset");
     return this.compiledData.offset || 0;
+  }
+  getFinalLimitAndOffset() {
+    this.lock("offset");
+    this.lock("limit");
+    this.lock("first");
+    this.lock("last");
+    let limit = this.compiledData.limit;
+    let offset = this.compiledData.offset || 0;
+    let flip = false;
+    if (this.compiledData.first != null) {
+      if (limit != null) {
+        limit = Math.min(limit, this.compiledData.first);
+      } else {
+        limit = this.compiledData.first;
+      }
+    }
+    if (this.compiledData.last != null) {
+      if (offset > 0 && limit != null) {
+        throw new Error(
+          "Issue within pagination, please report your query to graphile-build"
+        );
+      }
+      if (limit != null) {
+        if (this.compiledData.last < limit) {
+          offset = limit - this.compiledData.last;
+          limit = this.compiledData.last;
+        } else {
+          // no need to change anything
+        }
+      } else if (offset > 0) {
+        // eslint-disable-next-line
+        debugger
+        throw new Error("Cannot combine 'last' and 'offset'");
+      } else {
+        if (this.compiledData.orderBy.length > 0) {
+          flip = true;
+          limit = this.compiledData.last;
+        } else {
+          throw new Error("Cannot do last of an unordered set");
+        }
+      }
+    }
+    return {
+      limit,
+      offset,
+      flip,
+    };
+  }
+  getFinalOffset() {
+    return this.getFinalLimitAndOffset().offset;
+  }
+  getFinalLimit() {
+    return this.getFinalLimitAndOffset().limit;
   }
   getOrderByExpressionsAndDirections() {
     this.lock("orderBy");
@@ -354,10 +429,12 @@ class QueryBuilder {
     if (onlyJsonField) {
       return this.buildSelectJson({ addNullCase });
     }
+    const { limit, offset, flip } = this.getFinalLimitAndOffset();
     const fields =
       asJson || asJsonAggregate
         ? sql.fragment`${this.buildSelectJson({ addNullCase })} as object`
         : this.buildSelectFields();
+
     let fragment = sql.fragment`
       select ${fields}
       ${this.compiledData.from &&
@@ -369,20 +446,17 @@ class QueryBuilder {
         ? sql.fragment`order by ${sql.join(
             this.compiledData.orderBy.map(
               ([expr, ascending]) =>
-                sql.fragment`${expr} ${Number(ascending) ^
-                Number(this.compiledData.flip)
+                sql.fragment`${expr} ${Number(ascending) ^ Number(flip)
                   ? sql.fragment`ASC`
                   : sql.fragment`DESC`}`
             ),
             ","
           )}`
         : ""}
-      ${isSafeInteger(this.compiledData.limit) &&
-        sql.fragment`limit ${sql.literal(this.compiledData.limit)}`}
-      ${this.compiledData.offset &&
-        sql.fragment`offset ${sql.literal(this.compiledData.offset)}`}
+      ${isSafeInteger(limit) && sql.fragment`limit ${sql.literal(limit)}`}
+      ${offset && sql.fragment`offset ${sql.literal(offset)}`}
     `;
-    if (this.compiledData.flip) {
+    if (flip) {
       const flipAlias = Symbol();
       fragment = sql.fragment`
         with ${sql.identifier(flipAlias)} as (
@@ -455,7 +529,9 @@ class QueryBuilder {
       this.compiledData[type] = callIfNecessary(this.data[type]);
     } else if (type === "offset") {
       this.compiledData[type] = callIfNecessary(this.data[type]);
-    } else if (type === "flip") {
+    } else if (type === "first") {
+      this.compiledData[type] = this.data[type];
+    } else if (type === "last") {
       this.compiledData[type] = this.data[type];
     } else {
       throw new Error(`Wasn't expecting to lock '${type}'`);
@@ -477,7 +553,6 @@ class QueryBuilder {
     this._finalize();
     // We must execute everything after `from` so we have the alias to reference
     this.lock("from");
-    this.lock("flip");
     this.lock("join");
     this.lock("orderBy");
     // We must execute where after orderBy because cursor queries require all orderBy columns
@@ -487,6 +562,8 @@ class QueryBuilder {
     // 'where' -> 'whereBound' can affect 'offset'/'limit'
     this.lock("offset");
     this.lock("limit");
+    this.lock("first");
+    this.lock("last");
     // We must execute select after orderBy otherwise we cannot generate a cursor
     this.lock("selectCursor");
     this.lock("select");

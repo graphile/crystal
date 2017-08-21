@@ -10,6 +10,9 @@ query {
   tableSetQuery { edges { cursor node { name } } }
   tableSetQueryWithOffset: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", after: "WyJuYXR1cmFsIiwzXQ==") { edges { cursor node { name } } }
   tableSetQueryWithOffset2: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", before: "WyJuYXR1cmFsIiw1XQ==") { edges { cursor node { name } } }
+  tableSetQueryWithOffset3: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", last: 2) { edges { cursor node { name } } }
+  tableSetQueryWithOffset4: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", first: 2) { edges { cursor node { name } } }
+  tableSetQueryWithOffset5: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", first: 2) { edges { cursor node { name } } }
   intSetQuery(x: 5, z: 6) { edges { cursor node } }
   noArgsQuery
 }

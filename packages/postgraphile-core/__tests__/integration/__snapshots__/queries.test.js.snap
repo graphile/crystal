@@ -550,6 +550,71 @@ Object {
         },
       ],
     },
+    "p": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "name": "Joe Tucker",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+      },
+      "totalCount": 6,
+    },
+    "q": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "name": "Budd Deey",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+      },
+      "totalCount": 6,
+    },
+    "r": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+      },
+      "totalCount": 6,
+    },
   },
 }
 `;
@@ -1765,6 +1830,54 @@ Object {
           "cursor": "WyJuYXR1cmFsIiw0XQ==",
           "node": Object {
             "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+    },
+    "tableSetQueryWithOffset3": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+    },
+    "tableSetQueryWithOffset4": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+      ],
+    },
+    "tableSetQueryWithOffset5": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
           },
         },
       ],

@@ -14,6 +14,9 @@ query {
   m: allPeople(first: 3, offset: 1) { ...personConnection }
   n: allPeople(first: 0) { ...personConnection }
   o: allEdgeCases(condition: { rowId: 2 }) { nodes { rowId } }
+  p: allPeople(last: 2, before: "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=", after: null, first: null) { ...personConnection }
+  q: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=", first: 1) { ...personConnection }
+  r: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=", last: 1) { ...personConnection }
 }
 
 fragment personConnection on PeopleConnection {
