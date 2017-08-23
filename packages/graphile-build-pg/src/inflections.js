@@ -1,31 +1,6 @@
 // @flow
 import pluralize from "pluralize";
-import upperFirstAll from "lodash/upperFirst";
-import camelCaseAll from "lodash/camelCase";
-
-const constantCaseAll = str =>
-  str
-    .replace(/[^a-zA-Z0-9_]+/g, "_")
-    .replace(/[A-Z]+/g, "_$&")
-    .replace(/__+/g, "_")
-    .replace(/^[^a-zA-Z0-9]+/, "")
-    .replace(/^[0-9]/, "_$&") // GraphQL enums must not start with a number
-    .toUpperCase();
-
-const formatInsideUnderscores = (fn: (input: string) => string) => (
-  str: string
-) => {
-  const matches = str.match(/^(_*)([\s\S]*?)(_*)$/);
-  if (!matches) {
-    throw new Error("Impossible?"); // Satiate Flow
-  }
-  const [, start, middle, end] = matches;
-  return `${start}${fn(middle)}${end}`;
-};
-
-const upperFirst = formatInsideUnderscores(upperFirstAll);
-const camelCase = formatInsideUnderscores(camelCaseAll);
-const constantCase = formatInsideUnderscores(constantCaseAll);
+import { upperFirst, camelCase, constantCase } from "./utils";
 
 type Keys = Array<{
   column: string,
