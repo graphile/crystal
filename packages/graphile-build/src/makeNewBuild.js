@@ -160,6 +160,14 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
       return data[alias];
     },
     addType(type: GraphQLNamedType): void {
+      if (!type.name) {
+        throw new Error(
+          `addType must only be called with named types, try using require('graphql').getNamedType`
+        );
+      }
+      if (allTypes[type.name] && allTypes[type.name] !== type) {
+        throw new Error(`There's already a type with the name: ${type.name}`);
+      }
       allTypes[type.name] = type;
     },
     getTypeByName(typeName) {

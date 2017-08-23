@@ -1,7 +1,6 @@
 // @flow
 import type { Plugin, Build } from "../SchemaBuilder";
 import { Kind } from "graphql/language";
-import GraphQLJSON from "graphql-type-json";
 
 export default (function StandardTypesPlugin(builder) {
   // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
@@ -25,12 +24,6 @@ export default (function StandardTypesPlugin(builder) {
       "A location in a connection that can be used for resuming pagination."
     );
     build.addType(Cursor);
-    const UUID = stringType(
-      "UUID",
-      "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
-    );
-    build.addType(UUID);
-    build.addType(GraphQLJSON);
     return build;
   });
   builder.hook(

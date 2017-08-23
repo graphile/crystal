@@ -12,9 +12,13 @@ import {
   GraphQLInputObjectType,
   GraphQLScalarType,
   isInputType,
+  getNamedType,
 } from "graphql";
 import { Kind } from "graphql/language";
 import { types as pgTypes } from "pg";
+
+import GraphQLJSON from "graphql-type-json";
+
 const stringType = (name, description) =>
   new GraphQLScalarType({
     name,
@@ -100,7 +104,6 @@ export default (function PgTypesPlugin(
       pgSql: sql,
     } = build;
 
-    const GraphQLJSON = getTypeByName("JSON");
     const GraphQLUUID = getTypeByName("UUID");
     const gqlTypeByTypeId = Object.assign({}, build.pgGqlTypeByTypeId);
     const gqlInputTypeByTypeId = Object.assign(
@@ -538,6 +541,7 @@ export default (function PgTypesPlugin(
           gqlInputTypeByTypeId[type.id] = gqlTypeByTypeId[type.id];
         }
       }
+      addType(getNamedType(gqlTypeByTypeId[type.id]));
       return gqlTypeByTypeId[type.id];
     };
 

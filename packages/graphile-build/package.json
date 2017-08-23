@@ -29,8 +29,7 @@
   "dependencies": {
     "babel-runtime": ">=6 <7",
     "debug": ">=2 <3",
-    "graphql-parse-resolve-info": "^0.1.0-alpha.18",
-    "graphql-type-json": "^0.1.4"
+    "graphql-parse-resolve-info": "^0.1.0-alpha.18"
   },
   "engines": {
     "node": ">=4"
