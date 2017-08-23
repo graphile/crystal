@@ -53,6 +53,14 @@ const getPostGraphQLBuilder = async (
   } = options;
   if (replaceAllPlugins) {
     ensureValidPlugins("replaceAllPlugins", replaceAllPlugins);
+    if (
+      (prependPlugins && prependPlugins.length) ||
+      (appendPlugins && appendPlugins.length)
+    ) {
+      throw new Error(
+        "When using 'replaceAllPlugins' you must not specify 'appendPlugins'/'prependPlugins'"
+      );
+    }
   }
   ensureValidPlugins("prependPlugins", prependPlugins);
   ensureValidPlugins("appendPlugins", appendPlugins);

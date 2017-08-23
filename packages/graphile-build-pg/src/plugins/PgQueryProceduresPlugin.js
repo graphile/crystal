@@ -2,6 +2,7 @@
 import type { Plugin } from "graphile-build";
 import makeProcField from "./makeProcField";
 import debugFactory from "debug";
+import chalk from "chalk";
 
 const debugWarn = debugFactory("graphile-build-pg:warn");
 
@@ -71,8 +72,10 @@ export default (function PgQueryProceduresPlugin(builder) {
             } catch (e) {
               // eslint-disable-next-line no-console
               console.warn(
-                `Failed to add function '${proc.namespace
-                  .name}.${proc.name}'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                chalk.bold.yellow(
+                  `Failed to add function '${proc.namespace
+                    .name}.${proc.name}'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                )
               );
               debugWarn(e);
             }

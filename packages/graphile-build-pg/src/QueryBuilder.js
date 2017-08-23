@@ -307,8 +307,6 @@ class QueryBuilder {
           // no need to change anything
         }
       } else if (offset > 0) {
-        // eslint-disable-next-line
-        debugger
         throw new Error("Cannot combine 'last' and 'offset'");
       } else {
         if (this.compiledData.orderBy.length > 0) {

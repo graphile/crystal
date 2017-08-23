@@ -35,6 +35,7 @@
   "homepage": "https://github.com/graphile/graphile-build#readme",
   "dependencies": {
     "babel-runtime": ">=6 <7",
+    "chalk": "^2.1.0",
     "debug": ">=2 <3",
     "graphile-build": "^0.1.0-alpha.18",
     "graphql-iso-date": "^3.2.0",

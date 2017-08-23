@@ -4,6 +4,7 @@ import withPgClient from "../withPgClient";
 import { readFile as rawReadFile } from "fs";
 import pg from "pg";
 import debugFactory from "debug";
+import chalk from "chalk";
 const debug = debugFactory("graphile-build-pg");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
@@ -239,11 +240,25 @@ export default (async function PgIntrospectionPlugin(
       await pgClient.query(sql);
     } catch (error) {
       /* eslint-disable no-console */
-      console.warn("Failed to setup watch fixtures in Postgres database");
       console.warn(
-        "This is likely because your Postgres user is not a superuser. If the fixtures already exist, the watch functionality may still work."
+        `${chalk.bold.yellow(
+          "Failed to setup watch fixtures in Postgres database"
+        )} ️️⚠️`
       );
-      console.warn(error);
+      console.warn(
+        chalk.yellow(
+          "This is likely because your Postgres user is not a superuser. If the"
+        )
+      );
+      console.warn(
+        chalk.yellow(
+          "fixtures already exist, the watch functionality may still work."
+        )
+      );
+      console.warn(
+        chalk.yellow("Enable DEBUG='graphile-build-pg' to see the error")
+      );
+      debug(error);
       /* eslint-enable no-console */
       await pgClient.query("rollback");
     }

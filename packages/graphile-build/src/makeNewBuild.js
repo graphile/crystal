@@ -124,7 +124,7 @@ function ensureArray<T>(val: void | Array<T> | T): void | Array<T> {
 let ensureName = fn => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   ensureName = fn => {
-    if (isDev && !fn.displayName && !fn.name) {
+    if (isDev && !fn.displayName && !fn.name && debug.enabled) {
       // eslint-disable-next-line no-console
       console.trace(
         "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
@@ -187,7 +187,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         console.warn(
           `No scope was provided to new ${getNameFromType(
             Type
-          )}[name=${spec.name}], please check usage of 'newWithHooks'`
+          )}[name=${spec.name}], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
         );
       }
       if (!Type) {
