@@ -76,9 +76,6 @@ class PostGraphiQL extends React.Component {
    */
   // TODO: Send the introspection query results in the server sent event?
   async updateSchema () {
-    // Don’t allow users to see a schema while we update.
-    this.setState({ schema: undefined })
-
     // Fetch the schema using our introspection query and report once that has
     // finished.
     const { data } = await this.executeQuery({ query: introspectionQuery })
