@@ -1199,6 +1199,14 @@ chalk@^2.0.1:
     escape-string-regexp "^1.0.5"
     supports-color "^4.0.0"
 
+chalk@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.1.0.tgz#ac5becf14fa21b99c6c92ca7a7d7cfd5b17e743e"
+  dependencies:
+    ansi-styles "^3.1.0"
+    escape-string-regexp "^1.0.5"
+    supports-color "^4.0.0"
+
 change-case@*:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/change-case/-/change-case-3.0.1.tgz#ee5f5ad0415ad1ad9e8072cf49cd4cfa7660a554"
@@ -2669,13 +2677,14 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@^0.1.0-alpha.26:
-  version "0.1.0-alpha.26"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.26.tgz#4904b71e076db75b0d8195160fc08da8ce708c43"
+graphile-build-pg@^0.1.0-alpha.27:
+  version "0.1.0-alpha.27"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.27.tgz#4cdbca69d1bd2f9c5fb52acc252d49ad3e3b5874"
   dependencies:
     babel-runtime ">=6 <7"
+    chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "^0.1.0-alpha.18"
+    graphile-build "^0.1.0-alpha.27"
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
     jsonwebtoken "^7.4.1"
@@ -2685,14 +2694,13 @@ graphile-build-pg@^0.1.0-alpha.26:
     pg-sql2 "^1.0.0-beta.3"
     pluralize "^5.0.0"
 
-graphile-build@^0.1.0-alpha.18:
-  version "0.1.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.18.tgz#467534cc40e23839a2d1a0fdc451c058b35ab47f"
+graphile-build@^0.1.0-alpha.27:
+  version "0.1.0-alpha.27"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.27.tgz#3f5eab9b67d65e5489f55084ff40d5687cb03dca"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
     graphql-parse-resolve-info "^0.1.0-alpha.18"
-    graphql-type-json "^0.1.4"
 
 graphiql@^0.11.2:
   version "0.11.2"
@@ -4836,13 +4844,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@^0.1.0-alpha.26:
-  version "0.1.0-alpha.26"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.26.tgz#36a64bdacfe6571e93a730e5627a394a5b878c1c"
+postgraphile-core@^0.1.0-alpha.27:
+  version "0.1.0-alpha.27"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.27.tgz#39656c0dd7cd490248111f0e52f863e00e6f41b1"
   dependencies:
     babel-runtime ">=6 <7"
-    graphile-build "^0.1.0-alpha.18"
-    graphile-build-pg "^0.1.0-alpha.26"
+    graphile-build "^0.1.0-alpha.27"
+    graphile-build-pg "^0.1.0-alpha.27"
 
 postgres-array@~1.0.0:
   version "1.0.2"
