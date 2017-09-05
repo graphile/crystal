@@ -6,6 +6,7 @@ query {
   typesQuery(a: "50", b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}", f: { start: { value: 1, inclusive: false }, end: { value: 5, inclusive: false } })
   empty: typesQuery(a: "50", b: false, c: "", d: [], e: "{}", f: {})
   compoundTypeQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, fooBar: 8 }) { a b c d e fooBar }
+  compoundTypeSetQuery { edges { cursor node { a b c d e fooBar } } }
   tableQuery(id: 5) { nodeId id headline authorId }
   tableSetQuery { edges { cursor node { name } } }
   tableSetQueryWithOffset: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", after: "WyJuYXR1cmFsIiwzXQ==") { edges { cursor node { name } } }

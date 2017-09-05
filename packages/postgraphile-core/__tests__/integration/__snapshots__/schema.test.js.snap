@@ -6,6 +6,12 @@ exports[`prints a schema with Relay 1 style ids 1`] = `
 # strings and not numbers.
 scalar BigInt
 
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
 type CompoundKey implements Node {
   extra: Boolean
 
@@ -83,6 +89,41 @@ enum CompoundKeysOrderBy {
   PERSON_ID_2_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+}
+
+# Awesome feature!
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  computedField: Int
+  d: UUID
+  e: EnumCaps
+  fooBar: Int
+}
+
+# A connection to a list of \`CompoundType\` values.
+type CompoundTypesConnection {
+  # A list of edges which contains the \`CompoundType\` and cursor to aid in pagination.
+  edges: [CompoundTypesEdge!]!
+
+  # A list of \`CompoundType\` objects.
+  nodes: [CompoundType]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundType\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`CompoundType\` edge in the connection.
+type CompoundTypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`CompoundType\` at the end of the edge.
+  node: CompoundType!
 }
 
 # All input for the create \`CompoundKey\` mutation.
@@ -339,6 +380,13 @@ enum EdgeCasesOrderBy {
 }
 
 scalar Email
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
 
 # The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
@@ -827,6 +875,25 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
+  # Reads and enables pagination through a set of \`CompoundType\`.
+  compoundTypeSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): CompoundTypesConnection!
+
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   id: ID!
   intSetQuery(
@@ -1066,6 +1133,9 @@ type UpdatePersonPayload {
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
+
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+scalar UUID
 "
 `;
 
@@ -2479,6 +2549,30 @@ type CompoundTypeMutationPayload {
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
+}
+
+# A connection to a list of \`CompoundType\` values.
+type CompoundTypesConnection {
+  # A list of edges which contains the \`CompoundType\` and cursor to aid in pagination.
+  edges: [CompoundTypesEdge!]!
+
+  # A list of \`CompoundType\` objects.
+  nodes: [CompoundType]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundType\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`CompoundType\` edge in the connection.
+type CompoundTypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`CompoundType\` at the end of the edge.
+  node: CompoundType!
 }
 
 # All input for the create \`CompoundKey\` mutation.
@@ -4454,6 +4548,85 @@ type Query implements Node {
 
   # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
+
+  # Reads and enables pagination through a set of \`CompoundType\`.
+  compoundTypeSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): CompoundTypesConnection!
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab2\`.
+  crosstab2(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab2SConnection!
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab3\`.
+  crosstab3(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab3SConnection!
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab4\`.
+  crosstab4(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab4SConnection!
   intSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -4727,6 +4900,99 @@ enum SimilarTable2SOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+}
+
+type TablefuncCrosstab2 {
+  category1: String
+  category2: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab2\` values.
+type TablefuncCrosstab2SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab2\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab2SEdge!]!
+
+  # A list of \`TablefuncCrosstab2\` objects.
+  nodes: [TablefuncCrosstab2]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab2\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab2\` edge in the connection.
+type TablefuncCrosstab2SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab2\` at the end of the edge.
+  node: TablefuncCrosstab2!
+}
+
+type TablefuncCrosstab3 {
+  category1: String
+  category2: String
+  category3: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab3\` values.
+type TablefuncCrosstab3SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab3\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab3SEdge!]!
+
+  # A list of \`TablefuncCrosstab3\` objects.
+  nodes: [TablefuncCrosstab3]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab3\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab3\` edge in the connection.
+type TablefuncCrosstab3SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab3\` at the end of the edge.
+  node: TablefuncCrosstab3!
+}
+
+type TablefuncCrosstab4 {
+  category1: String
+  category2: String
+  category3: String
+  category4: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab4\` values.
+type TablefuncCrosstab4SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab4\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab4SEdge!]!
+
+  # A list of \`TablefuncCrosstab4\` objects.
+  nodes: [TablefuncCrosstab4]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab4\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab4\` edge in the connection.
+type TablefuncCrosstab4SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab4\` at the end of the edge.
+  node: TablefuncCrosstab4!
 }
 
 # All input for the \`tableMutation\` mutation.
@@ -5435,6 +5701,12 @@ exports[`prints a schema without default mutations 1`] = `
 # strings and not numbers.
 scalar BigInt
 
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
 type CompoundKey implements Node {
   extra: Boolean
 
@@ -5500,6 +5772,41 @@ enum CompoundKeysOrderBy {
   PRIMARY_KEY_DESC
 }
 
+# Awesome feature!
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  computedField: Int
+  d: UUID
+  e: EnumCaps
+  fooBar: Int
+}
+
+# A connection to a list of \`CompoundType\` values.
+type CompoundTypesConnection {
+  # A list of edges which contains the \`CompoundType\` and cursor to aid in pagination.
+  edges: [CompoundTypesEdge!]!
+
+  # A list of \`CompoundType\` objects.
+  nodes: [CompoundType]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundType\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`CompoundType\` edge in the connection.
+type CompoundTypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`CompoundType\` at the end of the edge.
+  node: CompoundType!
+}
+
 # A location in a connection that can be used for resuming pagination.
 scalar Cursor
 
@@ -5563,6 +5870,13 @@ enum EdgeCasesOrderBy {
 }
 
 scalar Email
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
 
 # The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
@@ -5951,6 +6265,25 @@ type Query implements Node {
     nodeId: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  # Reads and enables pagination through a set of \`CompoundType\`.
+  compoundTypeSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): CompoundTypesConnection!
   intSetQuery(
     # Read all values in the set after (below) this cursor.
     after: Cursor
@@ -6087,5 +6420,8 @@ type TypesMutationPayload {
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
 }
+
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+scalar UUID
 "
 `;

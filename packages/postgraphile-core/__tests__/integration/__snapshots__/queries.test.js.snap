@@ -1734,6 +1734,21 @@ Object {
       "e": "BAR_FOO",
       "fooBar": 8,
     },
+    "compoundTypeSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+            "d": null,
+            "e": "_0_BAR",
+            "fooBar": 7,
+          },
+        },
+      ],
+    },
     "empty": false,
     "intSetQuery": Object {
       "edges": Array [
