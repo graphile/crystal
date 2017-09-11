@@ -3,6 +3,7 @@ import { defaultPlugins, getBuilder } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
   inflections,
+  Inflector,
 } from "graphile-build-pg";
 import type { Pool, Client } from "pg";
 import type { Plugin, Options, SchemaListener } from "graphile-build";
@@ -32,9 +33,31 @@ type PostGraphQLOptions = {
   prependPlugins?: Array<Plugin>,
   jwtPgTypeIdentifier?: string,
   jwtSecret?: string,
+  inflector?: Inflector,
 };
 
 type PgConfig = Client | Pool | string;
+
+export { inflections };
+
+export const postGraphQLBaseOverrides = {
+  enumName(value: string) {
+    return inflections.defaultUtils.constantCase(value);
+  },
+};
+
+export const postGraphQLClassicIdsOverrides = {
+  column(name: string, _table: string, _schema: ?string) {
+    return name === "id" ? "rowId" : inflections.defaultUtils.camelCase(name);
+  },
+};
+
+export const postGraphQLInflection = inflections.newInflector(
+  postGraphQLBaseOverrides
+);
+export const postGraphQLClassicIdsInflection = inflections.newInflector(
+  Object.assign({}, postGraphQLBaseOverrides, postGraphQLClassicIdsOverrides)
+);
 
 const getPostGraphQLBuilder = async (
   pgConfig,
@@ -50,6 +73,7 @@ const getPostGraphQLBuilder = async (
     jwtSecret,
     disableDefaultMutations,
     graphqlBuildOptions,
+    inflector,
   } = options;
   if (replaceAllPlugins) {
     ensureValidPlugins("replaceAllPlugins", replaceAllPlugins);
@@ -78,9 +102,11 @@ const getPostGraphQLBuilder = async (
         pgConfig: pgConfig,
         pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
         pgExtendedTypes: !!dynamicJson,
-        pgInflection: classicIds
-          ? inflections.postGraphQLClassicIdsInflection
-          : inflections.postGraphQLInflection,
+        pgInflection:
+          inflector ||
+          (classicIds
+            ? postGraphQLClassicIdsInflection
+            : postGraphQLInflection),
         nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
         pgJwtTypeIdentifier: jwtPgTypeIdentifier,
         pgJwtSecret: jwtSecret,

@@ -42,3 +42,5 @@ export const formatInsideUnderscores = (fn: (input: string) => string) => (
 export const upperFirst = formatInsideUnderscores(upperFirstAll);
 export const camelCase = formatInsideUnderscores(camelCaseAll);
 export const constantCase = formatInsideUnderscores(constantCaseAll);
+export const upperCamelCase = (str: string): string =>
+  upperFirst(camelCase(str));
