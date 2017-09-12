@@ -104,7 +104,6 @@ export default (function PgTypesPlugin(
       pgSql: sql,
     } = build;
 
-    const GraphQLUUID = getTypeByName("UUID");
     const gqlTypeByTypeId = Object.assign({}, build.pgGqlTypeByTypeId);
     const gqlInputTypeByTypeId = Object.assign(
       {},
@@ -292,13 +291,13 @@ export default (function PgTypesPlugin(
       pgExtendedTypes && {
         "114": GraphQLJSON,
         "3802": GraphQLJSON,
-        "2950": GraphQLUUID,
         /*
         '1082': GraphQLDate, // date
         '1114': GraphQLDateTime, // timestamp
         '1184': GraphQLDateTime, // timestamptz
         '1083': GraphQLTime, // time
         '1266': GraphQLTime, // timetz
+        '2950': GraphQLUUID,
         */
       }
     );
