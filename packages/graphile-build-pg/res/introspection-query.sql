@@ -81,6 +81,7 @@ with
       rel.relname as "name",
       dsc.description as "description",
       rel.relnamespace as "namespaceId",
+      nsp.nspname as "namespaceName",
       rel.reltype as "typeId",
       -- Here we determine whether or not we can use this class in a
       -- `SELECT`’s `FROM` clause. In order to determine this we look at them
@@ -101,6 +102,7 @@ with
     from
       pg_catalog.pg_class as rel
       left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0
+      left join pg_catalog.pg_namespace as nsp on nsp.oid = rel.relnamespace
     where
       -- Select classes that are in our namespace, or are referenced in a
       -- procedure.

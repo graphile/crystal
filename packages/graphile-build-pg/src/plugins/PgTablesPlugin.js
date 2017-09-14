@@ -56,7 +56,6 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
             isUpdatable: true,
             isDeletable: true }
         */
-        const schema = table.namespace;
         const primaryKeyConstraint = introspectionResultsByKind.constraint
           .filter(con => con.classId === table.id)
           .filter(con => con.type === "p")[0];
@@ -71,11 +70,12 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
           .sort((a1, a2) => a1.num - a2.num);
         const tableTypeName = inflection.tableType(
           table.name,
-          schema && schema.name
+          table.namespaceName
         );
         const shouldHaveNodeId: boolean =
           nodeIdFieldName &&
           table.isSelectable &&
+          table.namespace &&
           primaryKeys &&
           primaryKeys.length
             ? true
@@ -168,7 +168,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
                 const fieldName = inflection.column(
                   attr.name,
                   table.name,
-                  table.namespace.name
+                  table.namespaceName
                 );
                 const pgInputField = pgInputFields[fieldName];
                 const v = obj[fieldName];

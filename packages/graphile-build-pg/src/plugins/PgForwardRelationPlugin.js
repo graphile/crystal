@@ -34,7 +34,8 @@ export default (function PgForwardRelationPlugin(
       if (
         !(isPgRowType || isMutationPayload) ||
         !table ||
-        table.kind !== "class"
+        table.kind !== "class" ||
+        !table.namespace
       ) {
         return fields;
       }

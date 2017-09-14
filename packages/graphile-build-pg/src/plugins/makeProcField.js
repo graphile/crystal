@@ -113,10 +113,7 @@ export default function makeProcField(
   const TableType =
     returnTypeTable &&
     getTypeByName(
-      inflection.tableType(
-        returnTypeTable.name,
-        returnTypeTable.namespace && returnTypeTable.namespace.name
-      )
+      inflection.tableType(returnTypeTable.name, returnTypeTable.namespaceName)
     );
 
   const isTableLike: boolean =

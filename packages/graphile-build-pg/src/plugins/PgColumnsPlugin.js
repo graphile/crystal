@@ -54,7 +54,7 @@ export default (function PgColumnsPlugin(
             const fieldName = inflection.column(
               attr.name,
               table.name,
-              table.namespace && table.namespace.name
+              table.namespaceName
             );
             memo[
               fieldName
@@ -155,7 +155,7 @@ export default (function PgColumnsPlugin(
             const fieldName = inflection.column(
               attr.name,
               table.name,
-              table.namespace && table.namespace.name
+              table.namespaceName
             );
             memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
               description: attr.description,

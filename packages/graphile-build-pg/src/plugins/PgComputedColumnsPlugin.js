@@ -23,7 +23,8 @@ export default (function PgComputedColumnsPlugin(builder) {
         isInputType ||
         !(isPgRowType || isPgCompoundType) ||
         !table ||
-        table.kind !== "class"
+        table.kind !== "class" ||
+        !table.namespace
       ) {
         return fields;
       }

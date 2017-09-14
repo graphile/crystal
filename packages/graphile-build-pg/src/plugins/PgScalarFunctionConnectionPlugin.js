@@ -23,6 +23,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
       const Cursor = getTypeByName("Cursor");
       introspectionResultsByKind.procedure
         .filter(proc => proc.returnsSet)
+        .filter(proc => !!proc.namespace)
         .forEach(proc => {
           const returnType =
             introspectionResultsByKind.typeById[proc.returnTypeId];

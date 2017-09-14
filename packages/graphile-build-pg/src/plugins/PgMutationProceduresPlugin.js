@@ -18,6 +18,7 @@ export default (function PgMutationProceduresPlugin(builder) {
         fields,
         introspectionResultsByKind.procedure
           .filter(proc => !proc.isStable)
+          .filter(proc => !!proc.namespace)
           .reduce((memo, proc) => {
             /*
             proc =

@@ -16,32 +16,35 @@ export default (function PgConnectionArgOrderBy(
         graphql: { GraphQLEnumType },
       }
     ) => {
-      introspectionResultsByKind.class.map(table => {
-        const tableTypeName = inflection.tableType(
-          table.name,
-          table.namespace && table.namespace.name
-        );
-        /* const TableOrderByType = */
-        newWithHooks(
-          GraphQLEnumType,
-          {
-            name: inflection.orderByType(tableTypeName),
-            description: `Methods to use when ordering \`${tableTypeName}\`.`,
-            values: {
-              NATURAL: {
-                value: {
-                  alias: null,
-                  specs: [],
+      introspectionResultsByKind.class
+        .filter(table => table.isSelectable)
+        .filter(table => !!table.namespace)
+        .forEach(table => {
+          const tableTypeName = inflection.tableType(
+            table.name,
+            table.namespace.name
+          );
+          /* const TableOrderByType = */
+          newWithHooks(
+            GraphQLEnumType,
+            {
+              name: inflection.orderByType(tableTypeName),
+              description: `Methods to use when ordering \`${tableTypeName}\`.`,
+              values: {
+                NATURAL: {
+                  value: {
+                    alias: null,
+                    specs: [],
+                  },
                 },
               },
             },
-          },
-          {
-            pgIntrospection: table,
-            isPgRowSortEnum: true,
-          }
-        );
-      });
+            {
+              pgIntrospection: table,
+              isPgRowSortEnum: true,
+            }
+          );
+        });
       return _;
     }
   );
@@ -55,12 +58,18 @@ export default (function PgConnectionArgOrderBy(
         addArgDataGenerator,
       }
     ) => {
-      if (!isPgConnectionField || !table || table.kind !== "class") {
+      if (
+        !isPgConnectionField ||
+        !table ||
+        table.kind !== "class" ||
+        !table.namespace ||
+        !table.isSelectable
+      ) {
         return args;
       }
       const tableTypeName = inflection.tableType(
         table.name,
-        table.namespace && table.namespace.name
+        table.namespace.name
       );
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)

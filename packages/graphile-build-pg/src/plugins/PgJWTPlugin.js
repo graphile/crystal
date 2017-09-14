@@ -40,8 +40,7 @@ export default (function PgJWTPlugin(
           !table.isUpdatable &&
           !table.isDeletable &&
           table.name === typeName &&
-          table.namespace &&
-          table.namespace.name === namespaceName
+          table.namespaceName === namespaceName
       );
       if (!compositeClass) {
         throw new Error(
@@ -67,7 +66,7 @@ export default (function PgJWTPlugin(
 
       const compositeTypeName = inflection.tableType(
         compositeClass.name,
-        compositeClass.namespace.name
+        compositeClass.namespaceName
       );
 
       const JWTType = newWithHooks(
