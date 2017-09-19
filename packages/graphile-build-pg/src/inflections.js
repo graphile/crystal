@@ -115,6 +115,13 @@ export const newInflector = (
             .join("-and-")}`
         );
       },
+      rowByUniqueKeys(detailedKeys: Keys, table: string, schema: ?string) {
+        return camelCase(
+          `${this.tableName(table, schema)}-by-${detailedKeys
+            .map(key => this.column(key.column, key.table, key.schema))
+            .join("-and-")}`
+        );
+      },
       updateByKeys(detailedKeys: Keys, table: string, schema: ?string) {
         return camelCase(
           `update-${this.tableName(table, schema)}-by-${detailedKeys

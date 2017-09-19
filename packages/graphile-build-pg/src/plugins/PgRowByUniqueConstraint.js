@@ -60,7 +60,7 @@ export default (async function PgRowByUniqueConstraint(
                   table: k.class.name,
                   schema: k.class.namespace.name,
                 }));
-                const fieldName = inflection.singleRelationByKeys(
+                const fieldName = inflection.rowByUniqueKeys(
                   simpleKeys,
                   table.name,
                   table.namespace.name
