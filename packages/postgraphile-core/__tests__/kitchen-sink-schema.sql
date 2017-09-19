@@ -219,3 +219,8 @@ create table a.similar_table_2 (
   col4 int,
   col5 int
 );
+
+CREATE TABLE a.default_value (
+    id serial primary key,
+    null_value text DEFAULT 'defaultValue!'
+);

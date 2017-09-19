@@ -70,6 +70,17 @@ mutation {
       email: "somethingelse@example.com"
     }
   }) { ...updatePersonPayload }
+  k: updateDefaultValueById(input: {
+    id: 1
+    defaultValuePatch: {
+      nullValue: null
+    }
+  }) {
+    defaultValue {
+      id
+      nullValue
+    }
+  }
 }
 
 fragment updatePersonPayload on UpdatePersonPayload {

@@ -174,7 +174,12 @@ export default (function PgMutationCreatePlugin(
                         table.namespace.name
                       );
                       const val = inputData[fieldName];
-                      if (val != null) {
+                      if (
+                        Object.prototype.hasOwnProperty.call(
+                          inputData,
+                          fieldName
+                        )
+                      ) {
                         sqlColumns.push(sql.identifier(attr.name));
                         sqlValues.push(gql2pg(val, attr.type));
                       }

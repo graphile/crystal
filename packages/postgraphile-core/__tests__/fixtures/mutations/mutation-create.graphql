@@ -201,6 +201,17 @@ mutation {
       issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
     }
   }
+  i: createDefaultValue(input: {
+    defaultValue: {
+      id: 2000
+      nullValue: null
+    }
+  }) {
+    defaultValue {
+      id
+      nullValue
+    }
+  }
 }
 
 fragment createPersonPayload on CreatePersonPayload {

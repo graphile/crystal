@@ -342,6 +342,12 @@ Object {
         "issue27UserExists": true,
       },
     },
+    "i": Object {
+      "defaultValue": Object {
+        "id": 2000,
+        "nullValue": null,
+      },
+    },
   },
 }
 `;
@@ -664,6 +670,12 @@ Object {
       },
       "query": Object {
         "nodeId": "query",
+      },
+    },
+    "k": Object {
+      "defaultValue": Object {
+        "id": 1,
+        "nullValue": null,
       },
     },
   },
