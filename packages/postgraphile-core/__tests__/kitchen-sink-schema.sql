@@ -49,6 +49,7 @@ create table a.post (
 create type a.letter as enum ('a', 'b', 'c', 'd');
 create type b.color as enum ('red', 'green', 'blue');
 create type b.enum_caps as enum ('FOO_BAR', 'BAR_FOO', 'BAZ_QUX', '0_BAR');
+create type b.enum_with_empty_string as enum ('', 'one', 'two');
 
 create type c.compound_type as (
   a int,
@@ -56,6 +57,7 @@ create type c.compound_type as (
   c b.color,
   d uuid,
   e b.enum_caps,
+  f b.enum_with_empty_string,
   foo_bar int
 );
 
@@ -173,9 +175,9 @@ create function c.json_identity(json json) returns json as $$ select json $$ lan
 create function c.json_identity_mutation(json json) returns json as $$ select json $$ language sql;
 create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql stable strict;
 create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql strict;
-create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.foo_bar)::c.compound_type $$ language sql stable;
-create function c.compound_type_set_query() returns setof c.compound_type as $$ select (1, '2', 'blue', null, '0_BAR', 7)::c.compound_type $$ language sql stable;
-create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.foo_bar)::c.compound_type $$ language sql;
+create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.f, object.foo_bar)::c.compound_type $$ language sql stable;
+create function c.compound_type_set_query() returns setof c.compound_type as $$ select (1, '2', 'blue', null, '0_BAR', '', 7)::c.compound_type $$ language sql stable;
+create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.f, object.foo_bar)::c.compound_type $$ language sql;
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;
 create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql;
 create function c.table_set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;

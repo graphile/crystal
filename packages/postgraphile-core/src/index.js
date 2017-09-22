@@ -42,7 +42,9 @@ export { inflections };
 
 export const postGraphQLBaseOverrides = {
   enumName(value: string) {
-    return inflections.defaultUtils.constantCase(value);
+    return inflections.defaultUtils.constantCase(
+      inflections.defaultInflection.enumName(value)
+    );
   },
 };
 

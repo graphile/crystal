@@ -99,6 +99,7 @@ type CompoundType {
   computedField: Int
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -386,6 +387,12 @@ enum EnumCaps {
   BAR_FOO
   BAZ_QUX
   FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
 }
 
 # The value at one end of a range. A range can either include this value, or not.
@@ -1260,6 +1267,7 @@ type CompoundType {
   c: Color
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -1270,6 +1278,7 @@ input CompoundTypeInput {
   c: Color
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -1439,6 +1448,12 @@ enum EnumCaps {
   BAR_FOO
   BAZ_QUX
   FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
 }
 
 # A range of \`Float\`.
@@ -2519,6 +2534,7 @@ type CompoundType {
   computedField: Int
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -2529,6 +2545,7 @@ input CompoundTypeInput {
   c: Color
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -3344,6 +3361,12 @@ enum EnumCaps {
   BAR_FOO
   BAZ_QUX
   FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
 }
 
 # A range of \`Float\`.
@@ -6017,6 +6040,7 @@ type CompoundType {
   computedField: Int
   d: UUID
   e: EnumCaps
+  f: EnumWithEmptyString
   fooBar: Int
 }
 
@@ -6113,6 +6137,12 @@ enum EnumCaps {
   BAR_FOO
   BAZ_QUX
   FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
 }
 
 # The value at one end of a range. A range can either include this value, or not.

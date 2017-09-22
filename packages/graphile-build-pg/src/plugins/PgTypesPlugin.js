@@ -351,6 +351,18 @@ export default (function PgTypesPlugin(
     };
 
     const enforceGqlTypeByPgType = type => {
+      try {
+        return reallyEnforceGqlTypeByPgType(type);
+      } catch (e) {
+        const error = new Error(
+          `Error occurred when processing type '${type.namespaceName}.${type.name}' (type=${type.type}): ${e.message}`
+        );
+        // $FlowFixMe
+        error.originalError = e;
+        throw error;
+      }
+    };
+    const reallyEnforceGqlTypeByPgType = type => {
       // Explicit overrides
       if (!gqlTypeByTypeId[type.id]) {
         const gqlType = oidLookup[type.id];

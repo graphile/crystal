@@ -61,6 +61,9 @@ export const newInflector = (
         return upperCamelCase(name);
       },
       enumName(value: string) {
+        if (value === "") {
+          return "_EMPTY_";
+        }
         return value;
       },
       enumType(name: string) {

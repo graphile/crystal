@@ -15,6 +15,7 @@ fragment compoundType on CompoundType {
   c
   d
   e
+  f
   fooBar
 }
 

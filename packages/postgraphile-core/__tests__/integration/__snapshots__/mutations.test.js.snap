@@ -24,6 +24,7 @@ Object {
           "c": "GREEN",
           "d": "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf",
           "e": "FOO_BAR",
+          "f": "_EMPTY_",
           "fooBar": 20,
         },
         "date": "2016-10-15",
@@ -64,6 +65,7 @@ Object {
             "c": "BLUE",
             "d": "79863dcf-0433-4c3d-bc51-978326d4546f",
             "e": "BAR_FOO",
+            "f": "ONE",
             "fooBar": 42,
           },
           "b": Object {
@@ -72,6 +74,7 @@ Object {
             "c": "RED",
             "d": "b687ee42-c515-4544-b742-525e39517e7d",
             "e": "BAZ_QUX",
+            "f": "_EMPTY_",
             "fooBar": -8,
           },
           "bazBuz": 0,
