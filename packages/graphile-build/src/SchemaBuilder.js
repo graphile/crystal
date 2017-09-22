@@ -122,6 +122,7 @@ export type Scope = {
 
 export type Context = {|
   scope: Scope,
+  type: string,
   [string]: mixed,
 |};
 

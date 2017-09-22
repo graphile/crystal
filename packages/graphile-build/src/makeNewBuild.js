@@ -15,7 +15,12 @@ import {
 import debugFactory from "debug";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 
-import type SchemaBuilder, { Build, Scope, DataForType } from "./SchemaBuilder";
+import type SchemaBuilder, {
+  Build,
+  Context,
+  Scope,
+  DataForType,
+} from "./SchemaBuilder";
 
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
@@ -38,21 +43,21 @@ type FieldSpecIsh = {
   deprecationReason?: string,
   description?: ?string,
 };
+
+type ContextAndGenerators =
+  | Context
+  | {
+      addDataGenerator: DataGeneratorFunction => void,
+      addArgDataGenerator: DataGeneratorFunction => void,
+      getDataFromParsedResolveInfoFragment: (
+        parsedResolveInfoFragment: ResolveTree,
+        Type: GraphQLType
+      ) => DataForType,
+    };
+
 export type FieldWithHooksFunction = (
   fieldName: string,
-  spec:
-    | FieldSpecIsh
-    | (({
-        addDataGenerator: DataGeneratorFunction => void,
-        addArgDataGenerator: DataGeneratorFunction => void,
-        getDataFromParsedResolveInfoFragment: (
-          parsedResolveInfoFragment: ResolveTree,
-          Type: GraphQLType
-        ) => DataForType,
-        scope: {
-          fieldName: string,
-        },
-      }) => FieldSpecIsh),
+  spec: FieldSpecIsh | (ContextAndGenerators => FieldSpecIsh),
   fieldScope?: {}
 ) => {};
 
@@ -218,6 +223,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
       }
       if (Type === GraphQLSchema) {
         newSpec = builder.applyHooks(this, "GraphQLSchema", newSpec, {
+          type: "GraphQLSchema",
           scope,
         });
       } else if (Type === GraphQLObjectType) {
@@ -274,26 +280,28 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           // get type from field, get
         };
 
+        const commonContext = {
+          type: "GraphQLObjectType",
+          scope,
+        };
         newSpec = builder.applyHooks(
           this,
           "GraphQLObjectType",
           newSpec,
-          {
-            scope,
+          Object.assign({}, commonContext, {
             addDataGeneratorForField,
             recurseDataGeneratorsForField,
-          },
+          }),
           `|${newSpec.name}`
         );
 
         const rawSpec = newSpec;
         newSpec = Object.assign({}, newSpec, {
           interfaces: () => {
-            const interfacesContext = {
-              scope,
+            const interfacesContext = Object.assign({}, commonContext, {
               Self,
               GraphQLObjectType: rawSpec,
-            };
+            });
             let rawInterfaces = rawSpec.interfaces || [];
             if (typeof rawInterfaces === "function") {
               rawInterfaces = rawInterfaces(interfacesContext);
@@ -308,8 +316,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           },
           fields: () => {
             const processedFields = [];
-            const fieldsContext = {
-              scope,
+            const fieldsContext = Object.assign({}, commonContext, {
               addDataGeneratorForField,
               recurseDataGeneratorsForField,
               Self,
@@ -323,7 +330,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 let argDataGenerators = [];
 
                 let newSpec = spec;
-                let context = {
+                let context = Object.assign({}, commonContext, {
                   addDataGenerator(fn) {
                     return addDataGeneratorForField(fieldName, fn);
                   },
@@ -397,7 +404,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                     },
                     fieldScope
                   ),
-                };
+                });
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
                 }
@@ -425,7 +432,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 processedFields.push(finalSpec);
                 return finalSpec;
               }: FieldWithHooksFunction),
-            };
+            });
             let rawFields = rawSpec.fields || {};
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
@@ -452,13 +459,15 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           },
         });
       } else if (Type === GraphQLInputObjectType) {
+        const commonContext = {
+          type: "GraphQLInputObjectType",
+          scope,
+        };
         newSpec = builder.applyHooks(
           this,
           "GraphQLInputObjectType",
           newSpec,
-          {
-            scope,
-          },
+          commonContext,
           `|${newSpec.name}`
         );
         newSpec.fields = newSpec.fields || {};
@@ -467,8 +476,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         newSpec = Object.assign({}, newSpec, {
           fields: () => {
             const processedFields = [];
-            const fieldsContext = {
-              scope,
+            const fieldsContext = Object.assign({}, commonContext, {
               Self,
               GraphQLInputObjectType: rawSpec,
               fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
@@ -477,7 +485,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
-                let context = {
+                let context = Object.assign({}, commonContext, {
                   scope: Object.assign(
                     {},
                     scope,
@@ -486,7 +494,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                     },
                     fieldScope
                   ),
-                };
+                });
                 let newSpec = spec;
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
@@ -502,7 +510,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                 processedFields.push(finalSpec);
                 return finalSpec;
               }: InputFieldWithHooksFunction),
-            };
+            });
             let rawFields = rawSpec.fields;
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
@@ -529,13 +537,15 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           },
         });
       } else if (Type === GraphQLEnumType) {
+        const commonContext = {
+          type: "GraphQLEnumType",
+          scope,
+        };
         newSpec = builder.applyHooks(
           this,
           "GraphQLEnumType",
           newSpec,
-          {
-            scope,
-          },
+          commonContext,
           `|${newSpec.name}`
         );
 
@@ -543,9 +553,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
           this,
           "GraphQLEnumType:values",
           newSpec.values,
-          {
-            scope,
-          },
+          commonContext,
           `|${newSpec.name}`
         );
         const values = newSpec.values;
@@ -555,9 +563,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
             this,
             "GraphQLEnumType:values:value",
             value,
-            {
-              scope,
-            },
+            commonContext,
             `|${newSpec.name}|${valueKey}`
           );
           memo[valueKey] = newValue;
