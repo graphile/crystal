@@ -1459,91 +1459,91 @@ type Mutation {
   add1Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add1MutationInput!
-  ): Add1MutationPayload!
+  ): Add1MutationPayload
 
   # lol, add some stuff 2 mutation
   add2Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add2MutationInput!
-  ): Add2MutationPayload!
+  ): Add2MutationPayload
 
   # lol, add some stuff 3 mutation
   add3Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add3MutationInput!
-  ): Add3MutationPayload!
+  ): Add3MutationPayload
 
   # lol, add some stuff 4 mutation
   add4Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add4MutationInput!
-  ): Add4MutationPayload!
+  ): Add4MutationPayload
   returnVoidMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: ReturnVoidMutationInput!
-  ): ReturnVoidMutationPayload!
+  ): ReturnVoidMutationPayload
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
-  ): AuthenticatePayload!
+  ): AuthenticatePayload
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
-  ): AuthenticateManyPayload!
+  ): AuthenticateManyPayload
 
   # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
-  ): CompoundTypeMutationPayload!
+  ): CompoundTypeMutationPayload
   mult1(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult1Input!
-  ): Mult1Payload!
+  ): Mult1Payload
   mult2(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult2Input!
-  ): Mult2Payload!
+  ): Mult2Payload
   mult3(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult3Input!
-  ): Mult3Payload!
+  ): Mult3Payload
   mult4(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult4Input!
-  ): Mult4Payload!
+  ): Mult4Payload
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
-  ): IntSetMutationPayload!
+  ): IntSetMutationPayload
   jsonIdentityMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: JsonIdentityMutationInput!
-  ): JsonIdentityMutationPayload!
+  ): JsonIdentityMutationPayload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
-  ): NoArgsMutationPayload!
+  ): NoArgsMutationPayload
 
   # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
-  ): TableMutationPayload!
+  ): TableMutationPayload
 
   # Reads and enables pagination through a set of \`Person\`.
   tableSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableSetMutationInput!
-  ): TableSetMutationPayload!
+  ): TableSetMutationPayload
   typesMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TypesMutationInput!
-  ): TypesMutationPayload!
+  ): TypesMutationPayload
 }
 
 type NestedCompoundType {
@@ -11689,13 +11689,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Add1MutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Add1MutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11720,13 +11716,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Add2MutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Add2MutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11751,13 +11743,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Add3MutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Add3MutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11782,13 +11770,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Add4MutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Add4MutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11813,13 +11797,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"ReturnVoidMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"ReturnVoidMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11844,13 +11824,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"AuthenticatePayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"AuthenticatePayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11875,13 +11851,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"AuthenticateManyPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"AuthenticateManyPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11906,13 +11878,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"CompoundTypeMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"CompoundTypeMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11937,13 +11905,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Mult1Payload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Mult1Payload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11968,13 +11932,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Mult2Payload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Mult2Payload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11999,13 +11959,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Mult3Payload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Mult3Payload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12030,13 +11986,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Mult4Payload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Mult4Payload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12061,13 +12013,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"IntSetMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"IntSetMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12092,13 +12040,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"JsonIdentityMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"JsonIdentityMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12123,13 +12067,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"NoArgsMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"NoArgsMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12154,13 +12094,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"TableMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"TableMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12185,13 +12121,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"TableSetMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"TableSetMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -12216,13 +12148,9 @@ exports[`test exports a schema as JSON 1`] = `
                 }
               ],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"TypesMutationPayload\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"TypesMutationPayload\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
