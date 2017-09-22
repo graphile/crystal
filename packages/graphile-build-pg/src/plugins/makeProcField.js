@@ -346,7 +346,7 @@ export default function makeProcField(
             scope
           )
         );
-        ReturnType = new GraphQLNonNull(PayloadType);
+        ReturnType = PayloadType;
         const InputType = newWithHooks(
           GraphQLInputObjectType,
           {
@@ -425,18 +425,30 @@ export default function makeProcField(
                 const isVoid = returnType.id === "2278";
                 const isPgClass =
                   !returnFirstValueAsValue || returnTypeTable || false;
-                queryResult = await viaTemporaryTable(
-                  pgClient,
-                  isVoid
-                    ? null
-                    : sql.identifier(returnType.namespaceName, returnType.name),
-                  sql.query`select ${isPgClass
-                    ? sql.query`${intermediateIdentifier}.*`
-                    : sql.query`${intermediateIdentifier}.${intermediateIdentifier} as ${functionAlias}`} from ${sqlMutationQuery} ${intermediateIdentifier}`,
-                  functionAlias,
-                  query,
-                  isPgClass
-                );
+                try {
+                  await pgClient.query("SAVEPOINT graphql_mutation");
+                  queryResult = await viaTemporaryTable(
+                    pgClient,
+                    isVoid
+                      ? null
+                      : sql.identifier(
+                          returnType.namespaceName,
+                          returnType.name
+                        ),
+                    sql.query`select ${isPgClass
+                      ? sql.query`${intermediateIdentifier}.*`
+                      : sql.query`${intermediateIdentifier}.${intermediateIdentifier} as ${functionAlias}`} from ${sqlMutationQuery} ${intermediateIdentifier}`,
+                    functionAlias,
+                    query,
+                    isPgClass
+                  );
+                  await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
+                } catch (e) {
+                  await pgClient.query(
+                    "ROLLBACK TO SAVEPOINT graphql_mutation"
+                  );
+                  throw e;
+                }
               } else {
                 const query = makeQuery(
                   parsedResolveInfoFragment,

@@ -1,0 +1,13 @@
+mutation {
+  deleteTypeById(input: { id: 12 }) {
+    clientMutationId
+    deletedTypeId
+    type {
+      nodeId
+      id
+    }
+    query {
+      nodeId
+    }
+  }
+}

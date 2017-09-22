@@ -398,6 +398,7 @@ Object {
         "nodeId": "query",
       },
     },
+    "d2": null,
     "e": Object {
       "clientMutationId": null,
       "deletedPostId": "WyJwb3N0cyIsNl0=",
@@ -509,7 +510,19 @@ Object {
   },
   "errors": Array [
     [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+    [GraphQLError: Nope.],
     [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+  ],
+}
+`;
+
+exports[`mutation-delete-error.graphql 1`] = `
+Object {
+  "data": Object {
+    "deleteTypeById": null,
+  },
+  "errors": Array [
+    [GraphQLError: Nope.],
   ],
 }
 `;
@@ -703,6 +716,7 @@ Object {
     "add4Mutation": Object {
       "integer": 4,
     },
+    "add4MutationError": null,
     "compoundTypeMutation": Object {
       "compoundType": Object {
         "a": 420,
@@ -797,5 +811,8 @@ Object {
       "boolean": false,
     },
   },
+  "errors": Array [
+    [GraphQLError: Deliberate error],
+  ],
 }
 `;

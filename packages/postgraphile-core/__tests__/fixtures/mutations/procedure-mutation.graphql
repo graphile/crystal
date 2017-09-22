@@ -4,6 +4,7 @@ mutation {
   add2Mutation(input: { clientMutationId: "hello", a: 2, b: 2 }) { clientMutationId integer }
   add3Mutation(input: { clientMutationId: "world", arg1: 5 }) { clientMutationId integer }
   add4Mutation(input: { arg0: 1, b: 3 }) { integer }
+  add4MutationError(input: { arg0: 1, b: 3 }) { integer }
   mult1(input: { arg0: 0, arg1: 1 }) { integer }
   mult2(input: { arg0: 1, arg1: 1 }) { integer }
   mult3(input: { arg0: 1, arg1: 2 }) { integer }

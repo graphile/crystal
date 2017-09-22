@@ -195,13 +195,24 @@ export default (function PgMutationCreatePlugin(
                       ) values(${sql.join(sqlValues, ", ")})`
                     : sql.fragment`default values`} returning *`;
 
-                  const { rows: [row] } = await viaTemporaryTable(
-                    pgClient,
-                    sql.identifier(table.namespace.name, table.name),
-                    mutationQuery,
-                    insertedRowAlias,
-                    query
-                  );
+                  let row;
+                  try {
+                    await pgClient.query("SAVEPOINT graphql_mutation");
+                    const result = await viaTemporaryTable(
+                      pgClient,
+                      sql.identifier(table.namespace.name, table.name),
+                      mutationQuery,
+                      insertedRowAlias,
+                      query
+                    );
+                    row = result.rows[0];
+                    await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
+                  } catch (e) {
+                    await pgClient.query(
+                      "ROLLBACK TO SAVEPOINT graphql_mutation"
+                    );
+                    throw e;
+                  }
                   return {
                     clientMutationId: input.clientMutationId,
                     data: row,

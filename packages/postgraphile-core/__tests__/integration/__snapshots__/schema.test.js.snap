@@ -526,31 +526,31 @@ type Mutation {
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
-  ): IntSetMutationPayload!
+  ): IntSetMutationPayload
   jsonIdentityMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: JsonIdentityMutationInput!
-  ): JsonIdentityMutationPayload!
+  ): JsonIdentityMutationPayload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
-  ): NoArgsMutationPayload!
+  ): NoArgsMutationPayload
 
   # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
-  ): TableMutationPayload!
+  ): TableMutationPayload
 
   # Reads and enables pagination through a set of \`Person\`.
   tableSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableSetMutationInput!
-  ): TableSetMutationPayload!
+  ): TableSetMutationPayload
   typesMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TypesMutationInput!
-  ): TypesMutationPayload!
+  ): TypesMutationPayload
 
   # Updates a single \`CompoundKey\` using its globally unique id and a patch.
   updateCompoundKey(
@@ -1655,21 +1655,21 @@ type Mutation {
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
-  ): AuthenticatePayload!
+  ): AuthenticatePayload
   authenticateFail(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateFailInput!
-  ): AuthenticateFailPayload!
+  ): AuthenticateFailPayload
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
-  ): AuthenticateManyPayload!
+  ): AuthenticateManyPayload
 
   # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
-  ): CompoundTypeMutationPayload!
+  ): CompoundTypeMutationPayload
 
   # Creates a single \`Type\`.
   createType(
@@ -1697,23 +1697,23 @@ type Mutation {
   guidFn(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: GuidFnInput!
-  ): GuidFnPayload!
+  ): GuidFnPayload
   mult1(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult1Input!
-  ): Mult1Payload!
+  ): Mult1Payload
   mult2(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult2Input!
-  ): Mult2Payload!
+  ): Mult2Payload
   mult3(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult3Input!
-  ): Mult3Payload!
+  ): Mult3Payload
   mult4(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult4Input!
-  ): Mult4Payload!
+  ): Mult4Payload
 
   # Updates a single \`Type\` using its globally unique id and a patch.
   updateType(
@@ -2279,6 +2279,27 @@ input Add3MutationInput {
 
 # The output of our \`add3Mutation\` mutation.
 type Add3MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`add4MutationError\` mutation.
+input Add4MutationErrorInput {
+  arg0: Int
+  b: Int
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add4MutationError\` mutation.
+type Add4MutationErrorPayload {
   # The exact same \`clientMutationId\` that was provided in the mutation input,
   # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
@@ -3698,49 +3719,53 @@ type Mutation {
   add1Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add1MutationInput!
-  ): Add1MutationPayload!
+  ): Add1MutationPayload
 
   # lol, add some stuff 2 mutation
   add2Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add2MutationInput!
-  ): Add2MutationPayload!
+  ): Add2MutationPayload
 
   # lol, add some stuff 3 mutation
   add3Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add3MutationInput!
-  ): Add3MutationPayload!
+  ): Add3MutationPayload
 
   # lol, add some stuff 4 mutation
   add4Mutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add4MutationInput!
-  ): Add4MutationPayload!
+  ): Add4MutationPayload
+  add4MutationError(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add4MutationErrorInput!
+  ): Add4MutationErrorPayload
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
-  ): AuthenticatePayload!
+  ): AuthenticatePayload
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateFail(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateFailInput!
-  ): AuthenticateFailPayload!
+  ): AuthenticateFailPayload
 
   # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
-  ): AuthenticateManyPayload!
+  ): AuthenticateManyPayload
 
   # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
-  ): CompoundTypeMutationPayload!
+  ): CompoundTypeMutationPayload
 
   # Creates a single \`CompoundKey\`.
   createCompoundKey(
@@ -3894,59 +3919,59 @@ type Mutation {
   guidFn(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: GuidFnInput!
-  ): GuidFnPayload!
+  ): GuidFnPayload
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
-  ): IntSetMutationPayload!
+  ): IntSetMutationPayload
   jsonIdentityMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: JsonIdentityMutationInput!
-  ): JsonIdentityMutationPayload!
+  ): JsonIdentityMutationPayload
   mult1(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult1Input!
-  ): Mult1Payload!
+  ): Mult1Payload
   mult2(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult2Input!
-  ): Mult2Payload!
+  ): Mult2Payload
   mult3(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult3Input!
-  ): Mult3Payload!
+  ): Mult3Payload
   mult4(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Mult4Input!
-  ): Mult4Payload!
+  ): Mult4Payload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
-  ): NoArgsMutationPayload!
+  ): NoArgsMutationPayload
   normalRand(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NormalRandInput!
-  ): NormalRandPayload!
+  ): NormalRandPayload
   returnVoidMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: ReturnVoidMutationInput!
-  ): ReturnVoidMutationPayload!
+  ): ReturnVoidMutationPayload
 
   # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
-  ): TableMutationPayload!
+  ): TableMutationPayload
 
   # Reads and enables pagination through a set of \`Person\`.
   tableSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableSetMutationInput!
-  ): TableSetMutationPayload!
+  ): TableSetMutationPayload
   typesMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TypesMutationInput!
-  ): TypesMutationPayload!
+  ): TypesMutationPayload
 
   # Updates a single \`CompoundKey\` using its globally unique id and a patch.
   updateCompoundKey(
@@ -6229,31 +6254,31 @@ type Mutation {
   intSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: IntSetMutationInput!
-  ): IntSetMutationPayload!
+  ): IntSetMutationPayload
   jsonIdentityMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: JsonIdentityMutationInput!
-  ): JsonIdentityMutationPayload!
+  ): JsonIdentityMutationPayload
   noArgsMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
-  ): NoArgsMutationPayload!
+  ): NoArgsMutationPayload
 
   # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
-  ): TableMutationPayload!
+  ): TableMutationPayload
 
   # Reads and enables pagination through a set of \`Person\`.
   tableSetMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableSetMutationInput!
-  ): TableSetMutationPayload!
+  ): TableSetMutationPayload
   typesMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TypesMutationInput!
-  ): TypesMutationPayload!
+  ): TypesMutationPayload
 }
 
 # All input for the \`noArgsMutation\` mutation.
