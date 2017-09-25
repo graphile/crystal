@@ -92,7 +92,9 @@ export default (function PgBackwardRelationPlugin(
           const fieldName = inflection.manyRelationByKeys(
             simpleKeys,
             table.name,
-            table.namespace.name
+            table.namespace.name,
+            foreignTable.name,
+            foreignTable.namespace.name
           );
           const primaryKeyConstraint = introspectionResultsByKind.constraint
             .filter(con => con.classId === table.id)

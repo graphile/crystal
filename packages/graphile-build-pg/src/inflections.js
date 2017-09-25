@@ -173,7 +173,13 @@ export const newInflector = (
       deleteNodeInputType(name: string, _schema: ?string) {
         return upperCamelCase(`delete-${singularize(name)}-input`);
       },
-      manyRelationByKeys(detailedKeys: Keys, table: string, schema: ?string) {
+      manyRelationByKeys(
+        detailedKeys: Keys,
+        table: string,
+        schema: ?string,
+        _foreignTable: string,
+        _foreignSchema: ?string
+      ) {
         return camelCase(
           `${this.pluralize(
             this.tableName(table, schema)
