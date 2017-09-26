@@ -162,6 +162,37 @@ test('will add extra settings as available', async () => {
   }], ['commit']])
 })
 
+test('falsy extra settings are converted to null', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ aud: 'postgraphql' }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+    pgSettings: {
+      'foo.bar': 'test1',
+      'some.other.var': null,
+      'some.setting.not.defined': undefined,
+      'some.setting.zero': 0,
+      'number.setting': 42,
+      'obj': {toString: () => 'bar'},
+    },
+  }, () => {})
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [{
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), ' +
+    'set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)',
+    values: [
+      'foo.bar', 'test1',
+      'some.other.var', null,
+      'some.setting.not.defined': null,
+      'some.setting.zero': null,
+      'number.setting': '42',
+      'obj': 'bar',
+      'jwt.claims.aud', 'postgraphql',
+    ],
+  }], ['commit']])
+})
+
 test('will set the default role if available', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }

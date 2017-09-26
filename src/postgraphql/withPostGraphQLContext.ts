@@ -163,7 +163,7 @@ async function setupPgClientTransaction ({
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
     for (const key of Object.keys(pgSettings)) {
-      localSettings.set(key, String(pgSettings[key]))
+      localSettings.set(key, !!pgSettings[key] ? String(pgSettings[key]) : null)
     }
   }
 
