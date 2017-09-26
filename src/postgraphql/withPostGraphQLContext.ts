@@ -163,7 +163,9 @@ async function setupPgClientTransaction ({
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
     for (const key of Object.keys(pgSettings)) {
-      localSettings.set(key, !!pgSettings[key] ? String(pgSettings[key]) : null)
+      if (isPgSettingValid(pgSettings[key])) {
+        localSettings.set(key, String(pgSettings[key]))
+      }
     }
   }
 
@@ -248,5 +250,22 @@ function getPath(inObject: mixed, path: Array<string>): any {
     object = object[path[index++]]
   }
   return (index && index === length) ? object : undefined
+}
+
+/**
+ * Check if a pgSetting is valid.
+ * Null and Undefined settings are not valid.
+ * pgSettings objects throw an error.
+ *
+ * @private
+ */
+function isPgSettingValid(pgSetting: mixed): boolean {
+  if (pgSetting === undefined || pgSetting === null) {
+    return false
+  }
+  if (typeof pgSetting === 'object') {
+    throw new Error(`Invalid pgSetting: ${pgSetting} is an Object.`)
+  }
+  return true
 }
 // tslint:enable no-any

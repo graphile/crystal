@@ -162,7 +162,7 @@ test('will add extra settings as available', async () => {
   }], ['commit']])
 })
 
-test('falsy extra settings are converted to null', async () => {
+test('undefined and null extra settings are ignored while 0 is converted to a string', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
   await withPostGraphQLContext({
@@ -175,22 +175,37 @@ test('falsy extra settings are converted to null', async () => {
       'some.setting.not.defined': undefined,
       'some.setting.zero': 0,
       'number.setting': 42,
-      'obj': {toString: () => 'bar'},
     },
   }, () => {})
   expect(pgClient.query.mock.calls).toEqual([['begin'], [{
-    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), ' +
-    'set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)',
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)'
     values: [
       'foo.bar', 'test1',
-      'some.other.var', null,
-      'some.setting.not.defined': null,
-      'some.setting.zero': null,
-      'number.setting': '42',
-      'obj': 'bar',
+      'some.setting.zero', '0',
+      'number.setting', '42',
       'jwt.claims.aud', 'postgraphql',
     ],
   }], ['commit']])
+})
+
+test('extra pgSettings that are objects throw an error', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  let message
+  try {
+    await withPostGraphQLContext({
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphql' }, 'secret', { noTimestamp: true }),
+      jwtSecret: 'secret',
+      pgSettings: {
+        'some.object': {toString: () => 'SomeObject'},
+      },
+    }, () => {})
+  } catch (error) {
+    message = error.message
+  }
+  expect(message).toBe('Invalid pgSetting: SomeObject is an Object.')
+  expect(pgClient.query).not.toHaveBeenCalled()
 })
 
 test('will set the default role if available', async () => {
