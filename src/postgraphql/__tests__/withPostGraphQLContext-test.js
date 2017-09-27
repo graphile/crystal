@@ -204,8 +204,45 @@ test('extra pgSettings that are objects throw an error', async () => {
   } catch (error) {
     message = error.message
   }
-  expect(message).toBe('Invalid pgSetting: SomeObject is an Object.')
-  expect(pgClient.query).not.toHaveBeenCalled()
+  expect(message).toBe('Error converting pgSetting: object needs to be of type string or number.')
+})
+
+test('extra pgSettings that are symbols throw an error', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  let message
+  try {
+    await withPostGraphQLContext({
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphql' }, 'secret', { noTimestamp: true }),
+      jwtSecret: 'secret',
+      pgSettings: {
+        'some.symbol': Symbol('some.symbol'),
+      },
+    }, () => {})
+  } catch (error) {
+    message = error.message
+  }
+  expect(message).toBe('Error converting pgSetting: symbol needs to be of type string or number.')
+})
+
+test('extra pgSettings that are booleans throw an error', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  let message
+  try {
+    await withPostGraphQLContext({
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphql' }, 'secret', { noTimestamp: true }),
+      jwtSecret: 'secret',
+      pgSettings: {
+        'some.boolean': true,
+      },
+    }, () => {})
+  } catch (error) {
+    message = error.message
+  }
+  expect(message).toBe('Error converting pgSetting: boolean needs to be of type string or number.')
 })
 
 test('will set the default role if available', async () => {

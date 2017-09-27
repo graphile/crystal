@@ -616,7 +616,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         pgSettings: {
           'foo.string': 'test1',
           'foo.number': 42,
-          'foo.boolean': true,
         },
       })
       await (
@@ -632,11 +631,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            text: 'select set_config($1, $2, true), set_config($3, $4, true)',
             values: [
               'foo.string', 'test1',
               'foo.number', '42',
-              'foo.boolean', 'true',
             ],
           },
         ],
@@ -653,7 +651,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         pgSettings: (req) => ({
           'foo.string': 'test1',
           'foo.number': 42,
-          'foo.boolean': true,
         }),
       })
       await (
@@ -669,11 +666,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            text: 'select set_config($1, $2, true), set_config($3, $4, true)',
             values: [
               'foo.string', 'test1',
               'foo.number', '42',
-              'foo.boolean', 'true',
             ],
           },
         ],

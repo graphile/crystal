@@ -253,19 +253,20 @@ function getPath(inObject: mixed, path: Array<string>): any {
 }
 
 /**
- * Check if a pgSetting is valid.
- * Null and Undefined settings are not valid.
- * pgSettings objects throw an error.
+ * Check if a pgSetting is a string or a number.
+ * Null and Undefined settings are not valid and will be ignored.
+ * pgSettings of other types throw an error.
  *
  * @private
  */
 function isPgSettingValid(pgSetting: mixed): boolean {
+  const supportedSettingTypes = ['string', 'number']
+  if (supportedSettingTypes.indexOf(typeof pgSetting) >= 0) {
+    return true
+  }
   if (pgSetting === undefined || pgSetting === null) {
     return false
   }
-  if (typeof pgSetting === 'object') {
-    throw new Error(`Invalid pgSetting: ${pgSetting} is an Object.`)
-  }
-  return true
+  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type ${supportedSettingTypes.join(' or ')}.`)
 }
 // tslint:enable no-any
