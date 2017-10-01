@@ -23,6 +23,7 @@ type PostGraphQLOptions = {
   extendedErrors?: Array<string>,
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
+  enableDefaultMutationTables?: Array<string>,
   enableCors?: boolean,
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
