@@ -7,4 +7,9 @@ export {
   createPostGraphQLSchema,
   watchPostGraphQLSchema,
   withPostGraphQLContext,
+
+  postgraphql as postgraphile,
+  createPostGraphQLSchema as createPostGraphileSchema,
+  watchPostGraphQLSchema as watchPostGraphileSchema,
+  withPostGraphQLContext as withPostGraphileContext,
 }
