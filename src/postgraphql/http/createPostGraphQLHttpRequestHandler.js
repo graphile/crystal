@@ -399,23 +399,27 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
       const jwtToken = options.jwtSecret ? getJwtToken(req) : null
+      const { jwtSecret, jwtAudiences, jwtRole, pgDefaultRole, additionalGraphqlContextFromRequest } = options
 
       result = await withPostGraphQLContext({
         pgPool,
         jwtToken,
-        jwtSecret: options.jwtSecret,
-        jwtAudiences: options.jwtAudiences,
-        jwtRole: options.jwtRole,
+        jwtSecret,
+        jwtAudiences,
+        jwtRole,
         pgDefaultRole,
         pgSettings:
           typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
         pgRole = context.pgRole
+        const graphqlContext = typeof additionalGraphqlContextFromRequest === 'function'
+          ? Object.assign({}, additionalGraphqlContextFromRequest(req), context)
+          : context
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,
           null,
-          context,
+          graphqlContext,
           params.variables,
           params.operationName,
         )
