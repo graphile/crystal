@@ -401,6 +401,9 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       const jwtToken = options.jwtSecret ? getJwtToken(req) : null
       const { jwtSecret, jwtAudiences, jwtRole, pgDefaultRole, additionalGraphqlContextFromRequest } = options
 
+      const additionalContext = typeof additionalGraphQLContextFromRequest === 'function'
+        ? await additionalGraphQLContextFromRequest(req)
+        : {}
       result = await withPostGraphQLContext({
         pgPool,
         jwtToken,
@@ -412,9 +415,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
           typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
         pgRole = context.pgRole
-        const graphqlContext = typeof additionalGraphqlContextFromRequest === 'function'
-          ? Object.assign({}, additionalGraphqlContextFromRequest(req), context)
-          : context
+        const graphqlContext = Object.assign({}, additionalContext, context)
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,

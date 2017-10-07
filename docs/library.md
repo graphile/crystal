@@ -69,7 +69,7 @@ Arguments include:
   - `exportJsonSchemaPath`: Enables saving the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.
   - `exportGqlSchemaPath`: Enables saving the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.
   - `bodySizeLimit`: Set the maximum size of JSON bodies that can be parsed (default 100kB). The size can be given as a human-readable string, such as '200kB' or '5MB' (case insensitive).
-  - `additionalGraphqlContextFromRequest`: Providing a function to this and it will be called for each request and the result added to the context passed in to each resolver. This can be used in conjunction with plugins to adapt resolver behaviour based on custom information in the request object.
+  - `additionalGraphQLContextFromRequest`: Provide an async function to this to add custom items to the context being provided to each graphQL resolver. The input is the incoming request object, allowing you to write plugins which adapt behaviour based on the request.
 
 [connect]: https://www.npmjs.com/connect
 [express]: https://www.npmjs.com/express

@@ -682,7 +682,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
-    test('will call additionalGraphqlContextFromRequest if provided and add the response to the context', async () => {
+    test('will call additionalGraphQLContextFromRequest if provided and add the response to the context', async () => {
       const helloResolver = jest.fn((source, args, context) => context.additional)
       const contextCheckGqlSchema = new GraphQLSchema({
         query: new GraphQLObjectType({
@@ -695,10 +695,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           },
         }),
       })
-      const additionalGraphqlContextFromRequest = jest.fn(() => ({ additional: 'foo' }))
+      const additionalGraphQLContextFromRequest = jest.fn(() => ({ additional: 'foo' }))
       const server = createServer({
-        additionalGraphqlContextFromRequest,
-        getGqlSchema: () => contextCheckGqlSchema,
+        additionalGraphQLContextFromRequest,
+        getGqlSchema: () => Promise.resolve(contextCheckGqlSchema),
       })
 
       await (
@@ -709,8 +709,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'foo' } })
       )
-      expect(additionalGraphqlContextFromRequest).toHaveBeenCalledTimes(1)
-      expect(additionalGraphqlContextFromRequest.mock.calls[0][0]).toBeInstanceOf(http.IncomingMessage)
+      expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1)
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(http.IncomingMessage)
     })
   })
 }

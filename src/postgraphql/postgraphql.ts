@@ -31,7 +31,7 @@ type PostGraphQLOptions = {
   appendPlugins?: Array<(builder: mixed) => {}>,
   prependPlugins?: Array<(builder: mixed) => {}>,
   replaceAllPlugins?: Array<(builder: mixed) => {}>,
-  additionalGraphqlContextFromRequest?: (req: IncomingMessage) => {},
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage) => Promise<{}>,
 }
 
 /**
