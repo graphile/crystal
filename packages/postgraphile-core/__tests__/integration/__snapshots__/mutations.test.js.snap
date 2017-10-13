@@ -747,6 +747,18 @@ Object {
     "jsonIdentityMutation": Object {
       "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     },
+    "jsonIdentityMutationIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutation": Object {
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+    },
+    "jsonbIdentityMutationIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutationPlpgsqlIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
     "mult1": Object {
       "integer": 0,
     },

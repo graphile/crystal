@@ -46,6 +46,7 @@ export default async function viaTemporaryTable(
   isPgClassLike: boolean = true
 ) {
   async function performQuery(pgClient: Client, sqlQuery: SQLQuery) {
+    // TODO: look into rowMode = 'array'
     const { text, values } = sql.compile(sqlQuery);
     if (debugSql.enabled) debugSql(text);
     return pgClient.query(text, values);
@@ -61,7 +62,7 @@ export default async function viaTemporaryTable(
       ) ${sqlResultQuery}`
     );
   } else {
-    const { rows } = await performQuery(
+    const result = await performQuery(
       pgClient,
       sql.query`
       with ${sqlResultSourceAlias} as (
@@ -71,7 +72,35 @@ export default async function viaTemporaryTable(
         ? sqlResultSourceAlias
         : sql.query`${sqlResultSourceAlias}.${sqlResultSourceAlias}`}::${sqlTypeIdentifier} from ${sqlResultSourceAlias}`
     );
-    const values = rows.map(row => row[Object.keys(row)[0]]);
+    /*
+     * This is a bit of a hack. Basically `pg` likes to send us JSON parsed,
+     * but doesn't like it when we send JSON back through without stringifying.
+     * We're not really mapping back to GraphQL here so we shouldn't use
+     * pg2gql. So we're just going to JSON.stringify the value if we don't
+     * think that `pg` will be happy with it.
+     *
+     * The optimium solution would be to have the `pg` module not parse the
+     * data at all and just send it through to us as a string which we can then
+     * post straight back to postgres. There may be options to enable this - if
+     * you find them then a pull request would be welcome!
+     */
+    const { rows, fields } = result;
+    const typeID = String(fields[0].dataTypeID);
+    const jsonTypeId = "114";
+    const jsonbTypeId = "3802";
+    const mapValue = val => {
+      if (
+        val &&
+        (typeof val === "object" ||
+          typeID === jsonTypeId ||
+          typeID === jsonbTypeId)
+      ) {
+        return JSON.stringify(val);
+      } else {
+        return val;
+      }
+    };
+    const values = rows.map(row => mapValue(row[Object.keys(row)[0]]));
     return await performQuery(
       pgClient,
       sql.query`

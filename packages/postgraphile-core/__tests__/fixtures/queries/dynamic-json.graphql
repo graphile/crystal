@@ -12,6 +12,8 @@ query {
   h: jsonIdentity(json: { boolean: true, integer: 42, float: 3.1415, object: { a: 1, b: 2, c: 3 }, array: [1, 2, 3, 4] })
   i: jsonIdentity(json: [true, 42, 3.1415, { a: 1, b: 2, c: 3 }, [1, 2, 3, 4]])
   j: jsonIdentity(json: [true, null, 42, 3.1415, { a: 1, b: null, c: 3 }, [1, 2, null, 3, 4]])
+  k: jsonbIdentity(json: { a: 1, b: 2, c: 3 })
+  l: jsonbIdentity(json: [true, 42, 3.1415, { a: 1, b: 2, c: 3 }, [1, 2, 3, 4]])
   allTypes {
     nodes {
       json

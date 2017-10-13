@@ -1,4 +1,8 @@
 query {
+  jsonIdentity(json: "{\"a\":1,\"b\":2,\"c\":3}")
+  jsonbIdentity(json: "{\"a\":1,\"b\":2,\"c\":3}")
+  jsonIdentityIssue85: jsonIdentity(json:  "[{\"amount\":\"44\"},{\"amount\":null}]")
+  jsonbIdentityIssue85: jsonbIdentity(json: "[{\"amount\":\"44\"},{\"amount\":null}]")
   add1Query(arg0: 1, arg1: 2)
   add2Query(a: 2, b: 2)
   add3Query(arg1: 5)

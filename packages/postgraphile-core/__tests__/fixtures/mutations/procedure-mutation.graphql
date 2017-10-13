@@ -1,5 +1,9 @@
 mutation {
   jsonIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }
+  jsonbIdentityMutation(input: { json: "{\"a\":1,\"b\":2,\"c\":3}" }) { json }
+  jsonIdentityMutationIssue85: jsonIdentityMutation(input: { json: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  jsonbIdentityMutationIssue85: jsonbIdentityMutation(input: { json: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
+  jsonbIdentityMutationPlpgsqlIssue85: jsonbIdentityMutationPlpgsql(input: { _theJson: "[{\"amount\":\"44\"},{\"amount\":null}]" }) { json }
   add1Mutation(input: { arg0: 1, arg1: 2 }) { clientMutationId integer }
   add2Mutation(input: { clientMutationId: "hello", a: 2, b: 2 }) { clientMutationId integer }
   add3Mutation(input: { clientMutationId: "world", arg1: 5 }) { clientMutationId integer }
