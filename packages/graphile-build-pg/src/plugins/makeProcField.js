@@ -208,7 +208,12 @@ export default function makeProcField(
         // defaults in SQL.
         while (
           sqlArgValues.length > requiredArgCount &&
-          args[argNames[sqlArgValues.length - 1]] == null
+          args[
+            inflection.argument(
+              argNames[sqlArgValues.length - 1],
+              sqlArgValues.length - 1
+            )
+          ] == null
         ) {
           sqlArgValues.pop();
         }

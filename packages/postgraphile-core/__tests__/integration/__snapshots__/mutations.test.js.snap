@@ -759,6 +759,12 @@ Object {
     "jsonbIdentityMutationPlpgsqlIssue85": Object {
       "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
     },
+    "jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutationPlpgsqlWithDefaultIssue85": Object {
+      "json": "[]",
+    },
     "mult1": Object {
       "integer": 0,
     },
