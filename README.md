@@ -81,6 +81,10 @@ lerna run test
 If the above succeeds, you're good to go! If not, please reach out on twitter:
 [@benjie](https://twitter.com/benjie).
 
+### Working with docker
+
+If you want to work in a docker environment you can follow [the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
+
 ### GraphQL conflict
 
 If you get an error like the below:
