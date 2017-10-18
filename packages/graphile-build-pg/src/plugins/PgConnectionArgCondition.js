@@ -111,6 +111,12 @@ export default (function PgConnectionArgCondition(
                         attr.name
                       )} = ${gql2pg(val, attr.type)}`
                     );
+                  } else if (val === null) {
+                    queryBuilder.where(
+                      sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                        attr.name
+                      )} IS NULL`
+                    );
                   }
                 });
             }
