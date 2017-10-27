@@ -5,19 +5,25 @@ import isSafeInteger from "lodash/isSafeInteger";
 
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 
-type Gen<T> = () => T;
+type GenContext = {
+  queryBuilder: QueryBuilder,
+};
+type Gen<T> = (context: GenContext) => T;
 
-function callIfNecessary<T>(o: Gen<T> | T): T {
+function callIfNecessary<T>(o: Gen<T> | T, context: GenContext): T {
   if (typeof o === "function") {
-    return o();
+    return o(context);
   } else {
     return o;
   }
 }
 
-function callIfNecessaryArray<T>(o: Array<Gen<T> | T>): Array<T> {
+function callIfNecessaryArray<T>(
+  o: Array<Gen<T> | T>,
+  context: GenContext
+): Array<T> {
   if (Array.isArray(o)) {
-    return o.map(callIfNecessary);
+    return o.map(v => callIfNecessary(v, context));
   } else {
     return o;
   }
@@ -483,6 +489,9 @@ class QueryBuilder {
   }
   lock(type: string) {
     if (this.locks[type]) return;
+    const getContext = () => ({
+      queryBuilder: this,
+    });
     const beforeLocks = this.data.beforeLock[type];
     this.data.beforeLock[type] = [];
     for (const fn of beforeLocks || []) {
@@ -495,38 +504,43 @@ class QueryBuilder {
     } else if (type === "whereBound") {
       // Handle properties separately
       this.compiledData[type].lower = callIfNecessaryArray(
-        this.data[type].lower
+        this.data[type].lower,
+        getContext()
       );
       this.compiledData[type].upper = callIfNecessaryArray(
-        this.data[type].upper
+        this.data[type].upper,
+        getContext()
       );
     } else if (type === "select") {
       this.compiledData[type] = this.data[type].map(([a, b]) => [
-        callIfNecessary(a),
+        callIfNecessary(a, getContext()),
         b,
       ]);
     } else if (type === "orderBy") {
       this.compiledData[type] = this.data[type].map(([a, b]) => [
-        callIfNecessary(a),
+        callIfNecessary(a, getContext()),
         b,
       ]);
     } else if (type === "from") {
       if (this.data.from) {
         const f = this.data.from;
-        this.compiledData.from = [callIfNecessary(f[0]), f[1]];
+        this.compiledData.from = [callIfNecessary(f[0], getContext()), f[1]];
       }
     } else if (type === "join" || type === "where") {
-      this.compiledData[type] = callIfNecessaryArray(this.data[type]);
+      this.compiledData[type] = callIfNecessaryArray(
+        this.data[type],
+        getContext()
+      );
     } else if (type === "selectCursor") {
-      this.compiledData[type] = callIfNecessary(this.data[type]);
+      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
     } else if (type === "cursorPrefix") {
       this.compiledData[type] = this.data[type];
     } else if (type === "orderIsUnique") {
       this.compiledData[type] = this.data[type];
     } else if (type === "limit") {
-      this.compiledData[type] = callIfNecessary(this.data[type]);
+      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
     } else if (type === "offset") {
-      this.compiledData[type] = callIfNecessary(this.data[type]);
+      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
     } else if (type === "first") {
       this.compiledData[type] = this.data[type];
     } else if (type === "last") {
