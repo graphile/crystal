@@ -131,7 +131,10 @@ export default (
   if (options.withPagination || options.withPaginationAsFields) {
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
-      if (orderByExpressionsAndDirections.length > 0) {
+      if (
+        orderByExpressionsAndDirections.length > 0 &&
+        queryBuilder.isOrderUnique()
+      ) {
         const sqlCursors = cursorValue[getPgCursorPrefix().length].map(val =>
           sql.value(val)
         );
