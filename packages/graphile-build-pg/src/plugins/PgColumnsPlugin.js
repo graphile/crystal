@@ -55,6 +55,11 @@ export default (function PgColumnsPlugin(
             table.name,
             table.namespaceName
           );
+          if (memo[fieldName]) {
+            throw new Error(
+              `Two columns produce the same GraphQL field name '${fieldName}' on class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
+            );
+          }
           memo[
             fieldName
           ] = fieldWithHooks(
@@ -152,6 +157,11 @@ export default (function PgColumnsPlugin(
             table.name,
             table.namespaceName
           );
+          if (memo[fieldName]) {
+            throw new Error(
+              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
+            );
+          }
           memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
             description: attr.description,
             type: nullableIf(
