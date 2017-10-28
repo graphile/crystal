@@ -3,6 +3,11 @@ GraphQL-Build
 
 Build a high-performance easily-extensible GraphQL schema by combining plugins.
 
+*NOTE: you might actually be looking for PostGraphile (previously
+'PostGraphQL') which can be found
+[here](https://github.com/postgraphql/postgraphql); the schema building tools
+in this repository are used to power PostGraphile among other things.*
+
 This repository is a monorepo (managed by [lerna][]) which comprises the following packages:
 
 **[graphile-build][]**: The core package: a simple plugin system that enables you to build a GraphQL schema out of plugins

@@ -4,6 +4,10 @@ This module implements a compatibility layer between PostGraphQL v4 and
 `graphile-build`, loading the relevant `graphile-build-pg` plugins and setting
 the correct inflector depending on the PostGraphQL options provided.
 
+Unless you want to use the low-level API you probably want to go to the
+PostGraphile (previously 'PostGraphQL') repository instead:
+[https://github.com/postgraphql/postgraphql](https://github.com/postgraphql/postgraphql)
+
 It's also suitable for usage in your own application, but please be aware you
 need to bring your own security in the form of an authenticated `pgClient` (see
 below).
