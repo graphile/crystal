@@ -9,7 +9,7 @@ const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgAllRows(
   builder,
-  { pgInflection: inflection }
+  { pgInflection: inflection, pgViewUniqueKey: viewUniqueKey }
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -55,6 +55,10 @@ export default (async function PgAllRows(
               primaryKeyConstraint.keyAttributeNums.map(
                 num => attributes.filter(attr => attr.num === num)[0]
               );
+            const isView = t => t.classKind === "v";
+            const uniqueIdAttribute = viewUniqueKey
+              ? attributes.find(attr => attr.name === viewUniqueKey)
+              : undefined;
             if (!ConnectionType) {
               throw new Error(
                 `Could not find GraphQL connection type for table '${table.name}'`
@@ -89,7 +93,7 @@ export default (async function PgAllRows(
                         builder => {
                           if (primaryKeys) {
                             builder.beforeLock("orderBy", () => {
-                              if (!builder.isOrderUnique()) {
+                              if (!builder.isOrderUnique(false)) {
                                 // Order by PK if no order specified
                                 builder.data.cursorPrefix = ["primary_key_asc"];
                                 primaryKeys.forEach(key => {
@@ -100,6 +104,21 @@ export default (async function PgAllRows(
                                     true
                                   );
                                 });
+                                builder.setOrderIsUnique();
+                              }
+                            });
+                          } else if (isView(table) && !!uniqueIdAttribute) {
+                            builder.beforeLock("orderBy", () => {
+                              if (!builder.isOrderUnique(false)) {
+                                builder.data.cursorPrefix = [
+                                  "view_unique_key_asc",
+                                ];
+                                builder.orderBy(
+                                  sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                                    uniqueIdAttribute.name
+                                  )}`,
+                                  true
+                                );
                                 builder.setOrderIsUnique();
                               }
                             });

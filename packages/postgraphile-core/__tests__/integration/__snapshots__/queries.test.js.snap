@@ -374,7 +374,7 @@ Object {
     "i": Object {
       "edges": Array [
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDFd",
           "node": Object {
             "constant": 2,
             "name": "John Smith",
@@ -382,7 +382,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDJd",
           "node": Object {
             "constant": 2,
             "name": "Sara Smith",
@@ -390,7 +390,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDNd",
           "node": Object {
             "constant": 2,
             "name": "Budd Deey",
@@ -398,7 +398,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDRd",
           "node": Object {
             "constant": 2,
             "name": "Kathryn Ramirez",
@@ -406,7 +406,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDVd",
           "node": Object {
             "constant": 2,
             "name": "Joe Tucker",
@@ -414,7 +414,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDZd",
           "node": Object {
             "constant": 2,
             "name": "Twenty Seventwo",
@@ -2587,6 +2587,69 @@ Object {
       "personId2": 4,
     },
     "e": null,
+  },
+}
+`;
+
+exports[`view.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "col1": 11,
+            "col2": 21,
+            "testviewid": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "col1": 12,
+            "col2": 22,
+            "testviewid": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "col1": 13,
+            "col2": 23,
+            "testviewid": 3,
+          },
+        },
+      ],
+    },
+    "b": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLDNd",
+          "node": Object {
+            "col1": 13,
+            "col2": 23,
+            "testviewid": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLDJd",
+          "node": Object {
+            "col1": 12,
+            "col2": 22,
+            "testviewid": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLDFd",
+          "node": Object {
+            "col1": 11,
+            "col2": 21,
+            "testviewid": 1,
+          },
+        },
+      ],
+    },
   },
 }
 `;

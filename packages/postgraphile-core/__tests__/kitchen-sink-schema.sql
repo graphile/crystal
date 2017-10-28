@@ -249,3 +249,13 @@ CREATE TABLE a.default_value (
     id serial primary key,
     null_value text DEFAULT 'defaultValue!'
 );
+
+create table a.view_table (
+  id serial primary key,
+  col1 int,
+  col2 int
+);
+
+create view a.testview as
+  select id as testviewid, col1, col2
+  from a.view_table;

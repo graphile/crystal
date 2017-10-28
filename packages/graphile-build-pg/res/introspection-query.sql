@@ -79,6 +79,7 @@ with
       'class' as "kind",
       rel.oid as "id",
       rel.relname as "name",
+      rel.relkind as "classKind",
       dsc.description as "description",
       rel.relnamespace as "namespaceId",
       nsp.nspname as "namespaceName",

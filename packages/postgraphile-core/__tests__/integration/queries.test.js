@@ -28,12 +28,15 @@ beforeAll(() => {
     // Different fixtures need different schemas with different configurations.
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
-    const [normal, classicIds, dynamicJson] = await Promise.all([
+    const [normal, classicIds, dynamicJson, viewUniqueKey] = await Promise.all([
       createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { dynamicJson: true }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
         pgColumnFilter: attr => attr.name !== "headline",
+      }),
+      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+        viewUniqueKey: "testviewid",
       }),
     ]);
     debug(printSchema(normal));
@@ -41,6 +44,7 @@ beforeAll(() => {
       normal,
       classicIds,
       dynamicJson,
+      viewUniqueKey,
     };
   });
 
@@ -67,12 +71,15 @@ beforeAll(() => {
           // Get the appropriate GraphQL schema for this fixture. We want to test
           // some specific fixtures against a schema configured slightly
           // differently.
-          const gqlSchema =
-            fileName === "classic-ids.graphql"
-              ? gqlSchemas.classicIds
-              : fileName === "dynamic-json.graphql"
-                ? gqlSchemas.dynamicJson
-                : gqlSchemas.normal;
+          const schemas = {
+            "classic-ids.graphql": gqlSchemas.classicIds,
+            "dynamic-json.graphql": gqlSchemas.dynamicJson,
+            "view.graphql": gqlSchemas.viewUniqueKey,
+          };
+          const gqlSchema = schemas[fileName]
+            ? schemas[fileName]
+            : gqlSchemas.normal;
+
           // Return the result of our GraphQL query.
           const result = await graphql(gqlSchema, query, null, {
             pgClient: pgClient,

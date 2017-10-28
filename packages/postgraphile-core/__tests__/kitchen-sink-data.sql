@@ -87,3 +87,8 @@ insert into a.similar_table_2 (id, col4, col5, col3) values
 
 insert into a.default_value (id, null_value) values
   (1, 'someValue!');
+
+insert into a.view_table (id, col1, col2) values
+  (1, 11, 21),
+  (2, 12, 22),
+  (3, 13, 23);

@@ -258,9 +258,15 @@ class QueryBuilder {
 
   // ----------------------------------------
 
-  isOrderUnique() {
-    this.lock("orderIsUnique");
-    return this.compiledData.orderIsUnique;
+  isOrderUnique(lock?: boolean = true) {
+    if (lock) {
+      this.lock("orderBy");
+      this.lock("orderIsUnique");
+      return this.compiledData.orderIsUnique;
+    } else {
+      // This is useful inside `beforeLock("orderBy", ...)` calls
+      return this.data.orderIsUnique;
+    }
   }
   getTableExpression(): SQL {
     this.lock("from");

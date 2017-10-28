@@ -131,7 +131,7 @@ export default (function PgBackwardRelationPlugin(
                           if (primaryKeys) {
                             innerQueryBuilder.beforeLock("orderBy", () => {
                               // append order by primary key to the list of orders
-                              if (!innerQueryBuilder.isOrderUnique()) {
+                              if (!innerQueryBuilder.isOrderUnique(false)) {
                                 innerQueryBuilder.data.cursorPrefix = [
                                   "primary_key_asc",
                                 ];
