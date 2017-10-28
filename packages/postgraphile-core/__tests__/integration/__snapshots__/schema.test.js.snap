@@ -6992,3 +6992,1609 @@ type TypesMutationPayload {
 scalar UUID
 "
 `;
+
+exports[`prints a schema without posts headlines 1`] = `
+"# All input for the \`add1Mutation\` mutation.
+input Add1MutationInput {
+  arg0: Int!
+  arg1: Int!
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add1Mutation\` mutation.
+type Add1MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`add2Mutation\` mutation.
+input Add2MutationInput {
+  a: Int!
+  b: Int
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add2Mutation\` mutation.
+type Add2MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`add3Mutation\` mutation.
+input Add3MutationInput {
+  a: Int
+  arg1: Int
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add3Mutation\` mutation.
+type Add3MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`add4MutationError\` mutation.
+input Add4MutationErrorInput {
+  arg0: Int
+  b: Int
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add4MutationError\` mutation.
+type Add4MutationErrorPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`add4Mutation\` mutation.
+input Add4MutationInput {
+  arg0: Int
+  b: Int
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`add4Mutation\` mutation.
+type Add4MutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+enum AnEnum {
+  AWAITING
+  PUBLISHED
+  REJECTED
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+# An input for mutations affecting \`Comptype\`
+input ComptypeInput {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+# All input for the create \`DefaultValue\` mutation.
+input CreateDefaultValueInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`DefaultValue\` to be created by this mutation.
+  defaultValue: DefaultValueInput!
+}
+
+# The output of our create \`DefaultValue\` mutation.
+type CreateDefaultValuePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`DefaultValue\` that was created by this mutation.
+  defaultValue: DefaultValue
+
+  # An edge for the type. May be used by Relay 1.
+  defaultValueEdge(
+    # The method to use when ordering \`DefaultValue\`.
+    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+  ): DefaultValuesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the create \`ForeignKey\` mutation.
+input CreateForeignKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`ForeignKey\` to be created by this mutation.
+  foreignKey: ForeignKeyInput!
+}
+
+# The output of our create \`ForeignKey\` mutation.
+type CreateForeignKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`ForeignKey\` that was created by this mutation.
+  foreignKey: ForeignKey
+
+  # An edge for the type. May be used by Relay 1.
+  foreignKeyEdge(
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+  ): ForeignKeysEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the create \`Post\` mutation.
+input CreatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`Post\` to be created by this mutation.
+  post: PostInput!
+}
+
+# The output of our create \`Post\` mutation.
+type CreatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`Post\` that was created by this mutation.
+  post: Post
+
+  # An edge for the type. May be used by Relay 1.
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the create \`SimilarTable1\` mutation.
+input CreateSimilarTable1Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`SimilarTable1\` to be created by this mutation.
+  similarTable1: SimilarTable1Input!
+}
+
+# The output of our create \`SimilarTable1\` mutation.
+type CreateSimilarTable1Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable1\` that was created by this mutation.
+  similarTable1: SimilarTable1
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable1Edge(
+    # The method to use when ordering \`SimilarTable1\`.
+    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable1SEdge
+}
+
+# All input for the create \`SimilarTable2\` mutation.
+input CreateSimilarTable2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`SimilarTable2\` to be created by this mutation.
+  similarTable2: SimilarTable2Input!
+}
+
+# The output of our create \`SimilarTable2\` mutation.
+type CreateSimilarTable2Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable2\` that was created by this mutation.
+  similarTable2: SimilarTable2
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable2Edge(
+    # The method to use when ordering \`SimilarTable2\`.
+    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable2SEdge
+}
+
+# A location in a connection that can be used for resuming pagination.
+scalar Cursor
+
+# A point in time as described by the [ISO
+# 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+scalar Datetime
+
+type DefaultValue implements Node {
+  id: Int!
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+  nullValue: String
+}
+
+# A condition to be used against \`DefaultValue\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input DefaultValueCondition {
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`nullValue\` field.
+  nullValue: String
+}
+
+# An input for mutations affecting \`DefaultValue\`
+input DefaultValueInput {
+  id: Int
+  nullValue: String
+}
+
+# Represents an update to a \`DefaultValue\`. Fields that are set will be updated.
+input DefaultValuePatch {
+  id: Int
+  nullValue: String
+}
+
+# A connection to a list of \`DefaultValue\` values.
+type DefaultValuesConnection {
+  # A list of edges which contains the \`DefaultValue\` and cursor to aid in pagination.
+  edges: [DefaultValuesEdge!]!
+
+  # A list of \`DefaultValue\` objects.
+  nodes: [DefaultValue]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`DefaultValue\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`DefaultValue\` edge in the connection.
+type DefaultValuesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`DefaultValue\` at the end of the edge.
+  node: DefaultValue!
+}
+
+# Methods to use when ordering \`DefaultValue\`.
+enum DefaultValuesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  NULL_VALUE_ASC
+  NULL_VALUE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+# All input for the \`deleteDefaultValueById\` mutation.
+input DeleteDefaultValueByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+}
+
+# All input for the \`deleteDefaultValue\` mutation.
+input DeleteDefaultValueInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`DefaultValue\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`DefaultValue\` mutation.
+type DeleteDefaultValuePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`DefaultValue\` that was deleted by this mutation.
+  defaultValue: DefaultValue
+
+  # An edge for the type. May be used by Relay 1.
+  defaultValueEdge(
+    # The method to use when ordering \`DefaultValue\`.
+    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+  ): DefaultValuesEdge
+  deletedDefaultValueId: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`deletePostById\` mutation.
+input DeletePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+}
+
+# All input for the \`deletePost\` mutation.
+input DeletePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`Post\` mutation.
+type DeletePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  deletedPostId: ID
+
+  # The \`Post\` that was deleted by this mutation.
+  post: Post
+
+  # An edge for the type. May be used by Relay 1.
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`deleteSimilarTable1ById\` mutation.
+input DeleteSimilarTable1ByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+}
+
+# All input for the \`deleteSimilarTable1\` mutation.
+input DeleteSimilarTable1Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`SimilarTable1\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`SimilarTable1\` mutation.
+type DeleteSimilarTable1Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  deletedSimilarTable1Id: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable1\` that was deleted by this mutation.
+  similarTable1: SimilarTable1
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable1Edge(
+    # The method to use when ordering \`SimilarTable1\`.
+    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable1SEdge
+}
+
+# All input for the \`deleteSimilarTable2ById\` mutation.
+input DeleteSimilarTable2ByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+}
+
+# All input for the \`deleteSimilarTable2\` mutation.
+input DeleteSimilarTable2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`SimilarTable2\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`SimilarTable2\` mutation.
+type DeleteSimilarTable2Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  deletedSimilarTable2Id: ID
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable2\` that was deleted by this mutation.
+  similarTable2: SimilarTable2
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable2Edge(
+    # The method to use when ordering \`SimilarTable2\`.
+    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable2SEdge
+}
+
+type ForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
+  personId: Int
+}
+
+# A condition to be used against \`ForeignKey\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input ForeignKeyCondition {
+  # Checks for equality with the object’s \`compoundKey1\` field.
+  compoundKey1: Int
+
+  # Checks for equality with the object’s \`compoundKey2\` field.
+  compoundKey2: Int
+
+  # Checks for equality with the object’s \`personId\` field.
+  personId: Int
+}
+
+# An input for mutations affecting \`ForeignKey\`
+input ForeignKeyInput {
+  compoundKey1: Int
+  compoundKey2: Int
+  personId: Int
+}
+
+# A connection to a list of \`ForeignKey\` values.
+type ForeignKeysConnection {
+  # A list of edges which contains the \`ForeignKey\` and cursor to aid in pagination.
+  edges: [ForeignKeysEdge!]!
+
+  # A list of \`ForeignKey\` objects.
+  nodes: [ForeignKey]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`ForeignKey\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`ForeignKey\` edge in the connection.
+type ForeignKeysEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`ForeignKey\` at the end of the edge.
+  node: ForeignKey!
+}
+
+# Methods to use when ordering \`ForeignKey\`.
+enum ForeignKeysOrderBy {
+  COMPOUND_KEY_1_ASC
+  COMPOUND_KEY_1_DESC
+  COMPOUND_KEY_2_ASC
+  COMPOUND_KEY_2_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+}
+
+# The root mutation type which contains root level fields which mutate data.
+type Mutation {
+  # lol, add some stuff 1 mutation
+  add1Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add1MutationInput!
+  ): Add1MutationPayload
+
+  # lol, add some stuff 2 mutation
+  add2Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add2MutationInput!
+  ): Add2MutationPayload
+
+  # lol, add some stuff 3 mutation
+  add3Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add3MutationInput!
+  ): Add3MutationPayload
+
+  # lol, add some stuff 4 mutation
+  add4Mutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add4MutationInput!
+  ): Add4MutationPayload
+  add4MutationError(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: Add4MutationErrorInput!
+  ): Add4MutationErrorPayload
+
+  # Creates a single \`DefaultValue\`.
+  createDefaultValue(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateDefaultValueInput!
+  ): CreateDefaultValuePayload
+
+  # Creates a single \`ForeignKey\`.
+  createForeignKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateForeignKeyInput!
+  ): CreateForeignKeyPayload
+
+  # Creates a single \`Post\`.
+  createPost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePostInput!
+  ): CreatePostPayload
+
+  # Creates a single \`SimilarTable1\`.
+  createSimilarTable1(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateSimilarTable1Input!
+  ): CreateSimilarTable1Payload
+
+  # Creates a single \`SimilarTable2\`.
+  createSimilarTable2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateSimilarTable2Input!
+  ): CreateSimilarTable2Payload
+
+  # Deletes a single \`DefaultValue\` using its globally unique id.
+  deleteDefaultValue(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteDefaultValueInput!
+  ): DeleteDefaultValuePayload
+
+  # Deletes a single \`DefaultValue\` using a unique key.
+  deleteDefaultValueById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteDefaultValueByIdInput!
+  ): DeleteDefaultValuePayload
+
+  # Deletes a single \`Post\` using its globally unique id.
+  deletePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostInput!
+  ): DeletePostPayload
+
+  # Deletes a single \`Post\` using a unique key.
+  deletePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
+
+  # Deletes a single \`SimilarTable1\` using its globally unique id.
+  deleteSimilarTable1(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteSimilarTable1Input!
+  ): DeleteSimilarTable1Payload
+
+  # Deletes a single \`SimilarTable1\` using a unique key.
+  deleteSimilarTable1ById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteSimilarTable1ByIdInput!
+  ): DeleteSimilarTable1Payload
+
+  # Deletes a single \`SimilarTable2\` using its globally unique id.
+  deleteSimilarTable2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteSimilarTable2Input!
+  ): DeleteSimilarTable2Payload
+
+  # Deletes a single \`SimilarTable2\` using a unique key.
+  deleteSimilarTable2ById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteSimilarTable2ByIdInput!
+  ): DeleteSimilarTable2Payload
+  normalRand(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: NormalRandInput!
+  ): NormalRandPayload
+  returnVoidMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: ReturnVoidMutationInput!
+  ): ReturnVoidMutationPayload
+
+  # Updates a single \`DefaultValue\` using its globally unique id and a patch.
+  updateDefaultValue(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateDefaultValueInput!
+  ): UpdateDefaultValuePayload
+
+  # Updates a single \`DefaultValue\` using a unique key and a patch.
+  updateDefaultValueById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateDefaultValueByIdInput!
+  ): UpdateDefaultValuePayload
+
+  # Updates a single \`Post\` using its globally unique id and a patch.
+  updatePost(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostInput!
+  ): UpdatePostPayload
+
+  # Updates a single \`Post\` using a unique key and a patch.
+  updatePostById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
+
+  # Updates a single \`SimilarTable1\` using its globally unique id and a patch.
+  updateSimilarTable1(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateSimilarTable1Input!
+  ): UpdateSimilarTable1Payload
+
+  # Updates a single \`SimilarTable1\` using a unique key and a patch.
+  updateSimilarTable1ById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateSimilarTable1ByIdInput!
+  ): UpdateSimilarTable1Payload
+
+  # Updates a single \`SimilarTable2\` using its globally unique id and a patch.
+  updateSimilarTable2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateSimilarTable2Input!
+  ): UpdateSimilarTable2Payload
+
+  # Updates a single \`SimilarTable2\` using a unique key and a patch.
+  updateSimilarTable2ById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateSimilarTable2ByIdInput!
+  ): UpdateSimilarTable2Payload
+}
+
+# An object with a globally unique \`ID\`.
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+type NonUpdatableView {
+  column: Int
+}
+
+# A condition to be used against \`NonUpdatableView\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input NonUpdatableViewCondition {
+  # Checks for equality with the object’s \`column\` field.
+  column: Int
+}
+
+# A connection to a list of \`NonUpdatableView\` values.
+type NonUpdatableViewsConnection {
+  # A list of edges which contains the \`NonUpdatableView\` and cursor to aid in pagination.
+  edges: [NonUpdatableViewsEdge!]!
+
+  # A list of \`NonUpdatableView\` objects.
+  nodes: [NonUpdatableView]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`NonUpdatableView\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`NonUpdatableView\` edge in the connection.
+type NonUpdatableViewsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`NonUpdatableView\` at the end of the edge.
+  node: NonUpdatableView!
+}
+
+# Methods to use when ordering \`NonUpdatableView\`.
+enum NonUpdatableViewsOrderBy {
+  COLUMN_ASC
+  COLUMN_DESC
+  NATURAL
+}
+
+# All input for the \`normalRand\` mutation.
+input NormalRandInput {
+  arg0: Int!
+  arg1: Float!
+  arg2: Float!
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`normalRand\` mutation.
+type NormalRandPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  floats: [Float]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, the cursor to continue.
+  endCursor: Cursor
+
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: Cursor
+}
+
+type Post implements Node {
+  authorId: Int
+  body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
+  headlineTrimmed(length: Int, omission: String): String
+  headlineTrimmedNoDefaults(length: Int, omission: String): String
+  headlineTrimmedStrict(length: Int, omission: String): String
+  id: Int!
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+# A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PostCondition {
+  # Checks for equality with the object’s \`authorId\` field.
+  authorId: Int
+
+  # Checks for equality with the object’s \`body\` field.
+  body: String
+
+  # Checks for equality with the object’s \`comptypes\` field.
+  comptypes: [ComptypeInput]
+
+  # Checks for equality with the object’s \`enums\` field.
+  enums: [AnEnum]
+
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+}
+
+# An input for mutations affecting \`Post\`
+input PostInput {
+  authorId: Int
+  body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
+  id: Int
+}
+
+# Represents an update to a \`Post\`. Fields that are set will be updated.
+input PostPatch {
+  authorId: Int
+  body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
+  id: Int
+}
+
+# A connection to a list of \`Post\` values.
+type PostsConnection {
+  # A list of edges which contains the \`Post\` and cursor to aid in pagination.
+  edges: [PostsEdge!]!
+
+  # A list of \`Post\` objects.
+  nodes: [Post]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Post\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`Post\` edge in the connection.
+type PostsEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`Post\` at the end of the edge.
+  node: Post!
+}
+
+# Methods to use when ordering \`Post\`.
+enum PostsOrderBy {
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  BODY_ASC
+  BODY_DESC
+  COMPTYPES_ASC
+  COMPTYPES_DESC
+  ENUMS_ASC
+  ENUMS_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+# The root query type which gives access points into the data universe.
+type Query implements Node {
+  # lol, add some stuff 1 query
+  add1Query(arg0: Int!, arg1: Int!): Int
+
+  # lol, add some stuff 2 query
+  add2Query(a: Int!, b: Int): Int
+
+  # lol, add some stuff 3 query
+  add3Query(a: Int, arg1: Int): Int
+
+  # lol, add some stuff 4 query
+  add4Query(arg0: Int, b: Int): Int
+
+  # Reads and enables pagination through a set of \`DefaultValue\`.
+  allDefaultValues(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: DefaultValueCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`DefaultValue\`.
+    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+  ): DefaultValuesConnection
+
+  # Reads and enables pagination through a set of \`ForeignKey\`.
+  allForeignKeys(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: ForeignKeyCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`ForeignKey\`.
+    orderBy: ForeignKeysOrderBy = NATURAL
+  ): ForeignKeysConnection
+
+  # Reads and enables pagination through a set of \`NonUpdatableView\`.
+  allNonUpdatableViews(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: NonUpdatableViewCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`NonUpdatableView\`.
+    orderBy: NonUpdatableViewsOrderBy = NATURAL
+  ): NonUpdatableViewsConnection
+
+  # Reads and enables pagination through a set of \`Post\`.
+  allPosts(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PostCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsConnection
+
+  # Reads and enables pagination through a set of \`SimilarTable1\`.
+  allSimilarTable1S(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: SimilarTable1Condition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`SimilarTable1\`.
+    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable1SConnection
+
+  # Reads and enables pagination through a set of \`SimilarTable2\`.
+  allSimilarTable2S(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: SimilarTable2Condition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`SimilarTable2\`.
+    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable2SConnection
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab2\`.
+  crosstab2(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab2SConnection!
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab3\`.
+  crosstab3(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab3SConnection!
+
+  # Reads and enables pagination through a set of \`TablefuncCrosstab4\`.
+  crosstab4(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+    arg0: String!
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): TablefuncCrosstab4SConnection!
+
+  # Reads a single \`DefaultValue\` using its globally unique \`ID\`.
+  defaultValue(
+    # The globally unique \`ID\` to be used in selecting a single \`DefaultValue\`.
+    nodeId: ID!
+  ): DefaultValue
+  defaultValueById(id: Int!): DefaultValue
+
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    nodeId: ID!
+  ): Node
+
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  nodeId: ID!
+
+  # Reads a single \`Post\` using its globally unique \`ID\`.
+  post(
+    # The globally unique \`ID\` to be used in selecting a single \`Post\`.
+    nodeId: ID!
+  ): Post
+  postById(id: Int!): Post
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  query: Query!
+
+  # Reads a single \`SimilarTable1\` using its globally unique \`ID\`.
+  similarTable1(
+    # The globally unique \`ID\` to be used in selecting a single \`SimilarTable1\`.
+    nodeId: ID!
+  ): SimilarTable1
+  similarTable1ById(id: Int!): SimilarTable1
+
+  # Reads a single \`SimilarTable2\` using its globally unique \`ID\`.
+  similarTable2(
+    # The globally unique \`ID\` to be used in selecting a single \`SimilarTable2\`.
+    nodeId: ID!
+  ): SimilarTable2
+  similarTable2ById(id: Int!): SimilarTable2
+}
+
+# All input for the \`returnVoidMutation\` mutation.
+input ReturnVoidMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`returnVoidMutation\` mutation.
+type ReturnVoidMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+type SimilarTable1 implements Node {
+  col1: Int
+  col2: Int
+  col3: Int!
+  id: Int!
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+# A condition to be used against \`SimilarTable1\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input SimilarTable1Condition {
+  # Checks for equality with the object’s \`col1\` field.
+  col1: Int
+
+  # Checks for equality with the object’s \`col2\` field.
+  col2: Int
+
+  # Checks for equality with the object’s \`col3\` field.
+  col3: Int
+
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+}
+
+# An input for mutations affecting \`SimilarTable1\`
+input SimilarTable1Input {
+  col1: Int
+  col2: Int
+  col3: Int!
+  id: Int
+}
+
+# Represents an update to a \`SimilarTable1\`. Fields that are set will be updated.
+input SimilarTable1Patch {
+  col1: Int
+  col2: Int
+  col3: Int
+  id: Int
+}
+
+# A connection to a list of \`SimilarTable1\` values.
+type SimilarTable1SConnection {
+  # A list of edges which contains the \`SimilarTable1\` and cursor to aid in pagination.
+  edges: [SimilarTable1SEdge!]!
+
+  # A list of \`SimilarTable1\` objects.
+  nodes: [SimilarTable1]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`SimilarTable1\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`SimilarTable1\` edge in the connection.
+type SimilarTable1SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`SimilarTable1\` at the end of the edge.
+  node: SimilarTable1!
+}
+
+# Methods to use when ordering \`SimilarTable1\`.
+enum SimilarTable1SOrderBy {
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
+  COL3_ASC
+  COL3_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type SimilarTable2 implements Node {
+  col3: Int!
+  col4: Int
+  col5: Int
+  id: Int!
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+# A condition to be used against \`SimilarTable2\` object types. All fields are
+# tested for equality and combined with a logical ‘and.’
+input SimilarTable2Condition {
+  # Checks for equality with the object’s \`col3\` field.
+  col3: Int
+
+  # Checks for equality with the object’s \`col4\` field.
+  col4: Int
+
+  # Checks for equality with the object’s \`col5\` field.
+  col5: Int
+
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+}
+
+# An input for mutations affecting \`SimilarTable2\`
+input SimilarTable2Input {
+  col3: Int!
+  col4: Int
+  col5: Int
+  id: Int
+}
+
+# Represents an update to a \`SimilarTable2\`. Fields that are set will be updated.
+input SimilarTable2Patch {
+  col3: Int
+  col4: Int
+  col5: Int
+  id: Int
+}
+
+# A connection to a list of \`SimilarTable2\` values.
+type SimilarTable2SConnection {
+  # A list of edges which contains the \`SimilarTable2\` and cursor to aid in pagination.
+  edges: [SimilarTable2SEdge!]!
+
+  # A list of \`SimilarTable2\` objects.
+  nodes: [SimilarTable2]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`SimilarTable2\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`SimilarTable2\` edge in the connection.
+type SimilarTable2SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`SimilarTable2\` at the end of the edge.
+  node: SimilarTable2!
+}
+
+# Methods to use when ordering \`SimilarTable2\`.
+enum SimilarTable2SOrderBy {
+  COL3_ASC
+  COL3_DESC
+  COL4_ASC
+  COL4_DESC
+  COL5_ASC
+  COL5_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type TablefuncCrosstab2 {
+  category1: String
+  category2: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab2\` values.
+type TablefuncCrosstab2SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab2\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab2SEdge!]!
+
+  # A list of \`TablefuncCrosstab2\` objects.
+  nodes: [TablefuncCrosstab2]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab2\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab2\` edge in the connection.
+type TablefuncCrosstab2SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab2\` at the end of the edge.
+  node: TablefuncCrosstab2!
+}
+
+type TablefuncCrosstab3 {
+  category1: String
+  category2: String
+  category3: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab3\` values.
+type TablefuncCrosstab3SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab3\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab3SEdge!]!
+
+  # A list of \`TablefuncCrosstab3\` objects.
+  nodes: [TablefuncCrosstab3]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab3\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab3\` edge in the connection.
+type TablefuncCrosstab3SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab3\` at the end of the edge.
+  node: TablefuncCrosstab3!
+}
+
+type TablefuncCrosstab4 {
+  category1: String
+  category2: String
+  category3: String
+  category4: String
+  rowName: String
+}
+
+# A connection to a list of \`TablefuncCrosstab4\` values.
+type TablefuncCrosstab4SConnection {
+  # A list of edges which contains the \`TablefuncCrosstab4\` and cursor to aid in pagination.
+  edges: [TablefuncCrosstab4SEdge!]!
+
+  # A list of \`TablefuncCrosstab4\` objects.
+  nodes: [TablefuncCrosstab4]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`TablefuncCrosstab4\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`TablefuncCrosstab4\` edge in the connection.
+type TablefuncCrosstab4SEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`TablefuncCrosstab4\` at the end of the edge.
+  node: TablefuncCrosstab4!
+}
+
+# All input for the \`updateDefaultValueById\` mutation.
+input UpdateDefaultValueByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # An object where the defined keys will be set on the \`DefaultValue\` being updated.
+  defaultValuePatch: DefaultValuePatch!
+  id: Int!
+}
+
+# All input for the \`updateDefaultValue\` mutation.
+input UpdateDefaultValueInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # An object where the defined keys will be set on the \`DefaultValue\` being updated.
+  defaultValuePatch: DefaultValuePatch!
+
+  # The globally unique \`ID\` which will identify a single \`DefaultValue\` to be updated.
+  nodeId: ID!
+}
+
+# The output of our update \`DefaultValue\` mutation.
+type UpdateDefaultValuePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`DefaultValue\` that was updated by this mutation.
+  defaultValue: DefaultValue
+
+  # An edge for the type. May be used by Relay 1.
+  defaultValueEdge(
+    # The method to use when ordering \`DefaultValue\`.
+    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+  ): DefaultValuesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`updatePostById\` mutation.
+input UpdatePostByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+
+  # An object where the defined keys will be set on the \`Post\` being updated.
+  postPatch: PostPatch!
+}
+
+# All input for the \`updatePost\` mutation.
+input UpdatePostInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Post\` to be updated.
+  nodeId: ID!
+
+  # An object where the defined keys will be set on the \`Post\` being updated.
+  postPatch: PostPatch!
+}
+
+# The output of our update \`Post\` mutation.
+type UpdatePostPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`Post\` that was updated by this mutation.
+  post: Post
+
+  # An edge for the type. May be used by Relay 1.
+  postEdge(
+    # The method to use when ordering \`Post\`.
+    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+  ): PostsEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`updateSimilarTable1ById\` mutation.
+input UpdateSimilarTable1ByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+
+  # An object where the defined keys will be set on the \`SimilarTable1\` being updated.
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+# All input for the \`updateSimilarTable1\` mutation.
+input UpdateSimilarTable1Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`SimilarTable1\` to be updated.
+  nodeId: ID!
+
+  # An object where the defined keys will be set on the \`SimilarTable1\` being updated.
+  similarTable1Patch: SimilarTable1Patch!
+}
+
+# The output of our update \`SimilarTable1\` mutation.
+type UpdateSimilarTable1Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable1\` that was updated by this mutation.
+  similarTable1: SimilarTable1
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable1Edge(
+    # The method to use when ordering \`SimilarTable1\`.
+    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable1SEdge
+}
+
+# All input for the \`updateSimilarTable2ById\` mutation.
+input UpdateSimilarTable2ByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+
+  # An object where the defined keys will be set on the \`SimilarTable2\` being updated.
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+# All input for the \`updateSimilarTable2\` mutation.
+input UpdateSimilarTable2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`SimilarTable2\` to be updated.
+  nodeId: ID!
+
+  # An object where the defined keys will be set on the \`SimilarTable2\` being updated.
+  similarTable2Patch: SimilarTable2Patch!
+}
+
+# The output of our update \`SimilarTable2\` mutation.
+type UpdateSimilarTable2Payload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+
+  # The \`SimilarTable2\` that was updated by this mutation.
+  similarTable2: SimilarTable2
+
+  # An edge for the type. May be used by Relay 1.
+  similarTable2Edge(
+    # The method to use when ordering \`SimilarTable2\`.
+    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+  ): SimilarTable2SEdge
+}
+"
+`;

@@ -60,6 +60,7 @@ export default (function PgJWTPlugin(
         throw new Error("JWT type has already been overridden?");
       }
       const attributes = introspectionResultsByKind.attribute
+        // TODO: consider adding to pgColumnFilter?
         .filter(attr => attr.classId === compositeClass.id)
         .sort((a1, a2) => a1.num - a2.num);
 

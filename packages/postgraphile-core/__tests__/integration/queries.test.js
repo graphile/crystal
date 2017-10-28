@@ -32,6 +32,9 @@ beforeAll(() => {
       createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { dynamicJson: true }),
+      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+        pgColumnFilter: attr => attr.name !== "headline",
+      }),
     ]);
     debug(printSchema(normal));
     return {

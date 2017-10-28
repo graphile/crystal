@@ -11,16 +11,19 @@ const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
 export default (async function PgMutationUpdateDeletePlugin(
   builder,
-  { pgInflection: inflection, pgDisableDefaultMutations }
+  {
+    pgInflection: inflection,
+    pgDisableDefaultMutations,
+    pgColumnFilter = (_attr, _build, _context) => true,
+  }
 ) {
   if (pgDisableDefaultMutations) {
     return;
   }
   builder.hook(
     "GraphQLObjectType:fields",
-    (
-      fields,
-      {
+    (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
+      const {
         newWithHooks,
         getNodeIdForTypeAndIdentifiers,
         nodeIdFieldName,
@@ -40,9 +43,7 @@ export default (async function PgMutationUpdateDeletePlugin(
           GraphQLObjectType,
           GraphQLID,
         },
-      },
-      { scope: { isRootMutation }, fieldWithHooks }
-    ) => {
+      } = build;
       if (!isRootMutation) {
         return fields;
       }
@@ -65,7 +66,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                   getDataFromParsedResolveInfoFragment,
                   PayloadType,
                   input,
-                  condition
+                  condition,
+                  context
                 ) {
                   const parsedResolveInfoFragment = parseResolveInfo(
                     resolveInfo
@@ -92,6 +94,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                       ];
                     introspectionResultsByKind.attribute
                       .filter(attr => attr.classId === table.id)
+                      .filter(attr => pgColumnFilter(attr, build, context))
                       .forEach(attr => {
                         const fieldName = inflection.column(
                           attr.name,
@@ -302,68 +305,62 @@ export default (async function PgMutationUpdateDeletePlugin(
                       }
                     );
 
-                    memo[
-                      fieldName
-                    ] = fieldWithHooks(
-                      fieldName,
-                      ({ getDataFromParsedResolveInfoFragment }) => {
-                        return {
-                          description:
-                            mode === "update"
-                              ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
-                              : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
-                          type: PayloadType,
-                          args: {
-                            input: {
-                              type: new GraphQLNonNull(InputType),
-                            },
+                    memo[fieldName] = fieldWithHooks(fieldName, context => {
+                      const { getDataFromParsedResolveInfoFragment } = context;
+                      return {
+                        description:
+                          mode === "update"
+                            ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
+                            : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
+                        type: PayloadType,
+                        args: {
+                          input: {
+                            type: new GraphQLNonNull(InputType),
                           },
-                          async resolve(
-                            parent,
-                            { input },
-                            { pgClient },
-                            resolveInfo
-                          ) {
-                            const nodeId = input[nodeIdFieldName];
-                            try {
-                              const [alias, ...identifiers] = JSON.parse(
-                                base64Decode(nodeId)
-                              );
-                              const NodeTypeByAlias = getNodeType(alias);
-                              if (NodeTypeByAlias !== TableType) {
-                                throw new Error("Mismatched type");
-                              }
-                              if (identifiers.length !== primaryKeys.length) {
-                                throw new Error("Invalid ID");
-                              }
-
-                              return commonCodeRenameMe(
-                                pgClient,
-                                resolveInfo,
-                                getDataFromParsedResolveInfoFragment,
-                                PayloadType,
-                                input,
-                                sql.fragment`(${sql.join(
-                                  primaryKeys.map(
-                                    (key, idx) =>
-                                      sql.fragment`${sql.identifier(
-                                        key.name
-                                      )} = ${gql2pg(
-                                        identifiers[idx],
-                                        key.type
-                                      )}`
-                                  ),
-                                  ") and ("
-                                )})`
-                              );
-                            } catch (e) {
-                              debug(e);
-                              return null;
+                        },
+                        async resolve(
+                          parent,
+                          { input },
+                          { pgClient },
+                          resolveInfo
+                        ) {
+                          const nodeId = input[nodeIdFieldName];
+                          try {
+                            const [alias, ...identifiers] = JSON.parse(
+                              base64Decode(nodeId)
+                            );
+                            const NodeTypeByAlias = getNodeType(alias);
+                            if (NodeTypeByAlias !== TableType) {
+                              throw new Error("Mismatched type");
                             }
-                          },
-                        };
-                      }
-                    );
+                            if (identifiers.length !== primaryKeys.length) {
+                              throw new Error("Invalid ID");
+                            }
+
+                            return commonCodeRenameMe(
+                              pgClient,
+                              resolveInfo,
+                              getDataFromParsedResolveInfoFragment,
+                              PayloadType,
+                              input,
+                              sql.fragment`(${sql.join(
+                                primaryKeys.map(
+                                  (key, idx) =>
+                                    sql.fragment`${sql.identifier(
+                                      key.name
+                                    )} = ${gql2pg(identifiers[idx], key.type)}`
+                                ),
+                                ") and ("
+                              )})`,
+                              context
+                            );
+                          } catch (e) {
+                            debug(e);
+                            return null;
+                          }
+                        },
+                      };
+                    });
                   }
 
                   // Unique
@@ -439,57 +436,54 @@ export default (async function PgMutationUpdateDeletePlugin(
                       }
                     );
 
-                    memo[
-                      fieldName
-                    ] = fieldWithHooks(
-                      fieldName,
-                      ({ getDataFromParsedResolveInfoFragment }) => {
-                        return {
-                          description:
-                            mode === "update"
-                              ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
-                              : `Deletes a single \`${tableTypeName}\` using a unique key.`,
-                          type: PayloadType,
-                          args: {
-                            input: {
-                              type: new GraphQLNonNull(InputType),
-                            },
+                    memo[fieldName] = fieldWithHooks(fieldName, context => {
+                      const { getDataFromParsedResolveInfoFragment } = context;
+                      return {
+                        description:
+                          mode === "update"
+                            ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
+                            : `Deletes a single \`${tableTypeName}\` using a unique key.`,
+                        type: PayloadType,
+                        args: {
+                          input: {
+                            type: new GraphQLNonNull(InputType),
                           },
-                          async resolve(
-                            parent,
-                            { input },
-                            { pgClient },
-                            resolveInfo
-                          ) {
-                            return commonCodeRenameMe(
-                              pgClient,
-                              resolveInfo,
-                              getDataFromParsedResolveInfoFragment,
-                              PayloadType,
-                              input,
-                              sql.fragment`(${sql.join(
-                                keys.map(
-                                  key =>
-                                    sql.fragment`${sql.identifier(
-                                      key.name
-                                    )} = ${gql2pg(
-                                      input[
-                                        inflection.column(
-                                          key.name,
-                                          key.class.name,
-                                          key.class.namespace.name
-                                        )
-                                      ],
-                                      key.type
-                                    )}`
-                                ),
-                                ") and ("
-                              )})`
-                            );
-                          },
-                        };
-                      }
-                    );
+                        },
+                        async resolve(
+                          parent,
+                          { input },
+                          { pgClient },
+                          resolveInfo
+                        ) {
+                          return commonCodeRenameMe(
+                            pgClient,
+                            resolveInfo,
+                            getDataFromParsedResolveInfoFragment,
+                            PayloadType,
+                            input,
+                            sql.fragment`(${sql.join(
+                              keys.map(
+                                key =>
+                                  sql.fragment`${sql.identifier(
+                                    key.name
+                                  )} = ${gql2pg(
+                                    input[
+                                      inflection.column(
+                                        key.name,
+                                        key.class.name,
+                                        key.class.namespace.name
+                                      )
+                                    ],
+                                    key.type
+                                  )}`
+                              ),
+                              ") and ("
+                            )})`,
+                            context
+                          );
+                        },
+                      };
+                    });
                   });
                 }
                 return memo;

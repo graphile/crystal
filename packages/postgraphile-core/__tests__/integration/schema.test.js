@@ -33,6 +33,13 @@ const testFixtures = [
     createSchema: client =>
       createPostGraphQLSchema(client, "c", { disableDefaultMutations: true }),
   },
+  {
+    name: "prints a schema without posts headlines",
+    createSchema: client =>
+      createPostGraphQLSchema(client, "a", {
+        pgColumnFilter: attr => attr.name !== "headline",
+      }),
+  },
 ];
 
 beforeAll(() => {

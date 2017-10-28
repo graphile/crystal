@@ -8,16 +8,19 @@ const debug = debugFactory("graphile-build-pg");
 
 export default (function PgMutationCreatePlugin(
   builder,
-  { pgInflection: inflection, pgDisableDefaultMutations }
+  {
+    pgInflection: inflection,
+    pgDisableDefaultMutations,
+    pgColumnFilter = (_attr, _build, _context) => true,
+  }
 ) {
   if (pgDisableDefaultMutations) {
     return;
   }
   builder.hook(
     "GraphQLObjectType:fields",
-    (
-      fields,
-      {
+    (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
+      const {
         extend,
         newWithHooks,
         parseResolveInfo,
@@ -32,9 +35,7 @@ export default (function PgMutationCreatePlugin(
           GraphQLNonNull,
           GraphQLString,
         },
-      },
-      { scope: { isRootMutation }, fieldWithHooks }
-    ) => {
+      } = build;
       if (!isRootMutation) {
         return fields;
       }
@@ -131,11 +132,9 @@ export default (function PgMutationCreatePlugin(
               table.name,
               table.namespace.name
             );
-            memo[
-              fieldName
-            ] = fieldWithHooks(
-              fieldName,
-              ({ getDataFromParsedResolveInfoFragment }) => ({
+            memo[fieldName] = fieldWithHooks(fieldName, context => {
+              const { getDataFromParsedResolveInfoFragment } = context;
+              return {
                 description: `Creates a single \`${tableTypeName}\`.`,
                 type: PayloadType,
                 args: {
@@ -166,6 +165,7 @@ export default (function PgMutationCreatePlugin(
                     ];
                   pgIntrospectionResultsByKind.attribute
                     .filter(attr => attr.classId === table.id)
+                    .filter(attr => pgColumnFilter(attr, build, context))
                     .forEach(attr => {
                       const fieldName = inflection.column(
                         attr.name,
@@ -217,8 +217,8 @@ export default (function PgMutationCreatePlugin(
                     data: row,
                   };
                 },
-              })
-            );
+              };
+            });
             return memo;
           }, {})
       );
