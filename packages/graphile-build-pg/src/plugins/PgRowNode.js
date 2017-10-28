@@ -86,7 +86,7 @@ export default (async function PgRowByUniqueConstraint(
         nodeIdFieldName,
         extend,
         parseResolveInfo,
-        getTypeByName,
+        pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         gql2pg,
@@ -103,9 +103,7 @@ export default (async function PgRowByUniqueConstraint(
         introspectionResultsByKind.class
           .filter(table => !!table.namespace)
           .reduce((memo, table) => {
-            const TableType = getTypeByName(
-              inflection.tableType(table.name, table.namespace.name)
-            );
+            const TableType = pgGetGqlTypeByTypeId(table.type.id);
             const sqlFullTableName = sql.identifier(
               table.namespace.name,
               table.name

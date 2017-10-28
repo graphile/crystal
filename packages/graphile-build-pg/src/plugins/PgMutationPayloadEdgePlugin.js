@@ -10,7 +10,7 @@ export default (function PgMutationPayloadEdgePlugin(
     "GraphQLObjectType:fields",
     (
       fields,
-      { extend, getTypeByName, pgSql: sql },
+      { extend, getTypeByName, pgGetGqlTypeByTypeId, pgSql: sql },
       {
         scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
         fieldWithHooks,
@@ -27,10 +27,8 @@ export default (function PgMutationPayloadEdgePlugin(
       ) {
         return fields;
       }
-      const tableTypeName = inflection.tableType(
-        table.name,
-        table.namespace.name
-      );
+      const TableType = pgGetGqlTypeByTypeId(table.type.id);
+      const tableTypeName = TableType.name;
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)
       );

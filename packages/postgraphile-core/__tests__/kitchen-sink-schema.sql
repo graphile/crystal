@@ -30,6 +30,13 @@ create function c.person_exists(person c.person, email b.email) returns boolean 
 select exists(select 1 from c.person where person.email = person_exists.email);
 $$ language sql stable;
 
+create type a.an_enum as enum('awaiting', 'rejected', 'published');
+
+create type a.comptype as (
+  schedule timestamptz,
+  is_optimised boolean
+);
+
 create domain b.guid
   as character varying(15)
   default '000000000000000'::character varying
@@ -43,7 +50,9 @@ create table a.post (
   id serial primary key,
   headline text not null,
   body text,
-  author_id int4 references c.person(id)
+  author_id int4 references c.person(id),
+  enums a.an_enum[],
+  comptypes a.comptype[]
 );
 
 create type a.letter as enum ('a', 'b', 'c', 'd');

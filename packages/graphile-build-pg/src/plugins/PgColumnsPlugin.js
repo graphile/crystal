@@ -16,7 +16,7 @@ export default (function PgColumnsPlugin(
       fields,
       {
         extend,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
+        pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         pg2gql,
@@ -62,7 +62,7 @@ export default (function PgColumnsPlugin(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
                 const ReturnType =
-                  gqlTypeByTypeId[attr.typeId] || GraphQLString;
+                  pgGetGqlTypeByTypeId(attr.typeId) || GraphQLString;
                 addDataGenerator(parsedResolveInfoFragment => {
                   const { alias } = parsedResolveInfoFragment;
                   if (attr.type.type === "c") {
@@ -127,7 +127,7 @@ export default (function PgColumnsPlugin(
       fields,
       {
         extend,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+        pgGetGqlInputTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       },
       {
@@ -161,7 +161,7 @@ export default (function PgColumnsPlugin(
               description: attr.description,
               type: nullableIf(
                 isPgPatch || !attr.isNotNull || attr.hasDefault,
-                gqlInputTypeByTypeId[attr.typeId] || GraphQLString
+                pgGetGqlInputTypeByTypeId(attr.typeId) || GraphQLString
               ),
             });
             return memo;

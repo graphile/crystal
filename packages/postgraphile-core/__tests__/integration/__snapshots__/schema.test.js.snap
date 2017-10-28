@@ -1,7 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`prints a schema with Relay 1 style ids 1`] = `
-"# A signed eight-byte integer. The upper big integer values are greater then the
+"enum AnEnum {
+  AWAITING
+  PUBLISHED
+  REJECTED
+}
+
+# A signed eight-byte integer. The upper big integer values are greater then the
 # max value for a JavaScript number. Therefore all big integers will be output as
 # strings and not numbers.
 scalar BigInt
@@ -125,6 +131,11 @@ type CompoundTypesEdge {
 
   # The \`CompoundType\` at the end of the edge.
   node: CompoundType!
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
 }
 
 # All input for the create \`CompoundKey\` mutation.
@@ -865,6 +876,8 @@ input PersonPatch {
 type Post {
   authorId: Int
   body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
   headline: String!
   rowId: Int!
 }
@@ -2402,6 +2415,12 @@ type Add4MutationPayload {
   query: Query
 }
 
+enum AnEnum {
+  AWAITING
+  PUBLISHED
+  REJECTED
+}
+
 scalar AnInt
 
 # A range of \`AnInt\`.
@@ -2683,6 +2702,17 @@ type CompoundTypesEdge {
 
   # The \`CompoundType\` at the end of the edge.
   node: CompoundType!
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+# An input for mutations affecting \`Comptype\`
+input ComptypeInput {
+  isOptimised: Boolean
+  schedule: Datetime
 }
 
 # All input for the create \`CompoundKey\` mutation.
@@ -4545,6 +4575,8 @@ input PersonPatch {
 type Post implements Node {
   authorId: Int
   body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
   headline: String!
   headlineTrimmed(length: Int, omission: String): String
   headlineTrimmedNoDefaults(length: Int, omission: String): String
@@ -4566,6 +4598,12 @@ input PostCondition {
   # Checks for equality with the object’s \`body\` field.
   body: String
 
+  # Checks for equality with the object’s \`comptypes\` field.
+  comptypes: [ComptypeInput]
+
+  # Checks for equality with the object’s \`enums\` field.
+  enums: [AnEnum]
+
   # Checks for equality with the object’s \`headline\` field.
   headline: String
 
@@ -4577,6 +4615,8 @@ input PostCondition {
 input PostInput {
   authorId: Int
   body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
   headline: String!
   id: Int
 }
@@ -4585,6 +4625,8 @@ input PostInput {
 input PostPatch {
   authorId: Int
   body: String
+  comptypes: [ComptypeInput]
+  enums: [AnEnum]
   headline: String
   id: Int
 }
@@ -4619,6 +4661,10 @@ enum PostsOrderBy {
   AUTHOR_ID_DESC
   BODY_ASC
   BODY_DESC
+  COMPTYPES_ASC
+  COMPTYPES_DESC
+  ENUMS_ASC
+  ENUMS_DESC
   HEADLINE_ASC
   HEADLINE_DESC
   ID_ASC
@@ -6125,7 +6171,13 @@ scalar UUID
 `;
 
 exports[`prints a schema without default mutations 1`] = `
-"# A signed eight-byte integer. The upper big integer values are greater then the
+"enum AnEnum {
+  AWAITING
+  PUBLISHED
+  REJECTED
+}
+
+# A signed eight-byte integer. The upper big integer values are greater then the
 # max value for a JavaScript number. Therefore all big integers will be output as
 # strings and not numbers.
 scalar BigInt
@@ -6235,6 +6287,11 @@ type CompoundTypesEdge {
 
   # The \`CompoundType\` at the end of the edge.
   node: CompoundType!
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
 }
 
 # A location in a connection that can be used for resuming pagination.
@@ -6685,6 +6742,8 @@ input PersonCondition {
 type Post {
   authorId: Int
   body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
   headline: String!
   id: Int!
 }

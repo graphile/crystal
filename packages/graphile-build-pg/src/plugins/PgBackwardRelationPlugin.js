@@ -18,6 +18,7 @@ export default (function PgBackwardRelationPlugin(
       {
         extend,
         getTypeByName,
+        pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         getAliasFromResolveInfo,
@@ -45,7 +46,7 @@ export default (function PgBackwardRelationPlugin(
             table.name,
             table.namespace.name
           );
-          const gqlTableType = getTypeByName(tableTypeName);
+          const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
           if (!gqlTableType) {
             debug(
               `Could not determine type for table with id ${constraint.classId}`
@@ -54,8 +55,8 @@ export default (function PgBackwardRelationPlugin(
           }
           const foreignTable =
             introspectionResultsByKind.classById[constraint.foreignClassId];
-          const gqlForeignTableType = getTypeByName(
-            inflection.tableType(foreignTable.name, foreignTable.namespace.name)
+          const gqlForeignTableType = pgGetGqlTypeByTypeId(
+            foreignTable.type.id
           );
           if (!gqlForeignTableType) {
             debug(

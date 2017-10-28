@@ -15,11 +15,11 @@ export default (async function PgRowByUniqueConstraint(
       {
         extend,
         parseResolveInfo,
-        getTypeByName,
+        pgGetGqlTypeByTypeId,
+        pgGetGqlInputTypeByTypeId,
         gql2pg,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
-        pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
         graphql: { GraphQLNonNull },
       },
       { scope: { isRootQuery }, fieldWithHooks }
@@ -32,9 +32,7 @@ export default (async function PgRowByUniqueConstraint(
         introspectionResultsByKind.class
           .filter(table => !!table.namespace)
           .reduce((memo, table) => {
-            const TableType = getTypeByName(
-              inflection.tableType(table.name, table.namespace.name)
-            );
+            const TableType = pgGetGqlTypeByTypeId(table.type.id);
             const sqlFullTableName = sql.identifier(
               table.namespace.name,
               table.name
@@ -73,6 +71,12 @@ export default (async function PgRowByUniqueConstraint(
                     return {
                       type: TableType,
                       args: keys.reduce((memo, key) => {
+                        const InputType = pgGetGqlInputTypeByTypeId(key.typeId);
+                        if (!InputType) {
+                          throw new Error(
+                            `Could not find input type for key '${key.name}' on type '${TableType.name}'`
+                          );
+                        }
                         memo[
                           inflection.column(
                             key.name,
@@ -80,9 +84,7 @@ export default (async function PgRowByUniqueConstraint(
                             key.class.namespace.name
                           )
                         ] = {
-                          type: new GraphQLNonNull(
-                            gqlInputTypeByTypeId[key.typeId]
-                          ),
+                          type: new GraphQLNonNull(InputType),
                         };
                         return memo;
                       }, {}),

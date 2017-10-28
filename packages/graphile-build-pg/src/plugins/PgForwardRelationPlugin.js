@@ -15,8 +15,8 @@ export default (function PgForwardRelationPlugin(
       fields,
       {
         extend,
-        getTypeByName,
         getAliasFromResolveInfo,
+        pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
       },
@@ -51,11 +51,8 @@ export default (function PgForwardRelationPlugin(
       return extend(
         fields,
         foreignKeyConstraints.reduce((memo, constraint) => {
-          const tableTypeName = inflection.tableType(
-            table.name,
-            table.namespace.name
-          );
-          const gqlTableType = getTypeByName(tableTypeName);
+          const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
+          const tableTypeName = gqlTableType.name;
           if (!gqlTableType) {
             debug(
               `Could not determine type for table with id ${constraint.classId}`
@@ -64,11 +61,10 @@ export default (function PgForwardRelationPlugin(
           }
           const foreignTable =
             introspectionResultsByKind.classById[constraint.foreignClassId];
-          const foreignTableTypeName = inflection.tableType(
-            foreignTable.name,
-            foreignTable.namespace.name
+          const gqlForeignTableType = pgGetGqlTypeByTypeId(
+            foreignTable.type.id
           );
-          const gqlForeignTableType = getTypeByName(foreignTableTypeName);
+          const foreignTableTypeName = gqlForeignTableType.name;
           if (!gqlForeignTableType) {
             debug(
               `Could not determine type for foreign table with id ${constraint.foreignClassId}`

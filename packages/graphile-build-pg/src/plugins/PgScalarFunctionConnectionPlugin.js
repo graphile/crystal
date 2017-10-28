@@ -11,7 +11,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
         newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         getTypeByName,
-        pgGqlTypeByTypeId: gqlTypeByTypeId,
+        pgGetGqlTypeByTypeId,
         graphql: {
           GraphQLObjectType,
           GraphQLNonNull,
@@ -33,7 +33,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
             // Just use the standard table connection from PgTablesPlugin
             return;
           }
-          const NodeType = gqlTypeByTypeId[returnType.id] || GraphQLString;
+          const NodeType = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
           const EdgeType = newWithHooks(
             GraphQLObjectType,
             {

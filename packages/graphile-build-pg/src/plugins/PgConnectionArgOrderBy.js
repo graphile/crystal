@@ -52,7 +52,7 @@ export default (function PgConnectionArgOrderBy(
     "GraphQLObjectType:fields:field:args",
     (
       args,
-      { extend, getTypeByName, pgSql: sql },
+      { extend, getTypeByName, pgGetGqlTypeByTypeId, pgSql: sql },
       {
         scope: { isPgConnectionField, pgIntrospection: table },
         addArgDataGenerator,
@@ -67,10 +67,8 @@ export default (function PgConnectionArgOrderBy(
       ) {
         return args;
       }
-      const tableTypeName = inflection.tableType(
-        table.name,
-        table.namespace.name
-      );
+      const TableType = pgGetGqlTypeByTypeId(table.type.id);
+      const tableTypeName = TableType.name;
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)
       );

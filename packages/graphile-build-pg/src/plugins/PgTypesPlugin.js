@@ -19,6 +19,10 @@ import { types as pgTypes } from "pg";
 
 import GraphQLJSON from "graphql-type-json";
 
+function indent(str) {
+  return "  " + str.replace(/\n/g, "\n  ");
+}
+
 const stringType = (name, description) =>
   new GraphQLScalarType({
     name,
@@ -104,6 +108,8 @@ export default (function PgTypesPlugin(
       pgSql: sql,
     } = build;
 
+    const gqlTypeByTypeIdGenerator = {};
+    const gqlInputTypeByTypeIdGenerator = {};
     const gqlTypeByTypeId = Object.assign({}, build.pgGqlTypeByTypeId);
     const gqlInputTypeByTypeId = Object.assign(
       {},
@@ -350,19 +356,33 @@ export default (function PgTypesPlugin(
       unmap: val => sql.fragment`(${sql.value(val)})::money`,
     };
 
+    let depth = 0;
     const enforceGqlTypeByPgType = type => {
+      depth++;
+      if (depth > 50) {
+        throw new Error("Type enforcement went too deep - infinite loop?");
+      }
       try {
         return reallyEnforceGqlTypeByPgType(type);
       } catch (e) {
         const error = new Error(
-          `Error occurred when processing type '${type.namespaceName}.${type.name}' (type=${type.type}): ${e.message}`
+          `Error occurred when processing type '${type.namespaceName}.${type.name}' (type=${type.type}):\n${indent(
+            e.message
+          )}`
         );
         // $FlowFixMe
         error.originalError = e;
         throw error;
+      } finally {
+        depth--;
       }
     };
     const reallyEnforceGqlTypeByPgType = type => {
+      if (!type.id) {
+        throw new Error(
+          `Invalid argument to enforceGqlTypeByPgType - expected a full type, received '${type}'`
+        );
+      }
       // Explicit overrides
       if (!gqlTypeByTypeId[type.id]) {
         const gqlType = oidLookup[type.id];
@@ -556,11 +576,107 @@ export default (function PgTypesPlugin(
       return gqlTypeByTypeId[type.id];
     };
 
-    introspectionResultsByKind.type.forEach(enforceGqlTypeByPgType);
+    function getGqlTypeByTypeId(typeId) {
+      if (!gqlInputTypeByTypeIdGenerator[typeId]) {
+        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        return enforceGqlTypeByPgType(type);
+      }
+      if (!gqlTypeByTypeId[typeId]) {
+        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        if (!type) {
+          throw new Error(
+            `Type '${typeId}' not present in introspection results`
+          );
+        }
+        const gen = gqlTypeByTypeIdGenerator[type.id];
+        if (gen) {
+          const set = Type => {
+            gqlTypeByTypeId[type.id] = Type;
+          };
+          const result = gen(set);
+          if (result) {
+            if (
+              gqlTypeByTypeId[type.id] &&
+              gqlTypeByTypeId[type.id] !== result
+            ) {
+              throw new Error(
+                `Callback and return types differ when defining type for '${type.id}'`
+              );
+            }
+            gqlTypeByTypeId[type.id] = result;
+          }
+        }
+      }
+      return gqlTypeByTypeId[typeId];
+    }
+    function getGqlInputTypeByTypeId(typeId) {
+      if (!gqlInputTypeByTypeIdGenerator[typeId]) {
+        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        enforceGqlTypeByPgType(type);
+        return gqlInputTypeByTypeId[typeId];
+      }
+      if (!gqlInputTypeByTypeId[typeId]) {
+        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        getGqlTypeByTypeId(typeId);
+        if (!type) {
+          throw new Error(
+            `Type '${typeId}' not present in introspection results`
+          );
+        }
+        const gen = gqlInputTypeByTypeIdGenerator[type.id];
+        if (gen) {
+          const set = Type => {
+            gqlInputTypeByTypeId[type.id] = Type;
+          };
+          const result = gen(set);
+          if (result) {
+            if (
+              gqlInputTypeByTypeId[type.id] &&
+              gqlInputTypeByTypeId[type.id] !== result
+            ) {
+              throw new Error(
+                `Callback and return types differ when defining type for '${type.id}'`
+              );
+            }
+            gqlInputTypeByTypeId[type.id] = result;
+          }
+        }
+      }
+      return gqlInputTypeByTypeId[typeId];
+    }
+
+    function registerGqlTypeByTypeId(typeId, gen, yieldToExisting = false) {
+      if (gqlTypeByTypeIdGenerator[typeId]) {
+        if (yieldToExisting) {
+          return;
+        }
+        throw new Error(
+          `There's already a type generator registered for '${typeId}'`
+        );
+      }
+      gqlTypeByTypeIdGenerator[typeId] = gen;
+    }
+    function registerGqlInputTypeByTypeId(
+      typeId,
+      gen,
+      yieldToExisting = false
+    ) {
+      if (gqlInputTypeByTypeIdGenerator[typeId]) {
+        if (yieldToExisting) {
+          return;
+        }
+        throw new Error(
+          `There's already an input type generator registered for '${typeId}'`
+        );
+      }
+      gqlInputTypeByTypeIdGenerator[typeId] = gen;
+    }
 
     return build.extend(build, {
-      pgGqlTypeByTypeId: gqlTypeByTypeId,
-      pgGqlInputTypeByTypeId: gqlInputTypeByTypeId,
+      pgRegisterGqlTypeByTypeId: registerGqlTypeByTypeId,
+      pgRegisterGqlInputTypeByTypeId: registerGqlInputTypeByTypeId,
+      pgGetGqlTypeByTypeId: getGqlTypeByTypeId,
+      pgGetGqlInputTypeByTypeId: getGqlInputTypeByTypeId,
       pg2GqlMapper,
       pg2gql,
       gql2pg,

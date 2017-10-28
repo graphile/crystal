@@ -24,8 +24,8 @@ export default function makeProcField(
   proc: Proc,
   {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
-    pgGqlTypeByTypeId,
-    pgGqlInputTypeByTypeId,
+    pgGetGqlTypeByTypeId,
+    pgGetGqlInputTypeByTypeId,
     getTypeByName,
     pgSql: sql,
     parseResolveInfo,
@@ -89,7 +89,7 @@ export default function makeProcField(
   const notNullArgCount =
     proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
-    const Type = pgGqlInputTypeByTypeId[type.id] || GraphQLString;
+    const Type = pgGetGqlInputTypeByTypeId(type.id) || GraphQLString;
     if (idx >= notNullArgCount) {
       return Type;
     } else {
@@ -111,10 +111,7 @@ export default function makeProcField(
   scope.pgIntrospection = proc;
   let returnFirstValueAsValue = false;
   const TableType =
-    returnTypeTable &&
-    getTypeByName(
-      inflection.tableType(returnTypeTable.name, returnTypeTable.namespaceName)
-    );
+    returnTypeTable && pgGetGqlTypeByTypeId(returnTypeTable.type.id);
 
   const isTableLike: boolean =
     (TableType && isCompositeType(TableType)) || false;
@@ -145,7 +142,7 @@ export default function makeProcField(
       scope.pgIntrospectionTable = returnTypeTable;
     }
   } else {
-    const Type = pgGqlTypeByTypeId[returnType.id] || GraphQLString;
+    const Type = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(
         proc.name,

@@ -19,6 +19,7 @@ export default (async function PgAllRows(
         parseResolveInfo,
         extend,
         getTypeByName,
+        pgGetGqlTypeByTypeId,
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       },
@@ -33,11 +34,8 @@ export default (async function PgAllRows(
           .filter(table => table.isSelectable)
           .filter(table => table.namespace)
           .reduce((memo, table) => {
-            const tableTypeName = inflection.tableType(
-              table.name,
-              table.namespace.name
-            );
-            const TableType = getTypeByName(tableTypeName);
+            const TableType = pgGetGqlTypeByTypeId(table.type.id);
+            const tableTypeName = TableType.name;
             const ConnectionType = getTypeByName(
               inflection.connection(TableType.name)
             );
