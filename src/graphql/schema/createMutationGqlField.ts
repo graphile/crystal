@@ -6,7 +6,7 @@ import {
   GraphQLInputObjectType,
   GraphQLInputFieldConfig,
 } from 'graphql'
-import { formatName, buildObject } from '../utils'
+import { buildObject } from '../utils'
 import BuildToken from './BuildToken'
 import createMutationPayloadGqlType from './createMutationPayloadGqlType'
 
@@ -48,6 +48,7 @@ export default function createMutationGqlField <T>(
 ): GraphQLFieldConfig<mixed, MutationValue<T>> {
   if (config.outputFields && config.payloadType)
     throw new Error('Mutation `outputFields` and `payloadType` may not be defiend at the same time.')
+  const formatName = buildToken.options.formatName
 
   return {
     description: config.description,
@@ -60,7 +61,7 @@ export default function createMutationGqlField <T>(
       input: {
         description: 'The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.',
         type: new GraphQLNonNull(new GraphQLInputObjectType({
-          name: formatName.type(`${config.name}-input`),
+          name: formatName.createType(config.name),
           description: `All input for the \`${formatName.field(config.name)}\` mutation.`,
           fields: buildObject<GraphQLInputFieldConfig>(
             [

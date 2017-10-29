@@ -12,7 +12,7 @@ import {
   Kind,
 } from 'graphql'
 import { Paginator } from '../../../interface'
-import { buildObject, formatName, memoize2, scrib } from '../../utils'
+import { buildObject, memoize2, scrib } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import BuildToken from '../BuildToken'
 
@@ -137,9 +137,10 @@ export function _createConnectionGqlType <TInput, TItemValue>(
 ): GraphQLObjectType {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
   const gqlEdgeType = getEdgeGqlType(buildToken, paginator)
+  const formatName = buildToken.options.formatName
 
   return new GraphQLObjectType({
-    name: formatName.type(`${paginator.name}-connection`),
+    name: formatName.queryAllRelationType(paginator.name),
     description: `A connection to a list of ${scrib.type(gqlType)} values.`,
     fields: () => ({
       pageInfo: {
@@ -178,10 +179,11 @@ export function _createEdgeGqlType <TInput, TItemValue>(
   buildToken: BuildToken,
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLObjectType {
+  const formatName = buildToken.options.formatName
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
 
   return new GraphQLObjectType({
-    name: formatName.type(`${paginator.name}-edge`),
+    name: formatName.queryAllEdgeType(paginator.name),
     description: `A ${scrib.type(gqlType)} edge in the connection.`,
     fields: () => ({
       cursor: {
@@ -237,9 +239,10 @@ export function _createOrderByGqlEnumType <TInput, TItemValue>(
   paginator: Paginator<TInput, TItemValue>,
 ): GraphQLEnumType {
   const { gqlType } = getGqlOutputType(buildToken, paginator.itemType)
+  const formatName = buildToken.options.formatName
 
   return new GraphQLEnumType({
-    name: formatName.type(`${paginator.name}-order-by`),
+    name: formatName.queryAllOrderByType(paginator.name),
     description: `Methods to use when ordering ${scrib.type(gqlType)}.`,
     values: buildObject(
       Array.from(paginator.orderings)

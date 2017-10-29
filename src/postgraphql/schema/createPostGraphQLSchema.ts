@@ -113,12 +113,12 @@ export default async function createPostGraphQLSchema (
     // If we have a JWT Postgres type, let us override the GraphQL output type
     // with our own.
     _typeOverrides: jwtPgType && new Map<Type<mixed>, { input?: true, output?: GraphQLOutputType }>([
-      [getTypeFromPgType(pgCatalog, jwtPgType), {
+      [getTypeFromPgType(pgCatalog, jwtPgType), (buildToken: BuildToken) => ({
         // Throw an error if the user tries to use this as input.
         get input (): never { throw new Error(`Using the JWT Token type '${options.jwtPgTypeIdentifier}' as input is not yet implemented.`) },
         // Use our JWT GraphQL type as the output.
-        output: getJwtGqlType(getNonNullableType(getTypeFromPgType(pgCatalog, jwtPgType)) as PgClassType, options.jwtSecret!),
-      }],
+        output: getJwtGqlType(buildToken, getNonNullableType(getTypeFromPgType(pgCatalog, jwtPgType)) as PgClassType, options.jwtSecret!),
+      })],
     ]),
 
     _hooks: {

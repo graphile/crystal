@@ -1,5 +1,5 @@
 import { GraphQLNonNull, GraphQLFieldConfig, GraphQLArgumentConfig, getNullableType } from 'graphql'
-import { formatName, buildObject } from '../../../graphql/utils'
+import { buildObject } from '../../../graphql/utils'
 import BuildToken from '../../../graphql/schema/BuildToken'
 import createConnectionGqlField from '../../../graphql/schema/connection/createConnectionGqlField'
 import { sql } from '../../../postgres/utils'
@@ -35,6 +35,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
   pgProcedure: PgCatalogProcedure,
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
   const fixtures = createPgProcedureFixtures(buildToken, pgCatalog, pgProcedure)
+  const formatName = buildToken.options.formatName
 
   if (fixtures.return === null) {
     throw new Error('Procedures with a void return type are not allowed in GraphQL queries.')
@@ -76,6 +77,7 @@ function createPgSetProcedureQueryGqlFieldEntry (
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
   const fixtures = createPgProcedureFixtures(buildToken, pgCatalog, pgProcedure)
   const paginator = new PgProcedurePaginator(fixtures)
+  const formatName = buildToken.options.formatName
 
   // Create our GraphQL input fields users will use to input data into our
   // procedure.

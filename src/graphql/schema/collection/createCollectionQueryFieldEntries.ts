@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, CollectionKey, NullableType } from '../../../interface'
-import { formatName, idSerde, buildObject, scrib } from '../../utils'
+import { idSerde, buildObject, scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
@@ -19,13 +19,14 @@ export default function createCollectionQueryFieldEntries <TValue>(
   const entries: Array<[string, GraphQLFieldConfig<never, never>]> = []
   const primaryKey = collection.primaryKey
   const paginator = collection.paginator
+  const formatName = buildToken.options.formatName
 
   // If the collection has a paginator, let’s use it to create a connection
   // field for our collection.
   if (paginator) {
     const { gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput } = getConditionGqlType(buildToken, type)
     entries.push([
-      formatName.field(`all-${collection.name}`),
+      formatName.queryAllMethod(collection.name),
       createConnectionGqlField(buildToken, paginator, {
         // The one input arg we have for this connection is the `condition` arg.
         inputArgEntries: [
@@ -50,7 +51,7 @@ export default function createCollectionQueryFieldEntries <TValue>(
 
     // If we got a field back, add it.
     if (field)
-      entries.push([formatName.field(type.name), field])
+      entries.push([formatName.queryMethod(type.name), field])
   }
 
   // Add a field to select any value in the collection by any key. So all
@@ -59,7 +60,7 @@ export default function createCollectionQueryFieldEntries <TValue>(
     const field = createCollectionKeyField(buildToken, collectionKey)
 
     // If we got a field back, add it.
-    if (field) entries.push([formatName.field(`${type.name}-by-${collectionKey.name}`), field])
+    if (field) entries.push([formatName.queryByKeyMethod(type.name, collectionKey.name), field])
   }
 
   return entries

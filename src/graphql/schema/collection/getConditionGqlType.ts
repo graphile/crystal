@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLInputFieldConfig } from 'graphql'
 import { Condition, conditionHelpers, NullableType, ObjectType } from '../../../interface'
-import { formatName, buildObject, memoize2 } from '../../utils'
+import { buildObject, memoize2 } from '../../utils'
 import getGqlInputType from '../type/getGqlInputType'
 import BuildToken from '../BuildToken'
 
@@ -10,6 +10,7 @@ function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectTyp
   gqlType: GraphQLInputObjectType,
   fromGqlInput: (condition?: { [key: string]: mixed }) => Condition,
 } {
+  const formatName = buildToken.options.formatName
   // Creates the field entries for our paginator condition type.
   const gqlConditionFieldEntries =
     Array.from(type.fields).map(
@@ -34,7 +35,7 @@ function createConditionGqlType <TValue>(buildToken: BuildToken, type: ObjectTyp
 
   // Creates our GraphQL condition type.
   const gqlType = new GraphQLInputObjectType({
-    name: formatName.type(`${type.name}-condition`),
+    name: formatName.queryAllConditionType(type.name),
     description: `A condition to be used against \`${formatName.type(type.name)}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
     fields: buildObject<GraphQLInputFieldConfig>(gqlConditionFieldEntries),
   })

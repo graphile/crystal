@@ -228,7 +228,13 @@ export default function getGqlOutputType <TValue>(buildToken: BuildToken, type: 
   // before we call our actual type function. We will automatically define the
   // coercer as an identity function.
   if (buildToken._typeOverrides) {
-    const typeOverride = buildToken._typeOverrides.get(type)
+    const typeOverrideRaw = buildToken._typeOverrides.get(type)
+    let typeOverride
+    if (typeof typeOverrideRaw === 'function') {
+      typeOverride = typeOverrideRaw(buildToken)
+    } else {
+      typeOverride = typeOverrideRaw
+    }
     if (typeOverride && typeOverride.output)
       return { gqlType: typeOverride.output, intoGqlOutput: value => value }
   }

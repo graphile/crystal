@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Collection, Relation, NullableType } from '../../../interface'
-import { formatName, scrib } from '../../utils'
+import { scrib } from '../../utils'
 import BuildToken from '../BuildToken'
 import getGqlOutputType from '../type/getGqlOutputType'
 
@@ -17,6 +17,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
     getFieldName?: (relation: Relation<TValue, mixed, mixed>, collection: Collection<mixed>) => string,
   },
 ): Array<[string, GraphQLFieldConfig<TSource, mixed>]> {
+  const formatName = buildToken.options.formatName
   const { inventory } = buildToken
 
   // Some tests may choose to not include the inventory. If this is the case,
@@ -43,7 +44,7 @@ export default function createCollectionRelationTailGqlFieldEntries <TSource, TV
         return [
           options.getFieldName
             ? options.getFieldName(relation, collection)
-            : formatName.field(`${headCollection.type.name}-by-${relation.name}`),
+            : formatName.queryRelationFieldByKeyMethod(headCollection.type.name, relation.name),
           {
             description: `Reads a single ${scrib.type(headCollectionGqlType)} that is related to this ${scrib.type(collectionGqlType)}.`,
             type: headCollectionGqlType,

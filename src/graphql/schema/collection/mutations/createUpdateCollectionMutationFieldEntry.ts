@@ -7,7 +7,7 @@ import {
   GraphQLFieldConfig,
 } from 'graphql'
 import { Collection, NullableType } from '../../../../interface'
-import { formatName, buildObject, idSerde, memoize2 } from '../../../utils'
+import { buildObject, idSerde, memoize2 } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGqlInputType from '../../type/getGqlInputType'
 import getGqlOutputType from '../../type/getGqlOutputType'
@@ -31,12 +31,13 @@ export default function createUpdateCollectionMutationFieldEntry <TValue>(
   if (!primaryKey || !primaryKey.update)
     return
 
+  const formatName = buildToken.options.formatName
   const { options, inventory } = buildToken
-  const name = `update-${collection.type.name}`
-  const patchFieldName = formatName.field(`${collection.type.name}-patch`)
+  const name = formatName.updateMethod(collection.type.name)
+  const patchFieldName = formatName.updatePatchField(collection.type.name)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
 
-  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
+  return [name, createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Updates a single \`${formatName.type(collection.type.name)}\` using its globally unique id and a patch.`,
     inputFields: [
@@ -87,6 +88,7 @@ function createCollectionPatchType <TValue>(buildToken: BuildToken, collection: 
 } {
   const { type } = collection
 
+  const formatName = buildToken.options.formatName
   const fields =
     Array.from(type.fields).map(([fieldName, field]) => {
       const { gqlType, fromGqlInput } = getGqlInputType(buildToken, new NullableType(field.type))
@@ -103,7 +105,7 @@ function createCollectionPatchType <TValue>(buildToken: BuildToken, collection: 
 
   return {
     gqlType: new GraphQLInputObjectType({
-      name: formatName.type(`${type.name}-patch`),
+      name: formatName.updatePatchType(type.name),
       description: `Represents an update to a \`${formatName.type(type.name)}\`. Fields that are set will be updated.`,
       fields: () => buildObject<GraphQLInputFieldConfig>(fields),
     }),
@@ -134,9 +136,10 @@ function createUpdateCollectionPayloadGqlType <TValue>(
   buildToken: BuildToken,
   collection: Collection<TValue>,
 ): GraphQLObjectType {
+  const formatName = buildToken.options.formatName
   const { gqlType, intoGqlOutput } = getGqlOutputType(buildToken, new NullableType(collection.type))
   return createMutationPayloadGqlType<TValue>(buildToken, {
-    name: `update-${collection.type.name}`,
+    name: formatName.updateType(collection.type.name),
     outputFields: [
       // Add the updated value as an output field so the user can see the
       // object they just updated.

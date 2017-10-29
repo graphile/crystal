@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Collection, NullableType } from '../../../../interface'
-import { formatName, scrib } from '../../../utils'
+import { scrib } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import getGqlInputType from '../../type/getGqlInputType'
 import getGqlOutputType from '../../type/getGqlOutputType'
@@ -20,12 +20,13 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
   if (!collection.create)
     return
 
-  const name = `create-${collection.type.name}`
+  const formatName = buildToken.options.formatName
+  const name = formatName.createMethod(collection.type.name)
   const inputFieldName = formatName.field(collection.type.name)
   const { gqlType: inputGqlType, fromGqlInput: inputFromGqlInput } = getGqlInputType(buildToken, collection.type)
   const { gqlType: collectionGqlType } = getGqlOutputType(buildToken, new NullableType(collection.type))
 
-  return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {
+  return [name, createMutationGqlField<TValue>(buildToken, {
     name,
     description: `Creates a single ${scrib.type(collectionGqlType)}.`,
 
@@ -55,7 +56,7 @@ export default function createCreateCollectionMutationFieldEntry <TValue>(
       // Also Relay 1 requires us to return the edge.
       //
       // We may deprecate this in the future if Relay 2 doesn’t need it.
-      collection.paginator && [formatName.field(`${collection.type.name}-edge`), {
+      collection.paginator && [formatName.queryAllEdgeFieldName(collection.type.name), {
         description: `An edge for our ${scrib.type(collectionGqlType)}. May be used by Relay 1.`,
         type: getEdgeGqlType(buildToken, collection.paginator),
         args: { orderBy: createOrderByGqlArg(buildToken, collection.paginator) },

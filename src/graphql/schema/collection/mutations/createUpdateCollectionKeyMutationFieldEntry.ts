@@ -1,6 +1,5 @@
 import { GraphQLNonNull, GraphQLFieldConfig } from 'graphql'
 import { CollectionKey } from '../../../../interface'
-import { formatName } from '../../../utils'
 import BuildToken from '../../BuildToken'
 import createMutationGqlField from '../../createMutationGqlField'
 import createCollectionKeyInputHelpers from '../createCollectionKeyInputHelpers'
@@ -19,10 +18,11 @@ export default function createUpdateCollectionKeyMutationFieldEntry <TValue, TKe
   if (!collectionKey.update)
     return
 
+  const formatName = buildToken.options.formatName
   const { collection } = collectionKey
-  const name = `update-${collection.type.name}-by-${collectionKey.name}`
+  const name = formatName.updateByKeyMethod(collection.type.name, collectionKey.name)
   const inputHelpers = createCollectionKeyInputHelpers(buildToken, collectionKey)
-  const patchFieldName = formatName.field(`${collection.type.name}-patch`)
+  const patchFieldName = formatName.updatePatchField(collection.type.name)
   const { gqlType: patchGqlType, fromGqlInput: patchFromGqlInput } = getCollectionPatchType(buildToken, collection)
 
   return [formatName.field(name), createMutationGqlField<TValue>(buildToken, {

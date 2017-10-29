@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLFieldConfig, GraphQLNonNull, GraphQLID } from 'graphql'
 import { Collection, Condition, ObjectType, Relation, conditionHelpers } from '../../../interface'
-import { formatName, buildObject, idSerde } from '../../utils'
+import { buildObject, idSerde } from '../../utils'
 import getGqlOutputType from '../type/getGqlOutputType'
 import getNodeInterfaceType from '../node/getNodeInterfaceType'
 import createConnectionGqlField from '../connection/createConnectionGqlField'
@@ -19,6 +19,7 @@ export default function createCollectionGqlType<TValue> (
 ): GraphQLObjectType {
   const { options, inventory } = buildToken
   const { type, primaryKey } = collection
+  const formatName = buildToken.options.formatName
   const collectionTypeName = formatName.type(type.name)
 
   return new GraphQLObjectType({
@@ -82,7 +83,7 @@ export default function createCollectionGqlType<TValue> (
 
           const { gqlType: gqlConditionType, fromGqlInput: conditionFromGqlInput } = getConditionGqlType(buildToken, tailCollection.type)
           return [
-            formatName.field(`${tailCollection.name}-by-${relation.name}`),
+            formatName.queryRelationFieldByKeyMethod(tailCollection.name, relation.name),
             createConnectionGqlField<TValue, Condition, TTailValue>(buildToken, tailPaginator, {
               // The one input arg we have for this connection is the `condition` arg.
               inputArgEntries: [

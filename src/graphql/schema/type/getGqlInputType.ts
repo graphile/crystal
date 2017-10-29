@@ -204,7 +204,13 @@ export default function getGqlInputType <TValue>(buildToken: BuildToken, type: T
   // If we have an input type override for this type, throw an error because
   // that is not yet implemented!
   if (buildToken._typeOverrides) {
-    const typeOverride = buildToken._typeOverrides.get(type)
+    const typeOverrideRaw = buildToken._typeOverrides.get(type)
+    let typeOverride
+    if (typeof typeOverrideRaw === 'function') {
+      typeOverride = typeOverrideRaw(buildToken)
+    } else {
+      typeOverride = typeOverrideRaw
+    }
     if (typeOverride && typeOverride.input)
       throw new Error(`Unimplemented, cannot create an input type for '${getNamedType(type).name}'.`)
   }
