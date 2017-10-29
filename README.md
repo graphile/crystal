@@ -15,6 +15,10 @@ PostGraphQL holds a fundamental belief that a *well designed database schema sho
 
 For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read the [evaluating PostGraphQL for your project](#evaluating-postgraphql-for-your-project) section.
 
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/GvWU8mAin34aDjbdv9ze278R/postgraphql/postgraphql'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/GvWU8mAin34aDjbdv9ze278R/postgraphql/postgraphql.svg' />
+</a>
+
 ## Introduction
 Watch a talk by the author at GraphQL summit for a fast 7 minute introduction to using the PostGraphQL project.
 
