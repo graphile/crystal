@@ -66,7 +66,7 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole } = options
+  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole, jwtSecret, jwtAudiences, jwtRole, additionalGraphQLContextFromRequest } = options
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
     throw new Error('pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).')
@@ -400,22 +400,26 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       const jwtToken = options.jwtSecret ? getJwtToken(req) : null
 
+      const additionalContext = typeof additionalGraphQLContextFromRequest === 'function'
+        ? await additionalGraphQLContextFromRequest(req)
+        : {}
       result = await withPostGraphQLContext({
         pgPool,
         jwtToken,
-        jwtSecret: options.jwtSecret,
-        jwtAudiences: options.jwtAudiences,
-        jwtRole: options.jwtRole,
+        jwtSecret,
+        jwtAudiences,
+        jwtRole,
         pgDefaultRole,
         pgSettings:
           typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
         pgRole = context.pgRole
+        const graphqlContext = Object.assign({}, additionalContext, context)
         return executeGraphql(
           gqlSchema,
           queryDocumentAst,
           null,
-          context,
+          graphqlContext,
           params.variables,
           params.operationName,
         )

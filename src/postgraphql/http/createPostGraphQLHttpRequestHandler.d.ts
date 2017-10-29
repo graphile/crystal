@@ -86,4 +86,8 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // each transaction via set_config. They can then be used via current_setting
   // in postgres functions.
   pgSettings?: { [key: string]: mixed },
+
+  // Provide an async function to this to add custom properties to the context
+  // object being provided to each graphQL resolver.
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage) => Promise<{}>,
 }): HttpRequestHandler
