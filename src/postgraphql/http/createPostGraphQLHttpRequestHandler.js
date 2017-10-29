@@ -66,7 +66,14 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool, pgSettings } = options
+  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole } = options
+
+  if (pgDefaultRole && typeof pgSettings === 'function') {
+    throw new Error('pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).')
+  }
+  if (pgDefaultRole && pgSettings && typeof pgSettings === 'object' && Object.keys(pgSettings).map(s => s.toLowerCase()).indexOf('role') >= 0) {
+    throw new Error('pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.')
+  }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
@@ -399,7 +406,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         jwtSecret: options.jwtSecret,
         jwtAudiences: options.jwtAudiences,
         jwtRole: options.jwtRole,
-        pgDefaultRole: options.pgDefaultRole,
+        pgDefaultRole,
         pgSettings:
           typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
