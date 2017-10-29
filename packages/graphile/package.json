@@ -2,7 +2,9 @@
   "name": "graphile",
   "version": "0.1.0-alpha.33",
   "scripts": {
-    "watch": "sleep 1000000000"
+    "watch": "sleep 1000000000",
+    "test": "true",
+    "prepublish": "true"
   },
   "description": "You probably want postgraphile or graphile-build",
   "main": "index.js",
