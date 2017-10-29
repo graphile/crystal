@@ -1,0 +1,21 @@
+{
+  "name": "graphile",
+  "version": "0.0.0",
+  "scripts": {
+    "watch": "sleep 1000000000"
+  },
+  "description": "You probably want postgraphile or graphile-build",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "homepage": "https://www.graphile.org",
+  "files": [
+    "index.js"
+  ]
+}
