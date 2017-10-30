@@ -9,10 +9,15 @@ const http = require('http')
 const request = require('supertest')
 const connect = require('connect')
 const express = require('express')
-const Koa = require('koa') // tslint:disable-line variable-name
 const sendFile = require('send')
+const event = require('events')
 
-sendFile.mockImplementation(() => ({ pipe: jest.fn(res => res.end()) }))
+sendFile.mockImplementation(() => {
+  const stream = new event.EventEmitter()
+  stream.pipe = jest.fn(res => process.nextTick(() => res.end()))
+  process.nextTick(() => stream.emit('end'))
+  return stream
+})
 
 const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -33,6 +38,16 @@ const gqlSchema = new GraphQLSchema({
         type: GraphQLString,
         resolve: (source, args, context) =>
           context[$$pgClient].query('EXECUTE'),
+      },
+      testError: {
+        type: GraphQLString,
+        resolve: (source, args, context) => {
+          const err = new Error('test message')
+          err.detail = 'test detail'
+          err.hint = 'test hint'
+          err.code = '12345'
+          throw err
+        },
       },
     },
   }),
@@ -76,18 +91,32 @@ const serverCreators = new Map([
     app.use(handler)
     return http.createServer(app)
   }],
-  ['koa', handler => {
+])
+
+// Parse out the Node.js version number. The version will be in a semantic
+// versioning format with maybe a `v` in front. We remove that `v`, split by
+// `.`, get the first item in the split array, and parse that as an integer to
+// get the Node.js major version number.
+const nodeMajorVersion = parseInt(process.version.replace(/^v/, '').split('.')[0], 10)
+
+// Only test Koa in version of Node.js greater than 4 because the Koa source
+// code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
+// not meant to be used in Node.js 4 anyway so this is fine.
+if (nodeMajorVersion > 4) {
+  const Koa = require('koa') // tslint:disable-line variable-name
+  serverCreators.set('koa', handler => {
     const app = new Koa()
     app.use(handler)
     return http.createServer(app.callback())
-  }],
-])
+  })
+}
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = options =>
     createServerFromHandler(createPostGraphQLHttpRequestHandler(Object.assign({}, defaultOptions, options)))
 
   describe(name, () => {
+
     test('will 404 for route other than that specified', async () => {
       const server1 = createServer()
       const server2 = createServer({ graphqlRoute: '/x' })
@@ -371,6 +400,47 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
     })
 
+    test('will report a simple error in the default case', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer()
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { testError: null }, errors: [ {
+          message: 'test message',
+          locations: [{ line: 1, column: 2 }],
+          path: ['testError'],
+        } ] })
+      )
+    })
+
+    test('will report an extended error when extendedErrors is enabled', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({ extendedErrors: ['hint', 'detail', 'errcode'] })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { testError: null }, errors: [ {
+          message: 'test message',
+          locations: [{ line: 1, column: 2 }],
+          path: ['testError'],
+          hint: 'test hint',
+          detail: 'test detail',
+          errcode: '12345',
+        } ] })
+      )
+    })
+
     test('will serve a favicon when graphiql is enabled', async () => {
       const server1 = createServer({ graphiql: true })
       const server2 = createServer({ graphiql: true, route: '/graphql' })
@@ -533,6 +603,80 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       finally {
         console.error = origConsoleError
       }
+    })
+
+    test('will correctly hand over pgSettings to the withPostGraphQLContext call', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        pgSettings: {
+          'foo.string': 'test1',
+          'foo.number': 42,
+          'foo.boolean': true,
+        },
+      })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } })
+      )
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [
+          {
+            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            values: [
+              'foo.string', 'test1',
+              'foo.number', '42',
+              'foo.boolean', 'true',
+            ],
+          },
+        ],
+        ['commit'],
+      ])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+    })
+
+    test('will correctly hand over pgSettings function to the withPostGraphQLContext call', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        pgSettings: (req) => ({
+          'foo.string': 'test1',
+          'foo.number': 42,
+          'foo.boolean': true,
+        }),
+      })
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } })
+      )
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [
+          {
+            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            values: [
+              'foo.string', 'test1',
+              'foo.number', '42',
+              'foo.boolean', 'true',
+            ],
+          },
+        ],
+        ['commit'],
+      ])
+      expect(pgClient.release.mock.calls).toEqual([[]])
     })
   })
 }

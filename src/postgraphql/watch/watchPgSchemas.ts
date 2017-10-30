@@ -2,7 +2,7 @@ import { resolve as resolvePath } from 'path'
 import { readFile } from 'fs'
 import chalk = require('chalk')
 import { Pool } from 'pg'
-import minify = require('pg-minify')
+import * as minify from 'pg-minify'
 
 /**
  * This query creates some fixtures required to watch a Postgres database.
@@ -45,6 +45,7 @@ export default async function watchPgSchemas ({ pgPool, pgSchemas, onChange }: {
     console.warn(chalk.yellow('This is likely because your Postgres user is not a superuser. If the'))
     console.warn(chalk.yellow('fixtures already exist, the watch functionality may still work.'))
     // tslint:enable no-console
+    await pgClient.query('rollback')
   }
 
   // Listen to the `postgraphql_watch` channel. Any and all updates will come

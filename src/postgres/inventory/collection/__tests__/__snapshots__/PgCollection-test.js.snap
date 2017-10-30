@@ -1,0 +1,1 @@
+exports[`test create will only include relevant columns 1`] = `"with __local_0__ as ( insert into \"c\".\"person\" (\"name\", \"email\") values ($1, $2), ($3, $4), ($5, $6) returning * ) select row_to_json(__local_0__) as object from __local_0__"`;

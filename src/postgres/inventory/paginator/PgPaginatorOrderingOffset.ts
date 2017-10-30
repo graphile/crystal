@@ -121,17 +121,23 @@ implements Paginator.Ordering<TInput, TItemValue, OffsetCursor> {
     }
 
     const aliasIdentifier = Symbol()
+    const cteIdentifier = Symbol()
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
     // Construct our Sql query that will actually do the selecting.
     const query = sql.compile(sql.query`
-      select to_json(${sql.identifier(aliasIdentifier)}) as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
-      where ${conditionSql}
-      ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
-      offset ${sql.value(offset)}
-      limit ${limit != null ? sql.value(limit) : sql.query`all`}
+      -- The query is wrapped with a CTE on which the to_json function is
+      -- applied. This ensures the to_json function is only called on the final
+      -- results of the query.
+      with ${sql.identifier(cteIdentifier)} as (
+        select ${sql.identifier(aliasIdentifier)} as value
+        from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+        where ${conditionSql}
+        ${this.orderBy ? sql.query`order by ${this.orderBy}` : sql.query``}
+        offset ${sql.value(offset)}
+        limit ${limit != null ? sql.value(limit) : sql.query`all`}
+      ) select to_json(${sql.identifier(cteIdentifier)}.value) as value from ${sql.identifier(cteIdentifier)};
     `)
 
     // Send our query to Postgres.

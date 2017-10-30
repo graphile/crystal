@@ -4,7 +4,7 @@ import { resolve as resolvePath } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
 import chalk = require('chalk')
-import { Command } from 'commander'
+import program = require('commander')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from './postgraphql'
 
@@ -14,7 +14,6 @@ import postgraphql from './postgraphql'
 const DEMO_PG_URL = null
 
 const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString())
-const program = new Command('postgraphql')
 
 program
   .version(manifest.version)
@@ -31,15 +30,20 @@ program
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-e, --secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('-t, --token <identifier>', 'the Postgres identifier for a composite type that will be used to create tokens')
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
+  .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
+  .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
+  .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('--jwt-role <string>', 'a comma separated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
   .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
+  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Possible fields: \'hint\', \'detail\', \'errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -66,7 +70,10 @@ const {
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
-  secret: jwtSecret,
+  secret: deprecatedJwtSecret,
+  jwtSecret,
+  jwtAudiences = ['postgraphql'],
+  jwtRole = ['role'],
   token: jwtPgTypeIdentifier,
   cors: enableCors = false,
   classicIds = false,
@@ -75,6 +82,8 @@ const {
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
+  extendedErrors = [],
+  bodySizeLimit,
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -108,15 +117,19 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
-  jwtSecret,
   jwtPgTypeIdentifier,
+  jwtSecret: jwtSecret || deprecatedJwtSecret,
+  jwtAudiences,
+  jwtRole,
   pgDefaultRole,
   watchPg,
   showErrorStack,
+  extendedErrors,
   disableQueryLog: false,
   enableCors,
   exportJsonSchemaPath,
   exportGqlSchemaPath,
+  bodySizeLimit,
 }))
 
 // Start our server by listening to a specific port and host name. Also log

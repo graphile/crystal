@@ -406,7 +406,7 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = NAME_ASC
@@ -449,7 +449,7 @@ type Query implements Node {
     email: String!
   ): Person
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   allPosts(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = HEADLINE_ASC

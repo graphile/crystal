@@ -138,3 +138,8 @@ test('will create a new PostGraphQL schema on when `watchPgSchemas` emits a chan
   ])
   console.log = origLog
 })
+
+test('will not error if jwtSecret is provided without jwtPgTypeIdentifier', async () => {
+  const pgPool = new Pool()
+  expect(() => postgraphql(pgPool, [], { jwtSecret: 'test' })).not.toThrow()
+})

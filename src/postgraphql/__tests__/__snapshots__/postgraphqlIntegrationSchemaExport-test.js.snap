@@ -183,7 +183,7 @@ type CompoundKey implements Node {
   # Reads a single \`Person\` that is related to this \`CompoundKey\`.
   personByPersonId1: Person
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByCompoundKey1AndCompoundKey2(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -1226,6 +1226,10 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add4MutationInput!
   ): Add4MutationPayload
+  returnVoidMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: ReturnVoidMutationInput!
+  ): ReturnVoidMutationPayload
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
@@ -1636,8 +1640,9 @@ type Person implements Node {
   email: Email!
   createdAt: Datetime
   firstName: String
+  firstPost: Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   friends(
     # The method to use when ordering \`Person\`.
     orderBy: PersonFriendsOrderBy = NATURAL
@@ -1659,7 +1664,7 @@ type Person implements Node {
     offset: Int
   ): PersonFriendsConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   postsByAuthorId(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
@@ -1684,7 +1689,7 @@ type Person implements Node {
     condition: PostCondition
   ): PostsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId2(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -1709,7 +1714,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -1734,7 +1739,7 @@ type Person implements Node {
     condition: CompoundKeyCondition
   ): CompoundKeysConnection
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   foreignKeysByPersonId(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -1932,7 +1937,7 @@ type Query implements Node {
   add4Query(arg0: Int, b: Int): Int
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
-  # Reads and enables paginatation through a set of \`Int\`.
+  # Reads and enables pagination through a set of \`Int\`.
   intSetQuery(
     # The method to use when ordering \`Int\`.
     orderBy: IntSetQueryOrderBy = NATURAL
@@ -1960,7 +1965,7 @@ type Query implements Node {
   noArgsQuery: Int
   tableQuery(id: Int): Post
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   tableSetQuery(
     # The method to use when ordering \`Person\`.
     orderBy: TableSetQueryOrderBy = NATURAL
@@ -1983,7 +1988,7 @@ type Query implements Node {
   ): TableSetQueryConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 
-  # Reads and enables paginatation through a set of \`ForeignKey\`.
+  # Reads and enables pagination through a set of \`ForeignKey\`.
   allForeignKeys(
     # The method to use when ordering \`ForeignKey\`.
     orderBy: ForeignKeysOrderBy = NATURAL
@@ -2008,7 +2013,7 @@ type Query implements Node {
     condition: ForeignKeyCondition
   ): ForeignKeysConnection
 
-  # Reads and enables paginatation through a set of \`NonUpdatableView\`.
+  # Reads and enables pagination through a set of \`NonUpdatableView\`.
   allNonUpdatableViews(
     # The method to use when ordering \`NonUpdatableView\`.
     orderBy: NonUpdatableViewsOrderBy = NATURAL
@@ -2033,7 +2038,7 @@ type Query implements Node {
     condition: NonUpdatableViewCondition
   ): NonUpdatableViewsConnection
 
-  # Reads and enables paginatation through a set of \`Post\`.
+  # Reads and enables pagination through a set of \`Post\`.
   allPosts(
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
@@ -2065,7 +2070,7 @@ type Query implements Node {
   ): Post
   postById(id: Int!): Post
 
-  # Reads and enables paginatation through a set of \`SimilarTable1\`.
+  # Reads and enables pagination through a set of \`SimilarTable1\`.
   allSimilarTable1S(
     # The method to use when ordering \`SimilarTable1\`.
     orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
@@ -2097,7 +2102,7 @@ type Query implements Node {
   ): SimilarTable1
   similarTable1ById(id: Int!): SimilarTable1
 
-  # Reads and enables paginatation through a set of \`SimilarTable2\`.
+  # Reads and enables pagination through a set of \`SimilarTable2\`.
   allSimilarTable2S(
     # The method to use when ordering \`SimilarTable2\`.
     orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
@@ -2129,7 +2134,7 @@ type Query implements Node {
   ): SimilarTable2
   similarTable2ById(id: Int!): SimilarTable2
 
-  # Reads and enables paginatation through a set of \`Type\`.
+  # Reads and enables pagination through a set of \`Type\`.
   allTypes(
     # The method to use when ordering \`Type\`.
     orderBy: TypesOrderBy = PRIMARY_KEY_ASC
@@ -2161,7 +2166,7 @@ type Query implements Node {
   ): Type
   typeById(id: Int!): Type
 
-  # Reads and enables paginatation through a set of \`UpdatableView\`.
+  # Reads and enables pagination through a set of \`UpdatableView\`.
   allUpdatableViews(
     # The method to use when ordering \`UpdatableView\`.
     orderBy: UpdatableViewsOrderBy = NATURAL
@@ -2186,7 +2191,7 @@ type Query implements Node {
     condition: UpdatableViewCondition
   ): UpdatableViewsConnection
 
-  # Reads and enables paginatation through a set of \`CompoundKey\`.
+  # Reads and enables pagination through a set of \`CompoundKey\`.
   allCompoundKeys(
     # The method to use when ordering \`CompoundKey\`.
     orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
@@ -2218,7 +2223,7 @@ type Query implements Node {
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
 
-  # Reads and enables paginatation through a set of \`EdgeCase\`.
+  # Reads and enables pagination through a set of \`EdgeCase\`.
   allEdgeCases(
     # The method to use when ordering \`EdgeCase\`.
     orderBy: EdgeCasesOrderBy = NATURAL
@@ -2243,7 +2248,7 @@ type Query implements Node {
     condition: EdgeCaseCondition
   ): EdgeCasesConnection
 
-  # Reads and enables paginatation through a set of \`Person\`.
+  # Reads and enables pagination through a set of \`Person\`.
   allPeople(
     # The method to use when ordering \`Person\`.
     orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
@@ -2282,6 +2287,23 @@ type Query implements Node {
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
+}
+
+# All input for the \`returnVoidMutation\` mutation.
+input ReturnVoidMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`returnVoidMutation\` mutation.
+type ReturnVoidMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
 }
 
 type SimilarTable1 implements Node {
@@ -3324,7 +3346,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"intSetQuery\",
-              \"description\": \"Reads and enables paginatation through a set of \`Int\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Int\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -3485,7 +3507,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"tableSetQuery\",
-              \"description\": \"Reads and enables paginatation through a set of \`Person\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Person\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -3659,7 +3681,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allForeignKeys\",
-              \"description\": \"Reads and enables paginatation through a set of \`ForeignKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`ForeignKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -3742,7 +3764,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allNonUpdatableViews\",
-              \"description\": \"Reads and enables paginatation through a set of \`NonUpdatableView\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`NonUpdatableView\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -3825,7 +3847,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allPosts\",
-              \"description\": \"Reads and enables paginatation through a set of \`Post\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Post\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -3962,7 +3984,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allSimilarTable1S\",
-              \"description\": \"Reads and enables paginatation through a set of \`SimilarTable1\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`SimilarTable1\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4099,7 +4121,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allSimilarTable2S\",
-              \"description\": \"Reads and enables paginatation through a set of \`SimilarTable2\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`SimilarTable2\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4236,7 +4258,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allTypes\",
-              \"description\": \"Reads and enables paginatation through a set of \`Type\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Type\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4373,7 +4395,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allUpdatableViews\",
-              \"description\": \"Reads and enables paginatation through a set of \`UpdatableView\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`UpdatableView\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4456,7 +4478,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allCompoundKeys\",
-              \"description\": \"Reads and enables paginatation through a set of \`CompoundKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`CompoundKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4607,7 +4629,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allEdgeCases\",
-              \"description\": \"Reads and enables paginatation through a set of \`EdgeCase\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`EdgeCase\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -4690,7 +4712,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"allPeople\",
-              \"description\": \"Reads and enables paginatation through a set of \`Person\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Person\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -5632,8 +5654,20 @@ exports[`test exports a schema as JSON 1`] = `
               \"deprecationReason\": null
             },
             {
+              \"name\": \"firstPost\",
+              \"description\": null,
+              \"args\": [],
+              \"type\": {
+                \"kind\": \"OBJECT\",
+                \"name\": \"Post\",
+                \"ofType\": null
+              },
+              \"isDeprecated\": false,
+              \"deprecationReason\": null
+            },
+            {
               \"name\": \"friends\",
-              \"description\": \"Reads and enables paginatation through a set of \`Person\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Person\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -5706,7 +5740,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"postsByAuthorId\",
-              \"description\": \"Reads and enables paginatation through a set of \`Post\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`Post\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -5789,7 +5823,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"compoundKeysByPersonId2\",
-              \"description\": \"Reads and enables paginatation through a set of \`CompoundKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`CompoundKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -5872,7 +5906,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"compoundKeysByPersonId1\",
-              \"description\": \"Reads and enables paginatation through a set of \`CompoundKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`CompoundKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -5955,7 +5989,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"foreignKeysByPersonId\",
-              \"description\": \"Reads and enables paginatation through a set of \`ForeignKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`ForeignKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -6744,7 +6778,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"foreignKeysByCompoundKey1AndCompoundKey2\",
-              \"description\": \"Reads and enables paginatation through a set of \`ForeignKey\`.\",
+              \"description\": \"Reads and enables pagination through a set of \`ForeignKey\`.\",
               \"args\": [
                 {
                   \"name\": \"orderBy\",
@@ -10951,6 +10985,33 @@ exports[`test exports a schema as JSON 1`] = `
               \"deprecationReason\": null
             },
             {
+              \"name\": \"returnVoidMutation\",
+              \"description\": null,
+              \"args\": [
+                {
+                  \"name\": \"input\",
+                  \"description\": \"The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.\",
+                  \"type\": {
+                    \"kind\": \"NON_NULL\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"INPUT_OBJECT\",
+                      \"name\": \"ReturnVoidMutationInput\",
+                      \"ofType\": null
+                    }
+                  },
+                  \"defaultValue\": null
+                }
+              ],
+              \"type\": {
+                \"kind\": \"OBJECT\",
+                \"name\": \"ReturnVoidMutationPayload\",
+                \"ofType\": null
+              },
+              \"isDeprecated\": false,
+              \"deprecationReason\": null
+            },
+            {
               \"name\": \"authenticate\",
               \"description\": null,
               \"args\": [
@@ -12597,6 +12658,62 @@ exports[`test exports a schema as JSON 1`] = `
               \"type\": {
                 \"kind\": \"SCALAR\",
                 \"name\": \"Int\",
+                \"ofType\": null
+              },
+              \"isDeprecated\": false,
+              \"deprecationReason\": null
+            },
+            {
+              \"name\": \"query\",
+              \"description\": \"Our root query field type. Allows us to run any query from our mutation payload.\",
+              \"args\": [],
+              \"type\": {
+                \"kind\": \"OBJECT\",
+                \"name\": \"Query\",
+                \"ofType\": null
+              },
+              \"isDeprecated\": false,
+              \"deprecationReason\": null
+            }
+          ],
+          \"inputFields\": null,
+          \"interfaces\": [],
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
+          \"kind\": \"INPUT_OBJECT\",
+          \"name\": \"ReturnVoidMutationInput\",
+          \"description\": \"All input for the \`returnVoidMutation\` mutation.\",
+          \"fields\": null,
+          \"inputFields\": [
+            {
+              \"name\": \"clientMutationId\",
+              \"description\": \"An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.\",
+              \"type\": {
+                \"kind\": \"SCALAR\",
+                \"name\": \"String\",
+                \"ofType\": null
+              },
+              \"defaultValue\": null
+            }
+          ],
+          \"interfaces\": null,
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
+          \"kind\": \"OBJECT\",
+          \"name\": \"ReturnVoidMutationPayload\",
+          \"description\": \"The output of our \`returnVoidMutation\` mutation.\",
+          \"fields\": [
+            {
+              \"name\": \"clientMutationId\",
+              \"description\": \"The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.\",
+              \"args\": [],
+              \"type\": {
+                \"kind\": \"SCALAR\",
+                \"name\": \"String\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,

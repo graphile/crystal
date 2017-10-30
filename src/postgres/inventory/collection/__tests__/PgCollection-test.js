@@ -1,8 +1,9 @@
 import { Client } from 'pg'
 import { NullableType } from '../../../../interface'
-import withPgClient from '../../../__tests__/fixtures/withPgClient'
-import pgPool from '../../../__tests__/fixtures/pgPool'
-import kitchenSinkSchemaSql from '../../../__tests__/fixtures/kitchenSinkSchemaSql'
+import createTestInParallel from '../../../../__tests__/utils/createTestInParallel'
+import withPgClient from '../../../../__tests__/utils/withPgClient'
+import pgPool from '../../../../__tests__/utils/pgPool'
+import kitchenSinkSchemaSql from '../../../../__tests__/utils/kitchenSinkSchemaSql'
 import { mapToObject } from '../../../utils'
 import { PgCatalog, introspectDatabase } from '../../../introspection'
 import { $$pgClient } from '../../pgClientFromContext'
@@ -33,139 +34,163 @@ beforeAll(withPgClient(async client => {
   collection3 = new PgCollection(options, pgCatalog, pgCatalog.getClassByName('c', 'compound_key'))
 }))
 
-test('name will be the plural form of the class name', () => {
-  expect(collection1.name).toBe('people')
-  expect(collection2.name).toBe('updatable_views')
-})
+{
+  const testInParallel = createTestInParallel()
 
-test('type will have the correct null and non null fields', () => {
-  expect(Array.from(collection1.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
-    .toEqual([false, false, true, false, true])
-  expect(Array.from(collection2.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
-    .toEqual([true, true, true, true])
-})
+  testInParallel('name will be the plural form of the class name', () => {
+    expect(collection1.name).toBe('people')
+    expect(collection2.name).toBe('updatable_views')
+  })
 
-test('create will insert new rows into the database', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+  testInParallel('type will have the correct null and non null fields', () => {
+    expect(Array.from(collection1.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
+      .toEqual([false, false, true, false, true])
+    expect(Array.from(collection2.type.fields.values()).map(({ type }) => type.kind === 'NULLABLE'))
+      .toEqual([true, true, true, true])
+  })
 
-  const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
-  const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
-  const value3 = new Map([['name', 'Budd Deey'], ['email', 'budd.deey@email.com']])
+  testInParallel('create will insert new rows into the database', withPgClient(async client => {
+    const context = { [$$pgClient]: client }
 
-  client.query.mockClear()
+    const value1 = new Map([['name', 'John Smith'], ['about', 'Hello, world!'], ['email', 'john.smith@email.com']])
+    const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
+    const value3 = new Map([['name', 'Budd Deey'], ['email', 'budd.deey@email.com']])
 
-  const values = await Promise.all([
-    collection1.create(context, value1),
-    collection1.create(context, value2),
-    collection1.create(context, value3),
-  ])
+    client.query.mockClear()
 
-  // Make sure that even though we created three objects, we only called the
-  // database with a single query. Thanks `dataloader`!
-  expect(client.query.mock.calls.length).toBe(1)
+    const values = await Promise.all([
+      collection1.create(context, value1),
+      collection1.create(context, value2),
+      collection1.create(context, value3),
+    ])
 
-  expect(typeof values[0].get('id')).toBe('number')
-  expect(typeof values[1].get('id')).toBe('number')
-  expect(typeof values[2].get('id')).toBe('number')
-  expect(values[0].get('created_at')).toBeTruthy()
-  expect(values[1].get('created_at')).toBeTruthy()
-  expect(values[2].get('created_at')).toBeTruthy()
-  expect(values[0].get('name')).toBe('John Smith')
-  expect(values[1].get('name')).toBe('Sarah Smith')
-  expect(values[2].get('name')).toBe('Budd Deey')
+    // Make sure that even though we created three objects, we only called the
+    // database with a single query. Thanks `dataloader`!
+    expect(client.query.mock.calls.length).toBe(1)
 
-  const pgQueryResult = await client.query('select row_to_json(p) as object from c.person as p')
+    expect(typeof values[0].get('id')).toBe('number')
+    expect(typeof values[1].get('id')).toBe('number')
+    expect(typeof values[2].get('id')).toBe('number')
+    expect(values[0].get('created_at')).toBeTruthy()
+    expect(values[1].get('created_at')).toBeTruthy()
+    expect(values[2].get('created_at')).toBeTruthy()
+    expect(values[0].get('name')).toBe('John Smith')
+    expect(values[1].get('name')).toBe('Sarah Smith')
+    expect(values[2].get('name')).toBe('Budd Deey')
 
-  expect(pgQueryResult.rows.map(({ object }) => object))
-    .toEqual(values.map(mapToObject))
-}))
+    const pgQueryResult = await client.query('select row_to_json(p) as object from c.person as p')
 
-// TODO: reimplement
-// test('paginator will have the same name and type', () => {
-//   expect(collection1.paginator.name).toBe(collection1.name)
-//   expect(collection1.paginator.type).toBe(collection1.type)
-//   expect(collection2.paginator.name).toBe(collection2.name)
-//   expect(collection2.paginator.type).toBe(collection2.type)
-// })
+    expect(pgQueryResult.rows.map(({ object }) => object))
+      .toEqual(values.map(mapToObject))
+  }))
 
-// test('paginator will have the correct `orderings`', () => {
-//   expect(collection1.paginator.orderings).toEqual([
-//     { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'OFFSET', name: 'natural' },
-//     { type: 'ATTRIBUTES', name: 'id_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'id_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'name_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'name'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'name_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'name'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'about_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'about'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'about_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'about'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'email_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'email'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'email_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'email'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'created_at_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'created_at'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//     { type: 'ATTRIBUTES', name: 'created_at_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'created_at'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
-//   ])
+  test('create will only include relevant columns', withPgClient(async client => {
+    const context = { [$$pgClient]: client }
 
-//   expect(collection2.paginator.orderings).toEqual([
-//     { type: 'OFFSET', name: 'natural' },
-//     { type: 'ATTRIBUTES', name: 'x_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'x')] },
-//     { type: 'ATTRIBUTES', name: 'x_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'x')] },
-//     { type: 'ATTRIBUTES', name: 'name_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'name')] },
-//     { type: 'ATTRIBUTES', name: 'name_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'name')] },
-//     { type: 'ATTRIBUTES', name: 'description_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'description')] },
-//     { type: 'ATTRIBUTES', name: 'description_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'description')] },
-//     { type: 'ATTRIBUTES', name: 'constant_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'constant')] },
-//     { type: 'ATTRIBUTES', name: 'constant_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'constant')] },
-//   ])
+    // Note how the about column is not used
+    const value1 = new Map([['name', 'John Smith'], ['email', 'john.smith@email.com']])
+    const value2 = new Map([['name', 'Sarah Smith'], ['email', 'sarah.smith@email.com']])
+    const value3 = new Map([['name', 'Budd Deey'], ['email', 'budd.deey@email.com']])
 
-//   expect(collection3.paginator.orderings).toEqual([
-//     { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//     { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//     { type: 'OFFSET', name: 'natural' },
-//     { type: 'ATTRIBUTES', name: 'person_id_2_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1')] },
-//     { type: 'ATTRIBUTES', name: 'person_id_2_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1')] },
-//     { type: 'ATTRIBUTES', name: 'person_id_1_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//     { type: 'ATTRIBUTES', name: 'person_id_1_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//     { type: 'ATTRIBUTES', name: 'extra_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'extra'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//     { type: 'ATTRIBUTES', name: 'extra_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'extra'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
-//   ])
-// })
+    client.query.mockClear()
 
-// test('paginator `defaultOrdering` will be the first ordering in `orderings`', () => {
-//   expect(collection1.paginator.defaultOrdering).toBe(collection1.paginator.orderings[0])
-//   expect(collection2.paginator.defaultOrdering).toBe(collection2.paginator.orderings[0])
-//   expect(collection3.paginator.defaultOrdering).toBe(collection3.paginator.orderings[0])
-// })
+    await Promise.all([
+      collection1.create(context, value1),
+      collection1.create(context, value2),
+      collection1.create(context, value3),
+    ])
 
-test('paginator `count` will count all of the values in a collection with a condition', withPgClient(async client => {
-  const context = { [$$pgClient]: client }
+    expect(client.query.mock.calls.length).toBe(1)
+    expect(client.query.mock.calls[0][0].text).toMatchSnapshot()
+  }))
 
-  expect(await collection1.paginator.count(context, true)).toBe(0)
-  expect(await collection2.paginator.count(context, true)).toBe(0)
-  expect(await collection3.paginator.count(context, true)).toBe(0)
+  // TODO: reimplement
+  // test('paginator will have the same name and type', () => {
+  //   expect(collection1.paginator.name).toBe(collection1.name)
+  //   expect(collection1.paginator.type).toBe(collection1.type)
+  //   expect(collection2.paginator.name).toBe(collection2.name)
+  //   expect(collection2.paginator.type).toBe(collection2.type)
+  // })
 
-  await client.query(`
-    insert into c.person (id, name, email, about, created_at) values
-      (1, 'John Smith', 'john.smith@email.com', null, null),
-      (2, 'Sara Smith', 'sara.smith@email.com', null, null),
-      (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null);
-  `)
+  // test('paginator will have the correct `orderings`', () => {
+  //   expect(collection1.paginator.orderings).toEqual([
+  //     { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'OFFSET', name: 'natural' },
+  //     { type: 'ATTRIBUTES', name: 'id_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'id_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'name_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'name'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'name_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'name'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'about_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'about'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'about_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'about'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'email_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'email'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'email_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'email'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'created_at_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'created_at'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //     { type: 'ATTRIBUTES', name: 'created_at_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'person', 'created_at'), pgCatalog.getAttributeByName('c', 'person', 'id')] },
+  //   ])
 
-  await client.query(`
-    insert into c.compound_key (person_id_1, person_id_2, extra) values
-      (1, 2, false),
-      (2, 1, true),
-      (3, 2, false),
-      (3, 1, true);
-  `)
+  //   expect(collection2.paginator.orderings).toEqual([
+  //     { type: 'OFFSET', name: 'natural' },
+  //     { type: 'ATTRIBUTES', name: 'x_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'x')] },
+  //     { type: 'ATTRIBUTES', name: 'x_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'x')] },
+  //     { type: 'ATTRIBUTES', name: 'name_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'name')] },
+  //     { type: 'ATTRIBUTES', name: 'name_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'name')] },
+  //     { type: 'ATTRIBUTES', name: 'description_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'description')] },
+  //     { type: 'ATTRIBUTES', name: 'description_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'description')] },
+  //     { type: 'ATTRIBUTES', name: 'constant_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'constant')] },
+  //     { type: 'ATTRIBUTES', name: 'constant_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('b', 'updatable_view', 'constant')] },
+  //   ])
 
-  expect(await collection1.paginator.count(context, true)).toBe(3)
-  expect(await collection2.paginator.count(context, true)).toBe(3)
-  expect(await collection3.paginator.count(context, true)).toBe(4)
-  expect(await collection2.paginator.count(context, false)).toBe(0)
-  expect(await collection3.paginator.count(context, false)).toBe(0)
-  expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'EQUAL', value: 3 } })).toBe(2)
-  expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'LESS_THAN', value: 2 } })).toBe(1)
-}))
+  //   expect(collection3.paginator.orderings).toEqual([
+  //     { type: 'ATTRIBUTES', name: 'primary_key_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //     { type: 'ATTRIBUTES', name: 'primary_key_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //     { type: 'OFFSET', name: 'natural' },
+  //     { type: 'ATTRIBUTES', name: 'person_id_2_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1')] },
+  //     { type: 'ATTRIBUTES', name: 'person_id_2_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1')] },
+  //     { type: 'ATTRIBUTES', name: 'person_id_1_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //     { type: 'ATTRIBUTES', name: 'person_id_1_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //     { type: 'ATTRIBUTES', name: 'extra_asc', descending: false, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'extra'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //     { type: 'ATTRIBUTES', name: 'extra_desc', descending: true, pgAttributes: [pgCatalog.getAttributeByName('c', 'compound_key', 'extra'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_1'), pgCatalog.getAttributeByName('c', 'compound_key', 'person_id_2')] },
+  //   ])
+  // })
+
+  // test('paginator `defaultOrdering` will be the first ordering in `orderings`', () => {
+  //   expect(collection1.paginator.defaultOrdering).toBe(collection1.paginator.orderings[0])
+  //   expect(collection2.paginator.defaultOrdering).toBe(collection2.paginator.orderings[0])
+  //   expect(collection3.paginator.defaultOrdering).toBe(collection3.paginator.orderings[0])
+  // })
+
+  testInParallel('paginator `count` will count all of the values in a collection with a condition', withPgClient(async client => {
+    const context = { [$$pgClient]: client }
+
+    expect(await collection1.paginator.count(context, true)).toBe(0)
+    expect(await collection2.paginator.count(context, true)).toBe(0)
+    expect(await collection3.paginator.count(context, true)).toBe(0)
+
+    await client.query(`
+      insert into c.person (id, name, email, about, created_at) values
+        (1, 'John Smith', 'john.smith@email.com', null, null),
+        (2, 'Sara Smith', 'sara.smith@email.com', null, null),
+        (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null);
+    `)
+
+    await client.query(`
+      insert into c.compound_key (person_id_1, person_id_2, extra) values
+        (1, 2, false),
+        (2, 1, true),
+        (3, 2, false),
+        (3, 1, true);
+    `)
+
+    expect(await collection1.paginator.count(context, true)).toBe(3)
+    expect(await collection2.paginator.count(context, true)).toBe(3)
+    expect(await collection3.paginator.count(context, true)).toBe(4)
+    expect(await collection2.paginator.count(context, false)).toBe(0)
+    expect(await collection3.paginator.count(context, false)).toBe(0)
+    expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'EQUAL', value: 3 } })).toBe(2)
+    expect(await collection3.paginator.count(context, { type: 'FIELD', name: 'person_id_1', condition: { type: 'LESS_THAN', value: 2 } })).toBe(1)
+  }))
+}
 
 // TODO: Test conditions.
 const paginatorFixtures = [
@@ -353,19 +378,21 @@ paginatorFixtures.forEach(paginatorFixture => {
 
     paginatorFixture.orderingFixtures.forEach(orderingFixture => {
       describe(`ordering '${orderingFixture.name}'`, () => {
+        const testInParallel = createTestInParallel()
+
         const sortedValues = orderingFixture.compareValues ? [...allValues].sort(orderingFixture.compareValues) : [...allValues]
         const sortedValuesWithCursors = sortedValues.map((value, i) => ({ value, cursor: orderingFixture.getValueCursor(value, i) }))
 
         let ordering
         beforeAll(() => ordering = orderingFixture.getOrdering())
 
-        test('will read all of the values in the correct order', async () => {
+        testInParallel('will read all of the values in the correct order', async () => {
           const page = await ordering.readPage(context, true, {})
           expect(page.values).toEqual(sortedValuesWithCursors)
           expect(await Promise.all([page.hasNextPage(), page.hasPreviousPage()])).toEqual([false, false])
         })
 
-        test('will read all values after an `afterCursor`', async () => {
+        testInParallel('will read all values after an `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[2].cursor }),
@@ -378,7 +405,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will read all values before a `beforeCursor`', async () => {
+        testInParallel('will read all values before a `beforeCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[1].cursor }),
             ordering.readPage(context, true, { beforeCursor: sortedValuesWithCursors[3].cursor }),
@@ -391,7 +418,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
+        testInParallel('will read all values between a `beforeCursor` and an `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { afterCursor: sortedValuesWithCursors[1].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -404,7 +431,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('will read only the first few values when provided `first`', async () => {
+        testInParallel('will read only the first few values when provided `first`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1 }),
             ordering.readPage(context, true, { first: 3 }),
@@ -417,7 +444,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('will read only the last few values when provided `last`', async () => {
+        testInParallel('will read only the last few values when provided `last`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1 }),
             ordering.readPage(context, true, { last: 3 }),
@@ -430,7 +457,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will offset the results when provided an `offset`', async () => {
+        testInParallel('will offset the results when provided an `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { _offset: 1 }),
             ordering.readPage(context, true, { _offset: 3 }),
@@ -443,15 +470,15 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('will fail when trying to use `first` and `last` together', async () => {
+        testInParallel('will fail when trying to use `first` and `last` together', async () => {
           expect((await ordering.readPage(context, true, { first: 1, last: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`first` and `last` may not be defined at the same time.')
         })
 
-        test('will fail when trying to use `last` and `offset` together', async () => {
+        testInParallel('will fail when trying to use `last` and `offset` together', async () => {
           expect((await ordering.readPage(context, true, { last: 1, _offset: 1 }).then(() => { throw new Error('Cannot suceed') }, error => error)).message).toEqual('`offset` may not be used with `last`.')
         })
 
-        test('can use `beforeCursor` and `first` together', async () => {
+        testInParallel('can use `beforeCursor` and `first` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -464,7 +491,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, false, true, false])
         })
 
-        test('can use `afterCursor` and `first` together', async () => {
+        testInParallel('can use `afterCursor` and `first` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
@@ -477,7 +504,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
+        testInParallel('can use `first` with both `beforeCursor` and `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { first: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -490,7 +517,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `beforeCursor` and `last` together', async () => {
+        testInParallel('can use `beforeCursor` and `last` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, beforeCursor: sortedValuesWithCursors[1].cursor }),
@@ -503,7 +530,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, false])
         })
 
-        test('can use `afterCursor` and `last` together', async () => {
+        testInParallel('can use `afterCursor` and `last` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[sortedValuesWithCursors.length - 2].cursor }),
@@ -516,7 +543,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
+        testInParallel('can use `last` with both `beforeCursor` and `afterCursor`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { last: 1, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[3].cursor }),
             ordering.readPage(context, true, { last: 2, afterCursor: sortedValuesWithCursors[0].cursor, beforeCursor: sortedValuesWithCursors[2].cursor }),
@@ -529,7 +556,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, true, true])
         })
 
-        test('can use `first` with `offset`', async () => {
+        testInParallel('can use `first` with `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 2, _offset: 1 }),
             ordering.readPage(context, true, { first: 2, _offset: 3 }),
@@ -542,7 +569,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([true, true, false, true])
         })
 
-        test('can use `afterCursor` with `offset`', async () => {
+        testInParallel('can use `afterCursor` with `offset`', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { _offset: 2, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),
@@ -555,7 +582,7 @@ paginatorFixtures.forEach(paginatorFixture => {
             .toEqual([false, true, false, true])
         })
 
-        test('can use `first`, `afterCursor`, and `offset` together', async () => {
+        testInParallel('can use `first`, `afterCursor`, and `offset` together', async () => {
           const [page1, page2] = await Promise.all([
             ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[0].cursor }),
             ordering.readPage(context, true, { first: 1, _offset: 1, afterCursor: sortedValuesWithCursors[1].cursor }),

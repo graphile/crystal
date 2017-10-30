@@ -7,6 +7,7 @@ import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
+import { IncomingMessage } from 'http'
 
 export type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -16,14 +17,19 @@ export type PostGraphQLOptions = {
   graphiql?: boolean,
   pgDefaultRole?: string,
   jwtSecret?: string,
+  jwtAudiences?: Array<string>,
+  jwtRole?: Array<string>,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
+  extendedErrors?: Array<string>,
   disableQueryLog?: boolean,
   disableDefaultMutations?: boolean,
   enableCors?: boolean,
   exportJsonSchemaPath?: string,
   exportGqlSchemaPath?: string,
+  bodySizeLimit?: string,
+  pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{[key: string]: mixed }>),
 }
 
 /**
@@ -59,6 +65,13 @@ export default function postgraphql (
   else {
     schema = 'public'
     options = schemaOrOptions
+  }
+
+  // Check for a jwtSecret without a jwtPgTypeIdentifier
+  // a secret without a token identifier prevents JWT creation
+  if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
+    // tslint:disable-next-line no-console
+    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
   }
 
   // Creates the Postgres schemas array.

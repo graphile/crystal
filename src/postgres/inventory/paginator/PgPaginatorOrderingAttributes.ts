@@ -66,37 +66,43 @@ implements Paginator.Ordering<TInput, PgClassType.Value, AttributesCursor> {
       throw new Error('Before cursor must be a value tuple of the correct length.')
 
     const aliasIdentifier = Symbol()
+    const cteIdentifier = Symbol()
     const fromSql = this.pgPaginator.getFromEntrySql(input)
     const conditionSql = this.pgPaginator.getConditionSql(input)
 
     const query = sql.compile(sql.query`
-      -- The standard select/from clauses up top.
-      select to_json(${sql.identifier(aliasIdentifier)}) as value
-      from ${fromSql} as ${sql.identifier(aliasIdentifier)}
+      -- The query is wrapped with a CTE on which the to_json function is
+      -- applied. This ensures the to_json function is only called on the final
+      -- results of the query.
+      with ${sql.identifier(cteIdentifier)} as (
+        -- The standard select/from clauses up top.
+        select ${sql.identifier(aliasIdentifier)} as value
+        from ${fromSql} as ${sql.identifier(aliasIdentifier)}
 
-      -- Combine our cursors with the condition used for this page to
-      -- implement a where condition which will filter what we want it to.
-      --
-      -- We throw away nulls because there is a lot of wierdness when they
-      -- get included.
-      where
-        ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
-        ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
-        ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
-        ${conditionSql}
+        -- Combine our cursors with the condition used for this page to
+        -- implement a where condition which will filter what we want it to.
+        --
+        -- We throw away nulls because there is a lot of wierdness when they
+        -- get included.
+        where
+          ${sql.join(pgAttributes.map(pgAttribute => sql.query`${sql.identifier(pgAttribute.name)} is not null`), ' and ')} and
+          ${beforeCursor ? this._getCursorCondition(pgAttributes, beforeCursor, descending ? '>' : '<') : sql.raw('true')} and
+          ${afterCursor ? this._getCursorCondition(pgAttributes, afterCursor, descending ? '<' : '>') : sql.raw('true')} and
+          ${conditionSql}
 
-      -- Order using the same attributes used to construct the cursors. If
-      -- a last property was defined we need to reverse our ordering so the
-      -- limit will work. We will fix the order in JavaScript.
-      order by ${sql.join(pgAttributes.map(pgAttribute =>
-        sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
-      ), ', ')}
+        -- Order using the same attributes used to construct the cursors. If
+        -- a last property was defined we need to reverse our ordering so the
+        -- limit will work. We will fix the order in JavaScript.
+        order by ${sql.join(pgAttributes.map(pgAttribute =>
+          sql.query`${sql.identifier(pgAttribute.name)} using ${sql.raw((last != null ? !descending : descending) ? '>' : '<')}`,
+        ), ', ')}
 
-      -- Finally, apply the appropriate limit.
-      limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
+        -- Finally, apply the appropriate limit.
+        limit ${first != null ? sql.value(first) : last != null ? sql.value(last) : sql.raw('all')}
 
-      -- If we have an offset, add that as well.
-      ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
+        -- If we have an offset, add that as well.
+        ${_offset != null ? sql.query`offset ${sql.value(_offset)}` : sql.query``}
+      ) select to_json(${sql.identifier(cteIdentifier)}.value) as value from ${sql.identifier(cteIdentifier)};
     `)
 
     let { rows } = await client.query(query)

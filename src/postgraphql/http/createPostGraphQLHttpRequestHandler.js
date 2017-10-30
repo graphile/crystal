@@ -10,6 +10,7 @@ import {
   formatError as defaultFormatError,
   print as printGraphql,
 } from 'graphql'
+import { extendedFormatError } from '../extendedFormatError'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
 import renderGraphiQL from './renderGraphiQL'
 import debugPgClient from './debugPgClient'
@@ -65,7 +66,14 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool } = options
+  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole } = options
+
+  if (pgDefaultRole && typeof pgSettings === 'function') {
+    throw new Error('pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).')
+  }
+  if (pgDefaultRole && pgSettings && typeof pgSettings === 'object' && Object.keys(pgSettings).map(s => s.toLowerCase()).indexOf('role') >= 0) {
+    throw new Error('pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.')
+  }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql'
@@ -78,8 +86,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
   const formatError = error => {
-    // Get the default formatted error object.
-    const formattedError = defaultFormatError(error)
+    // Get the appropriate formatted error object, including any extended error
+    // fields if the user wants them.
+    const formattedError = options.extendedErrors && options.extendedErrors.length ?
+      extendedFormatError(error, options.extendedErrors) : defaultFormatError(error)
 
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
@@ -96,7 +106,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
   // want that.
   const bodyParserMiddlewares = [
     // Parse JSON bodies.
-    bodyParser.json(),
+    bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
     bodyParser.urlencoded({ extended: false }),
     // Parse `application/graphql` content type bodies as text.
@@ -190,7 +200,12 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
         // Sends the asset at this path. Defaults to a `statusCode` of 200.
         res.statusCode = 200
-        sendFile(req, joinPath(graphiqlDirectory, assetPath), { index: false }).pipe(res)
+        await new Promise((resolve, reject) => {
+          const stream = sendFile(req, joinPath(graphiqlDirectory, assetPath), { index: false })
+            .on('end', resolve)
+            .on('error', reject)
+            .pipe(res)
+        })
         return
       }
 
@@ -383,13 +398,17 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       if (debugGraphql.enabled)
         debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
 
-      const jwtToken = getJwtToken(req)
+      const jwtToken = options.jwtSecret ? getJwtToken(req) : null
 
       result = await withPostGraphQLContext({
         pgPool,
         jwtToken,
         jwtSecret: options.jwtSecret,
-        pgDefaultRole: options.pgDefaultRole,
+        jwtAudiences: options.jwtAudiences,
+        jwtRole: options.jwtRole,
+        pgDefaultRole,
+        pgSettings:
+          typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
         pgRole = context.pgRole
         return executeGraphql(

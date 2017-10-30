@@ -38,7 +38,7 @@ The `auth_user` will have all the priveleges PostGraphQL might need.
 
 You can also specify a `default_role` with PostGraphQL. The `default_role` will be used by PostGraphQL whenever no authorization token is provided or when the role claim in the authorization token is not specified. So all users that don’t explicitly specify a role will automatically use the `default_role`.
 
-So the `default_role` should have restricted priveleges to only your data that is publicly accessible.
+So the `default_role` should have restricted privileges to only your data that is publicly accessible.
 
 After that you could also specify more roles like a `user_role` which should be included in the payload of your authorization tokens which may have more or less permissions then `default_role`.
 

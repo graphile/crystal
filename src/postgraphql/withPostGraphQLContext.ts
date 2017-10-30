@@ -35,12 +35,18 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
+    jwtAudiences = ['postgraphql'],
+    jwtRole = ['role'],
     pgDefaultRole,
+    pgSettings,
   }: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
+    jwtAudiences?: Array<string>,
+    jwtRole: Array<string>,
     pgDefaultRole?: string,
+    pgSettings?: { [key: string]: mixed },
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -59,7 +65,10 @@ export default async function withPostGraphQLContext(
       pgClient,
       jwtToken,
       jwtSecret,
+      jwtAudiences,
+      jwtRole,
       pgDefaultRole,
+      pgSettings,
     })
 
     return await callback({
@@ -88,12 +97,18 @@ async function setupPgClientTransaction ({
   pgClient,
   jwtToken,
   jwtSecret,
+  jwtAudiences,
+  jwtRole,
   pgDefaultRole,
+  pgSettings,
 }: {
   pgClient: Client,
   jwtToken?: string,
   jwtSecret?: string,
+  jwtAudiences?: Array<string>,
+  jwtRole: Array<string>,
   pgDefaultRole?: string,
+  pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
@@ -105,14 +120,16 @@ async function setupPgClientTransaction ({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not procided to the server
+      // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, { audience: 'postgraphql' })
+      jwtClaims = jwt.verify(jwtToken, jwtSecret, {
+        audience: jwtAudiences,
+      })
 
-      const roleClaim = jwtClaims['role']
+      const roleClaim = getPath(jwtClaims, jwtRole)
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
@@ -124,9 +141,16 @@ async function setupPgClientTransaction ({
       }
     }
     catch (error) {
-      // In case this error is thrown in an HTTP context, we want to add a 403
-      // status code.
-      error.statusCode = 403
+      // In case this error is thrown in an HTTP context, we want to add status code
+      // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
+      if ( ('name' in error) && error.name === 'TokenExpiredError') {
+        // The correct status code for an expired ( but otherwise acceptable token is 401 )
+        error.statusCode = 401
+      } else {
+        // All other authentication errors should get a 403 status code.
+        error.statusCode = 403
+      }
+
       throw error
     }
   }
@@ -134,6 +158,14 @@ async function setupPgClientTransaction ({
   // Instantiate a map of local settings. This map will be transformed into a
   // Sql query.
   const localSettings = new Map<string, mixed>()
+
+  // Set the custom provided settings before jwt claims and role are set
+  // this prevents an accidentional overwriting
+  if (typeof pgSettings === 'object') {
+    for (const key of Object.keys(pgSettings)) {
+      localSettings.set(key, String(pgSettings[key]))
+    }
+  }
 
   // If there is a rule, we want to set the root `role` setting locally
   // to be our role. The role may only be null if we have no default role.
@@ -199,5 +231,22 @@ function debugPgClient (pgClient: Client): Client {
   }
 
   return pgClient
+}
+
+/**
+ * Safely gets the value at `path` (array of keys) of `inObject`.
+ *
+ * @private
+ */
+function getPath(inObject: mixed, path: Array<string>): any {
+  let object = inObject
+  // From https://github.com/lodash/lodash/blob/master/.internal/baseGet.js
+  let index = 0
+  const length = path.length
+
+  while (object && index < length) {
+    object = object[path[index++]]
+  }
+  return (index && index === length) ? object : undefined
 }
 // tslint:enable no-any

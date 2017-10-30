@@ -36,6 +36,10 @@ function createPgSingleProcedureQueryGqlFieldEntry (
 ): [string, GraphQLFieldConfig<mixed, mixed>] {
   const fixtures = createPgProcedureFixtures(buildToken, pgCatalog, pgProcedure)
 
+  if (fixtures.return === null) {
+    throw new Error('Procedures with a void return type are not allowed in GraphQL queries.')
+  }
+
   // Create our GraphQL input fields users will use to input data into our
   // procedure.
   const argEntries = fixtures.args.map<[string, GraphQLArgumentConfig]>(
@@ -56,7 +60,7 @@ function createPgSingleProcedureQueryGqlFieldEntry (
       const input = argEntries.map(([argName], i) => fixtures.args[i].fromGqlInput(args[argName]))
       const query = sql.compile(sql.query`select to_json(${createPgProcedureSqlCall(fixtures, input)}) as value`)
       const { rows: [row] } = await client.query(query)
-      return row ? fixtures.return.intoGqlOutput(fixtures.return.type.transformPgValueIntoValue(row['value'])) : null
+      return row ? fixtures.return!.intoGqlOutput(fixtures.return!.type.transformPgValueIntoValue(row['value'])) : null
     },
   }]
 }
