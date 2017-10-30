@@ -178,7 +178,7 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
     },
   }, () => {})
   expect(pgClient.query.mock.calls).toEqual([['begin'], [{
-    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)'
+    text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)',
     values: [
       'foo.bar', 'test1',
       'some.setting.zero', '0',
