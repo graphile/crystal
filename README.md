@@ -1,6 +1,8 @@
 GraphQL-Build
 =============
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/benjie)
+
 Build a high-performance easily-extensible GraphQL schema by combining plugins.
 
 *NOTE: you might actually be looking for PostGraphile (previously
