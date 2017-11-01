@@ -163,7 +163,9 @@ async function setupPgClientTransaction ({
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
     for (const key of Object.keys(pgSettings)) {
-      localSettings.set(key, String(pgSettings[key]))
+      if (isPgSettingValid(pgSettings[key])) {
+        localSettings.set(key, String(pgSettings[key]))
+      }
     }
   }
 
@@ -248,5 +250,23 @@ function getPath(inObject: mixed, path: Array<string>): any {
     object = object[path[index++]]
   }
   return (index && index === length) ? object : undefined
+}
+
+/**
+ * Check if a pgSetting is a string or a number.
+ * Null and Undefined settings are not valid and will be ignored.
+ * pgSettings of other types throw an error.
+ *
+ * @private
+ */
+function isPgSettingValid(pgSetting: mixed): boolean {
+  const supportedSettingTypes = ['string', 'number']
+  if (supportedSettingTypes.indexOf(typeof pgSetting) >= 0) {
+    return true
+  }
+  if (pgSetting === undefined || pgSetting === null) {
+    return false
+  }
+  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type ${supportedSettingTypes.join(' or ')}.`)
 }
 // tslint:enable no-any
