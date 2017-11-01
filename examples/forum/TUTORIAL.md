@@ -38,7 +38,7 @@ If you are running on MacOS, it is highly recommended that you install and use [
 
 After that, make sure your copy of Postgres is running locally on `postgres://localhost:5432`. This is the default location for local Postgres databases and is used by many Postgres tools.
 
-In a terminal window, run `psql`. This is your most basic tool for querying your Postgres databse. By default `psql` will connect to `postgres://localhost:5432`. If you want to connect to another database, just pass that database as the first argument.
+In a terminal window, run `psql`. This is your most basic tool for querying your Postgres database. By default `psql` will connect to `postgres://localhost:5432`. If you want to connect to another database, just pass that database as the first argument.
 
 ```bash
 $ psql                                  # Connects to the default database at `postgres://localhost:5432`

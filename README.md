@@ -2,7 +2,7 @@
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Gitter chat room](https://badges.gitter.im/postgraphql/postgraphql.svg)](https://gitter.im/postgraphql/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/benjie)
 
 # This is the ALPHA VERSION of PostGraphQL v4; use with caution and monitor [#506](https://github.com/postgraphql/postgraphql/pull/506)!
 
