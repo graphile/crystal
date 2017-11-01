@@ -12,6 +12,10 @@ create extension tablefunc with schema a;
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
 
+create domain b.not_null_url as character varying(2048) not null;
+create type b.wrapped_url as (
+  url b.not_null_url
+);
 create domain b.email as text
   check (value ~* '^.+@.+\..+$');
 
@@ -20,6 +24,7 @@ create table c.person (
   name varchar not null,
   about text,
   email b.email not null unique,
+  site b.wrapped_url default null,
   created_at timestamp default current_timestamp
 );
 

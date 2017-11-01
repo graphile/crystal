@@ -112,7 +112,10 @@ export default (function PgColumnsPlugin(
               });
               return {
                 description: attr.description,
-                type: nullableIf(!attr.isNotNull, ReturnType),
+                type: nullableIf(
+                  !attr.isNotNull && !attr.type.domainIsNotNull,
+                  ReturnType
+                ),
                 resolve: (data, _args, _context, resolveInfo) => {
                   const alias = getAliasFromResolveInfo(resolveInfo);
                   return pg2gql(data[alias], attr.type);
@@ -165,7 +168,9 @@ export default (function PgColumnsPlugin(
           memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
             description: attr.description,
             type: nullableIf(
-              isPgPatch || !attr.isNotNull || attr.hasDefault,
+              isPgPatch ||
+                (!attr.isNotNull && !attr.type.domainIsNotNull) ||
+                attr.hasDefault,
               pgGetGqlInputTypeByTypeId(attr.typeId) || GraphQLString
             ),
           });
