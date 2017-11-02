@@ -1,4 +1,4 @@
-# PostGraphQL@next
+# PostGraphile
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Package on npm](https://img.shields.io/npm/v/postgraphql/next.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
@@ -8,7 +8,7 @@
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/benjie)
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
-# This is the ALPHA VERSION of PostGraphQL v4; use with caution and monitor [#506](https://github.com/postgraphql/postgraphql/pull/506)!
+# This is the ALPHA VERSION of PostGraphile v4 (previously known as PostGraphQL); use with caution and monitor [#506](https://github.com/postgraphql/postgraphql/pull/506)!
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
 
