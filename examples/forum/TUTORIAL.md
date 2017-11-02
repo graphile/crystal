@@ -1,4 +1,4 @@
-# Postgres Schema Design
+﻿# Postgres Schema Design
 The Postgres database is rich with features well beyond that of any other database. However, most developers do not know the extent to which they can leverage the features in Postgres to completely express their application business logic in the database.
 
 Often developers may find themselves re-implimenting authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
@@ -162,8 +162,8 @@ To add comments, just see the SQL below:
 ```sql
 comment on table forum_example.person is 'A user of the forum.';
 comment on column forum_example.person.id is 'The primary unique identifier for the person.';
-comment on column forum_example.person.first_name is 'The person’s first name.';
-comment on column forum_example.person.last_name is 'The person’s last name.';
+comment on column forum_example.person.first_name is 'The person’’s first name.';
+comment on column forum_example.person.last_name is 'The person’’s last name.';
 comment on column forum_example.person.about is 'A short description about the user, written by the user.';
 comment on column forum_example.person.created_at is 'The time this person was created.';
 ```
@@ -268,7 +268,7 @@ create function forum_example.person_full_name(person forum_example.person) retu
   select person.first_name || ' ' || person.last_name
 $$ language sql stable;
 
-comment on function forum_example.person_full_name(forum_example.person) is 'A person’s full name which is a concatenation of their first and last name.';
+comment on function forum_example.person_full_name(forum_example.person) is 'A person’’s full name which is a concatenation of their first and last name.';
 ```
 
 Second, a function which will get a summary of a forum post:
@@ -299,7 +299,7 @@ create function forum_example.person_latest_post(person forum_example.person) re
   limit 1
 $$ language sql stable;
 
-comment on function forum_example.person_latest_post(forum_example.person) is 'Get’s the latest post written by the person.';
+comment on function forum_example.person_latest_post(forum_example.person) is 'Gets the latest post written by the person.';
 ```
 
 Don’t get too stuck on the function implementations. It is fairly easy to discover how to express what you want in SQL through a quick search of the Postgres documentation (which is excellent!). These functions are here to give you some examples of what functions in Postgres look like. Also note how we added comments to our functions with the [`COMMENT`](https://www.postgresql.org/docs/9.6/static/sql-comment.html) command, just like we add comments to our tables.
@@ -421,10 +421,10 @@ create table forum_example_private.person_account (
   password_hash    text not null
 );
 
-comment on table forum_example_private.person_account is 'Private information about a person’s account.';
+comment on table forum_example_private.person_account is 'Private information about a person’’s account.';
 comment on column forum_example_private.person_account.person_id is 'The id of the person associated with this account.';
 comment on column forum_example_private.person_account.email is 'The email address of the person.';
-comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
+comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’’s password.';
 ```
 
 > **Warning:** Never store passwords in plaintext! The `password_hash` column will contain the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
@@ -670,7 +670,7 @@ This is a simple function that we can use in PostGraphQL or our database to get 
 Now, let’s use the JWT to define permissions.
 
 ### Grants
-The highest level of permission that can be given to roles using the Postgres are access privileges assigned using the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command. The access privileges defined by `GRANT` work on no smaller level than the table level. As you can allow a role to select an value from a table, or delete any value in a table. We will look at how to restrict access on a row level next.
+The highest level of permission that can be given to roles using the Postgres are access privileges assigned using the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command. The access privileges defined by `GRANT` work on no smaller level than the table level. As you can allow a role to select any value from a table, or delete any value in a table. We will look at how to restrict access on a row level next.
 
 ```sql
 -- after schema creation and before function creation
@@ -752,7 +752,7 @@ create policy delete_post on forum_example.post for delete to forum_example_pers
 
 These policies are very similar to the ones before, except that the `insert_post` policy uses `with check` instead of `using` like our other policies. The difference between `with check` and `using` is roughly that `using` is applied *before* any operation occurs to the table’s rows. So in the case of updating a post, one could not update a row that does not have the appropriate `author_id` in the first place. `with check` is run *after* an operation is applied. If the `with check` fails the operation will be rejected. So in the case of an insert, Postgres sets all of the columns as specified and then compares against `with check` on the new row. You must use `with check` with `INSERT` commands because there are no rows to compare against before insertion, and you must use `using` with `DELETE` commands because a delete changes no rows only removes current ones.
 
-That’s it! We have succesfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphQL we will get a well designed GraphQL API that we can be used in our frontend application.
+That’s it! We have succesfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphQL we will get a well designed GraphQL API that we can use in our frontend application.
 
 The final argument list for starting our PostGraphQL server using the CLI would be as follows:
 
