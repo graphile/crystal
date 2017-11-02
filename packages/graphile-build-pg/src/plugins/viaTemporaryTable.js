@@ -62,52 +62,43 @@ export default async function viaTemporaryTable(
       ) ${sqlResultQuery}`
     );
   } else {
+    /*
+     * In this code we're converting the rows to a string representation within
+     * PostgreSQL itself, then we can send it back into PostgreSQL and have it
+     * re-interpret the results cleanly (using it's own serializer/parser
+     * combination) so we should be fairly confident that it will work
+     * correctly every time assuming none of the PostgreSQL types are broken.
+     *
+     * If you have a way to improve this, I'd love to see a PR - but please
+     * make sure that the integration tests pass with your solution first as
+     * there are a log of potential pitfalls!
+     */
+    const selectionField = isPgClassLike
+      ? sqlResultSourceAlias
+      : sql.query`(${sqlResultSourceAlias}.${sqlResultSourceAlias})::${sqlTypeIdentifier}`;
     const result = await performQuery(
       pgClient,
       sql.query`
       with ${sqlResultSourceAlias} as (
         ${sqlMutationQuery}
       )
-      select ${isPgClassLike
-        ? sqlResultSourceAlias
-        : sql.query`${sqlResultSourceAlias}.${sqlResultSourceAlias}`}::${sqlTypeIdentifier} from ${sqlResultSourceAlias}`
+      select (${selectionField})::text from ${sqlResultSourceAlias}`
     );
-    /*
-     * This is a bit of a hack. Basically `pg` likes to send us JSON parsed,
-     * but doesn't like it when we send JSON back through without stringifying.
-     * We're not really mapping back to GraphQL here so we shouldn't use
-     * pg2gql. So we're just going to JSON.stringify the value if we don't
-     * think that `pg` will be happy with it.
-     *
-     * The optimium solution would be to have the `pg` module not parse the
-     * data at all and just send it through to us as a string which we can then
-     * post straight back to postgres. There may be options to enable this - if
-     * you find them then a pull request would be welcome!
-     */
-    const { rows, fields } = result;
-    const typeID = String(fields[0].dataTypeID);
-    const jsonTypeId = "114";
-    const jsonbTypeId = "3802";
-    const mapValue = val => {
-      if (
-        val &&
-        (typeof val === "object" ||
-          typeID === jsonTypeId ||
-          typeID === jsonbTypeId)
-      ) {
-        return JSON.stringify(val);
-      } else {
-        return val;
-      }
-    };
-    const values = rows.map(row => mapValue(row[Object.keys(row)[0]]));
+    const { rows } = result;
+    const firstRow = rows[0];
+    // TODO: we should be able to have `pg` not interpret the results as
+    // objects and instead just return them as arrays - then we can just do
+    // `row[0]`. PR welcome!
+    const firstKey = firstRow && Object.keys(firstRow)[0];
+    const values = rows.map(row => row[firstKey]);
+    const convertFieldBack = isPgClassLike
+      ? sql.query`(str::${sqlTypeIdentifier}).*`
+      : sql.query`str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}`;
     return await performQuery(
       pgClient,
       sql.query`
       with ${sqlResultSourceAlias} as (
-        select ${isPgClassLike
-          ? sql.query`(str::${sqlTypeIdentifier}).*`
-          : sql.query`str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}`}
+        select ${convertFieldBack}
         from unnest((${sql.value(values)})::text[]) str
       )
       ${sqlResultQuery}`

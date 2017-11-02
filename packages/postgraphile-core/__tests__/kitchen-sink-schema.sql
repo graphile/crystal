@@ -223,6 +223,7 @@ create function c.compound_type_computed_field(compound_type c.compound_type) re
 create function a.post_headline_trimmed(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
 create function a.post_headline_trimmed_strict(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable strict;
 create function a.post_headline_trimmed_no_defaults(post a.post, length int, omission text) returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
+create function a.post_many(posts a.post[]) returns setof a.post as $$ declare current_post a.post; begin foreach current_post in array posts loop return next current_post; end loop; end; $$ language plpgsql;
 
 create type b.jwt_token as (
   role text,

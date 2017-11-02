@@ -124,6 +124,13 @@ export default (function PgTypesPlugin(
         return pg2GqlMapper[type.id].map(val);
       } else if (type.domainBaseType) {
         return pg2gql(val, type.domainBaseType);
+      } else if (type.arrayItemType) {
+        if (!Array.isArray(val)) {
+          throw new Error(
+            `Expected array when converting PostgreSQL data into GraphQL; failing type: '${type.namespaceName}.${type.name}'`
+          );
+        }
+        return val.map(v => pg2gql(v, type.arrayItemType));
       } else {
         return val;
       }
@@ -136,6 +143,21 @@ export default (function PgTypesPlugin(
         return pg2GqlMapper[type.id].unmap(val);
       } else if (type.domainBaseType) {
         return gql2pg(val, type.domainBaseType);
+      } else if (type.arrayItemType) {
+        if (!Array.isArray(val)) {
+          throw new Error(
+            `Expected array when converting GraphQL data into PostgreSQL data; failing type: '${type.namespaceName}.${type.name}' (type: ${type ===
+            null
+              ? "null"
+              : typeof type})`
+          );
+        }
+        return sql.fragment`array[${sql.join(
+          val.map(v => gql2pg(v, type.arrayItemType)),
+          ", "
+        )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
+          type.name
+        )}`;
       } else {
         return sql.value(val);
       }
@@ -247,6 +269,16 @@ export default (function PgTypesPlugin(
         return tweaker(fragment);
       } else if (type.domainBaseType) {
         return pgTweakFragmentForType(fragment, type.domainBaseType);
+      } else if (type.arrayItemType) {
+        const error = new Error(
+          "Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: `${type.namespaceName}.${type.name}`)"
+        );
+        if (process.env.NODE_ENV === "test") {
+          throw error;
+        }
+        // eslint-disable-next-line no-console
+        console.error(error);
+        return fragment;
       } else {
         return fragment;
       }

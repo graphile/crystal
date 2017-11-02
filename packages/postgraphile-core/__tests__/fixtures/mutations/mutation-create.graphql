@@ -215,6 +215,34 @@ mutation {
       nullValue
     }
   }
+  j: createPost(input: {
+    post: {
+      headline: "super headline",
+      comptypes: [
+        {
+          schedule: "2009-10-24 10:23:54+02",
+          isOptimised: true
+        },
+        {
+          schedule: "2008-10-24 10:23:54+02",
+          isOptimised: false
+        },
+        {
+          schedule: "2007-10-24 10:23:54+02",
+          isOptimised: null
+        }
+      ]
+    }
+  }) {
+    post {
+      id
+      headline
+      comptypes {
+        schedule
+        isOptimised
+      }
+    }
+  }
 }
 
 fragment createPersonPayload on CreatePersonPayload {

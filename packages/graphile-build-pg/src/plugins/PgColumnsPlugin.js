@@ -69,46 +69,50 @@ export default (function PgColumnsPlugin(
                 pgGetGqlTypeByTypeId(attr.typeId) || GraphQLString;
               addDataGenerator(parsedResolveInfoFragment => {
                 const { alias } = parsedResolveInfoFragment;
-                if (attr.type.type === "c") {
-                  return {
-                    pgQuery: queryBuilder => {
-                      // json_build_object
-                      /*
-                      queryBuilder.select(
-                        sql.identifier(queryBuilder.getTableAlias(), attr.name),
-                        alias
-                      );
-                      */
-                      const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment,
-                        ReturnType
-                      );
-                      const jsonBuildObject = queryFromResolveData(
-                        sql.identifier(Symbol()), // Ignore!
+                return {
+                  pgQuery: queryBuilder => {
+                    const getSelectValueForFieldAndType = (
+                      sqlFullName,
+                      type
+                    ) => {
+                      if (type.arrayItemType) {
+                        const ident = sql.identifier(Symbol());
+                        return sql.fragment`
+                          (
+                            select json_agg(${getSelectValueForFieldAndType(
+                              ident,
+                              type.arrayItemType
+                            )})
+                            from unnest(${sqlFullName}) as ${ident}
+                          )
+                        `;
+                      } else if (type.type === "c") {
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment,
+                          ReturnType
+                        );
+                        const jsonBuildObject = queryFromResolveData(
+                          sql.identifier(Symbol()), // Ignore!
+                          sqlFullName,
+                          resolveData,
+                          { onlyJsonField: true }
+                        );
+                        return jsonBuildObject;
+                      } else {
+                        return pgTweakFragmentForType(sqlFullName, type);
+                      }
+                    };
+                    queryBuilder.select(
+                      getSelectValueForFieldAndType(
                         sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
                           attr.name
                         )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
-                        resolveData,
-                        { onlyJsonField: true }
-                      );
-                      queryBuilder.select(jsonBuildObject, alias);
-                    },
-                  };
-                } else {
-                  return {
-                    pgQuery: queryBuilder => {
-                      queryBuilder.select(
-                        pgTweakFragmentForType(
-                          sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                            attr.name
-                          )}`,
-                          attr.type
-                        ),
-                        alias
-                      );
-                    },
-                  };
-                }
+                        attr.type
+                      ),
+                      alias
+                    );
+                  },
+                };
               });
               return {
                 description: attr.description,

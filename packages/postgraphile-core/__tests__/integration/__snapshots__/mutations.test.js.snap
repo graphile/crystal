@@ -351,6 +351,26 @@ Object {
         "nullValue": null,
       },
     },
+    "j": Object {
+      "post": Object {
+        "comptypes": Array [
+          Object {
+            "isOptimised": true,
+            "schedule": "2009-10-24T04:23:54-04:00",
+          },
+          Object {
+            "isOptimised": false,
+            "schedule": "2008-10-24T04:23:54-04:00",
+          },
+          Object {
+            "isOptimised": null,
+            "schedule": "2007-10-24T04:23:54-04:00",
+          },
+        ],
+        "headline": "super headline",
+        "id": 12,
+      },
+    },
   },
 }
 `;
@@ -780,6 +800,40 @@ Object {
     "noArgsMutation": Object {
       "clientMutationId": "x",
       "integer": 2,
+    },
+    "postMany": Object {
+      "posts": Array [
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": true,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 7,
+        },
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": null,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 8,
+        },
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": false,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 9,
+        },
+      ],
     },
     "returnVoidMutation": Object {
       "__typename": "ReturnVoidMutationPayload",
