@@ -1,20 +1,23 @@
-I'm submitting a ... (check one with "x")
+I'm submitting a ... <!-- check one with "x" -->
 - [ ] bug report
 - [ ] feature request
+- [ ] question <!-- alternatively, ask on Gitter (https://gitter.im/postgraphql/postgraphql) -->
 
-***For bug reports, please include:***
+PostGraphQL version:
+<!-- CLI: `postgraphql --version`; Library: package version -->
+
+<!--
+  For bug reports, please complete the rest of this form.
+  For all other issues, you can delete the rest of this form.
+-->
 
 Minimal SQL file that can be loaded into a clean database:
 ``` sql
 
 ```
 
-PostGraphQL version (CLI: `postgraphql --version`; Library: package version):
-
-Steps to reproduce (CLI: complete `postgraphql` command line; Library: relevant code):
-```
-
-```
+Steps to reproduce:
+<!-- Please describe how you are running PostGraphQL (CLI: full `postgraphql` command line; Library: relevant code) and include any relevant GraphQL queries that demonstrate the issue. -->
 
 Current behavior:
 
