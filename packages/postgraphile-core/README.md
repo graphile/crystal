@@ -37,11 +37,14 @@ const schema = await createPostGraphQLSchema(
 Full example:
 
 ```js
-const { createPostGraphQLSchema } = require('graphile-build-pg');
-const pg = require('pg');
+const { createPostGraphQLSchema } = require("postgraphile-core");
+const { graphql } = require("graphql");
+const pg = require("pg");
 
 // Create a postgres pool for efficiency
-const pgPool = new pg.Pool(process.env.DATABASE_URL);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 async function runQuery(query, variables) {
 
@@ -98,7 +101,7 @@ runQuery(
   "query MyQuery { allPosts { nodes { id, title, author: userByAuthorId { username } } } }"
 ).then(result => {
   console.dir(result);
-  pgPool.release();
+  pgPool.end();
 }).catch(e => {
   console.error(e);
   process.exit(1);
