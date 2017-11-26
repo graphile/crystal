@@ -1,7 +1,7 @@
 # Postgres Schema Design
 The Postgres database is rich with features well beyond that of any other database. However, most developers do not know the extent to which they can leverage the features in Postgres to completely express their application business logic in the database.
 
-Often developers may find themselves re-implimenting authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
+Often developers may find themselves re-implementing authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
 
 This reimplementation of features that come with Postgres is not just an inefficient way to spend developer resources, but may also result in an interface that is slower than if the logic was implemented in Postgres itself. PostGraphQL aims to make developers more efficient and their APIs faster by packaging the repeatable work in one open source project that encourages community contributions.
 
