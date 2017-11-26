@@ -240,7 +240,7 @@ comment on column forum_example.post.body is 'The main body text of our post.';
 comment on column forum_example.post.created_at is 'The time this post was created.';
 ```
 
-Pretty basic. Our `headline` is twice as long as a tweet, and to use our `forum_example.post_topic` type we wrote it as the column type just as we may write `integer` as the column type. We also made sure to include comments.
+Pretty basic. Our `headline` is as long as a tweet, and to use our `forum_example.post_topic` type we wrote it as the column type just as we may write `integer` as the column type. We also made sure to include comments.
 
 Now that we have gone over the basics, let’s explore Postgres functions and see how we can use them to extend the functionality of our database.
 
