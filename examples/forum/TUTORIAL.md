@@ -670,7 +670,7 @@ This is a simple function that we can use in PostGraphQL or our database to get 
 Now, let’s use the JWT to define permissions.
 
 ### Grants
-The highest level of permission that can be given to roles using the Postgres are access privileges assigned using the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command. The access privileges defined by `GRANT` work on no smaller level than the table level. As you can allow a role to select an value from a table, or delete any value in a table. We will look at how to restrict access on a row level next.
+Role-based permissions are assigned using the `GRANT` command.  For a thorough explanation of grants, see the [GRANT](https://www.postgresql.org/docs/9.6/static/sql-grant.html) page of the Postgres documentation.  For the purpose of this tutorial, we will assign the following grants:
 
 ```sql
 -- after schema creation and before function creation
@@ -705,7 +705,7 @@ See how we had to grant permissions on every single Postgres object we have defi
 6. `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
 7. `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
 
-This provides basic permissions for all of our Postgres objects, but as we mentioned before users can update and delete all and any persons or posts. For obvious reasons we don’t want this, so let’s define row level security next.
+This provides basic permissions for all of our Postgres objects, but as we mentioned before, users can still update and delete any or all persons or posts. For obvious reasons, we don’t want this, so let’s define row level security next.
 
 ### Row Level Security
 In Postgres 9.5 (released January 2016) [Row Level Security (RLS)](https://www.postgresql.org/docs/9.6/static/ddl-rowsecurity.html) was introduced. RLS allows us to specify access to the data in our Postgres databases on a row level instead of a table level. In order to enable row level security on our tables we first need to run the following:
