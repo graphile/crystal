@@ -1,7 +1,7 @@
 # Postgres Schema Design
 The Postgres database is rich with features well beyond that of any other database. However, most developers do not know the extent to which they can leverage the features in Postgres to completely express their application business logic in the database.
 
-Often developers may find themselves re-implimenting authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
+Often developers may find themselves re-implementing authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
 
 This reimplementation of features that come with Postgres is not just an inefficient way to spend developer resources, but may also result in an interface that is slower than if the logic was implemented in Postgres itself. PostGraphQL aims to make developers more efficient and their APIs faster by packaging the repeatable work in one open source project that encourages community contributions.
 
@@ -240,7 +240,7 @@ comment on column forum_example.post.body is 'The main body text of our post.';
 comment on column forum_example.post.created_at is 'The time this post was created.';
 ```
 
-Pretty basic. Our `headline` is twice as long as a tweet, and to use our `forum_example.post_topic` type we wrote it as the column type just as we may write `integer` as the column type. We also made sure to include comments.
+Pretty basic. Our `headline` is as long as a tweet, and to use our `forum_example.post_topic` type we wrote it as the column type just as we may write `integer` as the column type. We also made sure to include comments.
 
 Now that we have gone over the basics, let’s explore Postgres functions and see how we can use them to extend the functionality of our database.
 
@@ -670,7 +670,7 @@ This is a simple function that we can use in PostGraphQL or our database to get 
 Now, let’s use the JWT to define permissions.
 
 ### Grants
-The highest level of permission that can be given to roles using the Postgres are access privileges assigned using the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command. The access privileges defined by `GRANT` work on no smaller level than the table level. As you can allow a role to select any value from a table, or delete any value in a table. We will look at how to restrict access on a row level next.
+Role-based permissions are assigned using the `GRANT` command.  For a thorough explanation of grants, see the [GRANT](https://www.postgresql.org/docs/9.6/static/sql-grant.html) page of the Postgres documentation.  For the purpose of this tutorial, we will assign the following grants:
 
 ```sql
 -- after schema creation and before function creation
@@ -705,7 +705,7 @@ See how we had to grant permissions on every single Postgres object we have defi
 6. `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
 7. `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
 
-This provides basic permissions for all of our Postgres objects, but as we mentioned before users can update and delete all and any persons or posts. For obvious reasons we don’t want this, so let’s define row level security next.
+This provides basic permissions for all of our Postgres objects, but as we mentioned before, users can still update and delete any or all persons or posts. For obvious reasons, we don’t want this, so let’s define row level security next.
 
 ### Row Level Security
 In Postgres 9.5 (released January 2016) [Row Level Security (RLS)](https://www.postgresql.org/docs/9.6/static/ddl-rowsecurity.html) was introduced. RLS allows us to specify access to the data in our Postgres databases on a row level instead of a table level. In order to enable row level security on our tables we first need to run the following:
