@@ -45,7 +45,7 @@ The usage of the `postgraphql` binary is as follows. To pull up this documentati
     --export-schema-json [path]      enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.
     --export-schema-graphql [path]   enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.
     --show-error-stack [setting]     show JavaScript error stacks in the GraphQL result errors
-    --extended-errors <string>       a comma separated list of extended Postgres error fields to display in the GraphQL result. Possible fields: `'hint', 'detail', 'errcode'`. Default: none
+    --extended-errors <string>       a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: `'hint,detail,errcode'`. Default: none
 
   Get Started:
 

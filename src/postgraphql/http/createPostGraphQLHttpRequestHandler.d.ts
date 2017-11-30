@@ -66,7 +66,7 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   showErrorStack?: boolean | 'json',
 
   // Enables reporting of additional details from errors that are thrown in postgres.
-  // Additional details include the HINT, DETAIL, and ERRCODE.
+  // Additional details include the 'hint', 'detail', and 'errcode'.
   extendedErrors?: Array<string>,
 
   // Disables the query log. Whenever a GraphQL query is about to be executed, it

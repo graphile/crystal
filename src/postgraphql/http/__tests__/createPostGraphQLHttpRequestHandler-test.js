@@ -46,6 +46,8 @@ const gqlSchema = new GraphQLSchema({
           err.detail = 'test detail'
           err.hint = 'test hint'
           err.code = '12345'
+          err.where = 'In your code somewhere'
+          err.file = 'alcchk.c'
           throw err
         },
       },
