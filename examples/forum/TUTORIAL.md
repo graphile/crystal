@@ -1,4 +1,4 @@
-﻿# Postgres Schema Design
+# Postgres Schema Design
 The Postgres database is rich with features well beyond that of any other database. However, most developers do not know the extent to which they can leverage the features in Postgres to completely express their application business logic in the database.
 
 Often developers may find themselves re-implimenting authentication and authorization in their apps, when Postgres comes with application level security features out of the box. Or perhaps developers may rewrite basic insert functions with some extra app logic where that too may be handled in the database.
@@ -162,8 +162,8 @@ To add comments, just see the SQL below:
 ```sql
 comment on table forum_example.person is 'A user of the forum.';
 comment on column forum_example.person.id is 'The primary unique identifier for the person.';
-comment on column forum_example.person.first_name is 'The person’’s first name.';
-comment on column forum_example.person.last_name is 'The person’’s last name.';
+comment on column forum_example.person.first_name is 'The person’s first name.';
+comment on column forum_example.person.last_name is 'The person’s last name.';
 comment on column forum_example.person.about is 'A short description about the user, written by the user.';
 comment on column forum_example.person.created_at is 'The time this person was created.';
 ```
@@ -268,7 +268,7 @@ create function forum_example.person_full_name(person forum_example.person) retu
   select person.first_name || ' ' || person.last_name
 $$ language sql stable;
 
-comment on function forum_example.person_full_name(forum_example.person) is 'A person’’s full name which is a concatenation of their first and last name.';
+comment on function forum_example.person_full_name(forum_example.person) is 'A person’s full name which is a concatenation of their first and last name.';
 ```
 
 Second, a function which will get a summary of a forum post:
@@ -421,10 +421,10 @@ create table forum_example_private.person_account (
   password_hash    text not null
 );
 
-comment on table forum_example_private.person_account is 'Private information about a person’’s account.';
+comment on table forum_example_private.person_account is 'Private information about a person’s account.';
 comment on column forum_example_private.person_account.person_id is 'The id of the person associated with this account.';
 comment on column forum_example_private.person_account.email is 'The email address of the person.';
-comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’’s password.';
+comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
 > **Warning:** Never store passwords in plaintext! The `password_hash` column will contain the user’s password *after* it has gone through a secure hashing algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/). Later in this tutorial we will show you how to securely hash a password in Postgres.
