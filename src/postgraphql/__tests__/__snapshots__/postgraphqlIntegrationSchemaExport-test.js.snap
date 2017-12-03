@@ -945,24 +945,6 @@ enum EdgeCasesOrderBy {
 
 scalar Email
 
-# A range of \`Float\`.
-type FloatRange {
-  # The starting bound of our range.
-  start: FloatRangeBound
-
-  # The ending bound of our range.
-  end: FloatRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type FloatRangeBound {
-  # The value at one end of our range.
-  value: Float!
-
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-}
-
 # The value at one end of a range. A range can either include this value, or not.
 input FloatRangeBoundInput {
   # The value at one end of our range.
@@ -2487,6 +2469,42 @@ enum SimilarTable2SOrderBy {
   PRIMARY_KEY_DESC
 }
 
+# A range of \`String\`.
+type StringRange {
+  # The starting bound of our range.
+  start: StringRangeBound
+
+  # The ending bound of our range.
+  end: StringRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type StringRangeBound {
+  # The value at one end of our range.
+  value: String!
+
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input StringRangeBoundInput {
+  # The value at one end of our range.
+  value: String!
+
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+}
+
+# A range of \`String\`.
+input StringRangeInput {
+  # The starting bound of our range.
+  start: StringRangeBoundInput
+
+  # The ending bound of our range.
+  end: StringRangeBoundInput
+}
+
 # All input for the \`tableMutation\` mutation.
 input TableMutationInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
@@ -2548,8 +2566,8 @@ type Type implements Node {
   id: Int!
   smallint: Int!
   bigint: BigInt!
-  numeric: Float!
-  decimal: Float!
+  numeric: String!
+  decimal: String!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -2558,8 +2576,8 @@ type Type implements Node {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
-  nullableRange: FloatRange
-  numrange: FloatRange!
+  nullableRange: StringRange
+  numrange: StringRange!
   daterange: DateRange!
   anIntRange: AnIntRange!
   timestamp: Datetime!
@@ -2585,10 +2603,10 @@ input TypeCondition {
   bigint: BigInt
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: Float
+  numeric: String
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: Float
+  decimal: String
 
   # Checks for equality with the object’s \`boolean\` field.
   boolean: Boolean
@@ -2615,10 +2633,10 @@ input TypeCondition {
   jsonb: JSON
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: FloatRangeInput
+  nullableRange: StringRangeInput
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: FloatRangeInput
+  numrange: StringRangeInput
 
   # Checks for equality with the object’s \`daterange\` field.
   daterange: DateRangeInput
@@ -2659,8 +2677,8 @@ input TypeInput {
   id: Int
   smallint: Int!
   bigint: BigInt!
-  numeric: Float!
-  decimal: Float!
+  numeric: String!
+  decimal: String!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -2669,8 +2687,8 @@ input TypeInput {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
-  nullableRange: FloatRangeInput
-  numrange: FloatRangeInput!
+  nullableRange: StringRangeInput
+  numrange: StringRangeInput!
   daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
   timestamp: Datetime!
@@ -2689,8 +2707,8 @@ input TypePatch {
   id: Int
   smallint: Int
   bigint: BigInt
-  numeric: Float
-  decimal: Float
+  numeric: String
+  decimal: String
   boolean: Boolean
   varchar: String
   enum: Color
@@ -2699,8 +2717,8 @@ input TypePatch {
   textArray: [String]
   json: JSON
   jsonb: JSON
-  nullableRange: FloatRangeInput
-  numrange: FloatRangeInput
+  nullableRange: StringRangeInput
+  numrange: StringRangeInput
   daterange: DateRangeInput
   anIntRange: AnIntRangeInput
   timestamp: Datetime
@@ -8159,7 +8177,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`numeric\` field.\",
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"Float\",
+                \"name\": \"String\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8169,7 +8187,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`decimal\` field.\",
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"Float\",
+                \"name\": \"String\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8263,7 +8281,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`nullableRange\` field.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeInput\",
+                \"name\": \"StringRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8273,7 +8291,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`numrange\` field.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeInput\",
+                \"name\": \"StringRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8404,16 +8422,6 @@ exports[`test exports a schema as JSON 1`] = `
           \"possibleTypes\": null
         },
         {
-          \"kind\": \"SCALAR\",
-          \"name\": \"Float\",
-          \"description\": \"The \`Float\` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). \",
-          \"fields\": null,
-          \"inputFields\": null,
-          \"interfaces\": null,
-          \"enumValues\": null,
-          \"possibleTypes\": null
-        },
-        {
           \"kind\": \"ENUM\",
           \"name\": \"Color\",
           \"description\": null,
@@ -8474,8 +8482,8 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"INPUT_OBJECT\",
-          \"name\": \"FloatRangeInput\",
-          \"description\": \"A range of \`Float\`.\",
+          \"name\": \"StringRangeInput\",
+          \"description\": \"A range of \`String\`.\",
           \"fields\": null,
           \"inputFields\": [
             {
@@ -8483,7 +8491,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The starting bound of our range.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeBoundInput\",
+                \"name\": \"StringRangeBoundInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8493,7 +8501,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The ending bound of our range.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeBoundInput\",
+                \"name\": \"StringRangeBoundInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8505,7 +8513,7 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"INPUT_OBJECT\",
-          \"name\": \"FloatRangeBoundInput\",
+          \"name\": \"StringRangeBoundInput\",
           \"description\": \"The value at one end of a range. A range can either include this value, or not.\",
           \"fields\": null,
           \"inputFields\": [
@@ -8517,7 +8525,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -8769,6 +8777,16 @@ exports[`test exports a schema as JSON 1`] = `
               \"defaultValue\": null
             }
           ],
+          \"interfaces\": null,
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
+          \"kind\": \"SCALAR\",
+          \"name\": \"Float\",
+          \"description\": \"The \`Float\` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). \",
+          \"fields\": null,
+          \"inputFields\": null,
           \"interfaces\": null,
           \"enumValues\": null,
           \"possibleTypes\": null
@@ -9046,7 +9064,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -9062,7 +9080,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -9207,7 +9225,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"FloatRange\",
+                \"name\": \"StringRange\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9222,7 +9240,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"OBJECT\",
-                  \"name\": \"FloatRange\",
+                  \"name\": \"StringRange\",
                   \"ofType\": null
                 }
               },
@@ -9419,8 +9437,8 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"OBJECT\",
-          \"name\": \"FloatRange\",
-          \"description\": \"A range of \`Float\`.\",
+          \"name\": \"StringRange\",
+          \"description\": \"A range of \`String\`.\",
           \"fields\": [
             {
               \"name\": \"start\",
@@ -9428,7 +9446,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"FloatRangeBound\",
+                \"name\": \"StringRangeBound\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9440,7 +9458,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"FloatRangeBound\",
+                \"name\": \"StringRangeBound\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9454,7 +9472,7 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"OBJECT\",
-          \"name\": \"FloatRangeBound\",
+          \"name\": \"StringRangeBound\",
           \"description\": \"The value at one end of a range. A range can either include this value, or not.\",
           \"fields\": [
             {
@@ -9466,7 +9484,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -10716,6 +10734,76 @@ exports[`test exports a schema as JSON 1`] = `
           ],
           \"inputFields\": null,
           \"interfaces\": [],
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
+          \"kind\": \"INPUT_OBJECT\",
+          \"name\": \"FloatRangeInput\",
+          \"description\": \"A range of \`Float\`.\",
+          \"fields\": null,
+          \"inputFields\": [
+            {
+              \"name\": \"start\",
+              \"description\": \"The starting bound of our range.\",
+              \"type\": {
+                \"kind\": \"INPUT_OBJECT\",
+                \"name\": \"FloatRangeBoundInput\",
+                \"ofType\": null
+              },
+              \"defaultValue\": null
+            },
+            {
+              \"name\": \"end\",
+              \"description\": \"The ending bound of our range.\",
+              \"type\": {
+                \"kind\": \"INPUT_OBJECT\",
+                \"name\": \"FloatRangeBoundInput\",
+                \"ofType\": null
+              },
+              \"defaultValue\": null
+            }
+          ],
+          \"interfaces\": null,
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
+          \"kind\": \"INPUT_OBJECT\",
+          \"name\": \"FloatRangeBoundInput\",
+          \"description\": \"The value at one end of a range. A range can either include this value, or not.\",
+          \"fields\": null,
+          \"inputFields\": [
+            {
+              \"name\": \"value\",
+              \"description\": \"The value at one end of our range.\",
+              \"type\": {
+                \"kind\": \"NON_NULL\",
+                \"name\": null,
+                \"ofType\": {
+                  \"kind\": \"SCALAR\",
+                  \"name\": \"Float\",
+                  \"ofType\": null
+                }
+              },
+              \"defaultValue\": null
+            },
+            {
+              \"name\": \"inclusive\",
+              \"description\": \"Whether or not the value of this bound is included in the range.\",
+              \"type\": {
+                \"kind\": \"NON_NULL\",
+                \"name\": null,
+                \"ofType\": {
+                  \"kind\": \"SCALAR\",
+                  \"name\": \"Boolean\",
+                  \"ofType\": null
+                }
+              },
+              \"defaultValue\": null
+            }
+          ],
+          \"interfaces\": null,
           \"enumValues\": null,
           \"possibleTypes\": null
         },
@@ -12910,7 +12998,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -12924,7 +13012,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"Float\",
+                  \"name\": \"String\",
                   \"ofType\": null
                 }
               },
@@ -13051,7 +13139,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeInput\",
+                \"name\": \"StringRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -13064,7 +13152,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"INPUT_OBJECT\",
-                  \"name\": \"FloatRangeInput\",
+                  \"name\": \"StringRangeInput\",
                   \"ofType\": null
                 }
               },
@@ -14712,7 +14800,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"Float\",
+                \"name\": \"String\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14722,7 +14810,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"Float\",
+                \"name\": \"String\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14816,7 +14904,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeInput\",
+                \"name\": \"StringRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14826,7 +14914,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"FloatRangeInput\",
+                \"name\": \"StringRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null

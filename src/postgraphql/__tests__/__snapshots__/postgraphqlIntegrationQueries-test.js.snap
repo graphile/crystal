@@ -1598,11 +1598,11 @@ Object {
           "numrange": Object {
             "end": Object {
               "inclusive": false,
-              "value": 52,
+              "value": "52",
             },
             "start": Object {
               "inclusive": true,
-              "value": -10,
+              "value": "-10",
             },
           },
           "smallint": 50,
