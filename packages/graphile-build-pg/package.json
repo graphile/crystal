@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "0.1.0-alpha.35",
+  "version": "0.1.0-alpha.36",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "babel-runtime": ">=6 <7",
     "chalk": "^2.1.0",
     "debug": ">=2 <3",
-    "graphile-build": "0.1.0-alpha.32",
+    "graphile-build": "^0.1.0-alpha.36",
     "graphql-iso-date": "^3.2.0",
     "graphql-type-json": "^0.1.4",
     "jsonwebtoken": "^7.4.1",
