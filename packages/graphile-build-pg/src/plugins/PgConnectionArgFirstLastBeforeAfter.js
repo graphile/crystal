@@ -10,12 +10,12 @@ export default (function PgConnectionArgs(builder) {
       args,
       { extend, getTypeByName, graphql: { GraphQLInt } },
       {
-        scope: { isPgConnectionField, pgIntrospection: source },
+        scope: { isPgFieldConnection, pgFieldIntrospection: source },
         addArgDataGenerator,
       }
     ) => {
       if (
-        !isPgConnectionField ||
+        !isPgFieldConnection ||
         !source ||
         (source.kind !== "class" && source.kind !== "procedure")
       ) {

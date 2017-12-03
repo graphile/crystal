@@ -127,9 +127,7 @@ export default (async function PgRowByUniqueConstraint(
                 table.name,
                 table.namespace.name
               );
-              memo[
-                fieldName
-              ] = fieldWithHooks(
+              memo[fieldName] = fieldWithHooks(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {
@@ -192,6 +190,10 @@ export default (async function PgRowByUniqueConstraint(
                       }
                     },
                   };
+                },
+                {
+                  isPgNodeQuery: true,
+                  pgFieldIntrospection: table,
                 }
               );
             }

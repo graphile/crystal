@@ -217,7 +217,10 @@ export default (function NodePlugin(
                 return null;
               }
             },
-          })
+          }),
+          {
+            isRootNodeField: true,
+          }
         ),
       });
     }

@@ -25,17 +25,23 @@ export default (function PgConnectionTotalCount(builder) {
         table.namespace.name
       );
       return extend(fields, {
-        totalCount: fieldWithHooks("totalCount", ({ addDataGenerator }) => {
-          addDataGenerator(() => {
+        totalCount: fieldWithHooks(
+          "totalCount",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => {
+              return {
+                pgCalculateTotalCount: true,
+              };
+            });
             return {
-              pgCalculateTotalCount: true,
+              description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
+              type: GraphQLInt,
             };
-          });
-          return {
-            description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
-            type: GraphQLInt,
-          };
-        }),
+          },
+          {
+            isPgConnectionTotalCountField: true,
+          }
+        ),
       });
     }
   );

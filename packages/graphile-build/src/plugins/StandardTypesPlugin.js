@@ -56,7 +56,8 @@ export default (function StandardTypesPlugin(builder) {
                     "When paginating forwards, are there more items?",
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
-              }
+              },
+              { isPageInfoHasNextPageField: true }
             ),
             hasPreviousPage: fieldWithHooks(
               "hasPreviousPage",
@@ -71,7 +72,8 @@ export default (function StandardTypesPlugin(builder) {
                     "When paginating backwards, are there more items?",
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
-              }
+              },
+              { isPageInfoHasPreviousPageField: true }
             ),
           }),
         },

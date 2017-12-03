@@ -10,20 +10,32 @@ export default (function PageInfoStartEndCursor(builder) {
       }
       const Cursor = getTypeByName("Cursor");
       return extend(fields, {
-        startCursor: fieldWithHooks("startCursor", ({ addDataGenerator }) => {
-          addDataGenerator(() => ({ usesCursor: [true] }));
-          return {
-            description: "When paginating backwards, the cursor to continue.",
-            type: Cursor,
-          };
-        }),
-        endCursor: fieldWithHooks("endCursor", ({ addDataGenerator }) => {
-          addDataGenerator(() => ({ usesCursor: [true] }));
-          return {
-            description: "When paginating forwards, the cursor to continue.",
-            type: Cursor,
-          };
-        }),
+        startCursor: fieldWithHooks(
+          "startCursor",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => ({ usesCursor: [true] }));
+            return {
+              description: "When paginating backwards, the cursor to continue.",
+              type: Cursor,
+            };
+          },
+          {
+            isPageInfoStartCursorField: true,
+          }
+        ),
+        endCursor: fieldWithHooks(
+          "endCursor",
+          ({ addDataGenerator }) => {
+            addDataGenerator(() => ({ usesCursor: [true] }));
+            return {
+              description: "When paginating forwards, the cursor to continue.",
+              type: Cursor,
+            };
+          },
+          {
+            isPageInfoStartCursorField: true,
+          }
+        ),
       });
     }
   );

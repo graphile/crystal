@@ -40,52 +40,59 @@ export default (function PgMutationPayloadEdgePlugin(
       const fieldName = inflection.edgeField(table.name, table.namespace.name);
       recurseDataGeneratorsForField(fieldName);
       return extend(fields, {
-        [fieldName]: fieldWithHooks(fieldName, ({ addArgDataGenerator }) => {
-          addArgDataGenerator(function connectionOrderBy({ orderBy }) {
-            return {
-              pgCursorPrefix:
-                orderBy &&
-                orderBy.alias &&
-                sql.literal(orderBy && orderBy.alias),
-              pgQuery: queryBuilder => {
-                if (orderBy != null) {
-                  const { specs, unique } = orderBy;
-                  const orders = Array.isArray(specs[0]) ? specs : [specs];
-                  orders.forEach(([col, ascending]) => {
-                    const expr = isString(col)
-                      ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                          col
-                        )}`
-                      : col;
-                    queryBuilder.orderBy(expr, ascending);
-                  });
-                  if (unique) {
-                    queryBuilder.setOrderIsUnique();
+        [fieldName]: fieldWithHooks(
+          fieldName,
+          ({ addArgDataGenerator }) => {
+            addArgDataGenerator(function connectionOrderBy({ orderBy }) {
+              return {
+                pgCursorPrefix:
+                  orderBy &&
+                  orderBy.alias &&
+                  sql.literal(orderBy && orderBy.alias),
+                pgQuery: queryBuilder => {
+                  if (orderBy != null) {
+                    const { specs, unique } = orderBy;
+                    const orders = Array.isArray(specs[0]) ? specs : [specs];
+                    orders.forEach(([col, ascending]) => {
+                      const expr = isString(col)
+                        ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                            col
+                          )}`
+                        : col;
+                      queryBuilder.orderBy(expr, ascending);
+                    });
+                    if (unique) {
+                      queryBuilder.setOrderIsUnique();
+                    }
                   }
-                }
+                },
+              };
+            });
+
+            const defaultValueEnum =
+              TableOrderByType.getValues().find(
+                v => v.name === "PRIMARY_KEY_ASC"
+              ) || TableOrderByType.getValues()[0];
+            return {
+              description: "An edge for the type. May be used by Relay 1.",
+              type: TableEdgeType,
+              args: {
+                orderBy: {
+                  description: `The method to use when ordering \`${tableTypeName}\`.`,
+                  type: TableOrderByType,
+                  defaultValue: defaultValueEnum && defaultValueEnum.value,
+                },
+              },
+              resolve(data) {
+                return data.data;
               },
             };
-          });
-
-          const defaultValueEnum =
-            TableOrderByType.getValues().find(
-              v => v.name === "PRIMARY_KEY_ASC"
-            ) || TableOrderByType.getValues()[0];
-          return {
-            description: "An edge for the type. May be used by Relay 1.",
-            type: TableEdgeType,
-            args: {
-              orderBy: {
-                description: `The method to use when ordering \`${tableTypeName}\`.`,
-                type: TableOrderByType,
-                defaultValue: defaultValueEnum && defaultValueEnum.value,
-              },
-            },
-            resolve(data) {
-              return data.data;
-            },
-          };
-        }),
+          },
+          {
+            isPgMutationPayloadEdgeField: true,
+            pgFieldIntrospection: table,
+          }
+        ),
       });
     }
   );

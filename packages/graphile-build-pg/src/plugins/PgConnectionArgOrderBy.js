@@ -54,12 +54,12 @@ export default (function PgConnectionArgOrderBy(
       args,
       { extend, getTypeByName, pgGetGqlTypeByTypeId, pgSql: sql },
       {
-        scope: { isPgConnectionField, pgIntrospection: table },
+        scope: { isPgFieldConnection, pgFieldIntrospection: table },
         addArgDataGenerator,
       }
     ) => {
       if (
-        !isPgConnectionField ||
+        !isPgFieldConnection ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||

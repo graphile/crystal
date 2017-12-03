@@ -22,6 +22,8 @@ import type SchemaBuilder, {
   DataForType,
 } from "./SchemaBuilder";
 
+import extend from "./extend";
+
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphile-build");
@@ -178,16 +180,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
     getTypeByName(typeName) {
       return allTypes[typeName];
     },
-    extend<Obj1: *, Obj2: *>(base: Obj1, extra: Obj2): Obj1 & Obj2 {
-      const keysA = Object.keys(base);
-      const keysB = Object.keys(extra);
-      for (const key of keysB) {
-        if (keysA.indexOf(key) >= 0) {
-          throw new Error(`Overwriting key '${key}' is not allowed!`);
-        }
-      }
-      return Object.assign({}, base, extra);
-    },
+    extend,
     newWithHooks<T: GraphQLNamedType | GraphQLSchema, ConfigType: *>(
       Type: Class<T>,
       spec: ConfigType,
@@ -321,10 +314,21 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               recurseDataGeneratorsForField,
               Self,
               GraphQLObjectType: rawSpec,
-              fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
+              fieldWithHooks: ((fieldName, spec, fieldScope) => {
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
+                  );
+                }
+                if (!fieldScope) {
+                  throw new Error(
+                    "All calls to `fieldWithHooks` must specify a `fieldScope` " +
+                      "argument that gives additional context about the field so " +
+                      "that further plugins may more easily understand the field. " +
+                      "Keys within this object should contain the phrase 'field' " +
+                      "since they will be merged into the parent objects scope and " +
+                      "are not allowed to clash. If you really have no additional " +
+                      "information to give, please just pass `{}`."
                   );
                 }
                 let argDataGenerators = [];
@@ -396,12 +400,10 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                     }
                     return data;
                   },
-                  scope: Object.assign(
-                    {},
-                    scope,
-                    {
+                  scope: extend(
+                    extend(scope, {
                       fieldName,
-                    },
+                    }),
                     fieldScope
                   ),
                 });
@@ -449,10 +451,11 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               const fieldSpec = fieldsSpec[fieldName];
               if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
-                  fieldName,
-                  fieldSpec
-                );
+                fieldsSpec[
+                  fieldName
+                ] = fieldsContext.fieldWithHooks(fieldName, fieldSpec, {
+                  autoField: true, // We don't have any additional information
+                });
               }
             }
             return fieldsSpec;
@@ -486,12 +489,10 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                   );
                 }
                 let context = Object.assign({}, commonContext, {
-                  scope: Object.assign(
-                    {},
-                    scope,
-                    {
+                  scope: extend(
+                    extend(scope, {
                       fieldName,
-                    },
+                    }),
                     fieldScope
                   ),
                 });
@@ -527,10 +528,11 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               const fieldSpec = fieldsSpec[fieldName];
               if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
-                  fieldName,
-                  fieldSpec
-                );
+                fieldsSpec[
+                  fieldName
+                ] = fieldsContext.fieldWithHooks(fieldName, fieldSpec, {
+                  autoField: true, // We don't have any additional information
+                });
               }
             }
             return fieldsSpec;

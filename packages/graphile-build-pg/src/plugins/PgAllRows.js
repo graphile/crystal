@@ -136,8 +136,8 @@ export default (async function PgAllRows(
                   };
                 },
                 {
-                  isPgConnectionField: true,
-                  pgIntrospection: table,
+                  isPgFieldConnection: true,
+                  pgFieldIntrospection: table,
                 }
               );
             }

@@ -276,7 +276,8 @@ const DummyConnectionPlugin = async builder => {
                 return ret;
               },
             };
-          }
+          },
+          { isDummyConnectionField: true }
         ),
       });
     }

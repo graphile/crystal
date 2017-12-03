@@ -81,7 +81,8 @@ const makePluginEtc = (defaultCounter = 0) => {
                   return {};
                 },
               };
-            }
+            },
+            { isDummyField: true }
           ),
         });
       }

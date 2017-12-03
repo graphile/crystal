@@ -104,9 +104,7 @@ export default (function PgForwardRelationPlugin(
             foreignTable.namespace.name
           );
 
-          memo[
-            fieldName
-          ] = fieldWithHooks(
+          memo[fieldName] = fieldWithHooks(
             fieldName,
             ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
               addDataGenerator(parsedResolveInfoFragment => {
@@ -149,6 +147,9 @@ export default (function PgForwardRelationPlugin(
                   return data[alias];
                 },
               };
+            },
+            {
+              pgFieldIntrospection: constraint,
             }
           );
           return memo;

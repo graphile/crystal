@@ -178,8 +178,8 @@ export default (function PgBackwardRelationPlugin(
               };
             },
             {
-              isPgConnectionField: true,
-              pgIntrospection: table,
+              isPgFieldConnection: true,
+              pgFieldIntrospection: table,
             }
           );
           return memo;

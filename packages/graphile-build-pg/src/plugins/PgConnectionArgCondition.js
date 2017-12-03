@@ -76,11 +76,11 @@ export default (function PgConnectionArgCondition(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       } = build;
       const {
-        scope: { isPgConnectionField, pgIntrospection: table },
+        scope: { isPgFieldConnection, pgFieldIntrospection: table },
         addArgDataGenerator,
       } = context;
       if (
-        !isPgConnectionField ||
+        !isPgFieldConnection ||
         !table ||
         table.kind !== "class" ||
         !table.namespace

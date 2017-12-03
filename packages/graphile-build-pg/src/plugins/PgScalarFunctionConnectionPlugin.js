@@ -44,18 +44,24 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
               description: `A \`${NodeType.name}\` edge in the connection.`,
               fields: ({ fieldWithHooks }) => {
                 return {
-                  cursor: fieldWithHooks("cursor", ({ addDataGenerator }) => {
-                    addDataGenerator(() => ({
-                      usesCursor: [true],
-                    }));
-                    return {
-                      description: "A cursor for use in pagination.",
-                      type: Cursor,
-                      resolve(data) {
-                        return base64(JSON.stringify(data.__cursor));
-                      },
-                    };
-                  }),
+                  cursor: fieldWithHooks(
+                    "cursor",
+                    ({ addDataGenerator }) => {
+                      addDataGenerator(() => ({
+                        usesCursor: [true],
+                      }));
+                      return {
+                        description: "A cursor for use in pagination.",
+                        type: Cursor,
+                        resolve(data) {
+                          return base64(JSON.stringify(data.__cursor));
+                        },
+                      };
+                    },
+                    {
+                      isCursorField: true,
+                    }
+                  ),
                   node: {
                     description: `The \`${NodeType.name}\` at the end of the edge.`,
                     type: NodeType,

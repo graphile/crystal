@@ -107,8 +107,10 @@ export default function makeProcField(
     );
   }
   let type;
-  const scope = {};
-  scope.pgIntrospection = proc;
+  const fieldScope = {};
+  const payloadTypeScope = {};
+  fieldScope.pgFieldIntrospection = proc;
+  payloadTypeScope.pgIntrospection = proc;
   let returnFirstValueAsValue = false;
   const TableType =
     returnTypeTable && pgGetGqlTypeByTypeId(returnTypeTable.type.id);
@@ -131,15 +133,17 @@ export default function makeProcField(
           );
         }
         type = new GraphQLNonNull(ConnectionType);
-        scope.isPgConnectionField = true;
+        fieldScope.isPgFieldConnection = true;
       }
-      scope.pgIntrospectionTable = returnTypeTable;
+      fieldScope.pgFieldIntrospectionTable = returnTypeTable;
+      payloadTypeScope.pgIntrospectionTable = returnTypeTable;
     } else {
       type = TableType;
       if (rawReturnType.arrayItemType) {
         type = new GraphQLList(type);
       }
-      scope.pgIntrospectionTable = returnTypeTable;
+      fieldScope.pgFieldIntrospectionTable = returnTypeTable;
+      payloadTypeScope.pgIntrospectionTable = returnTypeTable;
     }
   } else {
     const Type = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
@@ -156,7 +160,7 @@ export default function makeProcField(
           returnFirstValueAsValue = true;
         } else {
           type = new GraphQLNonNull(ConnectionType);
-          scope.isPgConnectionField = true;
+          fieldScope.isPgFieldConnection = true;
         }
       } else {
         returnFirstValueAsValue = true;
@@ -345,7 +349,7 @@ export default function makeProcField(
             {
               isMutationPayload: true,
             },
-            scope
+            payloadTypeScope
           )
         );
         ReturnType = PayloadType;
@@ -497,6 +501,6 @@ export default function makeProcField(
             },
       };
     },
-    scope
+    fieldScope
   );
 }
