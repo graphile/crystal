@@ -231,7 +231,11 @@ export default (function PgTypesPlugin(
     }, {});
     const categoryLookup = {
       B: () => GraphQLBoolean,
-      N: () => GraphQLFloat,
+
+      // Numbers may be too large for GraphQL/JS to handle, so stringify by
+      // default.
+      N: () => GraphQLString,
+
       A: type =>
         new GraphQLList(
           enforceGqlTypeByPgType(pgTypeById[type.arrayItemTypeId])
@@ -315,16 +319,24 @@ export default (function PgTypesPlugin(
         ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
         "21": GraphQLInt, // int2
         "23": GraphQLInt, // int4
+        "700": GraphQLFloat, // float4
+        "701": GraphQLFloat, // float8
+        "1700": GraphQLString, // numeric
         "790": GraphQLFloat, // money
+
         "1186": GQLInterval, // interval
         "1082": SimpleDate, // date
         "1114": SimpleDatetime, // timestamp
         "1184": SimpleDatetime, // timestamptz
         "1083": SimpleTime, // time
         "1266": SimpleTime, // timetz
+
         "114": SimpleJSON, // json
         "3802": SimpleJSON, // jsonb
         "2950": SimpleUUID, // uuid
+
+        "1560": GraphQLString, // bit
+        "1562": GraphQLString, // varbit
       },
       pgExtendedTypes && {
         "114": GraphQLJSON,

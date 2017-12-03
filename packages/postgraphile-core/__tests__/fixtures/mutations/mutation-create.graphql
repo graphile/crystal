@@ -4,8 +4,8 @@ mutation {
       id: 201
       smallint: 30
       bigint: "467131188225"
-      numeric: 15.2
-      decimal: 15.2
+      numeric: "15.2"
+      decimal: "15.2"
       boolean: false
       varchar: "abc"
       enum: RED
@@ -16,7 +16,7 @@ mutation {
       json: "{\"x\":1,\"y\":2,\"z\":3}"
       jsonb: "{\"a\":1,\"b\":2,\"c\":3}"
       numrange: {
-        start: { value: 50, inclusive: true }
+        start: { value: "50", inclusive: true }
       }
       daterange: {
         start: { value: "1927-11-05", inclusive: false }

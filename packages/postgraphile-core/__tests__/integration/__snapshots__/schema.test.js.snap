@@ -1560,42 +1560,6 @@ enum EnumWithEmptyString {
   TWO
 }
 
-# A range of \`Float\`.
-type FloatRange {
-  # The ending bound of our range.
-  end: FloatRangeBound
-
-  # The starting bound of our range.
-  start: FloatRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type FloatRangeBound {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: Float!
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-input FloatRangeBoundInput {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: Float!
-}
-
-# A range of \`Float\`.
-input FloatRangeInput {
-  # The ending bound of our range.
-  end: FloatRangeBoundInput
-
-  # The starting bound of our range.
-  start: FloatRangeBoundInput
-}
-
 scalar Guid
 
 # All input for the \`guidFn\` mutation.
@@ -1942,6 +1906,42 @@ type Query implements Node {
   typeById(id: Int!): Type
 }
 
+# A range of \`String\`.
+type StringRange {
+  # The ending bound of our range.
+  end: StringRangeBound
+
+  # The starting bound of our range.
+  start: StringRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type StringRangeBound {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: String!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input StringRangeBoundInput {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: String!
+}
+
+# A range of \`String\`.
+input StringRangeInput {
+  # The ending bound of our range.
+  end: StringRangeBoundInput
+
+  # The starting bound of our range.
+  start: StringRangeBoundInput
+}
+
 # The exact time of day, does not include the date. May or may not have a timezone offset.
 scalar Time
 
@@ -1952,7 +1952,7 @@ type Type implements Node {
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
-  decimal: Float!
+  decimal: String!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -1966,9 +1966,9 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
-  nullableRange: FloatRange
-  numeric: Float!
-  numrange: FloatRange!
+  nullableRange: StringRange
+  numeric: String!
+  numrange: StringRange!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -1999,7 +1999,7 @@ input TypeCondition {
   daterange: DateRangeInput
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: Float
+  decimal: String
 
   # Checks for equality with the object’s \`domain\` field.
   domain: AnInt
@@ -2032,13 +2032,13 @@ input TypeCondition {
   nestedCompoundType: NestedCompoundTypeInput
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: FloatRangeInput
+  nullableRange: StringRangeInput
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: Float
+  numeric: String
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: FloatRangeInput
+  numrange: StringRangeInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -2070,7 +2070,7 @@ input TypeInput {
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
-  decimal: Float!
+  decimal: String!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -2081,9 +2081,9 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
-  nullableRange: FloatRangeInput
-  numeric: Float!
-  numrange: FloatRangeInput!
+  nullableRange: StringRangeInput
+  numeric: String!
+  numrange: StringRangeInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -2101,7 +2101,7 @@ input TypePatch {
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
-  decimal: Float
+  decimal: String
   domain: AnInt
   domain2: AnotherInt
   enum: Color
@@ -2112,9 +2112,9 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
-  nullableRange: FloatRangeInput
-  numeric: Float
-  numrange: FloatRangeInput
+  nullableRange: StringRangeInput
+  numeric: String
+  numrange: StringRangeInput
   smallint: Int
   textArray: [String]
   time: Time
@@ -3605,24 +3605,6 @@ enum EnumWithEmptyString {
   _EMPTY_
   ONE
   TWO
-}
-
-# A range of \`Float\`.
-type FloatRange {
-  # The ending bound of our range.
-  end: FloatRangeBound
-
-  # The starting bound of our range.
-  start: FloatRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type FloatRangeBound {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: Float!
 }
 
 # The value at one end of a range. A range can either include this value, or not.
@@ -5586,6 +5568,42 @@ enum SimilarTable2SOrderBy {
   PRIMARY_KEY_DESC
 }
 
+# A range of \`String\`.
+type StringRange {
+  # The ending bound of our range.
+  end: StringRangeBound
+
+  # The starting bound of our range.
+  start: StringRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type StringRangeBound {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: String!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input StringRangeBoundInput {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: String!
+}
+
+# A range of \`String\`.
+input StringRangeInput {
+  # The ending bound of our range.
+  end: StringRangeBoundInput
+
+  # The starting bound of our range.
+  start: StringRangeBoundInput
+}
+
 type TablefuncCrosstab2 {
   category1: String
   category2: String
@@ -5802,7 +5820,7 @@ type Type implements Node {
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
-  decimal: Float!
+  decimal: String!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -5816,9 +5834,9 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
-  nullableRange: FloatRange
-  numeric: Float!
-  numrange: FloatRange!
+  nullableRange: StringRange
+  numeric: String!
+  numrange: StringRange!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -5849,7 +5867,7 @@ input TypeCondition {
   daterange: DateRangeInput
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: Float
+  decimal: String
 
   # Checks for equality with the object’s \`domain\` field.
   domain: AnInt
@@ -5882,13 +5900,13 @@ input TypeCondition {
   nestedCompoundType: NestedCompoundTypeInput
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: FloatRangeInput
+  nullableRange: StringRangeInput
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: Float
+  numeric: String
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: FloatRangeInput
+  numrange: StringRangeInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -5920,7 +5938,7 @@ input TypeInput {
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
-  decimal: Float!
+  decimal: String!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -5931,9 +5949,9 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
-  nullableRange: FloatRangeInput
-  numeric: Float!
-  numrange: FloatRangeInput!
+  nullableRange: StringRangeInput
+  numeric: String!
+  numrange: StringRangeInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -5951,7 +5969,7 @@ input TypePatch {
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
-  decimal: Float
+  decimal: String
   domain: AnInt
   domain2: AnotherInt
   enum: Color
@@ -5962,9 +5980,9 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
-  nullableRange: FloatRangeInput
-  numeric: Float
-  numrange: FloatRangeInput
+  nullableRange: StringRangeInput
+  numeric: String
+  numrange: StringRangeInput
   smallint: Int
   textArray: [String]
   time: Time

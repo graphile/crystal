@@ -81,6 +81,8 @@ create type b.nested_compound_type as (
   baz_buz int
 );
 
+create type c.floatrange as range (subtype = float8, subtype_diff = float8mi);
+
 comment on type c.compound_type is 'Awesome feature!';
 
 create view b.updatable_view as
@@ -201,8 +203,8 @@ create function c.jsonb_identity(json jsonb) returns jsonb as $$ select json $$ 
 create function c.jsonb_identity_mutation(json jsonb) returns jsonb as $$ select json $$ language sql;
 create function c.jsonb_identity_mutation_plpgsql(_the_json jsonb) returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
 create function c.jsonb_identity_mutation_plpgsql_with_default(_the_json jsonb default '[]') returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
-create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql stable strict;
-create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql strict;
+create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql stable strict;
+create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql strict;
 create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.f, object.foo_bar)::c.compound_type $$ language sql stable;
 create function c.compound_type_set_query() returns setof c.compound_type as $$ select (1, '2', 'blue', null, '0_BAR', '', 7)::c.compound_type $$ language sql stable;
 create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.e, object.f, object.foo_bar)::c.compound_type $$ language sql;
