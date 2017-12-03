@@ -2700,14 +2700,14 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@^0.1.0-alpha.35:
-  version "0.1.0-alpha.35"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.35.tgz#b562f15484bdfb2e1ae04f0b77c29dcc3d450e4f"
+graphile-build-pg@^0.1.0-alpha.36:
+  version "0.1.0-alpha.36"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.36.tgz#3778934c0e0c5751e6dd01c0aae592bf6fef19dd"
   dependencies:
     babel-runtime ">=6 <7"
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "0.1.0-alpha.32"
+    graphile-build "^0.1.0-alpha.36"
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
     jsonwebtoken "^7.4.1"
@@ -2716,10 +2716,11 @@ graphile-build-pg@^0.1.0-alpha.35:
     pg-range-parser "^1.0.0"
     pg-sql2 "^1.0.0-beta.3"
     pluralize "^5.0.0"
+    postgres-interval "1.1.1"
 
-graphile-build@0.1.0-alpha.32:
-  version "0.1.0-alpha.32"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.32.tgz#16d7ebe06101d39d96d145509d2d9117bbeadc9e"
+graphile-build@^0.1.0-alpha.36:
+  version "0.1.0-alpha.36"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.36.tgz#f1f2e0a85f817e2b16848973d762865cf985b69f"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
@@ -4893,13 +4894,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@0.1.0-alpha.35:
-  version "0.1.0-alpha.35"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.35.tgz#3b4c09de6e8998c1feac2f512e4baa61ab500799"
+postgraphile-core@0.1.0-alpha.36:
+  version "0.1.0-alpha.36"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.36.tgz#54b6b217d586e78e44df9e934a06761edf8552a2"
   dependencies:
     babel-runtime ">=6 <7"
-    graphile-build "0.1.0-alpha.32"
-    graphile-build-pg "^0.1.0-alpha.35"
+    graphile-build "^0.1.0-alpha.36"
+    graphile-build-pg "^0.1.0-alpha.36"
 
 postgres-array@~1.0.0:
   version "1.0.2"
@@ -4912,6 +4913,12 @@ postgres-bytea@~1.0.0:
 postgres-date@~1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/postgres-date/-/postgres-date-1.0.3.tgz#e2d89702efdb258ff9d9cee0fe91bd06975257a8"
+
+postgres-interval@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/postgres-interval/-/postgres-interval-1.1.1.tgz#acdb0f897b4b1c6e496d9d4e0a853e1c428f06f0"
+  dependencies:
+    xtend "^4.0.0"
 
 postgres-interval@^1.0.2, postgres-interval@^1.1.0:
   version "1.1.0"
