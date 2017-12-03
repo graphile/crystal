@@ -7,6 +7,12 @@ query {
   add2Query(a: 2, b: 2)
   add3Query(arg1: 5)
   add4Query(arg0: 1, b: 3)
+  optionalMissingMiddle1(arg0: 1, c: 7) # expect 10 (b defaults to 2)
+  optionalMissingMiddle1_2: optionalMissingMiddle1(arg0: 1, b: 8, c: 7) # expect 16
+  optionalMissingMiddle2(a: 1, c: 7) # expect 10 (b defaults to 2)
+  optionalMissingMiddle3(a: 1, c: 7) # expect 10 because we can specify $1 positionally and $3 via name, and b defaults to 2
+  optionalMissingMiddle4(arg0: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
+  optionalMissingMiddle5(a: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
   typesQuery(a: "50", b: false, c: "xyz", d: [1, 2, 3], e: "{\"a\":1,\"b\":2,\"c\":3}", f: { start: { value: 1, inclusive: false }, end: { value: 5, inclusive: false } })
   empty: typesQuery(a: "50", b: false, c: "", d: [], e: "{}", f: {})
   compoundTypeQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, fooBar: 8 }) { a b c d e fooBar }

@@ -1860,6 +1860,12 @@ Object {
     "jsonbIdentity": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     "jsonbIdentityIssue85": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
     "noArgsQuery": 2,
+    "optionalMissingMiddle1": 10,
+    "optionalMissingMiddle1_2": 16,
+    "optionalMissingMiddle2": 10,
+    "optionalMissingMiddle3": 10,
+    "optionalMissingMiddle4": null,
+    "optionalMissingMiddle5": null,
     "tableQuery": Object {
       "authorId": 5,
       "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",

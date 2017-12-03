@@ -183,6 +183,12 @@ create function a.add_2_query(a int, b int default 2) returns int as $$ select $
 create function a.add_3_query(a int, int) returns int as $$ select $1 + $2 $$ language sql immutable;
 create function a.add_4_query(int, b int default 2) returns int as $$ select $1 + $2 $$ language sql stable;
 
+create function a.optional_missing_middle_1(int, b int default 2, c int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
+create function a.optional_missing_middle_2(a int, b int default 2, c int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
+create function a.optional_missing_middle_3(a int, int default 2, c int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
+create function a.optional_missing_middle_4(int, b int default 2, int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
+create function a.optional_missing_middle_5(a int, int default 2, int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
+
 comment on function a.add_1_mutation(int, int) is 'lol, add some stuff 1 mutation';
 comment on function a.add_2_mutation(int, int) is 'lol, add some stuff 2 mutation';
 comment on function a.add_3_mutation(int, int) is 'lol, add some stuff 3 mutation';

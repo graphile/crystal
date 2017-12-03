@@ -5317,6 +5317,11 @@ type Query implements Node {
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
 
   # Reads a single \`Person\` using its globally unique \`ID\`.
   person(
@@ -8812,6 +8817,11 @@ type Query implements Node {
 
   # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   nodeId: ID!
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
 
   # Reads a single \`Post\` using its globally unique \`ID\`.
   post(

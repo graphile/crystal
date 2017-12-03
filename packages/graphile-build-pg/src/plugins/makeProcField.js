@@ -201,22 +201,27 @@ export default function makeProcField(
       ): SQL {
         const { args: rawArgs = {} } = parsedResolveInfoFragment;
         const args = isMutation ? rawArgs.input : rawArgs;
-        const sqlArgValues = argNames.map((argName, argIndex) => {
+        const sqlArgValues = [];
+        let haveNames = true;
+        for (let argIndex = argNames.length - 1; argIndex >= 0; argIndex--) {
+          const argName = argNames[argIndex];
           const gqlArgName = inflection.argument(argName, argIndex);
-          return gql2pg(args[gqlArgName], argTypes[argIndex]);
-        });
-        // Removes null arguments from end of args list if those arguments have
-        // defaults in SQL.
-        while (
-          sqlArgValues.length > requiredArgCount &&
-          args[
-            inflection.argument(
-              argNames[sqlArgValues.length - 1],
-              sqlArgValues.length - 1
-            )
-          ] == null
-        ) {
-          sqlArgValues.pop();
+          const value = args[gqlArgName];
+          const sqlValue = gql2pg(value, argTypes[argIndex]);
+          if (argIndex + 1 > requiredArgCount && haveNames && value == null) {
+            // No need to pass argument to function
+            continue;
+          } else if (argIndex + 1 > requiredArgCount && haveNames) {
+            const sqlArgName = argName ? sql.identifier(argName) : null;
+            if (sqlArgName) {
+              sqlArgValues.unshift(sql.fragment`${sqlArgName} := ${sqlValue}`);
+            } else {
+              haveNames = false;
+              sqlArgValues.unshift(sqlValue);
+            }
+          } else {
+            sqlArgValues.unshift(sqlValue);
+          }
         }
         return sql.fragment`${sql.identifier(
           proc.namespace.name,
