@@ -299,7 +299,7 @@ create function forum_example.person_latest_post(person forum_example.person) re
   limit 1
 $$ language sql stable;
 
-comment on function forum_example.person_latest_post(forum_example.person) is 'Get’s the latest post written by the person.';
+comment on function forum_example.person_latest_post(forum_example.person) is 'Gets the latest post written by the person.';
 ```
 
 Don’t get too stuck on the function implementations. It is fairly easy to discover how to express what you want in SQL through a quick search of the Postgres documentation (which is excellent!). These functions are here to give you some examples of what functions in Postgres look like. Also note how we added comments to our functions with the [`COMMENT`](https://www.postgresql.org/docs/9.6/static/sql-comment.html) command, just like we add comments to our tables.
@@ -752,7 +752,7 @@ create policy delete_post on forum_example.post for delete to forum_example_pers
 
 These policies are very similar to the ones before, except that the `insert_post` policy uses `with check` instead of `using` like our other policies. The difference between `with check` and `using` is roughly that `using` is applied *before* any operation occurs to the table’s rows. So in the case of updating a post, one could not update a row that does not have the appropriate `author_id` in the first place. `with check` is run *after* an operation is applied. If the `with check` fails the operation will be rejected. So in the case of an insert, Postgres sets all of the columns as specified and then compares against `with check` on the new row. You must use `with check` with `INSERT` commands because there are no rows to compare against before insertion, and you must use `using` with `DELETE` commands because a delete changes no rows only removes current ones.
 
-That’s it! We have succesfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphQL we will get a well designed GraphQL API that we can be used in our frontend application.
+That’s it! We have succesfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphQL we will get a well designed GraphQL API that we can use in our frontend application.
 
 The final argument list for starting our PostGraphQL server using the CLI would be as follows:
 
