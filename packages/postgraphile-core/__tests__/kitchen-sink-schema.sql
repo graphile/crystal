@@ -28,6 +28,9 @@ create table c.person (
   created_at timestamp default current_timestamp
 );
 
+-- This should not add a query to the schema
+create unique index uniq_person__email_id_3 on c.person (email) where (id = 3);
+
 comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
 
@@ -59,6 +62,9 @@ create table a.post (
   enums a.an_enum[],
   comptypes a.comptype[]
 );
+
+-- This should not add a query to the schema
+create unique index uniq_post__headline_author_3 on a.post (headline) where (author_id = 3);
 
 create type a.letter as enum ('a', 'b', 'c', 'd');
 create type b.color as enum ('red', 'green', 'blue');
