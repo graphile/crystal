@@ -6,6 +6,9 @@
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
 
+**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only  
+**Next**: v4 ([`postgraphile`](https://github.com/postgraphql/postgraphql/tree/postgraphile) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
+
 The strongly typed GraphQL data querying language is a revolutionary new way to interact with your server. Similar to how JSON very quickly overtook XML, GraphQL will likely take over REST. Why? Because GraphQL allows us to express our data in the exact same way we think about it.
 
 The PostgreSQL database is the self acclaimed “world’s most advanced open source database” and even after 20 years that still rings true. PostgreSQL is the most feature rich SQL database available and provides an excellent public reflection API giving its users a lot of power over their data. And despite being 20 years old, the database still has frequent releases.
