@@ -293,4 +293,6 @@ Thanks so much to the people working on [PostgREST](https://github.com/begriffs/
 
 A humongous, heart-felt, thank you to the original author of PostGraphQL - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphQL! He's now graduated from the project and we all wish him the best for his future ventures!
 
+Even more thanks to each and every [sponsor](SPONSORS.md) of the project - without their help progress would be a lot slower!
+
 Thanks and enjoy 👍
