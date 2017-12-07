@@ -22,7 +22,9 @@ export default (function PgColumnDeprecationPlugin(builder) {
     }
     return pgFieldIntrospection.tags.deprecated
       ? Object.assign({}, field, {
-          deprecationReason: pgFieldIntrospection.tags.deprecated,
+          deprecationReason: Array.isArray(pgFieldIntrospection.tags.deprecated)
+            ? pgFieldIntrospection.tags.deprecated.join("\n")
+            : pgFieldIntrospection.tags.deprecated,
         })
       : field;
   });
