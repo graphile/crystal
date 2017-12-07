@@ -38,6 +38,7 @@ type PostGraphQLOptions = {
   inflector?: Inflector,
   pgColumnFilter?: (mixed, Build, Context) => boolean,
   viewUniqueKey?: string,
+  enableTags?: boolean,
 };
 
 type PgConfig = Client | Pool | string;
@@ -83,6 +84,7 @@ const getPostGraphQLBuilder = async (
     inflector,
     pgColumnFilter,
     viewUniqueKey,
+    enableTags = true,
   } = options;
   if (replaceAllPlugins) {
     ensureValidPlugins("replaceAllPlugins", replaceAllPlugins);
@@ -122,6 +124,7 @@ const getPostGraphQLBuilder = async (
         pgJwtSecret: jwtSecret,
         pgDisableDefaultMutations: disableDefaultMutations,
         pgViewUniqueKey: viewUniqueKey,
+        pgEnableTags: enableTags,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!

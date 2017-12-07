@@ -40,6 +40,13 @@ const testFixtures = [
         pgColumnFilter: attr => attr.name !== "headline",
       }),
   },
+  {
+    name: "prints a schema without parsing tags",
+    createSchema: client =>
+      createPostGraphQLSchema(client, "c", {
+        enableTags: false
+      }),
+  },
 ];
 
 beforeAll(() => {

@@ -835,7 +835,7 @@ type Person implements Node {
   # The person’s name
   name: String!
   rowId: Int!
-  site: WrappedUrl
+  site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
 # A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
@@ -4673,7 +4673,7 @@ type Person implements Node {
     # The method to use when ordering \`Post\`.
     orderBy: PostsOrderBy = PRIMARY_KEY_ASC
   ): PostsConnection!
-  site: WrappedUrl
+  site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
 # A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
@@ -7184,7 +7184,7 @@ type Person implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
-  site: WrappedUrl
+  site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
 # A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
@@ -7452,6 +7452,1262 @@ type TypesMutationPayload {
   # The exact same \`clientMutationId\` that was provided in the mutation input,
   # unchanged and unused. May be used by a client to track mutations.
   clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+scalar UUID
+
+type WrappedUrl {
+  url: NotNullUrl!
+}
+
+# An input for mutations affecting \`WrappedUrl\`
+input WrappedUrlInput {
+  url: NotNullUrl!
+}
+"
+`;
+
+exports[`prints a schema without parsing tags 1`] = `
+"enum AnEnum {
+  AWAITING
+  PUBLISHED
+  REJECTED
+}
+
+# A signed eight-byte integer. The upper big integer values are greater then the
+# max value for a JavaScript number. Therefore all big integers will be output as
+# strings and not numbers.
+scalar BigInt
+
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
+type CompoundKey implements Node {
+  extra: Boolean
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+  personId1: Int!
+  personId2: Int!
+}
+
+# A condition to be used against \`CompoundKey\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input CompoundKeyCondition {
+  # Checks for equality with the object’s \`extra\` field.
+  extra: Boolean
+
+  # Checks for equality with the object’s \`personId1\` field.
+  personId1: Int
+
+  # Checks for equality with the object’s \`personId2\` field.
+  personId2: Int
+}
+
+# An input for mutations affecting \`CompoundKey\`
+input CompoundKeyInput {
+  extra: Boolean
+  personId1: Int!
+  personId2: Int!
+}
+
+# Represents an update to a \`CompoundKey\`. Fields that are set will be updated.
+input CompoundKeyPatch {
+  extra: Boolean
+  personId1: Int
+  personId2: Int
+}
+
+# A connection to a list of \`CompoundKey\` values.
+type CompoundKeysConnection {
+  # A list of edges which contains the \`CompoundKey\` and cursor to aid in pagination.
+  edges: [CompoundKeysEdge!]!
+
+  # A list of \`CompoundKey\` objects.
+  nodes: [CompoundKey]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundKey\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`CompoundKey\` edge in the connection.
+type CompoundKeysEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`CompoundKey\` at the end of the edge.
+  node: CompoundKey!
+}
+
+# Methods to use when ordering \`CompoundKey\`.
+enum CompoundKeysOrderBy {
+  EXTRA_ASC
+  EXTRA_DESC
+  NATURAL
+  PERSON_ID_1_ASC
+  PERSON_ID_1_DESC
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+# Awesome feature!
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  computedField: Int
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+}
+
+# A connection to a list of \`CompoundType\` values.
+type CompoundTypesConnection {
+  # A list of edges which contains the \`CompoundType\` and cursor to aid in pagination.
+  edges: [CompoundTypesEdge!]!
+
+  # A list of \`CompoundType\` objects.
+  nodes: [CompoundType]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`CompoundType\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`CompoundType\` edge in the connection.
+type CompoundTypesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`CompoundType\` at the end of the edge.
+  node: CompoundType!
+}
+
+type Comptype {
+  isOptimised: Boolean
+  schedule: Datetime
+}
+
+# All input for the create \`CompoundKey\` mutation.
+input CreateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`CompoundKey\` to be created by this mutation.
+  compoundKey: CompoundKeyInput!
+}
+
+# The output of our create \`CompoundKey\` mutation.
+type CreateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`CompoundKey\` that was created by this mutation.
+  compoundKey: CompoundKey
+
+  # An edge for the type. May be used by Relay 1.
+  compoundKeyEdge(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysEdge
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the create \`EdgeCase\` mutation.
+input CreateEdgeCaseInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`EdgeCase\` to be created by this mutation.
+  edgeCase: EdgeCaseInput!
+}
+
+# The output of our create \`EdgeCase\` mutation.
+type CreateEdgeCasePayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`EdgeCase\` that was created by this mutation.
+  edgeCase: EdgeCase
+
+  # An edge for the type. May be used by Relay 1.
+  edgeCaseEdge(
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+  ): EdgeCasesEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the create \`Person\` mutation.
+input CreatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The \`Person\` to be created by this mutation.
+  person: PersonInput!
+}
+
+# The output of our create \`Person\` mutation.
+type CreatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`Person\` that was created by this mutation.
+  person: Person
+
+  # An edge for the type. May be used by Relay 1.
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# A location in a connection that can be used for resuming pagination.
+scalar Cursor
+
+# A point in time as described by the [ISO
+# 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+scalar Datetime
+
+# All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
+input DeleteCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  personId1: Int!
+  personId2: Int!
+}
+
+# All input for the \`deleteCompoundKey\` mutation.
+input DeleteCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`CompoundKey\` mutation.
+type DeleteCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`CompoundKey\` that was deleted by this mutation.
+  compoundKey: CompoundKey
+
+  # An edge for the type. May be used by Relay 1.
+  compoundKeyEdge(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysEdge
+  deletedCompoundKeyId: ID
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`deletePersonByEmail\` mutation.
+input DeletePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  email: Email!
+}
+
+# All input for the \`deletePersonById\` mutation.
+input DeletePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+}
+
+# All input for the \`deletePerson\` mutation.
+input DeletePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
+  nodeId: ID!
+}
+
+# The output of our delete \`Person\` mutation.
+type DeletePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  deletedPersonId: ID
+
+  # The \`Person\` that was deleted by this mutation.
+  person: Person
+
+  # An edge for the type. May be used by Relay 1.
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+type EdgeCase {
+  computed: String
+  notNullHasDefault: Boolean!
+  rowId: Int
+  wontCastEasy: Int
+}
+
+# A condition to be used against \`EdgeCase\` object types. All fields are tested
+# for equality and combined with a logical ‘and.’
+input EdgeCaseCondition {
+  # Checks for equality with the object’s \`notNullHasDefault\` field.
+  notNullHasDefault: Boolean
+
+  # Checks for equality with the object’s \`rowId\` field.
+  rowId: Int
+
+  # Checks for equality with the object’s \`wontCastEasy\` field.
+  wontCastEasy: Int
+}
+
+# An input for mutations affecting \`EdgeCase\`
+input EdgeCaseInput {
+  notNullHasDefault: Boolean
+  rowId: Int
+  wontCastEasy: Int
+}
+
+# A connection to a list of \`EdgeCase\` values.
+type EdgeCasesConnection {
+  # A list of edges which contains the \`EdgeCase\` and cursor to aid in pagination.
+  edges: [EdgeCasesEdge!]!
+
+  # A list of \`EdgeCase\` objects.
+  nodes: [EdgeCase]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`EdgeCase\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`EdgeCase\` edge in the connection.
+type EdgeCasesEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`EdgeCase\` at the end of the edge.
+  node: EdgeCase!
+}
+
+# Methods to use when ordering \`EdgeCase\`.
+enum EdgeCasesOrderBy {
+  NATURAL
+  NOT_NULL_HAS_DEFAULT_ASC
+  NOT_NULL_HAS_DEFAULT_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+  WONT_CAST_EASY_ASC
+  WONT_CAST_EASY_DESC
+}
+
+scalar Email
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input FloatRangeBoundInput {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: Float!
+}
+
+# A range of \`Float\`.
+input FloatRangeInput {
+  # The ending bound of our range.
+  end: FloatRangeBoundInput
+
+  # The starting bound of our range.
+  start: FloatRangeBoundInput
+}
+
+# All input for the \`intSetMutation\` mutation.
+input IntSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+# The output of our \`intSetMutation\` mutation.
+type IntSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integers: [Int]
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# A connection to a list of \`Int\` values.
+type IntSetQueryConnection {
+  # A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  edges: [IntSetQueryEdge!]!
+
+  # A list of \`Int\` objects.
+  nodes: [Int]!
+}
+
+# A \`Int\` edge in the connection.
+type IntSetQueryEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`Int\` at the end of the edge.
+  node: Int
+}
+
+# A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+scalar JSON
+
+# All input for the \`jsonbIdentityMutation\` mutation.
+input JsonbIdentityMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  json: JSON
+}
+
+# The output of our \`jsonbIdentityMutation\` mutation.
+type JsonbIdentityMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: JSON
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`jsonbIdentityMutationPlpgsql\` mutation.
+input JsonbIdentityMutationPlpgsqlInput {
+  _theJson: JSON!
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`jsonbIdentityMutationPlpgsql\` mutation.
+type JsonbIdentityMutationPlpgsqlPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: JSON
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`jsonbIdentityMutationPlpgsqlWithDefault\` mutation.
+input JsonbIdentityMutationPlpgsqlWithDefaultInput {
+  _theJson: JSON
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`jsonbIdentityMutationPlpgsqlWithDefault\` mutation.
+type JsonbIdentityMutationPlpgsqlWithDefaultPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: JSON
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`jsonIdentityMutation\` mutation.
+input JsonIdentityMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  json: JSON
+}
+
+# The output of our \`jsonIdentityMutation\` mutation.
+type JsonIdentityMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  json: JSON
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# The root mutation type which contains root level fields which mutate data.
+type Mutation {
+  # Creates a single \`CompoundKey\`.
+  createCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateCompoundKeyInput!
+  ): CreateCompoundKeyPayload
+
+  # Creates a single \`EdgeCase\`.
+  createEdgeCase(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreateEdgeCaseInput!
+  ): CreateEdgeCasePayload
+
+  # Creates a single \`Person\`.
+  createPerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  # Deletes a single \`CompoundKey\` using its globally unique id.
+  deleteCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyInput!
+  ): DeleteCompoundKeyPayload
+
+  # Deletes a single \`CompoundKey\` using a unique key.
+  deleteCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeleteCompoundKeyByPersonId1AndPersonId2Input!
+  ): DeleteCompoundKeyPayload
+
+  # Deletes a single \`Person\` using its globally unique id.
+  deletePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByEmailInput!
+  ): DeletePersonPayload
+
+  # Deletes a single \`Person\` using a unique key.
+  deletePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
+  intSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: IntSetMutationInput!
+  ): IntSetMutationPayload
+  jsonIdentityMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonIdentityMutationInput!
+  ): JsonIdentityMutationPayload
+  jsonbIdentityMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonbIdentityMutationInput!
+  ): JsonbIdentityMutationPayload
+  jsonbIdentityMutationPlpgsql(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonbIdentityMutationPlpgsqlInput!
+  ): JsonbIdentityMutationPlpgsqlPayload
+  jsonbIdentityMutationPlpgsqlWithDefault(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: JsonbIdentityMutationPlpgsqlWithDefaultInput!
+  ): JsonbIdentityMutationPlpgsqlWithDefaultPayload
+  noArgsMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: NoArgsMutationInput!
+  ): NoArgsMutationPayload
+
+  # Reads and enables pagination through a set of \`Post\`.
+  tableMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableMutationInput!
+  ): TableMutationPayload
+
+  # Reads and enables pagination through a set of \`Person\`.
+  tableSetMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TableSetMutationInput!
+  ): TableSetMutationPayload
+  typesMutation(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: TypesMutationInput!
+  ): TypesMutationPayload
+
+  # Updates a single \`CompoundKey\` using its globally unique id and a patch.
+  updateCompoundKey(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyInput!
+  ): UpdateCompoundKeyPayload
+
+  # Updates a single \`CompoundKey\` using a unique key and a patch.
+  updateCompoundKeyByPersonId1AndPersonId2(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdateCompoundKeyByPersonId1AndPersonId2Input!
+  ): UpdateCompoundKeyPayload
+
+  # Updates a single \`Person\` using its globally unique id and a patch.
+  updatePerson(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonByEmail(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByEmailInput!
+  ): UpdatePersonPayload
+
+  # Updates a single \`Person\` using a unique key and a patch.
+  updatePersonById(
+    # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
+}
+
+# All input for the \`noArgsMutation\` mutation.
+input NoArgsMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`noArgsMutation\` mutation.
+type NoArgsMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  integer: Int
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# An object with a globally unique \`ID\`.
+interface Node {
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+}
+
+scalar NotNullUrl
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, the cursor to continue.
+  endCursor: Cursor
+
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: Cursor
+}
+
+# A connection to a list of \`Person\` values.
+type PeopleConnection {
+  # A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  edges: [PeopleEdge!]!
+
+  # A list of \`Person\` objects.
+  nodes: [Person]!
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # The count of *all* \`Person\` you could get from the connection.
+  totalCount: Int
+}
+
+# A \`Person\` edge in the connection.
+type PeopleEdge {
+  # A cursor for use in pagination.
+  cursor: Cursor
+
+  # The \`Person\` at the end of the edge.
+  node: Person!
+}
+
+# Methods to use when ordering \`Person\`.
+enum PeopleOrderBy {
+  ABOUT_ASC
+  ABOUT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  SITE_ASC
+  SITE_DESC
+}
+
+# Person test comment
+type Person implements Node {
+  about: String
+
+  # Reads and enables pagination through a set of \`CompoundKey\`.
+  compoundKeysByPersonId1(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysConnection!
+
+  # Reads and enables pagination through a set of \`CompoundKey\`.
+  compoundKeysByPersonId2(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysConnection!
+  createdAt: Datetime
+  email: Email!
+  exists(email: Email): Boolean
+  firstName: String
+
+  # Reads and enables pagination through a set of \`Post\`.
+  firstPost: Post
+
+  # Reads and enables pagination through a set of \`Person\`.
+  friends(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): PeopleConnection!
+  id: Int!
+
+  # The person’s name
+  name: String!
+
+  # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  nodeId: ID!
+
+  # @deprecated Don’t use me
+  site: WrappedUrl
+}
+
+# A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+input PersonCondition {
+  # Checks for equality with the object’s \`about\` field.
+  about: String
+
+  # Checks for equality with the object’s \`createdAt\` field.
+  createdAt: Datetime
+
+  # Checks for equality with the object’s \`email\` field.
+  email: Email
+
+  # Checks for equality with the object’s \`id\` field.
+  id: Int
+
+  # Checks for equality with the object’s \`name\` field.
+  name: String
+
+  # Checks for equality with the object’s \`site\` field.
+  site: WrappedUrlInput
+}
+
+# An input for mutations affecting \`Person\`
+input PersonInput {
+  about: String
+  createdAt: Datetime
+  email: Email!
+  id: Int
+
+  # The person’s name
+  name: String!
+
+  # @deprecated Don’t use me
+  site: WrappedUrlInput
+}
+
+# Represents an update to a \`Person\`. Fields that are set will be updated.
+input PersonPatch {
+  about: String
+  createdAt: Datetime
+  email: Email
+  id: Int
+
+  # The person’s name
+  name: String
+
+  # @deprecated Don’t use me
+  site: WrappedUrlInput
+}
+
+type Post {
+  authorId: Int
+  body: String
+  comptypes: [Comptype]
+  enums: [AnEnum]
+  headline: String!
+  id: Int!
+}
+
+# The root query type which gives access points into the data universe.
+type Query implements Node {
+  # Reads and enables pagination through a set of \`CompoundKey\`.
+  allCompoundKeys(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: CompoundKeyCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysConnection
+
+  # Reads and enables pagination through a set of \`EdgeCase\`.
+  allEdgeCases(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: EdgeCaseCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`EdgeCase\`.
+    orderBy: EdgeCasesOrderBy = NATURAL
+  ): EdgeCasesConnection
+
+  # Reads and enables pagination through a set of \`Person\`.
+  allPeople(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # A condition to be used in determining which values should be returned by the collection.
+    condition: PersonCondition
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleConnection
+
+  # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
+  compoundKey(
+    # The globally unique \`ID\` to be used in selecting a single \`CompoundKey\`.
+    nodeId: ID!
+  ): CompoundKey
+  compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+
+  # Reads and enables pagination through a set of \`CompoundType\`.
+  compoundTypeSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): CompoundTypesConnection!
+  intSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+    x: Int
+    y: Int
+    z: Int
+  ): IntSetQueryConnection!
+  jsonIdentity(json: JSON): JSON
+  jsonbIdentity(json: JSON): JSON
+  noArgsQuery: Int
+
+  # Fetches an object given its globally unique \`ID\`.
+  node(
+    # The globally unique \`ID\`.
+    nodeId: ID!
+  ): Node
+
+  # The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  nodeId: ID!
+
+  # Reads a single \`Person\` using its globally unique \`ID\`.
+  person(
+    # The globally unique \`ID\` to be used in selecting a single \`Person\`.
+    nodeId: ID!
+  ): Person
+  personByEmail(email: Email!): Person
+  personById(id: Int!): Person
+
+  # Exposes the root query type nested one level down. This is helpful for Relay 1
+  # which can only query top level fields if they are in a particular form.
+  query: Query!
+
+  # Reads and enables pagination through a set of \`Post\`.
+  tableQuery(id: Int): Post
+
+  # Reads and enables pagination through a set of \`Person\`.
+  tableSetQuery(
+    # Read all values in the set after (below) this cursor.
+    after: Cursor
+
+    # Read all values in the set before (above) this cursor.
+    before: Cursor
+
+    # Only read the first \`n\` values of the set.
+    first: Int
+
+    # Only read the last \`n\` values of the set.
+    last: Int
+
+    # Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    # based pagination. May not be used with \`last\`.
+    offset: Int
+  ): PeopleConnection!
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+}
+
+# All input for the \`tableMutation\` mutation.
+input TableMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int
+}
+
+# The output of our \`tableMutation\` mutation.
+type TableMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  post: Post
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`tableSetMutation\` mutation.
+input TableSetMutationInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+}
+
+# The output of our \`tableSetMutation\` mutation.
+type TableSetMutationPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+  people: [Person]
+
+  # An edge for the type. May be used by Relay 1.
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleEdge
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`typesMutation\` mutation.
+input TypesMutationInput {
+  a: BigInt!
+  b: Boolean!
+  c: String!
+
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  d: [Int]!
+  e: JSON!
+  f: FloatRangeInput!
+}
+
+# The output of our \`typesMutation\` mutation.
+type TypesMutationPayload {
+  boolean: Boolean
+
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
+input UpdateCompoundKeyByPersonId1AndPersonId2Input {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # An object where the defined keys will be set on the \`CompoundKey\` being updated.
+  compoundKeyPatch: CompoundKeyPatch!
+  personId1: Int!
+  personId2: Int!
+}
+
+# All input for the \`updateCompoundKey\` mutation.
+input UpdateCompoundKeyInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # An object where the defined keys will be set on the \`CompoundKey\` being updated.
+  compoundKeyPatch: CompoundKeyPatch!
+
+  # The globally unique \`ID\` which will identify a single \`CompoundKey\` to be updated.
+  nodeId: ID!
+}
+
+# The output of our update \`CompoundKey\` mutation.
+type UpdateCompoundKeyPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`CompoundKey\` that was updated by this mutation.
+  compoundKey: CompoundKey
+
+  # An edge for the type. May be used by Relay 1.
+  compoundKeyEdge(
+    # The method to use when ordering \`CompoundKey\`.
+    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+  ): CompoundKeysEdge
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId1: Person
+
+  # Reads a single \`Person\` that is related to this \`CompoundKey\`.
+  personByPersonId2: Person
+
+  # Our root query field type. Allows us to run any query from our mutation payload.
+  query: Query
+}
+
+# All input for the \`updatePersonByEmail\` mutation.
+input UpdatePersonByEmailInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  email: Email!
+
+  # An object where the defined keys will be set on the \`Person\` being updated.
+  personPatch: PersonPatch!
+}
+
+# All input for the \`updatePersonById\` mutation.
+input UpdatePersonByIdInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+  id: Int!
+
+  # An object where the defined keys will be set on the \`Person\` being updated.
+  personPatch: PersonPatch!
+}
+
+# All input for the \`updatePerson\` mutation.
+input UpdatePersonInput {
+  # An arbitrary string value with no semantic meaning. Will be included in the
+  # payload verbatim. May be used to track mutations by the client.
+  clientMutationId: String
+
+  # The globally unique \`ID\` which will identify a single \`Person\` to be updated.
+  nodeId: ID!
+
+  # An object where the defined keys will be set on the \`Person\` being updated.
+  personPatch: PersonPatch!
+}
+
+# The output of our update \`Person\` mutation.
+type UpdatePersonPayload {
+  # The exact same \`clientMutationId\` that was provided in the mutation input,
+  # unchanged and unused. May be used by a client to track mutations.
+  clientMutationId: String
+
+  # The \`Person\` that was updated by this mutation.
+  person: Person
+
+  # An edge for the type. May be used by Relay 1.
+  personEdge(
+    # The method to use when ordering \`Person\`.
+    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+  ): PeopleEdge
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query

@@ -33,6 +33,7 @@ create unique index uniq_person__email_id_3 on c.person (email) where (id = 3);
 
 comment on table c.person is 'Person test comment';
 comment on column c.person.name is 'The person’s name';
+comment on column c.person.site is '@deprecated Don’t use me';
 
 create function c.person_exists(person c.person, email b.email) returns boolean as $$
 select exists(select 1 from c.person where person.email = person_exists.email);
