@@ -814,6 +814,22 @@ Object {
 }
 `;
 
+exports[`empty-array.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "aliases": Array [],
+          "id": 1,
+          "name": "John Smith",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`node.graphql 1`] = `
 Object {
   "data": Object {

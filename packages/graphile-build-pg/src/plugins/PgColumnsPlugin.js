@@ -77,11 +77,18 @@ export default (function PgColumnsPlugin(
                         const ident = sql.identifier(Symbol());
                         return sql.fragment`
                           (
-                            select json_agg(${getSelectValueForFieldAndType(
-                              ident,
-                              type.arrayItemType
-                            )})
-                            from unnest(${sqlFullName}) as ${ident}
+                            case
+                            when ${sqlFullName} is null then null
+                            when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
+                            else
+                              (
+                                select json_agg(${getSelectValueForFieldAndType(
+                                  ident,
+                                  type.arrayItemType
+                                )})
+                                from unnest(${sqlFullName}) as ${ident}
+                              )
+                            end
                           )
                         `;
                       } else if (type.type === "c") {

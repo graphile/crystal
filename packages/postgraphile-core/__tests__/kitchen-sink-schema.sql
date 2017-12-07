@@ -22,6 +22,7 @@ create domain b.email as text
 create table c.person (
   id serial primary key,
   name varchar not null,
+  aliases text[] not null default '{}',
   about text,
   email b.email not null unique,
   site b.wrapped_url default null,

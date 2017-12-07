@@ -734,6 +734,8 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
+  ALIASES_ASC
+  ALIASES_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
@@ -752,6 +754,7 @@ enum PeopleOrderBy {
 # Person test comment
 type Person implements Node {
   about: String
+  aliases: [String]!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
@@ -843,6 +846,9 @@ input PersonCondition {
   # Checks for equality with the object’s \`about\` field.
   about: String
 
+  # Checks for equality with the object’s \`aliases\` field.
+  aliases: [String]
+
   # Checks for equality with the object’s \`createdAt\` field.
   createdAt: Datetime
 
@@ -862,6 +868,7 @@ input PersonCondition {
 # An input for mutations affecting \`Person\`
 input PersonInput {
   about: String
+  aliases: [String]
   createdAt: Datetime
   email: Email!
 
@@ -874,6 +881,7 @@ input PersonInput {
 # Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   about: String
+  aliases: [String]
   createdAt: Datetime
   email: Email
 
@@ -4522,6 +4530,8 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
+  ALIASES_ASC
+  ALIASES_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
@@ -4540,6 +4550,7 @@ enum PeopleOrderBy {
 # Person test comment
 type Person implements Node {
   about: String
+  aliases: [String]!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
@@ -4681,6 +4692,9 @@ input PersonCondition {
   # Checks for equality with the object’s \`about\` field.
   about: String
 
+  # Checks for equality with the object’s \`aliases\` field.
+  aliases: [String]
+
   # Checks for equality with the object’s \`createdAt\` field.
   createdAt: Datetime
 
@@ -4700,6 +4714,7 @@ input PersonCondition {
 # An input for mutations affecting \`Person\`
 input PersonInput {
   about: String
+  aliases: [String]
   createdAt: Datetime
   email: Email!
   id: Int
@@ -4712,6 +4727,7 @@ input PersonInput {
 # Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   about: String
+  aliases: [String]
   createdAt: Datetime
   email: Email
   id: Int
@@ -7083,6 +7099,8 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
+  ALIASES_ASC
+  ALIASES_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
@@ -7101,6 +7119,7 @@ enum PeopleOrderBy {
 # Person test comment
 type Person implements Node {
   about: String
+  aliases: [String]!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
   compoundKeysByPersonId1(
@@ -7191,6 +7210,9 @@ type Person implements Node {
 input PersonCondition {
   # Checks for equality with the object’s \`about\` field.
   about: String
+
+  # Checks for equality with the object’s \`aliases\` field.
+  aliases: [String]
 
   # Checks for equality with the object’s \`createdAt\` field.
   createdAt: Datetime
