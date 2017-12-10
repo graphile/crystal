@@ -34,18 +34,6 @@ export default (function PgMutationProceduresPlugin(builder) {
                 argNames: [ 'integration' ],
                 argDefaultsNum: 0 }
             */
-            const argTypes = proc.argTypeIds.map(
-              typeId => introspectionResultsByKind.typeById[typeId]
-            );
-            if (
-              argTypes.some(
-                type =>
-                  type.type === "c" && type.class && type.class.isSelectable
-              )
-            ) {
-              // It selects a table, don't add it at root level (see Computed Columns plugin)
-              return memo;
-            }
 
             const fieldName = inflection.functionName(
               proc.name,

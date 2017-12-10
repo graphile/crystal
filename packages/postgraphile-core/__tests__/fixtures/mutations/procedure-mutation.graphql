@@ -29,4 +29,8 @@ mutation {
     {id: 8, headline: "headline", body: "body", authorId: 9000, enums: AWAITING, comptypes: {schedule: "2009-10-24 10:23:54+02", isOptimised: null}},
     {id: 9, headline: "headline", body: "body", authorId: 9000, enums: AWAITING, comptypes: {schedule: "2009-10-24 10:23:54+02", isOptimised: false}}
   ]}) { posts { id headline comptypes { schedule isOptimised } } }
+  postWithSuffix(input: {
+    post: {id: 15, headline: "headline_", body: "body"},
+    suffix: "test"
+  }) { post { id headline } }
 }

@@ -835,6 +835,12 @@ Object {
         },
       ],
     },
+    "postWithSuffix": Object {
+      "post": Object {
+        "headline": "headline_test",
+        "id": 15,
+      },
+    },
     "returnVoidMutation": Object {
       "__typename": "ReturnVoidMutationPayload",
     },

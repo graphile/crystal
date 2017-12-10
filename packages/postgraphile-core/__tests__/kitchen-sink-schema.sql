@@ -281,3 +281,9 @@ create table a.view_table (
 create view a.testview as
   select id as testviewid, col1, col2
   from a.view_table;
+
+create function a.post_with_suffix(post a.post,suffix text) returns a.post as $$
+  insert into a.post(id,headline,body,author_id,enums,comptypes) values
+  (post.id,post.headline || suffix,post.body,post.author_id,post.enums,post.comptypes)
+  returning *; 
+$$ language sql volatile;
