@@ -6,6 +6,7 @@ import PgJWTPlugin from "./plugins/PgJWTPlugin";
 import PgTablesPlugin from "./plugins/PgTablesPlugin";
 import PgConnectionArgFirstLastBeforeAfter from "./plugins/PgConnectionArgFirstLastBeforeAfter";
 import PgConnectionArgOrderBy from "./plugins/PgConnectionArgOrderBy";
+import PgConnectionArgOrderByDefaultValue from "./plugins/PgConnectionArgOrderByDefaultValue";
 import PgConnectionArgCondition from "./plugins/PgConnectionArgCondition";
 import PgAllRows from "./plugins/PgAllRows";
 import PgColumnsPlugin from "./plugins/PgColumnsPlugin";
@@ -39,6 +40,7 @@ export const defaultPlugins = [
   PgTablesPlugin,
   PgConnectionArgFirstLastBeforeAfter,
   PgConnectionArgOrderBy,
+  PgConnectionArgOrderByDefaultValue,
   PgConnectionArgCondition,
   PgAllRows,
   PgColumnsPlugin,
@@ -73,6 +75,7 @@ export {
   PgTablesPlugin,
   PgConnectionArgFirstLastBeforeAfter,
   PgConnectionArgOrderBy,
+  PgConnectionArgOrderByDefaultValue,
   PgConnectionArgCondition,
   PgAllRows,
   PgColumnsPlugin,

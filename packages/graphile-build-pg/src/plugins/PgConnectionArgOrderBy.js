@@ -97,15 +97,11 @@ export default (function PgConnectionArgOrderBy(
           },
         };
       });
-      const defaultValueEnum =
-        TableOrderByType.getValues().find(v => v.name === "PRIMARY_KEY_ASC") ||
-        TableOrderByType.getValues()[0];
 
       return extend(args, {
         orderBy: {
           description: `The method to use when ordering \`${tableTypeName}\`.`,
           type: TableOrderByType,
-          defaultValue: defaultValueEnum && defaultValueEnum.value,
         },
       });
     }
