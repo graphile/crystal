@@ -311,46 +311,47 @@ export default (function PgTypesPlugin(
       "UUID",
       "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
     );
-    const oidLookup = Object.assign(
-      {
-        "20": stringType(
-          "BigInt",
-          "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
-        ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
-        "21": GraphQLInt, // int2
-        "23": GraphQLInt, // int4
-        "700": GraphQLFloat, // float4
-        "701": GraphQLFloat, // float8
-        "1700": GraphQLString, // numeric
-        "790": GraphQLFloat, // money
 
-        "1186": GQLInterval, // interval
-        "1082": SimpleDate, // date
-        "1114": SimpleDatetime, // timestamp
-        "1184": SimpleDatetime, // timestamptz
-        "1083": SimpleTime, // time
-        "1266": SimpleTime, // timetz
+    // pgExtendedTypes might change what types we use for things
+    const JSONType = pgExtendedTypes ? GraphQLJSON : SimpleJSON;
+    const UUIDType = SimpleUUID; // GraphQLUUID
+    const DateType = SimpleDate; // GraphQLDate
+    const DateTimeType = SimpleDatetime; // GraphQLDateTime
+    const TimeType = SimpleTime; // GraphQLTime
 
-        "114": SimpleJSON, // json
-        "3802": SimpleJSON, // jsonb
-        "2950": SimpleUUID, // uuid
+    // Other plugins might want to use JSON
+    addType(JSONType);
+    addType(UUIDType);
+    addType(DateType);
+    addType(DateTimeType);
+    addType(TimeType);
 
-        "1560": GraphQLString, // bit
-        "1562": GraphQLString, // varbit
-      },
-      pgExtendedTypes && {
-        "114": GraphQLJSON,
-        "3802": GraphQLJSON,
-        /*
-        '1082': GraphQLDate, // date
-        '1114': GraphQLDateTime, // timestamp
-        '1184': GraphQLDateTime, // timestamptz
-        '1083': GraphQLTime, // time
-        '1266': GraphQLTime, // timetz
-        '2950': GraphQLUUID,
-        */
-      }
-    );
+    const oidLookup = {
+      "20": stringType(
+        "BigInt",
+        "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
+      ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
+      "21": GraphQLInt, // int2
+      "23": GraphQLInt, // int4
+      "700": GraphQLFloat, // float4
+      "701": GraphQLFloat, // float8
+      "1700": GraphQLString, // numeric
+      "790": GraphQLFloat, // money
+
+      "1186": GQLInterval, // interval
+      "1082": DateType, // date
+      "1114": DateTimeType, // timestamp
+      "1184": DateTimeType, // timestamptz
+      "1083": TimeType, // time
+      "1266": TimeType, // timetz
+
+      "114": JSONType, // json
+      "3802": JSONType, // jsonb
+      "2950": UUIDType, // uuid
+
+      "1560": GraphQLString, // bit
+      "1562": GraphQLString, // varbit
+    };
     const oidInputLookup = {
       "1186": GQLIntervalInput, // interval
     };
