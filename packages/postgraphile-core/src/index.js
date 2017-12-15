@@ -33,6 +33,7 @@ type PostGraphQLOptions = {
   replaceAllPlugins?: Array<Plugin>,
   appendPlugins?: Array<Plugin>,
   prependPlugins?: Array<Plugin>,
+  skipPlugins?: Array<Plugin>,
   jwtPgTypeIdentifier?: string,
   jwtSecret?: string,
   inflector?: Inflector,
@@ -76,6 +77,7 @@ const getPostGraphQLBuilder = async (
     replaceAllPlugins,
     appendPlugins = [],
     prependPlugins = [],
+    skipPlugins = [],
     jwtPgTypeIdentifier,
     jwtSecret,
     disableDefaultMutations,
@@ -99,15 +101,16 @@ const getPostGraphQLBuilder = async (
   }
   ensureValidPlugins("prependPlugins", prependPlugins);
   ensureValidPlugins("appendPlugins", appendPlugins);
+  ensureValidPlugins("skipPlugins", skipPlugins);
   return getBuilder(
-    replaceAllPlugins
+    (replaceAllPlugins
       ? [...prependPlugins, ...replaceAllPlugins, ...appendPlugins]
       : [
           ...prependPlugins,
           ...defaultPlugins,
           ...pgDefaultPlugins,
           ...appendPlugins,
-        ],
+        ]).filter(p => skipPlugins.indexOf(p) === -1),
     Object.assign(
       {
         pgConfig: pgConfig,
