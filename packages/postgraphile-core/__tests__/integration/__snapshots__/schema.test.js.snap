@@ -1361,6 +1361,45 @@ type AuthenticatePayload {
   query: Query
 }
 
+# A floating point number that requires more precision than IEEE 754 binary 64
+scalar BigFloat
+
+# A range of \`BigFloat\`.
+type BigFloatRange {
+  # The ending bound of our range.
+  end: BigFloatRangeBound
+
+  # The starting bound of our range.
+  start: BigFloatRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type BigFloatRangeBound {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: BigFloat!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input BigFloatRangeBoundInput {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: BigFloat!
+}
+
+# A range of \`BigFloat\`.
+input BigFloatRangeInput {
+  # The ending bound of our range.
+  end: BigFloatRangeBoundInput
+
+  # The starting bound of our range.
+  start: BigFloatRangeBoundInput
+}
+
 # A signed eight-byte integer. The upper big integer values are greater then the
 # max value for a JavaScript number. Therefore all big integers will be output as
 # strings and not numbers.
@@ -1914,42 +1953,6 @@ type Query implements Node {
   typeById(id: Int!): Type
 }
 
-# A range of \`String\`.
-type StringRange {
-  # The ending bound of our range.
-  end: StringRangeBound
-
-  # The starting bound of our range.
-  start: StringRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type StringRangeBound {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: String!
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-input StringRangeBoundInput {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: String!
-}
-
-# A range of \`String\`.
-input StringRangeInput {
-  # The ending bound of our range.
-  end: StringRangeBoundInput
-
-  # The starting bound of our range.
-  start: StringRangeBoundInput
-}
-
 # The exact time of day, does not include the date. May or may not have a timezone offset.
 scalar Time
 
@@ -1960,7 +1963,7 @@ type Type implements Node {
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
-  decimal: String!
+  decimal: BigFloat!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -1974,9 +1977,9 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
-  nullableRange: StringRange
-  numeric: String!
-  numrange: StringRange!
+  nullableRange: BigFloatRange
+  numeric: BigFloat!
+  numrange: BigFloatRange!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -2007,7 +2010,7 @@ input TypeCondition {
   daterange: DateRangeInput
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: String
+  decimal: BigFloat
 
   # Checks for equality with the object’s \`domain\` field.
   domain: AnInt
@@ -2040,13 +2043,13 @@ input TypeCondition {
   nestedCompoundType: NestedCompoundTypeInput
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: StringRangeInput
+  nullableRange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: String
+  numeric: BigFloat
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: StringRangeInput
+  numrange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -2078,7 +2081,7 @@ input TypeInput {
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
-  decimal: String!
+  decimal: BigFloat!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -2089,9 +2092,9 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
-  nullableRange: StringRangeInput
-  numeric: String!
-  numrange: StringRangeInput!
+  nullableRange: BigFloatRangeInput
+  numeric: BigFloat!
+  numrange: BigFloatRangeInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -2109,7 +2112,7 @@ input TypePatch {
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
-  decimal: String
+  decimal: BigFloat
   domain: AnInt
   domain2: AnotherInt
   enum: Color
@@ -2120,9 +2123,9 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
-  nullableRange: StringRangeInput
-  numeric: String
-  numrange: StringRangeInput
+  nullableRange: BigFloatRangeInput
+  numeric: BigFloat
+  numrange: BigFloatRangeInput
   smallint: Int
   textArray: [String]
   time: Time
@@ -2548,6 +2551,45 @@ type AuthenticatePayload {
 
   # Our root query field type. Allows us to run any query from our mutation payload.
   query: Query
+}
+
+# A floating point number that requires more precision than IEEE 754 binary 64
+scalar BigFloat
+
+# A range of \`BigFloat\`.
+type BigFloatRange {
+  # The ending bound of our range.
+  end: BigFloatRangeBound
+
+  # The starting bound of our range.
+  start: BigFloatRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type BigFloatRangeBound {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: BigFloat!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input BigFloatRangeBoundInput {
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+
+  # The value at one end of our range.
+  value: BigFloat!
+}
+
+# A range of \`BigFloat\`.
+input BigFloatRangeInput {
+  # The ending bound of our range.
+  end: BigFloatRangeBoundInput
+
+  # The starting bound of our range.
+  start: BigFloatRangeBoundInput
 }
 
 # A signed eight-byte integer. The upper big integer values are greater then the
@@ -5624,42 +5666,6 @@ enum SimilarTable2SOrderBy {
   PRIMARY_KEY_DESC
 }
 
-# A range of \`String\`.
-type StringRange {
-  # The ending bound of our range.
-  end: StringRangeBound
-
-  # The starting bound of our range.
-  start: StringRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type StringRangeBound {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: String!
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-input StringRangeBoundInput {
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-
-  # The value at one end of our range.
-  value: String!
-}
-
-# A range of \`String\`.
-input StringRangeInput {
-  # The ending bound of our range.
-  end: StringRangeBoundInput
-
-  # The starting bound of our range.
-  start: StringRangeBoundInput
-}
-
 type TablefuncCrosstab2 {
   category1: String
   category2: String
@@ -5876,7 +5882,7 @@ type Type implements Node {
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
-  decimal: String!
+  decimal: BigFloat!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -5890,9 +5896,9 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
-  nullableRange: StringRange
-  numeric: String!
-  numrange: StringRange!
+  nullableRange: BigFloatRange
+  numeric: BigFloat!
+  numrange: BigFloatRange!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -5923,7 +5929,7 @@ input TypeCondition {
   daterange: DateRangeInput
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: String
+  decimal: BigFloat
 
   # Checks for equality with the object’s \`domain\` field.
   domain: AnInt
@@ -5956,13 +5962,13 @@ input TypeCondition {
   nestedCompoundType: NestedCompoundTypeInput
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: StringRangeInput
+  nullableRange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: String
+  numeric: BigFloat
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: StringRangeInput
+  numrange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -5994,7 +6000,7 @@ input TypeInput {
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
-  decimal: String!
+  decimal: BigFloat!
   domain: AnInt!
   domain2: AnotherInt!
   enum: Color!
@@ -6005,9 +6011,9 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
-  nullableRange: StringRangeInput
-  numeric: String!
-  numrange: StringRangeInput!
+  nullableRange: BigFloatRangeInput
+  numeric: BigFloat!
+  numrange: BigFloatRangeInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -6025,7 +6031,7 @@ input TypePatch {
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
-  decimal: String
+  decimal: BigFloat
   domain: AnInt
   domain2: AnotherInt
   enum: Color
@@ -6036,9 +6042,9 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
-  nullableRange: StringRangeInput
-  numeric: String
-  numrange: StringRangeInput
+  nullableRange: BigFloatRangeInput
+  numeric: BigFloat
+  numrange: BigFloatRangeInput
   smallint: Int
   textArray: [String]
   time: Time
