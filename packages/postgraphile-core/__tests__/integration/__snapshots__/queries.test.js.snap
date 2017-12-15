@@ -1800,6 +1800,8 @@ Object {
               "fooBar": -5,
             },
           },
+          "nullableCompoundType": null,
+          "nullableNestedCompoundType": null,
         },
       ],
     },
@@ -2493,6 +2495,8 @@ Object {
             },
             "bazBuz": 7,
           },
+          "nullableCompoundType": null,
+          "nullableNestedCompoundType": null,
           "nullableRange": null,
           "numrange": Object {
             "end": Object {
@@ -2568,6 +2572,8 @@ Object {
         },
         "bazBuz": 7,
       },
+      "nullableCompoundType": null,
+      "nullableNestedCompoundType": null,
       "nullableRange": null,
       "numrange": Object {
         "end": Object {

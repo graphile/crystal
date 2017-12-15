@@ -6,6 +6,11 @@ query {
         a { a fooBar computedField }
         b { a fooBar computedField }
       }
+      nullableCompoundType { a fooBar computedField }
+      nullableNestedCompoundType {
+        a { a fooBar computedField }
+        b { a fooBar computedField }
+      }
     }
   }
   allPosts {

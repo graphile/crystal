@@ -1977,6 +1977,8 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
+  nullableCompoundType: CompoundType
+  nullableNestedCompoundType: NestedCompoundType
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
@@ -2042,6 +2044,12 @@ input TypeCondition {
   # Checks for equality with the object’s \`nestedCompoundType\` field.
   nestedCompoundType: NestedCompoundTypeInput
 
+  # Checks for equality with the object’s \`nullableCompoundType\` field.
+  nullableCompoundType: CompoundTypeInput
+
+  # Checks for equality with the object’s \`nullableNestedCompoundType\` field.
+  nullableNestedCompoundType: NestedCompoundTypeInput
+
   # Checks for equality with the object’s \`nullableRange\` field.
   nullableRange: BigFloatRangeInput
 
@@ -2092,6 +2100,8 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
+  nullableCompoundType: CompoundTypeInput
+  nullableNestedCompoundType: NestedCompoundTypeInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
@@ -2123,6 +2133,8 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
+  nullableCompoundType: CompoundTypeInput
+  nullableNestedCompoundType: NestedCompoundTypeInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
@@ -2196,6 +2208,10 @@ enum TypesOrderBy {
   NATURAL
   NESTED_COMPOUND_TYPE_ASC
   NESTED_COMPOUND_TYPE_DESC
+  NULLABLE_COMPOUND_TYPE_ASC
+  NULLABLE_COMPOUND_TYPE_DESC
+  NULLABLE_NESTED_COMPOUND_TYPE_ASC
+  NULLABLE_NESTED_COMPOUND_TYPE_DESC
   NULLABLE_RANGE_ASC
   NULLABLE_RANGE_DESC
   NUMERIC_ASC
@@ -5896,6 +5912,8 @@ type Type implements Node {
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   nodeId: ID!
+  nullableCompoundType: CompoundType
+  nullableNestedCompoundType: NestedCompoundType
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
@@ -5961,6 +5979,12 @@ input TypeCondition {
   # Checks for equality with the object’s \`nestedCompoundType\` field.
   nestedCompoundType: NestedCompoundTypeInput
 
+  # Checks for equality with the object’s \`nullableCompoundType\` field.
+  nullableCompoundType: CompoundTypeInput
+
+  # Checks for equality with the object’s \`nullableNestedCompoundType\` field.
+  nullableNestedCompoundType: NestedCompoundTypeInput
+
   # Checks for equality with the object’s \`nullableRange\` field.
   nullableRange: BigFloatRangeInput
 
@@ -6011,6 +6035,8 @@ input TypeInput {
   jsonb: JSON!
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
+  nullableCompoundType: CompoundTypeInput
+  nullableNestedCompoundType: NestedCompoundTypeInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
@@ -6042,6 +6068,8 @@ input TypePatch {
   jsonb: JSON
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
+  nullableCompoundType: CompoundTypeInput
+  nullableNestedCompoundType: NestedCompoundTypeInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
@@ -6141,6 +6169,10 @@ enum TypesOrderBy {
   NATURAL
   NESTED_COMPOUND_TYPE_ASC
   NESTED_COMPOUND_TYPE_DESC
+  NULLABLE_COMPOUND_TYPE_ASC
+  NULLABLE_COMPOUND_TYPE_DESC
+  NULLABLE_NESTED_COMPOUND_TYPE_ASC
+  NULLABLE_NESTED_COMPOUND_TYPE_DESC
   NULLABLE_RANGE_ASC
   NULLABLE_RANGE_DESC
   NUMERIC_ASC

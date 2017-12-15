@@ -49,4 +49,10 @@ fragment type on Type {
     b { ...compoundType }
     bazBuz
   }
+  nullableCompoundType { ...compoundType }
+  nullableNestedCompoundType {
+    a { ...compoundType }
+    b { ...compoundType }
+    bazBuz
+  }
 }

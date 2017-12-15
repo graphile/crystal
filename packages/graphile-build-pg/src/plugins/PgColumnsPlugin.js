@@ -100,7 +100,7 @@ export default (function PgColumnsPlugin(
                           sql.identifier(Symbol()), // Ignore!
                           sqlFullName,
                           resolveData,
-                          { onlyJsonField: true }
+                          { onlyJsonField: true, addNullCase: true }
                         );
                         return jsonBuildObject;
                       } else {
