@@ -124,7 +124,7 @@ export default (function PgTypesPlugin(
         return pg2GqlMapper[type.id].map(val);
       } else if (type.domainBaseType) {
         return pg2gql(val, type.domainBaseType);
-      } else if (type.arrayItemType) {
+      } else if (type.isPgArray) {
         if (!Array.isArray(val)) {
           throw new Error(
             `Expected array when converting PostgreSQL data into GraphQL; failing type: '${type.namespaceName}.${type.name}'`
@@ -143,7 +143,7 @@ export default (function PgTypesPlugin(
         return pg2GqlMapper[type.id].unmap(val);
       } else if (type.domainBaseType) {
         return gql2pg(val, type.domainBaseType);
-      } else if (type.arrayItemType) {
+      } else if (type.isPgArray) {
         if (!Array.isArray(val)) {
           throw new Error(
             `Expected array when converting GraphQL data into PostgreSQL data; failing type: '${type.namespaceName}.${type.name}' (type: ${type ===
@@ -285,7 +285,7 @@ export default (function PgTypesPlugin(
         return tweaker(fragment);
       } else if (type.domainBaseType) {
         return pgTweakFragmentForType(fragment, type.domainBaseType);
-      } else if (type.arrayItemType) {
+      } else if (type.isPgArray) {
         const error = new Error(
           "Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: `${type.namespaceName}.${type.name}`)"
         );
@@ -331,6 +331,30 @@ export default (function PgTypesPlugin(
     const DateTimeType = SimpleDatetime; // GraphQLDateTime
     const TimeType = SimpleTime; // GraphQLTime
 
+    // 'point' in PostgreSQL is a 16-byte type that's comprised of two 8-byte floats.
+    const Point = new GraphQLObjectType({
+      name: "Point",
+      fields: {
+        x: {
+          type: new GraphQLNonNull(GraphQLFloat),
+        },
+        y: {
+          type: new GraphQLNonNull(GraphQLFloat),
+        },
+      },
+    });
+    const PointInput = new GraphQLInputObjectType({
+      name: "PointInput",
+      fields: {
+        x: {
+          type: new GraphQLNonNull(GraphQLFloat),
+        },
+        y: {
+          type: new GraphQLNonNull(GraphQLFloat),
+        },
+      },
+    });
+
     // Other plugins might want to use JSON
     addType(JSONType);
     addType(UUIDType);
@@ -367,9 +391,12 @@ export default (function PgTypesPlugin(
       "18": GraphQLString, // char
       "25": GraphQLString, // text
       "1043": GraphQLString, // varchar
+
+      "600": Point, // point
     };
     const oidInputLookup = {
       "1186": GQLIntervalInput, // interval
+      "600": PointInput, // point
     };
     const identity = _ => _;
     const jsonStringify = o => JSON.stringify(o);
@@ -416,6 +443,22 @@ export default (function PgTypesPlugin(
       map: parseMoney,
       unmap: val => sql.fragment`(${sql.value(val)})::money`,
     };
+
+    // point
+    pg2GqlMapper[600] = {
+      map: f => {
+        if (f[0] === "(" && f[f.length - 1] === ")") {
+          const [x, y] = f
+            .substr(1, f.length - 2)
+            .split(",")
+            .map(f => parseFloat(f));
+          return { x, y };
+        }
+      },
+      unmap: o => sql.fragment`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
+    };
+
+    // TODO: add more support for geometric types
 
     let depth = 0;
     const enforceGqlTypeByPgType = type => {

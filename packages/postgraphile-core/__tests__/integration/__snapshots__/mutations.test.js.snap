@@ -80,6 +80,7 @@ Object {
           "bazBuz": 0,
         },
         "nodeId": "WyJ0eXBlcyIsMjAxXQ==",
+        "nullablePoint": null,
         "numeric": "15.2",
         "numrange": Object {
           "end": null,
@@ -87,6 +88,10 @@ Object {
             "inclusive": true,
             "value": "50",
           },
+        },
+        "point": Object {
+          "x": 1,
+          "y": 3,
         },
         "smallint": 30,
         "textArray": Array [

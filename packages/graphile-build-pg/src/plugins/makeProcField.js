@@ -73,7 +73,7 @@ export default function makeProcField(
     } else {
       name = camelCase(gqlNamedType.name);
     }
-    return returnsSet || type.arrayItemType ? pluralize(name) : name;
+    return returnsSet || type.isPgArray ? pluralize(name) : name;
   }
   if (computed && isMutation) {
     throw new Error("Mutation procedure cannot be computed");
@@ -98,7 +98,9 @@ export default function makeProcField(
   });
 
   const rawReturnType = introspectionResultsByKind.typeById[proc.returnTypeId];
-  const returnType = rawReturnType.arrayItemType || rawReturnType;
+  const returnType = rawReturnType.isPgArray
+    ? rawReturnType.arrayItemType
+    : rawReturnType;
   const returnTypeTable =
     introspectionResultsByKind.classById[returnType.classId];
   if (!returnType) {
@@ -139,7 +141,7 @@ export default function makeProcField(
       payloadTypeScope.pgIntrospectionTable = returnTypeTable;
     } else {
       type = TableType;
-      if (rawReturnType.arrayItemType) {
+      if (rawReturnType.isPgArray) {
         type = new GraphQLList(type);
       }
       fieldScope.pgFieldIntrospectionTable = returnTypeTable;
@@ -169,7 +171,7 @@ export default function makeProcField(
     } else {
       returnFirstValueAsValue = true;
       type = Type;
-      if (rawReturnType.arrayItemType) {
+      if (rawReturnType.isPgArray) {
         type = new GraphQLList(type);
       }
     }

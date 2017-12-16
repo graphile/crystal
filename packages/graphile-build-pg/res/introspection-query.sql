@@ -155,6 +155,8 @@ with
         typ.typcategory as "category",
         typ.typnotnull as "domainIsNotNull",
         nullif(typ.typelem, 0) as "arrayItemTypeId",
+        typ.typlen as "typeLength",
+        (typ.typelem <> 0 and typ.typlen = -1) as "isPgArray",
         nullif(typ.typrelid, 0) as "classId",
         nullif(typ.typbasetype, 0) as "domainBaseTypeId",
         -- If this type is an enum type, let’s select all of its enum variants.

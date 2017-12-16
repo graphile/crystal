@@ -55,4 +55,6 @@ fragment type on Type {
     b { ...compoundType }
     bazBuz
   }
+  point { x y }
+  nullablePoint { x y }
 }

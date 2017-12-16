@@ -171,7 +171,9 @@ create table b.types (
   "compound_type" c.compound_type not null,
   "nested_compound_type" b.nested_compound_type not null,
   "nullable_compound_type" c.compound_type,
-  "nullable_nested_compound_type" b.nested_compound_type
+  "nullable_nested_compound_type" b.nested_compound_type,
+  "point" point not null,
+  "nullablePoint" point
 );
 
 create function b.throw_error() returns trigger as $$

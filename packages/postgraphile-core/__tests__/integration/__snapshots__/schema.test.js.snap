@@ -1877,6 +1877,16 @@ type PageInfo {
   startCursor: Cursor
 }
 
+type Point {
+  x: Float!
+  y: Float!
+}
+
+input PointInput {
+  x: Float!
+  y: Float!
+}
+
 # The root query type which gives access points into the data universe.
 type Query implements Node {
   # Reads and enables pagination through a set of \`Type\`.
@@ -1979,9 +1989,11 @@ type Type implements Node {
   nodeId: ID!
   nullableCompoundType: CompoundType
   nullableNestedCompoundType: NestedCompoundType
+  nullablePoint: Point
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  point: Point!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -2050,6 +2062,9 @@ input TypeCondition {
   # Checks for equality with the object’s \`nullableNestedCompoundType\` field.
   nullableNestedCompoundType: NestedCompoundTypeInput
 
+  # Checks for equality with the object’s \`nullablePoint\` field.
+  nullablePoint: PointInput
+
   # Checks for equality with the object’s \`nullableRange\` field.
   nullableRange: BigFloatRangeInput
 
@@ -2058,6 +2073,9 @@ input TypeCondition {
 
   # Checks for equality with the object’s \`numrange\` field.
   numrange: BigFloatRangeInput
+
+  # Checks for equality with the object’s \`point\` field.
+  point: PointInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -2102,9 +2120,11 @@ input TypeInput {
   nestedCompoundType: NestedCompoundTypeInput!
   nullableCompoundType: CompoundTypeInput
   nullableNestedCompoundType: NestedCompoundTypeInput
+  nullablePoint: PointInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  point: PointInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -2135,9 +2155,11 @@ input TypePatch {
   nestedCompoundType: NestedCompoundTypeInput
   nullableCompoundType: CompoundTypeInput
   nullableNestedCompoundType: NestedCompoundTypeInput
+  nullablePoint: PointInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  point: PointInput
   smallint: Int
   textArray: [String]
   time: Time
@@ -2212,12 +2234,16 @@ enum TypesOrderBy {
   NULLABLE_COMPOUND_TYPE_DESC
   NULLABLE_NESTED_COMPOUND_TYPE_ASC
   NULLABLE_NESTED_COMPOUND_TYPE_DESC
+  NULLABLE_POINT_ASC
+  NULLABLE_POINT_DESC
   NULLABLE_RANGE_ASC
   NULLABLE_RANGE_DESC
   NUMERIC_ASC
   NUMERIC_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
+  POINT_ASC
+  POINT_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   SMALLINT_ASC
@@ -4801,6 +4827,16 @@ input PersonPatch {
   site: WrappedUrlInput
 }
 
+type Point {
+  x: Float!
+  y: Float!
+}
+
+input PointInput {
+  x: Float!
+  y: Float!
+}
+
 type Post implements Node {
   authorId: Int
   body: String
@@ -5914,9 +5950,11 @@ type Type implements Node {
   nodeId: ID!
   nullableCompoundType: CompoundType
   nullableNestedCompoundType: NestedCompoundType
+  nullablePoint: Point
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  point: Point!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -5985,6 +6023,9 @@ input TypeCondition {
   # Checks for equality with the object’s \`nullableNestedCompoundType\` field.
   nullableNestedCompoundType: NestedCompoundTypeInput
 
+  # Checks for equality with the object’s \`nullablePoint\` field.
+  nullablePoint: PointInput
+
   # Checks for equality with the object’s \`nullableRange\` field.
   nullableRange: BigFloatRangeInput
 
@@ -5993,6 +6034,9 @@ input TypeCondition {
 
   # Checks for equality with the object’s \`numrange\` field.
   numrange: BigFloatRangeInput
+
+  # Checks for equality with the object’s \`point\` field.
+  point: PointInput
 
   # Checks for equality with the object’s \`smallint\` field.
   smallint: Int
@@ -6037,9 +6081,11 @@ input TypeInput {
   nestedCompoundType: NestedCompoundTypeInput!
   nullableCompoundType: CompoundTypeInput
   nullableNestedCompoundType: NestedCompoundTypeInput
+  nullablePoint: PointInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  point: PointInput!
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -6070,9 +6116,11 @@ input TypePatch {
   nestedCompoundType: NestedCompoundTypeInput
   nullableCompoundType: CompoundTypeInput
   nullableNestedCompoundType: NestedCompoundTypeInput
+  nullablePoint: PointInput
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  point: PointInput
   smallint: Int
   textArray: [String]
   time: Time
@@ -6173,12 +6221,16 @@ enum TypesOrderBy {
   NULLABLE_COMPOUND_TYPE_DESC
   NULLABLE_NESTED_COMPOUND_TYPE_ASC
   NULLABLE_NESTED_COMPOUND_TYPE_DESC
+  NULLABLE_POINT_ASC
+  NULLABLE_POINT_DESC
   NULLABLE_RANGE_ASC
   NULLABLE_RANGE_DESC
   NUMERIC_ASC
   NUMERIC_DESC
   NUMRANGE_ASC
   NUMRANGE_DESC
+  POINT_ASC
+  POINT_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   SMALLINT_ASC

@@ -2529,6 +2529,7 @@ Object {
           },
           "nullableCompoundType": null,
           "nullableNestedCompoundType": null,
+          "nullablePoint": null,
           "nullableRange": null,
           "numrange": Object {
             "end": Object {
@@ -2539,6 +2540,10 @@ Object {
               "inclusive": true,
               "value": "-10",
             },
+          },
+          "point": Object {
+            "x": 1,
+            "y": 3,
           },
           "smallint": 50,
           "textArray": Array [
@@ -2606,6 +2611,7 @@ Object {
       },
       "nullableCompoundType": null,
       "nullableNestedCompoundType": null,
+      "nullablePoint": null,
       "nullableRange": null,
       "numrange": Object {
         "end": Object {
@@ -2616,6 +2622,10 @@ Object {
           "inclusive": true,
           "value": "-10",
         },
+      },
+      "point": Object {
+        "x": 1,
+        "y": 3,
       },
       "smallint": 50,
       "textArray": Array [

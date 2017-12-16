@@ -73,7 +73,7 @@ export default (function PgColumnsPlugin(
                       sqlFullName,
                       type
                     ) => {
-                      if (type.arrayItemType) {
+                      if (type.isPgArray) {
                         const ident = sql.identifier(Symbol());
                         return sql.fragment`
                           (
