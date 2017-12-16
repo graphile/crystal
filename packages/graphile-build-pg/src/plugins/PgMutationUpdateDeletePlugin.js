@@ -11,11 +11,7 @@ const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
 export default (async function PgMutationUpdateDeletePlugin(
   builder,
-  {
-    pgInflection: inflection,
-    pgDisableDefaultMutations,
-    pgColumnFilter = (_attr, _build, _context) => true,
-  }
+  { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
   if (pgDisableDefaultMutations) {
     return;
@@ -44,6 +40,7 @@ export default (async function PgMutationUpdateDeletePlugin(
           GraphQLObjectType,
           GraphQLID,
         },
+        pgColumnFilter,
       } = build;
       if (!isRootMutation) {
         return fields;

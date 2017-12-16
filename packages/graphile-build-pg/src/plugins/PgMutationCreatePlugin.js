@@ -8,11 +8,7 @@ const debug = debugFactory("graphile-build-pg");
 
 export default (function PgMutationCreatePlugin(
   builder,
-  {
-    pgInflection: inflection,
-    pgDisableDefaultMutations,
-    pgColumnFilter = (_attr, _build, _context) => true,
-  }
+  { pgInflection: inflection, pgDisableDefaultMutations }
 ) {
   if (pgDisableDefaultMutations) {
     return;
@@ -35,6 +31,7 @@ export default (function PgMutationCreatePlugin(
           GraphQLNonNull,
           GraphQLString,
         },
+        pgColumnFilter,
       } = build;
       if (!isRootMutation) {
         return fields;

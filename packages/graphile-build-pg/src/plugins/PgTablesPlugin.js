@@ -2,13 +2,7 @@
 import type { Plugin } from "graphile-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
-export default (function PgTablesPlugin(
-  builder,
-  {
-    pgInflection: inflection,
-    pgColumnFilter = (_attr, _build, _context) => true,
-  }
-) {
+export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
   builder.hook("init", (_, build) => {
     const {
       getNodeIdForTypeAndIdentifiers,
@@ -30,6 +24,7 @@ export default (function PgTablesPlugin(
         GraphQLList,
         GraphQLInputObjectType,
       },
+      pgColumnFilter,
     } = build;
     const Cursor = getTypeByName("Cursor");
     introspectionResultsByKind.class.forEach(table => {

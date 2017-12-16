@@ -3,15 +3,13 @@ import type { Plugin } from "graphile-build";
 
 export default (function PgOrderAllColumnsPlugin(
   builder,
-  {
-    pgInflection: inflection,
-    pgColumnFilter = (_attr, _build, _context) => true,
-  }
+  { pgInflection: inflection }
 ) {
   builder.hook("GraphQLEnumType:values", (values, build, context) => {
     const {
       extend,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
+      pgColumnFilter,
     } = build;
     const { scope: { isPgRowSortEnum, pgIntrospection: table } } = context;
     if (!isPgRowSortEnum || !table || table.kind !== "class") {

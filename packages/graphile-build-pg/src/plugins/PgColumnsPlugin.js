@@ -5,11 +5,9 @@ import type { Plugin } from "graphile-build";
 const nullableIf = (GraphQLNonNull, condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 
-const defaultPgColumnFilter = (_attr, _build, _context) => true;
-
 export default (function PgColumnsPlugin(
   builder,
-  { pgInflection: inflection, pgColumnFilter = defaultPgColumnFilter }
+  { pgInflection: inflection }
 ) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
@@ -21,6 +19,7 @@ export default (function PgColumnsPlugin(
       graphql: { GraphQLString, GraphQLNonNull },
       getAliasFromResolveInfo,
       pgTweakFragmentForType,
+      pgColumnFilter,
     } = build;
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -144,6 +143,7 @@ export default (function PgColumnsPlugin(
       pgGetGqlInputTypeByTypeId,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       graphql: { GraphQLString, GraphQLNonNull },
+      pgColumnFilter,
     } = build;
     const {
       scope: {

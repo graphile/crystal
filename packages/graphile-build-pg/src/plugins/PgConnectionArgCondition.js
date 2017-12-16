@@ -1,11 +1,9 @@
 // @flow
 import type { Plugin } from "graphile-build";
 
-const defaultPgColumnFilter = (_attr, _build, _context) => true;
-
 export default (function PgConnectionArgCondition(
   builder,
-  { pgInflection: inflection, pgColumnFilter = defaultPgColumnFilter }
+  { pgInflection: inflection }
 ) {
   builder.hook("init", (_, build) => {
     const {
@@ -13,6 +11,7 @@ export default (function PgConnectionArgCondition(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgGetGqlInputTypeByTypeId,
       graphql: { GraphQLInputObjectType, GraphQLString },
+      pgColumnFilter,
     } = build;
     introspectionResultsByKind.class
       .filter(table => table.isSelectable)
@@ -74,6 +73,7 @@ export default (function PgConnectionArgCondition(
         getTypeByName,
         pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
+        pgColumnFilter,
       } = build;
       const {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
