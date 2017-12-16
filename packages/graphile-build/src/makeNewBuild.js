@@ -609,5 +609,6 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
       fieldDataGeneratorsByType.set(Self, fieldDataGeneratorsByFieldName);
       return Self;
     },
+    fieldDataGeneratorsByType,
   };
 }

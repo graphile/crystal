@@ -110,6 +110,7 @@ export type Build = {|
     scope: {},
     returnNullOnInvalid?: boolean
   ): ?T,
+  fieldDataGeneratorsByType: Map<*, *>,
 |};
 
 export type BuildExtensionQuery = {|

@@ -27,6 +27,7 @@ export default (async function PgMutationUpdateDeletePlugin(
         newWithHooks,
         getNodeIdForTypeAndIdentifiers,
         nodeIdFieldName,
+        fieldDataGeneratorsByType,
         extend,
         parseResolveInfo,
         getTypeByName,
@@ -193,12 +194,19 @@ export default (async function PgMutationUpdateDeletePlugin(
                           : "updatePayloadType"
                       ](table.name, table.namespace.name),
                       description: `The output of our ${mode} \`${tableTypeName}\` mutation.`,
-                      fields: ({ recurseDataGeneratorsForField }) => {
+                      fields: ({
+                        recurseDataGeneratorsForField,
+                        fieldWithHooks,
+                      }) => {
                         const tableName = inflection.tableName(
                           table.name,
                           table.namespace.name
                         );
                         recurseDataGeneratorsForField(tableName);
+                        // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
+                        const deletedNodeIdFieldName = camelCase(
+                          `deleted-${pluralize.singular(table.name)}-id`
+                        );
                         return Object.assign(
                           {
                             clientMutationId: {
@@ -216,20 +224,40 @@ export default (async function PgMutationUpdateDeletePlugin(
                           },
                           mode === "delete"
                             ? {
-                                [camelCase(
-                                  `deleted-${pluralize.singular(table.name)}-id`
-                                )]: {
-                                  type: GraphQLID,
-                                  resolve(data) {
-                                    return (
-                                      data.data.__identifiers &&
-                                      getNodeIdForTypeAndIdentifiers(
-                                        Table,
-                                        ...data.data.__identifiers
-                                      )
+                                [deletedNodeIdFieldName]: fieldWithHooks(
+                                  deletedNodeIdFieldName,
+                                  ({ addDataGenerator }) => {
+                                    const fieldDataGeneratorsByTableType = fieldDataGeneratorsByType.get(
+                                      TableType
                                     );
+
+                                    const gens =
+                                      fieldDataGeneratorsByTableType &&
+                                      fieldDataGeneratorsByTableType[
+                                        nodeIdFieldName
+                                      ];
+                                    if (gens) {
+                                      gens.forEach(gen =>
+                                        addDataGenerator(gen)
+                                      );
+                                    }
+                                    return {
+                                      type: GraphQLID,
+                                      resolve(data) {
+                                        return (
+                                          data.data.__identifiers &&
+                                          getNodeIdForTypeAndIdentifiers(
+                                            Table,
+                                            ...data.data.__identifiers
+                                          )
+                                        );
+                                      },
+                                    };
                                   },
-                                },
+                                  {
+                                    isPgMutationPayloadDeletedNodeIdField: true,
+                                  }
+                                ),
                               }
                             : null
                         );

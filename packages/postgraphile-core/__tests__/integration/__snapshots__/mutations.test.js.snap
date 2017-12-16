@@ -502,13 +502,6 @@ Object {
     "k": Object {
       "clientMutationId": null,
       "deletedPersonId": "WyJwZW9wbGUiLDNd",
-      "person": Object {
-        "email": "budd.deey@email.com",
-        "id": 3,
-        "issue27UserExists": true,
-        "name": "Budd Deey",
-        "nodeId": "WyJwZW9wbGUiLDNd",
-      },
       "query": Object {
         "nodeId": "query",
       },
