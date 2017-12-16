@@ -161,6 +161,45 @@ type AuthenticatePayload {
   query: Query
 }
 
+# A floating point number that requires more precision than IEEE 754 binary 64
+scalar BigFloat
+
+# A range of \`BigFloat\`.
+type BigFloatRange {
+  # The starting bound of our range.
+  start: BigFloatRangeBound
+
+  # The ending bound of our range.
+  end: BigFloatRangeBound
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+type BigFloatRangeBound {
+  # The value at one end of our range.
+  value: BigFloat!
+
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+}
+
+# The value at one end of a range. A range can either include this value, or not.
+input BigFloatRangeBoundInput {
+  # The value at one end of our range.
+  value: BigFloat!
+
+  # Whether or not the value of this bound is included in the range.
+  inclusive: Boolean!
+}
+
+# A range of \`BigFloat\`.
+input BigFloatRangeInput {
+  # The starting bound of our range.
+  start: BigFloatRangeBoundInput
+
+  # The ending bound of our range.
+  end: BigFloatRangeBoundInput
+}
+
 # A signed eight-byte integer. The upper big integer values are greater then the
 # max value for a JavaScript number. Therefore all big integers will be output as
 # strings and not numbers.
@@ -204,7 +243,7 @@ type CompoundKey implements Node {
     after: Cursor
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: ForeignKeyCondition
@@ -1694,7 +1733,7 @@ type Person implements Node {
     after: Cursor
 
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: PostCondition
@@ -1719,7 +1758,7 @@ type Person implements Node {
     after: Cursor
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: CompoundKeyCondition
@@ -1744,7 +1783,7 @@ type Person implements Node {
     after: Cursor
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: CompoundKeyCondition
@@ -1769,7 +1808,7 @@ type Person implements Node {
     after: Cursor
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: ForeignKeyCondition
@@ -1956,7 +1995,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: ForeignKeyCondition
@@ -1981,7 +2020,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`NonUpdatableView\`.
-    orderBy: NonUpdatableViewsOrderBy = NATURAL
+    orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: NonUpdatableViewCondition
@@ -2006,7 +2045,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: PostCondition
@@ -2031,7 +2070,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: SimilarTable1Condition
@@ -2056,7 +2095,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: SimilarTable2Condition
@@ -2081,7 +2120,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: TypeCondition
@@ -2106,7 +2145,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: UpdatableViewCondition
@@ -2131,7 +2170,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: CompoundKeyCondition
@@ -2156,7 +2195,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: EdgeCaseCondition
@@ -2181,7 +2220,7 @@ type Query implements Node {
     after: Cursor
 
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
 
     # A condition to be used in determining which values should be returned by the collection.
     condition: PersonCondition
@@ -2469,42 +2508,6 @@ enum SimilarTable2SOrderBy {
   PRIMARY_KEY_DESC
 }
 
-# A range of \`String\`.
-type StringRange {
-  # The starting bound of our range.
-  start: StringRangeBound
-
-  # The ending bound of our range.
-  end: StringRangeBound
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-type StringRangeBound {
-  # The value at one end of our range.
-  value: String!
-
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-}
-
-# The value at one end of a range. A range can either include this value, or not.
-input StringRangeBoundInput {
-  # The value at one end of our range.
-  value: String!
-
-  # Whether or not the value of this bound is included in the range.
-  inclusive: Boolean!
-}
-
-# A range of \`String\`.
-input StringRangeInput {
-  # The starting bound of our range.
-  start: StringRangeBoundInput
-
-  # The ending bound of our range.
-  end: StringRangeBoundInput
-}
-
 # All input for the \`tableMutation\` mutation.
 input TableMutationInput {
   # An arbitrary string value with no semantic meaning. Will be included in the
@@ -2566,8 +2569,8 @@ type Type implements Node {
   id: Int!
   smallint: Int!
   bigint: BigInt!
-  numeric: String!
-  decimal: String!
+  numeric: BigFloat!
+  decimal: BigFloat!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -2576,8 +2579,8 @@ type Type implements Node {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
-  nullableRange: StringRange
-  numrange: StringRange!
+  nullableRange: BigFloatRange
+  numrange: BigFloatRange!
   daterange: DateRange!
   anIntRange: AnIntRange!
   timestamp: Datetime!
@@ -2603,10 +2606,10 @@ input TypeCondition {
   bigint: BigInt
 
   # Checks for equality with the object’s \`numeric\` field.
-  numeric: String
+  numeric: BigFloat
 
   # Checks for equality with the object’s \`decimal\` field.
-  decimal: String
+  decimal: BigFloat
 
   # Checks for equality with the object’s \`boolean\` field.
   boolean: Boolean
@@ -2633,10 +2636,10 @@ input TypeCondition {
   jsonb: JSON
 
   # Checks for equality with the object’s \`nullableRange\` field.
-  nullableRange: StringRangeInput
+  nullableRange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`numrange\` field.
-  numrange: StringRangeInput
+  numrange: BigFloatRangeInput
 
   # Checks for equality with the object’s \`daterange\` field.
   daterange: DateRangeInput
@@ -2677,8 +2680,8 @@ input TypeInput {
   id: Int
   smallint: Int!
   bigint: BigInt!
-  numeric: String!
-  decimal: String!
+  numeric: BigFloat!
+  decimal: BigFloat!
   boolean: Boolean!
   varchar: String!
   enum: Color!
@@ -2687,8 +2690,8 @@ input TypeInput {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
-  nullableRange: StringRangeInput
-  numrange: StringRangeInput!
+  nullableRange: BigFloatRangeInput
+  numrange: BigFloatRangeInput!
   daterange: DateRangeInput!
   anIntRange: AnIntRangeInput!
   timestamp: Datetime!
@@ -2707,8 +2710,8 @@ input TypePatch {
   id: Int
   smallint: Int
   bigint: BigInt
-  numeric: String
-  decimal: String
+  numeric: BigFloat
+  decimal: BigFloat
   boolean: Boolean
   varchar: String
   enum: Color
@@ -2717,8 +2720,8 @@ input TypePatch {
   textArray: [String]
   json: JSON
   jsonb: JSON
-  nullableRange: StringRangeInput
-  numrange: StringRangeInput
+  nullableRange: BigFloatRangeInput
+  numrange: BigFloatRangeInput
   daterange: DateRangeInput
   anIntRange: AnIntRangeInput
   timestamp: Datetime
@@ -3330,11 +3333,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`ForeignKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"ForeignKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"ForeignKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3413,11 +3424,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`NonUpdatableView\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"NonUpdatableViewsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"NonUpdatableViewsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3496,11 +3515,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3579,11 +3606,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable1\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable1SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable1SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3662,11 +3697,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable2\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable2SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable2SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3745,11 +3788,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Type\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"TypesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"TypesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3828,11 +3879,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`UpdatableView\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"UpdatableViewsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"UpdatableViewsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3911,11 +3970,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -3994,11 +4061,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`EdgeCase\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"EdgeCasesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"EdgeCasesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -4077,11 +4152,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Person\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PeopleOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PeopleOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -5461,11 +5544,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -5548,11 +5639,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -5635,11 +5734,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"PRIMARY_KEY_ASC\"
+                  \"defaultValue\": \"[PRIMARY_KEY_ASC]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -5722,11 +5829,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`ForeignKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"ForeignKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"ForeignKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -6681,11 +6796,19 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`ForeignKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"ForeignKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"ForeignKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
-                  \"defaultValue\": \"NATURAL\"
+                  \"defaultValue\": \"[NATURAL]\"
                 },
                 {
                   \"name\": \"condition\",
@@ -8177,7 +8300,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`numeric\` field.\",
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"String\",
+                \"name\": \"BigFloat\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8187,7 +8310,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`decimal\` field.\",
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"String\",
+                \"name\": \"BigFloat\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8281,7 +8404,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`nullableRange\` field.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeInput\",
+                \"name\": \"BigFloatRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8291,7 +8414,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"Checks for equality with the object’s \`numrange\` field.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeInput\",
+                \"name\": \"BigFloatRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8422,6 +8545,16 @@ exports[`test exports a schema as JSON 1`] = `
           \"possibleTypes\": null
         },
         {
+          \"kind\": \"SCALAR\",
+          \"name\": \"BigFloat\",
+          \"description\": \"A floating point number that requires more precision than IEEE 754 binary 64\",
+          \"fields\": null,
+          \"inputFields\": null,
+          \"interfaces\": null,
+          \"enumValues\": null,
+          \"possibleTypes\": null
+        },
+        {
           \"kind\": \"ENUM\",
           \"name\": \"Color\",
           \"description\": null,
@@ -8482,8 +8615,8 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"INPUT_OBJECT\",
-          \"name\": \"StringRangeInput\",
-          \"description\": \"A range of \`String\`.\",
+          \"name\": \"BigFloatRangeInput\",
+          \"description\": \"A range of \`BigFloat\`.\",
           \"fields\": null,
           \"inputFields\": [
             {
@@ -8491,7 +8624,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The starting bound of our range.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeBoundInput\",
+                \"name\": \"BigFloatRangeBoundInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8501,7 +8634,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The ending bound of our range.\",
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeBoundInput\",
+                \"name\": \"BigFloatRangeBoundInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -8513,7 +8646,7 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"INPUT_OBJECT\",
-          \"name\": \"StringRangeBoundInput\",
+          \"name\": \"BigFloatRangeBoundInput\",
           \"description\": \"The value at one end of a range. A range can either include this value, or not.\",
           \"fields\": null,
           \"inputFields\": [
@@ -8525,7 +8658,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -9064,7 +9197,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -9080,7 +9213,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -9225,7 +9358,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"StringRange\",
+                \"name\": \"BigFloatRange\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9240,7 +9373,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"OBJECT\",
-                  \"name\": \"StringRange\",
+                  \"name\": \"BigFloatRange\",
                   \"ofType\": null
                 }
               },
@@ -9437,8 +9570,8 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"OBJECT\",
-          \"name\": \"StringRange\",
-          \"description\": \"A range of \`String\`.\",
+          \"name\": \"BigFloatRange\",
+          \"description\": \"A range of \`BigFloat\`.\",
           \"fields\": [
             {
               \"name\": \"start\",
@@ -9446,7 +9579,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"StringRangeBound\",
+                \"name\": \"BigFloatRangeBound\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9458,7 +9591,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
-                \"name\": \"StringRangeBound\",
+                \"name\": \"BigFloatRangeBound\",
                 \"ofType\": null
               },
               \"isDeprecated\": false,
@@ -9472,7 +9605,7 @@ exports[`test exports a schema as JSON 1`] = `
         },
         {
           \"kind\": \"OBJECT\",
-          \"name\": \"StringRangeBound\",
+          \"name\": \"BigFloatRangeBound\",
           \"description\": \"The value at one end of a range. A range can either include this value, or not.\",
           \"fields\": [
             {
@@ -9484,7 +9617,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -12998,7 +13131,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -13012,7 +13145,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"SCALAR\",
-                  \"name\": \"String\",
+                  \"name\": \"BigFloat\",
                   \"ofType\": null
                 }
               },
@@ -13139,7 +13272,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeInput\",
+                \"name\": \"BigFloatRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -13152,7 +13285,7 @@ exports[`test exports a schema as JSON 1`] = `
                 \"name\": null,
                 \"ofType\": {
                   \"kind\": \"INPUT_OBJECT\",
-                  \"name\": \"StringRangeInput\",
+                  \"name\": \"BigFloatRangeInput\",
                   \"ofType\": null
                 }
               },
@@ -14800,7 +14933,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"String\",
+                \"name\": \"BigFloat\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14810,7 +14943,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"SCALAR\",
-                \"name\": \"String\",
+                \"name\": \"BigFloat\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14904,7 +15037,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeInput\",
+                \"name\": \"BigFloatRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
@@ -14914,7 +15047,7 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": null,
               \"type\": {
                 \"kind\": \"INPUT_OBJECT\",
-                \"name\": \"StringRangeInput\",
+                \"name\": \"BigFloatRangeInput\",
                 \"ofType\": null
               },
               \"defaultValue\": null
