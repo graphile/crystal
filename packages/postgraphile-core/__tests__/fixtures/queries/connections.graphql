@@ -18,6 +18,7 @@ query {
   q: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=", first: 1) { ...personConnection }
   r: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=", last: 1) { ...personConnection }
   s: allPeople(condition: { about: null }) { ...personConnection }
+  t: allPosts(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], first: 3) { ...postConnection }
 }
 
 fragment personConnection on PeopleConnection {

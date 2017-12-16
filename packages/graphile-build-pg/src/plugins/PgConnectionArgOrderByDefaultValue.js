@@ -33,7 +33,7 @@ export default (function PgConnectionArgOrderByDefaultValue(
 
       return Object.assign({}, args, {
         orderBy: extend(args.orderBy, {
-          defaultValue: defaultValueEnum && defaultValueEnum.value,
+          defaultValue: defaultValueEnum && [defaultValueEnum.value],
         }),
       });
     }

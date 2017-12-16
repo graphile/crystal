@@ -52,7 +52,13 @@ export default (function PgConnectionArgOrderBy(
     "GraphQLObjectType:fields:field:args",
     (
       args,
-      { extend, getTypeByName, pgGetGqlTypeByTypeId, pgSql: sql },
+      {
+        extend,
+        getTypeByName,
+        pgGetGqlTypeByTypeId,
+        pgSql: sql,
+        graphql: { GraphQLList, GraphQLNonNull },
+      },
       {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         addArgDataGenerator,
@@ -76,23 +82,31 @@ export default (function PgConnectionArgOrderBy(
       addArgDataGenerator(function connectionOrderBy({ orderBy }) {
         return {
           pgCursorPrefix:
-            orderBy && orderBy.alias && sql.literal(orderBy && orderBy.alias),
+            orderBy && orderBy.some(item => item.alias)
+              ? orderBy
+                  .filter(item => item.alias)
+                  .map(item => sql.literal(item.alias))
+              : null,
           pgQuery: queryBuilder => {
             if (orderBy != null) {
-              const { specs, unique } = orderBy;
-              const orders =
-                Array.isArray(specs[0]) || specs.length === 0 ? specs : [specs];
-              orders.forEach(([col, ascending]) => {
-                const expr = isString(col)
-                  ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                      col
-                    )}`
-                  : col;
-                queryBuilder.orderBy(expr, ascending);
+              orderBy.forEach(item => {
+                const { specs, unique } = item;
+                const orders =
+                  Array.isArray(specs[0]) || specs.length === 0
+                    ? specs
+                    : [specs];
+                orders.forEach(([col, ascending]) => {
+                  const expr = isString(col)
+                    ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                        col
+                      )}`
+                    : col;
+                  queryBuilder.orderBy(expr, ascending);
+                });
+                if (unique) {
+                  queryBuilder.setOrderIsUnique();
+                }
               });
-              if (unique) {
-                queryBuilder.setOrderIsUnique();
-              }
             }
           },
         };
@@ -101,7 +115,7 @@ export default (function PgConnectionArgOrderBy(
       return extend(args, {
         orderBy: {
           description: `The method to use when ordering \`${tableTypeName}\`.`,
-          type: TableOrderByType,
+          type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
         },
       });
     }

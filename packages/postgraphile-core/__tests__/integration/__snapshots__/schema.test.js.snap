@@ -778,7 +778,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
@@ -803,7 +803,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
@@ -924,7 +924,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
 
   # Reads and enables pagination through a set of \`EdgeCase\`.
@@ -949,7 +949,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -974,7 +974,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -1901,7 +1901,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesConnection
 
   # Reads and enables pagination through a set of \`UpdatableView\`.
@@ -1926,7 +1926,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsConnection
 
   # Reads and enables pagination through a set of \`CompoundType\`.
@@ -2644,7 +2644,7 @@ type CompoundKey implements Node {
     offset: Int
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysConnection!
 
   # A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -4638,7 +4638,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
@@ -4663,7 +4663,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
@@ -4695,7 +4695,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysConnection!
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -4746,7 +4746,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection!
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
@@ -4996,7 +4996,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
 
   # Reads and enables pagination through a set of \`DefaultValue\`.
@@ -5021,7 +5021,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`DefaultValue\`.
-    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
   ): DefaultValuesConnection
 
   # Reads and enables pagination through a set of \`EdgeCase\`.
@@ -5046,7 +5046,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
 
   # Reads and enables pagination through a set of \`ForeignKey\`.
@@ -5071,7 +5071,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysConnection
 
   # Reads and enables pagination through a set of \`NonUpdatableView\`.
@@ -5096,7 +5096,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`NonUpdatableView\`.
-    orderBy: NonUpdatableViewsOrderBy = NATURAL
+    orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
   ): NonUpdatableViewsConnection
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -5121,7 +5121,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
   # Reads and enables pagination through a set of \`Post\`.
@@ -5146,7 +5146,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
   # Reads and enables pagination through a set of \`SimilarTable1\`.
@@ -5171,7 +5171,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SConnection
 
   # Reads and enables pagination through a set of \`SimilarTable2\`.
@@ -5196,7 +5196,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SConnection
 
   # Reads and enables pagination through a set of \`Testview\`.
@@ -5221,7 +5221,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Testview\`.
-    orderBy: TestviewsOrderBy = NATURAL
+    orderBy: [TestviewsOrderBy!] = [NATURAL]
   ): TestviewsConnection
 
   # Reads and enables pagination through a set of \`Type\`.
@@ -5246,7 +5246,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesConnection
 
   # Reads and enables pagination through a set of \`UpdatableView\`.
@@ -5271,7 +5271,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsConnection
 
   # Reads and enables pagination through a set of \`ViewTable\`.
@@ -5296,7 +5296,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`ViewTable\`.
-    orderBy: ViewTablesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewTablesConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -7216,7 +7216,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
@@ -7241,7 +7241,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
@@ -7336,7 +7336,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
 
   # Reads and enables pagination through a set of \`EdgeCase\`.
@@ -7361,7 +7361,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -7386,7 +7386,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -8344,7 +8344,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
 
   # Reads and enables pagination through a set of \`CompoundKey\`.
@@ -8369,7 +8369,7 @@ type Person implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
   createdAt: Datetime
   email: Email!
@@ -8496,7 +8496,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
 
   # Reads and enables pagination through a set of \`EdgeCase\`.
@@ -8521,7 +8521,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -8546,7 +8546,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
   # Reads a single \`CompoundKey\` using its globally unique \`ID\`.
@@ -9955,7 +9955,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`DefaultValue\`.
-    orderBy: DefaultValuesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]
   ): DefaultValuesConnection
 
   # Reads and enables pagination through a set of \`ForeignKey\`.
@@ -9980,7 +9980,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysConnection
 
   # Reads and enables pagination through a set of \`NonUpdatableView\`.
@@ -10005,7 +10005,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`NonUpdatableView\`.
-    orderBy: NonUpdatableViewsOrderBy = NATURAL
+    orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
   ): NonUpdatableViewsConnection
 
   # Reads and enables pagination through a set of \`Post\`.
@@ -10030,7 +10030,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
   # Reads and enables pagination through a set of \`SimilarTable1\`.
@@ -10055,7 +10055,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SConnection
 
   # Reads and enables pagination through a set of \`SimilarTable2\`.
@@ -10080,7 +10080,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SConnection
 
   # Reads and enables pagination through a set of \`Testview\`.
@@ -10105,7 +10105,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`Testview\`.
-    orderBy: TestviewsOrderBy = NATURAL
+    orderBy: [TestviewsOrderBy!] = [NATURAL]
   ): TestviewsConnection
 
   # Reads and enables pagination through a set of \`ViewTable\`.
@@ -10130,7 +10130,7 @@ type Query implements Node {
     offset: Int
 
     # The method to use when ordering \`ViewTable\`.
-    orderBy: ViewTablesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewTablesConnection
 
   # Reads and enables pagination through a set of \`TablefuncCrosstab2\`.
