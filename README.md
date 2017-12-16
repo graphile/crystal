@@ -1,12 +1,21 @@
 # PostGraphQL@next
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
+[![Package on npm](https://img.shields.io/npm/v/postgraphql/next.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
+![MIT license](https://img.shields.io/npm/l/postgraphql.svg)
 [![Gitter chat room](https://badges.gitter.im/postgraphql/postgraphql.svg)](https://gitter.im/postgraphql/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/benjie)
+<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/benjie)
+[![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
 # This is the ALPHA VERSION of PostGraphQL v4; use with caution and monitor [#506](https://github.com/postgraphql/postgraphql/pull/506)!
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
+
+**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only  
+**Next**: v4 ([`postgraphile`](https://github.com/postgraphql/postgraphql/tree/postgraphile) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
+
+---
 
 The strongly typed GraphQL data querying language is a revolutionary new way to interact with your server. Similar to how JSON very quickly overtook XML, GraphQL will likely take over REST. Why? Because GraphQL allows us to express our data in the exact same way we think about it.
 
@@ -19,7 +28,7 @@ PostGraphQL holds a fundamental belief that a *well designed database schema sho
 For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read [evaluating PostGraphQL for your project](https://www.graphile.org/postgraphile/evaluating/).
 
 ## Introduction
-Watch a talk by the original author at GraphQL summit for a fast 7 minute introduction to using the PostGraphQL project. This was using v2; we're now up to v4 which has many more bells and whistles!
+Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a fast 7 minute introduction to using the PostGraphQL project. This was using v2; we're now up to v4 which has many more bells and whistles!
 
 [![PostGraphQL at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
 
@@ -255,9 +264,14 @@ The specific specs PostGraphQL implements are:
 ## Contributing
 Want to help testing and developing PostGraphQL? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!
 
+## Maintenance
+The maintainer of this project is [Benjie Gillam](https://twitter.com/benjie) - follow him on Twitter!
+
 ## Thanks
 Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definetly a huge inspiration for this project!
 
-The original author of PostGraphQL was [@calebmer](https://twitter.com/calebmer). The primary maintainer is now [@benjie](https://twitter.com/benjie).
+A humongous, heart-felt, thank you to the original author of PostGraphQL - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphQL! He's now graduated from the project and we all wish him the best for his future ventures!
+
+Even more thanks to each and every [sponsor](SPONSORS.md) of the project - without their help progress would be a lot slower! Please join them in supporting this project 🙏
 
 Thanks and enjoy 👍
