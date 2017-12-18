@@ -3,6 +3,7 @@ import jwt = require('jsonwebtoken')
 import { Pool, Client } from 'pg'
 import { ExecutionResult } from 'graphql'
 import * as sql from 'pg-sql2'
+import EventEmitter = require('events')
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
 /**
@@ -39,6 +40,7 @@ export default async function withPostGraphQLContext(
     jwtRole = ['role'],
     pgDefaultRole,
     pgSettings,
+    eventListener,
   }: {
     pgPool: Pool,
     jwtToken?: string,
@@ -47,6 +49,7 @@ export default async function withPostGraphQLContext(
     jwtRole: Array<string>,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    eventListener: (event: string) => Promise<EventEmitter>,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> {
@@ -73,6 +76,7 @@ export default async function withPostGraphQLContext(
 
     return await callback({
       [$$pgClient]: pgClient,
+      eventListener,
       pgRole,
     })
   }

@@ -66,7 +66,7 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole, jwtSecret, jwtAudiences, jwtRole, additionalGraphQLContextFromRequest } = options
+  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole, jwtSecret, jwtAudiences, jwtRole, additionalGraphQLContextFromRequest, eventListenerFactory } = options
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
     throw new Error('pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).')
@@ -410,6 +410,8 @@ export default function createPostGraphQLHttpRequestHandler (options) {
         jwtAudiences,
         jwtRole,
         pgDefaultRole,
+        eventListener:
+          typeof eventListenerFactory === 'function' ?  await eventListenerFactory(req, res) : null,
         pgSettings:
           typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
       }, context => {
