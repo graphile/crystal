@@ -5,7 +5,7 @@ import { EventEmitter } from 'events'
 import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphile-core'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
-import { IncomingMessage } from 'http'
+import { IncomingMessage, ServerResponse } from 'http'
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -31,7 +31,7 @@ type PostGraphQLOptions = {
   appendPlugins?: Array<(builder: mixed) => {}>,
   prependPlugins?: Array<(builder: mixed) => {}>,
   replaceAllPlugins?: Array<(builder: mixed) => {}>,
-  additionalGraphQLContextFromRequest?: (req: IncomingMessage) => Promise<{}>,
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
 }
 
 /**

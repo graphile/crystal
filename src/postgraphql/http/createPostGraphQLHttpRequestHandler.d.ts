@@ -89,5 +89,5 @@ export default function createPostGraphQLHttpRequestHandler (config: {
 
   // Provide an async function to this to add custom properties to the context
   // object being provided to each graphQL resolver.
-  additionalGraphQLContextFromRequest?: (req: IncomingMessage) => Promise<{}>,
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
 }): HttpRequestHandler

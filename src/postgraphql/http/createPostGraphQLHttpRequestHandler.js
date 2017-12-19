@@ -401,7 +401,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       const jwtToken = options.jwtSecret ? getJwtToken(req) : null
 
       const additionalContext = typeof additionalGraphQLContextFromRequest === 'function'
-        ? await additionalGraphQLContextFromRequest(req)
+        ? await additionalGraphQLContextFromRequest(req, res)
         : {}
       result = await withPostGraphQLContext({
         pgPool,

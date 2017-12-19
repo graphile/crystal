@@ -709,6 +709,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
       expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1)
       expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(http.IncomingMessage)
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][1]).toBeInstanceOf(http.ServerResponse)
     })
   })
 }
