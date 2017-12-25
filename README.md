@@ -10,7 +10,7 @@
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
 
-**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only  
+**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only
 **Next**: v4 ([`postgraphile`](https://github.com/postgraphql/postgraphql/tree/postgraphile) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
 
 ---
@@ -289,7 +289,7 @@ Want to help testing and developing PostGraphQL? Check out the [contributing doc
 The current maintainer of this project is [Benjie Gillam](https://twitter.com/benjie).
 
 ## Thanks
-Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definetly a huge inspiration for this project! The core contributors are awesome and taught us so much 😊. Ironically, they also convinced us that GraphQL was superior to REST…
+Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definitely a huge inspiration for this project! The core contributors are awesome and taught us so much 😊. Ironically, they also convinced us that GraphQL was superior to REST…
 
 A humongous, heart-felt, thank you to the original author of PostGraphQL - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphQL! He's now graduated from the project and we all wish him the best for his future ventures!
 
