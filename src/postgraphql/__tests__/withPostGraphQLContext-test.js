@@ -85,28 +85,6 @@ test('will throw an error if the JWT token was signed with the wrong signature',
   expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
 })
 
-test('will throw an error if the JWT token does not have an audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  await expectHttpError(withPostGraphQLContext({
-    pgPool,
-    jwtToken: jwt.sign({ a: 1, b: 2, c: 3 }, 'secret', { noTimestamp: true }),
-    jwtSecret: 'secret',
-  }, () => {}), 403, 'jwt audience invalid. expected: postgraphql')
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
-
-test('will throw an error if the JWT token does not have an appropriate audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  await expectHttpError(withPostGraphQLContext({
-    pgPool,
-    jwtToken: jwt.sign({ a: 1, b: 2, c: 3, aud: 'postgrest' }, 'secret', { noTimestamp: true }),
-    jwtSecret: 'secret',
-  }, () => {}), 403, 'jwt audience invalid. expected: postgraphql')
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
-
 test('will succeed with all the correct things', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
@@ -366,4 +344,46 @@ test('will set a role provided in the JWT superceding the default role', async (
       'jwt.claims.some', {'other': {'path': 'test_deep_role'}},
     ],
   }], ['commit']])
+})
+
+describe('jwtVerifyOptions', () => {
+  test('will throw an error if the JWT token does not have an appropriate audience', async () => {
+    const pgClient = { query: jest.fn(), release: jest.fn() }
+    const pgPool = { connect: jest.fn(() => pgClient) }
+    await expectHttpError(withPostGraphQLContext({
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgrest' }, 'secret', { noTimestamp: true }),
+      jwtSecret: 'secret',
+      jwtVerifyOptions: {audience: 'the-hoity-toity'},
+    }, () => {}), 403, 'jwt audience invalid. expected: the-hoity-toity')
+    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+  })
+
+  test('will throw an error from a mismatched subject', async () => {
+    const pgClient = { query: jest.fn(), release: jest.fn() }
+    const pgPool = { connect: jest.fn(() => pgClient) }
+    await expectHttpError(
+      withPostGraphQLContext({
+        pgPool,
+        jwtSecret: 'secret',
+        jwtToken: jwt.sign({ aud: 'postgraphql', subject: 'gorilla'}, 'secret'),
+        jwtVerifyOptions: {subject: 'orangutan'},
+      }, () => {},
+      ), 403, 'jwt subject invalid. expected: orangutan')
+    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+  })
+
+  test('will throw an error from an issuer array that does not match iss', async () => {
+    const pgClient = { query: jest.fn(), release: jest.fn() }
+    const pgPool = { connect: jest.fn(() => pgClient) }
+    await expectHttpError(
+      withPostGraphQLContext({
+        pgPool,
+        jwtSecret: 'secret',
+        jwtToken: jwt.sign({ aud: 'postgraphql', iss: 'alpha:nasa'}, 'secret'),
+        jwtVerifyOptions: {issuer: ['alpha:aliens', 'alpha:ufo']},
+      }, () => {},
+      ), 403, 'jwt issuer invalid. expected: alpha:aliens,alpha:ufo')
+    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+  })
 })
