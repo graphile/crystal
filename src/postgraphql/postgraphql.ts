@@ -6,6 +6,7 @@ import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphile-co
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import { IncomingMessage } from 'http'
+import jwt = require('jsonwebtoken')
 
 type PostGraphQLOptions = {
   classicIds?: boolean,
@@ -15,8 +16,8 @@ type PostGraphQLOptions = {
   graphiql?: boolean,
   pgDefaultRole?: string,
   jwtSecret?: string,
-  jwtAudiences?: Array<string>,
   jwtRole?: Array<string>,
+  jwtVerifyOptions?: jwt.VerifyOptions,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
