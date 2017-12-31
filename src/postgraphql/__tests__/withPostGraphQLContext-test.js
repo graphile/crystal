@@ -85,6 +85,28 @@ test('will throw an error if the JWT token was signed with the wrong signature',
   expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
 })
 
+test('will throw an error if the JWT token does not have an audience', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await expectHttpError(withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ a: 1, b: 2, c: 3 }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+  }, () => {}), 403, 'jwt audience invalid. expected: postgraphql')
+  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+})
+
+test('will throw an error if the JWT token does not have an appropriate audience', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() }
+  const pgPool = { connect: jest.fn(() => pgClient) }
+  await expectHttpError(withPostGraphQLContext({
+    pgPool,
+    jwtToken: jwt.sign({ a: 1, b: 2, c: 3, aud: 'postgrest' }, 'secret', { noTimestamp: true }),
+    jwtSecret: 'secret',
+  }, () => {}), 403, 'jwt audience invalid. expected: postgraphql')
+  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+})
+
 test('will succeed with all the correct things', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
