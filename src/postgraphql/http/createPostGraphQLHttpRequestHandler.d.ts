@@ -49,8 +49,11 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // value.
   jwtSecret?: string,
 
-  // The jwt verify options. The default
-  // verify options is {audience: ['postgraphql']}.
+  // The audiences to use when verifing the JWT token. If not set the default
+  // audience will be ['postgraphql'].
+  jwtAudiences?: Array<string>,
+
+  // The jwt verify options.
   jwtVerifyOptions?: jwt.VerifyOptions,
 
   // Whether or not we are watching the PostGraphQL schema for changes. Should

@@ -175,7 +175,7 @@ if (jwtAudiences && jwtVerifyAudience) {
 
 const jwtVerifyOptions: jwt.VerifyOptions = {
   algorithms: jwtVerifyAlgorithms,
-  audience: jwtAudiences || jwtVerifyAudience || ['postgraphql'],
+  audience: jwtVerifyAudience,
   clockTolerance: jwtVerifyClockTolerance,
   jwtId: jwtVerifyId,
   ignoreExpiration: jwtVerifyIgnoreExpiration,
@@ -195,6 +195,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   graphiql: !disableGraphiql,
   jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
   jwtSecret: jwtSecret || deprecatedJwtSecret,
+  jwtAudiences,
   jwtRole,
   jwtVerifyOptions,
   pgDefaultRole,
