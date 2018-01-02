@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
+import jwt = require('jsonwebtoken')
 import { EventEmitter } from 'events'
 
 /**
@@ -51,6 +52,9 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // The audiences to use when verifing the JWT token. If not set the default
   // audience will be ['postgraphql'].
   jwtAudiences?: Array<string>,
+
+  // The jwt verify options.
+  jwtVerifyOptions?: jwt.VerifyOptions,
 
   // Whether or not we are watching the PostGraphQL schema for changes. Should
   // be associated with `_emitter`.

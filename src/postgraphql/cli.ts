@@ -5,6 +5,7 @@ import { readFileSync } from 'fs'
 import { createServer } from 'http'
 import chalk = require('chalk')
 import program = require('commander')
+import jwt = require('jsonwebtoken')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphql from './postgraphql'
 
@@ -38,7 +39,15 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('-A, --jwt-audiences <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
+  .option('--jwt-verify-algorithms <string>', 'a comma separated list of the names of the allowed jwt token algorithms', (option: string) => option.split(','))
+  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('--jwt-verify-clock-tolerance <number>', 'number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers', parseFloat)
+  .option('--jwt-verify-id <string>', 'the name of the allowed jwt token id')
+  .option('--jwt-verify-ignore-expiration', 'if `true` do not validate the expiration of the token defaults to `false`')
+  .option('--jwt-verify-ignore-not-before', 'if `true` do not validate the notBefore of the token defaults to `false`')
+  .option('--jwt-verify-issuer <string>', 'a comma separated list of the names of the allowed jwt token issuer', (option: string) => option.split(','))
+  .option('--jwt-verify-subject <string>', 'the name of the allowed jwt token subject')
   .option('--jwt-role <string>', 'a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
   .option('-t, --jwt-token-identifier <identifier>', 'the Postgres identifier for a composite type that will be used to create JWT tokens')
   .option('--append-plugins <string>', 'a comma-separated list of plugins to append to the list of GraphQL schema plugins')
@@ -77,7 +86,15 @@ const {
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   jwtSecret,
-  jwtAudiences = ['postgraphql'],
+  jwtAudiences,
+  jwtVerifyAlgorithms,
+  jwtVerifyAudience,
+  jwtVerifyClockTolerance,
+  jwtVerifyId,
+  jwtVerifyIgnoreExpiration,
+  jwtVerifyIgnoreNotBefore,
+  jwtVerifyIssuer,
+  jwtVerifySubject,
   jwtRole = ['role'],
   token: deprecatedJwtPgTypeIdentifier,
   jwtTokenIdentifier: jwtPgTypeIdentifier,
@@ -156,6 +173,21 @@ const loadPlugins = (rawNames: mixed) => {
   })
 }
 
+if (jwtAudiences && jwtVerifyAudience) {
+  throw new Error(`Provide either '--jwt-audiences' or '-A, --jwt-verify-audience' but not both`)
+}
+
+const jwtVerifyOptions: jwt.VerifyOptions = {
+  algorithms: jwtVerifyAlgorithms,
+  audience: jwtVerifyAudience,
+  clockTolerance: jwtVerifyClockTolerance,
+  jwtId: jwtVerifyId,
+  ignoreExpiration: jwtVerifyIgnoreExpiration,
+  ignoreNotBefore: jwtVerifyIgnoreNotBefore,
+  issuer: jwtVerifyIssuer,
+  subject: jwtVerifySubject,
+}
+
 // Create’s our PostGraphQL server and provides all the appropriate
 // configuration options.
 const server = createServer(postgraphql(pgConfig, schemas, {
@@ -169,6 +201,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   jwtSecret: jwtSecret || deprecatedJwtSecret,
   jwtAudiences,
   jwtRole,
+  jwtVerifyOptions,
   pgDefaultRole,
   watchPg,
   showErrorStack,
