@@ -39,9 +39,9 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('-A, --jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
+  .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
   .option('--jwt-verify-algorithms <string>', 'a comma separated list of the names of the allowed jwt token algorithms', (option: string) => option.split(','))
-  .option('--jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
   .option('--jwt-verify-clock-tolerance <number>', 'number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers', parseFloat)
   .option('--jwt-verify-id <string>', 'the name of the allowed jwt token id')
   .option('--jwt-verify-ignore-expiration', 'if `true` do not validate the expiration of the token defaults to `false`')
@@ -170,7 +170,7 @@ const loadPlugins = (rawNames: mixed) => {
 }
 
 if (jwtAudiences && jwtVerifyAudience) {
-  throw new Error(`Provide either '-A, --jwt-audiences' or '--jwt-verify-audience' but not both`)
+  throw new Error(`Provide either '--jwt-audiences' or '-A, --jwt-verify-audience' but not both`)
 }
 
 const jwtVerifyOptions: jwt.VerifyOptions = {
