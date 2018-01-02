@@ -35,8 +35,9 @@ export default async function withPostGraphQLContext(
     pgPool,
     jwtToken,
     jwtSecret,
-    jwtAudiences = ['postgraphql'],
+    jwtAudiences,
     jwtRole = ['role'],
+    jwtVerifyOptions,
     pgDefaultRole,
     pgSettings,
   }: {
@@ -45,6 +46,7 @@ export default async function withPostGraphQLContext(
     jwtSecret?: string,
     jwtAudiences?: Array<string>,
     jwtRole: Array<string>,
+    jwtVerifyOptions?: jwt.VerifyOptions,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
   },
@@ -67,6 +69,7 @@ export default async function withPostGraphQLContext(
       jwtSecret,
       jwtAudiences,
       jwtRole,
+      jwtVerifyOptions,
       pgDefaultRole,
       pgSettings,
     })
@@ -99,6 +102,7 @@ async function setupPgClientTransaction({
   jwtSecret,
   jwtAudiences,
   jwtRole,
+  jwtVerifyOptions,
   pgDefaultRole,
   pgSettings,
 }: {
@@ -107,6 +111,7 @@ async function setupPgClientTransaction({
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
   jwtRole: Array<string>,
+  jwtVerifyOptions?: jwt.VerifyOptions,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
 }): Promise<string | undefined> {
@@ -125,8 +130,12 @@ async function setupPgClientTransaction({
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
+      if (jwtAudiences && jwtVerifyOptions && jwtVerifyOptions.audience)
+        throw new Error(`Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`)
+
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
-        audience: jwtAudiences,
+        audience: jwtAudiences || ['postgraphql'],
+        ...jwtVerifyOptions,
       })
 
       const roleClaim = getPath(jwtClaims, jwtRole)
