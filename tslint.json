@@ -26,8 +26,7 @@
       "call-signature": "nospace",
       "index-signature": "nospace",
       "parameter": "nospace",
-      "property-declaration": "nospace",
-      "variable-delcaration": "onespace"
+      "property-declaration": "nospace"
     }],
 
     "ban": false,
@@ -71,6 +70,11 @@
     "no-trailing-whitespace": true,
     "object-literal-sort-keys": false,
     "trailing-comma": [true, { "multiline": "always", "singleline": "never" }],
+    "space-before-function-paren": [true, {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
 
     "align": [true, "parameters", "statements"],
     "array-type": [true, "generic"],

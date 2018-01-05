@@ -19,7 +19,7 @@ export interface HttpRequestHandler {
  * - `express`.
  * - `koa` (2.0).
  */
-export default function createPostGraphQLHttpRequestHandler (config: {
+export default function createPostGraphQLHttpRequestHandler(config: {
   // The actual GraphQL schema we will use.
   getGqlSchema: () => Promise<GraphQLSchema>,
 
