@@ -41,9 +41,9 @@ type PostGraphQLOptions = {
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql (
+export default function postgraphql(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphql(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphql(
   poolOrConfig?: Pool | PoolConfig | string,
   schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
   maybeOptions?: PostGraphQLOptions,
@@ -114,7 +114,7 @@ export default function postgraphql (
     _emitter,
   }))
 
-  async function createGqlSchema (): Promise<GraphQLSchema> {
+  async function createGqlSchema(): Promise<GraphQLSchema> {
     try {
       if (options.watchPg) {
         await watchPostGraphQLSchema(pgPool, pgSchemas, options, newSchema => {
@@ -137,7 +137,7 @@ export default function postgraphql (
     }
   }
 
-  async function exportGqlSchema (newGqlSchema: GraphQLSchema): Promise<void> {
+  async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
     try {
       await exportPostGraphQLSchema(newGqlSchema, options)
     }
@@ -148,7 +148,7 @@ export default function postgraphql (
   }
 }
 
-function handleFatalError (error: Error): never {
+function handleFatalError(error: Error): never {
   process.stderr.write(`${error.stack}\n`) // console.error fails under the tests
   process.exit(1)
 

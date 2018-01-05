@@ -93,7 +93,7 @@ export default async function withPostGraphQLContext(
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-async function setupPgClientTransaction ({
+async function setupPgClientTransaction({
   pgClient,
   jwtToken,
   jwtSecret,
@@ -208,7 +208,7 @@ const debugPgError = createDebugger('postgraphql:postgres:error')
  * @private
  */
 // tslint:disable no-any
-function debugPgClient (pgClient: Client): Client {
+function debugPgClient(pgClient: Client): Client {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (debugPg.enabled || debugPgError.enabled) {
