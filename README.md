@@ -268,7 +268,7 @@ Want to help testing and developing PostGraphQL? Check out the [contributing doc
 The maintainer of this project is [Benjie Gillam](https://twitter.com/benjie) - follow him on Twitter!
 
 ## Thanks
-Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definetly a huge inspiration for this project!
+Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definitely a huge inspiration for this project!
 
 A humongous, heart-felt, thank you to the original author of PostGraphQL - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphQL! He's now graduated from the project and we all wish him the best for his future ventures!
 
