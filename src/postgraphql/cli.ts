@@ -43,10 +43,12 @@ program
   .option('-t, --jwt-token-identifier <identifier>', 'the Postgres identifier for a composite type that will be used to create JWT tokens')
   .option('--append-plugins <string>', 'a comma-separated list of plugins to append to the list of GraphQL schema plugins')
   .option('--prepend-plugins <string>', 'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins')
-  .option('--export-schema-json [path]', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
-  .option('--export-schema-graphql [path]', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
+  .option('--export-schema-json <path>', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
+  .option('--export-schema-graphql <path>', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
   .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
   .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
+  .option('--write-cache <path>', 'writes computed values to local cache file so startup can be faster (do this during the build phase)')
+  .option('--read-cache <path>', 'reads cached values from local cache file to improve startup time (you may want to do this in production)')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -91,6 +93,8 @@ const {
   appendPlugins: appendPluginNames,
   prependPlugins: prependPluginNames,
   // replaceAllPlugins is NOT exposed via the CLI
+  readCache,
+  writeCache,
 // tslint:disable-next-line no-any
 } = program as any
 
@@ -176,6 +180,8 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   bodySizeLimit,
   appendPlugins: loadPlugins(appendPluginNames),
   prependPlugins: loadPlugins(prependPluginNames),
+  readCache,
+  writeCache,
 }))
 
 // Start our server by listening to a specific port and host name. Also log

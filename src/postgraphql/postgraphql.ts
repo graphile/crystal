@@ -32,6 +32,8 @@ type PostGraphQLOptions = {
   prependPlugins?: Array<(builder: mixed) => {}>,
   replaceAllPlugins?: Array<(builder: mixed) => {}>,
   additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
+  readCache?: string,
+  writeCache?: string,
 }
 
 /**
