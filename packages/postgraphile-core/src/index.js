@@ -110,7 +110,8 @@ const getPostGraphQLBuilder = async (
           ...defaultPlugins,
           ...pgDefaultPlugins,
           ...appendPlugins,
-        ]).filter(p => skipPlugins.indexOf(p) === -1),
+        ]
+    ).filter(p => skipPlugins.indexOf(p) === -1),
     Object.assign(
       {
         pgConfig: pgConfig,

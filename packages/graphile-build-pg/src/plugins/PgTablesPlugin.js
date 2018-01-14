@@ -84,7 +84,9 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
           if (pg2GqlMapper[tablePgType.id]) {
             // Already handled
             throw new Error(
-              `Register was called but there's already a mapper in place for '${tablePgType.id}'!`
+              `Register was called but there's already a mapper in place for '${
+                tablePgType.id
+              }'!`
             );
           }
           const TableType = newWithHooks(

@@ -47,16 +47,18 @@ export default (function PgMutationCreatePlugin(
             const Table = pgGetGqlTypeByTypeId(table.type.id);
             if (!Table) {
               debug(
-                `There was no table type for table '${table.namespace
-                  .name}.${table.name}', so we're not generating a create mutation for it.`
+                `There was no table type for table '${table.namespace.name}.${
+                  table.name
+                }', so we're not generating a create mutation for it.`
               );
               return memo;
             }
             const TableInput = pgGetGqlInputTypeByTypeId(table.type.id);
             if (!TableInput) {
               debug(
-                `There was no input type for table '${table.namespace
-                  .name}.${table.name}', so we're not generating a create mutation for it.`
+                `There was no input type for table '${table.namespace.name}.${
+                  table.name
+                }', so we're not generating a create mutation for it.`
               );
               return memo;
             }
@@ -187,11 +189,13 @@ export default (function PgMutationCreatePlugin(
                     insert into ${sql.identifier(
                       table.namespace.name,
                       table.name
-                    )} ${sqlColumns.length
-                      ? sql.fragment`(
+                    )} ${
+                      sqlColumns.length
+                        ? sql.fragment`(
                         ${sql.join(sqlColumns, ", ")}
                       ) values(${sql.join(sqlValues, ", ")})`
-                      : sql.fragment`default values`} returning *`;
+                        : sql.fragment`default values`
+                    } returning *`;
 
                     let row;
                     try {

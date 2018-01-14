@@ -2,11 +2,11 @@
   "private": true,
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "8.2.1",
     "babel-preset-env": "^1.6.0",
     "concurrently": "^3.5.0",
     "eslint": "^4.0.0",
-    "eslint-config-prettier": "2.3.0",
+    "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-flowtype": "^2.35.0",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-prettier": "^2.1.2",

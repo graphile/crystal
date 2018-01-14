@@ -74,8 +74,9 @@ export default (function PgQueryProceduresPlugin(builder) {
               // eslint-disable-next-line no-console
               console.warn(
                 chalk.bold.yellow(
-                  `Failed to add function '${proc.namespace
-                    .name}.${proc.name}'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                  `Failed to add function '${proc.namespace.name}.${
+                    proc.name
+                  }'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
                 )
               );
               debugWarn(e);

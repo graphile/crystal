@@ -392,7 +392,9 @@ export default function makeProcField(
         description: proc.description
           ? proc.description
           : isTableLike
-            ? `Reads and enables pagination through a set of \`${TableType.name}\`.`
+            ? `Reads and enables pagination through a set of \`${
+                TableType.name
+              }\`.`
             : null,
         type: ReturnType,
         args: args,
@@ -448,9 +450,11 @@ export default function makeProcField(
                           returnType.namespaceName,
                           returnType.name
                         ),
-                    sql.query`select ${isPgClass
-                      ? sql.query`${intermediateIdentifier}.*`
-                      : sql.query`${intermediateIdentifier}.${intermediateIdentifier} as ${functionAlias}`} from ${sqlMutationQuery} ${intermediateIdentifier}`,
+                    sql.query`select ${
+                      isPgClass
+                        ? sql.query`${intermediateIdentifier}.*`
+                        : sql.query`${intermediateIdentifier}.${intermediateIdentifier} as ${functionAlias}`
+                    } from ${sqlMutationQuery} ${intermediateIdentifier}`,
                     functionAlias,
                     query,
                     isPgClass

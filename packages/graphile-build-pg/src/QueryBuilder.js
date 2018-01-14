@@ -448,21 +448,26 @@ class QueryBuilder {
     let fragment = sql.fragment`
       select ${fields}
       ${this.compiledData.from &&
-        sql.fragment`from ${this.compiledData
-          .from[0]} as ${this.getTableAlias()}`}
+        sql.fragment`from ${
+          this.compiledData.from[0]
+        } as ${this.getTableAlias()}`}
       ${this.compiledData.join.length && sql.join(this.compiledData.join, " ")}
       where ${this.buildWhereClause(true, true, options)}
-      ${this.compiledData.orderBy.length
-        ? sql.fragment`order by ${sql.join(
-            this.compiledData.orderBy.map(
-              ([expr, ascending]) =>
-                sql.fragment`${expr} ${Number(ascending) ^ Number(flip)
-                  ? sql.fragment`ASC`
-                  : sql.fragment`DESC`}`
-            ),
-            ","
-          )}`
-        : ""}
+      ${
+        this.compiledData.orderBy.length
+          ? sql.fragment`order by ${sql.join(
+              this.compiledData.orderBy.map(
+                ([expr, ascending]) =>
+                  sql.fragment`${expr} ${
+                    Number(ascending) ^ Number(flip)
+                      ? sql.fragment`ASC`
+                      : sql.fragment`DESC`
+                  }`
+              ),
+              ","
+            )}`
+          : ""
+      }
       ${isSafeInteger(limit) && sql.fragment`limit ${sql.literal(limit)}`}
       ${offset && sql.fragment`offset ${sql.literal(offset)}`}
     `;

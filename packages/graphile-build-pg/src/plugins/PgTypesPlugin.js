@@ -127,7 +127,9 @@ export default (function PgTypesPlugin(
       } else if (type.isPgArray) {
         if (!Array.isArray(val)) {
           throw new Error(
-            `Expected array when converting PostgreSQL data into GraphQL; failing type: '${type.namespaceName}.${type.name}'`
+            `Expected array when converting PostgreSQL data into GraphQL; failing type: '${
+              type.namespaceName
+            }.${type.name}'`
           );
         }
         return val.map(v => pg2gql(v, type.arrayItemType));
@@ -146,10 +148,9 @@ export default (function PgTypesPlugin(
       } else if (type.isPgArray) {
         if (!Array.isArray(val)) {
           throw new Error(
-            `Expected array when converting GraphQL data into PostgreSQL data; failing type: '${type.namespaceName}.${type.name}' (type: ${type ===
-            null
-              ? "null"
-              : typeof type})`
+            `Expected array when converting GraphQL data into PostgreSQL data; failing type: '${
+              type.namespaceName
+            }.${type.name}' (type: ${type === null ? "null" : typeof type})`
           );
         }
         return sql.fragment`array[${sql.join(
@@ -470,9 +471,9 @@ export default (function PgTypesPlugin(
         return reallyEnforceGqlTypeByPgType(type);
       } catch (e) {
         const error = new Error(
-          `Error occurred when processing type '${type.namespaceName}.${type.name}' (type=${type.type}):\n${indent(
-            e.message
-          )}`
+          `Error occurred when processing type '${type.namespaceName}.${
+            type.name
+          }' (type=${type.type}):\n${indent(e.message)}`
         );
         // $FlowFixMe
         error.originalError = e;
@@ -704,7 +705,9 @@ export default (function PgTypesPlugin(
               gqlTypeByTypeId[type.id] !== result
             ) {
               throw new Error(
-                `Callback and return types differ when defining type for '${type.id}'`
+                `Callback and return types differ when defining type for '${
+                  type.id
+                }'`
               );
             }
             gqlTypeByTypeId[type.id] = result;
@@ -739,7 +742,9 @@ export default (function PgTypesPlugin(
               gqlInputTypeByTypeId[type.id] !== result
             ) {
               throw new Error(
-                `Callback and return types differ when defining type for '${type.id}'`
+                `Callback and return types differ when defining type for '${
+                  type.id
+                }'`
               );
             }
             gqlInputTypeByTypeId[type.id] = result;

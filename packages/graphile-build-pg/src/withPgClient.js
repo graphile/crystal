@@ -5,7 +5,7 @@ const debug = debugFactory("graphile-build-pg");
 
 const withPgClient = async (
   pgConfig: pg.Client | pg.Pool | string = process.env.DATABASE_URL,
-  fn: (pgClient: pg.Client) => Promise<void>
+  fn: (pgClient: pg.Client) => *
 ) => {
   if (!fn) {
     throw new Error("Nothing to do!");

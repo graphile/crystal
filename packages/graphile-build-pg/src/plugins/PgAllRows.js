@@ -61,7 +61,9 @@ export default (async function PgAllRows(
               : undefined;
             if (!ConnectionType) {
               throw new Error(
-                `Could not find GraphQL connection type for table '${table.name}'`
+                `Could not find GraphQL connection type for table '${
+                  table.name
+                }'`
               );
             }
             const schema = table.namespace;

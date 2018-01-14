@@ -72,7 +72,9 @@ export default (async function PgRowByUniqueConstraint(
                         const InputType = pgGetGqlInputTypeByTypeId(key.typeId);
                         if (!InputType) {
                           throw new Error(
-                            `Could not find input type for key '${key.name}' on type '${TableType.name}'`
+                            `Could not find input type for key '${
+                              key.name
+                            }' on type '${TableType.name}'`
                           );
                         }
                         memo[

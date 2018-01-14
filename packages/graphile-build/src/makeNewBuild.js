@@ -191,9 +191,9 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
       if (!inScope) {
         // eslint-disable-next-line no-console
         console.warn(
-          `No scope was provided to new ${getNameFromType(
-            Type
-          )}[name=${spec.name}], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
+          `No scope was provided to new ${getNameFromType(Type)}[name=${
+            spec.name
+          }], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
         );
       }
       if (!Type) {
@@ -211,7 +211,9 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         knownTypeNames.indexOf(Type.name) >= 0
       ) {
         throw new Error(
-          `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
+          `GraphQL conflict for '${
+            Type.name
+          }' detected! Multiple versions of graphql exist in your node_modules?`
         );
       }
       if (Type === GraphQLSchema) {
@@ -451,11 +453,13 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               const fieldSpec = fieldsSpec[fieldName];
               if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[
-                  fieldName
-                ] = fieldsContext.fieldWithHooks(fieldName, fieldSpec, {
-                  autoField: true, // We don't have any additional information
-                });
+                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
+                  fieldName,
+                  fieldSpec,
+                  {
+                    autoField: true, // We don't have any additional information
+                  }
+                );
               }
             }
             return fieldsSpec;
@@ -528,11 +532,13 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               const fieldSpec = fieldsSpec[fieldName];
               if (processedFields.indexOf(fieldSpec) < 0) {
                 // We've not processed this yet; process it now!
-                fieldsSpec[
-                  fieldName
-                ] = fieldsContext.fieldWithHooks(fieldName, fieldSpec, {
-                  autoField: true, // We don't have any additional information
-                });
+                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
+                  fieldName,
+                  fieldSpec,
+                  {
+                    autoField: true, // We don't have any additional information
+                  }
+                );
               }
             }
             return fieldsSpec;

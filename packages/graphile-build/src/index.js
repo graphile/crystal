@@ -1,5 +1,6 @@
 // @flow
 
+import util from "util";
 import SchemaBuilder from "./SchemaBuilder";
 import {
   StandardTypesPlugin,
@@ -31,6 +32,12 @@ export const getBuilder = async (
 ): Promise<SchemaBuilder> => {
   const builder = new SchemaBuilder();
   for (const plugin of plugins) {
+    if (typeof plugin !== "function") {
+      throw new Error(
+        "Expected a list of plugin functions, instead list contained a non-function: " +
+          util.inspect(plugin)
+      );
+    }
     builder._setPluginName(plugin.displayName || plugin.name);
     await plugin(builder, options);
     builder._setPluginName(null);
