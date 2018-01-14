@@ -24,6 +24,8 @@ import type SchemaBuilder, {
 
 import extend from "./extend";
 
+import { version } from "../package.json";
+
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphile-build");
@@ -158,6 +160,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
   const fieldDataGeneratorsByType = new Map();
 
   return {
+    graphileBuildVersion: version,
     graphql,
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,

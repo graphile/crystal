@@ -40,6 +40,7 @@ export type DataForType = {
 };
 
 export type Build = {|
+  graphileBuildVersion: string,
   graphql: {
     GraphQLSchema: typeof graphql.GraphQLSchema,
     GraphQLScalarType: typeof graphql.GraphQLScalarType,

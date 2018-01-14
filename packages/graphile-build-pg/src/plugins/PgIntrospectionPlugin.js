@@ -6,6 +6,9 @@ import { readFile as rawReadFile } from "fs";
 import pg from "pg";
 import debugFactory from "debug";
 import chalk from "chalk";
+
+import { version } from "../../package.json";
+
 const debug = debugFactory("graphile-build-pg");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
@@ -45,160 +48,178 @@ function readFile(filename, encoding) {
 
 export default (async function PgIntrospectionPlugin(
   builder,
-  { pgConfig, pgSchemas: schemas, pgEnableTags }
+  {
+    pgConfig,
+    pgSchemas: schemas,
+    pgEnableTags,
+    persistentMemoizeWithKey = (key, fn) => fn(),
+  }
 ) {
   async function introspect() {
-    return withPgClient(pgConfig, async pgClient => {
-      // Perform introspection
-      if (!Array.isArray(schemas)) {
-        throw new Error("Argument 'schemas' (array) is required");
-      }
-      const introspectionQuery = await readFile(INTROSPECTION_PATH, "utf8");
-      const { rows } = await pgClient.query(introspectionQuery, [schemas]);
+    // Perform introspection
+    if (!Array.isArray(schemas)) {
+      throw new Error("Argument 'schemas' (array) is required");
+    }
+    const cacheKey = `PgIntrospectionPlugin-introspectionResultsByKind-v${version}`;
+    const cloneResults = obj => {
+      const result = Object.keys(obj).reduce((memo, k) => {
+        memo[k] = obj[k].map(v => Object.assign({}, v));
+        return memo;
+      }, {});
+      return result;
+    };
+    const introspectionResultsByKind = cloneResults(
+      await persistentMemoizeWithKey(cacheKey, () =>
+        withPgClient(pgConfig, async pgClient => {
+          const introspectionQuery = await readFile(INTROSPECTION_PATH, "utf8");
+          const { rows } = await pgClient.query(introspectionQuery, [schemas]);
 
-      const introspectionResultsByKind = rows.reduce(
-        (memo, { object }) => {
-          memo[object.kind].push(object);
-          return memo;
-        },
-        {
-          namespace: [],
-          class: [],
-          attribute: [],
-          type: [],
-          constraint: [],
-          procedure: [],
-        }
-      );
-
-      // Parse tags from comments
-      ["namespace", "class", "attribute", "type", "procedure"].forEach(kind => {
-        introspectionResultsByKind[kind].forEach(object => {
-          if (pgEnableTags && object.description) {
-            const parsed = parseTags(object.description);
-            object.tags = parsed.tags;
-            object.description = parsed.text;
-          } else {
-            object.tags = {};
-          }
-        });
-      });
-
-      const xByY = (arrayOfX, attrKey) =>
-        arrayOfX.reduce((memo, x) => {
-          memo[x[attrKey]] = x;
-          return memo;
-        }, {});
-      const xByYAndZ = (arrayOfX, attrKey, attrKey2) =>
-        arrayOfX.reduce((memo, x) => {
-          memo[x[attrKey]] = memo[x[attrKey]] || {};
-          memo[x[attrKey]][x[attrKey2]] = x;
-          return memo;
-        }, {});
-      introspectionResultsByKind.namespaceById = xByY(
-        introspectionResultsByKind.namespace,
-        "id"
-      );
-      introspectionResultsByKind.classById = xByY(
-        introspectionResultsByKind.class,
-        "id"
-      );
-      introspectionResultsByKind.typeById = xByY(
-        introspectionResultsByKind.type,
-        "id"
-      );
-      introspectionResultsByKind.attributeByClassIdAndNum = xByYAndZ(
-        introspectionResultsByKind.attribute,
-        "classId",
-        "num"
-      );
-
-      const relate = (
-        array,
-        newAttr,
-        lookupAttr,
-        lookup,
-        missingOk = false
-      ) => {
-        array.forEach(entry => {
-          const key = entry[lookupAttr];
-          const result = lookup[key];
-          if (key && !result) {
-            if (missingOk) {
-              return;
+          const result = rows.reduce(
+            (memo, { object }) => {
+              memo[object.kind].push(object);
+              return memo;
+            },
+            {
+              namespace: [],
+              class: [],
+              attribute: [],
+              type: [],
+              constraint: [],
+              procedure: [],
             }
-            throw new Error(
-              `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
-                entry
-              )}'`
-            );
+          );
+
+          // Parse tags from comments
+          ["namespace", "class", "attribute", "type", "procedure"].forEach(
+            kind => {
+              result[kind].forEach(object => {
+                if (pgEnableTags && object.description) {
+                  const parsed = parseTags(object.description);
+                  object.tags = parsed.tags;
+                  object.description = parsed.text;
+                } else {
+                  object.tags = {};
+                }
+              });
+            }
+          );
+
+          for (const k in result) {
+            result[k].map(Object.freeze);
           }
-          entry[newAttr] = result;
-        });
-      };
+          return Object.freeze(result);
+        })
+      )
+    );
 
-      relate(
-        introspectionResultsByKind.class,
-        "namespace",
-        "namespaceId",
-        introspectionResultsByKind.namespaceById,
-        true // Because it could be a type defined in a different namespace - which is fine so long as we don't allow querying it directly
-      );
+    const xByY = (arrayOfX, attrKey) =>
+      arrayOfX.reduce((memo, x) => {
+        memo[x[attrKey]] = x;
+        return memo;
+      }, {});
+    const xByYAndZ = (arrayOfX, attrKey, attrKey2) =>
+      arrayOfX.reduce((memo, x) => {
+        memo[x[attrKey]] = memo[x[attrKey]] || {};
+        memo[x[attrKey]][x[attrKey2]] = x;
+        return memo;
+      }, {});
+    introspectionResultsByKind.namespaceById = xByY(
+      introspectionResultsByKind.namespace,
+      "id"
+    );
+    introspectionResultsByKind.classById = xByY(
+      introspectionResultsByKind.class,
+      "id"
+    );
+    introspectionResultsByKind.typeById = xByY(
+      introspectionResultsByKind.type,
+      "id"
+    );
+    introspectionResultsByKind.attributeByClassIdAndNum = xByYAndZ(
+      introspectionResultsByKind.attribute,
+      "classId",
+      "num"
+    );
 
-      relate(
-        introspectionResultsByKind.class,
-        "type",
-        "typeId",
-        introspectionResultsByKind.typeById
-      );
+    const relate = (array, newAttr, lookupAttr, lookup, missingOk = false) => {
+      array.forEach(entry => {
+        const key = entry[lookupAttr];
+        const result = lookup[key];
+        if (key && !result) {
+          if (missingOk) {
+            return;
+          }
+          throw new Error(
+            `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
+              entry
+            )}'`
+          );
+        }
+        entry[newAttr] = result;
+      });
+    };
 
-      relate(
-        introspectionResultsByKind.attribute,
-        "class",
-        "classId",
-        introspectionResultsByKind.classById
-      );
+    relate(
+      introspectionResultsByKind.class,
+      "namespace",
+      "namespaceId",
+      introspectionResultsByKind.namespaceById,
+      true // Because it could be a type defined in a different namespace - which is fine so long as we don't allow querying it directly
+    );
 
-      relate(
-        introspectionResultsByKind.attribute,
-        "type",
-        "typeId",
-        introspectionResultsByKind.typeById
-      );
+    relate(
+      introspectionResultsByKind.class,
+      "type",
+      "typeId",
+      introspectionResultsByKind.typeById
+    );
 
-      relate(
-        introspectionResultsByKind.procedure,
-        "namespace",
-        "namespaceId",
-        introspectionResultsByKind.namespaceById
-      );
+    relate(
+      introspectionResultsByKind.attribute,
+      "class",
+      "classId",
+      introspectionResultsByKind.classById
+    );
 
-      relate(
-        introspectionResultsByKind.type,
-        "class",
-        "classId",
-        introspectionResultsByKind.classById,
-        true
-      );
+    relate(
+      introspectionResultsByKind.attribute,
+      "type",
+      "typeId",
+      introspectionResultsByKind.typeById
+    );
 
-      relate(
-        introspectionResultsByKind.type,
-        "domainBaseType",
-        "domainBaseTypeId",
-        introspectionResultsByKind.typeById,
-        true // Because not all types are domains
-      );
+    relate(
+      introspectionResultsByKind.procedure,
+      "namespace",
+      "namespaceId",
+      introspectionResultsByKind.namespaceById
+    );
 
-      relate(
-        introspectionResultsByKind.type,
-        "arrayItemType",
-        "arrayItemTypeId",
-        introspectionResultsByKind.typeById,
-        true // Because not all types are arrays
-      );
+    relate(
+      introspectionResultsByKind.type,
+      "class",
+      "classId",
+      introspectionResultsByKind.classById,
+      true
+    );
 
-      return introspectionResultsByKind;
-    });
+    relate(
+      introspectionResultsByKind.type,
+      "domainBaseType",
+      "domainBaseTypeId",
+      introspectionResultsByKind.typeById,
+      true // Because not all types are domains
+    );
+
+    relate(
+      introspectionResultsByKind.type,
+      "arrayItemType",
+      "arrayItemTypeId",
+      introspectionResultsByKind.typeById,
+      true // Because not all types are arrays
+    );
+
+    return introspectionResultsByKind;
   }
 
   let introspectionResultsByKind = await introspect();
