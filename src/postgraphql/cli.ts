@@ -10,6 +10,15 @@ import postgraphql from './postgraphql'
 
 // tslint:disable no-console
 
+let config = {}
+try {
+  config = require(process.cwd() + '/.postgraphilerc') // tslint:disable-line no-var-requires
+  if (!config.hasOwnProperty('options')) {
+    console.warn('WARNING: Your configuration file does not export any options')
+  }
+} catch (error) {
+  // Use command line options
+}
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null
 
@@ -62,12 +71,13 @@ program.parse(process.argv)
 // Kill server on exit.
 process.on('SIGINT', process.exit)
 
-// Destruct our command line arguments, use defaults, and rename options to
+// Destruct our configuration file and command line arguments, use defaults, and rename options to
 // something appropriate for JavaScript.
 const {
   demo: isDemo = false,
   connection: pgConnectionString,
   watch: watchPg,
+  schema: dbSchema,
   host: hostname = 'localhost',
   port = 5000,
   maxPoolSize,
@@ -96,12 +106,12 @@ const {
   readCache,
   writeCache,
 // tslint:disable-next-line no-any
-} = program as any
+} = Object.assign({}, config['options'], program) as any
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
 // schema is what we want.
-const schemas: Array<string> = program['schema'] || (isDemo ? ['forum_example'] : ['public'])
+const schemas: Array<string> = dbSchema || (isDemo ? ['forum_example'] : ['public'])
 
 // Create our Postgres config.
 const pgConfig = Object.assign(
