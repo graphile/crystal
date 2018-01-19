@@ -120,11 +120,12 @@ const pgConfig = Object.assign(
   // config. If we don’t have a connection string use some environment
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
-  pgConnectionString || isDemo ? parsePgConnectionString(pgConnectionString || DEMO_PG_URL) : {
-    host: process.env.PGHOST || 'localhost',
-    port: process.env.PGPORT || 5432,
-    database: process.env.PGDATABASE,
-  },
+  pgConnectionString || process.env.DATABASE_URL || isDemo ?
+    parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL) : {
+      host: process.env.PGHOST || 'localhost',
+      port: process.env.PGPORT || 5432,
+      database: process.env.PGDATABASE,
+    },
   // Add the max pool size to our config.
   { max: maxPoolSize },
 )
