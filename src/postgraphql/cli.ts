@@ -85,7 +85,7 @@ process.on('SIGINT', process.exit)
 let {
   demo: isDemo = false,
   connection: pgConnectionString,
-  schema,
+  schema: dbSchemas,
   watch: watchPg,
   host: hostname = 'localhost',
   port = 5000,
@@ -129,7 +129,7 @@ let {
 ({
   demo: isDemo = isDemo,
   connection: pgConnectionString = pgConnectionString,
-  schema = schema,
+  schema: dbSchemas = dbSchemas,
   watch: watchPg = watchPg,
   host: hostname = hostname,
   port = port,
@@ -172,7 +172,7 @@ let {
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
 // schema is what we want.
-const schemas: Array<string> = schema || (isDemo ? ['forum_example'] : ['public'])
+const schemas: Array<string> = dbSchemas || (isDemo ? ['forum_example'] : ['public'])
 
 // Create our Postgres config.
 const pgConfig = Object.assign(
