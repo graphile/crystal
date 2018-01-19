@@ -11,6 +11,15 @@ import postgraphql from './postgraphql'
 
 // tslint:disable no-console
 
+let config = {
+  options: {},
+}
+try {
+  config = require(process.cwd() + '/.postgraphilerc.js') // tslint:disable-line no-var-requires
+} catch (error) {
+  // Use command line options
+}
+
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null
 
@@ -62,8 +71,8 @@ program
 program.on('--help', () => console.log(`
   Get Started:
 
-    $ postgraphql --demo
-    $ postgraphql --schema my_schema
+    $ postgraphile --demo
+    $ postgraphile --schema my_schema
 `.slice(1)))
 
 program.parse(process.argv)
@@ -71,11 +80,12 @@ program.parse(process.argv)
 // Kill server on exit.
 process.on('SIGINT', process.exit)
 
-// Destruct our command line arguments, use defaults, and rename options to
+// Destruct options from config file, use defaults, and rename options to
 // something appropriate for JavaScript.
-const {
+let {
   demo: isDemo = false,
   connection: pgConnectionString,
+  schema: dbSchemas,
   watch: watchPg,
   host: hostname = 'localhost',
   port = 5000,
@@ -113,12 +123,56 @@ const {
   readCache,
   writeCache,
 // tslint:disable-next-line no-any
-} = program as any
+} = config['options'] as any
+
+// Command line options override config file options
+({
+  demo: isDemo = isDemo,
+  connection: pgConnectionString = pgConnectionString,
+  schema: dbSchemas = dbSchemas,
+  watch: watchPg = watchPg,
+  host: hostname = hostname,
+  port = port,
+  maxPoolSize = maxPoolSize,
+  defaultRole: pgDefaultRole = pgDefaultRole,
+  graphql: graphqlRoute = graphqlRoute,
+  graphiql: graphiqlRoute = graphiqlRoute,
+  disableGraphiql = disableGraphiql,
+  secret: deprecatedJwtSecret = deprecatedJwtSecret,
+  jwtSecret = jwtSecret,
+  jwtAudiences = jwtAudiences,
+  jwtVerifyAlgorithms = jwtVerifyAlgorithms,
+  jwtVerifyAudience = jwtVerifyAudience,
+  jwtVerifyClockTolerance = jwtVerifyClockTolerance,
+  jwtVerifyId = jwtVerifyId,
+  jwtVerifyIgnoreExpiration,
+  jwtVerifyIgnoreNotBefore,
+  jwtVerifyIssuer = jwtVerifyIssuer,
+  jwtVerifySubject = jwtVerifySubject,
+  jwtRole = jwtRole,
+  token: deprecatedJwtPgTypeIdentifier = deprecatedJwtPgTypeIdentifier,
+  jwtTokenIdentifier: jwtPgTypeIdentifier = jwtPgTypeIdentifier,
+  cors: enableCors = enableCors,
+  classicIds = classicIds,
+  dynamicJson = dynamicJson,
+  disableDefaultMutations = disableDefaultMutations,
+  exportSchemaJson: exportJsonSchemaPath = exportJsonSchemaPath,
+  exportSchemaGraphql: exportGqlSchemaPath = exportGqlSchemaPath,
+  showErrorStack = showErrorStack,
+  extendedErrors = extendedErrors,
+  bodySizeLimit = bodySizeLimit,
+  appendPlugins: appendPluginNames = appendPluginNames,
+  prependPlugins: prependPluginNames = prependPluginNames,
+  // replaceAllPlugins is NOT exposed via the CLI
+  readCache = readCache,
+  writeCache = writeCache,
+// tslint:disable-next-line no-any
+} = program as any)
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
 // schema is what we want.
-const schemas: Array<string> = program['schema'] || (isDemo ? ['forum_example'] : ['public'])
+const schemas: Array<string> = dbSchemas || (isDemo ? ['forum_example'] : ['public'])
 
 // Create our Postgres config.
 const pgConfig = Object.assign(
@@ -127,7 +181,8 @@ const pgConfig = Object.assign(
   // config. If we don’t have a connection string use some environment
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
-  pgConnectionString || isDemo ? parsePgConnectionString(pgConnectionString || DEMO_PG_URL) : {
+  pgConnectionString || process.env.DATABASE_URL || isDemo ?
+    parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL) : {
     host: process.env.PGHOST || 'localhost',
     port: process.env.PGPORT || 5432,
     database: process.env.PGDATABASE,
