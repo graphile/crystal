@@ -8,6 +8,7 @@ Leaders
 -------
 
 - Chad Furman
+- Diwank Tomer
 
 Supporters
 ----------
