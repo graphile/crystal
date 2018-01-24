@@ -1,18 +1,16 @@
-Sponsors
-========
+# Sponsors
 
 These people and companies help accelerate the advancement of this project by
 sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 
-Leaders
--------
+## Leaders
 
-- Chad Furman
-- Diwank Tomer
+* Chad Furman
+* Diwank Tomer
+* Joe Dennis
 
-Supporters
-----------
+## Supporters
 
-- Mtpc
-- Evgeniy Foucault
-- Alec Wenzowski
+* Mtpc
+* Evgeniy Foucault
+* Alec Wenzowski
