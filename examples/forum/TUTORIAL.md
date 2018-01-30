@@ -259,7 +259,13 @@ Note the form. The double dollar signs (`$$`) open and close the function, and a
 
 > **Note:** If you are interested in running JavaScript or Ruby in Postgres, check out [PL/V8](https://blog.heroku.com/javascript_in_your_postgres) and [PL/ruby](https://github.com/knu/postgresql-plruby) respectively. It is recommended that you use SQL and PL/pgSQL (which comes native with Postgres) whenever you can (even if they are a pain). There is plenty of documentation and StackOverflow answers on both SQL and PL/pgSQL. However, there are alternatives if you so choose.
 
-That function above isn’t so useful for us in our schema, so let’s write some functions which will be useful. We will define three.
+That function above isn’t so useful for us in our schema.  Before we write any functions for our schema, let's revoke the default grant on function execution:
+
+```sql
+alter default privileges revoke execute on functions from public;
+```
+
+This will allow us to apply fine-grained control over function permissions later in this tutorial.  Now we're ready to define three functions.
 
 First, a function which will concatenate the users first and last name to return their full name:
 
@@ -673,9 +679,6 @@ Now, let’s use the JWT to define permissions.
 Role-based permissions are assigned using the `GRANT` command.  For a thorough explanation of grants, see the [GRANT](https://www.postgresql.org/docs/9.6/static/sql-grant.html) page of the Postgres documentation.  For the purpose of this tutorial, we will assign the following grants:
 
 ```sql
--- after schema creation and before function creation
-alter default privileges revoke execute on functions from public;
-
 grant usage on schema forum_example to forum_example_anonymous, forum_example_person;
 
 grant select on table forum_example.person to forum_example_anonymous, forum_example_person;
@@ -697,13 +700,12 @@ grant execute on function forum_example.register_person(text, text, text, text) 
 
 See how we had to grant permissions on every single Postgres object we have defined so far? Postgres permissions work as a whitelist and not a blacklist (except for functions), so therefore no one has more access than you explicitly give them. Let’s walk through the grants:
 
-1. `alter default privileges ...`: By default, functions can be executable by public. Since we're applying our fine-grained control over function permissions here, we remove the default grant. Note that this line needs to be placed before any function definition.
-2. `grant usage on schema forum_example to forum_example_anonymous, forum_example_person`: We say that anonymous users (`forum_example_anonymous`) and logged in users (`forum_example_person`) may use the objects in the `forum_example` schema. This does not mean that those roles can use anything they want in the schema, it just allows the roles to know the schema exists. Also note that we did not grant usage for the `forum_example_private` schema.
-3. `grant select on table forum_example.person to forum_example_anonymous, forum_example_person`: We give anonymous users and logged in users the ability to read all of the rows in the `forum_example.person` table.
-4. `grant update, delete on table forum_example.person to forum_example_person`: Here we give *only* logged in users the ability to update and delete rows from the `forum_example.person` table. This means that anonymous users can never update or delete a person. However, it does mean that users can update and delete any rows in the table. We will fix this later.
-5. `grant select ...` and `grant insert, update, delete ...`: We do the same thing with these two grants as we did with the grants above. The only difference here is that we also give signed in users the ability to `insert` into `forum_example.post`. We do not allow anyone to insert directly into `forum_example.person`, instead users should use the `forum_example.register_person` function.
-6. `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
-7. `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
+1. `grant usage on schema forum_example to forum_example_anonymous, forum_example_person`: We say that anonymous users (`forum_example_anonymous`) and logged in users (`forum_example_person`) may use the objects in the `forum_example` schema. This does not mean that those roles can use anything they want in the schema, it just allows the roles to know the schema exists. Also note that we did not grant usage for the `forum_example_private` schema.
+2. `grant select on table forum_example.person to forum_example_anonymous, forum_example_person`: We give anonymous users and logged in users the ability to read all of the rows in the `forum_example.person` table.
+3. `grant update, delete on table forum_example.person to forum_example_person`: Here we give *only* logged in users the ability to update and delete rows from the `forum_example.person` table. This means that anonymous users can never update or delete a person. However, it does mean that users can update and delete any rows in the table. We will fix this later.
+4. `grant select ...` and `grant insert, update, delete ...`: We do the same thing with these two grants as we did with the grants above. The only difference here is that we also give signed in users the ability to `insert` into `forum_example.post`. We do not allow anyone to insert directly into `forum_example.person`, instead users should use the `forum_example.register_person` function.
+5. `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
+6. `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
 
 This provides basic permissions for all of our Postgres objects, but as we mentioned before, users can still update and delete any or all persons or posts. For obvious reasons, we don’t want this, so let’s define row level security next.
 
