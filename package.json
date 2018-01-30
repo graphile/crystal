@@ -55,11 +55,12 @@
   "devDependencies": {
     "@types/chalk": "^0.4.30",
     "@types/change-case": "2.3.1",
-    "@types/commander": "^2.3.30",
+    "@types/commander": ">=2.3.30 <2.12.0",
     "@types/debug": "0.0.29",
     "@types/graphql": "^0.8.2",
     "@types/jest": "^16.0.4",
     "@types/jsonwebtoken": "<7.2.1",
+    "@types/lodash": ">=4.14.30 <4.14.57",
     "@types/node": "^7.0.4",
     "@types/pluralize": "0.0.27",
     "codemirror-graphql": "^0.6.12",
