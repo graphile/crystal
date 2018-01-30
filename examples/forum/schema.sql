@@ -1,7 +1,7 @@
 -- This file was automatically generated from the `TUTORIAL.md` which
 -- contains a complete explanation of how this schema works and why certain
 -- decisions were made. If you are looking for a comprehensive tutorial,
--- definetly check it out as this file is a little tough to read.
+-- definitely check it out as this file is a little tough to read.
 --
 -- If you want to contribute to this file, please change the
 -- `TUTORIAL.md` file and then rebuild this file :)
@@ -51,6 +51,8 @@ comment on column forum_example.post.topic is 'The topic this has been posted in
 comment on column forum_example.post.body is 'The main body text of our post.';
 comment on column forum_example.post.created_at is 'The time this post was created.';
 
+alter default privileges revoke execute on functions from public;
+
 create function forum_example.person_full_name(person forum_example.person) returns text as $$
   select person.first_name || ' ' || person.last_name
 $$ language sql stable;
@@ -78,7 +80,7 @@ create function forum_example.person_latest_post(person forum_example.person) re
   limit 1
 $$ language sql stable;
 
-comment on function forum_example.person_latest_post(forum_example.person) is 'Get’s the latest post written by the person.';
+comment on function forum_example.person_latest_post(forum_example.person) is 'Gets the latest post written by the person.';
 
 create function forum_example.search_posts(search text) returns setof forum_example.post as $$
   select post.*

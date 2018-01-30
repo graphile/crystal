@@ -242,7 +242,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .send({ query: '{' })
         .expect(400)
         .expect('Content-Type', /json/)
-        .expect({ errors: [{ message: 'Syntax Error GraphQL Http Request (1:2) Expected Name, found <EOF>\n\n1: {\n    ^\n', locations: [{ line: 1, column: 2 }] }] })
+        .expect({ errors: [{ message: 'Syntax Error: Expected Name, found <EOF>', locations: [{ line: 1, column: 2 }] }] })
       )
     })
 
@@ -498,11 +498,21 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .get('/_postgraphql/graphiql/very/deeply/nested')
         .expect(200)
       )
-      expect(sendFile.mock.calls.map(([res, filepath, options]) => [path.relative(graphiqlDirectory, filepath), options]))
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/index.html')
+        .expect(404)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/../../../../etc/passwd')
+        .expect(403)
+      )
+      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options]))
         .toEqual([
-          ['anything.css', { index: false }],
-          ['something.js', { index: false }],
-          ['very/deeply/nested', { index: false }],
+          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ])
     })
 
