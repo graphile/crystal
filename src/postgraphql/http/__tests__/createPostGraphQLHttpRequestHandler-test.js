@@ -495,11 +495,21 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .get('/_postgraphql/graphiql/very/deeply/nested')
         .expect(200)
       )
-      expect(sendFile.mock.calls.map(([res, filepath, options]) => [path.relative(graphiqlDirectory, filepath), options]))
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/index.html')
+        .expect(404)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/../../../../etc/passwd')
+        .expect(403)
+      )
+      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options]))
         .toEqual([
-          ['anything.css', { index: false }],
-          ['something.js', { index: false }],
-          ['very/deeply/nested', { index: false }],
+          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ])
     })
 
