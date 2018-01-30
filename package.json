@@ -1,8 +1,7 @@
 {
   "name": "postgraphql",
-  "version": "4.0.0-alpha2.28",
-  "description":
-    "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
+  "version": "4.0.0-alpha2.29",
+  "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Caleb Meredith <calebmeredith8@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/calebmer/postgraphql#readme",
@@ -86,12 +85,22 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": ["ts", "js"],
-    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/resources/jest-setup.js"
+    ],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": ["<rootDir>/src"],
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": ["build", "resources/favicon.ico"]
+  "files": [
+    "build",
+    "resources/favicon.ico"
+  ]
 }
