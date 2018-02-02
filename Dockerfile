@@ -9,6 +9,9 @@ WORKDIR /postgraphql
 
 COPY . /postgraphql
 
+# Temporary pin of graphql to less than 0.12 in package.json
+RUN sed -i 's/\"graphql\": \">=0.6 <0.13\"/\"graphql\": \">=0.6 <0.12\"/g' package.json
+
 RUN npm install
 RUN scripts/build
 RUN npm pack
