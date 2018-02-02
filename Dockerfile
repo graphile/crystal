@@ -10,7 +10,6 @@ WORKDIR /postgraphql
 RUN sed -i 's/\"graphql\": \">=0.6 <0.13\"/\"graphql\": \">=0.6 <0.12\"/g' package.json
 
 RUN apk add --update bash && rm -rf /var/cache/apk/* && \
-    mkdir -p /postgraphql && \
     npm install && \
     scripts/build && \
     npm pack && \
