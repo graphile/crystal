@@ -8,6 +8,7 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Chad Furman
 * Diwank Tomer
 * Joe Dennis
+* James Allain
 
 ## Supporters
 
