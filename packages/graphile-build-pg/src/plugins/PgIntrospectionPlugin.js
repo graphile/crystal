@@ -53,6 +53,7 @@ export default (async function PgIntrospectionPlugin(
     pgSchemas: schemas,
     pgEnableTags,
     persistentMemoizeWithKey = (key, fn) => fn(),
+    pgThrowOnMissingSchema = false,
   }
 ) {
   async function introspect() {
@@ -111,6 +112,21 @@ export default (async function PgIntrospectionPlugin(
         })
       )
     );
+
+    const knownSchemas = introspectionResultsByKind.namespace.map(n => n.name);
+    const missingSchemas = schemas.filter(s => knownSchemas.indexOf(s) < 0);
+    if (missingSchemas.length) {
+      const errorMessage = `You requested to use schema '${schemas.join(
+        "', '"
+      )}'; however we couldn't find some of those! Missing schemas are: '${missingSchemas.join(
+        "', '"
+      )}'`;
+      if (pgThrowOnMissingSchema) {
+        throw new Error(errorMessage);
+      } else {
+        console.warn("⚠️ WARNING⚠️  " + errorMessage); // eslint-disable-line no-console
+      }
+    }
 
     const xByY = (arrayOfX, attrKey) =>
       arrayOfX.reduce((memo, x) => {
