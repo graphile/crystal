@@ -39,8 +39,15 @@ export const newInflector = (
     pluralize,
     singularize,
   }: InflectorUtils = defaultUtils
-): Inflector =>
-  Object.assign(
+): Inflector => {
+  function singularizeTable(tableName: string): string {
+    return singularize(tableName).replace(
+      /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
+      "$&_record"
+    );
+  }
+
+  return Object.assign(
     {
       pluralize,
       argument(name: ?string, index: number) {
@@ -88,10 +95,10 @@ export const newInflector = (
         return camelCase(`${itemName}-patch`);
       },
       tableName(name: string, _schema: ?string) {
-        return camelCase(singularize(name));
+        return camelCase(singularizeTable(name));
       },
       tableNode(name: string, _schema: ?string) {
-        return camelCase(singularize(name));
+        return camelCase(singularizeTable(name));
       },
       allRows(name: string, schema: ?string) {
         return camelCase(`all-${this.pluralize(this.tableName(name, schema))}`);
@@ -140,10 +147,10 @@ export const newInflector = (
         );
       },
       updateNode(name: string, _schema: ?string) {
-        return camelCase(`update-${singularize(name)}`);
+        return camelCase(`update-${singularizeTable(name)}`);
       },
       deleteNode(name: string, _schema: ?string) {
-        return camelCase(`delete-${singularize(name)}`);
+        return camelCase(`delete-${singularizeTable(name)}`);
       },
       updateByKeysInputType(
         detailedKeys: Keys,
@@ -151,7 +158,7 @@ export const newInflector = (
         _schema: ?string
       ) {
         return upperCamelCase(
-          `update-${singularize(name)}-by-${detailedKeys
+          `update-${singularizeTable(name)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
             .join("-and-")}-input`
         );
@@ -162,16 +169,16 @@ export const newInflector = (
         _schema: ?string
       ) {
         return upperCamelCase(
-          `delete-${singularize(name)}-by-${detailedKeys
+          `delete-${singularizeTable(name)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
             .join("-and-")}-input`
         );
       },
       updateNodeInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`update-${singularize(name)}-input`);
+        return upperCamelCase(`update-${singularizeTable(name)}-input`);
       },
       deleteNodeInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`delete-${singularize(name)}-input`);
+        return upperCamelCase(`delete-${singularizeTable(name)}-input`);
       },
       manyRelationByKeys(
         detailedKeys: Keys,
@@ -192,7 +199,7 @@ export const newInflector = (
         return upperCamelCase(`${pluralize(typeName)}-edge`);
       },
       edgeField(name: string, _schema: ?string) {
-        return camelCase(`${singularize(name)}-edge`);
+        return camelCase(`${singularizeTable(name)}-edge`);
       },
       connection(typeName: string) {
         return upperCamelCase(`${this.pluralize(typeName)}-connection`);
@@ -204,22 +211,23 @@ export const newInflector = (
         return upperCamelCase(`${procName}-edge`);
       },
       createField(name: string, _schema: ?string) {
-        return camelCase(`create-${singularize(name)}`);
+        return camelCase(`create-${singularizeTable(name)}`);
       },
       createInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`create-${singularize(name)}-input`);
+        return upperCamelCase(`create-${singularizeTable(name)}-input`);
       },
       createPayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`create-${singularize(name)}-payload`);
+        return upperCamelCase(`create-${singularizeTable(name)}-payload`);
       },
       updatePayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`update-${singularize(name)}-payload`);
+        return upperCamelCase(`update-${singularizeTable(name)}-payload`);
       },
       deletePayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`delete-${singularize(name)}-payload`);
+        return upperCamelCase(`delete-${singularizeTable(name)}-payload`);
       },
     },
     overrides
   );
+};
 
 export const defaultInflection = newInflector();

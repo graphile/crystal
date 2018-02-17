@@ -296,3 +296,27 @@ create function a.static_big_integer() returns setof int8 as $$
   -- See https://github.com/postgraphql/postgraphql/issues/678#issuecomment-363659705
   select generate_series(30894622507013190, 30894622507013200);
 $$ language sql stable security definer;
+
+create table a.inputs (
+  id serial primary key
+);
+comment on table a.inputs is 'Should output as Input';
+
+create table a.patchs (
+  id serial primary key
+);
+comment on table a.patchs is 'Should output as Patch';
+
+create table a.reserved (
+  id serial primary key
+);
+
+create table a.reserved_input (
+  id serial primary key
+);
+comment on table a.reserved_input is '`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table';
+
+create table a."reservedPatchs" (
+  id serial primary key
+);
+comment on table a."reservedPatchs" is '`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table';
