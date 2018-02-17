@@ -383,7 +383,7 @@ type CreateCompoundKeyPayload {
   # An edge for the type. May be used by Relay 1.
   compoundKeyEdge(
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
   ): CompoundKeysEdge
 }
 
@@ -412,7 +412,7 @@ type CreateEdgeCasePayload {
   # An edge for the type. May be used by Relay 1.
   edgeCaseEdge(
     # The method to use when ordering \`EdgeCase\`.
-    orderBy: EdgeCasesOrderBy = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = NATURAL
   ): EdgeCasesEdge
 }
 
@@ -447,7 +447,7 @@ type CreateForeignKeyPayload {
   # An edge for the type. May be used by Relay 1.
   foreignKeyEdge(
     # The method to use when ordering \`ForeignKey\`.
-    orderBy: ForeignKeysOrderBy = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = NATURAL
   ): ForeignKeysEdge
 }
 
@@ -476,7 +476,7 @@ type CreatePersonPayload {
   # An edge for the type. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
   ): PeopleEdge
 }
 
@@ -508,7 +508,7 @@ type CreatePostPayload {
   # An edge for the type. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
   ): PostsEdge
 }
 
@@ -537,7 +537,7 @@ type CreateSimilarTable1Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable1Edge(
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable1SEdge
 }
 
@@ -566,7 +566,7 @@ type CreateSimilarTable2Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable2Edge(
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable2SEdge
 }
 
@@ -595,7 +595,7 @@ type CreateTypePayload {
   # An edge for the type. May be used by Relay 1.
   typeEdge(
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
   ): TypesEdge
 }
 
@@ -624,7 +624,7 @@ type CreateUpdatableViewPayload {
   # An edge for the type. May be used by Relay 1.
   updatableViewEdge(
     # The method to use when ordering \`UpdatableView\`.
-    orderBy: UpdatableViewsOrderBy = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = NATURAL
   ): UpdatableViewsEdge
 }
 
@@ -715,7 +715,7 @@ type DeleteCompoundKeyPayload {
   # An edge for the type. May be used by Relay 1.
   compoundKeyEdge(
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
   ): CompoundKeysEdge
 }
 
@@ -761,7 +761,7 @@ type DeletePersonPayload {
   # An edge for the type. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
   ): PeopleEdge
 }
 
@@ -802,7 +802,7 @@ type DeletePostPayload {
   # An edge for the type. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
   ): PostsEdge
 }
 
@@ -840,7 +840,7 @@ type DeleteSimilarTable1Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable1Edge(
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable1SEdge
 }
 
@@ -878,7 +878,7 @@ type DeleteSimilarTable2Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable2Edge(
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable2SEdge
 }
 
@@ -916,7 +916,7 @@ type DeleteTypePayload {
   # An edge for the type. May be used by Relay 1.
   typeEdge(
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
   ): TypesEdge
 }
 
@@ -1503,20 +1503,14 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: ReturnVoidMutationInput!
   ): ReturnVoidMutationPayload
-
-  # Reads and enables pagination through a set of \`JwtToken\`.
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload
-
-  # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
@@ -1549,8 +1543,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
   ): NoArgsMutationPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
@@ -1814,8 +1806,6 @@ type Person implements Node {
     condition: ForeignKeyCondition
   ): ForeignKeysConnection!
   firstName: String
-
-  # Reads and enables pagination through a set of \`Post\`.
   firstPost: Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -2244,8 +2234,6 @@ type Query implements Node {
 
   # lol, add some stuff 4 query
   add4Query(arg0: Int, b: Int): Int
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
   intSetQuery(
     x: Int
@@ -2270,8 +2258,6 @@ type Query implements Node {
   ): IntSetQueryConnection!
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableQuery(id: Int): Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -2532,7 +2518,7 @@ type TableMutationPayload {
   # An edge for the type. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
   ): PostsEdge
 }
 
@@ -2556,7 +2542,7 @@ type TableSetMutationPayload {
   # An edge for the type. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
   ): PeopleEdge
 }
 
@@ -2961,7 +2947,7 @@ type UpdateCompoundKeyPayload {
   # An edge for the type. May be used by Relay 1.
   compoundKeyEdge(
     # The method to use when ordering \`CompoundKey\`.
-    orderBy: CompoundKeysOrderBy = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
   ): CompoundKeysEdge
 }
 
@@ -3015,7 +3001,7 @@ type UpdatePersonPayload {
   # An edge for the type. May be used by Relay 1.
   personEdge(
     # The method to use when ordering \`Person\`.
-    orderBy: PeopleOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
   ): PeopleEdge
 }
 
@@ -3061,7 +3047,7 @@ type UpdatePostPayload {
   # An edge for the type. May be used by Relay 1.
   postEdge(
     # The method to use when ordering \`Post\`.
-    orderBy: PostsOrderBy = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
   ): PostsEdge
 }
 
@@ -3104,7 +3090,7 @@ type UpdateSimilarTable1Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable1Edge(
     # The method to use when ordering \`SimilarTable1\`.
-    orderBy: SimilarTable1SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable1SEdge
 }
 
@@ -3147,7 +3133,7 @@ type UpdateSimilarTable2Payload {
   # An edge for the type. May be used by Relay 1.
   similarTable2Edge(
     # The method to use when ordering \`SimilarTable2\`.
-    orderBy: SimilarTable2SOrderBy = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
   ): SimilarTable2SEdge
 }
 
@@ -3190,7 +3176,7 @@ type UpdateTypePayload {
   # An edge for the type. May be used by Relay 1.
   typeEdge(
     # The method to use when ordering \`Type\`.
-    orderBy: TypesOrderBy = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
   ): TypesEdge
 }
 
@@ -4534,7 +4520,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"compoundTypeQuery\",
-              \"description\": \"Reads and enables pagination through a set of \`CompoundType\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"object\",
@@ -4689,7 +4675,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"tableQuery\",
-              \"description\": \"Reads and enables pagination through a set of \`Post\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"id\",
@@ -5880,7 +5866,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"firstPost\",
-              \"description\": \"Reads and enables pagination through a set of \`Post\`.\",
+              \"description\": null,
               \"args\": [],
               \"type\": {
                 \"kind\": \"OBJECT\",
@@ -12027,7 +12013,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"authenticate\",
-              \"description\": \"Reads and enables pagination through a set of \`JwtToken\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"input\",
@@ -12054,7 +12040,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"authenticateMany\",
-              \"description\": \"Reads and enables pagination through a set of \`JwtToken\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"input\",
@@ -12081,7 +12067,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"compoundTypeMutation\",
-              \"description\": \"Reads and enables pagination through a set of \`CompoundType\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"input\",
@@ -12297,7 +12283,7 @@ exports[`test exports a schema as JSON 1`] = `
             },
             {
               \"name\": \"tableMutation\",
-              \"description\": \"Reads and enables pagination through a set of \`Post\`.\",
+              \"description\": null,
               \"args\": [
                 {
                   \"name\": \"input\",
@@ -12531,9 +12517,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`ForeignKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"ForeignKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"ForeignKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"NATURAL\"
                 }
@@ -12703,9 +12697,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -12863,9 +12865,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable1\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable1SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable1SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -13023,9 +13033,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable2\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable2SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable2SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -13499,9 +13517,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Type\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"TypesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"TypesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -13655,9 +13681,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`UpdatableView\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"UpdatableViewsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"UpdatableViewsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"NATURAL\"
                 }
@@ -13833,9 +13867,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -13979,9 +14021,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`EdgeCase\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"EdgeCasesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"EdgeCasesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"NATURAL\"
                 }
@@ -14153,9 +14203,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Person\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PeopleOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PeopleOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -14335,9 +14393,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -14554,9 +14620,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable1\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable1SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable1SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -14773,9 +14847,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable2\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable2SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable2SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -15216,9 +15298,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Type\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"TypesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"TypesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -15449,9 +15539,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -15692,9 +15790,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Person\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PeopleOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PeopleOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -15919,9 +16025,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -16071,9 +16185,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable1\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable1SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable1SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -16223,9 +16345,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`SimilarTable2\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"SimilarTable2SOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"SimilarTable2SOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -16375,9 +16505,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Type\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"TypesOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"TypesOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -16551,9 +16689,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`CompoundKey\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"CompoundKeysOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"CompoundKeysOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -16717,9 +16863,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Person\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PeopleOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PeopleOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -18285,9 +18439,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Post\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PostsOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PostsOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
@@ -18380,9 +18542,17 @@ exports[`test exports a schema as JSON 1`] = `
                   \"name\": \"orderBy\",
                   \"description\": \"The method to use when ordering \`Person\`.\",
                   \"type\": {
-                    \"kind\": \"ENUM\",
-                    \"name\": \"PeopleOrderBy\",
-                    \"ofType\": null
+                    \"kind\": \"LIST\",
+                    \"name\": null,
+                    \"ofType\": {
+                      \"kind\": \"NON_NULL\",
+                      \"name\": null,
+                      \"ofType\": {
+                        \"kind\": \"ENUM\",
+                        \"name\": \"PeopleOrderBy\",
+                        \"ofType\": null
+                      }
+                    }
                   },
                   \"defaultValue\": \"PRIMARY_KEY_ASC\"
                 }
