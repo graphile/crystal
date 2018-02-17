@@ -114,21 +114,21 @@ Object {
     },
     "b": Object {
       "a": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "b": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbOTAwMF1d",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "c": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9hc2MiLFs5MDAwLDkwMDBdXQ==",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -136,28 +136,28 @@ Object {
       },
       "clientMutationId": null,
       "d": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9kZXNjIixbOTAwMCw5MDAwXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "e": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9hc2MiLFsiam9obm55LmJveS5zbWl0aEBlbWFpbC5jb20iLDkwMDBdXQ==",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "f": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9kZXNjIixbImpvaG5ueS5ib3kuc21pdGhAZW1haWwuY29tIiw5MDAwXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
       "g": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -177,21 +177,21 @@ Object {
     },
     "c": Object {
       "a": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "b": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbMjBdXQ==",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "c": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9hc2MiLFsyMCwyMF1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -199,28 +199,28 @@ Object {
       },
       "clientMutationId": "hello",
       "d": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9kZXNjIixbMjAsMjBdXQ==",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "e": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYmVzdC5wYWxAZW1haWwuY29tIiwyMF1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "f": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJlc3QucGFsQGVtYWlsLmNvbSIsMjBdXQ==",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
         },
       },
       "g": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -284,21 +284,21 @@ Object {
     },
     "g": Object {
       "a": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "b": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbMTk5OF1d",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "c": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9hc2MiLFsxOTk4LDE5OThdXQ==",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
@@ -306,28 +306,28 @@ Object {
       },
       "clientMutationId": null,
       "d": Object {
-        "cursor": null,
+        "cursor": "WyJpZF9kZXNjIixbMTk5OCwxOTk4XV0=",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "e": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYnVkZC5kZWV5LnRoZS5zZWNvbmRAZW1haWwuY29tIiwxOTk4XV0=",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "f": Object {
-        "cursor": null,
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJ1ZGQuZGVleS50aGUuc2Vjb25kQGVtYWlsLmNvbSIsMTk5OF1d",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
         },
       },
       "g": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
@@ -558,6 +558,13 @@ Object {
         "name": "John Smith Sr.",
         "nodeId": "WyJwZW9wbGUiLDFd",
       },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "node": Object {
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+      },
       "query": Object {
         "nodeId": "query",
       },
@@ -571,6 +578,13 @@ Object {
         "issue27UserExists": true,
         "name": "Sarah Smith",
         "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
       },
       "query": Object {
         "nodeId": "query",
@@ -586,6 +600,13 @@ Object {
         "name": "Sarah Smith",
         "nodeId": "WyJwZW9wbGUiLDJd",
       },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+      },
       "query": Object {
         "nodeId": "query",
       },
@@ -600,6 +621,13 @@ Object {
         "name": "Best Pal",
         "nodeId": "WyJwZW9wbGUiLDNd",
       },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        "node": Object {
+          "id": 3,
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+      },
       "query": Object {
         "nodeId": "query",
       },
@@ -613,6 +641,13 @@ Object {
         "issue27UserExists": true,
         "name": "Kathryn Ramirez",
         "nodeId": "WyJwZW9wbGUiLDRd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        "node": Object {
+          "id": 4,
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
       },
       "query": Object {
         "nodeId": "query",
@@ -688,6 +723,13 @@ Object {
         "name": "Sarah Smith",
         "nodeId": "WyJwZW9wbGUiLDJd",
       },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+      },
       "query": Object {
         "nodeId": "query",
       },
@@ -701,6 +743,13 @@ Object {
         "issue27UserExists": false,
         "name": "Twenty Seventwo",
         "nodeId": "WyJwZW9wbGUiLDZd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "node": Object {
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
       },
       "query": Object {
         "nodeId": "query",
@@ -854,7 +903,7 @@ Object {
         "nodeId": "WyJwb3N0cyIsNV0=",
       },
       "postEdge": Object {
-        "cursor": null,
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
         "node": Object {
           "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
           "id": 5,

@@ -79,7 +79,10 @@ export default (function PgConnectionArgOrderBy(
         inflection.orderByType(tableTypeName)
       );
 
-      addArgDataGenerator(function connectionOrderBy({ orderBy }) {
+      addArgDataGenerator(function connectionOrderBy({ orderBy: rawOrderBy }) {
+        const orderBy = rawOrderBy
+          ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+          : null;
         return {
           pgCursorPrefix:
             orderBy && orderBy.some(item => item.alias)

@@ -93,6 +93,13 @@ fragment updatePersonPayload on UpdatePersonPayload {
     about
     issue27UserExists: exists(email: "graphile-build.issue.27.exists@example.com")
   }
+  personEdge {
+    cursor
+    node {
+      nodeId
+      id
+    }
+  }
   query { nodeId }
 }
 

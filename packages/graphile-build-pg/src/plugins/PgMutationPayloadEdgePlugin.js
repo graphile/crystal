@@ -10,7 +10,14 @@ export default (function PgMutationPayloadEdgePlugin(
     "GraphQLObjectType:fields",
     (
       fields,
-      { extend, getTypeByName, pgGetGqlTypeByTypeId, pgSql: sql },
+      {
+        extend,
+        getTypeByName,
+        pgGetGqlTypeByTypeId,
+        pgSql: sql,
+        graphql: { GraphQLList, GraphQLNonNull },
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+      },
       {
         scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
         fieldWithHooks,
@@ -37,32 +44,74 @@ export default (function PgMutationPayloadEdgePlugin(
         return fields;
       }
 
+      const attributes = introspectionResultsByKind.attribute.filter(
+        attr => attr.classId === table.id
+      );
+      const primaryKeyConstraint = introspectionResultsByKind.constraint
+        .filter(con => con.classId === table.id)
+        .filter(con => con.type === "p")[0];
+      const primaryKeys =
+        primaryKeyConstraint &&
+        primaryKeyConstraint.keyAttributeNums.map(
+          num => attributes.filter(attr => attr.num === num)[0]
+        );
+
       const fieldName = inflection.edgeField(table.name, table.namespace.name);
       recurseDataGeneratorsForField(fieldName);
       return extend(fields, {
         [fieldName]: fieldWithHooks(
           fieldName,
           ({ addArgDataGenerator }) => {
-            addArgDataGenerator(function connectionOrderBy({ orderBy }) {
+            addArgDataGenerator(function connectionOrderBy({
+              orderBy: rawOrderBy,
+            }) {
+              const orderBy = rawOrderBy
+                ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                : null;
               return {
-                pgCursorPrefix:
-                  orderBy &&
-                  orderBy.alias &&
-                  sql.literal(orderBy && orderBy.alias),
                 pgQuery: queryBuilder => {
                   if (orderBy != null) {
-                    const { specs, unique } = orderBy;
-                    const orders = Array.isArray(specs[0]) ? specs : [specs];
-                    orders.forEach(([col, ascending]) => {
-                      const expr = isString(col)
-                        ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                            col
-                          )}`
-                        : col;
-                      queryBuilder.orderBy(expr, ascending);
+                    const aliases = [];
+                    const expressions = [];
+                    let unique = false;
+                    orderBy.forEach(item => {
+                      const { alias, specs, unique: itemIsUnique } = item;
+                      unique = unique || itemIsUnique;
+                      const orders = Array.isArray(specs[0]) ? specs : [specs];
+                      orders.forEach(([col, _ascending]) => {
+                        if (!col) {
+                          return;
+                        }
+                        const expr = isString(col)
+                          ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                              col
+                            )}`
+                          : col;
+                        expressions.push(expr);
+                      });
+                      if (alias == null) return;
+                      aliases.push(alias);
                     });
-                    if (unique) {
-                      queryBuilder.setOrderIsUnique();
+                    if (!unique && primaryKeys) {
+                      // Add PKs
+                      primaryKeys.forEach(key => {
+                        expressions.push(
+                          sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                            key.name
+                          )}`
+                        );
+                      });
+                    }
+                    if (aliases.length) {
+                      queryBuilder.select(
+                        sql.fragment`json_build_array(${sql.join(
+                          aliases.map(
+                            a => sql.fragment`${sql.literal(a)}::text`
+                          ),
+                          ", "
+                        )}, json_build_array(${sql.join(expressions, ", ")}))`,
+                        "__order_" + aliases.join("|")
+                      );
                     }
                   }
                 },
@@ -79,12 +128,34 @@ export default (function PgMutationPayloadEdgePlugin(
               args: {
                 orderBy: {
                   description: `The method to use when ordering \`${tableTypeName}\`.`,
-                  type: TableOrderByType,
+                  type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
                   defaultValue: defaultValueEnum && defaultValueEnum.value,
                 },
               },
-              resolve(data) {
-                return data.data;
+              resolve(data, { orderBy: rawOrderBy }) {
+                const orderBy = rawOrderBy
+                  ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                  : null;
+                const order =
+                  orderBy && orderBy.some(item => item.alias)
+                    ? orderBy.filter(item => item.alias)
+                    : null;
+
+                if (!order) {
+                  if (data.data.__identifiers) {
+                    return Object.assign({}, data.data, {
+                      __cursor: ["primary_key_asc", data.data.__identifiers],
+                    });
+                  } else {
+                    return data.data;
+                  }
+                }
+                return Object.assign({}, data.data, {
+                  __cursor:
+                    data.data[
+                      `__order_${order.map(item => item.alias).join("|")}`
+                    ],
+                });
               },
             };
           },

@@ -111,7 +111,9 @@ export type Build = {|
     scope: {},
     returnNullOnInvalid?: boolean
   ): ?T,
-  fieldDataGeneratorsByType: Map<*, *>,
+  fieldDataGeneratorsByType: Map<*, *>, // @deprecated - use fieldDataGeneratorsByFieldNameByType instead
+  fieldDataGeneratorsByFieldNameByType: Map<*, *>,
+  fieldArgDataGeneratorsByFieldNameByType: Map<*, *>,
 |};
 
 export type BuildExtensionQuery = {|

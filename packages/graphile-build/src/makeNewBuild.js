@@ -157,7 +157,8 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
   // GraphQLObjectType and whose values are an object (whose keys are
   // arbitrary namespaced keys and whose values are arrays of
   // information of this kind)
-  const fieldDataGeneratorsByType = new Map();
+  const fieldDataGeneratorsByFieldNameByType = new Map();
+  const fieldArgDataGeneratorsByFieldNameByType = new Map();
 
   return {
     graphileBuildVersion: version,
@@ -208,6 +209,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         );
       }
       const fieldDataGeneratorsByFieldName = {};
+      const fieldArgDataGeneratorsByFieldName = {};
       let newSpec = spec;
       if (
         knownTypes.indexOf(Type) === -1 &&
@@ -238,17 +240,31 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         };
         const recurseDataGeneratorsForField = fieldName => {
           const fn = (parsedResolveInfoFragment, ReturnType, ...rest) => {
+            const { args } = parsedResolveInfoFragment;
             const { fields } = this.simplifyParsedResolveInfoFragmentWithType(
               parsedResolveInfoFragment,
               ReturnType
             );
             const results = [];
             const StrippedType: GraphQLNamedType = getNamedType(ReturnType);
-            const fieldDataGenerators = fieldDataGeneratorsByType.get(
+            const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
               StrippedType
             );
+            const argDataGeneratorsForSelfByFieldName = fieldArgDataGeneratorsByFieldNameByType.get(
+              Self
+            );
+            if (argDataGeneratorsForSelfByFieldName) {
+              const argDataGenerators =
+                argDataGeneratorsForSelfByFieldName[fieldName];
+              for (const gen of argDataGenerators) {
+                const local = ensureArray(gen(args, ReturnType, ...rest));
+                if (local) {
+                  results.push(...local);
+                }
+              }
+            }
             if (
-              fieldDataGenerators &&
+              fieldDataGeneratorsByFieldName &&
               isCompositeType(StrippedType) &&
               !isAbstractType(StrippedType)
             ) {
@@ -256,7 +272,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
               for (const alias of Object.keys(fields)) {
                 const field = fields[alias];
                 // Run generators with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
-                const gens = fieldDataGenerators[field.name];
+                const gens = fieldDataGeneratorsByFieldName[field.name];
                 if (gens) {
                   for (const gen of gens) {
                     const local = ensureArray(
@@ -336,7 +352,11 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                       "information to give, please just pass `{}`."
                   );
                 }
+
                 let argDataGenerators = [];
+                fieldArgDataGeneratorsByFieldName[
+                  fieldName
+                ] = argDataGenerators;
 
                 let newSpec = spec;
                 let context = Object.assign({}, commonContext, {
@@ -383,18 +403,18 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
                         "It's too early to call this! Call from within resolve"
                       );
                     }
-                    const fieldDataGenerators = fieldDataGeneratorsByType.get(
+                    const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
                       Type
                     );
                     if (
-                      fieldDataGenerators &&
+                      fieldDataGeneratorsByFieldName &&
                       isCompositeType(Type) &&
                       !isAbstractType(Type)
                     ) {
                       const typeFields = Type.getFields();
                       for (const alias of Object.keys(fields)) {
                         const field = fields[alias];
-                        const gens = fieldDataGenerators[field.name];
+                        const gens = fieldDataGeneratorsByFieldName[field.name];
                         if (gens) {
                           const FieldReturnType = typeFields[field.name].type;
                           for (const gen of gens) {
@@ -615,9 +635,18 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
         }
         allTypes[finalSpec.name] = Self;
       }
-      fieldDataGeneratorsByType.set(Self, fieldDataGeneratorsByFieldName);
+      fieldDataGeneratorsByFieldNameByType.set(
+        Self,
+        fieldDataGeneratorsByFieldName
+      );
+      fieldArgDataGeneratorsByFieldNameByType.set(
+        Self,
+        fieldArgDataGeneratorsByFieldName
+      );
       return Self;
     },
-    fieldDataGeneratorsByType,
+    fieldDataGeneratorsByType: fieldDataGeneratorsByFieldNameByType, // @deprecated
+    fieldDataGeneratorsByFieldNameByType,
+    fieldArgDataGeneratorsByFieldNameByType,
   };
 }
