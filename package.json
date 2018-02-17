@@ -32,7 +32,6 @@
     "flow-bin": "^0.52.0",
     "flow-copy-source": "^1.2.0",
     "graphql": "^0.10.5",
-    "pg": ">=6 < 7",
     "sql-formatter": "^1.2.2"
   },
   "workspaces": [

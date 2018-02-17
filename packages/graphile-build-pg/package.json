@@ -43,6 +43,7 @@
     "jsonwebtoken": "^7.4.1",
     "lodash": ">=4 <5",
     "lru-cache": "4.1.1",
+    "pg": ">=6.1.0 <8",
     "pg-range-parser": "^1.0.0",
     "pg-sql2": "^1.0.0-beta.3",
     "pluralize": "^5.0.0",
