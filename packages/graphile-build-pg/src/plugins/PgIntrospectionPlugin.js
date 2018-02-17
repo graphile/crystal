@@ -6,6 +6,7 @@ import { readFile as rawReadFile } from "fs";
 import pg from "pg";
 import debugFactory from "debug";
 import chalk from "chalk";
+import { quacksLikePgPool } from "../withPgClient";
 
 import { version } from "../../package.json";
 
@@ -260,7 +261,7 @@ export default (async function PgIntrospectionPlugin(
     await stopListening();
 
     // Check we can get a pgClient
-    if (pgConfig instanceof pg.Pool) {
+    if (pgConfig instanceof pg.Pool || quacksLikePgPool(pgConfig)) {
       pgClient = await pgConfig.connect();
       releasePgClient = () => pgClient && pgClient.release();
     } else if (typeof pgConfig === "string") {
