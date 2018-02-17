@@ -44,7 +44,8 @@ export default (function PgMutationProceduresPlugin(builder) {
               isMutation: true,
             });
             return memo;
-          }, {})
+          }, {}),
+        `Adding mutation procedure to root Mutation field`
       );
     }
   );

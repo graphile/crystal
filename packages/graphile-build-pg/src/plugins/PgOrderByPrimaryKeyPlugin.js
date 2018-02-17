@@ -26,22 +26,26 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
         primaryKeyConstraint.keyAttributeNums.map(
           num => attributes.filter(attr => attr.num === num)[0]
         );
-      return extend(values, {
-        PRIMARY_KEY_ASC: {
-          value: {
-            alias: "primary_key_asc",
-            specs: primaryKeys.map(key => [key.name, true]),
-            unique: true,
+      return extend(
+        values,
+        {
+          PRIMARY_KEY_ASC: {
+            value: {
+              alias: "primary_key_asc",
+              specs: primaryKeys.map(key => [key.name, true]),
+              unique: true,
+            },
+          },
+          PRIMARY_KEY_DESC: {
+            value: {
+              alias: "primary_key_desc",
+              specs: primaryKeys.map(key => [key.name, false]),
+              unique: true,
+            },
           },
         },
-        PRIMARY_KEY_DESC: {
-          value: {
-            alias: "primary_key_desc",
-            specs: primaryKeys.map(key => [key.name, false]),
-            unique: true,
-          },
-        },
-      });
+        `Adding primary key asc/desc sort to table '${table.name}'`
+      );
     }
   );
 }: Plugin);

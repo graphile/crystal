@@ -230,7 +230,8 @@ export default (function PgMutationCreatePlugin(
               }
             );
             return memo;
-          }, {})
+          }, {}),
+        `Adding default 'create' mutation to root mutation`
       );
     }
   );

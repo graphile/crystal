@@ -17,6 +17,7 @@ export default (function PgComputedColumnsPlugin(builder) {
           pgIntrospection: table,
         },
         fieldWithHooks,
+        Self,
       }
     ) => {
       if (
@@ -91,7 +92,8 @@ export default (function PgComputedColumnsPlugin(builder) {
               computed: true,
             });
             return memo;
-          }, {})
+          }, {}),
+        `Adding computed column to '${Self.name}'`
       );
     }
   );

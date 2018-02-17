@@ -10,7 +10,11 @@ export default (function PgConnectionArgOrderByDefaultValue(
     (
       args,
       { extend, getTypeByName, pgGetGqlTypeByTypeId },
-      { scope: { isPgFieldConnection, pgFieldIntrospection: table } }
+      {
+        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        Self,
+        field,
+      }
     ) => {
       if (
         !isPgFieldConnection ||
@@ -32,9 +36,15 @@ export default (function PgConnectionArgOrderByDefaultValue(
         TableOrderByType.getValues()[0];
 
       return Object.assign({}, args, {
-        orderBy: extend(args.orderBy, {
-          defaultValue: defaultValueEnum && [defaultValueEnum.value],
-        }),
+        orderBy: extend(
+          args.orderBy,
+          {
+            defaultValue: defaultValueEnum && [defaultValueEnum.value],
+          },
+          `Adding defaultValue to orderBy for field '${field.name}' of '${
+            Self.name
+          }'`
+        ),
       });
     }
   );

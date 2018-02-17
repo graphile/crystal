@@ -144,7 +144,8 @@ export default (async function PgAllRows(
               );
             }
             return memo;
-          }, {})
+          }, {}),
+        `Adding 'all*' relations to root Query`
       );
     }
   );

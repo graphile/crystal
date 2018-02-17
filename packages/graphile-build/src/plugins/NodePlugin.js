@@ -47,35 +47,39 @@ export default (function NodePlugin(
     const nodeFetcherByTypeName = {};
     const nodeAliasByTypeName = {};
     const nodeTypeNameByAlias = {};
-    return build.extend(build, {
-      nodeIdFieldName,
-      $$nodeType: Symbol("nodeType"),
-      nodeFetcherByTypeName,
-      getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
-        return base64(
-          JSON.stringify([this.getNodeAlias(Type), ...identifiers])
-        );
+    return build.extend(
+      build,
+      {
+        nodeIdFieldName,
+        $$nodeType: Symbol("nodeType"),
+        nodeFetcherByTypeName,
+        getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
+          return base64(
+            JSON.stringify([this.getNodeAlias(Type), ...identifiers])
+          );
+        },
+        addNodeFetcherForTypeName(typeName, fetcher) {
+          if (nodeFetcherByTypeName[typeName]) {
+            throw new Error("There's already a fetcher for this type");
+          }
+          if (!fetcher) {
+            throw new Error("No fetcher specified");
+          }
+          nodeFetcherByTypeName[typeName] = fetcher;
+        },
+        getNodeAlias(typeName) {
+          return nodeAliasByTypeName[typeName] || typeName;
+        },
+        getNodeType(alias) {
+          return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
+        },
+        setNodeAlias(typeName, alias) {
+          nodeAliasByTypeName[typeName] = alias;
+          nodeTypeNameByAlias[alias] = typeName;
+        },
       },
-      addNodeFetcherForTypeName(typeName, fetcher) {
-        if (nodeFetcherByTypeName[typeName]) {
-          throw new Error("There's already a fetcher for this type");
-        }
-        if (!fetcher) {
-          throw new Error("No fetcher specified");
-        }
-        nodeFetcherByTypeName[typeName] = fetcher;
-      },
-      getNodeAlias(typeName) {
-        return nodeAliasByTypeName[typeName] || typeName;
-      },
-      getNodeType(alias) {
-        return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
-      },
-      setNodeAlias(typeName, alias) {
-        nodeAliasByTypeName[typeName] = alias;
-        nodeTypeNameByAlias[alias] = typeName;
-      },
-    });
+      `Adding 'Node' interface support to the Build`
+    );
   });
 
   builder.hook("init", function defineNodeInterfaceType(
@@ -156,73 +160,78 @@ export default (function NodePlugin(
       if (!isRootQuery) {
         return fields;
       }
-      return extend(fields, {
-        [nodeIdFieldName]: {
-          description:
-            "The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.",
-          type: new GraphQLNonNull(GraphQLID),
-          resolve() {
-            return "query";
+      return extend(
+        fields,
+        {
+          [nodeIdFieldName]: {
+            description:
+              "The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.",
+            type: new GraphQLNonNull(GraphQLID),
+            resolve() {
+              return "query";
+            },
           },
-        },
-        node: fieldWithHooks(
-          "node",
-          ({ getDataFromParsedResolveInfoFragment }) => ({
-            description: "Fetches an object given its globally unique `ID`.",
-            type: getTypeByName("Node"),
-            args: {
-              [nodeIdFieldName]: {
-                description: "The globally unique `ID`.",
-                type: new GraphQLNonNull(GraphQLID),
+          node: fieldWithHooks(
+            "node",
+            ({ getDataFromParsedResolveInfoFragment }) => ({
+              description: "Fetches an object given its globally unique `ID`.",
+              type: getTypeByName("Node"),
+              args: {
+                [nodeIdFieldName]: {
+                  description: "The globally unique `ID`.",
+                  type: new GraphQLNonNull(GraphQLID),
+                },
               },
-            },
-            async resolve(data, args, context, resolveInfo) {
-              const nodeId = args[nodeIdFieldName];
-              if (nodeId === "query") {
-                return $$isQuery;
-              }
-              try {
-                const [alias, ...identifiers] = JSON.parse(
-                  base64Decode(nodeId)
-                );
-                const Type = getNodeType(alias);
-                if (!Type) {
-                  throw new Error("Type not found");
+              async resolve(data, args, context, resolveInfo) {
+                const nodeId = args[nodeIdFieldName];
+                if (nodeId === "query") {
+                  return $$isQuery;
                 }
-                const resolver = nodeFetcherByTypeName[getNamedType(Type).name];
-                const parsedResolveInfoFragment = parseResolveInfo(
-                  resolveInfo,
-                  {},
-                  Type
-                );
-                const resolveData = getDataFromParsedResolveInfoFragment(
-                  parsedResolveInfoFragment,
-                  getNamedType(Type)
-                );
-                const node = await resolver(
-                  data,
-                  identifiers,
-                  context,
-                  parsedResolveInfoFragment,
-                  resolveInfo.returnType,
-                  resolveData
-                );
-                Object.defineProperty(node, $$nodeType, {
-                  enumerable: false,
-                  configurable: false,
-                  value: Type,
-                });
-                return node;
-              } catch (e) {
-                return null;
-              }
-            },
-          }),
-          {
-            isRootNodeField: true,
-          }
-        ),
-      });
+                try {
+                  const [alias, ...identifiers] = JSON.parse(
+                    base64Decode(nodeId)
+                  );
+                  const Type = getNodeType(alias);
+                  if (!Type) {
+                    throw new Error("Type not found");
+                  }
+                  const resolver =
+                    nodeFetcherByTypeName[getNamedType(Type).name];
+                  const parsedResolveInfoFragment = parseResolveInfo(
+                    resolveInfo,
+                    {},
+                    Type
+                  );
+                  const resolveData = getDataFromParsedResolveInfoFragment(
+                    parsedResolveInfoFragment,
+                    getNamedType(Type)
+                  );
+                  const node = await resolver(
+                    data,
+                    identifiers,
+                    context,
+                    parsedResolveInfoFragment,
+                    resolveInfo.returnType,
+                    resolveData
+                  );
+                  Object.defineProperty(node, $$nodeType, {
+                    enumerable: false,
+                    configurable: false,
+                    value: Type,
+                  });
+                  return node;
+                } catch (e) {
+                  return null;
+                }
+              },
+            }),
+            {
+              isRootNodeField: true,
+            }
+          ),
+        },
+        `Adding node helpers to the root Query`
+      );
     }
   );
 }: Plugin);

@@ -202,7 +202,8 @@ export default (async function PgRowByUniqueConstraint(
               );
             }
             return memo;
-          }, {})
+          }, {}),
+        `Adding "row by node ID" fields to root Query type`
       );
     }
   );

@@ -138,7 +138,8 @@ export default (async function PgRowByUniqueConstraint(
               });
             }
             return memo;
-          }, {})
+          }, {}),
+        `Adding "row by unique constraint" fields to root Query type`
       );
     }
   );

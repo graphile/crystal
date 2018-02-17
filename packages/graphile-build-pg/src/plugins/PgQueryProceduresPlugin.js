@@ -82,7 +82,8 @@ export default (function PgQueryProceduresPlugin(builder) {
               debugWarn(e);
             }
             return memo;
-          }, {})
+          }, {}),
+        `Adding query procedures to root Query type`
       );
     }
   );

@@ -24,6 +24,7 @@ export default (function PgColumnsPlugin(
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
       fieldWithHooks,
+      Self,
     } = context;
     if (
       !(isPgRowType || isPgCompoundType) ||
@@ -136,7 +137,8 @@ export default (function PgColumnsPlugin(
             { pgFieldIntrospection: attr }
           );
           return memo;
-        }, {})
+        }, {}),
+      `Adding columns to '${Self.name}'`
     );
   });
   builder.hook("GraphQLInputObjectType:fields", (fields, build, context) => {
@@ -155,6 +157,7 @@ export default (function PgColumnsPlugin(
         pgIntrospection: table,
         pgAddSubfield,
       },
+      Self,
     } = context;
     if (
       !(isPgRowType || isPgCompoundType) ||
@@ -192,7 +195,8 @@ export default (function PgColumnsPlugin(
             ),
           });
           return memo;
-        }, {})
+        }, {}),
+      `Adding columns to input object '${Self.name}'`
     );
   });
 }: Plugin);

@@ -28,6 +28,7 @@ export default (function PgForwardRelationPlugin(
           pgIntrospectionTable,
         },
         fieldWithHooks,
+        Self,
       }
     ) => {
       const table = pgIntrospectionTable || pgIntrospection;
@@ -157,7 +158,8 @@ export default (function PgForwardRelationPlugin(
             }
           );
           return memo;
-        }, {})
+        }, {}),
+        `Adding forward relations to '${Self.name}'`
       );
     }
   );

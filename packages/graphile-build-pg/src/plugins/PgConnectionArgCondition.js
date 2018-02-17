@@ -78,6 +78,8 @@ export default (function PgConnectionArgCondition(
       const {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         addArgDataGenerator,
+        Self,
+        field,
       } = context;
       if (
         !isPgFieldConnection ||
@@ -125,13 +127,17 @@ export default (function PgConnectionArgCondition(
         };
       });
 
-      return extend(args, {
-        condition: {
-          description:
-            "A condition to be used in determining which values should be returned by the collection.",
-          type: TableConditionType,
+      return extend(
+        args,
+        {
+          condition: {
+            description:
+              "A condition to be used in determining which values should be returned by the collection.",
+            type: TableConditionType,
+          },
         },
-      });
+        `Adding condition to connection field '${field.name}' of '${Self.name}'`
+      );
     }
   );
 }: Plugin);

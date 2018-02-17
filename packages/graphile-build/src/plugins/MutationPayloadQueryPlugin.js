@@ -12,22 +12,26 @@ export default (function MutationPayloadQueryPlugin(builder) {
         extend,
         getTypeByName,
       }: {| ...Build, ...BuildExtensionQuery |},
-      { scope: { isMutationPayload } }
+      { scope: { isMutationPayload }, Self }
     ): {} => {
       if (!isMutationPayload) {
         return fields;
       }
       const Query = getTypeByName("Query");
-      return extend(fields, {
-        query: {
-          description:
-            "Our root query field type. Allows us to run any query from our mutation payload.",
-          type: Query,
-          resolve() {
-            return $$isQuery;
+      return extend(
+        fields,
+        {
+          query: {
+            description:
+              "Our root query field type. Allows us to run any query from our mutation payload.",
+            type: Query,
+            resolve() {
+              return $$isQuery;
+            },
           },
         },
-      });
+        `Adding 'query' field to mutation payload ${Self.name}`
+      );
     }
   );
 }: Plugin);

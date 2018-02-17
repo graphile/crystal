@@ -46,7 +46,8 @@ export default (function PgOrderAllColumnsPlugin(
             },
           };
           return memo;
-        }, {})
+        }, {}),
+      `Adding order values from table '${table.name}'`
     );
   });
 }: Plugin);

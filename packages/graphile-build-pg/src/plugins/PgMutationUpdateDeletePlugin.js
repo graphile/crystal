@@ -541,7 +541,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                 return memo;
               }, outerMemo),
           {}
-        )
+        ),
+        `Adding default update/delete mutations to root Mutation type`
       );
     }
   );

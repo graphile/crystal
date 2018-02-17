@@ -62,6 +62,8 @@ export default (function PgConnectionArgOrderBy(
       {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         addArgDataGenerator,
+        Self,
+        field,
       }
     ) => {
       if (
@@ -115,12 +117,16 @@ export default (function PgConnectionArgOrderBy(
         };
       });
 
-      return extend(args, {
-        orderBy: {
-          description: `The method to use when ordering \`${tableTypeName}\`.`,
-          type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
+      return extend(
+        args,
+        {
+          orderBy: {
+            description: `The method to use when ordering \`${tableTypeName}\`.`,
+            type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
+          },
         },
-      });
+        `Adding 'orderBy' to field '${field.name}' of '${Self.name}'`
+      );
     }
   );
 }: Plugin);

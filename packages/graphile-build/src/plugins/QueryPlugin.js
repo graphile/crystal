@@ -7,9 +7,13 @@ export type BuildExtensionQuery = {|
 
 export default (async function QueryPlugin(builder) {
   builder.hook("build", (build: Build): Build & BuildExtensionQuery =>
-    build.extend(build, {
-      $$isQuery: Symbol("isQuery"),
-    })
+    build.extend(
+      build,
+      {
+        $$isQuery: Symbol("isQuery"),
+      },
+      `Extending Build`
+    )
   );
   builder.hook(
     "GraphQLSchema",
@@ -45,9 +49,13 @@ export default (async function QueryPlugin(builder) {
         true
       );
       if (queryType) {
-        return extend(schema, {
-          query: queryType,
-        });
+        return extend(
+          schema,
+          {
+            query: queryType,
+          },
+          `Adding 'query' type to Schema`
+        );
       } else {
         return schema;
       }

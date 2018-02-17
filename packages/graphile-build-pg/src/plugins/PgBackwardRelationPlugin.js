@@ -24,7 +24,11 @@ export default (function PgBackwardRelationPlugin(
         getAliasFromResolveInfo,
         graphql: { GraphQLNonNull },
       },
-      { scope: { isPgRowType, pgIntrospection: foreignTable }, fieldWithHooks }
+      {
+        scope: { isPgRowType, pgIntrospection: foreignTable },
+        fieldWithHooks,
+        Self,
+      }
     ) => {
       if (!isPgRowType || !foreignTable || foreignTable.kind !== "class") {
         return fields;
@@ -187,7 +191,8 @@ export default (function PgBackwardRelationPlugin(
             }
           );
           return memo;
-        }, {})
+        }, {}),
+        `Adding backward relations for ${Self.name}`
       );
     }
   );
