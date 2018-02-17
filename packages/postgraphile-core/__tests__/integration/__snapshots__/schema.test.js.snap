@@ -628,8 +628,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
   ): NoArgsMutationPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
@@ -820,8 +818,6 @@ type Person implements Node {
   email: Email!
   exists(email: Email): Boolean
   firstName: String
-
-  # Reads and enables pagination through a set of \`Post\`.
   firstPost: Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -1057,8 +1053,6 @@ type Query implements Node {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   query: Query!
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableQuery(id: Int): Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -1790,8 +1784,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
@@ -1949,8 +1941,6 @@ type Query implements Node {
     # The method to use when ordering \`UpdatableView\`.
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsConnection
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
   # Fetches an object given its globally unique \`ID\`.
@@ -4506,26 +4496,18 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: Add4MutationErrorInput!
   ): Add4MutationErrorPayload
-
-  # Reads and enables pagination through a set of \`JwtToken\`.
   authenticate(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateInput!
   ): AuthenticatePayload
-
-  # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateFail(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateFailInput!
   ): AuthenticateFailPayload
-
-  # Reads and enables pagination through a set of \`JwtToken\`.
   authenticateMany(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: CompoundTypeMutationInput!
@@ -4848,8 +4830,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: PostManyInput!
   ): PostManyPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   postWithSuffix(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: PostWithSuffixInput!
@@ -4858,8 +4838,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: ReturnVoidMutationInput!
   ): ReturnVoidMutationPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
@@ -5316,8 +5294,6 @@ type Person implements Node {
   email: Email!
   exists(email: Email): Boolean
   firstName: String
-
-  # Reads and enables pagination through a set of \`Post\`.
   firstPost: Post
 
   # Reads and enables pagination through a set of \`ForeignKey\`.
@@ -6087,8 +6063,6 @@ type Query implements Node {
     nodeId: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-
-  # Reads and enables pagination through a set of \`CompoundType\`.
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
   # Reads and enables pagination through a set of \`CompoundType\`.
@@ -6298,8 +6272,6 @@ type Query implements Node {
     # based pagination. May not be used with \`last\`.
     offset: Int
   ): StaticBigIntegerConnection!
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableQuery(id: Int): Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -8352,8 +8324,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
   ): NoArgsMutationPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
@@ -8514,8 +8484,6 @@ type Person implements Node {
   email: Email!
   exists(email: Email): Boolean
   firstName: String
-
-  # Reads and enables pagination through a set of \`Post\`.
   firstPost: Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -8725,8 +8693,6 @@ type Query implements Node {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   query: Query!
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableQuery(id: Int): Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -9461,8 +9427,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: NoArgsMutationInput!
   ): NoArgsMutationPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableMutation(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: TableMutationInput!
@@ -9653,8 +9617,6 @@ type Person implements Node {
   email: Email!
   exists(email: Email): Boolean
   firstName: String
-
-  # Reads and enables pagination through a set of \`Post\`.
   firstPost: Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -9896,8 +9858,6 @@ type Query implements Node {
   # Exposes the root query type nested one level down. This is helpful for Relay 1
   # which can only query top level fields if they are in a particular form.
   query: Query!
-
-  # Reads and enables pagination through a set of \`Post\`.
   tableQuery(id: Int): Post
 
   # Reads and enables pagination through a set of \`Person\`.
@@ -11396,8 +11356,6 @@ type Mutation {
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: PostManyInput!
   ): PostManyPayload
-
-  # Reads and enables pagination through a set of \`Post\`.
   postWithSuffix(
     # The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     input: PostWithSuffixInput!
