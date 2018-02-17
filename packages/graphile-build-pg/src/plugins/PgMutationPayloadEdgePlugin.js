@@ -110,7 +110,7 @@ export default (function PgMutationPayloadEdgePlugin(
                           ),
                           ", "
                         )}, json_build_array(${sql.join(expressions, ", ")}))`,
-                        "__order_" + aliases.join("|")
+                        "__order_" + aliases.join("__")
                       );
                     }
                   }
@@ -153,7 +153,7 @@ export default (function PgMutationPayloadEdgePlugin(
                 return Object.assign({}, data.data, {
                   __cursor:
                     data.data[
-                      `__order_${order.map(item => item.alias).join("|")}`
+                      `__order_${order.map(item => item.alias).join("__")}`
                     ],
                 });
               },

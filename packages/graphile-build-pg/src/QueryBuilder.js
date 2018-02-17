@@ -187,7 +187,7 @@ class QueryBuilder {
       //
       // so this should not cause any issues in practice.
       if (/^[_A-Za-z][_0-9A-Za-z]*$/.test(alias) !== true) {
-        throw new Error("Disallowed alias.");
+        throw new Error(`Disallowed alias '${alias}'.`);
       }
     }
     this.data.select.push([exprGen, alias]);

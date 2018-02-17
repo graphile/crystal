@@ -163,6 +163,13 @@ Object {
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
         },
       },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJqb2hubnkuYm95LnNtaXRoQGVtYWlsLmNvbSIsOTAwMCw5MDAwXV0=",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
       "person": Object {
         "about": "Son of Sara and John Smith.",
         "email": "johnny.boy.smith@email.com",
@@ -221,6 +228,13 @@ Object {
       },
       "g": Object {
         "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJiZXN0LnBhbEBlbWFpbC5jb20iLDIwLDIwXV0=",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -328,6 +342,13 @@ Object {
       },
       "g": Object {
         "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJidWRkLmRlZXkudGhlLnNlY29uZEBlbWFpbC5jb20iLDE5OTgsMTk5OF1d",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
