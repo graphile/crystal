@@ -2696,27 +2696,28 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@^0.1.0-alpha.38:
-  version "0.1.0-alpha.38"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.38.tgz#529b1c80b2d4d230b53dc463ca25d1d4f46148c7"
+graphile-build-pg@0.1.0-alpha.39:
+  version "0.1.0-alpha.39"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.39.tgz#485cd04f66e7784f1e1571063ba23b83e16ba60e"
   dependencies:
     babel-runtime ">=6 <7"
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "^0.1.0-alpha.38"
+    graphile-build "0.1.0-alpha.39"
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
     jsonwebtoken "^7.4.1"
     lodash ">=4 <5"
     lru-cache "4.1.1"
+    pg ">=6.1.0 <8"
     pg-range-parser "^1.0.0"
     pg-sql2 "^1.0.0-beta.3"
     pluralize "^5.0.0"
     postgres-interval "1.1.1"
 
-graphile-build@^0.1.0-alpha.38:
-  version "0.1.0-alpha.38"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.38.tgz#f9fcb14a6c8e79d345d6a5f707aa90eca0ec5ae4"
+graphile-build@0.1.0-alpha.39:
+  version "0.1.0-alpha.39"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-0.1.0-alpha.39.tgz#74a18ff5a4af91de3238b7c9d4bc82996b82da32"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
@@ -4552,7 +4553,7 @@ pg-types@~1.12.1:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-"pg@>=6.1 <8":
+"pg@>=6.1 <8", "pg@>=6.1.0 <8":
   version "7.4.1"
   resolved "https://registry.yarnpkg.com/pg/-/pg-7.4.1.tgz#f3411c8ddf9f692322fe05e7017a1888e47f78f1"
   dependencies:
@@ -4887,13 +4888,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@0.1.0-alpha.38:
-  version "0.1.0-alpha.38"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.38.tgz#c250ba4f1f41977e980e1558a8011b1af36004bd"
+postgraphile-core@0.1.0-alpha.39:
+  version "0.1.0-alpha.39"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.39.tgz#4e397d88484f84f8a55e71058d958615a78459d5"
   dependencies:
     babel-runtime ">=6 <7"
-    graphile-build "^0.1.0-alpha.38"
-    graphile-build-pg "^0.1.0-alpha.38"
+    graphile-build "0.1.0-alpha.39"
+    graphile-build-pg "0.1.0-alpha.39"
 
 postgres-array@~1.0.0:
   version "1.0.2"
