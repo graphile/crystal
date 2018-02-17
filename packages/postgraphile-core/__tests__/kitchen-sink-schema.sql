@@ -40,7 +40,7 @@ create function c.person_exists(person c.person, email b.email) returns boolean 
 select exists(select 1 from c.person where person.email = person_exists.email);
 $$ language sql stable;
 
-create type a.an_enum as enum('awaiting', 'rejected', 'published');
+create type a.an_enum as enum('awaiting', 'rejected', 'published', '*', '**', '***', 'foo*', 'foo*_','_foo*','*bar','*bar_','_*bar_','*baz*','_*baz*_');
 
 create type a.comptype as (
   schedule timestamptz,

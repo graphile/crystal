@@ -71,7 +71,11 @@ export const newInflector = (
         if (value === "") {
           return "_EMPTY_";
         }
-        return value;
+        const valueWithAsterisksReplaced = value
+          .replace(/\*/g, "_ASTERISK_")
+          .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
+          .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
+        return valueWithAsterisksReplaced;
       },
       enumType(name: string) {
         return upperCamelCase(name);
