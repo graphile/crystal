@@ -291,3 +291,8 @@ create function a.post_with_suffix(post a.post,suffix text) returns a.post as $$
   (post.id,post.headline || suffix,post.body,post.author_id,post.enums,post.comptypes)
   returning *; 
 $$ language sql volatile;
+
+create function a.static_big_integer() returns setof int8 as $$
+  -- See https://github.com/postgraphql/postgraphql/issues/678#issuecomment-363659705
+  select generate_series(30894622507013190, 30894622507013200);
+$$ language sql stable security definer;

@@ -1916,6 +1916,43 @@ Object {
     "optionalMissingMiddle3": 10,
     "optionalMissingMiddle4": null,
     "optionalMissingMiddle5": null,
+    "staticBigInteger": Object {
+      "edges": Array [
+        Object {
+          "node": "30894622507013190",
+        },
+        Object {
+          "node": "30894622507013191",
+        },
+        Object {
+          "node": "30894622507013192",
+        },
+        Object {
+          "node": "30894622507013193",
+        },
+        Object {
+          "node": "30894622507013194",
+        },
+        Object {
+          "node": "30894622507013195",
+        },
+        Object {
+          "node": "30894622507013196",
+        },
+        Object {
+          "node": "30894622507013197",
+        },
+        Object {
+          "node": "30894622507013198",
+        },
+        Object {
+          "node": "30894622507013199",
+        },
+        Object {
+          "node": "30894622507013200",
+        },
+      ],
+    },
     "tableQuery": Object {
       "authorId": 5,
       "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",

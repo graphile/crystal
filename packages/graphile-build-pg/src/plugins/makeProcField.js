@@ -262,7 +262,10 @@ export default function makeProcField(
                 );
               } else {
                 innerQueryBuilder.select(
-                  sql.fragment`${functionAlias}.${functionAlias}`,
+                  pgTweakFragmentForType(
+                    sql.fragment`${functionAlias}.${functionAlias}`,
+                    returnType
+                  ),
                   "value"
                 );
               }

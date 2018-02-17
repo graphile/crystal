@@ -26,4 +26,5 @@ query {
   tableSetQueryWithOffset5: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", first: 2) { edges { cursor node { name } } }
   intSetQuery(x: 5, z: 6) { edges { cursor node } }
   noArgsQuery
+  staticBigInteger { edges { node } }
 }

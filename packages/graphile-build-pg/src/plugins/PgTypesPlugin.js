@@ -242,18 +242,6 @@ export default (function PgTypesPlugin(
     addType(BigFloat);
     addType(BitString);
 
-    const categoryLookup = {
-      B: () => GraphQLBoolean,
-
-      // Numbers may be too large for GraphQL/JS to handle, so stringify by
-      // default.
-      N: () => BigFloat,
-
-      A: type =>
-        new GraphQLList(
-          enforceGqlTypeByPgType(pgTypeById[type.arrayItemTypeId])
-        ),
-    };
     const rawTypes = [
       1186, // interval
       1082, // date
@@ -272,6 +260,9 @@ export default (function PgTypesPlugin(
         return memo;
       }, {}),
       {
+        // cast numbers above our ken to strings to avoid loss of precision
+        "20": tweakToText,
+        "1700": tweakToText,
         // to_json all dates to make them ISO (overrides rawTypes above)
         "1082": tweakToJson,
         "1114": tweakToJson,
@@ -280,6 +271,23 @@ export default (function PgTypesPlugin(
         "1266": tweakToJson,
       }
     );
+
+    const categoryLookup = {
+      B: () => GraphQLBoolean,
+
+      // Numbers may be too large for GraphQL/JS to handle, so stringify by
+      // default.
+      N: type => {
+        pgTweaksByTypeId[type.id] = tweakToText;
+        return BigFloat;
+      },
+
+      A: type =>
+        new GraphQLList(
+          enforceGqlTypeByPgType(pgTypeById[type.arrayItemTypeId])
+        ),
+    };
+
     const pgTweakFragmentForType = (fragment, type) => {
       const tweaker = pgTweaksByTypeId[type.id];
       if (tweaker) {
