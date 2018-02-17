@@ -523,10 +523,15 @@ class QueryBuilder {
         getContext()
       );
     } else if (type === "select") {
-      this.compiledData[type] = this.data[type].map(([a, b]) => [
-        callIfNecessary(a, getContext()),
-        b,
-      ]);
+      // Assume that duplicate fields must be identical, don't output the same key multiple times
+      const seenFields = [];
+      this.compiledData[type] = this.data[type].reduce((memo, [a, b]) => {
+        if (seenFields.indexOf(b) < 0) {
+          seenFields.push(b);
+          memo.push([callIfNecessary(a, getContext()), b]);
+        }
+        return memo;
+      }, []);
     } else if (type === "orderBy") {
       this.compiledData[type] = this.data[type].map(([a, b]) => [
         callIfNecessary(a, getContext()),
