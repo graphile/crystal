@@ -11,6 +11,7 @@ const connect = require('connect')
 const express = require('express')
 const sendFile = require('send')
 const event = require('events')
+const querystring = require('querystring')
 
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter()
@@ -170,25 +171,19 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
     })
 
-    test('will not allow requests other than POST', async () => {
+    test('will not allow requests other than POST and GET', async () => {
       const server = createServer()
-      await (
-        request(server)
-        .get('/graphql')
-        .expect(405)
-        .expect('Allow', 'POST, OPTIONS')
-      )
       await (
         request(server)
         .delete('/graphql')
         .expect(405)
-        .expect('Allow', 'POST, OPTIONS')
+        .expect('Allow', 'POST, GET, OPTIONS')
       )
       await (
         request(server)
         .put('/graphql')
         .expect(405)
-        .expect('Allow', 'POST, OPTIONS')
+        .expect('Allow', 'POST, GET, OPTIONS')
       )
     })
 
@@ -202,6 +197,19 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect(200)
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } })
+      )
+    })
+
+    test('will run a query on a GET request with JSON data', async () => {
+      const server = createServer()
+      await (
+        request(server)
+          .get('/graphql?' + querystring.stringify(
+              { query: '{hello}' },
+          ))
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect({ data: { hello: 'world' } })
       )
     })
 
@@ -348,7 +356,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
     })
 
-    test('will use variables', async () => {
+    test('will use variables on a POST', async () => {
       const server = createServer()
       await (
         request(server)
@@ -369,7 +377,20 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       )
     })
 
-    test('will ignore empty string variables', async () => {
+    test('will use variables on a GET', async () => {
+      const server = createServer()
+      await (
+        request(server)
+          .get('/graphql?' + querystring.stringify(
+            { query: 'query A($name: String!) { greetings(name: $name) }', variables: JSON.stringify({ name: 'Joe' }), operationName: 'A' },
+          ))
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect({ data: { greetings: 'Hello, Joe!' } })
+      )
+    })
+
+    test('will ignore empty string variables on a POST', async () => {
       const server = createServer()
       await (
         request(server)
@@ -377,6 +398,18 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .send({ query: '{hello}', variables: '' })
         .expect(200)
         .expect({ data: { hello: 'world' } })
+      )
+    })
+
+    test('will ignore empty string variables on a GET', async () => {
+      const server = createServer()
+      await (
+        request(server)
+          .get('/graphql?' + querystring.stringify(
+              { query: '{hello}', variables: '' },
+            ))
+          .expect(200)
+          .expect({ data: { hello: 'world' } })
       )
     })
 
