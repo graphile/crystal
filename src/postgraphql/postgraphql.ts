@@ -83,10 +83,10 @@ export default function postgraphql (
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const pgPool =
+  const pgPool: Pool =
     // If it is already a `Pool`, just use it.
-    poolOrConfig instanceof Pool
-      ? poolOrConfig
+    poolOrConfig instanceof Pool || quacksLikePgPool(poolOrConfig)
+      ? (poolOrConfig as Pool)
       : new Pool(typeof poolOrConfig === 'string'
         // Otherwise if it is a string, let us parse it to get a config to
         // create a `Pool`.
@@ -156,4 +156,21 @@ function handleFatalError (error: Error): never {
   // However, we need to return a value with type `never` here for
   // TypeScript.
   return null as never
+}
+
+function constructorName(obj: mixed): string | null {
+  return obj && typeof obj.constructor === 'function' && obj.constructor.name && String(obj.constructor.name) || null
+}
+
+// tslint:disable-next-line no-any
+function quacksLikePgPool(pgConfig: any): boolean {
+  // A diagnosis of exclusion
+  if (!pgConfig || typeof pgConfig !== 'object') return false
+  if (constructorName(pgConfig) !== 'Pool') return false
+  if (!pgConfig['Client']) return false
+  if (!pgConfig['options']) return false
+  if (typeof pgConfig['connect'] !== 'function') return false
+  if (typeof pgConfig['end'] !== 'function') return false
+  if (typeof pgConfig['query'] !== 'function') return false
+  return true
 }
