@@ -23,7 +23,12 @@ function quacksLikePgClient(pgConfig: mixed): boolean {
 export function quacksLikePgPool(pgConfig: mixed): boolean {
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== "object") return false;
-  if (constructorName(pgConfig) !== "Pool") return false;
+  if (
+    constructorName(pgConfig) !== "Pool" &&
+    constructorName(pgConfig) !== "BoundPool"
+  ) {
+    return false;
+  }
   if (!pgConfig.Client) return false;
   if (!pgConfig.options) return false;
   if (typeof pgConfig.connect !== "function") return false;
