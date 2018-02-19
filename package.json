@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "4.0.0-alpha2.32",
+  "version": "4.0.0-alpha2.33",
   "description":
     "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
   "author": "Benjie Gillam <benjie@graphile.org>",
@@ -44,7 +44,7 @@
     "pg-minify": "~0.5.3",
     "pg-sql2": "^1.0.0-alpha1.0",
     "pluralize": "^3.0.0",
-    "postgraphile-core": "0.1.0-alpha.40",
+    "postgraphile-core": "0.1.0-alpha.41",
     "postgres-interval": "^1.0.2",
     "send": "^0.16.1",
     "tslib": "^1.5.0"
