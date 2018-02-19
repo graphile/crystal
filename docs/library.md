@@ -93,12 +93,12 @@ createPostGraphQLSchema('postgres://localhost:5432')
 
 Now that you have your schema, in order to execute a GraphQL query you will need to get a PostGraphQL context object with `withPostGraphQLContext`. The context object will contain a Postgres client which has its own transaction with the correct permission levels for the associated user.
 
-You will also need a Postgres pool from the [`pg-pool`][] module.
+You will also need a Postgres pool from the [`pg`][] module.
 
 `withPostGraphQLContext`, like `createPostGraphQLSchema`, will also return a promise.
 
 ```js
-import { Pool } from 'pg-pool'
+import { Pool } from 'pg'
 import { graphql } from 'graphql'
 import { withPostGraphQLContext } from 'postgraphql'
 
@@ -146,12 +146,14 @@ Arguments include:
 This function sets up a PostGraphQL context, calls (and resolves) the callback function within this context, and then tears the context back down again finally resolving to the result of your function. The callback is expected to return a promise which resolves to a GraphQL execution result. The context you get as an argument to `callback` will be invalid anywhere outside of the `callback` function.
 
 - **`options`**: An object of options that are used to create the context object that gets passed into `callback`.
-  - `pgPool`: A required instance of a Postgres pool from [`pg-pool`][]. A Postgres client will be connected from this pool.
+  - `pgPool`: A required instance of a Postgres pool from [`pg`][]. A Postgres client will be connected from this pool.
   - `jwtToken`: An optional JWT token string. This JWT token represents the viewer of your PostGraphQL schema.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify the `jwtToken`.
+  - `jwtAudiences`: The audiences to use when verifying the JWT token. If not set the audience will be `['postgraphql']`.
+  - `jwtRole`: An array of strings describing the dotted path in the JWT from which to extract the postgres role. If none is provided it will use the key `role` on the root of the jwt. Defaults to `['role']`.
   - `pgDefaultRole`: The default Postgres role that will be used if no role was found in `jwtToken`. It is a best security practice to always have a value for this option even though it is optional.
   - `pgSettings`: A plain object specifying custom config values to set in the PostgreSQL transaction (accessed via `current_setting('my.custom.setting')`) or a function which will return the same (or a Promise to the same).
 - **`callback`**: The function which is called with the `context` object which was created. Whatever the return value of this function is will be the return value of `withPostGraphQLContext`.
 
 [GraphQL-js]: https://www.npmjs.com/package/graphql
-[`pg-pool`]: https://www.npmjs.com/package/pg-pool
+[`pg`]: https://www.npmjs.com/package/pg
