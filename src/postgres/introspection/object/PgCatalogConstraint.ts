@@ -50,7 +50,7 @@ export interface PgCatalogUniqueConstraint extends PgCatalogBaseConstraint {
  *
  * @private
  */
-interface PgCatalogBaseConstraint {
+export interface PgCatalogBaseConstraint {
   readonly kind: 'constraint'
   readonly name: string
 }

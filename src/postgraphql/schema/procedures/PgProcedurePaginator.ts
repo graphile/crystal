@@ -12,7 +12,7 @@ import createPgProcedureSqlCall from './createPgProcedureSqlCall'
  *
  * @private
  */
-type ProcedureInput = Array<mixed>
+export type ProcedureInput = Array<mixed>
 
 /**
  * A procedure paginator is one in which a Postgres function is the source of

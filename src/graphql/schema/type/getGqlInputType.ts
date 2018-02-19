@@ -33,7 +33,7 @@ import getGqlOutputType from './getGqlOutputType'
  *
  * @private
  */
-type GetGqlInputReturn<TValue> = {
+export type GetGqlInputReturn<TValue> = {
   gqlType: GraphQLInputType,
   fromGqlInput: (gqlInput: mixed) => TValue,
 }

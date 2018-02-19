@@ -8,7 +8,7 @@ import PgPaginator from './PgPaginator'
  *
  * @private
  */
-type OffsetCursor = number
+export type OffsetCursor = number
 
 /**
  * The `PgPaginatorOrderingOffset` implements an ordering strategy based solely

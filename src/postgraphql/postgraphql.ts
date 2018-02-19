@@ -9,7 +9,7 @@ import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import watchPgSchemas from './watch/watchPgSchemas'
 import { IncomingMessage } from 'http'
 
-type PostGraphQLOptions = {
+export type PostGraphQLOptions = {
   classicIds?: boolean,
   dynamicJson?: boolean,
   graphqlRoute?: string,

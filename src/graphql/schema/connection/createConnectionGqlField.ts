@@ -332,7 +332,7 @@ export const _pageInfoType: GraphQLObjectType =
  *
  * @private
  */
-interface Connection<TInput, TItemValue, TCursor> {
+export interface Connection<TInput, TItemValue, TCursor> {
   paginator: Paginator<TInput, TItemValue>
   orderingName: string
   input: TInput

@@ -15,7 +15,7 @@ import { Inventory, Type, ObjectType } from '../../interface'
  *    access `Inventory` and other options from arbitrary functions is
  *    necessary, a `BuildToken` makes that possible.
  */
-interface BuildToken {
+export interface BuildToken {
   // The `Inventory` we are using to build the GraphQL schema.
   readonly inventory: Inventory,
   // Some options we can use to configure how we build our GraphQL schema.

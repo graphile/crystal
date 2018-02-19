@@ -42,7 +42,7 @@ import aliasGqlType from './aliasGqlType'
  *
  * @private
  */
-type GetGqlOutputTypeReturn<TValue> = {
+export type GetGqlOutputTypeReturn<TValue> = {
   gqlType: GraphQLOutputType,
   intoGqlOutput: (value: TValue) => mixed,
 }

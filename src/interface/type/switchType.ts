@@ -12,7 +12,7 @@ import ScalarType from './ScalarType'
  *
  * @private
  */
-type SwitchTypeCases<T> = {
+export type SwitchTypeCases<T> = {
   adapter?: (type: AdapterType<mixed>) => T,
   nullable: (type: NullableType<mixed>) => T,
   list: (type: ListType<mixed, mixed>) => T,

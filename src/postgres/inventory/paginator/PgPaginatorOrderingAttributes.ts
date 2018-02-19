@@ -11,7 +11,7 @@ import PgPaginator from './PgPaginator'
  *
  * @private
  */
-type AttributesCursor = Array<mixed>
+export type AttributesCursor = Array<mixed>
 
 /**
  * The `PgPaginatorOrderingAttributes` paginator ordering implements an
