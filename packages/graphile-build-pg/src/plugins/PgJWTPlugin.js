@@ -82,11 +82,22 @@ export default (function PgJWTPlugin(
                 memo[attr.name] = value[attr.name];
                 return memo;
               }, {});
-              return signJwt(token, pgJwtSecret, {
-                audience: "postgraphql",
-                issuer: "postgraphql",
-                expiresIn: token.exp ? undefined : "1 day",
-              });
+              return signJwt(
+                token,
+                pgJwtSecret,
+                Object.assign(
+                  {},
+                  {
+                    audience: "postgraphql",
+                    issuer: "postgraphql",
+                  },
+                  token.exp
+                    ? null
+                    : {
+                        expiresIn: "1 day",
+                      }
+                )
+              );
             },
           },
           {
