@@ -2696,9 +2696,9 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@0.1.0-alpha.40:
-  version "0.1.0-alpha.40"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.40.tgz#cccd8f7097c70a4bcd1837de98c859350caf61ae"
+graphile-build-pg@0.1.0-alpha.41:
+  version "0.1.0-alpha.41"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-0.1.0-alpha.41.tgz#da93b380ed463440e998eb562e2c9fa8f15eeefd"
   dependencies:
     babel-runtime ">=6 <7"
     chalk "^2.1.0"
@@ -4904,13 +4904,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@0.1.0-alpha.40:
-  version "0.1.0-alpha.40"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.40.tgz#c81edb507054d303807ad9fa27dde8363eed06df"
+postgraphile-core@0.1.0-alpha.41:
+  version "0.1.0-alpha.41"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-0.1.0-alpha.41.tgz#a1c5f575d0c177e3fbc0a34d999b4c9162fac216"
   dependencies:
     babel-runtime ">=6 <7"
     graphile-build "0.1.0-alpha.39"
-    graphile-build-pg "0.1.0-alpha.40"
+    graphile-build-pg "0.1.0-alpha.41"
 
 postgres-array@~1.0.0:
   version "1.0.2"

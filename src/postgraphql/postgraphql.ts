@@ -166,7 +166,7 @@ function constructorName(obj: mixed): string | null {
 function quacksLikePgPool(pgConfig: any): boolean {
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== 'object') return false
-  if (constructorName(pgConfig) !== 'Pool') return false
+  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool') return false
   if (!pgConfig['Client']) return false
   if (!pgConfig['options']) return false
   if (typeof pgConfig['connect'] !== 'function') return false
