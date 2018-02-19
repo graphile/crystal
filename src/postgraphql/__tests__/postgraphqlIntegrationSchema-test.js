@@ -1,9 +1,11 @@
 // TODO: There may be some excessive waste, if we could somehow filter what
 // these guys see, that would be great 👍
 
+jest.unmock('postgraphile-core')
+
 import printSchemaOrdered from '../../__tests__/utils/printSchemaOrdered'
 import withPgClient from '../../__tests__/utils/withPgClient'
-import createPostGraphQLSchema from '../schema/createPostGraphQLSchema'
+import { createPostGraphQLSchema } from '..'
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20

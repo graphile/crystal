@@ -101,6 +101,8 @@ const serverCreators = new Map([
 // get the Node.js major version number.
 const nodeMajorVersion = parseInt(process.version.replace(/^v/, '').split('.')[0], 10)
 
+/* XXX: re-enable koa tests
+
 // Only test Koa in version of Node.js greater than 4 because the Koa source
 // code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
 // not meant to be used in Node.js 4 anyway so this is fine.
@@ -112,6 +114,7 @@ if (nodeMajorVersion > 4) {
     return http.createServer(app.callback())
   })
 }
+*/
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = options =>
@@ -495,11 +498,21 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .get('/_postgraphql/graphiql/very/deeply/nested')
         .expect(200)
       )
-      expect(sendFile.mock.calls.map(([res, filepath, options]) => [path.relative(graphiqlDirectory, filepath), options]))
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/index.html')
+        .expect(404)
+      )
+      await (
+        request(server)
+        .get('/_postgraphql/graphiql/../../../../etc/passwd')
+        .expect(403)
+      )
+      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options]))
         .toEqual([
-          ['anything.css', { index: false }],
-          ['something.js', { index: false }],
-          ['very/deeply/nested', { index: false }],
+          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+          ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ])
     })
 
@@ -615,7 +628,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         pgSettings: {
           'foo.string': 'test1',
           'foo.number': 42,
-          'foo.boolean': true,
         },
       })
       await (
@@ -631,11 +643,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            text: 'select set_config($1, $2, true), set_config($3, $4, true)',
             values: [
               'foo.string', 'test1',
               'foo.number', '42',
-              'foo.boolean', 'true',
             ],
           },
         ],
@@ -652,7 +663,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         pgSettings: (req) => ({
           'foo.string': 'test1',
           'foo.number': 42,
-          'foo.boolean': true,
         }),
       })
       await (
@@ -668,17 +678,48 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+            text: 'select set_config($1, $2, true), set_config($3, $4, true)',
             values: [
               'foo.string', 'test1',
               'foo.number', '42',
-              'foo.boolean', 'true',
             ],
           },
         ],
         ['commit'],
       ])
       expect(pgClient.release.mock.calls).toEqual([[]])
+    })
+
+    test('will call additionalGraphQLContextFromRequest if provided and add the response to the context', async () => {
+      const helloResolver = jest.fn((source, args, context) => context.additional)
+      const contextCheckGqlSchema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: {
+            hello: {
+              type: GraphQLString,
+              resolve: helloResolver,
+            },
+          },
+        }),
+      })
+      const additionalGraphQLContextFromRequest = jest.fn(() => ({ additional: 'foo' }))
+      const server = createServer({
+        additionalGraphQLContextFromRequest,
+        getGqlSchema: () => Promise.resolve(contextCheckGqlSchema),
+      })
+
+      await (
+        request(server)
+        .post('/graphql')
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'foo' } })
+      )
+      expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1)
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(http.IncomingMessage)
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][1]).toBeInstanceOf(http.ServerResponse)
     })
   })
 }

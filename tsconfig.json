@@ -29,6 +29,9 @@
     "examples",
     "utils",
     "resources",
-    "src/postgraphql/graphiql"
+    "src/postgraphql/graphiql",
+    "__tests__",
+    "**/__tests__",
+    "*-test.js"
   ]
 }

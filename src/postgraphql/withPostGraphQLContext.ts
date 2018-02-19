@@ -2,7 +2,7 @@ import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
 import { Pool, Client } from 'pg'
 import { ExecutionResult } from 'graphql'
-import { sql } from '../postgres/utils'
+import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
 /**
@@ -93,7 +93,7 @@ export default async function withPostGraphQLContext(
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-async function setupPgClientTransaction ({
+async function setupPgClientTransaction({
   pgClient,
   jwtToken,
   jwtSecret,
@@ -163,7 +163,9 @@ async function setupPgClientTransaction ({
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
     for (const key of Object.keys(pgSettings)) {
-      localSettings.set(key, String(pgSettings[key]))
+      if (isPgSettingValid(pgSettings[key])) {
+        localSettings.set(key, String(pgSettings[key]))
+      }
     }
   }
 
@@ -206,7 +208,7 @@ const debugPgError = createDebugger('postgraphql:postgres:error')
  * @private
  */
 // tslint:disable no-any
-function debugPgClient (pgClient: Client): Client {
+function debugPgClient(pgClient: Client): Client {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (debugPg.enabled || debugPgError.enabled) {
@@ -248,5 +250,23 @@ function getPath(inObject: mixed, path: Array<string>): any {
     object = object[path[index++]]
   }
   return (index && index === length) ? object : undefined
+}
+
+/**
+ * Check if a pgSetting is a string or a number.
+ * Null and Undefined settings are not valid and will be ignored.
+ * pgSettings of other types throw an error.
+ *
+ * @private
+ */
+function isPgSettingValid(pgSetting: mixed): boolean {
+  const supportedSettingTypes = ['string', 'number']
+  if (supportedSettingTypes.indexOf(typeof pgSetting) >= 0) {
+    return true
+  }
+  if (pgSetting === undefined || pgSetting === null) {
+    return false
+  }
+  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type ${supportedSettingTypes.join(' or ')}.`)
 }
 // tslint:enable no-any

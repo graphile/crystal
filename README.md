@@ -1,4 +1,4 @@
-# PostGraphQL
+# PostGraphQL@next
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
 [![Package on npm](https://img.shields.io/npm/v/postgraphql/next.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
@@ -8,9 +8,11 @@
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/benjie)
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
+# This is the ALPHA VERSION of PostGraphQL v4; use with caution and monitor [#506](https://github.com/postgraphql/postgraphql/pull/506)!
+
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
 
-**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only
+**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only  
 **Next**: v4 ([`postgraphile`](https://github.com/postgraphql/postgraphql/tree/postgraphile) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
 
 ---
@@ -23,10 +25,10 @@ With PostGraphQL, you can access the power of PostgreSQL through a well designed
 
 PostGraphQL holds a fundamental belief that a *well designed database schema should be all you need to serve well thought out APIs*. PostgreSQL already has amazing user management and relationship infrastructure, *why duplicate that logic* in a custom API? PostGraphQL is likely to provide a more performant and standards compliant GraphQL API then any created in house. Focus on your product and let PostGraphQL manage how the data gets to the product.
 
-For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read the [evaluating PostGraphQL for your project](#evaluating-postgraphql-for-your-project) section.
+For a critical evaluation of PostGraphQL to determine if it fits in your tech stack, read [evaluating PostGraphQL for your project](https://www.graphile.org/postgraphile/evaluating/).
 
 ## Introduction
-Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a fast 7 minute introduction to using the PostGraphQL project.
+Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a fast 7 minute introduction to using the PostGraphQL project. This was using v2; we're now up to v4 which has many more bells and whistles!
 
 [![PostGraphQL at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
 
@@ -34,7 +36,7 @@ Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at Gra
 First install using npm:
 
 ```bash
-npm install -g postgraphql
+npm install -g postgraphql@next
 ```
 
 …and then just run it! By default, PostGraphQL will connect to your local database at `postgres://localhost:5432` and introspect the `public` schema.
@@ -58,7 +60,7 @@ import postgraphql from 'postgraphql'
 createServer(postgraphql())
 ```
 
-For more information around using PostGraphQL as a library, and the options the API expects read the [library usage documentation article](https://github.com/calebmer/postgraphql/blob/master/docs/library.md).
+For more information around using PostGraphQL as a library, and the options the API expects read the [library usage article](https://www.graphile.org/postgraphile/usage-library/).
 
 There is also a docker image for running PostGraphQL maintained by @angelosarto, simply pass the same options to the docker container:
 
@@ -70,7 +72,7 @@ docker run postgraphql/postgraphql --help
 To connect to a database and expose the PostGraphQL port try this:
 
 ```bash
-docker run -p 5000:5000 postgraphql/postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_SCHEMA
+docker run -p 5000:5000 postgraphql/postgraphql --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE
 ```
 
 Also make sure to check out the **[forum example][]** and especially **[step by step tutorial][]** for a demo of a PostGraphQL compliant schema and authentication.
@@ -151,8 +153,8 @@ And queried through GraphQL like this:
 
 For more information, check out our [procedure documentation][] and our [advanced queries documentation][].
 
-[procedure documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md
-[advanced queries documentation]: https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md
+[procedure documentation]: https://www.graphile.org/postgraphile/procedures/
+[advanced queries documentation]: https://www.graphile.org/postgraphile/custom-queries/
 
 ### Advanced Watch Mode
 Running PostGraphQL in watch mode will get you the best experience for iterating on a GraphQL API in the whole GraphQL ecosystem.
@@ -220,8 +222,8 @@ To enable token based authorization use the `--secret <string>` command line arg
 [jwt]: https://jwt.io
 [grants]: http://www.postgresql.org/docs/current/static/sql-grant.html
 [row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
-[pg-jwt-spec]: https://github.com/calebmer/postgraphql/blob/master/docs/pg-jwt-spec.md
-[retrieving-claims]: https://github.com/calebmer/postgraphql/blob/master/docs/pg-jwt-spec.md#retrieving-claims-in-postgresql
+[pg-jwt-spec]: https://www.graphile.org/postgraphile/jwt-guide/
+[retrieving-claims]: https://www.graphile.org/postgraphile/jwt-guide/#retrieving-claims-in-postgresql
 
 ### Cursor Based Pagination For Free
 There are some problems with traditional limit/offset pagination and realtime data. For more information on such problems, read [this article][pagination-for-graphql].
@@ -242,35 +244,11 @@ The specific specs PostGraphQL implements are:
 * * *
 
 ## Documentation
-- [Using PostGraphQL as Express, Connect, or Koa middleware.](https://github.com/calebmer/postgraphql/blob/master/docs/library.md)
-- [Adding advanced queries to PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/advanced-queries.md)
-- [Using PostgreSQL functions to extend your PostGraphQL schema.](https://github.com/calebmer/postgraphql/blob/master/docs/procedures.md)
-- [A crash course in PostgreSQL roles for PostGraphQL.](https://github.com/calebmer/postgraphql/blob/master/docs/default-role.md)
+- [Using PostGraphQL as Express, Connect, or Koa middleware.](https://www.graphile.org/postgraphile/usage-library/)
+- [Adding advanced queries to PostGraphQL.](https://www.graphile.org/postgraphile/custom-queries/)
+- [Using PostgreSQL functions to extend your PostGraphQL schema.](https://www.graphile.org/postgraphile/procedures/)
+- [A crash course in PostgreSQL roles for PostGraphQL.](https://www.graphile.org/postgraphile/default-role/)
 
-## Evaluating PostGraphQL For Your Project
-Hopefully you’ve been convinced that PostGraphQL serves an awesome GraphQL API, but now let’s take a more critical look at whether or not you should adopt PostGraphQL for your project.
-
-PostGraphQL’s audience is for people whose core business is not the API and want to prioritize their product. PostGraphQL allows you to define your content model in the database as you normally would, however instead of building the bindings to the database (your API) PostGraphQL takes care of it.
-
-This takes a huge maintenance burden off your shoulders. Now you don’t have to worry about optimizing the API and the database, instead you can focus on just optimizing your database.
-
-### No Lock In
-PostGraphQL does not lock you into using PostGraphQL forever. Its purpose is to help your business in a transitory period. When you feel comfortable with the cost of building your API PostGraphQL is simple to switch with a custom solution.
-
-How is it simple? Well first of all, your PostgreSQL schema is still your PostgreSQL schema. PostGraphQL does not ask you to do anything too divergent with your schema allowing you to take your schema (and all your data) to whatever solution you build next. GraphQL itself provides a simple and clear deprecation path if you want to start using different fields.
-
-Ideally PostGraphQL scales with your company and we would appreciate your contributions to help it scale, however there is a simple exit path even years into the business.
-
-### Schema Driven APIs
-If you fundamentally disagree with a one-to-one mapping of a SQL schema to an API (GraphQL or otherwise) this section is for you. First of all, PostGraphQL is not necessarily meant to be a permanent solution. PostGraphQL was created to allow you to focus on your product and not the API. If you want a custom API there is a simple transition path (read [no lock in](#no-lock-in)). If you still can’t get over the one-to-one nature of PostGraphQL consider the following arguments why putting your business logic in PostgreSQL is a good idea:
-
-1. PostgreSQL already has a powerful [user management system][user-management] with fine grained [row level security][row-level-security]. A custom API would mean you have to build your own user management and security.
-2. PostgreSQL allows you to hide implementation details with [views][pg-views] of your data. Simple views can even be [auto-updatable][pg-udpatable-views]. This provides you with the same freedom and flexibility as you might want from a custom API except more performant.
-3. PostgreSQL gives you automatic relations with the `REFERENCES` constraint and PostGraphQL automatically detects them. With a custom API, you’d need to hardcode these relationships.
-4. For what it’s worth, you can write in your favorite scripting language in PostgreSQL including [JavaScript][js-in-pg] and [Ruby][ruby-in-pg].
-5. And if you don’t want to write your Ruby in PostgreSQL, you could also use PostgreSQL’s [`NOTIFY`][pg-notify] feature to fire events to a listening Ruby or [JavaScript][node-pg-notify] microservice can listen and respond to PostgreSQL events (this could include email transactions and event reporting).
-
-Still worried about a certain aspect of a schema driven API? Open an issue, confident we can convince you otherwise 😉
 
 [user-management]: http://www.postgresql.org/docs/current/static/user-manag.html
 [row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
@@ -286,13 +264,14 @@ Still worried about a certain aspect of a schema driven API? Open an issue, conf
 ## Contributing
 Want to help testing and developing PostGraphQL? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!
 
-The current maintainer of this project is [Benjie Gillam](https://twitter.com/benjie).
+## Maintenance
+The maintainer of this project is [Benjie Gillam](https://twitter.com/benjie) - follow him on Twitter!
 
 ## Thanks
-Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definitely a huge inspiration for this project! The core contributors are awesome and taught us so much 😊. Ironically, they also convinced us that GraphQL was superior to REST…
+Thanks so much to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was definitely a huge inspiration for this project!
 
 A humongous, heart-felt, thank you to the original author of PostGraphQL - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphQL! He's now graduated from the project and we all wish him the best for his future ventures!
 
-Even more thanks to each and every [sponsor](SPONSORS.md) of the project - without their help progress would be a lot slower!
+Even more thanks to each and every [sponsor](SPONSORS.md) of the project - without their help progress would be a lot slower! Please join them in supporting this project 🙏
 
 Thanks and enjoy 👍
