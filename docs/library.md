@@ -97,7 +97,7 @@ You will also need a Postgres pool from the [`pg-pool`][] module.
 `withPostGraphQLContext`, like `createPostGraphQLSchema`, will also return a promise.
 
 ```js
-import { Pool } from 'pg-pool'
+import Pool from 'pg-pool'
 import { graphql } from 'graphql'
 import { withPostGraphQLContext } from 'postgraphql'
 
