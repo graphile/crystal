@@ -145,7 +145,7 @@ Arguments include:
 This function sets up a PostGraphQL context, calls (and resolves) the callback function within this context, and then tears the context back down again finally resolving to the result of your function. The callback is expected to return a promise which resolves to a GraphQL execution result. The context you get as an argument to `callback` will be invalid anywhere outside of the `callback` function.
 
 - **`options`**: An object of options that are used to create the context object that gets passed into `callback`.
-  - `pgPool`: A required instance of a Postgres pool from [`https://www.npmjs.com/package/pg`][]. A Postgres client will be connected from this pool.
+  - `pgPool`: A required instance of a Postgres pool from [`pg`][]. A Postgres client will be connected from this pool.
   - `jwtToken`: An optional JWT token string. This JWT token represents the viewer of your PostGraphQL schema.
   - `jwtSecret`: The secret for your JSON web tokens. This will be used to verify the `jwtToken`.
   - `jwtAudiences`: The audiences to use when verifying the JWT token. If not set the audience will be `['postgraphql']`.
