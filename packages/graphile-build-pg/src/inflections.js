@@ -30,6 +30,27 @@ export type Inflector = {
   [string]: (...input: Array<any>) => string,
 };
 
+function preventEmptyResult(obj) {
+  return Object.keys(obj).reduce((memo, key) => {
+    const fn = obj[key];
+    memo[key] = (...args) => {
+      const result = fn.apply(memo, args);
+      if (typeof result !== "string" || result.length === 0) {
+        const stringifiedArgs = require("util").inspect(args);
+        throw new Error(
+          `Inflector for '${key}' returned '${String(
+            result
+          )}'; expected non-empty string\n` +
+            `See: https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/src/inflections.js\n` +
+            `Arguments passed to ${key}:\n${stringifiedArgs}`
+        );
+      }
+      return result;
+    };
+    return memo;
+  }, {});
+}
+
 export const newInflector = (
   overrides: ?{ [string]: () => string } = undefined,
   {
@@ -47,190 +68,198 @@ export const newInflector = (
     );
   }
 
-  return Object.assign(
-    {
-      pluralize,
-      argument(name: ?string, index: number) {
-        return camelCase(name || `arg${index}`);
+  return preventEmptyResult(
+    Object.assign(
+      {
+        pluralize,
+        argument(name: ?string, index: number) {
+          return camelCase(name || `arg${index}`);
+        },
+        orderByType(typeName: string) {
+          return upperCamelCase(`${pluralize(typeName)}-order-by`);
+        },
+        orderByEnum(
+          name: string,
+          ascending: boolean,
+          _table: string,
+          _schema: ?string
+        ) {
+          return constantCase(`${name}_${ascending ? "asc" : "desc"}`);
+        },
+        domainType(name: string) {
+          return upperCamelCase(name);
+        },
+        enumName(value: string) {
+          if (value === "") {
+            return "_EMPTY_";
+          }
+          const valueWithAsterisksReplaced = value
+            .replace(/\*/g, "_ASTERISK_")
+            .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
+            .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
+          return valueWithAsterisksReplaced;
+        },
+        enumType(name: string) {
+          return upperCamelCase(name);
+        },
+        conditionType(typeName: string) {
+          return upperCamelCase(`${typeName}-condition`);
+        },
+        inputType(typeName: string) {
+          return upperCamelCase(`${typeName}-input`);
+        },
+        rangeBoundType(typeName: string) {
+          return upperCamelCase(`${typeName}-range-bound`);
+        },
+        rangeType(typeName: string) {
+          return upperCamelCase(`${typeName}-range`);
+        },
+        patchType(typeName: string) {
+          return upperCamelCase(`${typeName}-patch`);
+        },
+        patchField(itemName: string) {
+          return camelCase(`${itemName}-patch`);
+        },
+        tableName(name: string, _schema: ?string) {
+          return camelCase(singularizeTable(name));
+        },
+        tableNode(name: string, _schema: ?string) {
+          return camelCase(singularizeTable(name));
+        },
+        allRows(name: string, schema: ?string) {
+          return camelCase(
+            `all-${this.pluralize(this.tableName(name, schema))}`
+          );
+        },
+        functionName(name: string, _schema: ?string) {
+          return camelCase(name);
+        },
+        functionPayloadType(name: string, _schema: ?string) {
+          return upperCamelCase(`${name}-payload`);
+        },
+        functionInputType(name: string, _schema: ?string) {
+          return upperCamelCase(`${name}-input`);
+        },
+        tableType(name: string, schema: ?string) {
+          return upperCamelCase(this.tableName(name, schema));
+        },
+        column(name: string, _table: string, _schema: ?string) {
+          return camelCase(name);
+        },
+        singleRelationByKeys(
+          detailedKeys: Keys,
+          table: string,
+          schema: ?string
+        ) {
+          return camelCase(
+            `${this.tableName(table, schema)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}`
+          );
+        },
+        rowByUniqueKeys(detailedKeys: Keys, table: string, schema: ?string) {
+          return camelCase(
+            `${this.tableName(table, schema)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}`
+          );
+        },
+        updateByKeys(detailedKeys: Keys, table: string, schema: ?string) {
+          return camelCase(
+            `update-${this.tableName(table, schema)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}`
+          );
+        },
+        deleteByKeys(detailedKeys: Keys, table: string, schema: ?string) {
+          return camelCase(
+            `delete-${this.tableName(table, schema)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}`
+          );
+        },
+        updateNode(name: string, _schema: ?string) {
+          return camelCase(`update-${singularizeTable(name)}`);
+        },
+        deleteNode(name: string, _schema: ?string) {
+          return camelCase(`delete-${singularizeTable(name)}`);
+        },
+        updateByKeysInputType(
+          detailedKeys: Keys,
+          name: string,
+          _schema: ?string
+        ) {
+          return upperCamelCase(
+            `update-${singularizeTable(name)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}-input`
+          );
+        },
+        deleteByKeysInputType(
+          detailedKeys: Keys,
+          name: string,
+          _schema: ?string
+        ) {
+          return upperCamelCase(
+            `delete-${singularizeTable(name)}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}-input`
+          );
+        },
+        updateNodeInputType(name: string, _schema: ?string) {
+          return upperCamelCase(`update-${singularizeTable(name)}-input`);
+        },
+        deleteNodeInputType(name: string, _schema: ?string) {
+          return upperCamelCase(`delete-${singularizeTable(name)}-input`);
+        },
+        manyRelationByKeys(
+          detailedKeys: Keys,
+          table: string,
+          schema: ?string,
+          _foreignTable: string,
+          _foreignSchema: ?string
+        ) {
+          return camelCase(
+            `${this.pluralize(
+              this.tableName(table, schema)
+            )}-by-${detailedKeys
+              .map(key => this.column(key.column, key.table, key.schema))
+              .join("-and-")}`
+          );
+        },
+        edge(typeName: string) {
+          return upperCamelCase(`${pluralize(typeName)}-edge`);
+        },
+        edgeField(name: string, _schema: ?string) {
+          return camelCase(`${singularizeTable(name)}-edge`);
+        },
+        connection(typeName: string) {
+          return upperCamelCase(`${this.pluralize(typeName)}-connection`);
+        },
+        scalarFunctionConnection(procName: string, _procSchema: ?string) {
+          return upperCamelCase(`${procName}-connection`);
+        },
+        scalarFunctionEdge(procName: string, _procSchema: ?string) {
+          return upperCamelCase(`${procName}-edge`);
+        },
+        createField(name: string, _schema: ?string) {
+          return camelCase(`create-${singularizeTable(name)}`);
+        },
+        createInputType(name: string, _schema: ?string) {
+          return upperCamelCase(`create-${singularizeTable(name)}-input`);
+        },
+        createPayloadType(name: string, _schema: ?string) {
+          return upperCamelCase(`create-${singularizeTable(name)}-payload`);
+        },
+        updatePayloadType(name: string, _schema: ?string) {
+          return upperCamelCase(`update-${singularizeTable(name)}-payload`);
+        },
+        deletePayloadType(name: string, _schema: ?string) {
+          return upperCamelCase(`delete-${singularizeTable(name)}-payload`);
+        },
       },
-      orderByType(typeName: string) {
-        return upperCamelCase(`${pluralize(typeName)}-order-by`);
-      },
-      orderByEnum(
-        name: string,
-        ascending: boolean,
-        _table: string,
-        _schema: ?string
-      ) {
-        return constantCase(`${name}_${ascending ? "asc" : "desc"}`);
-      },
-      domainType(name: string) {
-        return upperCamelCase(name);
-      },
-      enumName(value: string) {
-        if (value === "") {
-          return "_EMPTY_";
-        }
-        const valueWithAsterisksReplaced = value
-          .replace(/\*/g, "_ASTERISK_")
-          .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
-          .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
-        return valueWithAsterisksReplaced;
-      },
-      enumType(name: string) {
-        return upperCamelCase(name);
-      },
-      conditionType(typeName: string) {
-        return upperCamelCase(`${typeName}-condition`);
-      },
-      inputType(typeName: string) {
-        return upperCamelCase(`${typeName}-input`);
-      },
-      rangeBoundType(typeName: string) {
-        return upperCamelCase(`${typeName}-range-bound`);
-      },
-      rangeType(typeName: string) {
-        return upperCamelCase(`${typeName}-range`);
-      },
-      patchType(typeName: string) {
-        return upperCamelCase(`${typeName}-patch`);
-      },
-      patchField(itemName: string) {
-        return camelCase(`${itemName}-patch`);
-      },
-      tableName(name: string, _schema: ?string) {
-        return camelCase(singularizeTable(name));
-      },
-      tableNode(name: string, _schema: ?string) {
-        return camelCase(singularizeTable(name));
-      },
-      allRows(name: string, schema: ?string) {
-        return camelCase(`all-${this.pluralize(this.tableName(name, schema))}`);
-      },
-      functionName(name: string, _schema: ?string) {
-        return camelCase(name);
-      },
-      functionPayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`${name}-payload`);
-      },
-      functionInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`${name}-input`);
-      },
-      tableType(name: string, schema: ?string) {
-        return upperCamelCase(this.tableName(name, schema));
-      },
-      column(name: string, _table: string, _schema: ?string) {
-        return camelCase(name);
-      },
-      singleRelationByKeys(detailedKeys: Keys, table: string, schema: ?string) {
-        return camelCase(
-          `${this.tableName(table, schema)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
-        );
-      },
-      rowByUniqueKeys(detailedKeys: Keys, table: string, schema: ?string) {
-        return camelCase(
-          `${this.tableName(table, schema)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
-        );
-      },
-      updateByKeys(detailedKeys: Keys, table: string, schema: ?string) {
-        return camelCase(
-          `update-${this.tableName(table, schema)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
-        );
-      },
-      deleteByKeys(detailedKeys: Keys, table: string, schema: ?string) {
-        return camelCase(
-          `delete-${this.tableName(table, schema)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
-        );
-      },
-      updateNode(name: string, _schema: ?string) {
-        return camelCase(`update-${singularizeTable(name)}`);
-      },
-      deleteNode(name: string, _schema: ?string) {
-        return camelCase(`delete-${singularizeTable(name)}`);
-      },
-      updateByKeysInputType(
-        detailedKeys: Keys,
-        name: string,
-        _schema: ?string
-      ) {
-        return upperCamelCase(
-          `update-${singularizeTable(name)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}-input`
-        );
-      },
-      deleteByKeysInputType(
-        detailedKeys: Keys,
-        name: string,
-        _schema: ?string
-      ) {
-        return upperCamelCase(
-          `delete-${singularizeTable(name)}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}-input`
-        );
-      },
-      updateNodeInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`update-${singularizeTable(name)}-input`);
-      },
-      deleteNodeInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`delete-${singularizeTable(name)}-input`);
-      },
-      manyRelationByKeys(
-        detailedKeys: Keys,
-        table: string,
-        schema: ?string,
-        _foreignTable: string,
-        _foreignSchema: ?string
-      ) {
-        return camelCase(
-          `${this.pluralize(
-            this.tableName(table, schema)
-          )}-by-${detailedKeys
-            .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
-        );
-      },
-      edge(typeName: string) {
-        return upperCamelCase(`${pluralize(typeName)}-edge`);
-      },
-      edgeField(name: string, _schema: ?string) {
-        return camelCase(`${singularizeTable(name)}-edge`);
-      },
-      connection(typeName: string) {
-        return upperCamelCase(`${this.pluralize(typeName)}-connection`);
-      },
-      scalarFunctionConnection(procName: string, _procSchema: ?string) {
-        return upperCamelCase(`${procName}-connection`);
-      },
-      scalarFunctionEdge(procName: string, _procSchema: ?string) {
-        return upperCamelCase(`${procName}-edge`);
-      },
-      createField(name: string, _schema: ?string) {
-        return camelCase(`create-${singularizeTable(name)}`);
-      },
-      createInputType(name: string, _schema: ?string) {
-        return upperCamelCase(`create-${singularizeTable(name)}-input`);
-      },
-      createPayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`create-${singularizeTable(name)}-payload`);
-      },
-      updatePayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`update-${singularizeTable(name)}-payload`);
-      },
-      deletePayloadType(name: string, _schema: ?string) {
-        return upperCamelCase(`delete-${singularizeTable(name)}-payload`);
-      },
-    },
-    overrides
+      overrides
+    )
   );
 };
 

@@ -479,9 +479,9 @@ export default (function PgTypesPlugin(
         return reallyEnforceGqlTypeByPgType(type);
       } catch (e) {
         const error = new Error(
-          `Error occurred when processing type '${type.namespaceName}.${
-            type.name
-          }' (type=${type.type}):\n${indent(e.message)}`
+          `Error occurred when processing database type '${
+            type.namespaceName
+          }.${type.name}' (type=${type.type}):\n${indent(e.message)}`
         );
         // $FlowFixMe
         error.originalError = e;
