@@ -44,6 +44,7 @@ program
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('-E, --enable-default-mutation-tables <string>', 'a comma-separated list of tables to enable default mutations, mutation will only be possible for the specified tables', (option: string) => option.split(','))
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
@@ -95,6 +96,7 @@ const {
   classicIds = false,
   dynamicJson = false,
   disableDefaultMutations = false,
+  enableDefaultMutationTables = [],
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
@@ -175,6 +177,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   classicIds,
   dynamicJson,
   disableDefaultMutations,
+  enableDefaultMutationTables,
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
