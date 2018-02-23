@@ -11,8 +11,8 @@
 
 _A GraphQL schema created by reflection over a PostgreSQL schema._
 
-**Stable**: v3 ([`master`](https://github.com/graphile/postgraphile) branch) - maintenance only, called “PostGraphQL”  
-**Next**: v4 ([`postgraphile`](https://github.com/graphile/postgraphile/tree/postgraphile) branch) - renamed to PostGraphile; see [graphile.org](https://graphile.org) for docs
+**Stable**: v3 ([`v3`](https://github.com/graphile/postgraphile/tree/v3) branch) - maintenance only, called “PostGraphQL”  
+**Next**: v4 ([`master`](https://github.com/graphile/postgraphile) branch) - renamed to PostGraphile; see [graphile.org](https://graphile.org) for docs
 
 ---
 
