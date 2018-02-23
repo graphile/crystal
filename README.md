@@ -275,6 +275,24 @@ The specific specs PostGraphile implements are:
 
 ---
 
+## Requirements
+
+We officially only support Node v8.6+; if you require support for an earlier
+version of Node please raise an issue explaining why you can't update to the
+latest Node LTS and we'll wee what we can do.
+
+We officially support PostgreSQL 9.6+, but the tests run against PostgreSQL 9.4
+so all our core functionality should work on that DB too.
+
+We don't have much in the way of support for PG10-only features yet - if you'd
+like to sponsor development of these, please get in touch!
+
+The Graphile suite of tools are developed under Mac OS X and tested under
+Linux, since we're a small project we don't have the resources to ensure strong
+Windows support, however we would like to support that platform so if you have
+any issues related to operating system, please raise an issue or — even better
+— a pull request!
+
 ## Contributing
 
 Want to help testing and developing PostGraphile? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!

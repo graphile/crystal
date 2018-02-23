@@ -3361,14 +3361,14 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@4.0.0-alpha:
-  version "4.0.0-alpha"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-alpha.tgz#551a74eada51ab4fed3406f0c50dc80ba991faa3"
+graphile-build-pg@4.0.0-alpha.1:
+  version "4.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-alpha.1.tgz#7b071e45604dc2e76b18746cb5845935603395fc"
   dependencies:
     babel-runtime ">=6 <7"
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-alpha"
+    graphile-build "4.0.0-alpha.1"
     graphql-iso-date "^3.2.0"
     graphql-type-json "^0.1.4"
     jsonwebtoken "^8.1.1"
@@ -3379,13 +3379,13 @@ graphile-build-pg@4.0.0-alpha:
     pluralize "^5.0.0"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-alpha:
-  version "4.0.0-alpha"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-alpha.tgz#ce1cd53f31e2a974bf0d89c937ca53cc9e4c74de"
+graphile-build@4.0.0-alpha.1:
+  version "4.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-alpha.1.tgz#2a96cfa81e3454dcc1ffe2163763aea3cd1e4bfe"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
-    graphql-parse-resolve-info "4.0.0-alpha"
+    graphql-parse-resolve-info "4.0.0-alpha.1"
 
 graphiql@^0.11.2:
   version "0.11.2"
@@ -3435,9 +3435,9 @@ graphql-language-service-utils@^1.0.16:
     graphql-config "1.0.8"
     graphql-language-service-types "^0.1.14"
 
-graphql-parse-resolve-info@4.0.0-alpha:
-  version "4.0.0-alpha"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-alpha.tgz#c96d7a6e040c38c3062199bb8d360f8494b8e5f3"
+graphql-parse-resolve-info@4.0.0-alpha.1:
+  version "4.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-alpha.1.tgz#62036fe5778719e07260fc3b5ba7099bc10705ad"
   dependencies:
     babel-runtime ">=6 <7"
     debug ">=2 <3"
@@ -6255,13 +6255,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@4.0.0-alpha:
-  version "4.0.0-alpha"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-alpha.tgz#1635135a79e84219c7e773f98820e5c78db8cb87"
+postgraphile-core@4.0.0-alpha.1:
+  version "4.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-alpha.1.tgz#2a6551624cb737835580bd84bfef515be9a668de"
   dependencies:
     babel-runtime ">=6 <7"
-    graphile-build "4.0.0-alpha"
-    graphile-build-pg "4.0.0-alpha"
+    graphile-build "4.0.0-alpha.1"
+    graphile-build-pg "4.0.0-alpha.1"
 
 postgres-array@~1.0.0:
   version "1.0.2"
