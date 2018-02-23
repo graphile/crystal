@@ -53,7 +53,7 @@ For information about how to change these defaults, just run:
 postgraphql --help
 ```
 
-You can also use PostGraphQL as native HTTP, Connect, Express, or Koa middleware. Just import `postgraphql`:
+You can also use PostGraphQL as native HTTP, Connect, Express, or Koa (experimental) middleware. Just import `postgraphql`:
 
 ```js
 import { createServer } from "http";
