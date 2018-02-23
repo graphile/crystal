@@ -5,7 +5,7 @@ cd $(dirname $0)/..
 
 npm_bin=$(npm bin)
 
-export POSTGRAPHQL_ENV=development
+export POSTGRAPHILE_ENV=development
 export DEBUG=${DEBUG-postgraphile*,-postgraphile:graphql,-postgraphile:postgres:explain}
 
 # Run Nodemon and watch the PostGraphile source code for changes.

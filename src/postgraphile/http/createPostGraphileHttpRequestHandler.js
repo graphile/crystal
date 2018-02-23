@@ -30,7 +30,7 @@ const finalHandler = require("finalhandler");
 const bodyParser = require("body-parser");
 const sendFile = require("send");
 
-const { POSTGRAPHQL_ENV } = process.env;
+const { POSTGRAPHILE_ENV } = process.env;
 
 const debugGraphql = new Debugger("postgraphile:graphql");
 const debugRequest = new Debugger("postgraphile:request");
@@ -156,8 +156,8 @@ export default function createPostGraphileHttpRequestHandler(options) {
   // Takes the original GraphiQL HTML file and replaces the default config object.
   const graphiqlHtml = origGraphiqlHtml.then(html =>
     html.replace(
-      /window\.POSTGRAPHQL_CONFIG\s*=\s*\{[^]*\}/,
-      `window.POSTGRAPHQL_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
+      /window\.POSTGRAPHILE_CONFIG\s*=\s*\{[^]*\}/,
+      `window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
         options.watchPg ? "'/_postgraphile/stream'" : "null"
       }}`
     )
@@ -177,7 +177,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     //
     // Always enable CORS when developing PostGraphile because GraphiQL will be
     // on port 5783.
-    if (options.enableCors || POSTGRAPHQL_ENV === "development")
+    if (options.enableCors || POSTGRAPHILE_ENV === "development")
       addCORSHeaders(res);
 
     // ========================================================================
@@ -301,7 +301,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // If this is the GraphiQL route, show GraphiQL and stop execution.
       if (parseUrl(req).pathname === graphiqlRoute) {
         // If we are developing PostGraphile, instead just redirect.
-        if (POSTGRAPHQL_ENV === "development") {
+        if (POSTGRAPHILE_ENV === "development") {
           res.writeHead(302, { Location: "http://localhost:5783" });
           res.end();
           return;

@@ -7,7 +7,7 @@ import {
   GraphQLObjectType,
 } from "graphql";
 
-const { POSTGRAPHQL_CONFIG } = window;
+const { POSTGRAPHILE_CONFIG } = window;
 
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
@@ -26,9 +26,9 @@ class PostGraphiQL extends React.Component {
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
-    if (POSTGRAPHQL_CONFIG.streamUrl) {
+    if (POSTGRAPHILE_CONFIG.streamUrl) {
       // Starts listening to the event stream at the `sourceUrl`.
-      const eventSource = new EventSource(POSTGRAPHQL_CONFIG.streamUrl);
+      const eventSource = new EventSource(POSTGRAPHILE_CONFIG.streamUrl);
 
       // When we get a change notification, we want to update our schema.
       eventSource.addEventListener(
@@ -69,7 +69,7 @@ class PostGraphiQL extends React.Component {
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
   async executeQuery(graphQLParams, { jwtToken } = {}) {
-    const response = await fetch(POSTGRAPHQL_CONFIG.graphqlUrl, {
+    const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: "POST",
       headers: Object.assign(
         {
