@@ -2,20 +2,27 @@
   "name": "postgraphile",
   "version": "4.0.0-alpha2.33",
   "description":
-    "A GraphQL schema created by reflection over a PostgreSQL schema 🐘",
-  "author": "Benjie Gillam <benjie@graphile.org>",
+    "A GraphQL schema created by reflection over a PostgreSQL schema 🐘 (previously known as PostGraphQL)",
+  "author": "Benjie Gillam <benjie@graphile.org> (https://twitter.com/benjie)",
   "license": "MIT",
   "homepage": "https://www.graphile.org/postgraphile/",
   "keywords": [
     "graphql",
     "postgres",
+    "postgresql",
+    "postgraphql",
     "schema",
     "reflection",
     "server",
     "relay",
     "connection",
+    "graphile",
     "graphile-build"
   ],
+  "bugs": {
+    "url": "https://github.com/graphile/postgraphile/issues"
+  },
+  "repository": "github:graphile/postgraphile",
   "main": "build/index.js",
   "bin": {
     "postgraphile": "build/postgraphile/cli.js"
@@ -86,5 +93,8 @@
     "testPathDirs": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": ["build", "resources/favicon.ico"]
+  "files": ["build", "resources/favicon.ico"],
+  "engines": {
+    "node": ">=8.6"
+  }
 }
