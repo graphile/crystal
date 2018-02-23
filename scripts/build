@@ -19,8 +19,8 @@ find build -wholename '*/__tests__/*' -delete
 find build -name '__tests__' -delete
 
 echo "Building GraphiQL"
-(cd src/postgraphql/graphiql && "$npm_bin"/react-scripts build)
+(cd src/postgraphile/graphiql && "$npm_bin"/react-scripts build)
 
 echo "Moving GraphiQL build output"
-mkdir -p build/postgraphql/graphiql/public
-mv src/postgraphql/graphiql/build/* build/postgraphql/graphiql/public
+mkdir -p build/postgraphile/graphiql/public
+mv src/postgraphile/graphiql/build/* build/postgraphile/graphiql/public

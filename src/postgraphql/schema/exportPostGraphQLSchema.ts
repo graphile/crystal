@@ -15,9 +15,9 @@ async function writeFileAsync(
 }
 
 /**
- * Exports a PostGraphQL schema by looking at a Postgres client.
+ * Exports a PostGraphile schema by looking at a Postgres client.
  */
-export default async function exportPostGraphQLSchema(
+export default async function exportPostGraphileSchema(
   schema: GraphQLSchema,
   options: {
     exportJsonSchemaPath?: string,

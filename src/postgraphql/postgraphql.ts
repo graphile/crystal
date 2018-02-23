@@ -3,12 +3,12 @@ import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core'
-import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
-import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
+import createPostGraphileHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphileHttpRequestHandler'
+import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
 import { IncomingMessage, ServerResponse } from 'http'
 import jwt = require('jsonwebtoken')
 
-type PostGraphQLOptions = {
+type PostGraphileOptions = {
   classicIds?: boolean,
   dynamicJson?: boolean,
   graphqlRoute?: string,
@@ -45,11 +45,11 @@ type PostgraphileSchemaBuilder = {
 }
 
 /**
- * Creates a PostGraphQL Http request handler by first introspecting the
+ * Creates a PostGraphile Http request handler by first introspecting the
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, options: PostGraphQLOptions): PostgraphileSchemaBuilder {
+export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, options: PostGraphileOptions): PostgraphileSchemaBuilder {
   // Check for a jwtSecret without a jwtPgTypeIdentifier
   // a secret without a token identifier prevents JWT creation
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
@@ -84,7 +84,7 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
           exportGqlSchema(gqlSchema)
         })
         if (!gqlSchema) {
-          throw new Error('Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
+          throw new Error('Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
         }
       } else {
         gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options)
@@ -100,7 +100,7 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
 
   async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
     try {
-      await exportPostGraphQLSchema(newGqlSchema, options)
+      await exportPostGraphileSchema(newGqlSchema, options)
     }
     // If we fail to export our schema, log the error and exit the process.
     catch (error) {
@@ -108,15 +108,15 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
     }
   }
 }
-export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphileOptions): HttpRequestHandler
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphileOptions): HttpRequestHandler
 export default function postgraphile(
   poolOrConfig?: Pool | PoolConfig | string,
-  schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
-  maybeOptions?: PostGraphQLOptions,
+  schemaOrOptions?: string | Array<string> | PostGraphileOptions,
+  maybeOptions?: PostGraphileOptions,
 ): HttpRequestHandler {
   let schema: string | Array<string>
-  let options: PostGraphQLOptions
+  let options: PostGraphileOptions
 
   // If the second argument is undefined, use defaults for both `schema` and
   // `options`.
@@ -154,7 +154,7 @@ export default function postgraphile(
       )
 
   const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
-  return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
+  return createPostGraphileHttpRequestHandler(Object.assign({}, options, {
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,

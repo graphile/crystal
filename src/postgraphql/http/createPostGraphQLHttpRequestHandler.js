@@ -2,9 +2,9 @@ import {
   join as joinPath,
   resolve as resolvePath,
   relative as relativePath,
-} from 'path'
-import { readFile } from 'fs'
-import { IncomingMessage, ServerResponse } from 'http'
+} from "path";
+import { readFile } from "fs";
+import { IncomingMessage, ServerResponse } from "http";
 import {
   Source,
   parse as parseGraphql,
@@ -13,29 +13,29 @@ import {
   getOperationAST,
   formatError as defaultFormatError,
   print as printGraphql,
-} from 'graphql'
-import { extendedFormatError } from '../extendedFormatError'
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
-import renderGraphiQL from './renderGraphiQL'
-import debugPgClient from './debugPgClient'
-import setupServerSentEvents from './setupServerSentEvents'
-import setupPgClientTransaction from '../setupPgClientTransaction'
-import withPostGraphQLContext from '../withPostGraphQLContext'
+} from "graphql";
+import { extendedFormatError } from "../extendedFormatError";
+import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
+import renderGraphiQL from "./renderGraphiQL";
+import debugPgClient from "./debugPgClient";
+import setupServerSentEvents from "./setupServerSentEvents";
+import setupPgClientTransaction from "../setupPgClientTransaction";
+import withPostGraphileContext from "../withPostGraphileContext";
 
-const chalk = require('chalk')
-const Debugger = require('debug') // tslint:disable-line variable-name
-const httpError = require('http-errors')
-const parseUrl = require('parseurl')
-const finalHandler = require('finalhandler')
-const bodyParser = require('body-parser')
-const sendFile = require('send')
+const chalk = require("chalk");
+const Debugger = require("debug"); // tslint:disable-line variable-name
+const httpError = require("http-errors");
+const parseUrl = require("parseurl");
+const finalHandler = require("finalhandler");
+const bodyParser = require("body-parser");
+const sendFile = require("send");
 
-const { POSTGRAPHQL_ENV } = process.env
+const { POSTGRAPHQL_ENV } = process.env;
 
-const debugGraphql = new Debugger('postgraphql:graphql')
-const debugRequest = new Debugger('postgraphql:request')
+const debugGraphql = new Debugger("postgraphile:graphql");
+const debugRequest = new Debugger("postgraphile:request");
 
-export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
+export const graphiqlDirectory = resolvePath(__dirname, "../graphiql/public");
 
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
@@ -44,11 +44,14 @@ export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
  * @type {Promise<Buffer>}
  */
 const favicon = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
-    if (error) reject(error)
-    else resolve(data)
-  })
-})
+  readFile(
+    resolvePath(__dirname, "../../../resources/favicon.ico"),
+    (error, data) => {
+      if (error) reject(error);
+      else resolve(data);
+    }
+  );
+});
 
 /**
  * The GraphiQL HTML file as a string. We need it to be a string, because we
@@ -57,11 +60,15 @@ const favicon = new Promise((resolve, reject) => {
  * @type {Promise<string>}
  */
 const origGraphiqlHtml = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../graphiql/public/index.html'), 'utf8', (error, data) => {
-    if (error) reject(error)
-    else resolve(data)
-  })
-})
+  readFile(
+    resolvePath(__dirname, "../graphiql/public/index.html"),
+    "utf8",
+    (error, data) => {
+      if (error) reject(error);
+      else resolve(data);
+    }
+  );
+});
 
 /**
  * Creates a GraphQL request handler, this is untyped besides some JSDoc types
@@ -69,39 +76,68 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
  *
  * @param {GraphQLSchema} graphqlSchema
  */
-export default function createPostGraphQLHttpRequestHandler (options) {
-  const { getGqlSchema, pgPool, pgSettings, pgDefaultRole, jwtSecret, jwtAudiences, jwtRole, jwtVerifyOptions, additionalGraphQLContextFromRequest } = options
+export default function createPostGraphileHttpRequestHandler(options) {
+  const {
+    getGqlSchema,
+    pgPool,
+    pgSettings,
+    pgDefaultRole,
+    jwtSecret,
+    jwtAudiences,
+    jwtRole,
+    jwtVerifyOptions,
+    additionalGraphQLContextFromRequest,
+  } = options;
 
-  if (pgDefaultRole && typeof pgSettings === 'function') {
-    throw new Error('pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).')
+  if (pgDefaultRole && typeof pgSettings === "function") {
+    throw new Error(
+      "pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req)."
+    );
   }
-  if (pgDefaultRole && pgSettings && typeof pgSettings === 'object' && Object.keys(pgSettings).map(s => s.toLowerCase()).indexOf('role') >= 0) {
-    throw new Error('pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.')
+  if (
+    pgDefaultRole &&
+    pgSettings &&
+    typeof pgSettings === "object" &&
+    Object.keys(pgSettings)
+      .map(s => s.toLowerCase())
+      .indexOf("role") >= 0
+  ) {
+    throw new Error(
+      "pgDefaultRole cannot be combined with pgSettings.role - please use one or the other."
+    );
   }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
-  const graphqlRoute = options.graphqlRoute || '/graphql'
-  const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null
+  const graphqlRoute = options.graphqlRoute || "/graphql";
+  const graphiqlRoute =
+    options.graphiql === true ? options.graphiqlRoute || "/graphiql" : null;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
-    throw new Error(`Cannot use the same route, '${graphqlRoute}', for both GraphQL and GraphiQL. Please use different routes.`)
+    throw new Error(
+      `Cannot use the same route, '${graphqlRoute}', for both GraphQL and GraphiQL. Please use different routes.`
+    );
 
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
   const formatError = error => {
     // Get the appropriate formatted error object, including any extended error
     // fields if the user wants them.
-    const formattedError = options.extendedErrors && options.extendedErrors.length ?
-      extendedFormatError(error, options.extendedErrors) : defaultFormatError(error)
+    const formattedError =
+      options.extendedErrors && options.extendedErrors.length
+        ? extendedFormatError(error, options.extendedErrors)
+        : defaultFormatError(error);
 
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
     if (options.showErrorStack)
-      formattedError.stack = options.showErrorStack === 'json' ? error.stack.split('\n') : error.stack
+      formattedError.stack =
+        options.showErrorStack === "json"
+          ? error.stack.split("\n")
+          : error.stack;
 
-    return formattedError
-  }
+    return formattedError;
+  };
 
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
@@ -114,14 +150,18 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // Parse URL encoded bodies (forms).
     bodyParser.urlencoded({ extended: false }),
     // Parse `application/graphql` content type bodies as text.
-    bodyParser.text({ type: 'application/graphql' }),
-  ]
+    bodyParser.text({ type: "application/graphql" }),
+  ];
 
   // Takes the original GraphiQL HTML file and replaces the default config object.
-  const graphiqlHtml = origGraphiqlHtml.then(html => html.replace(
-    /window\.POSTGRAPHQL_CONFIG\s*=\s*\{[^]*\}/,
-    `window.POSTGRAPHQL_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${options.watchPg ? '\'/_postgraphql/stream\'' : 'null'}}`,
-  ))
+  const graphiqlHtml = origGraphiqlHtml.then(html =>
+    html.replace(
+      /window\.POSTGRAPHQL_CONFIG\s*=\s*\{[^]*\}/,
+      `window.POSTGRAPHQL_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
+        options.watchPg ? "'/_postgraphile/stream'" : "null"
+      }}`
+    )
+  );
 
   /**
    * The actual request handler. It’s an async function so it will return a
@@ -135,10 +175,10 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     // Add our CORS headers to be good web citizens (there are perf
     // implications though so be careful!)
     //
-    // Always enable CORS when developing PostGraphQL because GraphiQL will be
+    // Always enable CORS when developing PostGraphile because GraphiQL will be
     // on port 5783.
-    if (options.enableCors || POSTGRAPHQL_ENV === 'development')
-      addCORSHeaders(res)
+    if (options.enableCors || POSTGRAPHQL_ENV === "development")
+      addCORSHeaders(res);
 
     // ========================================================================
     // Serve GraphiQL and Related Assets
@@ -151,28 +191,28 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
-      if (parseUrl(req).pathname === '/favicon.ico') {
+      if (parseUrl(req).pathname === "/favicon.ico") {
         // If this is the wrong method, we should let the client know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
-          res.end()
-          return
+        if (!(req.method === "GET" || req.method === "HEAD")) {
+          res.statusCode = req.method === "OPTIONS" ? 200 : 405;
+          res.setHeader("Allow", "GET, HEAD, OPTIONS");
+          res.end();
+          return;
         }
 
         // Otherwise we are good and should pipe the favicon to the browser.
-        res.statusCode = 200
-        res.setHeader('Cache-Control', 'public, max-age=86400')
-        res.setHeader('Content-Type', 'image/x-icon')
+        res.statusCode = 200;
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        res.setHeader("Content-Type", "image/x-icon");
 
         // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end()
-          return
+        if (req.method === "HEAD") {
+          res.end();
+          return;
         }
 
-        res.end(await favicon)
-        return
+        res.end(await favicon);
+        return;
       }
 
       // ======================================================================
@@ -181,51 +221,62 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // Serve the assets for GraphiQL on a namespaced path. This will basically
       // serve up the built GraphiQL directory.
-      if (parseUrl(req).pathname.startsWith('/_postgraphql/graphiql/')) {
+      if (parseUrl(req).pathname.startsWith("/_postgraphile/graphiql/")) {
         // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
-          res.end()
-          return
+        if (!(req.method === "GET" || req.method === "HEAD")) {
+          res.statusCode = req.method === "OPTIONS" ? 200 : 405;
+          res.setHeader("Allow", "GET, HEAD, OPTIONS");
+          res.end();
+          return;
         }
 
-        // Gets the asset path (the path name with the PostGraphQL prefix
+        // Gets the asset path (the path name with the PostGraphile prefix
         // stripped off) and turns it into a real filesystem path
-        const assetPath = resolvePath(joinPath(graphiqlDirectory, parseUrl(req).pathname.slice('/_postgraphql/graphiql/'.length)))
+        const assetPath = resolvePath(
+          joinPath(
+            graphiqlDirectory,
+            parseUrl(req).pathname.slice("/_postgraphile/graphiql/".length)
+          )
+        );
 
         // Figures out the relative path for assetPath within graphiqlDirectory
         // so we can correctly filter 'index.html' and 'asset-manifest.json'
-        const assetPathRelative = relativePath(graphiqlDirectory, assetPath)
+        const assetPathRelative = relativePath(graphiqlDirectory, assetPath);
 
         // Block any attempts at path traversal issues
-        if (assetPath.substr(0, graphiqlDirectory.length) !== graphiqlDirectory || assetPathRelative.substr(0, 2) === '..') {
-          res.statusCode = 403
-          res.end()
-          return
+        if (
+          assetPath.substr(0, graphiqlDirectory.length) !== graphiqlDirectory ||
+          assetPathRelative.substr(0, 2) === ".."
+        ) {
+          res.statusCode = 403;
+          res.end();
+          return;
         }
 
         // Don’t allow certain files generated by `create-react-app` to be
         // inspected.
-        if (assetPathRelative === 'index.html' || assetPathRelative === 'asset-manifest.json') {
-          res.statusCode = 404
-          res.end()
-          return
+        if (
+          assetPathRelative === "index.html" ||
+          assetPathRelative === "asset-manifest.json"
+        ) {
+          res.statusCode = 404;
+          res.end();
+          return;
         }
 
         // Sends the asset at this path. Defaults to a `statusCode` of 200.
-        res.statusCode = 200
+        res.statusCode = 200;
         await new Promise((resolve, reject) => {
           const stream = sendFile(req, assetPathRelative, {
             index: false,
             root: graphiqlDirectory,
-            dotfiles: 'ignore',
+            dotfiles: "ignore",
           })
-            .on('end', resolve)
-            .on('error', reject)
-            .pipe(res)
-        })
-        return
+            .on("end", resolve)
+            .on("error", reject)
+            .pipe(res);
+        });
+        return;
       }
 
       // ======================================================================
@@ -233,14 +284,14 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (parseUrl(req).pathname === '/_postgraphql/stream') {
-        if (req.headers.accept !== 'text/event-stream') {
-          res.statusCode = 405
-          res.end()
-          return
+      if (parseUrl(req).pathname === "/_postgraphile/stream") {
+        if (req.headers.accept !== "text/event-stream") {
+          res.statusCode = 405;
+          res.end();
+          return;
         }
-        setupServerSentEvents(req, res, options)
-        return
+        setupServerSentEvents(req, res, options);
+        return;
       }
 
       // ======================================================================
@@ -249,64 +300,63 @@ export default function createPostGraphQLHttpRequestHandler (options) {
 
       // If this is the GraphiQL route, show GraphiQL and stop execution.
       if (parseUrl(req).pathname === graphiqlRoute) {
-        // If we are developing PostGraphQL, instead just redirect.
-        if (POSTGRAPHQL_ENV === 'development') {
-          res.writeHead(302, { Location: 'http://localhost:5783' })
-          res.end()
-          return
+        // If we are developing PostGraphile, instead just redirect.
+        if (POSTGRAPHQL_ENV === "development") {
+          res.writeHead(302, { Location: "http://localhost:5783" });
+          res.end();
+          return;
         }
 
         // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS')
-          res.end()
-          return
+        if (!(req.method === "GET" || req.method === "HEAD")) {
+          res.statusCode = req.method === "OPTIONS" ? 200 : 405;
+          res.setHeader("Allow", "GET, HEAD, OPTIONS");
+          res.end();
+          return;
         }
 
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
 
         // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end()
-          return
+        if (req.method === "HEAD") {
+          res.end();
+          return;
         }
 
         // Actually renders GraphiQL.
-        res.end(await graphiqlHtml)
-        return
+        res.end(await graphiqlHtml);
+        return;
       }
     }
 
     // Don’t handle any requests if this is not the correct route.
-    if (parseUrl(req).pathname !== graphqlRoute)
-      return next()
+    if (parseUrl(req).pathname !== graphqlRoute) return next();
 
     // ========================================================================
     // Execute GraphQL Queries
     // ========================================================================
 
     // If we didn’t call `next` above, all requests will return 200 by default!
-    res.statusCode = 200
+    res.statusCode = 200;
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
-    if (req.method === 'OPTIONS') {
-      res.statusCode = 200
-      res.end()
-      return
+    if (req.method === "OPTIONS") {
+      res.statusCode = 200;
+      res.end();
+      return;
     }
 
     // The `result` will be used at the very end in our `finally` block.
     // Statements inside the `try` will assign to `result` when they get
     // a result. We also keep track of `params`.
-    let params
-    let result
-    let queryDocumentAst
-    const queryTimeStart = process.hrtime()
-    let pgRole
+    let params;
+    let result;
+    let queryDocumentAst;
+    const queryTimeStart = process.hrtime();
+    let pgRole;
 
-    debugRequest('GraphQL query request has begun.')
+    debugRequest("GraphQL query request has begun.");
 
     // This big `try`/`catch`/`finally` block represents the execution of our
     // GraphQL query. All errors thrown in this block will be returned to the
@@ -314,7 +364,7 @@ export default function createPostGraphQLHttpRequestHandler (options) {
     try {
       // First thing we need to do is get the GraphQL schema for this request.
       // It should never really change unless we are in watch mode.
-      const gqlSchema = await getGqlSchema()
+      const gqlSchema = await getGqlSchema();
 
       // Run all of our middleware by converting them into promises and
       // chaining them together. Remember that if we have a middleware that
@@ -327,19 +377,24 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       //
       // We also run our middleware inside the `try` so that we get the GraphQL
       // error reporting style for syntax errors.
-      await bodyParserMiddlewares.reduce((promise, middleware) => (
-        promise.then(() => new Promise((resolve, reject) => {
-          middleware(req, res, error => {
-            if (error) reject(error)
-            else resolve()
-          })
-        }))
-      ), Promise.resolve())
+      await bodyParserMiddlewares.reduce(
+        (promise, middleware) =>
+          promise.then(
+            () =>
+              new Promise((resolve, reject) => {
+                middleware(req, res, error => {
+                  if (error) reject(error);
+                  else resolve();
+                });
+              })
+          ),
+        Promise.resolve()
+      );
 
       // If this is not one of the correct methods, throw an error.
-      if (req.method !== 'POST') {
-        res.setHeader('Allow', 'POST, OPTIONS')
-        throw httpError(405, 'Only `POST` requests are allowed.')
+      if (req.method !== "POST") {
+        res.setHeader("Allow", "POST, OPTIONS");
+        throw httpError(405, "Only `POST` requests are allowed.");
       }
 
       // Get the parameters we will use to run a GraphQL request. `params` may
@@ -349,137 +404,173 @@ export default function createPostGraphQLHttpRequestHandler (options) {
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      params = typeof req.body === 'string' ? { query: req.body } : req.body
+      params = typeof req.body === "string" ? { query: req.body } : req.body;
 
       // Validate our params object a bit.
-      if (params == null) throw httpError(400, 'Must provide an object parameters, not nullish value.')
-      if (typeof params !== 'object') throw httpError(400, `Expected parameter object, not value of type '${typeof params}'.`)
-      if (Array.isArray(params)) throw httpError(501, 'Batching queries as an array is currently unsupported. Please provide a single query object.')
-      if (!params.query) throw httpError(400, 'Must provide a query string.')
+      if (params == null)
+        throw httpError(
+          400,
+          "Must provide an object parameters, not nullish value."
+        );
+      if (typeof params !== "object")
+        throw httpError(
+          400,
+          `Expected parameter object, not value of type '${typeof params}'.`
+        );
+      if (Array.isArray(params))
+        throw httpError(
+          501,
+          "Batching queries as an array is currently unsupported. Please provide a single query object."
+        );
+      if (!params.query) throw httpError(400, "Must provide a query string.");
 
       // If variables is a string, we assume it is a JSON string and that it
       // needs to be parsed.
-      if (typeof params.variables === 'string') {
+      if (typeof params.variables === "string") {
         // If variables is just an empty string, we should set it to null and
         // ignore it.
-        if (params.variables === '') {
-          params.variables = null
-        }
-        // Otherwise, let us try to parse it as JSON.
-        else {
+        if (params.variables === "") {
+          params.variables = null;
+        } else {
+          // Otherwise, let us try to parse it as JSON.
           try {
-            params.variables = JSON.parse(params.variables)
-          }
-          catch (error) {
-            error.statusCode = 400
-            throw error
+            params.variables = JSON.parse(params.variables);
+          } catch (error) {
+            error.statusCode = 400;
+            throw error;
           }
         }
       }
 
       // Throw an error if `variables` is not an object.
-      if (params.variables != null && typeof params.variables !== 'object')
-        throw httpError(400, `Variables must be an object, not '${typeof params.variables}'.`)
+      if (params.variables != null && typeof params.variables !== "object")
+        throw httpError(
+          400,
+          `Variables must be an object, not '${typeof params.variables}'.`
+        );
 
       // Throw an error if `operationName` is not a string.
-      if (params.operationName != null && typeof params.operationName !== 'string')
-        throw httpError(400, `Operation name must be a string, not '${typeof params.operationName}'.`)
+      if (
+        params.operationName != null &&
+        typeof params.operationName !== "string"
+      )
+        throw httpError(
+          400,
+          `Operation name must be a string, not '${typeof params.operationName}'.`
+        );
 
-      const source = new Source(params.query, 'GraphQL Http Request')
+      const source = new Source(params.query, "GraphQL Http Request");
 
       // Catch an errors while parsing so that we can set the `statusCode` to
       // 400. Otherwise we don’t need to parse this way.
       try {
-        queryDocumentAst = parseGraphql(source)
-      }
-      catch (error) {
-        res.statusCode = 400
-        throw error
+        queryDocumentAst = parseGraphql(source);
+      } catch (error) {
+        res.statusCode = 400;
+        throw error;
       }
 
-      debugRequest('GraphQL query is parsed.')
+      debugRequest("GraphQL query is parsed.");
 
       // Validate our GraphQL query using given rules.
       // TODO: Add a complexity GraphQL rule.
-      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst)
+      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst);
 
       // If we have some validation errors, don’t execute the query. Instead
       // send the errors to the client with a `400` code.
       if (validationErrors.length > 0) {
-        res.statusCode = 400
-        result = { errors: validationErrors }
-        return
+        res.statusCode = 400;
+        result = { errors: validationErrors };
+        return;
       }
 
-      debugRequest('GraphQL query is validated.')
+      debugRequest("GraphQL query is validated.");
 
       // Lazily log the query. If this debugger isn’t enabled, don’t run it.
       if (debugGraphql.enabled)
-        debugGraphql(printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim())
+        debugGraphql(
+          printGraphql(queryDocumentAst)
+            .replace(/\s+/g, " ")
+            .trim()
+        );
 
-      const jwtToken = options.jwtSecret ? getJwtToken(req) : null
+      const jwtToken = options.jwtSecret ? getJwtToken(req) : null;
 
-      const additionalContext = typeof additionalGraphQLContextFromRequest === 'function'
-        ? await additionalGraphQLContextFromRequest(req, res)
-        : {}
-      result = await withPostGraphQLContext({
-        pgPool,
-        jwtToken,
-        jwtSecret,
-        jwtAudiences,
-        jwtRole,
-        jwtVerifyOptions,
-        pgDefaultRole,
-        pgSettings:
-          typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
-      }, context => {
-        pgRole = context.pgRole
-        const graphqlContext = Object.assign({}, additionalContext, context)
-        return executeGraphql(
-          gqlSchema,
-          queryDocumentAst,
-          null,
-          graphqlContext,
-          params.variables,
-          params.operationName,
-        )
-      })
-    }
-    catch (error) {
+      const additionalContext =
+        typeof additionalGraphQLContextFromRequest === "function"
+          ? await additionalGraphQLContextFromRequest(req, res)
+          : {};
+      result = await withPostGraphileContext(
+        {
+          pgPool,
+          jwtToken,
+          jwtSecret,
+          jwtAudiences,
+          jwtRole,
+          jwtVerifyOptions,
+          pgDefaultRole,
+          pgSettings:
+            typeof pgSettings === "function"
+              ? await pgSettings(req)
+              : pgSettings,
+        },
+        context => {
+          pgRole = context.pgRole;
+          const graphqlContext = Object.assign({}, additionalContext, context);
+          return executeGraphql(
+            gqlSchema,
+            queryDocumentAst,
+            null,
+            graphqlContext,
+            params.variables,
+            params.operationName
+          );
+        }
+      );
+    } catch (error) {
       // Set our status code and send the client our results!
-      if (res.statusCode === 200) res.statusCode = error.status || error.statusCode || 500
-      result = { errors: [error] }
+      if (res.statusCode === 200)
+        res.statusCode = error.status || error.statusCode || 500;
+      result = { errors: [error] };
 
       // If the status code is 500, let’s log our error.
       if (res.statusCode === 500)
         // tslint:disable-next-line no-console
-        console.error(error.stack)
-    }
-    // Finally, we send the client the contents of `result`.
-    finally {
-      debugRequest('GraphQL query has been executed.')
+        console.error(error.stack);
+    } finally {
+      // Finally, we send the client the contents of `result`.
+      debugRequest("GraphQL query has been executed.");
       // Format our errors so the client doesn’t get the full thing.
       if (result && result.errors)
-        result.errors = result.errors.map(formatError)
+        result.errors = result.errors.map(formatError);
 
-      res.setHeader('Content-Type', 'application/json; charset=utf-8')
-      res.end(JSON.stringify(result))
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify(result));
 
-      debugRequest('GraphQL query request finished.')
+      debugRequest("GraphQL query request finished.");
 
       // Log the query. If this debugger isn’t enabled, don’t run it.
       if (queryDocumentAst && !options.disableQueryLog) {
-        const prettyQuery = printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim()
-        const errorCount = (result.errors || []).length
-        const timeDiff = process.hrtime(queryTimeStart)
-        const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
+        const prettyQuery = printGraphql(queryDocumentAst)
+          .replace(/\s+/g, " ")
+          .trim();
+        const errorCount = (result.errors || []).length;
+        const timeDiff = process.hrtime(queryTimeStart);
+        const ms =
+          Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100;
 
         // If we have enabled the query log for the Http handler, use that.
         // tslint:disable-next-line no-console
-        console.log(`${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''}in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`)
+        console.log(
+          `${chalk[errorCount === 0 ? "green" : "red"](
+            `${errorCount} error(s)`
+          )} ${
+            pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ""
+          }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`
+        );
       }
     }
-  }
+  };
 
   /**
    * A polymorphic request handler that should detect what `http` framework is
@@ -495,33 +586,34 @@ export default function createPostGraphQLHttpRequestHandler (options) {
   return (a, b, c) => {
     // If are arguments look like the arguments to koa middleware, this is
     // `koa` middleware.
-    if (a.req && a.res && typeof b === 'function') {
+    if (a.req && a.res && typeof b === "function") {
       // Set the correct `koa` variable names…
-      const ctx = a
-      const next = b
+      const ctx = a;
+      const next = b;
 
       // Execute our request handler. If an error is thrown, we don’t call
       // `next` with an error. Instead we return the promise and let `koa`
       // handle the error.
-      return requestHandler(ctx.req, ctx.res, next)
-    }
-    else {
+      return requestHandler(ctx.req, ctx.res, next);
+    } else {
       // Set the correct `connect` style variable names. If there was no `next`
       // defined (likely the case if the client is using `http`) we use the
       // final handler.
-      const req = a
-      const res = b
-      const next = c || finalHandler(req, res)
+      const req = a;
+      const res = b;
+      const next = c || finalHandler(req, res);
 
       // Execute our request handler.
       requestHandler(req, res, next).then(
         // If the request was fulfilled, noop.
-        () => { /* noop */ },
+        () => {
+          /* noop */
+        },
         // If the request errored out, call `next` with the error.
-        error => next(error),
-      )
+        error => next(error)
+      );
     }
-  }
+  };
 }
 
 /**
@@ -536,22 +628,25 @@ export default function createPostGraphQLHttpRequestHandler (options) {
  *
  * [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
  */
-function addCORSHeaders (res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Request-Method', 'HEAD, GET, POST')
-  res.setHeader('Access-Control-Allow-Headers', [
-    'Origin',
-    'X-Requested-With',
-    // Used by `express-graphql` to determine whether to expose the GraphiQL
-    // interface (`text/html`) or not.
-    'Accept',
-    // Used by PostGraphQL for auth purposes.
-    'Authorization',
-    // The `Content-*` headers are used when making requests with a body,
-    // like in a POST request.
-    'Content-Type',
-    'Content-Length',
-  ].join(', '))
+function addCORSHeaders(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Request-Method", "HEAD, GET, POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    [
+      "Origin",
+      "X-Requested-With",
+      // Used by `express-graphql` to determine whether to expose the GraphiQL
+      // interface (`text/html`) or not.
+      "Accept",
+      // Used by PostGraphile for auth purposes.
+      "Authorization",
+      // The `Content-*` headers are used when making requests with a body,
+      // like in a POST request.
+      "Content-Type",
+      "Content-Length",
+    ].join(", ")
+  );
 }
 
 /**
@@ -568,7 +663,7 @@ function addCORSHeaders (res) {
  *
  * @private
  */
-const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
+const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i;
 
 /**
  * Gets the JWT token from the Http request’s headers. Specifically the
@@ -580,20 +675,22 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i
  * @param {IncomingMessage} request
  * @returns {string | null}
  */
-function getJwtToken (request) {
-  const { authorization } = request.headers
+function getJwtToken(request) {
+  const { authorization } = request.headers;
 
   // If there was no authorization header, just return null.
-  if (authorization == null)
-    return null
+  if (authorization == null) return null;
 
-  const match = authorizationBearerRex.exec(authorization)
+  const match = authorizationBearerRex.exec(authorization);
 
   // If we did not match the authorization header with our expected format,
   // throw a 400 error.
   if (!match)
-    throw httpError(400, 'Authorization header is not of the correct bearer scheme format.')
+    throw httpError(
+      400,
+      "Authorization header is not of the correct bearer scheme format."
+    );
 
   // Return the token from our match.
-  return match[1]
+  return match[1];
 }

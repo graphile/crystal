@@ -7,7 +7,7 @@ import chalk = require('chalk')
 import program = require('commander')
 import jwt = require('jsonwebtoken')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import postgraphql, { getPostgraphileSchemaBuilder } from './postgraphql'
+import postgraphile, { getPostgraphileSchemaBuilder } from './postgraphile'
 import { Pool } from 'pg'
 
 // tslint:disable no-console
@@ -30,7 +30,7 @@ program
   .version(manifest.version)
   .usage('[options...]')
   .description(manifest.description)
-  // .option('-d, --demo', 'run PostGraphQL using the demo database connection')
+  // .option('-d, --demo', 'run PostGraphile using the demo database connection')
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment, example: postgres://user:password@domain:port/db')
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
   .option('-w, --watch', 'watches the Postgres schema for changes and reruns introspection if a change was detected')
@@ -51,7 +51,7 @@ program
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
   .option('--jwt-verify-algorithms <string>', 'a comma separated list of the names of the allowed jwt token algorithms', (option: string) => option.split(','))
-  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphql`', (option: string) => option.split(','))
+  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphile`', (option: string) => option.split(','))
   .option('--jwt-verify-clock-tolerance <number>', 'number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers', parseFloat)
   .option('--jwt-verify-id <string>', 'the name of the allowed jwt token id')
   .option('--jwt-verify-ignore-expiration', 'if `true` do not validate the expiration of the token defaults to `false`')
@@ -74,8 +74,8 @@ program
 program.on('--help', () => console.log(`
   Get Started:
 
-    $ postgraphql --demo
-    $ postgraphql --schema my_schema
+    $ postgraphile --demo
+    $ postgraphile --schema my_schema
 `.slice(1)))
 
 program.parse(process.argv)
@@ -256,7 +256,7 @@ if (noServer) {
   )
 } else {
   // Create’s our PostGraphile server
-  const server = createServer(postgraphql(pgConfig, schemas, postgraphileOptions))
+  const server = createServer(postgraphile(pgConfig, schemas, postgraphileOptions))
 
   // Start our server by listening to a specific port and host name. Also log
   // some instructions and other interesting information.
@@ -264,7 +264,7 @@ if (noServer) {
     console.log('')
     console.log(`PostGraphile server listening on port ${chalk.underline(server.address().port.toString())} 🚀`)
     console.log('')
-    console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
+    console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphile_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
     console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
     console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
 

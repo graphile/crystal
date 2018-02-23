@@ -1,15 +1,16 @@
-import { postgraphql, createPostGraphQLSchema, watchPostGraphQLSchema, withPostGraphQLContext } from './postgraphql'
+import { postgraphile, createPostGraphileSchema, watchPostGraphileSchema, withPostGraphileContext } from './postgraphile'
 
-export default postgraphql
+export default postgraphile
 
 export {
-  postgraphql,
-  createPostGraphQLSchema,
-  watchPostGraphQLSchema,
-  withPostGraphQLContext,
+  postgraphile,
+  createPostGraphileSchema,
+  watchPostGraphileSchema,
+  withPostGraphileContext,
 
-  postgraphql as postgraphile,
-  createPostGraphQLSchema as createPostGraphileSchema,
-  watchPostGraphQLSchema as watchPostGraphileSchema,
-  withPostGraphQLContext as withPostGraphileContext,
+  // Backwards compatability
+  postgraphile as postgraphql,
+  createPostGraphileSchema as createPostGraphQLSchema,
+  watchPostGraphileSchema as watchPostGraphQLSchema,
+  withPostGraphileContext as withPostGraphQLContext,
 }

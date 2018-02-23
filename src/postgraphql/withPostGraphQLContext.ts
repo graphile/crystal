@@ -6,14 +6,14 @@ import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 
 /**
- * Creates a PostGraphQL context object which should be passed into a GraphQL
+ * Creates a PostGraphile context object which should be passed into a GraphQL
  * execution. This function will also connect a client from a Postgres pool and
  * setup a transaction in that client.
  *
  * This function is intended to wrap a call to GraphQL-js execution like so:
  *
  * ```js
- * const result = await withPostGraphQLContext({
+ * const result = await withPostGraphileContext({
  *   pgPool,
  *   jwtToken,
  *   jwtSecret,
@@ -30,7 +30,7 @@ import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
  * });
  * ```
  */
-export default async function withPostGraphQLContext(
+export default async function withPostGraphileContext(
   {
     pgPool,
     jwtToken,
@@ -134,7 +134,7 @@ async function setupPgClientTransaction({
         throw new Error(`Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`)
 
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
-        audience: jwtAudiences || ['postgraphql'],
+        audience: jwtAudiences || ['postgraphile'],
         ...jwtVerifyOptions,
       })
 
@@ -208,8 +208,8 @@ async function setupPgClientTransaction({
 
 const $$pgClientOrigQuery = Symbol()
 
-const debugPg = createDebugger('postgraphql:postgres')
-const debugPgError = createDebugger('postgraphql:postgres:error')
+const debugPg = createDebugger('postgraphile:postgres')
+const debugPgError = createDebugger('postgraphile:postgres:error')
 
 /**
  * Adds debug logging funcionality to a Postgres client.

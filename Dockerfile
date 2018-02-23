@@ -1,9 +1,9 @@
 FROM node:alpine
-LABEL description="A GraphQL API created by reflection over a PostgreSQL schmea https://github.com/postgraphql/postgraphql"
+LABEL description="A GraphQL API created by reflection over a PostgreSQL schmea https://github.com/graphile/postgraphile"
 
-# alpine linux standard doesn't include bash, and postgraphql scripts have #! bash
-COPY . /postgraphql
-WORKDIR /postgraphql
+# alpine linux standard doesn't include bash, and postgraphile scripts have #! bash
+COPY . /postgraphile
+WORKDIR /postgraphile
 
 
 # Temporary pin of graphql to less than 0.12 in package.json
@@ -13,8 +13,8 @@ RUN apk add --update bash && rm -rf /var/cache/apk/* && \
     npm install && \
     scripts/build && \
     npm pack && \
-    npm install -g postgraphql-*.tgz && \
-    rm -rf /postgraphql
+    npm install -g postgraphile-*.tgz && \
+    rm -rf /postgraphile
 
 EXPOSE 5000
-ENTRYPOINT ["postgraphql", "-n", "0.0.0.0"]
+ENTRYPOINT ["postgraphile", "-n", "0.0.0.0"]

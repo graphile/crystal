@@ -18,7 +18,7 @@
   ],
   "main": "build/index.js",
   "bin": {
-    "postgraphile": "build/postgraphql/cli.js"
+    "postgraphile": "build/postgraphile/cli.js"
   },
   "scripts": {
     "build": "./scripts/build",
