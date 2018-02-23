@@ -239,8 +239,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect({
           errors: [
             {
-              message:
-                "Syntax Error GraphQL Http Request (1:2) Expected Name, found <EOF>\n\n1: {\n    ^\n",
+              message: "Syntax Error: Expected Name, found <EOF>",
               locations: [{ line: 1, column: 2 }],
             },
           ],
