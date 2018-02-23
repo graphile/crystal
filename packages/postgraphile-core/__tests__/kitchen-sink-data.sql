@@ -8,6 +8,20 @@ insert into c.person (id, name, email, about, created_at) values
 
 alter sequence c.person_id_seq restart with 10;
 
+insert into c.person_secret (person_id, secret) values
+  (2, 'Sara Smith is not really my name!'),
+  (3, 'I once got stuck trying to retrieve something embarassing from between two panes of glass'),
+  (5, 'My only secret is that I have no secrets!'),
+  (6, 'I don''t think the bug I test for will ever return!');
+
+insert into c.left_arm (id, person_id, length_in_metres) values
+  (42, 4, 0.60),
+  (45, 2, 0.70),
+  (47, 5, 0.65),
+  (50, 1, 0.65);
+
+alter sequence c.left_arm_id_seq restart with 100;
+
 insert into a.post (id, author_id, headline) values
   (1, 2, 'No… It’s a thing; it’s like a plan, but with more greatness.'),
   (2, 1, 'I hate yogurt. It’s just stuff with bits in.'),

@@ -1041,6 +1041,153 @@ Object {
 }
 `;
 
+exports[`one-to-one-backward.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "firstName": "John",
+            "id": 1,
+            "leftArm": Object {
+              "id": 50,
+              "lengthInMetres": 0.65,
+              "nodeId": "WyJsZWZ0X2FybXMiLDUwXQ==",
+              "personByPersonId": Object {
+                "firstName": "John",
+                "id": 1,
+                "name": "John Smith",
+              },
+              "personId": 1,
+            },
+            "name": "John Smith",
+            "secret": null,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "firstName": "Sara",
+            "id": 2,
+            "leftArm": Object {
+              "id": 45,
+              "lengthInMetres": 0.7,
+              "nodeId": "WyJsZWZ0X2FybXMiLDQ1XQ==",
+              "personByPersonId": Object {
+                "firstName": "Sara",
+                "id": 2,
+                "name": "Sara Smith",
+              },
+              "personId": 2,
+            },
+            "name": "Sara Smith",
+            "secret": Object {
+              "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsMl0=",
+              "personByPersonId": Object {
+                "firstName": "Sara",
+                "id": 2,
+                "name": "Sara Smith",
+              },
+              "personId": 2,
+              "secret": "Sara Smith is not really my name!",
+            },
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "firstName": "Budd",
+            "id": 3,
+            "leftArm": null,
+            "name": "Budd Deey",
+            "secret": Object {
+              "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+              "personByPersonId": Object {
+                "firstName": "Budd",
+                "id": 3,
+                "name": "Budd Deey",
+              },
+              "personId": 3,
+              "secret": "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+            },
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "firstName": "Kathryn",
+            "id": 4,
+            "leftArm": Object {
+              "id": 42,
+              "lengthInMetres": 0.6,
+              "nodeId": "WyJsZWZ0X2FybXMiLDQyXQ==",
+              "personByPersonId": Object {
+                "firstName": "Kathryn",
+                "id": 4,
+                "name": "Kathryn Ramirez",
+              },
+              "personId": 4,
+            },
+            "name": "Kathryn Ramirez",
+            "secret": null,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "firstName": "Joe",
+            "id": 5,
+            "leftArm": Object {
+              "id": 47,
+              "lengthInMetres": 0.65,
+              "nodeId": "WyJsZWZ0X2FybXMiLDQ3XQ==",
+              "personByPersonId": Object {
+                "firstName": "Joe",
+                "id": 5,
+                "name": "Joe Tucker",
+              },
+              "personId": 5,
+            },
+            "name": "Joe Tucker",
+            "secret": Object {
+              "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsNV0=",
+              "personByPersonId": Object {
+                "firstName": "Joe",
+                "id": 5,
+                "name": "Joe Tucker",
+              },
+              "personId": 5,
+              "secret": "My only secret is that I have no secrets!",
+            },
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "firstName": "Twenty",
+            "id": 6,
+            "leftArm": null,
+            "name": "Twenty Seventwo",
+            "secret": Object {
+              "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsNl0=",
+              "personByPersonId": Object {
+                "firstName": "Twenty",
+                "id": 6,
+                "name": "Twenty Seventwo",
+              },
+              "personId": 6,
+              "secret": "I don't think the bug I test for will ever return!",
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`posts.graphql 1`] = `
 Object {
   "data": Object {

@@ -29,6 +29,23 @@ create table c.person (
   created_at timestamp default current_timestamp
 );
 
+-- This is to test that "one-to-one" relationships work on primary keys
+create table c.person_secret (
+  person_id int not null primary key references c.person on delete cascade,
+  secret text
+);
+
+comment on table c.person_secret is 'Tracks the person''s secret';
+
+-- This is to test that "one-to-one" relationships also work on unique keys
+create table c.left_arm (
+  id serial primary key,
+  person_id int not null unique references c.person on delete cascade,
+  length_in_metres float
+);
+
+comment on table c.left_arm is 'Tracks metadata about the left arms of various people';
+
 -- This should not add a query to the schema
 create unique index uniq_person__email_id_3 on c.person (email) where (id = 3);
 

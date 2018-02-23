@@ -44,6 +44,7 @@ type PostGraphQLOptions = {
   readCache?: string,
   writeCache?: string,
   setWriteCacheCallback?: (fn: () => Promise<void>) => void,
+  legacyRelations?: "only" | "deprecated",
 };
 
 type PgConfig = Client | Pool | string;
@@ -84,8 +85,10 @@ const getPostGraphQLBuilder = async (
   schemas,
   options: PostGraphQLOptions = {}
 ) => {
-  const { dynamicJson, classicIds, nodeIdFieldName } = options;
   const {
+    dynamicJson,
+    classicIds,
+    nodeIdFieldName,
     replaceAllPlugins,
     appendPlugins = [],
     prependPlugins = [],
@@ -102,7 +105,18 @@ const getPostGraphQLBuilder = async (
     readCache,
     writeCache,
     setWriteCacheCallback,
+    legacyRelations = "deprecated", // TODO: Change to 'omit' in v5
   } = options;
+
+  if (
+    legacyRelations &&
+    ["only", "deprecated", "omit"].indexOf(legacyRelations) < 0
+  ) {
+    throw new Error(
+      "Invalid configuration for legacy relations: " +
+        JSON.stringify(legacyRelations)
+    );
+  }
   if (replaceAllPlugins) {
     ensureValidPlugins("replaceAllPlugins", replaceAllPlugins);
     if (
@@ -201,6 +215,7 @@ const getPostGraphQLBuilder = async (
         pgDisableDefaultMutations: disableDefaultMutations,
         pgViewUniqueKey: viewUniqueKey,
         pgEnableTags: enableTags,
+        pgLegacyRelations: legacyRelations,
         persistentMemoizeWithKey,
       },
       graphileBuildOptions,

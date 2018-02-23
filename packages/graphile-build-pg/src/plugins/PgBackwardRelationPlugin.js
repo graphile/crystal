@@ -7,10 +7,19 @@ import type { Plugin } from "graphile-build";
 
 const debug = debugFactory("graphile-build-pg");
 
+const OMIT = 0;
+const DEPRECATED = 1;
+const ONLY = 2;
+
 export default (function PgBackwardRelationPlugin(
   builder,
-  { pgInflection: inflection }
+  { pgInflection: inflection, pgLegacyRelations }
 ) {
+  const legacyRelationMode =
+    {
+      only: ONLY,
+      deprecated: DEPRECATED,
+    }[pgLegacyRelations] || OMIT;
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -59,6 +68,10 @@ export default (function PgBackwardRelationPlugin(
           }
           const foreignTable =
             introspectionResultsByKind.classById[constraint.foreignClassId];
+          const foreignTableTypeName = inflection.tableType(
+            foreignTable.name,
+            foreignTable.namespace.name
+          );
           const gqlForeignTableType = pgGetGqlTypeByTypeId(
             foreignTable.type.id
           );
@@ -92,19 +105,42 @@ export default (function PgBackwardRelationPlugin(
           if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
             throw new Error("Could not find key columns!");
           }
+          const singleKey = keys.length === 1 ? keys[0] : null;
+          const isUnique = !!(
+            singleKey &&
+            introspectionResultsByKind.constraint.find(
+              c =>
+                c.classId === singleKey.classId &&
+                c.keyAttributeNums.length === 1 &&
+                c.keyAttributeNums[0] === singleKey.num &&
+                (c.type === "p" || c.type === "u")
+            )
+          );
+
+          const isDeprecated = isUnique && legacyRelationMode === DEPRECATED;
 
           const simpleKeys = keys.map(k => ({
             column: k.name,
             table: k.class.name,
             schema: k.class.namespace.name,
           }));
-          const fieldName = inflection.manyRelationByKeys(
+          const manyRelationFieldName = inflection.manyRelationByKeys(
             simpleKeys,
             table.name,
             table.namespace.name,
             foreignTable.name,
             foreignTable.namespace.name
           );
+          const singleRelationFieldName = isUnique
+            ? inflection.singleRelationByKeys(
+                simpleKeys,
+                table.name,
+                table.namespace.name,
+                foreignTable.name,
+                foreignTable.namespace.name
+              )
+            : null;
+
           const primaryKeyConstraint = introspectionResultsByKind.constraint
             .filter(con => con.classId === table.id)
             .filter(con => con.type === "p")[0];
@@ -114,82 +150,151 @@ export default (function PgBackwardRelationPlugin(
               num => attributes.filter(attr => attr.num === num)[0]
             );
 
-          memo[fieldName] = fieldWithHooks(
-            fieldName,
-            ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
-              addDataGenerator(parsedResolveInfoFragment => {
-                return {
-                  pgQuery: queryBuilder => {
-                    queryBuilder.select(() => {
-                      const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment,
-                        ConnectionType
-                      );
-                      const tableAlias = sql.identifier(Symbol());
-                      const foreignTableAlias = queryBuilder.getTableAlias();
-                      const query = queryFromResolveData(
-                        sql.identifier(schema.name, table.name),
-                        tableAlias,
-                        resolveData,
-                        {
-                          withPagination: true,
-                          withPaginationAsFields: false,
-                        },
-                        innerQueryBuilder => {
-                          if (primaryKeys) {
-                            innerQueryBuilder.beforeLock("orderBy", () => {
-                              // append order by primary key to the list of orders
-                              if (!innerQueryBuilder.isOrderUnique(false)) {
-                                innerQueryBuilder.data.cursorPrefix = [
-                                  "primary_key_asc",
-                                ];
-                                primaryKeys.forEach(key => {
-                                  innerQueryBuilder.orderBy(
-                                    sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
-                                      key.name
-                                    )}`,
-                                    true
-                                  );
-                                });
-                                innerQueryBuilder.setOrderIsUnique();
-                              }
+          const shouldAddSingleRelation =
+            isUnique && legacyRelationMode !== ONLY;
+
+          const shouldAddManyRelation =
+            !isUnique ||
+            legacyRelationMode === DEPRECATED ||
+            legacyRelationMode === ONLY;
+
+          if (shouldAddSingleRelation) {
+            memo[singleRelationFieldName] = fieldWithHooks(
+              singleRelationFieldName,
+              ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+                addDataGenerator(parsedResolveInfoFragment => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(() => {
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment,
+                          gqlTableType
+                        );
+                        const tableAlias = sql.identifier(Symbol());
+                        const foreignTableAlias = queryBuilder.getTableAlias();
+                        const query = queryFromResolveData(
+                          sql.identifier(schema.name, table.name),
+                          tableAlias,
+                          resolveData,
+                          {
+                            asJson: true,
+                            addNullCase: true,
+                            withPagination: false,
+                          },
+                          innerQueryBuilder => {
+                            keys.forEach((key, i) => {
+                              innerQueryBuilder.where(
+                                sql.fragment`${tableAlias}.${sql.identifier(
+                                  key.name
+                                )} = ${foreignTableAlias}.${sql.identifier(
+                                  foreignKeys[i].name
+                                )}`
+                              );
                             });
                           }
-
-                          keys.forEach((key, i) => {
-                            innerQueryBuilder.where(
-                              sql.fragment`${tableAlias}.${sql.identifier(
-                                key.name
-                              )} = ${foreignTableAlias}.${sql.identifier(
-                                foreignKeys[i].name
-                              )}`
-                            );
-                          });
-                        }
-                      );
-                      return sql.fragment`(${query})`;
-                    }, parsedResolveInfoFragment.alias);
+                        );
+                        return sql.fragment`(${query})`;
+                      }, parsedResolveInfoFragment.alias);
+                    },
+                  };
+                });
+                return {
+                  description: `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
+                  type: gqlTableType,
+                  args: {},
+                  resolve: (data, _args, _context, resolveInfo) => {
+                    const alias = getAliasFromResolveInfo(resolveInfo);
+                    return data[alias];
                   },
                 };
-              });
-              const ConnectionType = getTypeByName(
-                inflection.connection(gqlTableType.name)
-              );
-              return {
-                description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
-                type: new GraphQLNonNull(ConnectionType),
-                args: {},
-                resolve: (data, _args, _context, resolveInfo) => {
-                  const alias = getAliasFromResolveInfo(resolveInfo);
-                  return addStartEndCursor(data[alias]);
-                },
-              };
-            },
-            {
-              isPgFieldConnection: true,
-              pgFieldIntrospection: table,
-            }
-          );
+              },
+              {
+                pgFieldIntrospection: table,
+              }
+            );
+          }
+          if (shouldAddManyRelation) {
+            memo[manyRelationFieldName] = fieldWithHooks(
+              manyRelationFieldName,
+              ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+                addDataGenerator(parsedResolveInfoFragment => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(() => {
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment,
+                          ConnectionType
+                        );
+                        const tableAlias = sql.identifier(Symbol());
+                        const foreignTableAlias = queryBuilder.getTableAlias();
+                        const query = queryFromResolveData(
+                          sql.identifier(schema.name, table.name),
+                          tableAlias,
+                          resolveData,
+                          {
+                            withPagination: true,
+                            withPaginationAsFields: false,
+                          },
+                          innerQueryBuilder => {
+                            if (primaryKeys) {
+                              innerQueryBuilder.beforeLock("orderBy", () => {
+                                // append order by primary key to the list of orders
+                                if (!innerQueryBuilder.isOrderUnique(false)) {
+                                  innerQueryBuilder.data.cursorPrefix = [
+                                    "primary_key_asc",
+                                  ];
+                                  primaryKeys.forEach(key => {
+                                    innerQueryBuilder.orderBy(
+                                      sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
+                                        key.name
+                                      )}`,
+                                      true
+                                    );
+                                  });
+                                  innerQueryBuilder.setOrderIsUnique();
+                                }
+                              });
+                            }
+
+                            keys.forEach((key, i) => {
+                              innerQueryBuilder.where(
+                                sql.fragment`${tableAlias}.${sql.identifier(
+                                  key.name
+                                )} = ${foreignTableAlias}.${sql.identifier(
+                                  foreignKeys[i].name
+                                )}`
+                              );
+                            });
+                          }
+                        );
+                        return sql.fragment`(${query})`;
+                      }, parsedResolveInfoFragment.alias);
+                    },
+                  };
+                });
+                const ConnectionType = getTypeByName(
+                  inflection.connection(gqlTableType.name)
+                );
+                return {
+                  description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
+                  type: new GraphQLNonNull(ConnectionType),
+                  args: {},
+                  resolve: (data, _args, _context, resolveInfo) => {
+                    const alias = getAliasFromResolveInfo(resolveInfo);
+                    return addStartEndCursor(data[alias]);
+                  },
+                  deprecationReason: isDeprecated
+                    ? // $FlowFixMe
+                      `Please use ${singleRelationFieldName} instead`
+                    : undefined,
+                };
+              },
+              {
+                isPgFieldConnection: true,
+                pgFieldIntrospection: table,
+              }
+            );
+          }
           return memo;
         }, {}),
         `Adding backward relations for ${Self.name}`
