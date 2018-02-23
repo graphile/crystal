@@ -2,10 +2,10 @@
   "name": "graphile-build-pg",
   "version": "4.0.0-alpha",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
-  "main": "index.js",
+  "main": "node8plus/index.js",
   "scripts": {
     "test": "jest",
-    "prepublish": "mkdir -p node8plus node7minus && babel -s true --out-dir node8plus src && BABEL_ENV=node7minus babel -s true --out-dir node7minus src && ../../node_modules/.bin/flow-copy-source src node8plus",
+    "prepublish": "mkdir -p node8plus && babel -s true --out-dir node8plus src && ../../node_modules/.bin/flow-copy-source src node8plus",
     "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
   },
   "repository": {
@@ -61,8 +61,10 @@
   },
   "files": [
     "node8plus",
-    "node7minus",
     "res",
     "index.js"
-  ]
+  ],
+  "engines": {
+    "node": ">=8.6"
+  }
 }

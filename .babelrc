@@ -3,22 +3,12 @@
   "presets": [
     ["env", {
       "targets": {
-        "node": 8
+        "node": "8.6"
       }
     }],
     "flow"
   ],
   "env": {
-    "node7minus": {
-      "presets": [
-        ["env", {
-          "targets": {
-            "node": 4
-          }
-        }],
-        "flow"
-      ]
-    },
     "test": {
       "presets": [
         ["env", {

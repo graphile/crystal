@@ -37,5 +37,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "engines": {
+    "node": ">=8.6"
+  }
 }
