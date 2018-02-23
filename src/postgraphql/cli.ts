@@ -7,7 +7,8 @@ import chalk = require('chalk')
 import program = require('commander')
 import jwt = require('jsonwebtoken')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import postgraphql from './postgraphql'
+import postgraphql, { getPostgraphileSchemaBuilder } from './postgraphql'
+import { Pool } from 'pg'
 
 // tslint:disable no-console
 
@@ -68,6 +69,7 @@ program
   .option('--write-cache <path>', 'writes computed values to local cache file so startup can be faster (do this during the build phase)')
   .option('--read-cache <path>', 'reads cached values from local cache file to improve startup time (you may want to do this in production)')
   .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely', /^(only|deprecated|omit)$/, 'deprecated')
+  .option('-X, --no-server', 'for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -124,8 +126,11 @@ const {
   readCache,
   writeCache,
   legacyRelations,
+  server: yesServer,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
+
+const noServer = !yesServer
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
@@ -203,9 +208,8 @@ const jwtVerifyOptions: jwt.VerifyOptions = {
   subject: jwtVerifySubject,
 }
 
-// Create’s our PostGraphQL server and provides all the appropriate
-// configuration options.
-const server = createServer(postgraphql(pgConfig, schemas, {
+// The options to pass through to the schema builder, or the middleware
+const postgraphileOptions = {
   classicIds,
   dynamicJson,
   disableDefaultMutations,
@@ -231,22 +235,44 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   readCache,
   writeCache,
   legacyRelations,
-}))
+}
 
-// Start our server by listening to a specific port and host name. Also log
-// some instructions and other interesting information.
-server.listen(port, hostname, () => {
-  console.log('')
-  console.log(`PostGraphQL server listening on port ${chalk.underline(server.address().port.toString())} 🚀`)
-  console.log('')
-  console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
-  console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
-  console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
+if (noServer) {
+  // No need for a server, let's just spin up the schema builder
+  (async () => {
+    const pgPool = new Pool(pgConfig)
+    const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions)
+    await getGraphQLSchema()
+    if (!watchPg) {
+      await pgPool.end()
+    }
+  })().then(
+    null,
+    e => {
+      console.error('Error occurred!')
+      console.error(e)
+      process.exit(1)
+    },
+  )
+} else {
+  // Create’s our PostGraphile server
+  const server = createServer(postgraphql(pgConfig, schemas, postgraphileOptions))
 
-  if (!disableGraphiql)
-    console.log(`  ‣ GraphiQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphiqlRoute}`)}`)
+  // Start our server by listening to a specific port and host name. Also log
+  // some instructions and other interesting information.
+  server.listen(port, hostname, () => {
+    console.log('')
+    console.log(`PostGraphile server listening on port ${chalk.underline(server.address().port.toString())} 🚀`)
+    console.log('')
+    console.log(`  ‣ Connected to Postgres instance ${chalk.underline.blue(isDemo ? 'postgraphql_demo' : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${pgConfig.database != null ? `/${pgConfig.database}` : ''}`)}`)
+    console.log(`  ‣ Introspected Postgres schema(s) ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`)
+    console.log(`  ‣ GraphQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphqlRoute}`)}`)
 
-  console.log('')
-  console.log(chalk.gray('* * *'))
-  console.log('')
-})
+    if (!disableGraphiql)
+      console.log(`  ‣ GraphiQL endpoint served at ${chalk.underline(`http://${hostname}:${port}${graphiqlRoute}`)}`)
+
+    console.log('')
+    console.log(chalk.gray('* * *'))
+    console.log('')
+  })
+}

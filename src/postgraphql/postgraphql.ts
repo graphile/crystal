@@ -2,7 +2,7 @@ import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
-import { createPostGraphQLSchema, watchPostGraphQLSchema } from 'postgraphile-core'
+import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core'
 import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
 import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
 import { IncomingMessage, ServerResponse } from 'http'
@@ -39,14 +39,78 @@ type PostGraphQLOptions = {
   legacyRelations?: 'only' | 'deprecated' | 'omit',
 }
 
+type PostgraphileSchemaBuilder = {
+  _emitter: EventEmitter,
+  getGraphQLSchema: () => Promise<GraphQLSchema>,
+}
+
 /**
  * Creates a PostGraphQL Http request handler by first introspecting the
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export default function postgraphql(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql(
+export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, options: PostGraphQLOptions): PostgraphileSchemaBuilder {
+  // Check for a jwtSecret without a jwtPgTypeIdentifier
+  // a secret without a token identifier prevents JWT creation
+  if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
+    // tslint:disable-next-line no-console
+    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
+  }
+
+  // Creates the Postgres schemas array.
+  const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
+
+  const _emitter = new EventEmitter()
+
+  // Creates a promise which will resolve to a GraphQL schema. Connects a
+  // client from our pool to introspect the database.
+  //
+  // This is not a constant because when we are in watch mode, we want to swap
+  // out the `gqlSchema`.
+  let gqlSchema: GraphQLSchema
+  let gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
+
+  return {
+    _emitter,
+    getGraphQLSchema: () => Promise.resolve(gqlSchema || gqlSchemaPromise),
+  }
+
+  async function createGqlSchema(): Promise<GraphQLSchema> {
+    try {
+      if (options.watchPg) {
+        await watchPostGraphileSchema(pgPool, pgSchemas, options, (newSchema: GraphQLSchema) => {
+          gqlSchema = newSchema
+          _emitter.emit('schemas:changed')
+          exportGqlSchema(gqlSchema)
+        })
+        if (!gqlSchema) {
+          throw new Error('Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
+        }
+      } else {
+        gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options)
+        exportGqlSchema(gqlSchema)
+      }
+      return gqlSchema
+    }
+    // If we fail to build our schema, log the error and exit the process.
+    catch (error) {
+      return handleFatalError(error)
+    }
+  }
+
+  async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
+    try {
+      await exportPostGraphQLSchema(newGqlSchema, options)
+    }
+    // If we fail to export our schema, log the error and exit the process.
+    catch (error) {
+      handleFatalError(error)
+    }
+  }
+}
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
+export default function postgraphile(
   poolOrConfig?: Pool | PoolConfig | string,
   schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
   maybeOptions?: PostGraphQLOptions,
@@ -74,16 +138,6 @@ export default function postgraphql(
     options = schemaOrOptions
   }
 
-  // Check for a jwtSecret without a jwtPgTypeIdentifier
-  // a secret without a token identifier prevents JWT creation
-  if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
-    // tslint:disable-next-line no-console
-    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
-  }
-
-  // Creates the Postgres schemas array.
-  const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
-
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
   const pgPool: Pool =
@@ -99,56 +153,12 @@ export default function postgraphql(
         : poolOrConfig || {},
       )
 
-  const _emitter = new EventEmitter()
-
-  // Creates a promise which will resolve to a GraphQL schema. Connects a
-  // client from our pool to introspect the database.
-  //
-  // This is not a constant because when we are in watch mode, we want to swap
-  // out the `gqlSchema`.
-  let gqlSchema: GraphQLSchema
-  let gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
-
-  // Finally create our Http request handler using our options, the Postgres
-  // pool, and GraphQL schema. Return the final result.
+  const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
   return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
-    getGqlSchema: (): Promise<GraphQLSchema> => Promise.resolve(gqlSchema || gqlSchemaPromise),
+    getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
   }))
-
-  async function createGqlSchema(): Promise<GraphQLSchema> {
-    try {
-      if (options.watchPg) {
-        await watchPostGraphQLSchema(pgPool, pgSchemas, options, newSchema => {
-          gqlSchema = newSchema
-          _emitter.emit('schemas:changed')
-          exportGqlSchema(gqlSchema)
-        })
-        if (!gqlSchema) {
-          throw new Error('Consistency error: watchPostGraphQLSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
-        }
-      } else {
-        gqlSchema = await createPostGraphQLSchema(pgPool, pgSchemas, options)
-        exportGqlSchema(gqlSchema)
-      }
-      return gqlSchema
-    }
-    // If we fail to build our schema, log the error and exit the process.
-    catch (error) {
-      return handleFatalError(error)
-    }
-  }
-
-  async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
-    try {
-      await exportPostGraphQLSchema(newGqlSchema, options)
-    }
-    // If we fail to export our schema, log the error and exit the process.
-    catch (error) {
-      handleFatalError(error)
-    }
-  }
 }
 
 function handleFatalError(error: Error): never {

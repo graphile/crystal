@@ -1,7 +1,7 @@
 declare module 'postgraphile-core' {
   import { Pool, Client, ClientConfig } from 'pg'
   import { GraphQLSchema } from 'graphql'
-  export function createPostGraphQLSchema (
+  export function createPostGraphileSchema (
     clientOrConfig: Pool | Client | ClientConfig | string,
     schemaOrCatalog: string | Array<string>,
     options?: {
@@ -13,7 +13,7 @@ declare module 'postgraphile-core' {
     },
   ): Promise<GraphQLSchema>
 
-  export function watchPostGraphQLSchema (
+  export function watchPostGraphileSchema (
     clientOrConfig: Pool | Client | ClientConfig | string,
     schemaOrCatalog: string | Array<string>,
     options: {
