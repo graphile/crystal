@@ -67,6 +67,7 @@ program
   .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
   .option('--write-cache <path>', 'writes computed values to local cache file so startup can be faster (do this during the build phase)')
   .option('--read-cache <path>', 'reads cached values from local cache file to improve startup time (you may want to do this in production)')
+  .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely', /^(only|deprecated|omit)$/, 'deprecated')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -122,6 +123,7 @@ const {
   // replaceAllPlugins is NOT exposed via the CLI
   readCache,
   writeCache,
+  legacyRelations,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -228,6 +230,7 @@ const server = createServer(postgraphql(pgConfig, schemas, {
   prependPlugins: loadPlugins(prependPluginNames),
   readCache,
   writeCache,
+  legacyRelations,
 }))
 
 // Start our server by listening to a specific port and host name. Also log

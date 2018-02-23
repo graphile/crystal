@@ -36,6 +36,7 @@ type PostGraphQLOptions = {
   additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
   readCache?: string,
   writeCache?: string,
+  legacyRelations?: 'only' | 'deprecated' | 'omit',
 }
 
 /**
