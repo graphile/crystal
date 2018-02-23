@@ -1,7 +1,7 @@
 # PostGraphQL
 
 [![Package on npm](https://img.shields.io/npm/v/postgraphql.svg?style=flat)](https://www.npmjs.com/package/postgraphql)
-[![Package on npm](https://img.shields.io/npm/v/postgraphql/next.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
+[![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
 ![MIT license](https://img.shields.io/npm/l/postgraphql.svg)
 [![Gitter chat room](https://badges.gitter.im/postgraphql/postgraphql.svg)](https://gitter.im/postgraphql/postgraphql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
@@ -10,8 +10,8 @@
 
 *A GraphQL schema created by reflection over a PostgreSQL schema.*
 
-**Stable**: v3 ([`master`](https://github.com/postgraphql/postgraphql) branch) - maintenance only
-**Next**: v4 ([`postgraphile`](https://github.com/postgraphql/postgraphql/tree/postgraphile) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
+**Stable**: v3 ([`v3`](https://github.com/postgraphql/postgraphql/tree/v3) branch) - maintenance only
+**Next**: v4 ([`master`](https://github.com/postgraphql/postgraphql) branch) - PostGraphQL is being renamed PostGraphile with the launch of v4; see [graphile.org](https://graphile.org) for docs; see [#506](https://github.com/postgraphql/postgraphql/pull/506) for the low-down.
 
 ---
 
