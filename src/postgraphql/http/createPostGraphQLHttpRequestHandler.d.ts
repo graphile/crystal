@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
+import jwt = require('jsonwebtoken')
 import { EventEmitter } from 'events'
 
 /**
@@ -19,7 +20,7 @@ export interface HttpRequestHandler {
  * - `express`.
  * - `koa` (2.0).
  */
-export default function createPostGraphQLHttpRequestHandler (config: {
+export default function createPostGraphileHttpRequestHandler(config: {
   // The actual GraphQL schema we will use.
   getGqlSchema: () => Promise<GraphQLSchema>,
 
@@ -49,10 +50,13 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   jwtSecret?: string,
 
   // The audiences to use when verifing the JWT token. If not set the default
-  // audience will be ['postgraphql'].
+  // audience will be ['postgraphile'].
   jwtAudiences?: Array<string>,
 
-  // Whether or not we are watching the PostGraphQL schema for changes. Should
+  // The jwt verify options.
+  jwtVerifyOptions?: jwt.VerifyOptions,
+
+  // Whether or not we are watching the PostGraphile schema for changes. Should
   // be associated with `_emitter`.
   watchPg?: boolean,
 
@@ -86,4 +90,8 @@ export default function createPostGraphQLHttpRequestHandler (config: {
   // each transaction via set_config. They can then be used via current_setting
   // in postgres functions.
   pgSettings?: { [key: string]: mixed },
+
+  // Provide an async function to this to add custom properties to the context
+  // object being provided to each graphQL resolver.
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
 }): HttpRequestHandler

@@ -332,7 +332,7 @@ Object {
     "i": Object {
       "edges": Array [
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDFd",
           "node": Object {
             "constant": 2,
             "name": "John Smith",
@@ -340,7 +340,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDJd",
           "node": Object {
             "constant": 2,
             "name": "Sara Smith",
@@ -348,7 +348,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDNd",
           "node": Object {
             "constant": 2,
             "name": "Budd Deey",
@@ -356,7 +356,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDRd",
           "node": Object {
             "constant": 2,
             "name": "Kathryn Ramirez",
@@ -364,7 +364,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb25zdGFudF9hc2MiLFsyXV0=",
+          "cursor": "WyJjb25zdGFudF9hc2MiLDVd",
           "node": Object {
             "constant": 2,
             "name": "Joe Tucker",
@@ -1598,11 +1598,11 @@ Object {
           "numrange": Object {
             "end": Object {
               "inclusive": false,
-              "value": 52,
+              "value": "52",
             },
             "start": Object {
               "inclusive": true,
-              "value": -10,
+              "value": "-10",
             },
           },
           "smallint": 50,

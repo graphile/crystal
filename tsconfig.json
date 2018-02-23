@@ -18,10 +18,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true
   },
-  "include": [
-    "src",
-    "typings"
-  ],
+  "include": ["src", "typings"],
   "exclude": [
     "index.js",
     "node_modules",
@@ -29,6 +26,9 @@
     "examples",
     "utils",
     "resources",
-    "src/postgraphql/graphiql"
+    "src/postgraphile/graphiql",
+    "__tests__",
+    "**/__tests__",
+    "*-test.js"
   ]
 }

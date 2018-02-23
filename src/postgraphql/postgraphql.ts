@@ -2,14 +2,13 @@ import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import { GraphQLSchema } from 'graphql'
 import { EventEmitter } from 'events'
-import chalk = require('chalk')
-import createPostGraphQLSchema from './schema/createPostGraphQLSchema'
-import createPostGraphQLHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphQLHttpRequestHandler'
-import exportPostGraphQLSchema from './schema/exportPostGraphQLSchema'
-import watchPgSchemas from './watch/watchPgSchemas'
-import { IncomingMessage } from 'http'
+import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core'
+import createPostGraphileHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphileHttpRequestHandler'
+import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
+import { IncomingMessage, ServerResponse } from 'http'
+import jwt = require('jsonwebtoken')
 
-type PostGraphQLOptions = {
+type PostGraphileOptions = {
   classicIds?: boolean,
   dynamicJson?: boolean,
   graphqlRoute?: string,
@@ -19,6 +18,7 @@ type PostGraphQLOptions = {
   jwtSecret?: string,
   jwtAudiences?: Array<string>,
   jwtRole?: Array<string>,
+  jwtVerifyOptions?: jwt.VerifyOptions,
   jwtPgTypeIdentifier?: string,
   watchPg?: boolean,
   showErrorStack?: boolean,
@@ -30,22 +30,93 @@ type PostGraphQLOptions = {
   exportGqlSchemaPath?: string,
   bodySizeLimit?: string,
   pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{[key: string]: mixed }>),
+  appendPlugins?: Array<(builder: mixed) => {}>,
+  prependPlugins?: Array<(builder: mixed) => {}>,
+  replaceAllPlugins?: Array<(builder: mixed) => {}>,
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
+  readCache?: string,
+  writeCache?: string,
+  legacyRelations?: 'only' | 'deprecated' | 'omit',
+}
+
+type PostgraphileSchemaBuilder = {
+  _emitter: EventEmitter,
+  getGraphQLSchema: () => Promise<GraphQLSchema>,
 }
 
 /**
- * Creates a PostGraphQL Http request handler by first introspecting the
+ * Creates a PostGraphile Http request handler by first introspecting the
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql (poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphQLOptions): HttpRequestHandler
-export default function postgraphql (
+export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, options: PostGraphileOptions): PostgraphileSchemaBuilder {
+  // Check for a jwtSecret without a jwtPgTypeIdentifier
+  // a secret without a token identifier prevents JWT creation
+  if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
+    // tslint:disable-next-line no-console
+    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
+  }
+
+  // Creates the Postgres schemas array.
+  const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
+
+  const _emitter = new EventEmitter()
+
+  // Creates a promise which will resolve to a GraphQL schema. Connects a
+  // client from our pool to introspect the database.
+  //
+  // This is not a constant because when we are in watch mode, we want to swap
+  // out the `gqlSchema`.
+  let gqlSchema: GraphQLSchema
+  let gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
+
+  return {
+    _emitter,
+    getGraphQLSchema: () => Promise.resolve(gqlSchema || gqlSchemaPromise),
+  }
+
+  async function createGqlSchema(): Promise<GraphQLSchema> {
+    try {
+      if (options.watchPg) {
+        await watchPostGraphileSchema(pgPool, pgSchemas, options, (newSchema: GraphQLSchema) => {
+          gqlSchema = newSchema
+          _emitter.emit('schemas:changed')
+          exportGqlSchema(gqlSchema)
+        })
+        if (!gqlSchema) {
+          throw new Error('Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
+        }
+      } else {
+        gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options)
+        exportGqlSchema(gqlSchema)
+      }
+      return gqlSchema
+    }
+    // If we fail to build our schema, log the error and exit the process.
+    catch (error) {
+      return handleFatalError(error)
+    }
+  }
+
+  async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
+    try {
+      await exportPostGraphileSchema(newGqlSchema, options)
+    }
+    // If we fail to export our schema, log the error and exit the process.
+    catch (error) {
+      handleFatalError(error)
+    }
+  }
+}
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphileOptions): HttpRequestHandler
+export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphileOptions): HttpRequestHandler
+export default function postgraphile(
   poolOrConfig?: Pool | PoolConfig | string,
-  schemaOrOptions?: string | Array<string> | PostGraphQLOptions,
-  maybeOptions?: PostGraphQLOptions,
+  schemaOrOptions?: string | Array<string> | PostGraphileOptions,
+  maybeOptions?: PostGraphileOptions,
 ): HttpRequestHandler {
   let schema: string | Array<string>
-  let options: PostGraphQLOptions
+  let options: PostGraphileOptions
 
   // If the second argument is undefined, use defaults for both `schema` and
   // `options`.
@@ -67,22 +138,12 @@ export default function postgraphql (
     options = schemaOrOptions
   }
 
-  // Check for a jwtSecret without a jwtPgTypeIdentifier
-  // a secret without a token identifier prevents JWT creation
-  if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
-    // tslint:disable-next-line no-console
-    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
-  }
-
-  // Creates the Postgres schemas array.
-  const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema]
-
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const pgPool =
+  const pgPool: Pool =
     // If it is already a `Pool`, just use it.
-    poolOrConfig instanceof Pool
-      ? poolOrConfig
+    poolOrConfig instanceof Pool || quacksLikePgPool(poolOrConfig)
+      ? (poolOrConfig as Pool)
       : new Pool(typeof poolOrConfig === 'string'
         // Otherwise if it is a string, let us parse it to get a config to
         // create a `Pool`.
@@ -92,92 +153,37 @@ export default function postgraphql (
         : poolOrConfig || {},
       )
 
-  // Creates a promise which will resolve to a GraphQL schema. Connects a
-  // client from our pool to introspect the database.
-  //
-  // This is not a constant because when we are in watch mode, we want to swap
-  // out the `gqlSchema`.
-  let gqlSchema = createGqlSchema()
-
-  const _emitter = new EventEmitter()
-
-  // If the user wants us to watch the schema, execute the following:
-  if (options.watchPg) {
-    watchPgSchemas({
-      pgPool,
-      pgSchemas,
-      onChange: ({ commands }) => {
-        // tslint:disable-next-line no-console
-        console.log(`Rebuilding PostGraphQL API after Postgres command(s): ️${commands.map(command => chalk.bold.cyan(command)).join(', ')}`)
-
-        _emitter.emit('schemas:changed')
-
-        // Actually restart the GraphQL schema by creating a new one. Note that
-        // `createGqlSchema` returns a promise and we aren’t ‘await’ing it.
-        gqlSchema = createGqlSchema()
-      },
-    })
-      // If an error occurs when watching the Postgres schemas, log the error and
-      // exit the process.
-      .catch(error => {
-        // tslint:disable-next-line no-console
-        console.error(`${error.stack}\n`)
-        process.exit(1)
-      })
-  }
-
-  // Finally create our Http request handler using our options, the Postgres
-  // pool, and GraphQL schema. Return the final result.
-  return createPostGraphQLHttpRequestHandler(Object.assign({}, options, {
-    getGqlSchema: () => gqlSchema,
+  const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
+  return createPostGraphileHttpRequestHandler(Object.assign({}, options, {
+    getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
   }))
-
-  /**
-   * Creates a GraphQL schema by connecting a client from our pool which will
-   * be used to introspect our Postgres database. If this function fails, we
-   * will log the error and exit the process.
-   *
-   * This may only be executed once, at startup. However, if we are in watch
-   * mode this will be updated whenever there is a change in our schema.
-   */
-  async function createGqlSchema (): Promise<GraphQLSchema> {
-    try {
-      const pgClient = await pgPool.connect()
-      const newGqlSchema = await createPostGraphQLSchema(pgClient, pgSchemas, options)
-      exportGqlSchema(newGqlSchema)
-
-      // If no release function exists, don’t release. This is just for tests.
-      if (pgClient && pgClient.release)
-        pgClient.release()
-
-      return newGqlSchema
-    }
-    // If we fail to build our schema, log the error and exit the process.
-    catch (error) {
-      return handleFatalError(error)
-    }
-  }
-
-  async function exportGqlSchema (newGqlSchema: GraphQLSchema): Promise<void> {
-    try {
-      await exportPostGraphQLSchema(newGqlSchema, options)
-    }
-    // If we fail to export our schema, log the error and exit the process.
-    catch (error) {
-      handleFatalError(error)
-    }
-  }
 }
 
-function handleFatalError (error: Error): never {
-  // tslint:disable-next-line no-console
-  console.error(`${error.stack}\n`)
+function handleFatalError(error: Error): never {
+  process.stderr.write(`${error.stack}\n`) // console.error fails under the tests
   process.exit(1)
 
   // `process.exit` will mean all code below it will never get called.
   // However, we need to return a value with type `never` here for
   // TypeScript.
   return null as never
+}
+
+function constructorName(obj: mixed): string | null {
+  return obj && typeof obj.constructor === 'function' && obj.constructor.name && String(obj.constructor.name) || null
+}
+
+// tslint:disable-next-line no-any
+function quacksLikePgPool(pgConfig: any): boolean {
+  // A diagnosis of exclusion
+  if (!pgConfig || typeof pgConfig !== 'object') return false
+  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool') return false
+  if (!pgConfig['Client']) return false
+  if (!pgConfig['options']) return false
+  if (typeof pgConfig['connect'] !== 'function') return false
+  if (typeof pgConfig['end'] !== 'function') return false
+  if (typeof pgConfig['query'] !== 'function') return false
+  return true
 }

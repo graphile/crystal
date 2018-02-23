@@ -2,7 +2,7 @@ import { writeFile } from 'fs'
 import { graphql, GraphQLSchema } from 'graphql'
 import { introspectionQuery, printSchema } from 'graphql/utilities'
 
-async function writeFileAsync (
+async function writeFileAsync(
   path: string,
   contents: string,
 ): Promise<void> {
@@ -15,9 +15,9 @@ async function writeFileAsync (
 }
 
 /**
- * Exports a PostGraphQL schema by looking at a Postgres client.
+ * Exports a PostGraphile schema by looking at a Postgres client.
  */
-export default async function exportPostGraphQLSchema (
+export default async function exportPostGraphileSchema(
   schema: GraphQLSchema,
   options: {
     exportJsonSchemaPath?: string,

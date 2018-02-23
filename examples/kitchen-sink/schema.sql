@@ -33,6 +33,8 @@ create table a.post (
 create type a.letter as enum ('a', 'b', 'c', 'd');
 create type b.color as enum ('red', 'green', 'blue');
 
+create type c.floatrange as range (subtype = float8, subtype_diff = float8mi);
+
 create type c.compound_type as (
   a int,
   b text,
@@ -152,8 +154,8 @@ create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language 
 
 create function c.json_identity(json json) returns json as $$ select json $$ language sql immutable;
 create function c.json_identity_mutation(json json) returns json as $$ select json $$ language sql;
-create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql stable strict;
-create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f numrange) returns boolean as $$ select false $$ language sql strict;
+create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql stable strict;
+create function c.types_mutation(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql strict;
 create function b.compound_type_query(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql stable;
 create function b.compound_type_mutation(object c.compound_type) returns c.compound_type as $$ select (object.a + 1, object.b, object.c, object.d, object.foo_bar)::c.compound_type $$ language sql;
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;

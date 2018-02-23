@@ -145,13 +145,13 @@ $$ language plpgsql strict security definer;
 
 comment on function forum_example.register_person(text, text, text, text) is 'Registers a single user and creates an account in our forum.';
 
-create role forum_example_postgraphql login password 'xyz';
+create role forum_example_postgraphile login password 'xyz';
 
 create role forum_example_anonymous;
-grant forum_example_anonymous to forum_example_postgraphql;
+grant forum_example_anonymous to forum_example_postgraphile;
 
 create role forum_example_person;
-grant forum_example_person to forum_example_postgraphql;
+grant forum_example_person to forum_example_postgraphile;
 
 create type forum_example.jwt_token as (
   role text,

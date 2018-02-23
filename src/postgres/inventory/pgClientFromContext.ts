@@ -2,13 +2,13 @@
 
 import { Client } from 'pg'
 
-export const $$pgClient = Symbol('postgres/client')
+export const $$pgClient = 'pgClient'
 
 /**
  * Retrieves a Postgres client from a context, throwing an error if such a
  * client does not exist.
  */
-export default function getPgClientFromContext (context: mixed): Client {
+export default function getPgClientFromContext(context: mixed): Client {
   if (context == null || typeof context !== 'object')
     throw new Error('Context must be an object.')
 
