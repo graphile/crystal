@@ -68,7 +68,7 @@ program
   .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
   .option('--write-cache <path>', 'writes computed values to local cache file so startup can be faster (do this during the build phase)')
   .option('--read-cache <path>', 'reads cached values from local cache file to improve startup time (you may want to do this in production)')
-  .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely', /^(only|deprecated|omit)$/, 'deprecated')
+  .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely')
   .option('-X, --no-server', 'for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
 
 program.on('--help', () => console.log(`
@@ -125,10 +125,17 @@ const {
   // replaceAllPlugins is NOT exposed via the CLI
   readCache,
   writeCache,
-  legacyRelations,
+  legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
+
+let legacyRelations: 'omit' | 'deprecated' | 'only'
+if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
+  throw new Error(`Invalid argument to '--legacy-relations' - expected on of 'omit', 'deprecated', 'only'; but received '${rawLegacyRelations}'`)
+} else {
+  legacyRelations = rawLegacyRelations
+}
 
 const noServer = !yesServer
 
