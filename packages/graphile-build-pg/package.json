@@ -43,14 +43,13 @@
     "jsonwebtoken": "^8.1.1",
     "lodash": ">=4 <5",
     "lru-cache": "4.1.1",
-    "pg": ">=6.1.0 <8",
     "pg-range-parser": "^1.0.0",
     "pg-sql2": "^1.0.0-beta.3",
     "pluralize": "^5.0.0",
     "postgres-interval": "1.1.1"
   },
   "peerDependencies": {
-    "pg": ">=6 <7"
+    "pg": ">=6.1.0 <8"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

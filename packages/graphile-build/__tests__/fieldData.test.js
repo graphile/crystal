@@ -8,7 +8,7 @@ const {
   GraphQLList,
 } = require("graphql");
 const { printSchema } = require("graphql/utilities");
-const { buildSchema, defaultPlugins, MutationPlugin } = require("../");
+const { buildSchema, defaultPlugins } = require("../");
 
 const base64 = str => new Buffer(String(str)).toString("base64");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
@@ -267,11 +267,10 @@ const DummyConnectionPlugin = async builder => {
                 }
                 const ret = result.map(entry => {
                   const idx = dummyData.indexOf(entry);
-                  return (resolveData.map || [])
-                    .reduce(
-                      (memo, map) => Object.assign(memo, map(entry, idx)),
-                      {}
-                    );
+                  return (resolveData.map || []).reduce(
+                    (memo, map) => Object.assign(memo, map(entry, idx)),
+                    {}
+                  );
                 });
                 return ret;
               },
@@ -293,21 +292,23 @@ test("no arguments", async () => {
   const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
   const result = await graphql(
     schema,
-    `query {
-      dummyConnection {
-        edges {
-          cursor
-          node {
+    `
+      query {
+        dummyConnection {
+          edges {
+            cursor
+            node {
+              id
+              caps
+            }
+          }
+          nodes {
             id
             caps
           }
         }
-        nodes {
-          id
-          caps
-        }
       }
-    }`
+    `
   );
   if (result.errors) {
     console.log(result.errors.map(e => e.originalError));
@@ -319,9 +320,9 @@ test("no arguments", async () => {
     "baz",
     "qux",
   ]);
-  expect(
-    result.data.dummyConnection.edges.map(({ cursor }) => cursor)
-  ).toEqual(["0", "1", "2", "3"]);
+  expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
+    ["0", "1", "2", "3"]
+  );
   expect(result).toMatchSnapshot();
 });
 
@@ -329,21 +330,23 @@ test("sort", async () => {
   const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
   const result = await graphql(
     schema,
-    `query {
-      dummyConnection(sortBy: ID_ASC) {
-        edges {
-          cursor
-          node {
+    `
+      query {
+        dummyConnection(sortBy: ID_ASC) {
+          edges {
+            cursor
+            node {
+              id
+              caps
+            }
+          }
+          nodes {
             id
             caps
           }
         }
-        nodes {
-          id
-          caps
-        }
       }
-    }`
+    `
   );
   if (result.errors) {
     console.log(result.errors.map(e => e.originalError));
@@ -367,29 +370,31 @@ test("after", async () => {
   const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
   const result = await graphql(
     schema,
-    `query {
-      dummyConnection(after: "1") {
-        edges {
-          cursor
-          node {
+    `
+      query {
+        dummyConnection(after: "1") {
+          edges {
+            cursor
+            node {
+              id
+              caps
+            }
+          }
+          nodes {
             id
             caps
           }
         }
-        nodes {
-          id
-          caps
-        }
       }
-    }`
+    `
   );
   expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
     "baz",
     "qux",
   ]);
-  expect(
-    result.data.dummyConnection.edges.map(({ cursor }) => cursor)
-  ).toEqual(["2", "3"]);
+  expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
+    ["2", "3"]
+  );
   expect(result).toMatchSnapshot();
 });
 
@@ -397,21 +402,23 @@ test("sort, after", async () => {
   const schema = await buildSchema([...defaultPlugins, DummyConnectionPlugin]);
   const result = await graphql(
     schema,
-    `query {
-      dummyConnection(sortBy: ID_ASC, after: "WyJiYXoiXQ==") {
-        edges {
-          cursor
-          node {
+    `
+      query {
+        dummyConnection(sortBy: ID_ASC, after: "WyJiYXoiXQ==") {
+          edges {
+            cursor
+            node {
+              id
+              caps
+            }
+          }
+          nodes {
             id
             caps
           }
         }
-        nodes {
-          id
-          caps
-        }
       }
-    }`
+    `
   );
   if (result.errors) {
     console.log(result.errors.map(e => e.originalError));

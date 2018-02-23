@@ -41,58 +41,7 @@ export type DataForType = {
 
 export type Build = {|
   graphileBuildVersion: string,
-  graphql: {
-    GraphQLSchema: typeof graphql.GraphQLSchema,
-    GraphQLScalarType: typeof graphql.GraphQLScalarType,
-    GraphQLObjectType: typeof graphql.GraphQLObjectType,
-    GraphQLInterfaceType: typeof graphql.GraphQLInterfaceType,
-    GraphQLUnionType: typeof graphql.GraphQLUnionType,
-    GraphQLEnumType: typeof graphql.GraphQLEnumType,
-    GraphQLInputObjectType: typeof graphql.GraphQLInputObjectType,
-    GraphQLList: typeof graphql.GraphQLList,
-    GraphQLNonNull: typeof graphql.GraphQLNonNull,
-    GraphQLDirective: typeof graphql.GraphQLDirective,
-    TypeKind: typeof graphql.TypeKind,
-    DirectiveLocation: typeof graphql.DirectiveLocation,
-    GraphQLInt: typeof graphql.GraphQLInt,
-    GraphQLFloat: typeof graphql.GraphQLFloat,
-    GraphQLString: typeof graphql.GraphQLString,
-    GraphQLBoolean: typeof graphql.GraphQLBoolean,
-    GraphQLID: typeof graphql.GraphQLID,
-    specifiedDirectives: typeof graphql.specifiedDirectives,
-    GraphQLIncludeDirective: typeof graphql.GraphQLIncludeDirective,
-    GraphQLSkipDirective: typeof graphql.GraphQLSkipDirective,
-    GraphQLDeprecatedDirective: typeof graphql.GraphQLDeprecatedDirective,
-    DEFAULT_DEPRECATION_REASON: typeof graphql.DEFAULT_DEPRECATION_REASON,
-    SchemaMetaFieldDef: typeof graphql.SchemaMetaFieldDef,
-    TypeMetaFieldDef: typeof graphql.TypeMetaFieldDef,
-    TypeNameMetaFieldDef: typeof graphql.TypeNameMetaFieldDef,
-    __Schema: typeof graphql.__Schema,
-    __Directive: typeof graphql.__Directive,
-    __DirectiveLocation: typeof graphql.__DirectiveLocation,
-    __Type: typeof graphql.__Type,
-    __Field: typeof graphql.__Field,
-    __InputValue: typeof graphql.__InputValue,
-    __EnumValue: typeof graphql.__EnumValue,
-    __TypeKind: typeof graphql.__TypeKind,
-    isType: (type: mixed) => boolean,
-    isInputType: (type: GraphQLType) => boolean,
-    isOutputType: (type: GraphQLType) => boolean,
-    isLeafType: (type: GraphQLType) => boolean,
-    isCompositeType: (type: GraphQLType) => boolean,
-    isAbstractType: (type: GraphQLType) => boolean,
-    isNamedType: (type: GraphQLType) => boolean,
-    assertType: typeof graphql.assertType,
-    assertInputType: typeof graphql.assertInputType,
-    assertOutputType: typeof graphql.assertOutputType,
-    assertLeafType: typeof graphql.assertLeafType,
-    assertCompositeType: typeof graphql.assertCompositeType,
-    assertAbstractType: typeof graphql.assertAbstractType,
-    assertNamedType: typeof graphql.assertNamedType,
-    //getNullableType<T: GraphQLType>(type: ?T): ?(T & GraphQLNullableType),
-    getNullableType<T: GraphQLType>(type: ?T): mixed,
-    getNamedType: (type: GraphQLType) => GraphQLNamedType,
-  },
+  graphql: *,
   parseResolveInfo: parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType: simplifyParsedResolveInfoFragmentWithType,
   getAliasFromResolveInfo: getAliasFromResolveInfo,
@@ -147,12 +96,12 @@ type SupportedHookTypes = {} | Build | Array<GraphQLInterfaceType>;
 
 export type Hook<
   Type: SupportedHookTypes,
-  BuildExtensions: {},
-  ContextExtensions: {}
+  BuildExtensions: *,
+  ContextExtensions: *
 > = (
   input: Type,
-  build: {| ...Build, ...BuildExtensions |},
-  context: {| ...Context, ...ContextExtensions |}
+  build: { ...Build, ...BuildExtensions },
+  context: { ...Context, ...ContextExtensions }
 ) => Type;
 
 export type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
@@ -261,7 +210,7 @@ class SchemaBuilder extends EventEmitter {
   }
 
   applyHooks<T: *, Context>(
-    build: Build,
+    build: { ...Build },
     hookName: string,
     input: T,
     context: Context,
@@ -323,9 +272,9 @@ class SchemaBuilder extends EventEmitter {
     this.unwatchers.push(unlisten);
   }
 
-  createBuild(): Build {
-    const initialBuild: Build = makeNewBuild(this);
-    const build: Build = this.applyHooks(initialBuild, "build", initialBuild, {
+  createBuild(): { ...Build } {
+    const initialBuild = makeNewBuild(this);
+    const build = this.applyHooks(initialBuild, "build", initialBuild, {
       scope: {},
     });
     // Bind all functions so they can be dereferenced

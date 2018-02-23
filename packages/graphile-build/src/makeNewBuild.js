@@ -142,7 +142,7 @@ if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   };
 }
 
-export default function makeNewBuild(builder: SchemaBuilder): Build {
+export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
   const allTypes = {};
 
   // Every object type gets fieldData associated with each of its
@@ -195,7 +195,7 @@ export default function makeNewBuild(builder: SchemaBuilder): Build {
       if (!inScope) {
         // eslint-disable-next-line no-console
         console.warn(
-          `No scope was provided to new ${getNameFromType(Type)}[name=${
+          `No scope was provided to new ${Type.name}[name=${
             spec.name
           }], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
         );

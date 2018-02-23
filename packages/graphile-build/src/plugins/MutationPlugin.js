@@ -1,6 +1,20 @@
 // @flow
 import type { Plugin } from "../SchemaBuilder";
 
+function isValidMutation(Mutation) {
+  try {
+    if (!Mutation) {
+      return false;
+    }
+    if (Object.keys(Mutation.getFields()).length === 0) {
+      return false;
+    }
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 export default (async function MutationPlugin(builder) {
   builder.hook(
     "GraphQLSchema",
@@ -15,7 +29,7 @@ export default (async function MutationPlugin(builder) {
         { isRootMutation: true },
         true
       );
-      if (Mutation) {
+      if (isValidMutation(Mutation)) {
         return extend(schema, {
           mutation: Mutation,
         });

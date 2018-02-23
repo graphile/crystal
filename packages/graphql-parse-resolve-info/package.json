@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-build#readme",
   "peerDependencies": {
-    "graphql": ">=0.9 <1"
+    "graphql": ">=0.9 <0.14"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

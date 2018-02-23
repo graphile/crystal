@@ -67,7 +67,7 @@ export function parseResolveInfo(
   resolveInfo: GraphQLResolveInfo,
   options: { keepRoot?: boolean, deep?: boolean } = {}
 ): ResolveTree | FieldsByTypeName | null | void {
-  const fieldNodes: Array<FieldNode> =
+  const fieldNodes: $ReadOnlyArray<FieldNode> =
     resolveInfo.fieldNodes || resolveInfo.fieldASTs;
 
   const { parentType } = resolveInfo;
@@ -121,7 +121,7 @@ function getFieldFromAST(
 
 let iNum = 1;
 function fieldTreeFromAST<T: SelectionNode>(
-  inASTs: Array<T> | T,
+  inASTs: $ReadOnlyArray<T> | T,
   resolveInfo: GraphQLResolveInfo,
   initTree: FieldsByTypeName = {},
   options = {},
@@ -137,7 +137,7 @@ function fieldTreeFromAST<T: SelectionNode>(
   );
   let { variableValues } = resolveInfo;
   const fragments = resolveInfo.fragments || {};
-  const asts: Array<T> = Array.isArray(inASTs) ? inASTs : [inASTs];
+  const asts: $ReadOnlyArray<T> = Array.isArray(inASTs) ? inASTs : [inASTs];
   initTree[parentType.name] = initTree[parentType.name] || {};
   const outerDepth = depth;
   return asts.reduce(function(tree, selectionVal: SelectionNode, idx) {
