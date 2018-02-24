@@ -20,7 +20,7 @@ find build -name '__tests__' -delete
 
 echo "[hack] Hacking react-scripts webpack config to not mangle names"
 echo "[hack]   due to https://github.com/graphql/graphql-js/issues/1182"
-sed -e 's/mangle: [{]/mangle: false, mangle_DISABLED: {/g' -i '' node_modules/react-scripts/config/webpack.config.prod.js
+sed -i'' -e 's/mangle: [{]/mangle: false, mangle_DISABLED: {/g' node_modules/react-scripts/config/webpack.config.prod.js
 
 echo "Building GraphiQL"
 (cd src/postgraphile/graphiql && "$npm_bin"/react-scripts build)
