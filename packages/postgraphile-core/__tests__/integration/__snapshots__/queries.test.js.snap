@@ -1,5 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`badlyBehavedFunction.graphql 1`] = `
+Object {
+  "data": Object {
+    "badlyBehavedFunction": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "firstName": "John",
+            "id": 1,
+            "nodeId": "WyJwZW9wbGUiLDFd",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": null,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "firstName": "Twenty",
+            "id": 6,
+            "nodeId": "WyJwZW9wbGUiLDZd",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "firstName": "John",
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        null,
+        Object {
+          "firstName": "Twenty",
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`classic-ids.graphql 1`] = `
 Object {
   "data": Object {
@@ -2851,7 +2895,7 @@ Object {
     "a": Object {
       "edges": Array [
         Object {
-          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMV1d",
           "node": Object {
             "col1": 11,
             "col2": 21,
@@ -2859,7 +2903,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMl1d",
           "node": Object {
             "col1": 12,
             "col2": 22,
@@ -2867,7 +2911,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbM11d",
           "node": Object {
             "col1": 13,
             "col2": 23,
@@ -2879,7 +2923,7 @@ Object {
     "b": Object {
       "edges": Array [
         Object {
-          "cursor": "WyJjb2wxX2Rlc2MiLDNd",
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMywzXV0=",
           "node": Object {
             "col1": 13,
             "col2": 23,
@@ -2887,7 +2931,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb2wxX2Rlc2MiLDJd",
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMiwyXV0=",
           "node": Object {
             "col1": 12,
             "col2": 22,
@@ -2895,7 +2939,7 @@ Object {
           },
         },
         Object {
-          "cursor": "WyJjb2wxX2Rlc2MiLDFd",
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMSwxXV0=",
           "node": Object {
             "col1": 11,
             "col2": 21,

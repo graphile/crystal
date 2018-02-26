@@ -3,6 +3,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-eslint": "8.2.1",
+    "babel-plugin-syntax-object-rest-spread": "6.13.0",
     "babel-preset-env": "^1.6.0",
     "concurrently": "^3.5.0",
     "eslint": "^4.0.0",

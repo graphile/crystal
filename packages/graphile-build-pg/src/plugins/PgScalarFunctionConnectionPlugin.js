@@ -2,7 +2,10 @@
 import type { Plugin } from "graphile-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
-export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
+export default (function PgTablesPlugin(
+  builder,
+  { pgInflection: inflection, pgForbidSetofFunctionsToReturnNull = false }
+) {
   builder.hook(
     "init",
     (
@@ -20,6 +23,8 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
         },
       }
     ) => {
+      const nullableIf = (condition, Type) =>
+        condition ? Type : new GraphQLNonNull(Type);
       const Cursor = getTypeByName("Cursor");
       introspectionResultsByKind.procedure
         .filter(proc => proc.returnsSet)
@@ -97,7 +102,14 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
                 return {
                   nodes: {
                     description: `A list of \`${NodeType.name}\` objects.`,
-                    type: new GraphQLNonNull(new GraphQLList(NodeType)),
+                    type: new GraphQLNonNull(
+                      new GraphQLList(
+                        nullableIf(
+                          !pgForbidSetofFunctionsToReturnNull,
+                          NodeType
+                        )
+                      )
+                    ),
                     resolve(data) {
                       return data.data.map(entry => entry.value);
                     },

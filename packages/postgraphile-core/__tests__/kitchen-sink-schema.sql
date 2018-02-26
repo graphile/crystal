@@ -50,6 +50,7 @@ comment on table c.left_arm is 'Tracks metadata about the left arms of various p
 create unique index uniq_person__email_id_3 on c.person (email) where (id = 3);
 
 comment on table c.person is 'Person test comment';
+comment on column c.person.id is 'The primary unique identifier for the person';
 comment on column c.person.name is 'The person’s name';
 comment on column c.person.site is '@deprecated Don’t use me';
 
@@ -355,3 +356,11 @@ create table a."reservedPatchs" (
   id serial primary key
 );
 comment on table a."reservedPatchs" is '`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table';
+
+create function c.badly_behaved_function() returns setof c.person as $$
+begin
+  return query select * from c.person order by id asc limit 1;
+  return next null;
+  return query select * from c.person order by id desc limit 1;
+end;
+$$ language plpgsql stable;

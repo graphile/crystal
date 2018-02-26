@@ -45,6 +45,7 @@ type PostGraphQLOptions = {
   writeCache?: string,
   setWriteCacheCallback?: (fn: () => Promise<void>) => void,
   legacyRelations?: "only" | "deprecated",
+  badlyBehavedFunctions?: boolean,
 };
 
 type PgConfig = Client | Pool | string;
@@ -106,6 +107,7 @@ const getPostGraphQLBuilder = async (
     writeCache,
     setWriteCacheCallback,
     legacyRelations = "deprecated", // TODO: Change to 'omit' in v5
+    badlyBehavedFunctions = false,
   } = options;
 
   if (
@@ -217,6 +219,7 @@ const getPostGraphQLBuilder = async (
         pgEnableTags: enableTags,
         pgLegacyRelations: legacyRelations,
         persistentMemoizeWithKey,
+        pgForbidSetofFunctionsToReturnNull: !badlyBehavedFunctions,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!

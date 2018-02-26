@@ -28,7 +28,13 @@ beforeAll(() => {
     // Different fixtures need different schemas with different configurations.
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
-    const [normal, classicIds, dynamicJson, viewUniqueKey] = await Promise.all([
+    const [
+      normal,
+      classicIds,
+      dynamicJson,
+      pgColumnFilter,
+      viewUniqueKey,
+    ] = await Promise.all([
       createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { dynamicJson: true }),
@@ -37,6 +43,7 @@ beforeAll(() => {
       }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
         viewUniqueKey: "testviewid",
+        badlyBehavedFunctions: true,
       }),
     ]);
     debug(printSchema(normal));
@@ -44,6 +51,7 @@ beforeAll(() => {
       normal,
       classicIds,
       dynamicJson,
+      pgColumnFilter,
       viewUniqueKey,
     };
   });
@@ -75,6 +83,7 @@ beforeAll(() => {
             "classic-ids.graphql": gqlSchemas.classicIds,
             "dynamic-json.graphql": gqlSchemas.dynamicJson,
             "view.graphql": gqlSchemas.viewUniqueKey,
+            "badlyBehavedFunction.graphql": gqlSchemas.viewUniqueKey,
           };
           const gqlSchema = schemas[fileName]
             ? schemas[fileName]

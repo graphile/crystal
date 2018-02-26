@@ -1,5 +1,5 @@
 {
-  "plugins": ["transform-runtime", "transform-es2015-modules-commonjs"],
+  "plugins": ["transform-runtime", "transform-es2015-modules-commonjs", "syntax-object-rest-spread"],
   "presets": [
     ["env", {
       "targets": {

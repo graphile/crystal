@@ -2,7 +2,24 @@
 import type { Plugin } from "graphile-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
-export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
+export default (function PgTablesPlugin(
+  builder,
+  { pgInflection: inflection, pgForbidSetofFunctionsToReturnNull = false }
+) {
+  const handleNullRow = pgForbidSetofFunctionsToReturnNull
+    ? row => row
+    : row => {
+        if (
+          Object.keys(row)
+            .filter(str => !str.startsWith("__"))
+            .some(key => row[key] !== null)
+        ) {
+          return row;
+        } else {
+          return null;
+        }
+      };
+
   builder.hook("init", (_, build) => {
     const {
       getNodeIdForTypeAndIdentifiers,
@@ -26,6 +43,8 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
       },
       pgColumnFilter,
     } = build;
+    const nullableIf = (condition, Type) =>
+      condition ? Type : new GraphQLNonNull(Type);
     const Cursor = getTypeByName("Cursor");
     introspectionResultsByKind.class.forEach(table => {
       const tablePgType = introspectionResultsByKind.type.find(
@@ -256,9 +275,12 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
                   ),
                   node: {
                     description: `The \`${tableTypeName}\` at the end of the edge.`,
-                    type: new GraphQLNonNull(TableType),
+                    type: nullableIf(
+                      !pgForbidSetofFunctionsToReturnNull,
+                      TableType
+                    ),
                     resolve(data) {
-                      return data;
+                      return handleNullRow(data);
                     },
                   },
                 };
@@ -287,7 +309,7 @@ export default (function PgTablesPlugin(builder, { pgInflection: inflection }) {
                     description: `A list of \`${tableTypeName}\` objects.`,
                     type: new GraphQLNonNull(new GraphQLList(TableType)),
                     resolve(data) {
-                      return data.data;
+                      return data.data.map(handleNullRow);
                     },
                   },
                   edges: {

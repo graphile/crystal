@@ -457,6 +457,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                                 key.class.namespace.name
                               )
                             ] = {
+                              description: key.description,
                               type: new GraphQLNonNull(
                                 pgGetGqlInputTypeByTypeId(key.typeId)
                               ),
