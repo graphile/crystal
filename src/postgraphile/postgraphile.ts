@@ -38,6 +38,7 @@ type PostGraphileOptions = {
   writeCache?: string,
   legacyRelations?: 'only' | 'deprecated' | 'omit',
   badlyBehavedFunctions?: boolean,
+  legacyJsonUuid?: boolean,
 }
 
 type PostgraphileSchemaBuilder = {

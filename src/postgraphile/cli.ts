@@ -71,6 +71,7 @@ program
   .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely')
   .option('-X, --no-server', 'for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
   .option('--badly-behaved-functions', 'if you have any functions that return setof a compound type (such as a table) and you want to return null for some of the results in the set you must enable this')
+  .option('--legacy-json-uuid', `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`)
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -129,6 +130,7 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   badlyBehavedFunctions,
+  legacyJsonUuid,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -245,6 +247,7 @@ const postgraphileOptions = {
   writeCache,
   legacyRelations,
   badlyBehavedFunctions,
+  legacyJsonUuid,
 }
 
 if (noServer) {

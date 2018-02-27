@@ -3361,16 +3361,15 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@4.0.0-alpha.2:
-  version "4.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-alpha.2.tgz#c58164beae63ae27586182313b8e34f8d3e51eda"
+graphile-build-pg@4.0.0-alpha.3:
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-alpha.3.tgz#61a130671b8e784dc81450610b78f16597909d32"
   dependencies:
     babel-runtime ">=6 <7"
     chalk "^2.1.0"
     debug ">=2 <3"
     graphile-build "4.0.0-alpha.1"
     graphql-iso-date "^3.2.0"
-    graphql-type-json "^0.1.4"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
     lru-cache "4.1.1"
@@ -3447,10 +3446,6 @@ graphql-request@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-1.4.0.tgz#f5b067c83070296d93fb45760e83dfad0d9f537a"
   dependencies:
     cross-fetch "0.0.8"
-
-graphql-type-json@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/graphql-type-json/-/graphql-type-json-0.1.4.tgz#89f13f5d32ce08c9a76c79fdf9c1968384d81a4e"
 
 "graphql@>=0.6 <0.13":
   version "0.12.3"
@@ -6255,13 +6250,13 @@ postcss@^6.0.1:
     source-map "^0.5.6"
     supports-color "^4.1.0"
 
-postgraphile-core@4.0.0-alpha.2:
-  version "4.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-alpha.2.tgz#468bd5cc19c63781df08701200db77e1ccc945b4"
+postgraphile-core@4.0.0-alpha.3:
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-alpha.3.tgz#5652dac1657cdd3009fe16922b1e2525d7e79471"
   dependencies:
     babel-runtime ">=6 <7"
     graphile-build "4.0.0-alpha.1"
-    graphile-build-pg "4.0.0-alpha.2"
+    graphile-build-pg "4.0.0-alpha.3"
 
 postgres-array@~1.0.0:
   version "1.0.2"
