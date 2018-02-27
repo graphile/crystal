@@ -73,6 +73,7 @@ program
   .option('-X, --no-server', '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
   .option('--badly-behaved-functions', 'if you have any functions that return setof a compound type (such as a table) and you want to return null for some of the results in the set you must enable this')
+  .option('--legacy-json-uuid', `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`)
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -132,6 +133,7 @@ const {
   server: yesServer,
   clusterWorkers,
   badlyBehavedFunctions,
+  legacyJsonUuid,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -248,6 +250,7 @@ const postgraphileOptions = {
   writeCache,
   legacyRelations,
   badlyBehavedFunctions,
+  legacyJsonUuid,
 }
 
 if (noServer) {
