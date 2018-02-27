@@ -72,6 +72,7 @@ program
   .option('--read-cache <path>', '[experimental] reads cached values from local cache file to improve startup time (you may want to do this in production)')
   .option('-X, --no-server', '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
+  .option('--badly-behaved-functions', 'if you have any functions that return setof a compound type (such as a table) and you want to return null for some of the results in the set you must enable this')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -130,6 +131,7 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   clusterWorkers,
+  badlyBehavedFunctions,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -245,6 +247,7 @@ const postgraphileOptions = {
   readCache,
   writeCache,
   legacyRelations,
+  badlyBehavedFunctions,
 }
 
 if (noServer) {
