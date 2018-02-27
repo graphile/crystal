@@ -50,11 +50,12 @@ const testFixtures = [
       }),
   },
   {
-    name: "prints a schema without legacy relations", // will be default in v5
+    name: "prints a schema without new relations and with legacy type names",
     createSchema: client =>
       createPostGraphQLSchema(client, "c", {
         legacyRelations: "only",
         enableTags: false,
+        legacyJsonUuid: true,
       }),
   },
 ];

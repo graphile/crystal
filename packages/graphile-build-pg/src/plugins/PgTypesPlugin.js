@@ -17,7 +17,10 @@ import {
 import { Kind } from "graphql/language";
 import { types as pgTypes } from "pg";
 
-import GraphQLJSON from "graphql-type-json";
+import { GraphQLJSON, GraphQLJson } from "../GraphQLJSON";
+
+import rawParseInterval from "postgres-interval";
+import LRU from "lru-cache";
 
 function indent(str) {
   return "  " + str.replace(/\n/g, "\n  ");
@@ -36,8 +39,6 @@ const stringType = (name, description) =>
       return ast.value;
     },
   });
-import rawParseInterval from "postgres-interval";
-import LRU from "lru-cache";
 /*
 const {
   GraphQLDate,
@@ -97,7 +98,7 @@ const pgRangeParser = {
 
 export default (function PgTypesPlugin(
   builder,
-  { pgExtendedTypes = true, pgInflection: inflection }
+  { pgExtendedTypes = true, pgInflection: inflection, pgLegacyJsonUuid = false }
 ) {
   // XXX: most of this should be in an "init" hook, not a "build" hook
   builder.hook("build", build => {
@@ -325,16 +326,18 @@ export default (function PgTypesPlugin(
       "The exact time of day, does not include the date. May or may not have a timezone offset."
     );
     const SimpleJSON = stringType(
-      "JSON",
+      pgLegacyJsonUuid ? "Json" : "JSON",
       "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)."
     );
     const SimpleUUID = stringType(
-      "UUID",
+      pgLegacyJsonUuid ? "Uuid" : "UUID",
       "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
     );
 
     // pgExtendedTypes might change what types we use for things
-    const JSONType = pgExtendedTypes ? GraphQLJSON : SimpleJSON;
+    const JSONType = pgExtendedTypes
+      ? pgLegacyJsonUuid ? GraphQLJson : GraphQLJSON
+      : SimpleJSON;
     const UUIDType = SimpleUUID; // GraphQLUUID
     const DateType = SimpleDate; // GraphQLDate
     const DateTimeType = SimpleDatetime; // GraphQLDateTime

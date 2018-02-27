@@ -46,6 +46,7 @@ type PostGraphQLOptions = {
   setWriteCacheCallback?: (fn: () => Promise<void>) => void,
   legacyRelations?: "only" | "deprecated",
   badlyBehavedFunctions?: boolean,
+  legacyJsonUuid?: boolean,
 };
 
 type PgConfig = Client | Pool | string;
@@ -108,6 +109,7 @@ const getPostGraphQLBuilder = async (
     setWriteCacheCallback,
     legacyRelations = "deprecated", // TODO: Change to 'omit' in v5
     badlyBehavedFunctions = false,
+    legacyJsonUuid = false,
   } = options;
 
   if (
@@ -218,6 +220,7 @@ const getPostGraphQLBuilder = async (
         pgViewUniqueKey: viewUniqueKey,
         pgEnableTags: enableTags,
         pgLegacyRelations: legacyRelations,
+        pgLegacyJsonUuid: legacyJsonUuid,
         persistentMemoizeWithKey,
         pgForbidSetofFunctionsToReturnNull: !badlyBehavedFunctions,
       },

@@ -12294,7 +12294,7 @@ input WrappedUrlInput {
 "
 `;
 
-exports[`prints a schema without legacy relations 1`] = `
+exports[`prints a schema without new relations and with legacy type names 1`] = `
 "enum AnEnum {
   _ASTERISK_BAR_
   _ASTERISK_BAZ_ASTERISK_
@@ -12422,7 +12422,7 @@ type CompoundType {
   b: String
   c: Color
   computedField: Int
-  d: UUID
+  d: Uuid
   e: EnumCaps
   f: EnumWithEmptyString
   fooBar: Int
@@ -13035,7 +13035,7 @@ type IntSetQueryEdge {
 \\"\\"\\"
 A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 \\"\\"\\"
-scalar JSON
+scalar Json
 
 \\"\\"\\"All input for the \`jsonbIdentityMutation\` mutation.\\"\\"\\"
 input JsonbIdentityMutationInput {
@@ -13044,7 +13044,7 @@ input JsonbIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 }
 
 \\"\\"\\"The output of our \`jsonbIdentityMutation\` mutation.\\"\\"\\"
@@ -13054,7 +13054,7 @@ type JsonbIdentityMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -13064,7 +13064,7 @@ type JsonbIdentityMutationPayload {
 
 \\"\\"\\"All input for the \`jsonbIdentityMutationPlpgsql\` mutation.\\"\\"\\"
 input JsonbIdentityMutationPlpgsqlInput {
-  _theJson: JSON!
+  _theJson: Json!
 
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -13080,7 +13080,7 @@ type JsonbIdentityMutationPlpgsqlPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -13090,7 +13090,7 @@ type JsonbIdentityMutationPlpgsqlPayload {
 
 \\"\\"\\"All input for the \`jsonbIdentityMutationPlpgsqlWithDefault\` mutation.\\"\\"\\"
 input JsonbIdentityMutationPlpgsqlWithDefaultInput {
-  _theJson: JSON
+  _theJson: Json
 
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -13106,7 +13106,7 @@ type JsonbIdentityMutationPlpgsqlWithDefaultPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -13121,7 +13121,7 @@ input JsonIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 }
 
 \\"\\"\\"The output of our \`jsonIdentityMutation\` mutation.\\"\\"\\"
@@ -13131,7 +13131,7 @@ type JsonIdentityMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  json: JSON
+  json: Json
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -14112,8 +14112,8 @@ type Query implements Node {
     y: Int
     z: Int
   ): IntSetQueryConnection!
-  jsonIdentity(json: JSON): JSON
-  jsonbIdentity(json: JSON): JSON
+  jsonIdentity(json: Json): Json
+  jsonbIdentity(json: Json): Json
 
   \\"\\"\\"Reads a single \`LeftArm\` using its globally unique \`ID\`.\\"\\"\\"
   leftArm(
@@ -14179,7 +14179,7 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): PeopleConnection!
-  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+  typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 }
 
 \\"\\"\\"All input for the \`tableMutation\` mutation.\\"\\"\\"
@@ -14249,7 +14249,7 @@ input TypesMutationInput {
   \\"\\"\\"
   clientMutationId: String
   d: [Int]!
-  e: JSON!
+  e: Json!
   f: FloatRangeInput!
 }
 
@@ -14547,7 +14547,7 @@ type UpdatePersonSecretPayload {
 \\"\\"\\"
 A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
 \\"\\"\\"
-scalar UUID
+scalar Uuid
 
 type WrappedUrl {
   url: NotNullUrl!
