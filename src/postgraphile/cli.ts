@@ -70,6 +70,7 @@ program
   .option('--read-cache <path>', 'reads cached values from local cache file to improve startup time (you may want to do this in production)')
   .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely')
   .option('-X, --no-server', 'for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
+  .option('--badly-behaved-functions', 'if you have any functions that return setof a compound type (such as a table) and you want to return null for some of the results in the set you must enable this')
 
 program.on('--help', () => console.log(`
   Get Started:
@@ -127,6 +128,7 @@ const {
   writeCache,
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
+  badlyBehavedFunctions,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -242,6 +244,7 @@ const postgraphileOptions = {
   readCache,
   writeCache,
   legacyRelations,
+  badlyBehavedFunctions,
 }
 
 if (noServer) {

@@ -37,6 +37,7 @@ type PostGraphileOptions = {
   readCache?: string,
   writeCache?: string,
   legacyRelations?: 'only' | 'deprecated' | 'omit',
+  badlyBehavedFunctions?: boolean,
 }
 
 type PostgraphileSchemaBuilder = {
