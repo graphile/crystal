@@ -62,7 +62,7 @@ type CompoundKeysConnection {
   edges: [CompoundKeysEdge!]!
 
   \"\"\"A list of \`CompoundKey\` objects.\"\"\"
-  nodes: [CompoundKey]!
+  nodes: [CompoundKey!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -116,7 +116,7 @@ type CreateCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was created by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -157,7 +157,7 @@ type CreateEdgeCasePayload {
   \"\"\"The \`EdgeCase\` that was created by this mutation.\"\"\"
   edgeCase: EdgeCase
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`EdgeCase\`. May be used by Relay 1.\"\"\"
   edgeCaseEdge(
     \"\"\"The method to use when ordering \`EdgeCase\`.\"\"\"
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
@@ -192,7 +192,7 @@ type CreatePersonPayload {
   \"\"\"The \`Person\` that was created by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -251,7 +251,7 @@ type DeleteCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was deleted by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -316,7 +316,7 @@ type DeletePersonPayload {
   \"\"\"The \`Person\` that was deleted by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -365,7 +365,7 @@ type EdgeCasesConnection {
   edges: [EdgeCasesEdge!]!
 
   \"\"\"A list of \`EdgeCase\` objects.\"\"\"
-  nodes: [EdgeCase]!
+  nodes: [EdgeCase!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -451,7 +451,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \"\"\"A list of \`Int\` objects.\"\"\"
-  nodes: [Int]!
+  nodes: [Int!]!
 }
 
 \"\"\"A \`Int\` edge in the connection.\"\"\"
@@ -697,7 +697,7 @@ type PeopleConnection {
   edges: [PeopleEdge!]!
 
   \"\"\"A list of \`Person\` objects.\"\"\"
-  nodes: [Person]!
+  nodes: [Person!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -1094,7 +1094,7 @@ type TableSetMutationPayload {
   clientMutationId: String
   people: [Person]
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1186,7 +1186,7 @@ type UpdateCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was updated by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1264,7 +1264,7 @@ type UpdatePersonPayload {
   \"\"\"The \`Person\` that was updated by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1508,7 +1508,7 @@ type CreateTypePayload {
   \"\"\"The \`Type\` that was created by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1543,7 +1543,7 @@ type CreateUpdatableViewPayload {
   \"\"\"The \`UpdatableView\` that was created by this mutation.\"\"\"
   updatableView: UpdatableView
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`UpdatableView\`. May be used by Relay 1.\"\"\"
   updatableViewEdge(
     \"\"\"The method to use when ordering \`UpdatableView\`.\"\"\"
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
@@ -1643,7 +1643,7 @@ type DeleteTypePayload {
   \"\"\"The \`Type\` that was deleted by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -2233,7 +2233,7 @@ type TypesConnection {
   edges: [TypesEdge!]!
 
   \"\"\"A list of \`Type\` objects.\"\"\"
-  nodes: [Type]!
+  nodes: [Type!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -2354,7 +2354,7 @@ type UpdatableViewsConnection {
   edges: [UpdatableViewsEdge!]!
 
   \"\"\"A list of \`UpdatableView\` objects.\"\"\"
-  nodes: [UpdatableView]!
+  nodes: [UpdatableView!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -2435,7 +2435,7 @@ type UpdateTypePayload {
   \"\"\"The \`Type\` that was updated by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -2801,7 +2801,7 @@ type CompoundKeysConnection {
   edges: [CompoundKeysEdge!]!
 
   \"\"\"A list of \`CompoundKey\` objects.\"\"\"
-  nodes: [CompoundKey]!
+  nodes: [CompoundKey!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -2899,7 +2899,7 @@ type CreateCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was created by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -2940,7 +2940,7 @@ type CreateEdgeCasePayload {
   \"\"\"The \`EdgeCase\` that was created by this mutation.\"\"\"
   edgeCase: EdgeCase
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`EdgeCase\`. May be used by Relay 1.\"\"\"
   edgeCaseEdge(
     \"\"\"The method to use when ordering \`EdgeCase\`.\"\"\"
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
@@ -2978,7 +2978,7 @@ type CreateForeignKeyPayload {
   \"\"\"The \`ForeignKey\` that was created by this mutation.\"\"\"
   foreignKey: ForeignKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`ForeignKey\`. May be used by Relay 1.\"\"\"
   foreignKeyEdge(
     \"\"\"The method to use when ordering \`ForeignKey\`.\"\"\"
     orderBy: [ForeignKeysOrderBy!] = [NATURAL]
@@ -3016,7 +3016,7 @@ type CreatePersonPayload {
   \"\"\"The \`Person\` that was created by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3054,7 +3054,7 @@ type CreatePostPayload {
   \"\"\"The \`Post\` that was created by this mutation.\"\"\"
   post: Post
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Post\`. May be used by Relay 1.\"\"\"
   postEdge(
     \"\"\"The method to use when ordering \`Post\`.\"\"\"
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3094,7 +3094,7 @@ type CreateSimilarTable1Payload {
   \"\"\"The \`SimilarTable1\` that was created by this mutation.\"\"\"
   similarTable1: SimilarTable1
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\"\"\"
   similarTable1Edge(
     \"\"\"The method to use when ordering \`SimilarTable1\`.\"\"\"
     orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3129,7 +3129,7 @@ type CreateSimilarTable2Payload {
   \"\"\"The \`SimilarTable2\` that was created by this mutation.\"\"\"
   similarTable2: SimilarTable2
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\"\"\"
   similarTable2Edge(
     \"\"\"The method to use when ordering \`SimilarTable2\`.\"\"\"
     orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3164,7 +3164,7 @@ type CreateTypePayload {
   \"\"\"The \`Type\` that was created by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3199,7 +3199,7 @@ type CreateUpdatableViewPayload {
   \"\"\"The \`UpdatableView\` that was created by this mutation.\"\"\"
   updatableView: UpdatableView
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`UpdatableView\`. May be used by Relay 1.\"\"\"
   updatableViewEdge(
     \"\"\"The method to use when ordering \`UpdatableView\`.\"\"\"
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
@@ -3296,7 +3296,7 @@ type DeleteCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was deleted by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3361,7 +3361,7 @@ type DeletePersonPayload {
   \"\"\"The \`Person\` that was deleted by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3412,7 +3412,7 @@ type DeletePostPayload {
   \"\"\"The \`Post\` that was deleted by this mutation.\"\"\"
   post: Post
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Post\`. May be used by Relay 1.\"\"\"
   postEdge(
     \"\"\"The method to use when ordering \`Post\`.\"\"\"
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3465,7 +3465,7 @@ type DeleteSimilarTable1Payload {
   \"\"\"The \`SimilarTable1\` that was deleted by this mutation.\"\"\"
   similarTable1: SimilarTable1
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\"\"\"
   similarTable1Edge(
     \"\"\"The method to use when ordering \`SimilarTable1\`.\"\"\"
     orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3513,7 +3513,7 @@ type DeleteSimilarTable2Payload {
   \"\"\"The \`SimilarTable2\` that was deleted by this mutation.\"\"\"
   similarTable2: SimilarTable2
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\"\"\"
   similarTable2Edge(
     \"\"\"The method to use when ordering \`SimilarTable2\`.\"\"\"
     orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3561,7 +3561,7 @@ type DeleteTypePayload {
   \"\"\"The \`Type\` that was deleted by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -3605,7 +3605,7 @@ type EdgeCasesConnection {
   edges: [EdgeCasesEdge!]!
 
   \"\"\"A list of \`EdgeCase\` objects.\"\"\"
-  nodes: [EdgeCase]!
+  nodes: [EdgeCase!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -3698,7 +3698,7 @@ type ForeignKeysConnection {
   edges: [ForeignKeysEdge!]!
 
   \"\"\"A list of \`ForeignKey\` objects.\"\"\"
-  nodes: [ForeignKey]!
+  nodes: [ForeignKey!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -3816,7 +3816,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \"\"\"A list of \`Int\` objects.\"\"\"
-  nodes: [Int]!
+  nodes: [Int!]!
 }
 
 \"\"\"A \`Int\` edge in the connection.\"\"\"
@@ -4449,7 +4449,7 @@ type NonUpdatableViewsConnection {
   edges: [NonUpdatableViewsEdge!]!
 
   \"\"\"A list of \`NonUpdatableView\` objects.\"\"\"
-  nodes: [NonUpdatableView]!
+  nodes: [NonUpdatableView!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -4499,7 +4499,7 @@ type PeopleConnection {
   edges: [PeopleEdge!]!
 
   \"\"\"A list of \`Person\` objects.\"\"\"
-  nodes: [Person]!
+  nodes: [Person!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -4792,7 +4792,7 @@ type PostsConnection {
   edges: [PostsEdge!]!
 
   \"\"\"A list of \`Post\` objects.\"\"\"
-  nodes: [Post]!
+  nodes: [Post!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -5323,7 +5323,7 @@ type SimilarTable1SConnection {
   edges: [SimilarTable1SEdge!]!
 
   \"\"\"A list of \`SimilarTable1\` objects.\"\"\"
-  nodes: [SimilarTable1]!
+  nodes: [SimilarTable1!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -5412,7 +5412,7 @@ type SimilarTable2SConnection {
   edges: [SimilarTable2SEdge!]!
 
   \"\"\"A list of \`SimilarTable2\` objects.\"\"\"
-  nodes: [SimilarTable2]!
+  nodes: [SimilarTable2!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -5467,7 +5467,7 @@ type TableMutationPayload {
   personByAuthorId: Person
   post: Post
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Post\`. May be used by Relay 1.\"\"\"
   postEdge(
     \"\"\"The method to use when ordering \`Post\`.\"\"\"
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
@@ -5497,7 +5497,7 @@ type TableSetMutationPayload {
   clientMutationId: String
   people: [Person]
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -5701,7 +5701,7 @@ type TypesConnection {
   edges: [TypesEdge!]!
 
   \"\"\"A list of \`Type\` objects.\"\"\"
-  nodes: [Type]!
+  nodes: [Type!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -5854,7 +5854,7 @@ type UpdatableViewsConnection {
   edges: [UpdatableViewsEdge!]!
 
   \"\"\"A list of \`UpdatableView\` objects.\"\"\"
-  nodes: [UpdatableView]!
+  nodes: [UpdatableView!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -5933,7 +5933,7 @@ type UpdateCompoundKeyPayload {
   \"\"\"The \`CompoundKey\` that was updated by this mutation.\"\"\"
   compoundKey: CompoundKey
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`CompoundKey\`. May be used by Relay 1.\"\"\"
   compoundKeyEdge(
     \"\"\"The method to use when ordering \`CompoundKey\`.\"\"\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6011,7 +6011,7 @@ type UpdatePersonPayload {
   \"\"\"The \`Person\` that was updated by this mutation.\"\"\"
   person: Person
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6071,7 +6071,7 @@ type UpdatePostPayload {
   \"\"\"The \`Post\` that was updated by this mutation.\"\"\"
   post: Post
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Post\`. May be used by Relay 1.\"\"\"
   postEdge(
     \"\"\"The method to use when ordering \`Post\`.\"\"\"
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6133,7 +6133,7 @@ type UpdateSimilarTable1Payload {
   \"\"\"The \`SimilarTable1\` that was updated by this mutation.\"\"\"
   similarTable1: SimilarTable1
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\"\"\"
   similarTable1Edge(
     \"\"\"The method to use when ordering \`SimilarTable1\`.\"\"\"
     orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6190,7 +6190,7 @@ type UpdateSimilarTable2Payload {
   \"\"\"The \`SimilarTable2\` that was updated by this mutation.\"\"\"
   similarTable2: SimilarTable2
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\"\"\"
   similarTable2Edge(
     \"\"\"The method to use when ordering \`SimilarTable2\`.\"\"\"
     orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6247,7 +6247,7 @@ type UpdateTypePayload {
   \"\"\"The \`Type\` that was updated by this mutation.\"\"\"
   type: Type
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Type\`. May be used by Relay 1.\"\"\"
   typeEdge(
     \"\"\"The method to use when ordering \`Type\`.\"\"\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
@@ -6309,7 +6309,7 @@ type CompoundKeysConnection {
   edges: [CompoundKeysEdge!]!
 
   \"\"\"A list of \`CompoundKey\` objects.\"\"\"
-  nodes: [CompoundKey]!
+  nodes: [CompoundKey!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -6379,7 +6379,7 @@ type EdgeCasesConnection {
   edges: [EdgeCasesEdge!]!
 
   \"\"\"A list of \`EdgeCase\` objects.\"\"\"
-  nodes: [EdgeCase]!
+  nodes: [EdgeCase!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -6465,7 +6465,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \"\"\"A list of \`Int\` objects.\"\"\"
-  nodes: [Int]!
+  nodes: [Int!]!
 }
 
 \"\"\"A \`Int\` edge in the connection.\"\"\"
@@ -6606,7 +6606,7 @@ type PeopleConnection {
   edges: [PeopleEdge!]!
 
   \"\"\"A list of \`Person\` objects.\"\"\"
-  nodes: [Person]!
+  nodes: [Person!]!
 
   \"\"\"Information to aid in pagination.\"\"\"
   pageInfo: PageInfo!
@@ -6979,7 +6979,7 @@ type TableSetMutationPayload {
   clientMutationId: String
   people: [Person]
 
-  \"\"\"An edge for the type. May be used by Relay 1.\"\"\"
+  \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
     \"\"\"The method to use when ordering \`Person\`.\"\"\"
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
