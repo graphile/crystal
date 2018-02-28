@@ -32,6 +32,7 @@ program
   .usage('[options...]')
   .description(manifest.description)
   // .option('-d, --demo', 'run PostGraphile using the demo database connection')
+  // Standard options
   .option('-c, --connection <string>', 'the Postgres connection. if not provided it will be inferred from your environment, example: postgres://user:password@domain:port/db')
   .option('-s, --schema <string>', 'a Postgres schema to be introspected. Use commas to define multiple schemas', (option: string) => option.split(','))
   .option('-w, --watch', 'watches the Postgres schema for changes and reruns introspection if a change was detected')
@@ -39,18 +40,32 @@ program
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
+  // Schema configuration
+  .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
+  .option('-N, --no-setof-functions-contain-nulls', 'if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
+  .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
+  .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  // Error enhancements
+  .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors')
+  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
+  // Plugin-related options
+  .option('--append-plugins <string>', 'a comma-separated list of plugins to append to the list of GraphQL schema plugins')
+  .option('--prepend-plugins <string>', 'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins')
+  // Things that relate to -X
+  .option('--read-cache <path>', '[experimental] reads cached values from local cache file to improve startup time (you may want to do this in production)')
+  .option('--write-cache <path>', '[experimental] writes computed values to local cache file so startup can be faster (do this during the build phase)')
+  .option('--export-schema-json <path>', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
+  .option('--export-schema-graphql <path>', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
+  .option('-X, --no-server', '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
+  // Webserver configuration
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
-  .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
-  .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
-  .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
-  .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
+  .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
+  // JSON-related options
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
-  .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
   .option('--jwt-verify-algorithms <string>', 'a comma separated list of the names of the allowed jwt token algorithms', (option: string) => option.split(','))
   .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphile`', (option: string) => option.split(','))
   .option('--jwt-verify-clock-tolerance <number>', 'number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers', parseFloat)
@@ -61,23 +76,20 @@ program
   .option('--jwt-verify-subject <string>', 'the name of the allowed jwt token subject')
   .option('--jwt-role <string>', 'a comma seperated list of strings that create a path in the jwt from which to extract the postgres role. if none is provided it will use the key `role` on the root of the jwt.', (option: string) => option.split(','))
   .option('-t, --jwt-token-identifier <identifier>', 'the Postgres identifier for a composite type that will be used to create JWT tokens')
-  .option('--append-plugins <string>', 'a comma-separated list of plugins to append to the list of GraphQL schema plugins')
-  .option('--prepend-plugins <string>', 'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins')
-  .option('--export-schema-json <path>', 'enables exporting the detected schema, in JSON format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
-  .option('--export-schema-graphql <path>', 'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.')
-  .option('--show-error-stack [setting]', 'show JavaScript error stacks in the GraphQL result errors')
-  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
+  // Deprecated
+  .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
+  .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
+  .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
+  // Awkward application workarounds / legacy support
   .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely')
-  .option('--write-cache <path>', '[experimental] writes computed values to local cache file so startup can be faster (do this during the build phase)')
-  .option('--read-cache <path>', '[experimental] reads cached values from local cache file to improve startup time (you may want to do this in production)')
-  .option('-X, --no-server', '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)')
-  .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
+  .option('--legacy-json-uuid', `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`)
 
 program.on('--help', () => console.log(`
-  Get Started:
+  Get started:
 
-    $ postgraphile --demo
-    $ postgraphile --schema my_schema
+    $ postgraphile
+    $ postgraphile -c postgres://localhost/my_db
+    $ postgraphile --connection postgres://user:pass@localhost/my_db --schema my_schema --watch --dynamic-json
 `.slice(1)))
 
 program.parse(process.argv)
@@ -130,6 +142,8 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   clusterWorkers,
+  setofFunctionsContainNulls = true,
+  legacyJsonUuid,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -245,6 +259,8 @@ const postgraphileOptions = {
   readCache,
   writeCache,
   legacyRelations,
+  setofFunctionsContainNulls,
+  legacyJsonUuid,
 }
 
 if (noServer) {
