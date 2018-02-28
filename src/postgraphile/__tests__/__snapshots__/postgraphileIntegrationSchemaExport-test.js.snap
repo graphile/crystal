@@ -338,7 +338,7 @@ input CompoundKeyPatch {
 \"\"\"A connection to a list of \`CompoundKey\` values.\"\"\"
 type CompoundKeysConnection {
   \"\"\"A list of \`CompoundKey\` objects.\"\"\"
-  nodes: [CompoundKey!]!
+  nodes: [CompoundKey]!
 
   \"\"\"
   A list of edges which contains the \`CompoundKey\` and cursor to aid in pagination.
@@ -358,7 +358,7 @@ type CompoundKeysEdge {
   cursor: Cursor
 
   \"\"\"The \`CompoundKey\` at the end of the edge.\"\"\"
-  node: CompoundKey!
+  node: CompoundKey
 }
 
 \"\"\"Methods to use when ordering \`CompoundKey\`.\"\"\"
@@ -1142,7 +1142,7 @@ input EdgeCaseInput {
 \"\"\"A connection to a list of \`EdgeCase\` values.\"\"\"
 type EdgeCasesConnection {
   \"\"\"A list of \`EdgeCase\` objects.\"\"\"
-  nodes: [EdgeCase!]!
+  nodes: [EdgeCase]!
 
   \"\"\"
   A list of edges which contains the \`EdgeCase\` and cursor to aid in pagination.
@@ -1162,7 +1162,7 @@ type EdgeCasesEdge {
   cursor: Cursor
 
   \"\"\"The \`EdgeCase\` at the end of the edge.\"\"\"
-  node: EdgeCase!
+  node: EdgeCase
 }
 
 \"\"\"Methods to use when ordering \`EdgeCase\`.\"\"\"
@@ -1235,7 +1235,7 @@ input ForeignKeyInput {
 \"\"\"A connection to a list of \`ForeignKey\` values.\"\"\"
 type ForeignKeysConnection {
   \"\"\"A list of \`ForeignKey\` objects.\"\"\"
-  nodes: [ForeignKey!]!
+  nodes: [ForeignKey]!
 
   \"\"\"
   A list of edges which contains the \`ForeignKey\` and cursor to aid in pagination.
@@ -1255,7 +1255,7 @@ type ForeignKeysEdge {
   cursor: Cursor
 
   \"\"\"The \`ForeignKey\` at the end of the edge.\"\"\"
-  node: ForeignKey!
+  node: ForeignKey
 }
 
 \"\"\"Methods to use when ordering \`ForeignKey\`.\"\"\"
@@ -1353,7 +1353,7 @@ type IntSetMutationPayload {
 \"\"\"A connection to a list of \`Int\` values.\"\"\"
 type IntSetQueryConnection {
   \"\"\"A list of \`Int\` objects.\"\"\"
-  nodes: [Int!]!
+  nodes: [Int]!
 
   \"\"\"
   A list of edges which contains the \`Int\` and cursor to aid in pagination.
@@ -1982,7 +1982,7 @@ input NonUpdatableViewCondition {
 \"\"\"A connection to a list of \`NonUpdatableView\` values.\"\"\"
 type NonUpdatableViewsConnection {
   \"\"\"A list of \`NonUpdatableView\` objects.\"\"\"
-  nodes: [NonUpdatableView!]!
+  nodes: [NonUpdatableView]!
 
   \"\"\"
   A list of edges which contains the \`NonUpdatableView\` and cursor to aid in pagination.
@@ -2004,7 +2004,7 @@ type NonUpdatableViewsEdge {
   cursor: Cursor
 
   \"\"\"The \`NonUpdatableView\` at the end of the edge.\"\"\"
-  node: NonUpdatableView!
+  node: NonUpdatableView
 }
 
 \"\"\"Methods to use when ordering \`NonUpdatableView\`.\"\"\"
@@ -2032,7 +2032,7 @@ type PageInfo {
 \"\"\"A connection to a list of \`Person\` values.\"\"\"
 type PeopleConnection {
   \"\"\"A list of \`Person\` objects.\"\"\"
-  nodes: [Person!]!
+  nodes: [Person]!
 
   \"\"\"
   A list of edges which contains the \`Person\` and cursor to aid in pagination.
@@ -2052,7 +2052,7 @@ type PeopleEdge {
   cursor: Cursor
 
   \"\"\"The \`Person\` at the end of the edge.\"\"\"
-  node: Person!
+  node: Person
 }
 
 \"\"\"Methods to use when ordering \`Person\`.\"\"\"
@@ -2323,7 +2323,7 @@ input PostPatch {
 \"\"\"A connection to a list of \`Post\` values.\"\"\"
 type PostsConnection {
   \"\"\"A list of \`Post\` objects.\"\"\"
-  nodes: [Post!]!
+  nodes: [Post]!
 
   \"\"\"
   A list of edges which contains the \`Post\` and cursor to aid in pagination.
@@ -2343,7 +2343,7 @@ type PostsEdge {
   cursor: Cursor
 
   \"\"\"The \`Post\` at the end of the edge.\"\"\"
-  node: Post!
+  node: Post
 }
 
 \"\"\"Methods to use when ordering \`Post\`.\"\"\"
@@ -2854,7 +2854,7 @@ input SimilarTable1Patch {
 \"\"\"A connection to a list of \`SimilarTable1\` values.\"\"\"
 type SimilarTable1SConnection {
   \"\"\"A list of \`SimilarTable1\` objects.\"\"\"
-  nodes: [SimilarTable1!]!
+  nodes: [SimilarTable1]!
 
   \"\"\"
   A list of edges which contains the \`SimilarTable1\` and cursor to aid in pagination.
@@ -2874,7 +2874,7 @@ type SimilarTable1SEdge {
   cursor: Cursor
 
   \"\"\"The \`SimilarTable1\` at the end of the edge.\"\"\"
-  node: SimilarTable1!
+  node: SimilarTable1
 }
 
 \"\"\"Methods to use when ordering \`SimilarTable1\`.\"\"\"
@@ -2942,7 +2942,7 @@ input SimilarTable2Patch {
 \"\"\"A connection to a list of \`SimilarTable2\` values.\"\"\"
 type SimilarTable2SConnection {
   \"\"\"A list of \`SimilarTable2\` objects.\"\"\"
-  nodes: [SimilarTable2!]!
+  nodes: [SimilarTable2]!
 
   \"\"\"
   A list of edges which contains the \`SimilarTable2\` and cursor to aid in pagination.
@@ -2962,7 +2962,7 @@ type SimilarTable2SEdge {
   cursor: Cursor
 
   \"\"\"The \`SimilarTable2\` at the end of the edge.\"\"\"
-  node: SimilarTable2!
+  node: SimilarTable2
 }
 
 \"\"\"Methods to use when ordering \`SimilarTable2\`.\"\"\"
@@ -3230,7 +3230,7 @@ input TypePatch {
 \"\"\"A connection to a list of \`Type\` values.\"\"\"
 type TypesConnection {
   \"\"\"A list of \`Type\` objects.\"\"\"
-  nodes: [Type!]!
+  nodes: [Type]!
 
   \"\"\"
   A list of edges which contains the \`Type\` and cursor to aid in pagination.
@@ -3250,7 +3250,7 @@ type TypesEdge {
   cursor: Cursor
 
   \"\"\"The \`Type\` at the end of the edge.\"\"\"
-  node: Type!
+  node: Type
 }
 
 \"\"\"All input for the \`typesMutation\` mutation.\"\"\"
@@ -3383,7 +3383,7 @@ input UpdatableViewInput {
 \"\"\"A connection to a list of \`UpdatableView\` values.\"\"\"
 type UpdatableViewsConnection {
   \"\"\"A list of \`UpdatableView\` objects.\"\"\"
-  nodes: [UpdatableView!]!
+  nodes: [UpdatableView]!
 
   \"\"\"
   A list of edges which contains the \`UpdatableView\` and cursor to aid in pagination.
@@ -3403,7 +3403,7 @@ type UpdatableViewsEdge {
   cursor: Cursor
 
   \"\"\"The \`UpdatableView\` at the end of the edge.\"\"\"
-  node: UpdatableView!
+  node: UpdatableView
 }
 
 \"\"\"Methods to use when ordering \`UpdatableView\`.\"\"\"
@@ -5851,13 +5851,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"ForeignKey\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"ForeignKey\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -6743,13 +6739,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"Post\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"Post\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -6970,13 +6962,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`Post\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Post\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Post\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -7186,13 +7174,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"CompoundKey\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"CompoundKey\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -7475,13 +7459,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`CompoundKey\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"CompoundKey\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"CompoundKey\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -7508,13 +7488,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"Person\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"Person\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -7601,13 +7577,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`Person\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Person\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Person\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -7640,13 +7612,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`ForeignKey\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"ForeignKey\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"ForeignKey\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -7723,13 +7691,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"NonUpdatableView\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"NonUpdatableView\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -7839,13 +7803,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`NonUpdatableView\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"NonUpdatableView\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"NonUpdatableView\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -8000,13 +7960,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"SimilarTable1\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"SimilarTable1\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -8182,13 +8138,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`SimilarTable1\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"SimilarTable1\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"SimilarTable1\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -8343,13 +8295,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"SimilarTable2\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"SimilarTable2\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -8525,13 +8473,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`SimilarTable2\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"SimilarTable2\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"SimilarTable2\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -9676,13 +9620,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"Type\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"Type\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -10665,13 +10605,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`Type\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"Type\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"Type\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -10814,13 +10750,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"UpdatableView\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"UpdatableView\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -10966,13 +10898,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`UpdatableView\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"UpdatableView\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"UpdatableView\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11093,13 +11021,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"OBJECT\",
-                      \"name\": \"EdgeCase\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"OBJECT\",
+                    \"name\": \"EdgeCase\",
+                    \"ofType\": null
                   }
                 }
               },
@@ -11249,13 +11173,9 @@ exports[`test exports a schema as JSON 1`] = `
               \"description\": \"The \`EdgeCase\` at the end of the edge.\",
               \"args\": [],
               \"type\": {
-                \"kind\": \"NON_NULL\",
-                \"name\": null,
-                \"ofType\": {
-                  \"kind\": \"OBJECT\",
-                  \"name\": \"EdgeCase\",
-                  \"ofType\": null
-                }
+                \"kind\": \"OBJECT\",
+                \"name\": \"EdgeCase\",
+                \"ofType\": null
               },
               \"isDeprecated\": false,
               \"deprecationReason\": null
@@ -11432,13 +11352,9 @@ exports[`test exports a schema as JSON 1`] = `
                   \"kind\": \"LIST\",
                   \"name\": null,
                   \"ofType\": {
-                    \"kind\": \"NON_NULL\",
-                    \"name\": null,
-                    \"ofType\": {
-                      \"kind\": \"SCALAR\",
-                      \"name\": \"Int\",
-                      \"ofType\": null
-                    }
+                    \"kind\": \"SCALAR\",
+                    \"name\": \"Int\",
+                    \"ofType\": null
                   }
                 }
               },
