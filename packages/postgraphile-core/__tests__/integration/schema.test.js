@@ -18,7 +18,10 @@ const testFixtures = [
   {
     name: "prints a schema with Relay 1 style ids",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", { classicIds: true }),
+      createPostGraphQLSchema(client, "c", {
+        classicIds: true,
+        setofFunctionsContainNulls: false,
+      }),
   },
   {
     name: "prints a schema with a JWT generating mutation",
@@ -31,13 +34,17 @@ const testFixtures = [
   {
     name: "prints a schema without default mutations",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", { disableDefaultMutations: true }),
+      createPostGraphQLSchema(client, "c", {
+        disableDefaultMutations: true,
+        setofFunctionsContainNulls: false,
+      }),
   },
   {
     name: "prints a schema without posts headlines",
     createSchema: client =>
       createPostGraphQLSchema(client, "a", {
         pgColumnFilter: attr => attr.name !== "headline",
+        setofFunctionsContainNulls: false,
       }),
   },
   {
@@ -47,6 +54,7 @@ const testFixtures = [
       createPostGraphQLSchema(client, "c", {
         enableTags: false,
         legacyRelations: "omit",
+        setofFunctionsContainNulls: false,
       }),
   },
   {
@@ -56,6 +64,7 @@ const testFixtures = [
         legacyRelations: "only",
         enableTags: false,
         legacyJsonUuid: true,
+        setofFunctionsContainNulls: false,
       }),
   },
 ];

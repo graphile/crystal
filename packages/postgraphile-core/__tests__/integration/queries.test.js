@@ -37,13 +37,17 @@ beforeAll(() => {
     ] = await Promise.all([
       createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], { dynamicJson: true }),
+      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+        dynamicJson: true,
+        setofFunctionsContainNulls: null,
+      }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
         pgColumnFilter: attr => attr.name !== "headline",
+        setofFunctionsContainNulls: false,
       }),
       createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
         viewUniqueKey: "testviewid",
-        badlyBehavedFunctions: true,
+        setofFunctionsContainNulls: true,
       }),
     ]);
     debug(printSchema(normal));

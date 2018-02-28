@@ -3342,7 +3342,7 @@ type TypesConnection {
   edges: [TypesEdge!]!
 
   \\"\\"\\"A list of \`Type\` objects.\\"\\"\\"
-  nodes: [Type!]!
+  nodes: [Type]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -3357,7 +3357,7 @@ type TypesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Type\` at the end of the edge.\\"\\"\\"
-  node: Type!
+  node: Type
 }
 
 \\"\\"\\"Methods to use when ordering \`Type\`.\\"\\"\\"
@@ -3473,7 +3473,7 @@ type UpdatableViewsConnection {
   edges: [UpdatableViewsEdge!]!
 
   \\"\\"\\"A list of \`UpdatableView\` objects.\\"\\"\\"
-  nodes: [UpdatableView!]!
+  nodes: [UpdatableView]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -3488,7 +3488,7 @@ type UpdatableViewsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`UpdatableView\` at the end of the edge.\\"\\"\\"
-  node: UpdatableView!
+  node: UpdatableView
 }
 
 \\"\\"\\"Methods to use when ordering \`UpdatableView\`.\\"\\"\\"
@@ -3992,7 +3992,7 @@ type CompoundKeysConnection {
   edges: [CompoundKeysEdge!]!
 
   \\"\\"\\"A list of \`CompoundKey\` objects.\\"\\"\\"
-  nodes: [CompoundKey!]!
+  nodes: [CompoundKey]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -4007,7 +4007,7 @@ type CompoundKeysEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`CompoundKey\` at the end of the edge.\\"\\"\\"
-  node: CompoundKey!
+  node: CompoundKey
 }
 
 \\"\\"\\"Methods to use when ordering \`CompoundKey\`.\\"\\"\\"
@@ -4079,7 +4079,7 @@ type CompoundTypesConnection {
   edges: [CompoundTypesEdge!]!
 
   \\"\\"\\"A list of \`CompoundType\` objects.\\"\\"\\"
-  nodes: [CompoundType!]!
+  nodes: [CompoundType]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -4094,7 +4094,7 @@ type CompoundTypesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`CompoundType\` at the end of the edge.\\"\\"\\"
-  node: CompoundType!
+  node: CompoundType
 }
 
 type Comptype {
@@ -4890,7 +4890,7 @@ type DefaultValuesConnection {
   edges: [DefaultValuesEdge!]!
 
   \\"\\"\\"A list of \`DefaultValue\` objects.\\"\\"\\"
-  nodes: [DefaultValue!]!
+  nodes: [DefaultValue]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -4905,7 +4905,7 @@ type DefaultValuesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`DefaultValue\` at the end of the edge.\\"\\"\\"
-  node: DefaultValue!
+  node: DefaultValue
 }
 
 \\"\\"\\"Methods to use when ordering \`DefaultValue\`.\\"\\"\\"
@@ -5716,7 +5716,7 @@ type EdgeCasesConnection {
   edges: [EdgeCasesEdge!]!
 
   \\"\\"\\"A list of \`EdgeCase\` objects.\\"\\"\\"
-  nodes: [EdgeCase!]!
+  nodes: [EdgeCase]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -5731,7 +5731,7 @@ type EdgeCasesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`EdgeCase\` at the end of the edge.\\"\\"\\"
-  node: EdgeCase!
+  node: EdgeCase
 }
 
 \\"\\"\\"Methods to use when ordering \`EdgeCase\`.\\"\\"\\"
@@ -5822,7 +5822,7 @@ type ForeignKeysConnection {
   edges: [ForeignKeysEdge!]!
 
   \\"\\"\\"A list of \`ForeignKey\` objects.\\"\\"\\"
-  nodes: [ForeignKey!]!
+  nodes: [ForeignKey]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -5837,7 +5837,7 @@ type ForeignKeysEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`ForeignKey\` at the end of the edge.\\"\\"\\"
-  node: ForeignKey!
+  node: ForeignKey
 }
 
 \\"\\"\\"Methods to use when ordering \`ForeignKey\`.\\"\\"\\"
@@ -5916,7 +5916,7 @@ type InputsConnection {
   edges: [InputsEdge!]!
 
   \\"\\"\\"A list of \`Input\` objects.\\"\\"\\"
-  nodes: [Input!]!
+  nodes: [Input]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -5931,7 +5931,7 @@ type InputsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Input\` at the end of the edge.\\"\\"\\"
-  node: Input!
+  node: Input
 }
 
 \\"\\"\\"Methods to use when ordering \`Input\`.\\"\\"\\"
@@ -6032,7 +6032,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
-  nodes: [Int!]!
+  nodes: [Int]!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -6212,7 +6212,7 @@ type LeftArmsConnection {
   edges: [LeftArmsEdge!]!
 
   \\"\\"\\"A list of \`LeftArm\` objects.\\"\\"\\"
-  nodes: [LeftArm!]!
+  nodes: [LeftArm]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -6227,7 +6227,7 @@ type LeftArmsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`LeftArm\` at the end of the edge.\\"\\"\\"
-  node: LeftArm!
+  node: LeftArm
 }
 
 \\"\\"\\"Methods to use when ordering \`LeftArm\`.\\"\\"\\"
@@ -7280,7 +7280,7 @@ type NonUpdatableViewsConnection {
   edges: [NonUpdatableViewsEdge!]!
 
   \\"\\"\\"A list of \`NonUpdatableView\` objects.\\"\\"\\"
-  nodes: [NonUpdatableView!]!
+  nodes: [NonUpdatableView]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -7297,7 +7297,7 @@ type NonUpdatableViewsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`NonUpdatableView\` at the end of the edge.\\"\\"\\"
-  node: NonUpdatableView!
+  node: NonUpdatableView
 }
 
 \\"\\"\\"Methods to use when ordering \`NonUpdatableView\`.\\"\\"\\"
@@ -7378,7 +7378,7 @@ type PatchesConnection {
   edges: [PatchesEdge!]!
 
   \\"\\"\\"A list of \`Patch\` objects.\\"\\"\\"
-  nodes: [Patch!]!
+  nodes: [Patch]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -7393,7 +7393,7 @@ type PatchesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Patch\` at the end of the edge.\\"\\"\\"
-  node: Patch!
+  node: Patch
 }
 
 \\"\\"\\"Methods to use when ordering \`Patch\`.\\"\\"\\"
@@ -7425,7 +7425,7 @@ type PeopleConnection {
   edges: [PeopleEdge!]!
 
   \\"\\"\\"A list of \`Person\` objects.\\"\\"\\"
-  nodes: [Person!]!
+  nodes: [Person]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -7440,7 +7440,7 @@ type PeopleEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Person\` at the end of the edge.\\"\\"\\"
-  node: Person!
+  node: Person
 }
 
 \\"\\"\\"Methods to use when ordering \`Person\`.\\"\\"\\"
@@ -7793,7 +7793,7 @@ type PersonSecretsConnection {
   edges: [PersonSecretsEdge!]!
 
   \\"\\"\\"A list of \`PersonSecret\` objects.\\"\\"\\"
-  nodes: [PersonSecret!]!
+  nodes: [PersonSecret]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -7808,7 +7808,7 @@ type PersonSecretsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`PersonSecret\` at the end of the edge.\\"\\"\\"
-  node: PersonSecret!
+  node: PersonSecret
 }
 
 \\"\\"\\"Methods to use when ordering \`PersonSecret\`.\\"\\"\\"
@@ -7939,7 +7939,7 @@ type PostsConnection {
   edges: [PostsEdge!]!
 
   \\"\\"\\"A list of \`Post\` objects.\\"\\"\\"
-  nodes: [Post!]!
+  nodes: [Post]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -7954,7 +7954,7 @@ type PostsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Post\` at the end of the edge.\\"\\"\\"
-  node: Post!
+  node: Post
 }
 
 \\"\\"\\"Methods to use when ordering \`Post\`.\\"\\"\\"
@@ -8991,7 +8991,7 @@ type ReservedInputRecordsConnection {
   edges: [ReservedInputRecordsEdge!]!
 
   \\"\\"\\"A list of \`ReservedInputRecord\` objects.\\"\\"\\"
-  nodes: [ReservedInputRecord!]!
+  nodes: [ReservedInputRecord]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9008,7 +9008,7 @@ type ReservedInputRecordsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`ReservedInputRecord\` at the end of the edge.\\"\\"\\"
-  node: ReservedInputRecord!
+  node: ReservedInputRecord
 }
 
 \\"\\"\\"Methods to use when ordering \`ReservedInputRecord\`.\\"\\"\\"
@@ -9068,7 +9068,7 @@ type ReservedPatchRecordsConnection {
   edges: [ReservedPatchRecordsEdge!]!
 
   \\"\\"\\"A list of \`ReservedPatchRecord\` objects.\\"\\"\\"
-  nodes: [ReservedPatchRecord!]!
+  nodes: [ReservedPatchRecord]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9085,7 +9085,7 @@ type ReservedPatchRecordsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`ReservedPatchRecord\` at the end of the edge.\\"\\"\\"
-  node: ReservedPatchRecord!
+  node: ReservedPatchRecord
 }
 
 \\"\\"\\"Methods to use when ordering \`ReservedPatchRecord\`.\\"\\"\\"
@@ -9105,7 +9105,7 @@ type ReservedsConnection {
   edges: [ReservedsEdge!]!
 
   \\"\\"\\"A list of \`Reserved\` objects.\\"\\"\\"
-  nodes: [Reserved!]!
+  nodes: [Reserved]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9120,7 +9120,7 @@ type ReservedsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Reserved\` at the end of the edge.\\"\\"\\"
-  node: Reserved!
+  node: Reserved
 }
 
 \\"\\"\\"Methods to use when ordering \`Reserved\`.\\"\\"\\"
@@ -9211,7 +9211,7 @@ type SimilarTable1SConnection {
   edges: [SimilarTable1SEdge!]!
 
   \\"\\"\\"A list of \`SimilarTable1\` objects.\\"\\"\\"
-  nodes: [SimilarTable1!]!
+  nodes: [SimilarTable1]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9226,7 +9226,7 @@ type SimilarTable1SEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`SimilarTable1\` at the end of the edge.\\"\\"\\"
-  node: SimilarTable1!
+  node: SimilarTable1
 }
 
 \\"\\"\\"Methods to use when ordering \`SimilarTable1\`.\\"\\"\\"
@@ -9300,7 +9300,7 @@ type SimilarTable2SConnection {
   edges: [SimilarTable2SEdge!]!
 
   \\"\\"\\"A list of \`SimilarTable2\` objects.\\"\\"\\"
-  nodes: [SimilarTable2!]!
+  nodes: [SimilarTable2]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9315,7 +9315,7 @@ type SimilarTable2SEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`SimilarTable2\` at the end of the edge.\\"\\"\\"
-  node: SimilarTable2!
+  node: SimilarTable2
 }
 
 \\"\\"\\"Methods to use when ordering \`SimilarTable2\`.\\"\\"\\"
@@ -9341,7 +9341,7 @@ type StaticBigIntegerConnection {
   edges: [StaticBigIntegerEdge!]!
 
   \\"\\"\\"A list of \`BigInt\` objects.\\"\\"\\"
-  nodes: [BigInt!]!
+  nodes: [BigInt]!
 }
 
 \\"\\"\\"A \`BigInt\` edge in the connection.\\"\\"\\"
@@ -9367,7 +9367,7 @@ type TablefuncCrosstab2SConnection {
   edges: [TablefuncCrosstab2SEdge!]!
 
   \\"\\"\\"A list of \`TablefuncCrosstab2\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab2!]!
+  nodes: [TablefuncCrosstab2]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9384,7 +9384,7 @@ type TablefuncCrosstab2SEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`TablefuncCrosstab2\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab2!
+  node: TablefuncCrosstab2
 }
 
 type TablefuncCrosstab3 {
@@ -9402,7 +9402,7 @@ type TablefuncCrosstab3SConnection {
   edges: [TablefuncCrosstab3SEdge!]!
 
   \\"\\"\\"A list of \`TablefuncCrosstab3\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab3!]!
+  nodes: [TablefuncCrosstab3]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9419,7 +9419,7 @@ type TablefuncCrosstab3SEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`TablefuncCrosstab3\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab3!
+  node: TablefuncCrosstab3
 }
 
 type TablefuncCrosstab4 {
@@ -9438,7 +9438,7 @@ type TablefuncCrosstab4SConnection {
   edges: [TablefuncCrosstab4SEdge!]!
 
   \\"\\"\\"A list of \`TablefuncCrosstab4\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab4!]!
+  nodes: [TablefuncCrosstab4]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9455,7 +9455,7 @@ type TablefuncCrosstab4SEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`TablefuncCrosstab4\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab4!
+  node: TablefuncCrosstab4
 }
 
 \\"\\"\\"All input for the \`tableMutation\` mutation.\\"\\"\\"
@@ -9558,7 +9558,7 @@ type TestviewsConnection {
   edges: [TestviewsEdge!]!
 
   \\"\\"\\"A list of \`Testview\` objects.\\"\\"\\"
-  nodes: [Testview!]!
+  nodes: [Testview]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9573,7 +9573,7 @@ type TestviewsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Testview\` at the end of the edge.\\"\\"\\"
-  node: Testview!
+  node: Testview
 }
 
 \\"\\"\\"Methods to use when ordering \`Testview\`.\\"\\"\\"
@@ -9811,7 +9811,7 @@ type TypesConnection {
   edges: [TypesEdge!]!
 
   \\"\\"\\"A list of \`Type\` objects.\\"\\"\\"
-  nodes: [Type!]!
+  nodes: [Type]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9826,7 +9826,7 @@ type TypesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`Type\` at the end of the edge.\\"\\"\\"
-  node: Type!
+  node: Type
 }
 
 \\"\\"\\"All input for the \`typesMutation\` mutation.\\"\\"\\"
@@ -9974,7 +9974,7 @@ type UpdatableViewsConnection {
   edges: [UpdatableViewsEdge!]!
 
   \\"\\"\\"A list of \`UpdatableView\` objects.\\"\\"\\"
-  nodes: [UpdatableView!]!
+  nodes: [UpdatableView]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -9989,7 +9989,7 @@ type UpdatableViewsEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`UpdatableView\` at the end of the edge.\\"\\"\\"
-  node: UpdatableView!
+  node: UpdatableView
 }
 
 \\"\\"\\"Methods to use when ordering \`UpdatableView\`.\\"\\"\\"
@@ -10965,7 +10965,7 @@ type ViewTablesConnection {
   edges: [ViewTablesEdge!]!
 
   \\"\\"\\"A list of \`ViewTable\` objects.\\"\\"\\"
-  nodes: [ViewTable!]!
+  nodes: [ViewTable]!
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
@@ -10980,7 +10980,7 @@ type ViewTablesEdge {
   cursor: Cursor
 
   \\"\\"\\"The \`ViewTable\` at the end of the edge.\\"\\"\\"
-  node: ViewTable!
+  node: ViewTable
 }
 
 \\"\\"\\"Methods to use when ordering \`ViewTable\`.\\"\\"\\"

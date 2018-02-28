@@ -45,7 +45,7 @@ type PostGraphQLOptions = {
   writeCache?: string,
   setWriteCacheCallback?: (fn: () => Promise<void>) => void,
   legacyRelations?: "only" | "deprecated",
-  badlyBehavedFunctions?: boolean,
+  setofFunctionsContainNulls?: boolean,
   legacyJsonUuid?: boolean,
 };
 
@@ -108,7 +108,7 @@ const getPostGraphQLBuilder = async (
     writeCache,
     setWriteCacheCallback,
     legacyRelations = "deprecated", // TODO: Change to 'omit' in v5
-    badlyBehavedFunctions = false,
+    setofFunctionsContainNulls = true,
     legacyJsonUuid = false,
   } = options;
 
@@ -222,7 +222,7 @@ const getPostGraphQLBuilder = async (
         pgLegacyRelations: legacyRelations,
         pgLegacyJsonUuid: legacyJsonUuid,
         persistentMemoizeWithKey,
-        pgForbidSetofFunctionsToReturnNull: !badlyBehavedFunctions,
+        pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!
