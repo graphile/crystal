@@ -37,7 +37,7 @@ type PostGraphileOptions = {
   readCache?: string,
   writeCache?: string,
   legacyRelations?: 'only' | 'deprecated' | 'omit',
-  badlyBehavedFunctions?: boolean,
+  setofFunctionsContainNulls?: boolean,
   legacyJsonUuid?: boolean,
 }
 

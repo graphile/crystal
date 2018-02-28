@@ -41,8 +41,9 @@ program
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
   // Schema configuration
-  .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
+  .option('-N, --no-setof-functions-contain-nulls', 'if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
+  .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   // Error enhancements
   .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors')
@@ -80,7 +81,6 @@ program
   .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
   .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
   // Awkward application workarounds / legacy support
-  .option('--badly-behaved-functions', 'if you have any functions that return setof a compound type (such as a table) and you want to return null for some of the results in the set you must enable this')
   .option('--legacy-relations <omit|deprecated|only>', 'some one-to-one relations were previously detected as one-to-many - should we export \'only\' the old relation shapes, both new and old but mark the old ones as \'deprecated\', or \'omit\' the old relation shapes entirely')
   .option('--legacy-json-uuid', `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`)
 
@@ -142,7 +142,7 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   clusterWorkers,
-  badlyBehavedFunctions,
+  setofFunctionsContainNulls = true,
   legacyJsonUuid,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
@@ -259,7 +259,7 @@ const postgraphileOptions = {
   readCache,
   writeCache,
   legacyRelations,
-  badlyBehavedFunctions,
+  setofFunctionsContainNulls,
   legacyJsonUuid,
 }
 
