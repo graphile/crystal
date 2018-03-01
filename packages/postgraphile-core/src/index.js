@@ -24,7 +24,7 @@ const ensureValidPlugins = (name, arr) => {
   }
 };
 
-type PostGraphQLOptions = {
+type PostGraphileOptions = {
   dynamicJson?: boolean,
   classicIds?: boolean,
   disableDefaultMutations?: string,
@@ -53,7 +53,7 @@ type PgConfig = Client | Pool | string;
 
 export { inflections };
 
-export const postGraphQLBaseOverrides = {
+export const postGraphileBaseOverrides = {
   enumName(value: string) {
     return inflections.defaultUtils.constantCase(
       inflections.defaultInflection.enumName(value)
@@ -61,17 +61,18 @@ export const postGraphQLBaseOverrides = {
   },
 };
 
-export const postGraphQLClassicIdsOverrides = {
+export const postGraphileClassicIdsOverrides = {
   column(name: string, _table: string, _schema: ?string) {
     return name === "id" ? "rowId" : inflections.defaultUtils.camelCase(name);
   },
 };
 
-export const postGraphQLInflection = inflections.newInflector(
-  postGraphQLBaseOverrides
+export const postGraphileInflection = inflections.newInflector(
+  postGraphileBaseOverrides
 );
-export const postGraphQLClassicIdsInflection = inflections.newInflector(
-  Object.assign({}, postGraphQLBaseOverrides, postGraphQLClassicIdsOverrides)
+
+export const postGraphileClassicIdsInflection = inflections.newInflector(
+  Object.assign({}, postGraphileBaseOverrides, postGraphileClassicIdsOverrides)
 );
 
 const awaitKeys = async obj => {
@@ -82,10 +83,10 @@ const awaitKeys = async obj => {
   return result;
 };
 
-const getPostGraphQLBuilder = async (
+const getPostGraphileBuilder = async (
   pgConfig,
   schemas,
-  options: PostGraphQLOptions = {}
+  options: PostGraphileOptions = {}
 ) => {
   const {
     dynamicJson,
@@ -211,8 +212,8 @@ const getPostGraphQLBuilder = async (
         pgInflection:
           inflector ||
           (classicIds
-            ? postGraphQLClassicIdsInflection
-            : postGraphQLInflection),
+            ? postGraphileClassicIdsInflection
+            : postGraphileInflection),
         nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
         pgJwtTypeIdentifier: jwtPgTypeIdentifier,
         pgJwtSecret: jwtSecret,
@@ -238,13 +239,13 @@ function abort(e) {
   /* eslint-enable */
 }
 
-export const createPostGraphQLSchema = async (
+export const createPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphQLOptions = {}
+  options: PostGraphileOptions = {}
 ) => {
   let writeCache;
-  const builder = await getPostGraphQLBuilder(
+  const builder = await getPostGraphileBuilder(
     pgConfig,
     schemas,
     Object.assign({}, options, {
@@ -261,22 +262,22 @@ export const createPostGraphQLSchema = async (
 /*
  * Unless an error occurs, `onNewSchema` is guaranteed to be called before this promise resolves
  */
-export const watchPostGraphQLSchema = async (
+export const watchPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphQLOptions = {},
+  options: PostGraphileOptions = {},
   onNewSchema: SchemaListener
 ) => {
   if (typeof onNewSchema !== "function") {
     throw new Error(
-      "You cannot call watchPostGraphQLSchema without a function to pass new schemas to"
+      "You cannot call watchPostGraphileSchema without a function to pass new schemas to"
     );
   }
   if (options.readCache) {
     throw new Error("Using readCache in watch mode does not make sense.");
   }
   let writeCache;
-  const builder = await getPostGraphQLBuilder(
+  const builder = await getPostGraphileBuilder(
     pgConfig,
     schemas,
     Object.assign({}, options, {
@@ -299,9 +300,10 @@ export const watchPostGraphQLSchema = async (
   };
 };
 
-export const postGraphileBaseOverrides = postGraphQLBaseOverrides;
-export const postGraphileClassicIdsOverrides = postGraphQLClassicIdsOverrides;
-export const postGraphileInflection = postGraphQLInflection;
-export const postGraphileClassicIdsInflection = postGraphQLClassicIdsInflection;
-export const createPostGraphileSchema = createPostGraphQLSchema;
-export const watchPostGraphileSchema = watchPostGraphQLSchema;
+// Backwards compat
+export const postGraphQLBaseOverrides = postGraphileBaseOverrides;
+export const postGraphQLClassicIdsOverrides = postGraphileClassicIdsOverrides;
+export const postGraphQLInflection = postGraphileInflection;
+export const postGraphQLClassicIdsInflection = postGraphileClassicIdsInflection;
+export const createPostGraphQLSchema = createPostGraphileSchema;
+export const watchPostGraphQLSchema = watchPostGraphileSchema;
