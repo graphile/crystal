@@ -114,4 +114,4 @@ $$ LANGUAGE plpgsql STRICT SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION app.authenticate(text, text) to app_anon, app_user;
 
-```d
+```
