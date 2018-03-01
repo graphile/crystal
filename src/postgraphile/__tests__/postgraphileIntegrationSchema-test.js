@@ -35,6 +35,14 @@ const testFixtures = [
     createSchema: client =>
       createPostGraphileSchema(client, 'c', { disableDefaultMutations: true }),
   },
+  {
+    name: 'prints a schema with nulls reduced and old Json, Uuid',
+    createSchema: client =>
+      createPostGraphileSchema(client, ['a', 'b', 'c'], {
+        setofFunctionsContainNulls: false,
+        legacyJsonUuid: true,
+      }),
+  },
 ]
 
 beforeAll(() => {

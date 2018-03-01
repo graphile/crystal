@@ -3,11 +3,23 @@ import { GraphQLError } from 'graphql/error'
 /**
  * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
  */
-function pickPgError(err: mixed, fields: Array<string>): {[s: string]: string | void} {
+function pickPgError(err: mixed, inFields: string | Array<string>): {[s: string]: string | void} {
   const result: mixed = {}
+  let fields
+  if (Array.isArray(inFields)) {
+    fields = inFields
+  } else if (typeof inFields === 'string') {
+    fields = inFields.split(',')
+  } else {
+    throw new Error('Invalid argument to extendedErrors - expected array of strings')
+  }
+
   if (err && typeof err === 'object') {
     fields.forEach((field: string) => {
       // pg places 'errcode' on the 'code' property
+      if (typeof field !== 'string') {
+        throw new Error('Invalid argument to extendedErrors - expected array of strings')
+      }
       const errField = field === 'errcode' ? 'code' : field
       result[field] = err[errField] != null ? String(err[errField]) : err[errField]
     })
