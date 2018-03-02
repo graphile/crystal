@@ -1,6 +1,6 @@
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
-const { createPostGraphQLSchema } = require("../..");
+const { createPostGraphileSchema } = require("../..");
 const { readdirSync, readFile: rawReadFile } = require("fs");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
@@ -35,17 +35,17 @@ beforeAll(() => {
       pgColumnFilter,
       viewUniqueKey,
     ] = await Promise.all([
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+      createPostGraphileSchema(pgClient, ["a", "b", "c"]),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         dynamicJson: true,
         setofFunctionsContainNulls: null,
       }),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         pgColumnFilter: attr => attr.name !== "headline",
         setofFunctionsContainNulls: false,
       }),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         viewUniqueKey: "testviewid",
         setofFunctionsContainNulls: true,
       }),

@@ -14,7 +14,7 @@ const debug = debugFactory("graphile-build-pg");
 const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
-// Ref: https://github.com/postgraphql/postgraphql/tree/master/src/postgres/introspection/object
+// Ref: https://github.com/graphile/postgraphile/tree/master/src/postgres/introspection/object
 
 export type Namespace = {
   kind: "namespace",
@@ -245,7 +245,7 @@ export default (async function PgIntrospectionPlugin(
 
   function stopListening() {
     if (pgClient) {
-      pgClient.query("unlisten postgraphql_watch").catch(e => {
+      pgClient.query("unlisten postgraphile_watch").catch(e => {
         debug(`Error occurred trying to unlisten watch: ${e}`);
       });
       pgClient.removeListener("notification", listener);
@@ -316,7 +316,7 @@ export default (async function PgIntrospectionPlugin(
       await pgClient.query("rollback");
     }
 
-    await pgClient.query("listen postgraphql_watch");
+    await pgClient.query("listen postgraphile_watch");
 
     const handleChange = async () => {
       debug(`Schema change detected: re-inspecting schema...`);
@@ -326,7 +326,7 @@ export default (async function PgIntrospectionPlugin(
     };
 
     listener = async notification => {
-      if (notification.channel !== "postgraphql_watch") {
+      if (notification.channel !== "postgraphile_watch") {
         return;
       }
       try {

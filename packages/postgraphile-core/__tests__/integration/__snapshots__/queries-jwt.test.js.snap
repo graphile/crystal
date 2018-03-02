@@ -29,12 +29,12 @@ Object {
 exports[`jwt pgJwtTypeIdentifier 1`] = `
 Object {
   "a": 1,
-  "aud": "postgraphql",
+  "aud": "postgraphile",
   "b": 2,
   "c": 3,
   "exp": 2130969600,
   "iat": "[timestamp]",
-  "iss": "postgraphql",
+  "iss": "postgraphile",
   "role": "yay",
 }
 `;

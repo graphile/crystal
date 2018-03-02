@@ -1,4 +1,4 @@
--- From https://github.com/postgraphql/postgraphql/blob/master/examples/kitchen-sink/schema.sql
+-- From https://github.com/graphile/postgraphile/blob/master/examples/kitchen-sink/schema.sql
 drop schema if exists a, b, c cascade;
 
 create schema a;
@@ -329,7 +329,7 @@ create function a.post_with_suffix(post a.post,suffix text) returns a.post as $$
 $$ language sql volatile;
 
 create function a.static_big_integer() returns setof int8 as $$
-  -- See https://github.com/postgraphql/postgraphql/issues/678#issuecomment-363659705
+  -- See https://github.com/graphile/postgraphile/issues/678#issuecomment-363659705
   select generate_series(30894622507013190, 30894622507013200);
 $$ language sql stable security definer;
 

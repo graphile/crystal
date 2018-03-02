@@ -3,7 +3,7 @@ import type { Plugin } from "graphile-build";
 
 import pluralize from "pluralize";
 
-export default (async function PgNodeAliasPostGraphQL(builder) {
+export default (async function PgNodeAliasPostGraphile(builder) {
   builder.hook(
     "GraphQLObjectType",
     (

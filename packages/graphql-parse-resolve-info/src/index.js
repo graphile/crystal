@@ -262,7 +262,7 @@ function fieldTreeFromAST<T: SelectionNode>(
         selectionVal.kind
       );
     }
-    // Ref: https://github.com/postgraphql/postgraphql/pull/342/files#diff-d6702ec9fed755c88b9d70b430fda4d8R148
+    // Ref: https://github.com/graphile/postgraphile/pull/342/files#diff-d6702ec9fed755c88b9d70b430fda4d8R148
     return tree;
   }, initTree);
 }

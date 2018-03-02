@@ -19,7 +19,7 @@ import PgQueryProceduresPlugin from "./plugins/PgQueryProceduresPlugin";
 import PgOrderAllColumnsPlugin from "./plugins/PgOrderAllColumnsPlugin";
 import PgOrderByPrimaryKeyPlugin from "./plugins/PgOrderByPrimaryKeyPlugin";
 import PgRowNode from "./plugins/PgRowNode";
-import PgNodeAliasPostGraphQL from "./plugins/PgNodeAliasPostGraphQL";
+import PgNodeAliasPostGraphile from "./plugins/PgNodeAliasPostGraphile";
 import PgScalarFunctionConnectionPlugin from "./plugins/PgScalarFunctionConnectionPlugin";
 import PageInfoStartEndCursor from "./plugins/PageInfoStartEndCursor";
 import PgConnectionTotalCount from "./plugins/PgConnectionTotalCount";
@@ -53,9 +53,9 @@ export const defaultPlugins = [
   PgOrderAllColumnsPlugin,
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
-  PgNodeAliasPostGraphQL,
-  PgScalarFunctionConnectionPlugin, // For PostGraphQL compatibility
-  PageInfoStartEndCursor, // For PostGraphQL compatibility
+  PgNodeAliasPostGraphile,
+  PgScalarFunctionConnectionPlugin, // For PostGraphile compatibility
+  PageInfoStartEndCursor, // For PostGraphile compatibility
   PgConnectionTotalCount,
 
   // Mutations
@@ -88,7 +88,8 @@ export {
   PgOrderAllColumnsPlugin,
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
-  PgNodeAliasPostGraphQL,
+  PgNodeAliasPostGraphile,
+  PgNodeAliasPostGraphile as PgNodeAliasPostGraphQL,
   PgScalarFunctionConnectionPlugin,
   PageInfoStartEndCursor,
   PgConnectionTotalCount,

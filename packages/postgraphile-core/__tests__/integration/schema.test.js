@@ -3,7 +3,7 @@
 
 const printSchemaOrdered = require("../printSchemaOrdered");
 const { withPgClient } = require("../helpers");
-const { createPostGraphQLSchema } = require("../..");
+const { createPostGraphileSchema } = require("../..");
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
@@ -13,12 +13,12 @@ let testResults;
 const testFixtures = [
   {
     name: "prints a schema with the default options",
-    createSchema: client => createPostGraphQLSchema(client, ["a", "b", "c"]),
+    createSchema: client => createPostGraphileSchema(client, ["a", "b", "c"]),
   },
   {
     name: "prints a schema with Relay 1 style ids",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", {
+      createPostGraphileSchema(client, "c", {
         classicIds: true,
         setofFunctionsContainNulls: false,
       }),
@@ -26,7 +26,7 @@ const testFixtures = [
   {
     name: "prints a schema with a JWT generating mutation",
     createSchema: client =>
-      createPostGraphQLSchema(client, "b", {
+      createPostGraphileSchema(client, "b", {
         jwtSecret: "secret",
         jwtPgTypeIdentifier: "b.jwt_token",
       }),
@@ -34,7 +34,7 @@ const testFixtures = [
   {
     name: "prints a schema without default mutations",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", {
+      createPostGraphileSchema(client, "c", {
         disableDefaultMutations: true,
         setofFunctionsContainNulls: false,
       }),
@@ -42,7 +42,7 @@ const testFixtures = [
   {
     name: "prints a schema without posts headlines",
     createSchema: client =>
-      createPostGraphQLSchema(client, "a", {
+      createPostGraphileSchema(client, "a", {
         pgColumnFilter: attr => attr.name !== "headline",
         setofFunctionsContainNulls: false,
       }),
@@ -51,7 +51,7 @@ const testFixtures = [
     name:
       "prints a schema without parsing tags and with legacy relations omitted",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", {
+      createPostGraphileSchema(client, "c", {
         enableTags: false,
         legacyRelations: "omit",
         setofFunctionsContainNulls: false,
@@ -60,7 +60,7 @@ const testFixtures = [
   {
     name: "prints a schema without new relations and with legacy type names",
     createSchema: client =>
-      createPostGraphQLSchema(client, "c", {
+      createPostGraphileSchema(client, "c", {
         legacyRelations: "only",
         enableTags: false,
         legacyJsonUuid: true,

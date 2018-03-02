@@ -1,5 +1,5 @@
 -- @see https://www.postgresql.org/docs/9.5/static/catalogs.html
--- @see https://github.com/postgraphql/postgraphql/blob/master/resources/introspection-query.sql
+-- @see https://github.com/graphile/postgraphile/blob/master/resources/introspection-query.sql
 --
 -- ## Parameters
 -- - `$1`: An array of strings that represent the namespaces we are

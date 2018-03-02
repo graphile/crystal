@@ -1,5 +1,4 @@
-graphile-build-pg
-=================
+# graphile-build-pg
 
 `graphile-build-pg` is a collection of plugins for `graphile-build` that allow
 you to extend your GraphQL schema with high-performance types and fields based
@@ -10,12 +9,12 @@ database-based GraphQL APIs thanks to graphile-build's advanced
 [look-ahead](https://www.graphile.org/graphile-build/look-ahead/) features,
 they're more efficient, even, than `DataLoader`-based solutions.
 
-An example of an application built on `graphile-build-pg` is [PostGraphQL
-v4+](https://github.com/postgraphql/postgraphql) which allows you to run just
+An example of an application built on `graphile-build-pg` is [PostGraphile
+v4+](https://github.com/graphile/postgraphile) which allows you to run just
 one command to instantly get a fully working and secure GraphQL API up and
 running based on your PostgreSQL database schema.
 
-**It is recommended that you use PostGraphQL directly unless you really want to
+**It is recommended that you use PostGraphile directly unless you really want to
 get low level access to this library.**
 
 If you prefer to use the plugins yourself it's advised that you use the
@@ -34,10 +33,9 @@ the array that `postgraphile-core` uses.
 
 This is a list of inflection engines, we currently have the following:
 
-- `defaultInflection` - a sensible default
-- `postGraphQLInflection` - as above, but enums get converted to `CONSTANT_CASE`
-- `postGraphQLClassicIdsInflection` - as above, but `id` attributes get renamed to `rowId` to prevent conflicts with `id` from the Relay Global Unique Object Specification.
-
+* `defaultInflection` - a sensible default
+* `postGraphileInflection` - as above, but enums get converted to `CONSTANT_CASE`
+* `postGraphileClassicIdsInflection` - as above, but `id` attributes get renamed to `rowId` to prevent conflicts with `id` from the Relay Global Unique Object Specification.
 
 ### Manual usage
 

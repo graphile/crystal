@@ -88,7 +88,6 @@ lerna bootstrap
 [postgraphql]: https://github.com/graphile/postgraphile
 [caleb meredith]: https://github.com/calebmer
 [lerna]: https://github.com/lerna/lerna
-[postgraphql-sql]: https://github.com/graphile/postgraphile/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts
 [graphile-build]: packages/graphile-build/
 [graphile-build-pg]: packages/graphile-build-pg/
 [postgraphile-core]: packages/postgraphile-core/

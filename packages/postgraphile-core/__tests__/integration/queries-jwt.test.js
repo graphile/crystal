@@ -1,6 +1,6 @@
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
-const { createPostGraphQLSchema } = require("../..");
+const { createPostGraphileSchema } = require("../..");
 const { readdirSync, readFile: rawReadFile } = require("fs");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
@@ -80,8 +80,8 @@ beforeAll(() => {
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
     const [normal, withJwt] = await Promise.all([
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"]),
-      createPostGraphQLSchema(pgClient, ["a", "b", "c"], {
+      createPostGraphileSchema(pgClient, ["a", "b", "c"]),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         jwtPgTypeIdentifier: `"b"."jwt_token"`,
         jwtSecret: jwtSecret,
       }),

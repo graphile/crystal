@@ -2,7 +2,7 @@ const { resolve: resolvePath } = require("path");
 const { readdirSync, readFile: rawReadFile } = require("fs");
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
-const { createPostGraphQLSchema } = require("../..");
+const { createPostGraphileSchema } = require("../..");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphile-build:schema");
 
@@ -28,7 +28,7 @@ let mutationResults = [];
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
   const gqlSchemaPromise = withPgClient(async pgClient => {
-    const schema = await createPostGraphQLSchema(pgClient, ["a", "b", "c"]);
+    const schema = await createPostGraphileSchema(pgClient, ["a", "b", "c"]);
     debug(printSchema(schema));
     return schema;
   });

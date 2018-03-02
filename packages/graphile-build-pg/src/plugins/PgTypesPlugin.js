@@ -653,7 +653,7 @@ export default (function PgTypesPlugin(
       ) {
         const baseType = enforceGqlTypeByPgType(type.domainBaseType);
         const baseInputType = gqlInputTypeByTypeId[type.domainBaseTypeId];
-        // Hack stolen from: https://github.com/postgraphql/postgraphql/blob/ade728ed8f8e3ecdc5fdad7d770c67aa573578eb/src/graphql/schema/type/aliasGqlType.ts#L16
+        // Hack stolen from: https://github.com/graphile/postgraphile/blob/ade728ed8f8e3ecdc5fdad7d770c67aa573578eb/src/graphql/schema/type/aliasGqlType.ts#L16
         gqlTypeByTypeId[type.id] = Object.assign(Object.create(baseType), {
           name: inflection.domainType(type.name),
           description: type.description,

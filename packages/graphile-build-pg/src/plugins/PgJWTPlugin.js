@@ -87,10 +87,16 @@ export default (function PgJWTPlugin(
                 pgJwtSecret,
                 Object.assign(
                   {},
-                  {
-                    audience: "postgraphql",
-                    issuer: "postgraphql",
-                  },
+                  token.aud
+                    ? null
+                    : {
+                        audience: "postgraphile",
+                      },
+                  token.iss
+                    ? null
+                    : {
+                        issuer: "postgraphile",
+                      },
                   token.exp
                     ? null
                     : {

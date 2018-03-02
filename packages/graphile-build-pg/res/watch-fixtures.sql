@@ -1,23 +1,23 @@
--- @see https://github.com/postgraphql/postgraphql/blob/886f8752f03d3fa05bdbdd97eeabb153a4d0343e/resources/watch-fixtures.sql
+-- @see https://github.com/graphile/postgraphile/blob/886f8752f03d3fa05bdbdd97eeabb153a4d0343e/resources/watch-fixtures.sql
 
--- Adds the functionality for PostGraphQL to watch the database for schema
+-- Adds the functionality for PostGraphile to watch the database for schema
 -- changes. This script is idempotent, you can run it as many times as you
 -- would like.
 
--- Drop the `postgraphql_watch` schema and all of its dependant objects
+-- Drop the `postgraphile_watch` schema and all of its dependant objects
 -- including the event trigger function and the event trigger itself. We will
 -- recreate those objects in this script.
-drop schema if exists postgraphql_watch cascade;
+drop schema if exists postgraphile_watch cascade;
 
--- Create a schema for the PostGraphQL watch functionality. This schema will
+-- Create a schema for the PostGraphile watch functionality. This schema will
 -- hold things like trigger functions that are used to implement schema
 -- watching.
-create schema postgraphql_watch;
+create schema postgraphile_watch;
 
-create function postgraphql_watch.notify_watchers_ddl() returns event_trigger as $$
+create function postgraphile_watch.notify_watchers_ddl() returns event_trigger as $$
 begin
   perform pg_notify(
-    'postgraphql_watch',
+    'postgraphile_watch',
     json_build_object(
       'type',
       'ddl',
@@ -28,10 +28,10 @@ begin
 end;
 $$ language plpgsql;
 
-create function postgraphql_watch.notify_watchers_drop() returns event_trigger as $$
+create function postgraphile_watch.notify_watchers_drop() returns event_trigger as $$
 begin
   perform pg_notify(
-    'postgraphql_watch',
+    'postgraphile_watch',
     json_build_object(
       'type',
       'drop',
@@ -43,10 +43,10 @@ end;
 $$ language plpgsql;
 
 -- Create an event trigger which will listen for the completion of all DDL
--- events and report that they happened to PostGraphQL. Events are selected by
+-- events and report that they happened to PostGraphile. Events are selected by
 -- whether or not they modify the static definition of `pg_catalog` that
 -- `introspection-query.sql` queries.
-create event trigger postgraphql_watch_ddl
+create event trigger postgraphile_watch_ddl
   on ddl_command_end
   when tag in (
     'ALTER DOMAIN',
@@ -74,11 +74,11 @@ create event trigger postgraphql_watch_ddl
     'REVOKE',
     'SELECT INTO'
   )
-  execute procedure postgraphql_watch.notify_watchers_ddl();
+  execute procedure postgraphile_watch.notify_watchers_ddl();
 
 -- Create an event trigger which will listen for drop events because on drops
 -- the DDL method seems to get nothing returned from
 -- pg_event_trigger_ddl_commands()
-create event trigger postgraphql_watch_drop
+create event trigger postgraphile_watch_drop
   on sql_drop
-  execute procedure postgraphql_watch.notify_watchers_drop();
+  execute procedure postgraphile_watch.notify_watchers_drop();
