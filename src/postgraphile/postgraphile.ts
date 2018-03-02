@@ -10,6 +10,8 @@ import jwt = require('jsonwebtoken')
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
+// Anything tagged `@middlewareOnly` will not appear in the schema-only docs.
+// Only comments written beginning with `//` will be put in the docs.
 type PostGraphileOptions = {
   // When true, PostGraphile will watch your database schemas and re-create the
   // GraphQL API whenever your schema changes, notifying you as it does. This
@@ -25,6 +27,9 @@ type PostGraphileOptions = {
   // any JSON as input and get any arbitrary JSON as output. By default JSON
   // types are just a JSON string.
   dynamicJson?: boolean,
+  // If none of your `RETURNS SETOF compound_type` functions mix NULLs with the
+  // results then you may set this true to reduce the nullables in the GraphQL
+  // schema
   setofFunctionsContainNulls?: boolean,
   // Enables classic ids for Relay support. Instead of using the field name
   // `nodeId` for globally unique ids, PostGraphile will instead use the field
@@ -62,35 +67,46 @@ type PostGraphileOptions = {
   // Enables saving the detected schema, in JSON format, to the given location.
   // The directories must exist already, if the file exists it will be
   // overwritten.
+  /* @middlewareOnly */
   exportJsonSchemaPath?: string,
   // Enables saving the detected schema, in GraphQL schema format, to the given
   // location. The directories must exist already, if the file exists it will
   // be overwritten.
+  /* @middlewareOnly */
   exportGqlSchemaPath?: string,
   // The endpoint the GraphQL executer will listen on. Defaults to `/graphql`.
+  /* @middlewareOnly */
   graphqlRoute?: string,
   // The endpoint the GraphiQL query interface will listen on (**NOTE:**
   // GraphiQL will not be enabled unless the `graphiql` option is set to
   // `true`). Defaults to `/graphiql`.
+  /* @middlewareOnly */
   graphiqlRoute?: string,
   // Set this to `true` to enable the GraphiQL interface.
+  /* @middlewareOnly */
   graphiql?: boolean,
   // Enables some generous CORS settings for the GraphQL endpoint. There are
   // some costs associated when enabling this, if at all possible try to put
   // your API behind a reverse proxy.
+  /* @middlewareOnly */
   enableCors?: boolean,
   // Set the maximum size of JSON bodies that can be parsed (default 100kB).
   // The size can be given as a human-readable string, such as '200kB' or '5MB'
   // (case insensitive).
+  /* @middlewareOnly */
   bodySizeLimit?: string,
   // The secret for your JSON web tokens. This will be used to verify tokens in
   // the `Authorization` header, and signing JWT tokens you return in
   // procedures.
   jwtSecret?: string,
+  // Options with which to perform JWT verification - see
+  // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+  /* @middlewareOnly */
   jwtVerifyOptions?: jwt.VerifyOptions,
   // A comma separated list of strings that give a path in the jwt from which
   // to extract the postgres role. If none is provided it will use the key
   // `role` on the root of the jwt.
+  /* @middlewareOnly */
   jwtRole?: Array<string>,
   // The Postgres type identifier for the compound type which will be signed as
   // a JWT token if ever found as the return type of a procedure. Can be of the
@@ -99,18 +115,31 @@ type PostGraphileOptions = {
   jwtPgTypeIdentifier?: string,
   // The audiences to use when verifing the JWT token. If not set the audience
   // will be `['postgraphile']`.
+  /* @middlewareOnly */
   jwtAudiences?: Array<string>,
+  // Some one-to-one relations were previously detected as one-to-many - should
+  // we export 'only' the old relation shapes, both new and old but mark the
+  // old ones as 'deprecated', or 'omit' the old relation shapes entirely
   legacyRelations?: 'only' | 'deprecated' | 'omit',
+  // ONLY use this option if you require the v3 typenames 'Json' and 'Uuid'
+  // over 'JSON' and 'UUID'
   legacyJsonUuid?: boolean,
-
   // Turns off GraphQL query logging. By default PostGraphile will log every
   // GraphQL query it processes along with some other information. Set this to
   // `true` to disable that feature.
+  /* @middlewareOnly */
   disableQueryLog?: boolean,
   // A plain object specifying custom config values to set in the PostgreSQL
   // transaction (accessed via `current_setting('my.custom.setting')`) or a
-  // function which will return the same (or a Promise to the same).
+  // function which will return the same (or a Promise to the same) based on
+  // the incoming web request (e.g. to extract session data)
+  /* @middlewareOnly */
   pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{[key: string]: mixed }>),
+  // Some graphile-build plugins may need additional information available on
+  // the `context` argument to the resolver - you can use this function to
+  // provide such information based on the incoming request - you can even use
+  // this to change the response [experimental], e.g. setting cookies
+  /* @middlewareOnly */
   additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
 }
 
