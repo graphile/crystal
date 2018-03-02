@@ -13,6 +13,20 @@ Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
 This project was previously named PostGraphQL, for version 3 of PostGraphQL see the [`v3`](https://github.com/graphile/postgraphile/tree/v3) branch.
 
+### This is the BETA version of PostGraphile v4 (previously known as PostGraphQL)
+
+**Make sure you stay up to date via [the releases](https://github.com/graphile/postgraphile/releases).**
+
+Due to a few breaking changes we recommend that anyone starting fresh uses v4
+over v3 despite the beta status - v3 will not be receiving ongoing maintenance.
+All the anticipated breaking changes were ironed out during the alpha phase,
+breaking changes will only be made in the beta if absolutely necessary.
+
+A migration guide if you're coming from v3 is
+[here](https://www.graphile.org/postgraphile/v3-migration/) and you can check
+out some of the new features
+[here](https://www.graphile.org/postgraphile/v4-new-features/)
+
 ---
 
 The strongly typed GraphQL data querying language is a revolutionary new way to interact with your server. Similar to how JSON very quickly overtook XML, GraphQL will likely overtake REST. Why? Because GraphQL allows us to express our data in the exact same way we think about it.
