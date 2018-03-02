@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-core",
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "description": "",
   "main": "node8plus/index.js",
   "scripts": {
@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "babel-runtime": ">=6 <7",
-    "graphile-build": "4.0.0-alpha.1",
-    "graphile-build-pg": "4.0.0-alpha.4"
+    "graphile-build": "4.0.0-alpha.5",
+    "graphile-build-pg": "4.0.0-alpha.5"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

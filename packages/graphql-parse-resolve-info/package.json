@@ -1,6 +1,6 @@
 {
   "name": "graphql-parse-resolve-info",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.5",
   "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
   "main": "node8plus/index.js",
   "scripts": {
