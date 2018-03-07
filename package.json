@@ -1,8 +1,7 @@
 {
   "name": "postgraphile",
   "version": "4.0.0-alpha2.33",
-  "description":
-    "A GraphQL schema created by reflection over a PostgreSQL schema 🐘 (previously known as PostGraphQL)",
+  "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘 (previously known as PostGraphQL)",
   "author": "Benjie Gillam <benjie@graphile.org> (https://twitter.com/benjie)",
   "license": "MIT",
   "homepage": "https://www.graphile.org/postgraphile/",
@@ -86,14 +85,24 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": ["ts", "js"],
-    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/resources/jest-setup.js"
+    ],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": ["<rootDir>/src"],
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": ["build", "resources/favicon.ico"],
+  "files": [
+    "build",
+    "resources/favicon.ico"
+  ],
   "engines": {
     "node": ">=8.6"
   }
