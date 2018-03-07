@@ -12,8 +12,8 @@ It's also suitable for usage in your own application, but please be aware you
 need to bring your own security in the form of an authenticated `pgClient` (see
 below).
 
-For more information about `graphile-build-pg` please see the documentation at
-[graphile.org](https://www.graphile.org/graphile-build-pg/introduction/).
+For more information about `postgraphile` and `graphile-build` please see the
+documentation at [graphile.org](https://www.graphile.org/).
 
 ## `createPostGraphileSchema(pgConfig, schemas, options)`
 
