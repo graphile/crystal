@@ -7,12 +7,11 @@
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/benjie)
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
-# This is the ALPHA VERSION of PostGraphile v4 (previously known as PostGraphQL); use with caution and monitor [the releases](https://github.com/graphile/postgraphile/releases).
-
 _A GraphQL schema created by reflection over a PostgreSQL schema._
 
-**Stable**: v3 ([`v3`](https://github.com/graphile/postgraphile/tree/v3) branch) - maintenance only, called “PostGraphQL”  
-**Next**: v4 ([`master`](https://github.com/graphile/postgraphile) branch) - renamed to PostGraphile; see [graphile.org](https://graphile.org) for docs
+Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
+
+This project was previously named PostGraphQL, for version 3 of PostGraphQL see the [`v3`](https://github.com/graphile/postgraphile/tree/v3) branch.
 
 ---
 
