@@ -7,6 +7,7 @@ import {
   NodePlugin,
   QueryPlugin,
   MutationPlugin,
+  SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "./plugins";
@@ -59,6 +60,7 @@ export const defaultPlugins: Array<Plugin> = [
   NodePlugin,
   QueryPlugin,
   MutationPlugin,
+  SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
 ];
