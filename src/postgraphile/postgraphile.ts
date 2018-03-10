@@ -8,12 +8,13 @@ import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
 import { IncomingMessage, ServerResponse } from 'http'
 import jwt = require('jsonwebtoken')
 import { GraphQLErrorExtended } from './extendedFormatError'
+import { PluginHookFn, pluginHookFromOptions } from './pluginHook'
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
 // Anything tagged `@middlewareOnly` will not appear in the schema-only docs.
 // Only comments written beginning with `//` will be put in the docs.
-type PostGraphileOptions = {
+export type PostGraphileOptions = {
   // When true, PostGraphile will watch your database schemas and re-create the
   // GraphQL API whenever your schema changes, notifying you as it does. This
   // feature requires an event trigger to be added to the database by a
@@ -150,6 +151,11 @@ type PostGraphileOptions = {
   // this to change the response [experimental], e.g. setting cookies
   /* @middlewareOnly */
   additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>,
+  // [experimental] Plugin hook function, enables functionality within
+  // PostGraphile to be expanded with plugins. Generate with
+  // `makePluginHook(plugins)` passing a list of plugin objects.
+  /* @middlewareOnly */
+  pluginHook?: PluginHookFn,
 }
 
 type PostgraphileSchemaBuilder = {
@@ -162,7 +168,9 @@ type PostgraphileSchemaBuilder = {
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, options: PostGraphileOptions): PostgraphileSchemaBuilder {
+export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, incomingOptions: PostGraphileOptions): PostgraphileSchemaBuilder {
+  const pluginHook = pluginHookFromOptions(incomingOptions)
+  const options = pluginHook('postgraphile:options', incomingOptions, { pgPool, schema })
   // Check for a jwtSecret without a jwtPgTypeIdentifier
   // a secret without a token identifier prevents JWT creation
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {

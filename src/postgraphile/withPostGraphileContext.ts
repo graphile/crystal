@@ -1,46 +1,14 @@
+/* eslint-disable */// Because we use tslint
 import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
 import { Pool, Client } from 'pg'
 import { ExecutionResult } from 'graphql'
 import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
+import { pluginHookFromOptions } from './pluginHook'
 
-/**
- * Creates a PostGraphile context object which should be passed into a GraphQL
- * execution. This function will also connect a client from a Postgres pool and
- * setup a transaction in that client.
- *
- * This function is intended to wrap a call to GraphQL-js execution like so:
- *
- * ```js
- * const result = await withPostGraphileContext({
- *   pgPool,
- *   jwtToken,
- *   jwtSecret,
- *   pgDefaultRole,
- * }, async context => {
- *   return await graphql(
- *     schema,
- *     query,
- *     null,
- *     { ...context },
- *     variables,
- *     operationName,
- *   );
- * });
- * ```
- */
-export default async function withPostGraphileContext(
-  {
-    pgPool,
-    jwtToken,
-    jwtSecret,
-    jwtAudiences,
-    jwtRole = ['role'],
-    jwtVerifyOptions,
-    pgDefaultRole,
-    pgSettings,
-  }: {
+export type WithPostGraphileContextFn = (
+  options: {
     pgPool: Pool,
     jwtToken?: string,
     jwtSecret?: string,
@@ -51,7 +19,31 @@ export default async function withPostGraphileContext(
     pgSettings?: { [key: string]: mixed },
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
-): Promise<ExecutionResult> {
+) => Promise<ExecutionResult>
+
+const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
+  options: {
+    pgPool: Pool,
+    jwtToken?: string,
+    jwtSecret?: string,
+    jwtAudiences?: Array<string>,
+    jwtRole: Array<string>,
+    jwtVerifyOptions?: jwt.VerifyOptions,
+    pgDefaultRole?: string,
+    pgSettings?: { [key: string]: mixed },
+  },
+  callback: (context: mixed) => Promise<ExecutionResult>,
+): Promise<ExecutionResult> => {
+  const {
+    pgPool,
+    jwtToken,
+    jwtSecret,
+    jwtAudiences,
+    jwtRole = ['role'],
+    jwtVerifyOptions,
+    pgDefaultRole,
+    pgSettings,
+  } = options
   // Connect a new Postgres client and start a transaction.
   const pgClient = await pgPool.connect()
 
@@ -86,6 +78,51 @@ export default async function withPostGraphileContext(
     pgClient.release()
   }
 }
+
+/**
+ * Creates a PostGraphile context object which should be passed into a GraphQL
+ * execution. This function will also connect a client from a Postgres pool and
+ * setup a transaction in that client.
+ *
+ * This function is intended to wrap a call to GraphQL-js execution like so:
+ *
+ * ```js
+ * const result = await withPostGraphileContext({
+ *   pgPool,
+ *   jwtToken,
+ *   jwtSecret,
+ *   pgDefaultRole,
+ * }, async context => {
+ *   return await graphql(
+ *     schema,
+ *     query,
+ *     null,
+ *     { ...context },
+ *     variables,
+ *     operationName,
+ *   );
+ * });
+ * ```
+ */
+const withPostGraphileContext: WithPostGraphileContextFn = async (
+  options: {
+    pgPool: Pool,
+    jwtToken?: string,
+    jwtSecret?: string,
+    jwtAudiences?: Array<string>,
+    jwtRole: Array<string>,
+    jwtVerifyOptions?: jwt.VerifyOptions,
+    pgDefaultRole?: string,
+    pgSettings?: { [key: string]: mixed },
+  },
+  callback: (context: mixed) => Promise<ExecutionResult>,
+): Promise<ExecutionResult> => {
+  const pluginHook = pluginHookFromOptions(options)
+  const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext)
+  return withContext(options, callback)
+}
+
+export default withPostGraphileContext
 
 /**
  * Sets up the Postgres client transaction by decoding the JSON web token and
