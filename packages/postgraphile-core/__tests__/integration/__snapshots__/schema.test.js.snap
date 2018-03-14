@@ -2390,6 +2390,41 @@ type AuthenticatePayload {
   query: Query
 }
 
+\\"\\"\\"All input for the \`authenticatePayload\` mutation.\\"\\"\\"
+input AuthenticatePayloadInput {
+  a: Int
+  b: Int
+  c: Int
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`authenticatePayload\` mutation.\\"\\"\\"
+type AuthenticatePayloadPayload {
+  authPayload: AuthPayload
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+type AuthPayload {
+  admin: Boolean
+  id: Int
+  jwt: JwtToken
+}
+
 \\"\\"\\"
 A floating point number that requires more precision than IEEE 754 binary 64
 \\"\\"\\"
@@ -2900,6 +2935,12 @@ type Mutation {
     \\"\\"\\"
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
+  authenticatePayload(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: AuthenticatePayloadInput!
+  ): AuthenticatePayloadPayload
   compoundTypeMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3847,6 +3888,41 @@ type AuthenticatePayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
   query: Query
+}
+
+\\"\\"\\"All input for the \`authenticatePayload\` mutation.\\"\\"\\"
+input AuthenticatePayloadInput {
+  a: Int
+  b: Int
+  c: Int
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`authenticatePayload\` mutation.\\"\\"\\"
+type AuthenticatePayloadPayload {
+  authPayload: AuthPayload
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+type AuthPayload {
+  admin: Boolean
+  id: Int
+  jwt: JwtToken
 }
 
 \\"\\"\\"
@@ -6410,6 +6486,12 @@ type Mutation {
     \\"\\"\\"
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
+  authenticatePayload(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: AuthenticatePayloadInput!
+  ): AuthenticatePayloadPayload
   compoundTypeMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

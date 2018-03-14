@@ -71,6 +71,27 @@ const tests = [
     }`,
     schema: "withJwt",
   },
+  {
+    name: "jwt pgJwtTypeIdentifier with payload",
+    query: `mutation {
+      authenticatePayload(input: {a: 1, b: 2, c: 3}) {
+        authPayload {
+          jwt
+          id
+          admin
+        }
+      }
+    }`,
+    schema: "withJwt",
+    process: ({ data: { authenticatePayload: { authPayload } } }) => {
+      const { jwt: str } = authPayload;
+      return Object.assign({}, authPayload, {
+        jwt: Object.assign(jwt.verify(authPayload.jwt, jwtSecret), {
+          iat: "[timestamp]",
+        }),
+      });
+    },
+  },
 ];
 
 beforeAll(() => {

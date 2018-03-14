@@ -369,7 +369,7 @@ class QueryBuilder {
           ),
           ", "
         )})`
-      : sql.fragment`to_json(${this.getTableAlias()}.*)`;
+      : sql.fragment`to_json(${this.getTableAlias()})`;
     if (addNullCase) {
       buildObject = sql.fragment`(case when ${this.getTableAlias()} is not distinct from null then null else ${buildObject} end)`;
     }
