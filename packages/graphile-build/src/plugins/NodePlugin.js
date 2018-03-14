@@ -6,12 +6,12 @@ import type {
   Context,
   ContextGraphQLObjectTypeFields,
 } from "../SchemaBuilder";
+import resolveNode from "../resolveNode";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import type { GraphQLType, GraphQLInterfaceType } from "graphql";
 import type { BuildExtensionQuery } from "./QueryPlugin";
 
 const base64 = str => new Buffer(String(str)).toString("base64");
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
 export type NodeFetcher = (
   data: mixed,
@@ -142,16 +142,7 @@ export default (function NodePlugin(
     "GraphQLObjectType:fields",
     (
       fields: {},
-      {
-        $$isQuery,
-        $$nodeType,
-        parseResolveInfo,
-        getTypeByName,
-        extend,
-        nodeFetcherByTypeName,
-        getNodeType,
-        graphql: { GraphQLNonNull, GraphQLID, getNamedType },
-      }: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |},
+      build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |},
       {
         scope: { isRootQuery },
         fieldWithHooks,
@@ -160,6 +151,11 @@ export default (function NodePlugin(
       if (!isRootQuery) {
         return fields;
       }
+      const {
+        getTypeByName,
+        extend,
+        graphql: { GraphQLNonNull, GraphQLID },
+      } = build;
       return extend(
         fields,
         {
@@ -182,47 +178,16 @@ export default (function NodePlugin(
                   type: new GraphQLNonNull(GraphQLID),
                 },
               },
-              async resolve(data, args, context, resolveInfo) {
+              resolve(data, args, context, resolveInfo) {
                 const nodeId = args[nodeIdFieldName];
-                if (nodeId === "query") {
-                  return $$isQuery;
-                }
-                try {
-                  const [alias, ...identifiers] = JSON.parse(
-                    base64Decode(nodeId)
-                  );
-                  const Type = getNodeType(alias);
-                  if (!Type) {
-                    throw new Error("Type not found");
-                  }
-                  const resolver =
-                    nodeFetcherByTypeName[getNamedType(Type).name];
-                  const parsedResolveInfoFragment = parseResolveInfo(
-                    resolveInfo,
-                    {},
-                    Type
-                  );
-                  const resolveData = getDataFromParsedResolveInfoFragment(
-                    parsedResolveInfoFragment,
-                    getNamedType(Type)
-                  );
-                  const node = await resolver(
-                    data,
-                    identifiers,
-                    context,
-                    parsedResolveInfoFragment,
-                    resolveInfo.returnType,
-                    resolveData
-                  );
-                  Object.defineProperty(node, $$nodeType, {
-                    enumerable: false,
-                    configurable: false,
-                    value: Type,
-                  });
-                  return node;
-                } catch (e) {
-                  return null;
-                }
+                return resolveNode(
+                  nodeId,
+                  build,
+                  { getDataFromParsedResolveInfoFragment },
+                  data,
+                  context,
+                  resolveInfo
+                );
               },
             }),
             {

@@ -32,6 +32,10 @@ import PgMutationPayloadEdgePlugin from "./plugins/PgMutationPayloadEdgePlugin";
 
 import * as inflections from "./inflections";
 
+import parseIdentifier from "./parseIdentifier";
+
+export { parseIdentifier };
+
 export const defaultPlugins = [
   PgBasicsPlugin,
   PgIntrospectionPlugin,

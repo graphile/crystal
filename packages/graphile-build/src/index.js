@@ -10,6 +10,7 @@ import {
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "./plugins";
+import resolveNode from "./resolveNode";
 import type { GraphQLSchema } from "graphql";
 
 import type { Plugin, Options } from "./SchemaBuilder";
@@ -69,4 +70,6 @@ export {
   MutationPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
+  // resolveNode: EXPERIMENTAL, API might change!
+  resolveNode,
 };

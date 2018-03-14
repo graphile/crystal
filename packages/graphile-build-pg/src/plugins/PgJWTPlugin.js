@@ -1,6 +1,7 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
+import parseIdentifier from "../parseIdentifier";
 
 export default (function PgJWTPlugin(
   builder,
@@ -28,7 +29,7 @@ export default (function PgJWTPlugin(
           "pgJwtTypeIdentifier was specified without pgJwtSecret"
         );
       }
-      const { namespaceName, typeName } = parseTypeIdentifier(
+      const { namespaceName, entityName: typeName } = parseIdentifier(
         pgJwtTypeIdentifier
       );
 
@@ -135,19 +136,3 @@ export default (function PgJWTPlugin(
     }
   );
 }: Plugin);
-
-function parseTypeIdentifier(typeIdentifier) {
-  const match = typeIdentifier.match(
-    /^(?:([a-zA-Z0-9_]+)|"([^"]*)")\.(?:([a-zA-Z0-9_]+)|"([^"]*)")$/
-  );
-
-  if (!match)
-    throw new Error(
-      `Type identifier '${typeIdentifier}' is of the incorrect form.`
-    );
-
-  return {
-    namespaceName: match[1] || match[2],
-    typeName: match[3] || match[4],
-  };
-}
