@@ -76,6 +76,8 @@ createServer(postgraphile());
 
 For more information around using PostGraphile as a library, and the options the API expects read the [library usage article](https://www.graphile.org/postgraphile/usage-library/).
 
+Check out [hapi-postgraphile](https://github.com/mshick/hapi-postgraphile) if you're interested in using PostGraphile as a [hapi](https://github.com/hapijs/hapi) server plugin.
+
 There is also a docker image for running PostGraphile maintained by @angelosarto, simply pass the same options to the docker container:
 
 ```bash
