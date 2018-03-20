@@ -545,7 +545,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
         result.errors = result.errors.map(formatError)
 
       if (options.handleErrors && result.errors) {
-        result.errors = options.handleErrors(result.errors, req, res);
+        result.errors = options.handleErrors(result.errors, req, res)
       }
 
       if (!res.headersSent) {
