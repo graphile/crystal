@@ -544,6 +544,10 @@ export default function createPostGraphileHttpRequestHandler(options) {
       if (result && result.errors)
         result.errors = result.errors.map(formatError)
 
+      if (options.handleErrors && result.errors) {
+        result.error = options.handleErrors(result.errors, req, res);
+      }
+
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
       res.end(JSON.stringify(result))
 

@@ -7,6 +7,7 @@ import createPostGraphileHttpRequestHandler, { HttpRequestHandler } from './http
 import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
 import { IncomingMessage, ServerResponse } from 'http'
 import jwt = require('jsonwebtoken')
+import { GraphQLErrorExtended } from './extendedFormatError';
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
@@ -45,6 +46,8 @@ type PostGraphileOptions = {
   // `json` (which causes the stack to become an array with elements for each
   // line of the stack).
   showErrorStack?: boolean,
+  // Enables ability to modify errors before sending down to the client
+  handleErrors?:((errors: Array<GraphQLErrorExtended>, req: IncomingMessage, res: ServerResponse) => Array<GraphQLErrorExtended>),
   // Extends the error response with additional details from the Postgres
   // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
   // Default is `[]`.
