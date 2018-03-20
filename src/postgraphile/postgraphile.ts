@@ -51,7 +51,7 @@ type PostGraphileOptions = {
   handleErrors?: ((
     errors: Array<GraphQLErrorExtended>,
     req: IncomingMessage,
-    res: ServerResponse
+    res: ServerResponse,
   ) => Array<GraphQLErrorExtended>);
   // Extends the error response with additional details from the Postgres
   // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
