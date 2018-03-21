@@ -473,13 +473,13 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const server = createServer({
         extendedErrors: ['hint', 'detail', 'errcode'],
         handleErrors: (errors) => {
-          return errors.map(error=>{
-            error.message = 'my custom error message';
-            error.hint = 'my custom error hint';
-            error.detail = 'my custom error detail';
-            return error;
+          return errors.map(error => {
+            error.message = 'my custom error message'
+            error.hint = 'my custom error hint'
+            error.detail = 'my custom error detail'
+            return error
           })
-        }
+        },
       })
       await request(server)
         .post('/graphql')
@@ -508,9 +508,9 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const server = createServer({
         extendedErrors: ['hint', 'detail', 'errcode'],
         handleErrors: (errors, req, res) => {
-          res.statusCode = 401;
+          res.statusCode = 401
           res.send('Not Authorized!')
-        }
+        },
       })
       await request(server)
         .post('/graphql')
