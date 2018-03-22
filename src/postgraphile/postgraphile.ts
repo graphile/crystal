@@ -1,6 +1,6 @@
 import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLSchema, GraphQLError } from 'graphql'
 import { EventEmitter } from 'events'
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core'
 import createPostGraphileHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphileHttpRequestHandler'
@@ -48,8 +48,9 @@ type PostGraphileOptions = {
   showErrorStack?: boolean,
   // Enables ability to modify errors before sending them down to the client
   // optionally can send down custom responses
+  /* @middlewareOnly */
   handleErrors?: ((
-    errors: Array<GraphQLErrorExtended>,
+    errors: Array<GraphQLError>,
     req: IncomingMessage,
     res: ServerResponse,
   ) => Array<GraphQLErrorExtended>);

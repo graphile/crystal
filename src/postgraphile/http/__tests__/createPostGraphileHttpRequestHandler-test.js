@@ -471,7 +471,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer({
-        extendedErrors: ['hint', 'detail', 'errcode'],
         handleErrors: (errors) => {
           return errors.map(error => {
             error.message = 'my custom error message'
@@ -495,7 +494,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
               path: ['testError'],
               hint: 'my custom error hint',
               detail: 'my custom error detail',
-              errcode: '12345',
             },
           ],
         })
@@ -506,16 +504,14 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer({
-        extendedErrors: ['hint', 'detail', 'errcode'],
         handleErrors: (errors, req, res) => {
           res.statusCode = 401
-          res.send('Not Authorized!')
         },
       })
       await request(server)
         .post('/graphql')
         .send({ query: '{testError}' })
-        .expect(401, {})
+        .expect(401, { data: { testError: null } })
     })
 
     test('will serve a favicon when graphiql is enabled', async () => {
