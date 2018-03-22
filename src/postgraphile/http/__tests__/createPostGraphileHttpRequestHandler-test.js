@@ -517,10 +517,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
             {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
-              path: ['testError']
-            }
+              path: ['testError'],
+            },
           ],
-          data: { testError: null }
+          data: { testError: null },
         })
     })
 
