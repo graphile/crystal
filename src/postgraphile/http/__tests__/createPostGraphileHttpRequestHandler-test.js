@@ -466,7 +466,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         })
     })
 
-    test('will allow user to custom errors when handleErrors is set', async () => {
+    test('will allow user to customize errors when handleErrors is set', async () => {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
@@ -506,12 +506,22 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const server = createServer({
         handleErrors: (errors, req, res) => {
           res.statusCode = 401
+          return errors
         },
       })
       await request(server)
         .post('/graphql')
         .send({ query: '{testError}' })
-        .expect(401, { data: { testError: null } })
+        .expect(401, {
+          errors: [
+            {
+              message: 'test message',
+              locations: [{ line: 1, column: 2 }],
+              path: ['testError']
+            }
+          ],
+          data: { testError: null }
+        })
     })
 
     test('will serve a favicon when graphiql is enabled', async () => {
