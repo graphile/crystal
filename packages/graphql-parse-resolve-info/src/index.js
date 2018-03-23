@@ -43,6 +43,35 @@ export type ResolveTree = {
 
 const debug = debugFactory("graphql-parse-resolve-info");
 
+function getArgVal(resolveInfo, argument) {
+  if (argument.kind === "Variable") {
+    return resolveInfo.variableValues[argument.name.value];
+  } else if (argument.kind === "BooleanValue") {
+    return argument.value;
+  }
+}
+
+function skipField(resolveInfo, { directives = [] }) {
+  let skip = false;
+  directives.forEach(directive => {
+    const directiveName = directive.name.value;
+    if (Array.isArray(directive.arguments)) {
+      const ifArgumentAst = directive.arguments.find(
+        arg => arg.name && arg.name.value === "if"
+      );
+      if (ifArgumentAst) {
+        const argumentValueAst = ifArgumentAst.value;
+        if (directiveName === "skip") {
+          skip = skip || getArgVal(resolveInfo, argumentValueAst);
+        } else if (directiveName === "include") {
+          skip = skip || !getArgVal(resolveInfo, argumentValueAst);
+        }
+      }
+    }
+  });
+  return skip;
+}
+
 // Originally based on https://github.com/tjmehta/graphql-parse-fields
 
 export function getAliasFromResolveInfo(
@@ -150,7 +179,9 @@ function fieldTreeFromAST<T: SelectionNode>(
       asts.length,
       selectionVal.kind
     );
-    if (selectionVal.kind === "Field") {
+    if (skipField(resolveInfo, selectionVal)) {
+      debug("%s[%d] IGNORING due to directive", depth, instance);
+    } else if (selectionVal.kind === "Field") {
       const val: FieldNode = selectionVal;
       const name = val.name && val.name.value;
       const isReserved = name && name !== "__id" && name.substr(0, 2) === "__";
