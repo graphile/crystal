@@ -540,11 +540,16 @@ export default function createPostGraphileHttpRequestHandler(options) {
     } finally {
       // Finally, we send the client the contents of `result`.
       debugRequest('GraphQL query has been executed.')
-      // Format our errors so the client doesn’t get the full thing.
-      if (result && result.errors)
-        result.errors = result.errors.map(formatError)
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
+
+      // Format our errors so the client doesn’t get the full thing.
+      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
+
+      if (result && result.errors) {
+        result.errors = handleErrors(result.errors, req, res)
+      }
+
       res.end(JSON.stringify(result))
 
       debugRequest('GraphQL query request finished.')

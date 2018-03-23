@@ -1,12 +1,13 @@
 import { Pool, PoolConfig } from 'pg'
 import { parse as parsePgConnectionString } from 'pg-connection-string'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLSchema, GraphQLError } from 'graphql'
 import { EventEmitter } from 'events'
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core'
 import createPostGraphileHttpRequestHandler, { HttpRequestHandler } from './http/createPostGraphileHttpRequestHandler'
 import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
 import { IncomingMessage, ServerResponse } from 'http'
 import jwt = require('jsonwebtoken')
+import { GraphQLErrorExtended } from './extendedFormatError'
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
@@ -45,6 +46,14 @@ type PostGraphileOptions = {
   // `json` (which causes the stack to become an array with elements for each
   // line of the stack).
   showErrorStack?: boolean,
+  // Enables ability to modify errors before sending them down to the client
+  // optionally can send down custom responses
+  /* @middlewareOnly */
+  handleErrors?: ((
+    errors: Array<GraphQLError>,
+    req: IncomingMessage,
+    res: ServerResponse,
+  ) => Array<GraphQLErrorExtended>);
   // Extends the error response with additional details from the Postgres
   // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
   // Default is `[]`.
@@ -134,7 +143,7 @@ type PostGraphileOptions = {
   // function which will return the same (or a Promise to the same) based on
   // the incoming web request (e.g. to extract session data)
   /* @middlewareOnly */
-  pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{[key: string]: mixed }>),
+  pgSettings?: { [key: string]: mixed } | ((req: IncomingMessage) => Promise<{ [key: string]: mixed }>),
   // Some graphile-build plugins may need additional information available on
   // the `context` argument to the resolver - you can use this function to
   // provide such information based on the incoming request - you can even use
@@ -159,6 +168,10 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
     // tslint:disable-next-line no-console
     console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
+  }
+
+  if (options.handleErrors && (options.extendedErrors || options.showErrorStack)) {
+    throw new Error(`You cannot combine 'handleErrors' with the other error options`)
   }
 
   // Creates the Postgres schemas array.
