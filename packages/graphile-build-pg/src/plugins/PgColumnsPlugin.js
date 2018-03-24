@@ -157,6 +157,7 @@ export default (function PgColumnsPlugin(
         pgIntrospection: table,
         pgAddSubfield,
       },
+      fieldWithHooks,
       Self,
     } = context;
     if (
@@ -184,16 +185,20 @@ export default (function PgColumnsPlugin(
               }.${table.name}'; one of them is '${attr.name}'`
             );
           }
-          memo[fieldName] = pgAddSubfield(fieldName, attr.name, attr.type, {
-            description: attr.description,
-            type: nullableIf(
-              GraphQLNonNull,
-              isPgPatch ||
-                (!attr.isNotNull && !attr.type.domainIsNotNull) ||
-                attr.hasDefault,
-              pgGetGqlInputTypeByTypeId(attr.typeId) || GraphQLString
-            ),
-          });
+          memo[fieldName] = fieldWithHooks(
+            fieldName,
+            pgAddSubfield(fieldName, attr.name, attr.type, {
+              description: attr.description,
+              type: nullableIf(
+                GraphQLNonNull,
+                isPgPatch ||
+                  (!attr.isNotNull && !attr.type.domainIsNotNull) ||
+                  attr.hasDefault,
+                pgGetGqlInputTypeByTypeId(attr.typeId) || GraphQLString
+              ),
+            }),
+            { pgFieldIntrospection: attr }
+          );
           return memo;
         }, {}),
       `Adding columns to input object '${Self.name}'`
