@@ -339,6 +339,11 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
     // If we didn’t call `next` above, all requests will return 200 by default!
     res.statusCode = 200
+    if (options.watchPg) {
+      // Inform GraphiQL and other clients that they can subscribe to events
+      // (such as the schema being updated) at the following URL
+      res.setHeader('X-GraphQL-Event-Stream', '/_postgraphile/stream')
+    }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
     if (req.method === 'OPTIONS') {
