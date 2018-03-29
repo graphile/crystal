@@ -15,7 +15,7 @@ $npm_bin/nodemon \
   --ignore __mocks__ \
   --ignore src/postgraphile/graphiql \
   --ext js,ts \
-  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts --schema a,b,c --show-error-stack json --watch $@" &
+  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts --show-error-stack json --extended-errors hint,detail,errcode $@" &
 
 # Ensure forked process is killed even if we die unexpectedly
 trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS 2>/dev/null || true' SIGINT SIGTERM EXIT
