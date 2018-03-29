@@ -32,7 +32,7 @@ class PostGraphiQL extends React.Component {
 
       // When we get a change notification, we want to update our schema.
       eventSource.addEventListener(
-        'changed',
+        'change',
         () => {
           this.updateSchema()
             .then(() => console.log('PostGraphile: Schema updated')) // tslint:disable-line no-console
