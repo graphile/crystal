@@ -466,6 +466,64 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         })
     })
 
+    test('will allow user to customize errors when handleErrors is set', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        handleErrors: (errors) => {
+          return errors.map(error => {
+            error.message = 'my custom error message'
+            error.hint = 'my custom error hint'
+            error.detail = 'my custom error detail'
+            return error
+          })
+        },
+      })
+      await request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({
+          data: { testError: null },
+          errors: [
+            {
+              message: 'my custom error message',
+              locations: [{ line: 1, column: 2 }],
+              path: ['testError'],
+              hint: 'my custom error hint',
+              detail: 'my custom error detail',
+            },
+          ],
+        })
+    })
+
+    test('will allow user to send custom responses when handleErrors is set and sends a response', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        handleErrors: (errors, req, res) => {
+          res.statusCode = 401
+          return errors
+        },
+      })
+      await request(server)
+        .post('/graphql')
+        .send({ query: '{testError}' })
+        .expect(401, {
+          errors: [
+            {
+              message: 'test message',
+              locations: [{ line: 1, column: 2 }],
+              path: ['testError'],
+            },
+          ],
+          data: { testError: null },
+        })
+    })
+
     test('will serve a favicon when graphiql is enabled', async () => {
       const server1 = createServer({ graphiql: true })
       const server2 = createServer({ graphiql: true, route: '/graphql' })
