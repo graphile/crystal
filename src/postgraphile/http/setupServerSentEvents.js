@@ -25,7 +25,7 @@ export default function setupServerSentEvents (req, res, options) {
   sse('event: open\n\n')
 
   // Setup listeners.
-  const schemaChangedCb = () => sse('event: changed\ndata: schema\n\n')
+  const schemaChangedCb = () => sse('event: change\ndata: schema\n\n')
 
   if (options.watchPg)
     _emitter.on('schemas:changed', schemaChangedCb)
