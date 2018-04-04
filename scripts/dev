@@ -6,22 +6,29 @@ cd $(dirname $0)/..
 npm_bin=$(npm bin)
 
 export POSTGRAPHILE_ENV=development
-export DEBUG=${DEBUG-postgraphile*,-postgraphile:graphql,-postgraphile:postgres:explain}
+export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
 
 # Run Nodemon and watch the PostGraphile source code for changes.
-$npm_bin/nodemon \
-  --watch src \
-  --ignore __tests__ \
-  --ignore __mocks__ \
-  --ignore src/postgraphile/graphiql \
-  --ext js,ts \
-  --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts --show-error-stack json --extended-errors hint,detail,errcode $@" &
+if [ "$1" = "--" ]; then
+  shift
+  $npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* &
+else
+  $npm_bin/nodemon \
+    --watch src \
+    --ignore __tests__ \
+    --ignore __mocks__ \
+    --ignore src/postgraphile/graphiql \
+    --ext js,ts \
+    --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+fi;
 
 # Ensure forked process is killed even if we die unexpectedly
 trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS 2>/dev/null || true' SIGINT SIGTERM EXIT
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
-(cd src/postgraphile/graphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null
+(sleep 1 && cd src/postgraphile/graphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null &
 
+wait %1
+kill %2
 wait
