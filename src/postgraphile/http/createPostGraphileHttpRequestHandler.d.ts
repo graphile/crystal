@@ -3,6 +3,7 @@ import { GraphQLSchema } from 'graphql'
 import { Pool } from 'pg'
 import jwt = require('jsonwebtoken')
 import { EventEmitter } from 'events'
+import { GraphQLError } from 'graphql/error'
 
 /**
  * A request handler for one of many different `http` frameworks.
@@ -10,6 +11,9 @@ import { EventEmitter } from 'events'
 export interface HttpRequestHandler {
   (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): void
   (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
+  getGraphQLSchema: () => Promise<GraphQLSchema>
+  formatError: (e: GraphQLError) => GraphQLError
+  pgPool: Pool
 }
 
 /**

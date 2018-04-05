@@ -1,3 +1,4 @@
+/* eslint-disable */// Because we use tslint
 import {
   join as joinPath,
   resolve as resolvePath,
@@ -21,6 +22,7 @@ import debugPgClient from './debugPgClient'
 import setupServerSentEvents from './setupServerSentEvents'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphileContext from '../withPostGraphileContext'
+import mapKeys from 'lodash/mapKeys'
 
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
@@ -71,6 +73,41 @@ const origGraphiqlHtml = new Promise((resolve, reject) => {
 })
 
 /**
+ * We need to be able to share the withPostGraphileContext logic between HTTP
+ * and websockets
+ */
+const withPostGraphileContextFromReqResGenerator = options => {
+  const {
+    getGqlSchema,
+    pgSettings,
+    jwtSecret,
+    additionalGraphQLContextFromRequest,
+  } = options
+  return async (req, res, moreOptions, fn) => {
+    const jwtToken = options.jwtSecret ? getJwtToken(req) : null
+    const additionalContext =
+      typeof additionalGraphQLContextFromRequest === 'function'
+        ? await additionalGraphQLContextFromRequest(req, res)
+        : {}
+    return withPostGraphileContext(
+      {
+        ...options,
+        jwtToken,
+        pgSettings:
+          typeof pgSettings === 'function'
+            ? await pgSettings(req)
+            : pgSettings,
+        ...moreOptions,
+      },
+      context => {
+        const graphqlContext = Object.assign({}, additionalContext, context)
+        return fn(graphqlContext)
+      },
+    )
+  }
+}
+
+/**
  * Creates a GraphQL request handler, this is untyped besides some JSDoc types
  * for intellisense.
  *
@@ -82,11 +119,6 @@ export default function createPostGraphileHttpRequestHandler(options) {
     pgPool,
     pgSettings,
     pgDefaultRole,
-    jwtSecret,
-    jwtAudiences,
-    jwtRole,
-    jwtVerifyOptions,
-    additionalGraphQLContextFromRequest,
   } = options
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
@@ -162,6 +194,8 @@ export default function createPostGraphileHttpRequestHandler(options) {
       }}`,
     ),
   )
+
+  const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options)
 
   /**
    * The actual request handler. It’s an async function so it will return a
@@ -499,39 +533,17 @@ export default function createPostGraphileHttpRequestHandler(options) {
             .trim(),
         )
 
-      const jwtToken = options.jwtSecret ? getJwtToken(req) : null
-
-      const additionalContext =
-        typeof additionalGraphQLContextFromRequest === 'function'
-          ? await additionalGraphQLContextFromRequest(req, res)
-          : {}
-      result = await withPostGraphileContext(
-        {
-          pgPool,
-          jwtToken,
-          jwtSecret,
-          jwtAudiences,
-          jwtRole,
-          jwtVerifyOptions,
-          pgDefaultRole,
-          pgSettings:
-            typeof pgSettings === 'function'
-              ? await pgSettings(req)
-              : pgSettings,
-        },
-        context => {
-          pgRole = context.pgRole
-          const graphqlContext = Object.assign({}, additionalContext, context)
-          return executeGraphql(
-            gqlSchema,
-            queryDocumentAst,
-            null,
-            graphqlContext,
-            params.variables,
-            params.operationName,
-          )
-        },
-      )
+      result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
+        pgRole = graphqlContext.pgRole
+        return executeGraphql(
+          gqlSchema,
+          queryDocumentAst,
+          null,
+          graphqlContext,
+          params.variables,
+          params.operationName,
+        )
+      })
     } catch (error) {
       // Set our status code and send the client our results!
       if (res.statusCode === 200)
@@ -593,7 +605,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
    * - `express`.
    * - `koa` (2.0).
    */
-  return (a, b, c) => {
+  const middleware = (a, b, c) => {
     // If are arguments look like the arguments to koa middleware, this is
     // `koa` middleware.
     if (a.req && a.res && typeof b === 'function') {
@@ -624,6 +636,11 @@ export default function createPostGraphileHttpRequestHandler(options) {
       )
     }
   }
+  middleware.getGraphQLSchema = getGqlSchema
+  middleware.formatError = formatError
+  middleware.pgPool = pgPool
+  middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes
+  return middleware
 }
 
 /**

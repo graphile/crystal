@@ -76,6 +76,8 @@ export class Client extends events.EventEmitter {
   public on (event: "notification", listener: (message: any) => void): this
   public on (event: "notice", listener: (message: any) => void): this
   public on (event: string, listener: Function): this
+
+  public escapeIdentifier (identifier: string): string
 }
 
 export class PoolClient extends Client {
@@ -91,7 +93,7 @@ export class Query extends events.EventEmitter implements PromiseLike<ResultBuil
   public then <TResult>(onfulfilled?: (value: QueryResult) => TResult | PromiseLike<TResult>, onrejected?: (reason: any) => void): PromiseLike<TResult>
 }
 
-export class Pool {
+export class Pool extends events.EventEmitter {
   constructor (config: PoolConfig)
 
   public connect (callback?: (err: Error, client: Client, done: (err?: any) => void) => void): Promise<PoolClient>
