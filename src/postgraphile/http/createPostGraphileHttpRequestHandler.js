@@ -107,7 +107,6 @@ const withPostGraphileContextFromReqResGenerator = options => {
   }
 }
 
-
 /**
  * Runs a GraphQL Query. Can be mapped over a list of batched queries
  *
@@ -124,7 +123,7 @@ const runQuery = async (
   pgRole,
   queryTimeStart,
   params
-)=>{
+) => {
 
   let queryDocumentAst
 
@@ -133,22 +132,22 @@ const runQuery = async (
   // Validate our params object a bit.
   if (params == null){
     return {
-      status:400,
-      errors:'Must provide an object parameters, not nullish value.'
+      status: 400,
+      errors: 'Must provide an object parameters, not nullish value.',
     }
   }
 
   if (typeof params !== 'object'){
     return {
-      status:400,
-      errors:`Expected parameter object, not value of type '${typeof params}'.`
+      status: 400,
+      errors: `Expected parameter object, not value of type '${typeof params}'.`,
     }
   }
 
   if (!params.query){
     return {
-      status:400,
-      errors:'Must provide a query string.'
+      status: 400,
+      errors: 'Must provide a query string.',
     }
   }
 
@@ -165,8 +164,8 @@ const runQuery = async (
         params.variables = JSON.parse(params.variables)
       } catch (error) {
         return {
-          status:400,
-          errors:`Error parsing variables: ${error}`
+          status: 400,
+          errors: `Error parsing variables: ${error}`,
         }
       }
     }
@@ -175,8 +174,8 @@ const runQuery = async (
   // Throw an error if `variables` is not an object.
   if (params.variables != null && typeof params.variables !== 'object'){
     return {
-      status:400,
-      errors:`Variables must be an object, not '${typeof params.variables}'.`
+      status: 400,
+      errors: `Variables must be an object, not '${typeof params.variables}'.`,
     }
   }
 
@@ -186,8 +185,8 @@ const runQuery = async (
     typeof params.operationName !== 'string'
   ){
     return {
-      status:400,
-      errors:`Operation name must be a string, not '${typeof params.operationName}'.`
+      status: 400,
+      errors: `Operation name must be a string, not '${typeof params.operationName}'.`,
     }
   }
 
@@ -198,8 +197,8 @@ const runQuery = async (
     queryDocumentAst = parseGraphql(source)
   } catch (error) {
     return {
-      status:400,
-      errors:`Error parsing query: '${error}'.`
+      status: 400,
+      errors: `Error parsing query: '${error}'.`,
     }
   }
 
@@ -213,8 +212,8 @@ const runQuery = async (
   // send the errors to the client with a `400` code.
   if (validationErrors.length > 0) {
     return {
-      status:400,
-      errors:validationErrors
+      status: 400,
+      errors: validationErrors,
     }
   }
 
@@ -603,7 +602,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       params = typeof req.body === 'string' ? { query: req.body } : req.body
 
       if (Array.isArray(params)){
-        result = await Promise.all(params.map(param=>runQuery(
+        result = await Promise.all(params.map(param => runQuery(
           req,
           res,
           handleErrors,
@@ -612,7 +611,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           withPostGraphileContextFromReqRes,
           pgRole,
           queryTimeStart,
-          param
+          param,
         )))
       }else{
         result = await runQuery(
@@ -624,7 +623,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           withPostGraphileContextFromReqRes,
           pgRole,
           queryTimeStart,
-          params
+          params,
         )
       }
 
