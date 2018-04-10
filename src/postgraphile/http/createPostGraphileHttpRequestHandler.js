@@ -130,21 +130,21 @@ const runQuery = async (
   debugRequest('Running Query.')
 
   // Validate our params object a bit.
-  if (params == null){
+  if (params == null) {
     return {
       status: 400,
       errors: 'Must provide an object parameters, not nullish value.',
     }
   }
 
-  if (typeof params !== 'object'){
+  if (typeof params !== 'object') {
     return {
       status: 400,
       errors: `Expected parameter object, not value of type '${typeof params}'.`,
     }
   }
 
-  if (!params.query){
+  if (!params.query) {
     return {
       status: 400,
       errors: 'Must provide a query string.',
@@ -172,7 +172,7 @@ const runQuery = async (
   }
 
   // Throw an error if `variables` is not an object.
-  if (params.variables != null && typeof params.variables !== 'object'){
+  if (params.variables != null && typeof params.variables !== 'object') {
     return {
       status: 400,
       errors: `Variables must be an object, not '${typeof params.variables}'.`,
@@ -183,7 +183,7 @@ const runQuery = async (
   if (
     params.operationName != null &&
     typeof params.operationName !== 'string'
-  ){
+  ) {
     return {
       status: 400,
       errors: `Operation name must be a string, not '${typeof params.operationName}'.`,
@@ -601,7 +601,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       //   be executing.
       params = typeof req.body === 'string' ? { query: req.body } : req.body
 
-      if (Array.isArray(params)){
+      if (Array.isArray(params)) {
         result = await Promise.all(params.map(param => runQuery(
           req,
           res,
@@ -613,7 +613,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           queryTimeStart,
           param,
         )))
-      }else{
+      } else {
         result = await runQuery(
           req,
           res,
