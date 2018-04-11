@@ -132,22 +132,25 @@ const runQuery = async (
   // Validate our params object a bit.
   if (params == null) {
     return {
-      status: 400,
-      errors: 'Must provide an object parameters, not nullish value.',
+      errors: [{
+        message: 'Must provide an object parameters, not nullish value.',
+      }],
     }
   }
 
   if (typeof params !== 'object') {
     return {
-      status: 400,
-      errors: `Expected parameter object, not value of type '${typeof params}'.`,
+      errors: [{
+        message: `Expected parameter object, not value of type '${typeof params}'.`,
+      }],
     }
   }
 
   if (!params.query) {
     return {
-      status: 400,
-      errors: 'Must provide a query string.',
+      errors: [{
+        message: 'Must provide a query string.',
+      }],
     }
   }
 
@@ -164,8 +167,9 @@ const runQuery = async (
         params.variables = JSON.parse(params.variables)
       } catch (error) {
         return {
-          status: 400,
-          errors: `Error parsing variables: ${error}`,
+          errors: [{
+            message: `Error parsing variables: ${error}`,
+          }],
         }
       }
     }
@@ -174,8 +178,9 @@ const runQuery = async (
   // Throw an error if `variables` is not an object.
   if (params.variables != null && typeof params.variables !== 'object') {
     return {
-      status: 400,
-      errors: `Variables must be an object, not '${typeof params.variables}'.`,
+      errors: [{
+        message: `Variables must be an object, not '${typeof params.variables}'.`,
+      }],
     }
   }
 
@@ -185,8 +190,9 @@ const runQuery = async (
     typeof params.operationName !== 'string'
   ) {
     return {
-      status: 400,
-      errors: `Operation name must be a string, not '${typeof params.operationName}'.`,
+      errors: [{
+        message: `Operation name must be a string, not '${typeof params.operationName}'.`,
+      }],
     }
   }
 
@@ -197,8 +203,7 @@ const runQuery = async (
     queryDocumentAst = parseGraphql(source)
   } catch (error) {
     return {
-      status: 400,
-      errors: `Error parsing query: '${error}'.`,
+      errors: [error],
     }
   }
 
@@ -212,7 +217,6 @@ const runQuery = async (
   // send the errors to the client with a `400` code.
   if (validationErrors.length > 0) {
     return {
-      status: 400,
       errors: validationErrors,
     }
   }
@@ -227,7 +231,7 @@ const runQuery = async (
     .trim(),
   )
 
-  const result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
+  let result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
     pgRole = graphqlContext.pgRole
     return executeGraphql(
       gqlSchema,
@@ -238,6 +242,10 @@ const runQuery = async (
       params.operationName,
     )
   })
+
+  if (result && result.errors) {
+    result.errors = handleErrors(result.errors, req, res)
+  }
 
   // Log the query. If this debugger isn’t enabled, don’t run it.
   if (queryDocumentAst && !disableQueryLog) {
@@ -592,6 +600,9 @@ export default function createPostGraphileHttpRequestHandler(options) {
         throw httpError(405, 'Only `POST` requests are allowed.')
       }
 
+      // Format our errors so the client doesn’t get the full thing.
+      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
+
       // Get the parameters we will use to run a GraphQL request. `params` may
       // include:
       //
@@ -643,13 +654,6 @@ export default function createPostGraphileHttpRequestHandler(options) {
       debugRequest('GraphQL queries have been executed.')
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
-
-      // Format our errors so the client doesn’t get the full thing.
-      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
-
-      if (result && result.errors) {
-        result.errors = handleErrors(result.errors, req, res)
-      }
 
       res.end(JSON.stringify(result))
 
