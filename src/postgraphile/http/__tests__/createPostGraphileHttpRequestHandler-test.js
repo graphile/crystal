@@ -234,7 +234,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .send({ query: '{' })
-        .expect(400)
+        .expect(200)
         .expect('Content-Type', /json/)
         .expect({
           errors: [
@@ -251,7 +251,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .send({ query: '{notFound}' })
-        .expect(400)
+        .expect(200)
         .expect('Content-Type', /json/)
         .expect({
           errors: [
@@ -398,7 +398,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .send({ query: '{hello}', variables: 2 })
-        .expect(400)
+        .expect(200)
         .expect({
           errors: [{ message: 'Variables must be an object, not \'number\'.' }],
         })
@@ -409,7 +409,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .send({ query: '{hello}', operationName: 2 })
-        .expect(400)
+        .expect(200)
         .expect({
           errors: [
             { message: 'Operation name must be a string, not \'number\'.' },
