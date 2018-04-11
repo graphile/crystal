@@ -1,6 +1,12 @@
 # GraphQL-Build
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/benjie)
+[![Package on npm](https://img.shields.io/npm/v/postgraphile-core.svg?style=flat)](https://www.npmjs.com/package/postgraphile-core)
+[![Package on npm](https://img.shields.io/npm/v/graphile-build.svg?style=flat)](https://www.npmjs.com/package/graphile-build)
+[![Package on npm](https://img.shields.io/npm/v/graphile-build-pg.svg?style=flat)](https://www.npmjs.com/package/graphile-build-pg)
+![MIT license](https://img.shields.io/npm/l/graphile-build.svg)
+[![Gitter chat room](https://badges.gitter.im/graphile/postgraphile.svg)](https://gitter.im/graphile/postgraphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
+[![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
 Build a high-performance easily-extensible GraphQL schema by combining plugins.
 
