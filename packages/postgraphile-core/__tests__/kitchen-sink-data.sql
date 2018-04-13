@@ -110,3 +110,10 @@ insert into a.view_table (id, col1, col2) values
   (1, 11, 21),
   (2, 12, 22),
   (3, 13, 23);
+
+insert into c.my_table(id, json_data) values
+  (1, '{"stringField":"test"}'),
+  (2, '{"stringField":"test","otherField":"whatever"}'),
+  (3, '{"stringField":"notTest"}');
+
+alter sequence c.my_table_id_seq restart with 10;

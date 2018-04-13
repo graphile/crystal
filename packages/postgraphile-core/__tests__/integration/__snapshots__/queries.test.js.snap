@@ -756,6 +756,43 @@ Object {
 }
 `;
 
+exports[`dynamic-json.condition-json-field-variable.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "nodes": Array [
+        Object {
+          "id": 1,
+          "jsonData": Object {
+            "stringField": "test",
+          },
+        },
+      ],
+    },
+    "b": Object {
+      "nodes": Array [
+        Object {
+          "id": 1,
+          "jsonData": Object {
+            "stringField": "test",
+          },
+        },
+      ],
+    },
+    "c": Object {
+      "nodes": Array [
+        Object {
+          "id": 1,
+          "jsonData": Object {
+            "stringField": "test",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`dynamic-json.graphql 1`] = `
 Object {
   "data": Object {

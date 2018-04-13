@@ -279,6 +279,41 @@ type CreateLeftArmPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`MyTable\` mutation.\\"\\"\\"
+input CreateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` to be created by this mutation.\\"\\"\\"
+  myTable: MyTableInput!
+}
+
+\\"\\"\\"The output of our create \`MyTable\` mutation.\\"\\"\\"
+type CreateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was created by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`Person\` mutation.\\"\\"\\"
 input CreatePersonInput {
   \\"\\"\\"
@@ -472,6 +507,54 @@ type DeleteLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMyTableByRowId\` mutation.\\"\\"\\"
+input DeleteMyTableByRowIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  rowId: Int!
+}
+
+\\"\\"\\"All input for the \`deleteMyTable\` mutation.\\"\\"\\"
+input DeleteMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be deleted.
+  \\"\\"\\"
+  id: ID!
+}
+
+\\"\\"\\"The output of our delete \`MyTable\` mutation.\\"\\"\\"
+type DeleteMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMyTableId: ID
+
+  \\"\\"\\"The \`MyTable\` that was deleted by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -956,6 +1039,14 @@ type Mutation {
     input: CreateLeftArmInput!
   ): CreateLeftArmPayload
 
+  \\"\\"\\"Creates a single \`MyTable\`.\\"\\"\\"
+  createMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMyTableInput!
+  ): CreateMyTablePayload
+
   \\"\\"\\"Creates a single \`Person\`.\\"\\"\\"
   createPerson(
     \\"\\"\\"
@@ -1011,6 +1102,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteLeftArmByRowIdInput!
   ): DeleteLeftArmPayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using its globally unique id.\\"\\"\\"
+  deleteMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableInput!
+  ): DeleteMyTablePayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using a unique key.\\"\\"\\"
+  deleteMyTableByRowId(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableByRowIdInput!
+  ): DeleteMyTablePayload
 
   \\"\\"\\"Deletes a single \`Person\` using its globally unique id.\\"\\"\\"
   deletePerson(
@@ -1150,6 +1257,22 @@ type Mutation {
     input: UpdateLeftArmByRowIdInput!
   ): UpdateLeftArmPayload
 
+  \\"\\"\\"Updates a single \`MyTable\` using its globally unique id and a patch.\\"\\"\\"
+  updateMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableInput!
+  ): UpdateMyTablePayload
+
+  \\"\\"\\"Updates a single \`MyTable\` using a unique key and a patch.\\"\\"\\"
+  updateMyTableByRowId(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableByRowIdInput!
+  ): UpdateMyTablePayload
+
   \\"\\"\\"Updates a single \`Person\` using its globally unique id and a patch.\\"\\"\\"
   updatePerson(
     \\"\\"\\"
@@ -1191,6 +1314,77 @@ type Mutation {
     \\"\\"\\"
     input: UpdatePersonSecretByPersonIdInput!
   ): UpdatePersonSecretPayload
+}
+
+type MyTable implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  id: ID!
+  jsonData: JSON
+  rowId: Int!
+}
+
+\\"\\"\\"
+A condition to be used against \`MyTable\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MyTableCondition {
+  \\"\\"\\"Checks for equality with the object’s \`jsonData\` field.\\"\\"\\"
+  jsonData: JSON
+
+  \\"\\"\\"Checks for equality with the object’s \`rowId\` field.\\"\\"\\"
+  rowId: Int
+}
+
+\\"\\"\\"An input for mutations affecting \`MyTable\`\\"\\"\\"
+input MyTableInput {
+  jsonData: JSON
+  rowId: Int
+}
+
+\\"\\"\\"
+Represents an update to a \`MyTable\`. Fields that are set will be updated.
+\\"\\"\\"
+input MyTablePatch {
+  jsonData: JSON
+  rowId: Int
+}
+
+\\"\\"\\"A connection to a list of \`MyTable\` values.\\"\\"\\"
+type MyTablesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MyTable\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MyTablesEdge!]!
+
+  \\"\\"\\"A list of \`MyTable\` objects.\\"\\"\\"
+  nodes: [MyTable!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
+type MyTablesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MyTable\` at the end of the edge.\\"\\"\\"
+  node: MyTable!
+}
+
+\\"\\"\\"Methods to use when ordering \`MyTable\`.\\"\\"\\"
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 \\"\\"\\"All input for the \`noArgsMutation\` mutation.\\"\\"\\"
@@ -1687,6 +1881,35 @@ type Query implements Node {
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
+  allMyTables(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   allPeople(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -1832,6 +2055,13 @@ type Query implements Node {
   ): LeftArm
   leftArmByPersonId(personId: Int!): LeftArm
   leftArmByRowId(rowId: Int!): LeftArm
+
+  \\"\\"\\"Reads a single \`MyTable\` using its globally unique \`ID\`.\\"\\"\\"
+  myTable(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`MyTable\`.\\"\\"\\"
+    id: ID!
+  ): MyTable
+  myTableByRowId(rowId: Int!): MyTable
   noArgsQuery: Int
 
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
@@ -2108,6 +2338,63 @@ type UpdateLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateMyTableByRowId\` mutation.\\"\\"\\"
+input UpdateMyTableByRowIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+  rowId: Int!
+}
+
+\\"\\"\\"All input for the \`updateMyTable\` mutation.\\"\\"\\"
+input UpdateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be updated.
+  \\"\\"\\"
+  id: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+}
+
+\\"\\"\\"The output of our update \`MyTable\` mutation.\\"\\"\\"
+type UpdateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was updated by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4409,6 +4696,41 @@ type CreateLeftArmPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`MyTable\` mutation.\\"\\"\\"
+input CreateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` to be created by this mutation.\\"\\"\\"
+  myTable: MyTableInput!
+}
+
+\\"\\"\\"The output of our create \`MyTable\` mutation.\\"\\"\\"
+type CreateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was created by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`Patch\` mutation.\\"\\"\\"
 input CreatePatchInput {
   \\"\\"\\"
@@ -5202,6 +5524,54 @@ type DeleteLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMyTableById\` mutation.\\"\\"\\"
+input DeleteMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteMyTable\` mutation.\\"\\"\\"
+input DeleteMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`MyTable\` mutation.\\"\\"\\"
+type DeleteMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMyTableId: ID
+
+  \\"\\"\\"The \`MyTable\` that was deleted by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -6547,6 +6917,14 @@ type Mutation {
     input: CreateLeftArmInput!
   ): CreateLeftArmPayload
 
+  \\"\\"\\"Creates a single \`MyTable\`.\\"\\"\\"
+  createMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMyTableInput!
+  ): CreateMyTablePayload
+
   \\"\\"\\"Creates a single \`Patch\`.\\"\\"\\"
   createPatch(
     \\"\\"\\"
@@ -6722,6 +7100,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteLeftArmByPersonIdInput!
   ): DeleteLeftArmPayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using its globally unique id.\\"\\"\\"
+  deleteMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableInput!
+  ): DeleteMyTablePayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using a unique key.\\"\\"\\"
+  deleteMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableByIdInput!
+  ): DeleteMyTablePayload
 
   \\"\\"\\"Deletes a single \`Patch\` using its globally unique id.\\"\\"\\"
   deletePatch(
@@ -7095,6 +7489,22 @@ type Mutation {
     input: UpdateLeftArmByPersonIdInput!
   ): UpdateLeftArmPayload
 
+  \\"\\"\\"Updates a single \`MyTable\` using its globally unique id and a patch.\\"\\"\\"
+  updateMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableInput!
+  ): UpdateMyTablePayload
+
+  \\"\\"\\"Updates a single \`MyTable\` using a unique key and a patch.\\"\\"\\"
+  updateMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableByIdInput!
+  ): UpdateMyTablePayload
+
   \\"\\"\\"Updates a single \`Patch\` using its globally unique id and a patch.\\"\\"\\"
   updatePatch(
     \\"\\"\\"
@@ -7294,6 +7704,78 @@ type Mutation {
     \\"\\"\\"
     input: UpdateViewTableByIdInput!
   ): UpdateViewTablePayload
+}
+
+type MyTable implements Node {
+  id: Int!
+  jsonData: JSON
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`MyTable\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MyTableCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`jsonData\` field.\\"\\"\\"
+  jsonData: JSON
+}
+
+\\"\\"\\"An input for mutations affecting \`MyTable\`\\"\\"\\"
+input MyTableInput {
+  id: Int
+  jsonData: JSON
+}
+
+\\"\\"\\"
+Represents an update to a \`MyTable\`. Fields that are set will be updated.
+\\"\\"\\"
+input MyTablePatch {
+  id: Int
+  jsonData: JSON
+}
+
+\\"\\"\\"A connection to a list of \`MyTable\` values.\\"\\"\\"
+type MyTablesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MyTable\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MyTablesEdge!]!
+
+  \\"\\"\\"A list of \`MyTable\` objects.\\"\\"\\"
+  nodes: [MyTable]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
+type MyTablesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MyTable\` at the end of the edge.\\"\\"\\"
+  node: MyTable
+}
+
+\\"\\"\\"Methods to use when ordering \`MyTable\`.\\"\\"\\"
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 type NestedCompoundType {
@@ -8281,6 +8763,35 @@ type Query implements Node {
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
+  allMyTables(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`NonUpdatableView\`.\\"\\"\\"
   allNonUpdatableViews(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -8852,6 +9363,13 @@ type Query implements Node {
   ): LeftArm
   leftArmById(id: Int!): LeftArm
   leftArmByPersonId(personId: Int!): LeftArm
+
+  \\"\\"\\"Reads a single \`MyTable\` using its globally unique \`ID\`.\\"\\"\\"
+  myTable(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`MyTable\`.\\"\\"\\"
+    nodeId: ID!
+  ): MyTable
+  myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
@@ -10342,6 +10860,63 @@ type UpdateLeftArmPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the \`updateMyTableById\` mutation.\\"\\"\\"
+input UpdateMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+}
+
+\\"\\"\\"All input for the \`updateMyTable\` mutation.\\"\\"\\"
+input UpdateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`MyTable\` mutation.\\"\\"\\"
+type UpdateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was updated by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the \`updatePatchById\` mutation.\\"\\"\\"
 input UpdatePatchByIdInput {
   \\"\\"\\"
@@ -11625,6 +12200,64 @@ type Mutation {
   ): TypesMutationPayload
 }
 
+type MyTable implements Node {
+  id: Int!
+  jsonData: JSON
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`MyTable\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MyTableCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`jsonData\` field.\\"\\"\\"
+  jsonData: JSON
+}
+
+\\"\\"\\"A connection to a list of \`MyTable\` values.\\"\\"\\"
+type MyTablesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MyTable\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MyTablesEdge!]!
+
+  \\"\\"\\"A list of \`MyTable\` objects.\\"\\"\\"
+  nodes: [MyTable!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
+type MyTablesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MyTable\` at the end of the edge.\\"\\"\\"
+  node: MyTable!
+}
+
+\\"\\"\\"Methods to use when ordering \`MyTable\`.\\"\\"\\"
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"All input for the \`noArgsMutation\` mutation.\\"\\"\\"
 input NoArgsMutationInput {
   \\"\\"\\"
@@ -12073,6 +12706,35 @@ type Query implements Node {
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
+  allMyTables(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   allPeople(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -12213,6 +12875,13 @@ type Query implements Node {
   ): LeftArm
   leftArmById(id: Int!): LeftArm
   leftArmByPersonId(personId: Int!): LeftArm
+
+  \\"\\"\\"Reads a single \`MyTable\` using its globally unique \`ID\`.\\"\\"\\"
+  myTable(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`MyTable\`.\\"\\"\\"
+    nodeId: ID!
+  ): MyTable
+  myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
@@ -12655,6 +13324,41 @@ type CreateLeftArmPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`MyTable\` mutation.\\"\\"\\"
+input CreateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` to be created by this mutation.\\"\\"\\"
+  myTable: MyTableInput!
+}
+
+\\"\\"\\"The output of our create \`MyTable\` mutation.\\"\\"\\"
+type CreateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was created by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`Person\` mutation.\\"\\"\\"
 input CreatePersonInput {
   \\"\\"\\"
@@ -12848,6 +13552,54 @@ type DeleteLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMyTableById\` mutation.\\"\\"\\"
+input DeleteMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteMyTable\` mutation.\\"\\"\\"
+input DeleteMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`MyTable\` mutation.\\"\\"\\"
+type DeleteMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMyTableId: ID
+
+  \\"\\"\\"The \`MyTable\` that was deleted by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -13333,6 +14085,14 @@ type Mutation {
     input: CreateLeftArmInput!
   ): CreateLeftArmPayload
 
+  \\"\\"\\"Creates a single \`MyTable\`.\\"\\"\\"
+  createMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMyTableInput!
+  ): CreateMyTablePayload
+
   \\"\\"\\"Creates a single \`Person\`.\\"\\"\\"
   createPerson(
     \\"\\"\\"
@@ -13388,6 +14148,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteLeftArmByPersonIdInput!
   ): DeleteLeftArmPayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using its globally unique id.\\"\\"\\"
+  deleteMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableInput!
+  ): DeleteMyTablePayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using a unique key.\\"\\"\\"
+  deleteMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableByIdInput!
+  ): DeleteMyTablePayload
 
   \\"\\"\\"Deletes a single \`Person\` using its globally unique id.\\"\\"\\"
   deletePerson(
@@ -13527,6 +14303,22 @@ type Mutation {
     input: UpdateLeftArmByPersonIdInput!
   ): UpdateLeftArmPayload
 
+  \\"\\"\\"Updates a single \`MyTable\` using its globally unique id and a patch.\\"\\"\\"
+  updateMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableInput!
+  ): UpdateMyTablePayload
+
+  \\"\\"\\"Updates a single \`MyTable\` using a unique key and a patch.\\"\\"\\"
+  updateMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableByIdInput!
+  ): UpdateMyTablePayload
+
   \\"\\"\\"Updates a single \`Person\` using its globally unique id and a patch.\\"\\"\\"
   updatePerson(
     \\"\\"\\"
@@ -13568,6 +14360,78 @@ type Mutation {
     \\"\\"\\"
     input: UpdatePersonSecretByPersonIdInput!
   ): UpdatePersonSecretPayload
+}
+
+type MyTable implements Node {
+  id: Int!
+  jsonData: Json
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`MyTable\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MyTableCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`jsonData\` field.\\"\\"\\"
+  jsonData: Json
+}
+
+\\"\\"\\"An input for mutations affecting \`MyTable\`\\"\\"\\"
+input MyTableInput {
+  id: Int
+  jsonData: Json
+}
+
+\\"\\"\\"
+Represents an update to a \`MyTable\`. Fields that are set will be updated.
+\\"\\"\\"
+input MyTablePatch {
+  id: Int
+  jsonData: Json
+}
+
+\\"\\"\\"A connection to a list of \`MyTable\` values.\\"\\"\\"
+type MyTablesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MyTable\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MyTablesEdge!]!
+
+  \\"\\"\\"A list of \`MyTable\` objects.\\"\\"\\"
+  nodes: [MyTable!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
+type MyTablesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MyTable\` at the end of the edge.\\"\\"\\"
+  node: MyTable!
+}
+
+\\"\\"\\"Methods to use when ordering \`MyTable\`.\\"\\"\\"
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 \\"\\"\\"All input for the \`noArgsMutation\` mutation.\\"\\"\\"
@@ -14064,6 +14928,35 @@ type Query implements Node {
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
+  allMyTables(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   allPeople(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -14204,6 +15097,13 @@ type Query implements Node {
   ): LeftArm
   leftArmById(id: Int!): LeftArm
   leftArmByPersonId(personId: Int!): LeftArm
+
+  \\"\\"\\"Reads a single \`MyTable\` using its globally unique \`ID\`.\\"\\"\\"
+  myTable(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`MyTable\`.\\"\\"\\"
+    nodeId: ID!
+  ): MyTable
+  myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
@@ -14485,6 +15385,63 @@ type UpdateLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateMyTableById\` mutation.\\"\\"\\"
+input UpdateMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+}
+
+\\"\\"\\"All input for the \`updateMyTable\` mutation.\\"\\"\\"
+input UpdateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`MyTable\` mutation.\\"\\"\\"
+type UpdateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was updated by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -14921,6 +15878,41 @@ type CreateLeftArmPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`MyTable\` mutation.\\"\\"\\"
+input CreateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` to be created by this mutation.\\"\\"\\"
+  myTable: MyTableInput!
+}
+
+\\"\\"\\"The output of our create \`MyTable\` mutation.\\"\\"\\"
+type CreateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was created by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`Person\` mutation.\\"\\"\\"
 input CreatePersonInput {
   \\"\\"\\"
@@ -15114,6 +16106,54 @@ type DeleteLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMyTableById\` mutation.\\"\\"\\"
+input DeleteMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteMyTable\` mutation.\\"\\"\\"
+input DeleteMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`MyTable\` mutation.\\"\\"\\"
+type DeleteMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMyTableId: ID
+
+  \\"\\"\\"The \`MyTable\` that was deleted by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -15599,6 +16639,14 @@ type Mutation {
     input: CreateLeftArmInput!
   ): CreateLeftArmPayload
 
+  \\"\\"\\"Creates a single \`MyTable\`.\\"\\"\\"
+  createMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMyTableInput!
+  ): CreateMyTablePayload
+
   \\"\\"\\"Creates a single \`Person\`.\\"\\"\\"
   createPerson(
     \\"\\"\\"
@@ -15654,6 +16702,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteLeftArmByPersonIdInput!
   ): DeleteLeftArmPayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using its globally unique id.\\"\\"\\"
+  deleteMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableInput!
+  ): DeleteMyTablePayload
+
+  \\"\\"\\"Deletes a single \`MyTable\` using a unique key.\\"\\"\\"
+  deleteMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMyTableByIdInput!
+  ): DeleteMyTablePayload
 
   \\"\\"\\"Deletes a single \`Person\` using its globally unique id.\\"\\"\\"
   deletePerson(
@@ -15793,6 +16857,22 @@ type Mutation {
     input: UpdateLeftArmByPersonIdInput!
   ): UpdateLeftArmPayload
 
+  \\"\\"\\"Updates a single \`MyTable\` using its globally unique id and a patch.\\"\\"\\"
+  updateMyTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableInput!
+  ): UpdateMyTablePayload
+
+  \\"\\"\\"Updates a single \`MyTable\` using a unique key and a patch.\\"\\"\\"
+  updateMyTableById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMyTableByIdInput!
+  ): UpdateMyTablePayload
+
   \\"\\"\\"Updates a single \`Person\` using its globally unique id and a patch.\\"\\"\\"
   updatePerson(
     \\"\\"\\"
@@ -15834,6 +16914,78 @@ type Mutation {
     \\"\\"\\"
     input: UpdatePersonSecretByPersonIdInput!
   ): UpdatePersonSecretPayload
+}
+
+type MyTable implements Node {
+  id: Int!
+  jsonData: JSON
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`MyTable\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MyTableCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`jsonData\` field.\\"\\"\\"
+  jsonData: JSON
+}
+
+\\"\\"\\"An input for mutations affecting \`MyTable\`\\"\\"\\"
+input MyTableInput {
+  id: Int
+  jsonData: JSON
+}
+
+\\"\\"\\"
+Represents an update to a \`MyTable\`. Fields that are set will be updated.
+\\"\\"\\"
+input MyTablePatch {
+  id: Int
+  jsonData: JSON
+}
+
+\\"\\"\\"A connection to a list of \`MyTable\` values.\\"\\"\\"
+type MyTablesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MyTable\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MyTablesEdge!]!
+
+  \\"\\"\\"A list of \`MyTable\` objects.\\"\\"\\"
+  nodes: [MyTable!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
+type MyTablesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MyTable\` at the end of the edge.\\"\\"\\"
+  node: MyTable!
+}
+
+\\"\\"\\"Methods to use when ordering \`MyTable\`.\\"\\"\\"
+enum MyTablesOrderBy {
+  ID_ASC
+  ID_DESC
+  JSON_DATA_ASC
+  JSON_DATA_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 \\"\\"\\"All input for the \`noArgsMutation\` mutation.\\"\\"\\"
@@ -16278,6 +17430,35 @@ type Query implements Node {
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
+  allMyTables(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   allPeople(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -16418,6 +17599,13 @@ type Query implements Node {
   ): LeftArm
   leftArmById(id: Int!): LeftArm
   leftArmByPersonId(personId: Int!): LeftArm
+
+  \\"\\"\\"Reads a single \`MyTable\` using its globally unique \`ID\`.\\"\\"\\"
+  myTable(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`MyTable\`.\\"\\"\\"
+    nodeId: ID!
+  ): MyTable
+  myTableById(id: Int!): MyTable
   noArgsQuery: Int
 
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
@@ -16699,6 +17887,63 @@ type UpdateLeftArmPayload {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateMyTableById\` mutation.\\"\\"\\"
+input UpdateMyTableByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+}
+
+\\"\\"\\"All input for the \`updateMyTable\` mutation.\\"\\"\\"
+input UpdateMyTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MyTable\` being updated.
+  \\"\\"\\"
+  myTablePatch: MyTablePatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MyTable\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`MyTable\` mutation.\\"\\"\\"
+type UpdateMyTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MyTable\` that was updated by this mutation.\\"\\"\\"
+  myTable: MyTable
+
+  \\"\\"\\"An edge for our \`MyTable\`. May be used by Relay 1.\\"\\"\\"
+  myTableEdge(
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MyTablesEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

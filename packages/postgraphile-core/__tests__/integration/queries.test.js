@@ -86,6 +86,8 @@ beforeAll(() => {
           const schemas = {
             "classic-ids.graphql": gqlSchemas.classicIds,
             "dynamic-json.graphql": gqlSchemas.dynamicJson,
+            "dynamic-json.condition-json-field-variable.graphql":
+              gqlSchemas.dynamicJson,
             "view.graphql": gqlSchemas.viewUniqueKey,
             "badlyBehavedFunction.graphql": gqlSchemas.viewUniqueKey,
           };

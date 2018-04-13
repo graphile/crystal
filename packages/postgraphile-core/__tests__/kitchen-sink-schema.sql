@@ -372,3 +372,8 @@ begin
   return query select * from c.person order by id desc limit 1;
 end;
 $$ language plpgsql stable;
+
+create table c.my_table (
+  id serial primary key,
+  json_data jsonb
+);

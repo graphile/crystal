@@ -1,0 +1,21 @@
+query myQuery($myVal: String = "test", $myVal2: JSON = {stringField: "test"}) {
+  # All three of these should result in the same value
+  a: allMyTables(condition: {jsonData: {stringField: $myVal}}) {
+    nodes {
+      id
+      jsonData
+    }
+  }
+  b: allMyTables(condition: {jsonData: {stringField: "test"}}) {
+    nodes {
+      id
+      jsonData
+    }
+  }
+  c: allMyTables(condition: {jsonData: $myVal2}) {
+    nodes {
+      id
+      jsonData
+    }
+  }
+}
