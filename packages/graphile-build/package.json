@@ -5,7 +5,7 @@
   "main": "node8plus/index.js",
   "scripts": {
     "test": "jest",
-    "prepublish": "mkdir -p node8plus && babel -s true --out-dir node8plus src && ../../node_modules/.bin/flow-copy-source src node8plus",
+    "prepublish": "mkdir -p node8plus && babel -s true --out-dir node8plus src && flow-copy-source src node8plus",
     "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
   },
   "repository": {
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/graphile/graphile-build#readme",
   "dependencies": {
-    "babel-runtime": ">=6 <7",
     "debug": ">=2 <3",
     "graphql-parse-resolve-info": "4.0.0-beta.2"
   },
