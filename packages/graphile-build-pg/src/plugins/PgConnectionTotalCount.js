@@ -6,7 +6,7 @@ export default (function PgConnectionTotalCount(builder) {
     "GraphQLObjectType:fields",
     (
       fields,
-      { extend, pgInflection: inflection, graphql: { GraphQLInt } },
+      { extend, inflection, graphql: { GraphQLInt } },
       {
         scope: { isPgRowConnectionType, pgIntrospection: table },
         fieldWithHooks,
@@ -21,10 +21,7 @@ export default (function PgConnectionTotalCount(builder) {
       ) {
         return fields;
       }
-      const tableTypeName = inflection.tableType(
-        table.name,
-        table.namespace.name
-      );
+      const tableTypeName = inflection.tableType(table);
       return extend(
         fields,
         {

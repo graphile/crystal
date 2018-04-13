@@ -2,12 +2,10 @@
 import type { Plugin } from "graphile-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
+import omit from "../omit";
 const debugSql = debugFactory("graphile-build-pg:sql");
 
-export default (async function PgRowByUniqueConstraint(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (async function PgRowByUniqueConstraint(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -21,6 +19,7 @@ export default (async function PgRowByUniqueConstraint(
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
         graphql: { GraphQLNonNull },
+        inflection,
       },
       { scope: { isRootQuery }, fieldWithHooks }
     ) => {
@@ -31,6 +30,7 @@ export default (async function PgRowByUniqueConstraint(
         fields,
         introspectionResultsByKind.class
           .filter(table => !!table.namespace)
+          .filter(table => !omit(table, "read"))
           .reduce((memo, table) => {
             const TableType = pgGetGqlTypeByTypeId(table.type.id);
             const sqlFullTableName = sql.identifier(
@@ -45,23 +45,24 @@ export default (async function PgRowByUniqueConstraint(
                 .filter(attr => attr.classId === table.id)
                 .sort((a, b) => a.num - b.num);
               uniqueConstraints.forEach(constraint => {
+                if (omit(constraint, "read")) {
+                  return;
+                }
                 const keys = constraint.keyAttributeNums.map(
                   num => attributes.filter(attr => attr.num === num)[0]
                 );
+                if (keys.some(key => omit(key, "read"))) {
+                  return;
+                }
                 if (!keys.every(_ => _)) {
                   throw new Error(
                     "Consistency error: could not find an attribute!"
                   );
                 }
-                const simpleKeys = keys.map(k => ({
-                  column: k.name,
-                  table: k.class.name,
-                  schema: k.class.namespace.name,
-                }));
                 const fieldName = inflection.rowByUniqueKeys(
-                  simpleKeys,
-                  table.name,
-                  table.namespace.name
+                  keys,
+                  table,
+                  constraint
                 );
                 memo[fieldName] = fieldWithHooks(
                   fieldName,
@@ -77,13 +78,7 @@ export default (async function PgRowByUniqueConstraint(
                             }' on type '${TableType.name}'`
                           );
                         }
-                        memo[
-                          inflection.column(
-                            key.name,
-                            key.class.name,
-                            key.class.namespace.name
-                          )
-                        ] = {
+                        memo[inflection.column(key)] = {
                           type: new GraphQLNonNull(InputType),
                         };
                         return memo;
@@ -107,13 +102,7 @@ export default (async function PgRowByUniqueConstraint(
                                 sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                                   key.name
                                 )} = ${gql2pg(
-                                  args[
-                                    inflection.column(
-                                      key.name,
-                                      key.class.name,
-                                      key.class.namespace.name
-                                    )
-                                  ],
+                                  args[inflection.column(key)],
                                   key.type
                                 )}`
                               );

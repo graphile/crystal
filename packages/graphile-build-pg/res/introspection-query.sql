@@ -219,10 +219,12 @@ with
       con.contype as "type",
       con.conrelid as "classId",
       nullif(con.confrelid, 0) as "foreignClassId",
+      dsc.description as "description",
       con.conkey as "keyAttributeNums",
       con.confkey as "foreignKeyAttributeNums"
     from
       pg_catalog.pg_constraint as con
+      left join pg_catalog.pg_description as dsc on dsc.objoid = con.oid
     where
       -- Only get constraints for classes we have selected.
       con.conrelid in (select "id" from class where "namespaceId" in (select "id" from namespace)) and

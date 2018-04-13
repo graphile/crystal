@@ -1,10 +1,8 @@
 // @flow
 import type { Plugin } from "graphile-build";
+import omit from "../omit";
 
-export default (function PgConnectionArgCondition(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgConnectionArgCondition(builder) {
   builder.hook("init", (_, build) => {
     const {
       newWithHooks,
@@ -12,34 +10,27 @@ export default (function PgConnectionArgCondition(
       pgGetGqlInputTypeByTypeId,
       graphql: { GraphQLInputObjectType, GraphQLString },
       pgColumnFilter,
+      inflection,
     } = build;
     introspectionResultsByKind.class
-      .filter(table => table.isSelectable)
+      .filter(table => table.isSelectable && !omit(table, "filter"))
       .filter(table => !!table.namespace)
       .forEach(table => {
-        const tableTypeName = inflection.tableType(
-          table.name,
-          table.namespace.name
-        );
+        const tableTypeName = inflection.tableType(table);
         /* const TableConditionType = */
         newWithHooks(
           GraphQLInputObjectType,
           {
             description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
-            name: inflection.conditionType(
-              inflection.tableType(table.name, table.namespace.name)
-            ),
+            name: inflection.conditionType(inflection.tableType(table)),
             fields: context => {
               const { fieldWithHooks } = context;
               return introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
                 .filter(attr => pgColumnFilter(attr, build, context))
+                .filter(attr => !omit(attr, "filter"))
                 .reduce((memo, attr) => {
-                  const fieldName = inflection.column(
-                    attr.name,
-                    table.name,
-                    table.namespace.name
-                  );
+                  const fieldName = inflection.column(attr);
                   memo[fieldName] = fieldWithHooks(
                     fieldName,
                     {
@@ -74,6 +65,7 @@ export default (function PgConnectionArgCondition(
         pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgColumnFilter,
+        inflection,
       } = build;
       const {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
@@ -85,7 +77,8 @@ export default (function PgConnectionArgCondition(
         !isPgFieldConnection ||
         !table ||
         table.kind !== "class" ||
-        !table.namespace
+        !table.namespace ||
+        omit(table, "filter")
       ) {
         return args;
       }
@@ -101,12 +94,9 @@ export default (function PgConnectionArgCondition(
               introspectionResultsByKind.attribute
                 .filter(attr => attr.classId === table.id)
                 .filter(attr => pgColumnFilter(attr, build, context))
+                .filter(attr => !omit(attr, "filter"))
                 .forEach(attr => {
-                  const fieldName = inflection.column(
-                    attr.name,
-                    table.name,
-                    table.namespace.name
-                  );
+                  const fieldName = inflection.column(attr);
                   const val = condition[fieldName];
                   if (val != null) {
                     queryBuilder.where(

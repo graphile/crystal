@@ -1,13 +1,11 @@
 // @flow
 import debugFactory from "debug";
-import camelCase from "lodash/camelCase";
-import pluralize from "pluralize";
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
 import viaTemporaryTable from "./viaTemporaryTable";
 
 import type { Build, FieldWithHooksFunction } from "graphile-build";
-import type { Proc } from "./PgIntrospectionPlugin";
+import type { PgProc } from "./PgIntrospectionPlugin";
 import type { SQL } from "pg-sql2";
 
 const debugSql = debugFactory("graphile-build-pg:sql");
@@ -21,7 +19,7 @@ const firstValue = obj => {
 
 export default function makeProcField(
   fieldName: string,
-  proc: Proc,
+  proc: PgProc,
   {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
     pgGetGqlTypeByTypeId,
@@ -33,7 +31,6 @@ export default function makeProcField(
     gql2pg,
     pg2gql,
     newWithHooks,
-    pgInflection: inflection,
     pgStrictFunctions: strictFunctions,
     pgTweakFragmentForType,
     graphql: {
@@ -48,6 +45,7 @@ export default function makeProcField(
       getNamedType,
       isCompositeType,
     },
+    inflection,
   }: {| ...Build |},
   {
     fieldWithHooks,
@@ -59,7 +57,11 @@ export default function makeProcField(
     isMutation?: boolean,
   }
 ) {
-  function getResultFieldName(gqlType, type, returnsSet) {
+  const { pluralize, camelCase } = inflection;
+  function getResultFieldName(proc, gqlType, type, returnsSet) {
+    if (proc.tags.resultFieldName) {
+      return proc.tags.resultFieldName;
+    }
     const gqlNamedType = getNamedType(gqlType);
     let name;
     if (gqlNamedType === GraphQLInt) {
@@ -150,10 +152,7 @@ export default function makeProcField(
   } else {
     const Type = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
     if (proc.returnsSet) {
-      const connectionTypeName = inflection.scalarFunctionConnection(
-        proc.name,
-        proc.namespace.name
-      );
+      const connectionTypeName = inflection.scalarFunctionConnection(proc);
       const ConnectionType = getTypeByName(connectionTypeName);
       if (ConnectionType) {
         if (isMutation) {
@@ -312,6 +311,7 @@ export default function makeProcField(
       }, {});
       if (isMutation) {
         const resultFieldName = getResultFieldName(
+          proc,
           type,
           rawReturnType,
           proc.returnsSet
@@ -321,13 +321,9 @@ export default function makeProcField(
         PayloadType = newWithHooks(
           GraphQLObjectType,
           {
-            name: inflection.functionPayloadType(
-              proc.name,
-              proc.namespace.name
-            ),
-            description: `The output of our \`${inflection.functionName(
-              proc.name,
-              proc.namespace.name
+            name: inflection.functionPayloadType(proc),
+            description: `The output of our \`${inflection.functionMutationName(
+              proc
             )}\` mutation.`,
             fields: ({ recurseDataGeneratorsForField }) => {
               if (isNotVoid) {
@@ -366,10 +362,9 @@ export default function makeProcField(
         const InputType = newWithHooks(
           GraphQLInputObjectType,
           {
-            name: inflection.functionInputType(proc.name, proc.namespace.name),
-            description: `All input for the \`${inflection.functionName(
-              proc.name,
-              proc.namespace.name
+            name: inflection.functionInputType(proc),
+            description: `All input for the \`${inflection.functionMutationName(
+              proc
             )}\` mutation.`,
             fields: Object.assign(
               {

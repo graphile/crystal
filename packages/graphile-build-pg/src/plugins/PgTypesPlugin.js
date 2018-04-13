@@ -98,7 +98,7 @@ const pgRangeParser = {
 
 export default (function PgTypesPlugin(
   builder,
-  { pgExtendedTypes = true, pgInflection: inflection, pgLegacyJsonUuid = false }
+  { pgExtendedTypes = true, pgLegacyJsonUuid = false }
 ) {
   // XXX: most of this should be in an "init" hook, not a "build" hook
   builder.hook("build", build => {
@@ -107,6 +107,7 @@ export default (function PgTypesPlugin(
       getTypeByName,
       addType,
       pgSql: sql,
+      inflection,
     } = build;
 
     const gqlTypeByTypeIdGenerator = {};
@@ -515,7 +516,7 @@ export default (function PgTypesPlugin(
       // Enums
       if (!gqlTypeByTypeId[type.id] && type.type === "e") {
         gqlTypeByTypeId[type.id] = new GraphQLEnumType({
-          name: inflection.enumType(type.name),
+          name: inflection.enumType(type),
           description: type.description,
           values: type.enumVariants.reduce((memo, value) => {
             memo[inflection.enumName(value)] = {
@@ -655,7 +656,7 @@ export default (function PgTypesPlugin(
         const baseInputType = gqlInputTypeByTypeId[type.domainBaseTypeId];
         // Hack stolen from: https://github.com/graphile/postgraphile/blob/ade728ed8f8e3ecdc5fdad7d770c67aa573578eb/src/graphql/schema/type/aliasGqlType.ts#L16
         gqlTypeByTypeId[type.id] = Object.assign(Object.create(baseType), {
-          name: inflection.domainType(type.name),
+          name: inflection.domainType(type),
           description: type.description,
         });
         if (baseInputType && baseInputType !== baseType) {

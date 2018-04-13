@@ -1,11 +1,9 @@
 // @flow
 import isString from "lodash/isString";
 import type { Plugin } from "graphile-build";
+import omit from "../omit";
 
-export default (function PgConnectionArgOrderBy(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgConnectionArgOrderBy(builder) {
   builder.hook(
     "init",
     (
@@ -14,16 +12,14 @@ export default (function PgConnectionArgOrderBy(
         newWithHooks,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         graphql: { GraphQLEnumType },
+        inflection,
       }
     ) => {
       introspectionResultsByKind.class
-        .filter(table => table.isSelectable)
+        .filter(table => table.isSelectable && !omit(table, "order"))
         .filter(table => !!table.namespace)
         .forEach(table => {
-          const tableTypeName = inflection.tableType(
-            table.name,
-            table.namespace.name
-          );
+          const tableTypeName = inflection.tableType(table);
           /* const TableOrderByType = */
           newWithHooks(
             GraphQLEnumType,
@@ -58,6 +54,7 @@ export default (function PgConnectionArgOrderBy(
         pgGetGqlTypeByTypeId,
         pgSql: sql,
         graphql: { GraphQLList, GraphQLNonNull },
+        inflection,
       },
       {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
@@ -71,7 +68,8 @@ export default (function PgConnectionArgOrderBy(
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
-        !table.isSelectable
+        !table.isSelectable ||
+        omit(table, "order")
       ) {
         return args;
       }

@@ -22,9 +22,15 @@ let queryResults = [];
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
+const dSchemaComments = () =>
+  readFile(`${__dirname}/../kitchen-sink-d-schema-comments.sql`, "utf8");
+
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
   const gqlSchemasPromise = withPgClient(async pgClient => {
+    // A selection of omit/rename comments on the d schema
+    await pgClient.query(await dSchemaComments());
+
     // Different fixtures need different schemas with different configurations.
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
@@ -34,6 +40,7 @@ beforeAll(() => {
       dynamicJson,
       pgColumnFilter,
       viewUniqueKey,
+      dSchema,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
@@ -49,6 +56,7 @@ beforeAll(() => {
         viewUniqueKey: "testviewid",
         setofFunctionsContainNulls: true,
       }),
+      createPostGraphileSchema(pgClient, ["d"], {}),
     ]);
     debug(printSchema(normal));
     return {
@@ -57,6 +65,7 @@ beforeAll(() => {
       dynamicJson,
       pgColumnFilter,
       viewUniqueKey,
+      dSchema,
     };
   });
 
@@ -93,7 +102,9 @@ beforeAll(() => {
           };
           const gqlSchema = schemas[fileName]
             ? schemas[fileName]
-            : gqlSchemas.normal;
+            : fileName.substr(0, 2) === "d."
+              ? gqlSchemas.dSchema
+              : gqlSchemas.normal;
 
           // Return the result of our GraphQL query.
           const result = await graphql(gqlSchema, query, null, {

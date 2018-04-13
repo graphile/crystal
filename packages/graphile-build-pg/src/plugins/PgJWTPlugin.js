@@ -5,7 +5,7 @@ import parseIdentifier from "../parseIdentifier";
 
 export default (function PgJWTPlugin(
   builder,
-  { pgInflection: inflection, pgJwtTypeIdentifier, pgJwtSecret }
+  { pgJwtTypeIdentifier, pgJwtSecret }
 ) {
   builder.hook(
     "init",
@@ -19,6 +19,7 @@ export default (function PgJWTPlugin(
         pg2GqlMapper,
         pgTweaksByTypeId,
         graphql: { GraphQLScalarType },
+        inflection,
       }
     ) => {
       if (!pgJwtTypeIdentifier) {
@@ -65,10 +66,7 @@ export default (function PgJWTPlugin(
         .filter(attr => attr.classId === compositeClass.id)
         .sort((a1, a2) => a1.num - a2.num);
 
-      const compositeTypeName = inflection.tableType(
-        compositeClass.name,
-        compositeClass.namespaceName
-      );
+      const compositeTypeName = inflection.tableType(compositeClass);
 
       // NOTE: we deliberately do not create an input type
       pgRegisterGqlTypeByTypeId(compositeType.id, cb => {

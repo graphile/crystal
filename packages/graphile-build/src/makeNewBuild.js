@@ -14,6 +14,8 @@ import {
 } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import type { ResolveTree } from "graphql-parse-resolve-info";
+import pluralize from "pluralize";
+import { upperCamelCase, camelCase, constantCase } from "./utils";
 
 import type SchemaBuilder, {
   Build,
@@ -666,5 +668,12 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
     fieldDataGeneratorsByType: fieldDataGeneratorsByFieldNameByType, // @deprecated
     fieldDataGeneratorsByFieldNameByType,
     fieldArgDataGeneratorsByFieldNameByType,
+    inflection: {
+      pluralize,
+      singularize: pluralize.singular,
+      upperCamelCase,
+      camelCase,
+      constantCase,
+    },
   };
 }

@@ -1,14 +1,12 @@
 // @flow
 import queryFromResolveData from "../queryFromResolveData";
 import type { Plugin } from "graphile-build";
+import omit from "../omit";
 
 const nullableIf = (GraphQLNonNull, condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 
-export default (function PgColumnsPlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgColumnsPlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -20,6 +18,7 @@ export default (function PgColumnsPlugin(
       getAliasFromResolveInfo,
       pgTweakFragmentForType,
       pgColumnFilter,
+      inflection,
     } = build;
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -39,6 +38,9 @@ export default (function PgColumnsPlugin(
         .filter(attr => attr.classId === table.id)
         .filter(attr => pgColumnFilter(attr, build, context))
         .reduce((memo, attr) => {
+          if (omit(attr, "read")) {
+            return memo;
+          }
           /*
             attr =
               { kind: 'attribute',
@@ -50,11 +52,7 @@ export default (function PgColumnsPlugin(
                 isNotNull: false,
                 hasDefault: false }
             */
-          const fieldName = inflection.column(
-            attr.name,
-            table.name,
-            table.namespaceName
-          );
+          const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
               `Two columns produce the same GraphQL field name '${fieldName}' on class '${
@@ -148,6 +146,7 @@ export default (function PgColumnsPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       graphql: { GraphQLString, GraphQLNonNull },
       pgColumnFilter,
+      inflection,
     } = build;
     const {
       scope: {
@@ -173,11 +172,10 @@ export default (function PgColumnsPlugin(
         .filter(attr => attr.classId === table.id)
         .filter(attr => pgColumnFilter(attr, build, context))
         .reduce((memo, attr) => {
-          const fieldName = inflection.column(
-            attr.name,
-            table.name,
-            table.namespaceName
-          );
+          if (omit(attr, isPgPatch ? "update" : "create")) {
+            return memo;
+          }
+          const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
               `Two columns produce the same GraphQL field name '${fieldName}' on input class '${

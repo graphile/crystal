@@ -1,4 +1,4 @@
-insert into c.person (id, name, email, about, created_at) values
+insert into c.person (id, person_full_name, email, about, created_at) values
   (1, 'John Smith', 'john.smith@email.com', null, null),
   (2, 'Sara Smith', 'sara.smith@email.com', null, null),
   (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null),
@@ -8,7 +8,7 @@ insert into c.person (id, name, email, about, created_at) values
 
 alter sequence c.person_id_seq restart with 10;
 
-insert into c.person_secret (person_id, secret) values
+insert into c.person_secret (person_id, sekrit) values
   (2, 'Sara Smith is not really my name!'),
   (3, 'I once got stuck trying to retrieve something embarassing from between two panes of glass'),
   (5, 'My only secret is that I have no secrets!'),
@@ -117,3 +117,20 @@ insert into c.my_table(id, json_data) values
   (3, '{"stringField":"notTest"}');
 
 alter sequence c.my_table_id_seq restart with 10;
+
+-- Begin tests for smart comments
+
+insert into d.person (id, first_name, last_name) values
+  (1, 'John', 'Smith'),
+  (2, 'Sara', 'Smith');
+
+update d.person set
+  col_no_create = col_no_create || id::text,
+  col_no_update = col_no_update || id::text,
+  col_no_order = col_no_order || id::text,
+  col_no_filter = col_no_filter || id::text,
+  col_no_create_update = col_no_create_update || id::text,
+  col_no_create_update_order_filter = col_no_create_update_order_filter || id::text,
+  col_no_anything = col_no_anything || id::text;
+
+alter sequence d.person_id_seq restart with 10;

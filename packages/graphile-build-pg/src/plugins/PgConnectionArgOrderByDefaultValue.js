@@ -1,15 +1,12 @@
 // @flow
 import type { Plugin } from "graphile-build";
 
-export default (function PgConnectionArgOrderByDefaultValue(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgConnectionArgOrderByDefaultValue(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
     (
       args,
-      { extend, getTypeByName, pgGetGqlTypeByTypeId },
+      { extend, getTypeByName, pgGetGqlTypeByTypeId, inflection },
       {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         Self,
@@ -21,7 +18,8 @@ export default (function PgConnectionArgOrderByDefaultValue(
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
-        !table.isSelectable
+        !table.isSelectable ||
+        !args.orderBy
       ) {
         return args;
       }
@@ -30,12 +28,15 @@ export default (function PgConnectionArgOrderByDefaultValue(
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)
       );
+      if (!TableOrderByType) {
+        return args;
+      }
 
       const defaultValueEnum =
         TableOrderByType.getValues().find(v => v.name === "PRIMARY_KEY_ASC") ||
         TableOrderByType.getValues()[0];
 
-      return Object.assign({}, args, {
+      return extend(args, {
         orderBy: extend(
           args.orderBy,
           {

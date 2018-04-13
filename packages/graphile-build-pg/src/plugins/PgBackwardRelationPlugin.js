@@ -2,6 +2,7 @@
 import debugFactory from "debug";
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
+import omit from "../omit";
 
 import type { Plugin } from "graphile-build";
 
@@ -13,7 +14,7 @@ const ONLY = 2;
 
 export default (function PgBackwardRelationPlugin(
   builder,
-  { pgInflection: inflection, pgLegacyRelations }
+  { pgLegacyRelations }
 ) {
   const legacyRelationMode =
     {
@@ -32,6 +33,7 @@ export default (function PgBackwardRelationPlugin(
         pgSql: sql,
         getAliasFromResolveInfo,
         graphql: { GraphQLNonNull },
+        inflection,
       },
       {
         scope: { isPgRowType, pgIntrospection: foreignTable },
@@ -53,12 +55,12 @@ export default (function PgBackwardRelationPlugin(
       return extend(
         fields,
         foreignKeyConstraints.reduce((memo, constraint) => {
+          if (omit(constraint, "read")) {
+            return memo;
+          }
           const table =
             introspectionResultsByKind.classById[constraint.classId];
-          const tableTypeName = inflection.tableType(
-            table.name,
-            table.namespace.name
-          );
+          const tableTypeName = inflection.tableType(table);
           const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
           if (!gqlTableType) {
             debug(
@@ -68,10 +70,7 @@ export default (function PgBackwardRelationPlugin(
           }
           const foreignTable =
             introspectionResultsByKind.classById[constraint.foreignClassId];
-          const foreignTableTypeName = inflection.tableType(
-            foreignTable.name,
-            foreignTable.namespace.name
-          );
+          const foreignTableTypeName = inflection.tableType(foreignTable);
           const gqlForeignTableType = pgGetGqlTypeByTypeId(
             foreignTable.type.id
           );
@@ -105,6 +104,12 @@ export default (function PgBackwardRelationPlugin(
           if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
             throw new Error("Could not find key columns!");
           }
+          if (keys.some(key => omit(key, "read"))) {
+            return memo;
+          }
+          if (foreignKeys.some(key => omit(key, "read"))) {
+            return memo;
+          }
           const singleKey = keys.length === 1 ? keys[0] : null;
           const isUnique = !!(
             singleKey &&
@@ -119,25 +124,18 @@ export default (function PgBackwardRelationPlugin(
 
           const isDeprecated = isUnique && legacyRelationMode === DEPRECATED;
 
-          const simpleKeys = keys.map(k => ({
-            column: k.name,
-            table: k.class.name,
-            schema: k.class.namespace.name,
-          }));
           const manyRelationFieldName = inflection.manyRelationByKeys(
-            simpleKeys,
-            table.name,
-            table.namespace.name,
-            foreignTable.name,
-            foreignTable.namespace.name
+            keys,
+            table,
+            foreignTable,
+            constraint
           );
           const singleRelationFieldName = isUnique
             ? inflection.singleRelationByKeys(
-                simpleKeys,
-                table.name,
-                table.namespace.name,
-                foreignTable.name,
-                foreignTable.namespace.name
+                keys,
+                table,
+                foreignTable,
+                constraint
               )
             : null;
 
@@ -158,7 +156,7 @@ export default (function PgBackwardRelationPlugin(
             legacyRelationMode === DEPRECATED ||
             legacyRelationMode === ONLY;
 
-          if (shouldAddSingleRelation) {
+          if (shouldAddSingleRelation && !omit(table, "read")) {
             memo[singleRelationFieldName] = fieldWithHooks(
               singleRelationFieldName,
               ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
@@ -213,7 +211,7 @@ export default (function PgBackwardRelationPlugin(
               }
             );
           }
-          if (shouldAddManyRelation) {
+          if (shouldAddManyRelation && !omit(table, "many")) {
             memo[manyRelationFieldName] = fieldWithHooks(
               manyRelationFieldName,
               ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {

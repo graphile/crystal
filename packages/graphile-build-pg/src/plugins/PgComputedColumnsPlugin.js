@@ -1,5 +1,6 @@
 // @flow
 import makeProcField from "./makeProcField";
+import omit from "../omit";
 
 import type { Plugin } from "graphile-build";
 
@@ -32,7 +33,7 @@ export default (function PgComputedColumnsPlugin(builder) {
       const {
         extend,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgInflection: inflection,
+        inflection,
       } = build;
       const tableType = introspectionResultsByKind.type.filter(
         type =>
@@ -51,6 +52,7 @@ export default (function PgComputedColumnsPlugin(builder) {
           .filter(proc => proc.name.startsWith(`${table.name}_`))
           .filter(proc => proc.argTypeIds.length > 0)
           .filter(proc => proc.argTypeIds[0] === tableType.id)
+          .filter(proc => !omit(proc, "execute"))
           .reduce((memo, proc) => {
             /*
             proc =
@@ -82,10 +84,10 @@ export default (function PgComputedColumnsPlugin(builder) {
             }
 
             const pseudoColumnName = proc.name.substr(table.name.length + 1);
-            const fieldName = inflection.column(
+            const fieldName = inflection.computedColumn(
               pseudoColumnName,
-              table.name,
-              table.namespace.name
+              proc,
+              table
             );
             memo[fieldName] = makeProcField(fieldName, proc, build, {
               fieldWithHooks,

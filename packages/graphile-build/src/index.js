@@ -16,6 +16,17 @@ import type { GraphQLSchema } from "graphql";
 
 import type { Plugin, Options } from "./SchemaBuilder";
 
+export {
+  constantCaseAll,
+  formatInsideUnderscores,
+  upperFirst,
+  camelCase,
+  constantCase,
+  upperCamelCase,
+  pluralize,
+  singularize,
+} from "./utils";
+
 export type {
   Plugin,
   Options,

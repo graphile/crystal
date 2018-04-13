@@ -1,9 +1,10 @@
 -- From https://github.com/graphile/postgraphile/blob/master/examples/kitchen-sink/schema.sql
-drop schema if exists a, b, c cascade;
+drop schema if exists a, b, c, d cascade;
 
 create schema a;
 create schema b;
 create schema c;
+create schema d;
 
 -- Troublesome extensions install annoying things in our schema; we want to
 -- ensure this doesn't make us crash.
@@ -21,7 +22,7 @@ create domain b.email as text
 
 create table c.person (
   id serial primary key,
-  name varchar not null,
+  person_full_name varchar not null,
   aliases text[] not null default '{}',
   about text,
   email b.email not null unique,
@@ -32,8 +33,10 @@ create table c.person (
 -- This is to test that "one-to-one" relationships work on primary keys
 create table c.person_secret (
   person_id int not null primary key references c.person on delete cascade,
-  secret text
+  sekrit text
 );
+
+comment on column c.person_secret.sekrit is E'@name secret\nA secret held by the associated Person';
 
 comment on table c.person_secret is 'Tracks the person''s secret';
 
@@ -51,7 +54,7 @@ create unique index uniq_person__email_id_3 on c.person (email) where (id = 3);
 
 comment on table c.person is 'Person test comment';
 comment on column c.person.id is 'The primary unique identifier for the person';
-comment on column c.person.name is 'The person’s name';
+comment on column c.person.person_full_name is E'@name name\nThe person’s name';
 comment on column c.person.site is '@deprecated Don’t use me';
 
 create function c.person_exists(person c.person, email b.email) returns boolean as $$
@@ -132,7 +135,7 @@ comment on type c.compound_type is 'Awesome feature!';
 create view b.updatable_view as
   select
     id as x,
-    name,
+    person_full_name as name,
     about as description,
     2 as constant
   from
@@ -272,7 +275,7 @@ create function c.no_args_query() returns int as $$ select 2 $$ language sql sta
 create function c.no_args_mutation() returns int as $$ select 2 $$ language sql;
 create function a.return_void_mutation() returns void as $$ begin return; end; $$ language plpgsql;
 
-create function c.person_first_name(person c.person) returns text as $$ select split_part(person.name, ' ', 1) $$ language sql stable;
+create function c.person_first_name(person c.person) returns text as $$ select split_part(person.person_full_name, ' ', 1) $$ language sql stable;
 create function c.person_friends(person c.person) returns setof c.person as $$ select friend.* from c.person as friend where friend.id in (person.id + 1, person.id + 2) $$ language sql stable;
 create function c.person_first_post(person c.person) returns a.post as $$ select * from a.post where a.post.author_id = person.id limit 1 $$ language sql stable;
 create function c.compound_type_computed_field(compound_type c.compound_type) returns integer as $$ select compound_type.a + compound_type.foo_bar $$ language sql stable;
@@ -377,3 +380,126 @@ create table c.my_table (
   id serial primary key,
   json_data jsonb
 );
+
+-- Begin tests for smart comments
+
+-- Rename table and columns
+
+create table d.original_table (
+  col1 int
+);
+
+comment on table d.original_table is E'@name renamed_table';
+comment on column d.original_table.col1 is E'@name colA';
+
+create function d.original_function() returns int as $$
+  select 1;
+$$ language sql stable;
+
+comment on function d.original_function() is E'@name renamed_function';
+
+-- Rename relations and computed column
+
+create table d.person (
+  id serial primary key,
+  first_name varchar,
+  last_name varchar,
+  col_no_create text default 'col_no_create',
+  col_no_update text default 'col_no_update',
+  col_no_order text default 'col_no_order',
+  col_no_filter text default 'col_no_filter',
+  col_no_create_update text default 'col_no_create_update',
+  col_no_create_update_order_filter text default 'col_no_create_update_order_filter',
+  col_no_anything text default 'col_no_anything'
+);
+
+comment on column d.person.col_no_create is E'@omit create';
+comment on column d.person.col_no_update is E'@omit update';
+comment on column d.person.col_no_order is E'@omit order';
+comment on column d.person.col_no_filter is E'@omit filter';
+comment on column d.person.col_no_create_update is E'@omit create,update';
+comment on column d.person.col_no_create_update_order_filter is E'@omit create,update,order,filter';
+comment on column d.person.col_no_anything is E'@omit';
+
+create function d.person_full_name(n d.person)
+returns varchar as $$
+  select n.first_name || ' ' || n.last_name;
+$$ language sql stable;
+
+
+create table d.post (
+  id serial primary key,
+  body text,
+  author_id int4 references d.person(id)
+);
+
+comment on constraint post_author_id_fkey on d.post is E'@foreignFieldName posts\n@fieldName author';
+comment on constraint person_pkey on d.person is E'@fieldName findPersonById';
+comment on function d.person_full_name(d.person) is E'@fieldName name';
+
+-- Rename custom queries
+
+create function d.search_posts(search text)
+returns setof d.post as $$
+    select *
+    from d.post
+    where
+      body ilike ('%' || search || '%')
+  $$ language sql stable;
+
+  comment on function d.search_posts(text) is E'@name returnPostsMatching';
+
+-- rename custom mutations
+
+create type d.jwt_token as (
+  role text,
+  exp integer,
+  a integer
+);
+
+create function d.authenticate(a integer)
+returns d.jwt_token as $$
+    select ('yay', extract(epoch from '2037-07-12'::timestamp), a)::d.jwt_token
+    $$ language sql;
+
+comment on function d.authenticate(a integer) is E'@name login\n@resultFieldName token';
+
+-- rename type
+
+create type d.flibble as (f text);
+
+create function d.getflamble() returns SETOF d.flibble as $$
+    select body from d.post
+$$ language sql;
+
+comment on type d.flibble is E'@name flamble';
+
+-- Begin tests for omit actions
+
+-- Omit actions on a table
+
+create table d.films (
+    code        integer PRIMARY KEY,
+    title       varchar(40)
+);
+
+
+create table d.studios (
+  id integer PRIMARY KEY,
+  name text
+);
+
+
+create table d.tv_shows (
+    code        integer PRIMARY KEY,
+    title       varchar(40),
+    studio_id   integer references d.studios
+);
+
+
+create table d.tv_episodes (
+    code        integer PRIMARY KEY,
+    title       varchar(40),
+    show_id     integer references d.tv_shows
+);
+

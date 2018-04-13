@@ -1,11 +1,9 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import isString from "lodash/isString";
+import omit from "../omit";
 
-export default (function PgMutationPayloadEdgePlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgMutationPayloadEdgePlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -17,6 +15,7 @@ export default (function PgMutationPayloadEdgePlugin(
         pgSql: sql,
         graphql: { GraphQLList, GraphQLNonNull },
         pgIntrospectionResultsByKind: introspectionResultsByKind,
+        inflection,
       },
       {
         scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
@@ -31,7 +30,8 @@ export default (function PgMutationPayloadEdgePlugin(
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
-        !table.isSelectable
+        !table.isSelectable ||
+        (omit(table, "all") && omit(table, "many"))
       ) {
         return fields;
       }
@@ -56,8 +56,9 @@ export default (function PgMutationPayloadEdgePlugin(
         primaryKeyConstraint.keyAttributeNums.map(
           num => attributes.filter(attr => attr.num === num)[0]
         );
+      const canOrderBy = !omit(table, "order");
 
-      const fieldName = inflection.edgeField(table.name, table.namespace.name);
+      const fieldName = inflection.edgeField(table);
       recurseDataGeneratorsForField(fieldName);
       return extend(
         fields,
@@ -68,9 +69,10 @@ export default (function PgMutationPayloadEdgePlugin(
               addArgDataGenerator(function connectionOrderBy({
                 orderBy: rawOrderBy,
               }) {
-                const orderBy = rawOrderBy
-                  ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
-                  : null;
+                const orderBy =
+                  canOrderBy && rawOrderBy
+                    ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                    : null;
                 return {
                   pgQuery: queryBuilder => {
                     if (orderBy != null) {
@@ -127,23 +129,31 @@ export default (function PgMutationPayloadEdgePlugin(
               });
 
               const defaultValueEnum =
-                TableOrderByType.getValues().find(
+                canOrderBy &&
+                (TableOrderByType.getValues().find(
                   v => v.name === "PRIMARY_KEY_ASC"
-                ) || TableOrderByType.getValues()[0];
+                ) ||
+                  TableOrderByType.getValues()[0]);
               return {
                 description: `An edge for our \`${tableTypeName}\`. May be used by Relay 1.`,
                 type: TableEdgeType,
-                args: {
-                  orderBy: {
-                    description: `The method to use when ordering \`${tableTypeName}\`.`,
-                    type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-                    defaultValue: defaultValueEnum && defaultValueEnum.value,
-                  },
-                },
+                args: canOrderBy
+                  ? {
+                      orderBy: {
+                        description: `The method to use when ordering \`${tableTypeName}\`.`,
+                        type: new GraphQLList(
+                          new GraphQLNonNull(TableOrderByType)
+                        ),
+                        defaultValue:
+                          defaultValueEnum && defaultValueEnum.value,
+                      },
+                    }
+                  : {},
                 resolve(data, { orderBy: rawOrderBy }) {
-                  const orderBy = rawOrderBy
-                    ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
-                    : null;
+                  const orderBy =
+                    canOrderBy && rawOrderBy
+                      ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                      : null;
                   const order =
                     orderBy && orderBy.some(item => item.alias)
                       ? orderBy.filter(item => item.alias)

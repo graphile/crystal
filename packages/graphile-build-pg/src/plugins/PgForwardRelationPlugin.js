@@ -2,13 +2,11 @@
 import type { Plugin } from "graphile-build";
 import debugFactory from "debug";
 import queryFromResolveData from "../queryFromResolveData";
+import omit from "../omit";
 
 const debug = debugFactory("graphile-build-pg");
 
-export default (function PgForwardRelationPlugin(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (function PgForwardRelationPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -19,6 +17,7 @@ export default (function PgForwardRelationPlugin(
         pgGetGqlTypeByTypeId,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgSql: sql,
+        inflection,
       },
       {
         scope: {
@@ -52,6 +51,9 @@ export default (function PgForwardRelationPlugin(
       return extend(
         fields,
         foreignKeyConstraints.reduce((memo, constraint) => {
+          if (omit(constraint, "read")) {
+            return memo;
+          }
           const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
           const tableTypeName = gqlTableType.name;
           if (!gqlTableType) {
@@ -81,6 +83,9 @@ export default (function PgForwardRelationPlugin(
               })`
             );
           }
+          if (omit(foreignTable, "read")) {
+            return memo;
+          }
           const foreignSchema = introspectionResultsByKind.namespace.filter(
             n => n.id === foreignTable.namespaceId
           )[0];
@@ -97,16 +102,18 @@ export default (function PgForwardRelationPlugin(
           if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
             throw new Error("Could not find key columns!");
           }
+          if (keys.some(key => omit(key, "read"))) {
+            return memo;
+          }
+          if (foreignKeys.some(key => omit(key, "read"))) {
+            return memo;
+          }
 
-          const simpleKeys = keys.map(k => ({
-            column: k.name,
-            table: k.class.name,
-            schema: k.class.namespace.name,
-          }));
           const fieldName = inflection.singleRelationByKeys(
-            simpleKeys,
-            foreignTable.name,
-            foreignTable.namespace.name
+            keys,
+            foreignTable,
+            table,
+            constraint
           );
 
           memo[fieldName] = fieldWithHooks(

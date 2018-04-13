@@ -1,6 +1,13 @@
 // @flow
-import pluralize from "pluralize";
-import { upperCamelCase, camelCase, constantCase } from "./utils";
+import {
+  upperCamelCase,
+  camelCase,
+  constantCase,
+  pluralize,
+  singularize,
+} from "graphile-build";
+
+import { preventEmptyResult } from "./plugins/PgBasicsPlugin";
 
 type Keys = Array<{
   column: string,
@@ -21,7 +28,7 @@ export const defaultUtils: InflectorUtils = {
   camelCase,
   upperCamelCase,
   pluralize,
-  singularize: pluralize.singular,
+  singularize,
 };
 
 export type Inflector = {
@@ -29,29 +36,6 @@ export type Inflector = {
   // eslint-disable-next-line flowtype/no-weak-types
   [string]: (...input: Array<any>) => string,
 };
-
-function preventEmptyResult<O: { [key: string]: () => string }>(
-  obj
-): $ObjMap<O, <V>(V) => V> {
-  return Object.keys(obj).reduce((memo, key) => {
-    const fn = obj[key];
-    memo[key] = (...args) => {
-      const result = fn.apply(memo, args);
-      if (typeof result !== "string" || result.length === 0) {
-        const stringifiedArgs = require("util").inspect(args);
-        throw new Error(
-          `Inflector for '${key}' returned '${String(
-            result
-          )}'; expected non-empty string\n` +
-            `See: https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/src/inflections.js\n` +
-            `Arguments passed to ${key}:\n${stringifiedArgs}`
-        );
-      }
-      return result;
-    };
-    return memo;
-  }, {});
-}
 
 export const newInflector = (
   overrides: ?{ [string]: () => string } = undefined,

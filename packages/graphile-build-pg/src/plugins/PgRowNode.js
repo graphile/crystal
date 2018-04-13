@@ -2,14 +2,12 @@
 import type { Plugin } from "graphile-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
+import omit from "../omit";
 
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 const debugSql = debugFactory("graphile-build-pg:sql");
 
-export default (async function PgRowByUniqueConstraint(
-  builder,
-  { pgInflection: inflection }
-) {
+export default (async function PgRowByUniqueConstraint(builder) {
   builder.hook(
     "GraphQLObjectType",
     (
@@ -22,7 +20,7 @@ export default (async function PgRowByUniqueConstraint(
       },
       { scope: { isPgRowType, pgIntrospection: table } }
     ) => {
-      if (!isPgRowType || !table.namespace) {
+      if (!isPgRowType || !table.namespace || omit(table, "read")) {
         return object;
       }
       const sqlFullTableName = sql.identifier(table.namespace.name, table.name);
@@ -92,6 +90,7 @@ export default (async function PgRowByUniqueConstraint(
         gql2pg,
         getNodeType,
         graphql: { GraphQLNonNull, GraphQLID },
+        inflection,
       },
       { scope: { isRootQuery }, fieldWithHooks }
     ) => {
@@ -102,6 +101,7 @@ export default (async function PgRowByUniqueConstraint(
         fields,
         introspectionResultsByKind.class
           .filter(table => !!table.namespace)
+          .filter(table => !omit(table, "read"))
           .reduce((memo, table) => {
             const TableType = pgGetGqlTypeByTypeId(table.type.id);
             const sqlFullTableName = sql.identifier(
@@ -123,10 +123,7 @@ export default (async function PgRowByUniqueConstraint(
                 primaryKeyConstraint.keyAttributeNums.map(
                   num => attributes.filter(attr => attr.num === num)[0]
                 );
-              const fieldName = inflection.tableNode(
-                table.name,
-                table.namespace.name
-              );
+              const fieldName = inflection.tableNode(table);
               memo[fieldName] = fieldWithHooks(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {

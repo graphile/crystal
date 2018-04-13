@@ -3,12 +3,13 @@ import type { Plugin } from "graphile-build";
 import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
 import viaTemporaryTable from "./viaTemporaryTable";
+import omit from "../omit";
 
 const debug = debugFactory("graphile-build-pg");
 
 export default (function PgMutationCreatePlugin(
   builder,
-  { pgInflection: inflection, pgDisableDefaultMutations }
+  { pgDisableDefaultMutations }
 ) {
   if (pgDisableDefaultMutations) {
     return;
@@ -32,6 +33,7 @@ export default (function PgMutationCreatePlugin(
           GraphQLString,
         },
         pgColumnFilter,
+        inflection,
       } = build;
       if (!isRootMutation) {
         return fields;
@@ -42,7 +44,7 @@ export default (function PgMutationCreatePlugin(
         pgIntrospectionResultsByKind.class
           .filter(table => !!table.namespace)
           .filter(table => table.isSelectable)
-          .filter(table => table.isInsertable)
+          .filter(table => table.isInsertable && !omit(table, "create"))
           .reduce((memo, table) => {
             const Table = pgGetGqlTypeByTypeId(table.type.id);
             if (!Table) {
@@ -62,17 +64,11 @@ export default (function PgMutationCreatePlugin(
               );
               return memo;
             }
-            const tableTypeName = inflection.tableType(
-              table.name,
-              table.namespace.name
-            );
+            const tableTypeName = inflection.tableType(table);
             const InputType = newWithHooks(
               GraphQLInputObjectType,
               {
-                name: inflection.createInputType(
-                  table.name,
-                  table.namespace.name
-                ),
+                name: inflection.createInputType(table),
                 description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: {
                   clientMutationId: {
@@ -80,7 +76,7 @@ export default (function PgMutationCreatePlugin(
                       "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
                     type: GraphQLString,
                   },
-                  [inflection.tableName(table.name, table.namespace.name)]: {
+                  [inflection.tableFieldName(table)]: {
                     description: `The \`${tableTypeName}\` to be created by this mutation.`,
                     type: new GraphQLNonNull(TableInput),
                   },
@@ -94,16 +90,10 @@ export default (function PgMutationCreatePlugin(
             const PayloadType = newWithHooks(
               GraphQLObjectType,
               {
-                name: inflection.createPayloadType(
-                  table.name,
-                  table.namespace.name
-                ),
+                name: inflection.createPayloadType(table),
                 description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ recurseDataGeneratorsForField }) => {
-                  const tableName = inflection.tableName(
-                    table.name,
-                    table.namespace.name
-                  );
+                  const tableName = inflection.tableFieldName(table);
                   recurseDataGeneratorsForField(tableName);
                   return {
                     clientMutationId: {
@@ -127,10 +117,7 @@ export default (function PgMutationCreatePlugin(
                 pgIntrospection: table,
               }
             );
-            const fieldName = inflection.createField(
-              table.name,
-              table.namespace.name
-            );
+            const fieldName = inflection.createField(table);
             memo[fieldName] = fieldWithHooks(
               fieldName,
               context => {
@@ -160,19 +147,13 @@ export default (function PgMutationCreatePlugin(
                     );
                     const sqlColumns = [];
                     const sqlValues = [];
-                    const inputData =
-                      input[
-                        inflection.tableName(table.name, table.namespace.name)
-                      ];
+                    const inputData = input[inflection.tableFieldName(table)];
                     pgIntrospectionResultsByKind.attribute
                       .filter(attr => attr.classId === table.id)
                       .filter(attr => pgColumnFilter(attr, build, context))
+                      .filter(attr => !omit(attr, "create"))
                       .forEach(attr => {
-                        const fieldName = inflection.column(
-                          attr.name,
-                          table.name,
-                          table.namespace.name
-                        );
+                        const fieldName = inflection.column(attr);
                         const val = inputData[fieldName];
                         if (
                           Object.prototype.hasOwnProperty.call(

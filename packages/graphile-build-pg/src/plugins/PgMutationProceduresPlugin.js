@@ -1,6 +1,7 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import makeProcField from "./makeProcField";
+import omit from "../omit";
 
 export default (function PgMutationProceduresPlugin(builder) {
   builder.hook(
@@ -12,13 +13,14 @@ export default (function PgMutationProceduresPlugin(builder) {
       const {
         extend,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
-        pgInflection: inflection,
+        inflection,
       } = build;
       return extend(
         fields,
         introspectionResultsByKind.procedure
           .filter(proc => !proc.isStable)
           .filter(proc => !!proc.namespace)
+          .filter(proc => !omit(proc, "execute"))
           .reduce((memo, proc) => {
             /*
             proc =
@@ -35,10 +37,7 @@ export default (function PgMutationProceduresPlugin(builder) {
                 argDefaultsNum: 0 }
             */
 
-            const fieldName = inflection.functionName(
-              proc.name,
-              proc.namespace.name
-            );
+            const fieldName = inflection.functionMutationName(proc);
             memo[fieldName] = makeProcField(fieldName, proc, build, {
               fieldWithHooks,
               isMutation: true,

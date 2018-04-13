@@ -28,7 +28,9 @@
   "homepage": "https://github.com/graphile/graphile-build#readme",
   "dependencies": {
     "debug": ">=2 <3",
-    "graphql-parse-resolve-info": "4.0.0-beta.2"
+    "graphql-parse-resolve-info": "4.0.0-beta.2",
+    "lodash": ">=4 <5",
+    "pluralize": "7.0.0"
   },
   "engines": {
     "node": ">=8.6"

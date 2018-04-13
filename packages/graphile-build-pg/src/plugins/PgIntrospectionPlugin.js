@@ -6,6 +6,7 @@ import { readFile as rawReadFile } from "fs";
 import pg from "pg";
 import debugFactory from "debug";
 import chalk from "chalk";
+import throttle from "lodash/throttle";
 import { quacksLikePgPool } from "../withPgClient";
 
 import { version } from "../../package.json";
@@ -16,14 +17,15 @@ const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
 // Ref: https://github.com/graphile/postgraphile/tree/master/src/postgres/introspection/object
 
-export type Namespace = {
+export type PgNamespace = {
   kind: "namespace",
   id: string,
   name: string,
-  description: string,
+  description: ?string,
+  tags: { [string]: string },
 };
 
-export type Proc = {
+export type PgProc = {
   kind: "procedure",
   name: string,
   description: ?string,
@@ -35,7 +37,72 @@ export type Proc = {
   argTypeIds: Array<string>,
   argNames: Array<string>,
   argDefaultsNum: number,
-  namespace: Namespace,
+  namespace: PgNamespace,
+  tags: { [string]: string },
+};
+
+export type PgClass = {
+  kind: "class",
+  id: string,
+  name: string,
+  description: ?string,
+  classKind: string,
+  namespaceId: string,
+  namespaceName: string,
+  typeId: string,
+  isSelectable: boolean,
+  isInsertable: boolean,
+  isUpdatable: boolean,
+  isDeletable: boolean,
+  namespace: PgNamespace,
+  type: PgType,
+  tags: { [string]: string },
+};
+
+export type PgType = {
+  kind: "type",
+  id: string,
+  name: string,
+  description: ?string,
+  namespaceId: string,
+  namespaceName: string,
+  type: string,
+  category: string,
+  domainIsNotNull: boolean,
+  arrayItemTypeId: ?string,
+  typeLength: ?number,
+  isPgArray: boolean,
+  classId: ?string,
+  domainBaseTypeId: ?string,
+  tags: { [string]: string },
+};
+
+export type PgAttribute = {
+  kind: "attribute",
+  classId: string,
+  num: number,
+  name: string,
+  description: ?string,
+  typeId: string,
+  isNotNull: boolean,
+  hasDefault: boolean,
+  class: PgClass,
+  type: PgType,
+  namespace: PgNamespace,
+  tags: { [string]: string },
+};
+
+export type PgConstraint = {
+  kind: "constraint",
+  name: string,
+  type: string,
+  classId: string,
+  foreignClassId: ?string,
+  description: ?string,
+  keyAttributeNums: Array<number>,
+  foreignKeyAttributeNums: Array<number>,
+  namespace: PgNamespace,
+  tags: { [string]: string },
 };
 
 function readFile(filename, encoding) {
@@ -92,19 +159,24 @@ export default (async function PgIntrospectionPlugin(
           );
 
           // Parse tags from comments
-          ["namespace", "class", "attribute", "type", "procedure"].forEach(
-            kind => {
-              result[kind].forEach(object => {
-                if (pgEnableTags && object.description) {
-                  const parsed = parseTags(object.description);
-                  object.tags = parsed.tags;
-                  object.description = parsed.text;
-                } else {
-                  object.tags = {};
-                }
-              });
-            }
-          );
+          [
+            "namespace",
+            "class",
+            "attribute",
+            "type",
+            "constraint",
+            "procedure",
+          ].forEach(kind => {
+            result[kind].forEach(object => {
+              if (pgEnableTags && object.description) {
+                const parsed = parseTags(object.description);
+                object.tags = parsed.tags;
+                object.description = parsed.text;
+              } else {
+                object.tags = {};
+              }
+            });
+          });
 
           for (const k in result) {
             result[k].map(Object.freeze);
@@ -318,12 +390,19 @@ export default (async function PgIntrospectionPlugin(
 
     await pgClient.query("listen postgraphile_watch");
 
-    const handleChange = async () => {
-      debug(`Schema change detected: re-inspecting schema...`);
-      introspectionResultsByKind = await introspect();
-      debug(`Schema change detected: re-inspecting schema complete`);
-      triggerRebuild();
-    };
+    const handleChange = throttle(
+      async () => {
+        debug(`Schema change detected: re-inspecting schema...`);
+        introspectionResultsByKind = await introspect();
+        debug(`Schema change detected: re-inspecting schema complete`);
+        triggerRebuild();
+      },
+      750,
+      {
+        leading: true,
+        trailing: true,
+      }
+    );
 
     listener = async notification => {
       if (notification.channel !== "postgraphile_watch") {

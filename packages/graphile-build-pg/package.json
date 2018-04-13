@@ -43,7 +43,6 @@
     "lru-cache": "4.1.1",
     "pg-range-parser": "^1.0.0",
     "pg-sql2": "2.0.0",
-    "pluralize": "^5.0.0",
     "postgres-interval": "1.1.1"
   },
   "peerDependencies": {

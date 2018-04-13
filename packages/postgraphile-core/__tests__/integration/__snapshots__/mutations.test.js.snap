@@ -1,5 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`d.createPerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "createPerson": Object {
+      "person": Object {
+        "colNoCreate": "col_no_create",
+        "colNoCreateUpdate": "col_no_create_update",
+        "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter",
+        "colNoFilter": "create3",
+        "colNoOrder": "create1",
+        "colNoUpdate": "create2",
+        "firstName": null,
+        "id": 10,
+        "lastName": "Doe",
+      },
+    },
+  },
+}
+`;
+
+exports[`d.deletePerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "deletePersonById": Object {
+      "person": Object {
+        "colNoCreate": "col_no_create1",
+        "colNoCreateUpdate": "col_no_create_update1",
+        "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter1",
+        "colNoFilter": "col_no_filter1",
+        "colNoOrder": "col_no_order1",
+        "colNoUpdate": "col_no_update1",
+        "firstName": "John",
+        "id": 1,
+        "lastName": "Smith",
+      },
+    },
+  },
+}
+`;
+
+exports[`d.updatePerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "updatePersonById": Object {
+      "person": Object {
+        "colNoCreate": "update2",
+        "colNoCreateUpdate": "col_no_create_update1",
+        "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter1",
+        "colNoFilter": "update3",
+        "colNoOrder": "update1",
+        "colNoUpdate": "col_no_update1",
+        "firstName": "John",
+        "id": 1,
+        "lastName": "Doe",
+      },
+    },
+  },
+}
+`;
+
 exports[`mutation-create.graphql 1`] = `
 Object {
   "data": Object {

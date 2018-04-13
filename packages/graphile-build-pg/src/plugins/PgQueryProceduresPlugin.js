@@ -3,6 +3,7 @@ import type { Plugin } from "graphile-build";
 import makeProcField from "./makeProcField";
 import debugFactory from "debug";
 import chalk from "chalk";
+import omit from "../omit";
 
 const debugWarn = debugFactory("graphile-build-pg:warn");
 
@@ -15,7 +16,7 @@ export default (function PgQueryProceduresPlugin(builder) {
       }
       const {
         extend,
-        pgInflection: inflection,
+        inflection,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
       } = build;
       return extend(
@@ -23,6 +24,7 @@ export default (function PgQueryProceduresPlugin(builder) {
         introspectionResultsByKind.procedure
           .filter(proc => proc.isStable)
           .filter(proc => !!proc.namespace)
+          .filter(proc => !omit(proc, "execute"))
           .reduce((memo, proc) => {
             /*
             proc =
@@ -62,10 +64,7 @@ export default (function PgQueryProceduresPlugin(builder) {
               return memo;
             }
 
-            const fieldName = inflection.functionName(
-              proc.name,
-              proc.namespace.name
-            );
+            const fieldName = inflection.functionQueryName(proc);
             try {
               memo[fieldName] = makeProcField(fieldName, proc, build, {
                 fieldWithHooks,

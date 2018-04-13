@@ -37,7 +37,7 @@ type PostGraphileOptions = {
   skipPlugins?: Array<Plugin>,
   jwtPgTypeIdentifier?: string,
   jwtSecret?: string,
-  inflector?: Inflector,
+  inflector?: Inflector, // NO LONGER SUPPORTED!
   pgColumnFilter?: (mixed, Build, Context) => boolean,
   viewUniqueKey?: string,
   enableTags?: boolean,
@@ -51,6 +51,9 @@ type PostGraphileOptions = {
 
 type PgConfig = Client | Pool | string;
 
+/*
+ * BELOW HERE IS DEPRECATED!!
+ */
 export { inflections };
 
 export const postGraphileBaseOverrides = {
@@ -74,6 +77,36 @@ export const postGraphileInflection = inflections.newInflector(
 export const postGraphileClassicIdsInflection = inflections.newInflector(
   Object.assign({}, postGraphileBaseOverrides, postGraphileClassicIdsOverrides)
 );
+/*
+ * ABOVE HERE IS DEPRECATED.
+ */
+
+export const PostGraphileInflectionPlugin = (function(builder) {
+  builder.hook("inflection", inflection => {
+    const previous = inflection.enumName;
+    return {
+      ...inflection,
+      enumName(value: string) {
+        return this.constantCase(previous.call(this, value));
+      },
+    };
+  });
+}: Plugin);
+
+export const PostGraphileClassicIdsInflectionPlugin = (function(builder) {
+  builder.hook("inflection", inflection => {
+    const previous = inflection._columnName;
+    return {
+      ...inflection,
+      _columnName(attr, options) {
+        const previousValue = previous.call(this, attr, options);
+        return (options && options.skipRowId) || previousValue !== "id"
+          ? previousValue
+          : this.camelCase("rowId");
+      },
+    };
+  });
+}: Plugin);
 
 const awaitKeys = async obj => {
   const result = {};
@@ -101,7 +134,7 @@ const getPostGraphileBuilder = async (
     disableDefaultMutations,
     graphileBuildOptions,
     graphqlBuildOptions, // DEPRECATED!
-    inflector,
+    inflector, // NO LONGER SUPPORTED!
     pgColumnFilter,
     viewUniqueKey,
     enableTags = true,
@@ -193,13 +226,27 @@ const getPostGraphileBuilder = async (
   ensureValidPlugins("prependPlugins", prependPlugins);
   ensureValidPlugins("appendPlugins", appendPlugins);
   ensureValidPlugins("skipPlugins", skipPlugins);
+  if (inflector) {
+    throw new Error(
+      "Custom inflector arguments are no longer supported, please use the inflector plugin API instead"
+    );
+  }
+  const inflectionOverridePlugins = classicIds
+    ? [PostGraphileInflectionPlugin, PostGraphileClassicIdsInflectionPlugin]
+    : [PostGraphileInflectionPlugin];
   return getBuilder(
     (replaceAllPlugins
-      ? [...prependPlugins, ...replaceAllPlugins, ...appendPlugins]
+      ? [
+          ...prependPlugins,
+          ...replaceAllPlugins,
+          ...inflectionOverridePlugins,
+          ...appendPlugins,
+        ]
       : [
           ...prependPlugins,
           ...defaultPlugins,
           ...pgDefaultPlugins,
+          ...inflectionOverridePlugins,
           ...appendPlugins,
         ]
     ).filter(p => skipPlugins.indexOf(p) === -1),

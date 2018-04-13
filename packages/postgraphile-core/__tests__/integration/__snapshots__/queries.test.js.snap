@@ -756,6 +756,61 @@ Object {
 }
 `;
 
+exports[`d.filter.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "colNoCreate": "col_no_create1",
+          "colNoCreateUpdate": "col_no_create_update1",
+          "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter1",
+          "colNoFilter": "col_no_filter1",
+          "colNoOrder": "col_no_order1",
+          "colNoUpdate": "col_no_update1",
+          "firstName": "John",
+          "id": 1,
+          "lastName": "Smith",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`d.order.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "colNoCreate": "col_no_create2",
+          "colNoCreateUpdate": "col_no_create_update2",
+          "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter2",
+          "colNoFilter": "col_no_filter2",
+          "colNoOrder": "col_no_order2",
+          "colNoUpdate": "col_no_update2",
+          "firstName": "Sara",
+          "id": 2,
+          "lastName": "Smith",
+        },
+        Object {
+          "colNoCreate": "col_no_create1",
+          "colNoCreateUpdate": "col_no_create_update1",
+          "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter1",
+          "colNoFilter": "col_no_filter1",
+          "colNoOrder": "col_no_order1",
+          "colNoUpdate": "col_no_update1",
+          "firstName": "John",
+          "id": 1,
+          "lastName": "Smith",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`dynamic-json.condition-json-field-variable.graphql 1`] = `
 Object {
   "data": Object {
