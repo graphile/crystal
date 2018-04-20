@@ -17,6 +17,7 @@ else
     --watch src \
     --ignore __tests__ \
     --ignore __mocks__ \
+    --timeout 5000 \
     --ignore src/postgraphile/graphiql \
     --ext js,ts \
     --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
