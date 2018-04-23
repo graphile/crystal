@@ -424,7 +424,7 @@ if (noServer) {
     const rawMiddleware = postgraphile(pgConfig, schemas, postgraphileOptions)
     const middleware = pluginHook('cli:server:middleware', rawMiddleware, { options: postgraphileOptions })
     const server = createServer(middleware)
-    server.setTimeout(serverTimeout, () => { return })
+    server.timeout = serverTimeout
 
     pluginHook('cli:server:created', server, { options: postgraphileOptions, middleware })
 
