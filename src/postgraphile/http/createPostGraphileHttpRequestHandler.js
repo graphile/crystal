@@ -14,6 +14,7 @@ import {
   getOperationAST,
   formatError as defaultFormatError,
   print as printGraphql,
+  specifiedRules,
 } from 'graphql'
 import { extendedFormatError } from '../extendedFormatError'
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
@@ -23,6 +24,7 @@ import setupServerSentEvents from './setupServerSentEvents'
 import setupPgClientTransaction from '../setupPgClientTransaction'
 import withPostGraphileContext from '../withPostGraphileContext'
 import mapKeys from 'lodash/mapKeys'
+import { pluginHookFromOptions } from '../pluginHook'
 
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
@@ -120,6 +122,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     pgSettings,
     pgDefaultRole,
   } = options
+  const pluginHook = pluginHookFromOptions(options)
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
     throw new Error(
@@ -512,8 +515,14 @@ export default function createPostGraphileHttpRequestHandler(options) {
       debugRequest('GraphQL query is parsed.')
 
       // Validate our GraphQL query using given rules.
-      // TODO: Add a complexity GraphQL rule.
-      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst)
+      const validationRules = pluginHook('postgraphile:validationRules', specifiedRules, {
+        options,
+        req,
+        res,
+        variables: params.variables,
+        operationName: params.operationName,
+      })
+      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, validationRules)
 
       // If we have some validation errors, don’t execute the query. Instead
       // send the errors to the client with a `400` code.
