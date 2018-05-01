@@ -34,6 +34,18 @@ const finalHandler = require('finalhandler')
 const bodyParser = require('body-parser')
 const sendFile = require('send')
 
+// Fast way of checking if an object is empty,
+// faster than `Object.keys(value).length === 0`
+const hasOwnProperty = Object.prototype.hasOwnProperty
+function isEmpty(value) {
+  for (const key in value) {
+    if (hasOwnProperty.call(value, key)) {
+      return false
+    }
+  }
+  return true
+}
+
 const { POSTGRAPHILE_ENV } = process.env
 
 const debugGraphql = new Debugger('postgraphile:graphql')
@@ -393,8 +405,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     // Statements inside the `try` will assign to `result` when they get
     // a result. We also keep track of `params`.
     let paramsList
-    const results = []
-    let queryDocumentAst
+    let results
     const queryTimeStart = process.hrtime()
     let pgRole
 
@@ -473,8 +484,10 @@ export default function createPostGraphileHttpRequestHandler(options) {
         paramsList = [paramsList]
       }
       const handleErrors = options.handleErrors || (errors => errors.map(formatError))
-      for (const params of paramsList) {
+      results = await Promise.all(paramsList.map(async (params) => {
+        let queryDocumentAst
         let result
+        let meta = {}
         try {
           if (!params.query) throw httpError(400, 'Must provide a query string.')
 
@@ -533,6 +546,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
             res,
             variables: params.variables,
             operationName: params.operationName,
+            meta,
           })
           const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, validationRules)
 
@@ -541,30 +555,29 @@ export default function createPostGraphileHttpRequestHandler(options) {
           if (validationErrors.length > 0) {
             res.statusCode = 400
             result = { errors: validationErrors }
-            continue
+          } else {
+            debugRequest('GraphQL query is validated.')
+
+            // Lazily log the query. If this debugger isn’t enabled, don’t run it.
+            if (debugGraphql.enabled)
+              debugGraphql(
+                printGraphql(queryDocumentAst)
+                  .replace(/\s+/g, ' ')
+                  .trim(),
+              )
+
+            result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
+              pgRole = graphqlContext.pgRole
+              return executeGraphql(
+                gqlSchema,
+                queryDocumentAst,
+                null,
+                graphqlContext,
+                params.variables,
+                params.operationName,
+              )
+            })
           }
-
-          debugRequest('GraphQL query is validated.')
-
-          // Lazily log the query. If this debugger isn’t enabled, don’t run it.
-          if (debugGraphql.enabled)
-            debugGraphql(
-              printGraphql(queryDocumentAst)
-                .replace(/\s+/g, ' ')
-                .trim(),
-            )
-
-          result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
-            pgRole = graphqlContext.pgRole
-            return executeGraphql(
-              gqlSchema,
-              queryDocumentAst,
-              null,
-              graphqlContext,
-              params.variables,
-              params.operationName,
-            )
-          })
 
         } catch (error) {
           result = { errors: [error], statusCode: error.status || error.statusCode || 500 }
@@ -578,38 +591,46 @@ export default function createPostGraphileHttpRequestHandler(options) {
           if (result && result.errors) {
             result.errors = handleErrors(result.errors, req, res)
           }
-          results.push(result)
-
+          if (!isEmpty(meta)) {
+            result.meta = meta
+          }
           // Log the query. If this debugger isn’t enabled, don’t run it.
-          if (queryDocumentAst && !options.disableQueryLog) {
-            const prettyQuery = printGraphql(queryDocumentAst)
-              .replace(/\s+/g, ' ')
-              .trim()
-            const errorCount = (result.errors || []).length
-            const timeDiff = process.hrtime(queryTimeStart)
-            const ms =
-              Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
+          if (!options.disableQueryLog && queryDocumentAst) {
+            setTimeout(() => {
+              const prettyQuery = printGraphql(queryDocumentAst)
+                .replace(/\s+/g, ' ')
+                .trim()
+              const errorCount = (result.errors || []).length
+              const timeDiff = process.hrtime(queryTimeStart)
+              const ms =
+                Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
 
-            // If we have enabled the query log for the Http handler, use that.
-            // tslint:disable-next-line no-console
-            console.log(
-              `${chalk[errorCount === 0 ? 'green' : 'red'](
-                `${errorCount} error(s)`,
-              )} ${
-                pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
-              }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
-            )
+              // If we have enabled the query log for the Http handler, use that.
+              // tslint:disable-next-line no-console
+              console.log(
+                `${chalk[errorCount === 0 ? 'green' : 'red'](
+                  `${errorCount} error(s)`,
+                )} ${
+                  pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
+                }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
+              )
+            }, 0)
           }
           debugRequest('GraphQL query has been executed.')
         }
-      }
+        return result
+      }))
     } catch (error) {
       // Set our status code and send the client our results!
-      const statusCode = error.status || error.statusCode || 500
-      results = [{ errors: [error], statusCode }]
+      if (res.statusCode === 200)
+        res.statusCode = error.status || error.statusCode || 500
+
+      // Overwrite entire response
+      returnArray = false
+      results = [{ errors: [error] }]
 
       // If the status code is 500, let’s log our error.
-      if (statusCode === 500)
+      if (res.statusCode === 500)
         // tslint:disable-next-line no-console
         console.error(error.stack)
     } finally {
