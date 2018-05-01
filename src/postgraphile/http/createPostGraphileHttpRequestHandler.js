@@ -635,7 +635,13 @@ export default function createPostGraphileHttpRequestHandler(options) {
         // tslint:disable-next-line no-console
         console.error(error.stack)
     } finally {
-      // Finally, we send the client the contents of `result`.
+      // Finally, we send the client the results.
+      if (!returnArray) {
+        if (res.statusCode === 200 && results[0].statusCode) {
+          res.statusCode = results[0].statusCode
+        }
+        delete results[0].statusCode
+      }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
 
