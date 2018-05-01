@@ -83,7 +83,7 @@ program
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
 
-pluginHook('cli:flags:standard', addFlag)
+pluginHook('cli:flags:add:standard', addFlag)
 
 // Schema configuration
 program
