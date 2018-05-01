@@ -567,7 +567,12 @@ export default function createPostGraphileHttpRequestHandler(options) {
                   .trim(),
               )
 
-            result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
+            result = await withPostGraphileContextFromReqRes(req, res, {
+              singleStatement: false,
+              queryDocumentAst,
+              variables: params.variables,
+              operationName: params.operationName,
+            }, graphqlContext => {
               pgRole = graphqlContext.pgRole
               return executeGraphql(
                 gqlSchema,
