@@ -483,6 +483,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       } else {
         paramsList = [paramsList]
       }
+      paramsList = pluginHook('postgraphile:httpParamsList', paramsList, { req, res, returnArray, httpError })
       const handleErrors = options.handleErrors || (errors => errors.map(formatError))
       results = await Promise.all(paramsList.map(async (params) => {
         let queryDocumentAst
