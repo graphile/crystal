@@ -392,13 +392,14 @@ export default function createPostGraphileHttpRequestHandler(options) {
     // The `result` will be used at the very end in our `finally` block.
     // Statements inside the `try` will assign to `result` when they get
     // a result. We also keep track of `params`.
-    let params
-    let result
+    let paramsList
+    const results = []
     let queryDocumentAst
     const queryTimeStart = process.hrtime()
     let pgRole
 
     debugRequest('GraphQL query request has begun.')
+    let returnArray = false
 
     // This big `try`/`catch`/`finally` block represents the execution of our
     // GraphQL query. All errors thrown in this block will be returned to the
@@ -446,160 +447,180 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      params = typeof req.body === 'string' ? { query: req.body } : req.body
+      paramsList = typeof req.body === 'string' ? { query: req.body } : req.body
 
-      // Validate our params object a bit.
-      if (params == null)
+      // Validate our paramsList object a bit.
+      if (paramsList == null)
         throw httpError(
           400,
           'Must provide an object parameters, not nullish value.',
         )
-      if (typeof params !== 'object')
+      if (typeof paramsList !== 'object')
         throw httpError(
           400,
-          `Expected parameter object, not value of type '${typeof params}'.`,
+          `Expected parameter object, not value of type '${typeof paramsList}'.`,
         )
-      if (Array.isArray(params))
-        throw httpError(
-          501,
-          'Batching queries as an array is currently unsupported. Please provide a single query object.',
-        )
-      if (!params.query) throw httpError(400, 'Must provide a query string.')
-
-      // If variables is a string, we assume it is a JSON string and that it
-      // needs to be parsed.
-      if (typeof params.variables === 'string') {
-        // If variables is just an empty string, we should set it to null and
-        // ignore it.
-        if (params.variables === '') {
-          params.variables = null
+      if (Array.isArray(paramsList)) {
+        if (!options.enableQueryBatching) {
+          throw httpError(
+            501,
+            'Batching queries as an array is currently unsupported. Please provide a single query object.',
+          )
         } else {
-          // Otherwise, let us try to parse it as JSON.
+          returnArray = true
+        }
+      } else {
+        paramsList = [paramsList]
+      }
+      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
+      for (const params of paramsList) {
+        let result
+        try {
+          if (!params.query) throw httpError(400, 'Must provide a query string.')
+
+          // If variables is a string, we assume it is a JSON string and that it
+          // needs to be parsed.
+          if (typeof params.variables === 'string') {
+            // If variables is just an empty string, we should set it to null and
+            // ignore it.
+            if (params.variables === '') {
+              params.variables = null
+            } else {
+              // Otherwise, let us try to parse it as JSON.
+              try {
+                params.variables = JSON.parse(params.variables)
+              } catch (error) {
+                error.statusCode = 400
+                throw error
+              }
+            }
+          }
+
+          // Throw an error if `variables` is not an object.
+          if (params.variables != null && typeof params.variables !== 'object')
+            throw httpError(
+              400,
+              `Variables must be an object, not '${typeof params.variables}'.`,
+            )
+
+          // Throw an error if `operationName` is not a string.
+          if (
+            params.operationName != null &&
+            typeof params.operationName !== 'string'
+          )
+            throw httpError(
+              400,
+              `Operation name must be a string, not '${typeof params.operationName}'.`,
+            )
+
+          const source = new Source(params.query, 'GraphQL Http Request')
+
+          // Catch an errors while parsing so that we can set the `statusCode` to
+          // 400. Otherwise we don’t need to parse this way.
           try {
-            params.variables = JSON.parse(params.variables)
+            queryDocumentAst = parseGraphql(source)
           } catch (error) {
-            error.statusCode = 400
+            res.statusCode = 400
             throw error
           }
+
+          debugRequest('GraphQL query is parsed.')
+
+          // Validate our GraphQL query using given rules.
+          const validationRules = pluginHook('postgraphile:validationRules', specifiedRules, {
+            options,
+            req,
+            res,
+            variables: params.variables,
+            operationName: params.operationName,
+          })
+          const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, validationRules)
+
+          // If we have some validation errors, don’t execute the query. Instead
+          // send the errors to the client with a `400` code.
+          if (validationErrors.length > 0) {
+            res.statusCode = 400
+            result = { errors: validationErrors }
+            continue
+          }
+
+          debugRequest('GraphQL query is validated.')
+
+          // Lazily log the query. If this debugger isn’t enabled, don’t run it.
+          if (debugGraphql.enabled)
+            debugGraphql(
+              printGraphql(queryDocumentAst)
+                .replace(/\s+/g, ' ')
+                .trim(),
+            )
+
+          result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
+            pgRole = graphqlContext.pgRole
+            return executeGraphql(
+              gqlSchema,
+              queryDocumentAst,
+              null,
+              graphqlContext,
+              params.variables,
+              params.operationName,
+            )
+          })
+
+        } catch (error) {
+          result = { errors: [error], statusCode: error.status || error.statusCode || 500 }
+
+          // If the status code is 500, let’s log our error.
+          if (result.statusCode === 500)
+            // tslint:disable-next-line no-console
+            console.error(error.stack)
+        } finally {
+          // Format our errors so the client doesn’t get the full thing.
+          if (result && result.errors) {
+            result.errors = handleErrors(result.errors, req, res)
+          }
+          results.push(result)
+
+          // Log the query. If this debugger isn’t enabled, don’t run it.
+          if (queryDocumentAst && !options.disableQueryLog) {
+            const prettyQuery = printGraphql(queryDocumentAst)
+              .replace(/\s+/g, ' ')
+              .trim()
+            const errorCount = (result.errors || []).length
+            const timeDiff = process.hrtime(queryTimeStart)
+            const ms =
+              Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
+
+            // If we have enabled the query log for the Http handler, use that.
+            // tslint:disable-next-line no-console
+            console.log(
+              `${chalk[errorCount === 0 ? 'green' : 'red'](
+                `${errorCount} error(s)`,
+              )} ${
+                pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
+              }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
+            )
+          }
+          debugRequest('GraphQL query has been executed.')
         }
       }
-
-      // Throw an error if `variables` is not an object.
-      if (params.variables != null && typeof params.variables !== 'object')
-        throw httpError(
-          400,
-          `Variables must be an object, not '${typeof params.variables}'.`,
-        )
-
-      // Throw an error if `operationName` is not a string.
-      if (
-        params.operationName != null &&
-        typeof params.operationName !== 'string'
-      )
-        throw httpError(
-          400,
-          `Operation name must be a string, not '${typeof params.operationName}'.`,
-        )
-
-      const source = new Source(params.query, 'GraphQL Http Request')
-
-      // Catch an errors while parsing so that we can set the `statusCode` to
-      // 400. Otherwise we don’t need to parse this way.
-      try {
-        queryDocumentAst = parseGraphql(source)
-      } catch (error) {
-        res.statusCode = 400
-        throw error
-      }
-
-      debugRequest('GraphQL query is parsed.')
-
-      // Validate our GraphQL query using given rules.
-      const validationRules = pluginHook('postgraphile:validationRules', specifiedRules, {
-        options,
-        req,
-        res,
-        variables: params.variables,
-        operationName: params.operationName,
-      })
-      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, validationRules)
-
-      // If we have some validation errors, don’t execute the query. Instead
-      // send the errors to the client with a `400` code.
-      if (validationErrors.length > 0) {
-        res.statusCode = 400
-        result = { errors: validationErrors }
-        return
-      }
-
-      debugRequest('GraphQL query is validated.')
-
-      // Lazily log the query. If this debugger isn’t enabled, don’t run it.
-      if (debugGraphql.enabled)
-        debugGraphql(
-          printGraphql(queryDocumentAst)
-            .replace(/\s+/g, ' ')
-            .trim(),
-        )
-
-      result = await withPostGraphileContextFromReqRes(req, res, {singleStatement: false}, graphqlContext => {
-        pgRole = graphqlContext.pgRole
-        return executeGraphql(
-          gqlSchema,
-          queryDocumentAst,
-          null,
-          graphqlContext,
-          params.variables,
-          params.operationName,
-        )
-      })
     } catch (error) {
       // Set our status code and send the client our results!
-      if (res.statusCode === 200)
-        res.statusCode = error.status || error.statusCode || 500
-      result = { errors: [error] }
+      const statusCode = error.status || error.statusCode || 500
+      results = [{ errors: [error], statusCode }]
 
       // If the status code is 500, let’s log our error.
-      if (res.statusCode === 500)
+      if (statusCode === 500)
         // tslint:disable-next-line no-console
         console.error(error.stack)
     } finally {
       // Finally, we send the client the contents of `result`.
-      debugRequest('GraphQL query has been executed.')
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
 
-      // Format our errors so the client doesn’t get the full thing.
-      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
+      res.end(JSON.stringify(returnArray ? results : results[0]))
 
-      if (result && result.errors) {
-        result.errors = handleErrors(result.errors, req, res)
-      }
+      debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.')
 
-      res.end(JSON.stringify(result))
-
-      debugRequest('GraphQL query request finished.')
-
-      // Log the query. If this debugger isn’t enabled, don’t run it.
-      if (queryDocumentAst && !options.disableQueryLog) {
-        const prettyQuery = printGraphql(queryDocumentAst)
-          .replace(/\s+/g, ' ')
-          .trim()
-        const errorCount = (result.errors || []).length
-        const timeDiff = process.hrtime(queryTimeStart)
-        const ms =
-          Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100
-
-        // If we have enabled the query log for the Http handler, use that.
-        // tslint:disable-next-line no-console
-        console.log(
-          `${chalk[errorCount === 0 ? 'green' : 'red'](
-            `${errorCount} error(s)`,
-          )} ${
-            pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
-          }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
-        )
-      }
     }
   }
 
