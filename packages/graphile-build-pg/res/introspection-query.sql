@@ -102,7 +102,7 @@ with
       (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00000100') = B'00000100' as "isDeletable"
     from
       pg_catalog.pg_class as rel
-      left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0
+      left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0 and dsc.classoid = (select oid from pg_catalog.pg_class where relname = 'pg_class')
       left join pg_catalog.pg_namespace as nsp on nsp.oid = rel.relnamespace
     where
       rel.relpersistence in ('p') and
