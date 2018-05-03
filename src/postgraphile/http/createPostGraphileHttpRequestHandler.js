@@ -534,7 +534,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           try {
             queryDocumentAst = parseGraphql(source)
           } catch (error) {
-            res.statusCode = 400
+            error.statusCode = 400
             throw error
           }
 
@@ -554,8 +554,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           // If we have some validation errors, don’t execute the query. Instead
           // send the errors to the client with a `400` code.
           if (validationErrors.length > 0) {
-            res.statusCode = 400
-            result = { errors: validationErrors }
+            result = { errors: validationErrors, statusCode: 400 }
           } else {
             debugRequest('GraphQL query is validated.')
 
