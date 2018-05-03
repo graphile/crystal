@@ -83,7 +83,7 @@ program
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
 
-pluginHook('cli:flags:standard', addFlag)
+pluginHook('cli:flags:add:standard', addFlag)
 
 // Schema configuration
 program
@@ -126,6 +126,7 @@ program
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
+  .option('--enable-query-batching', '[experimental] enable the server to process multiple GraphQL queries in one request')
 
 pluginHook('cli:flags:add:webserver', addFlag)
 
@@ -228,6 +229,7 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   clusterWorkers,
+  enableQueryBatching,
   setofFunctionsContainNulls = true,
   legacyJsonUuid,
 // tslint:disable-next-line no-any
@@ -350,6 +352,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   legacyRelations,
   setofFunctionsContainNulls,
   legacyJsonUuid,
+  enableQueryBatching,
   pluginHook,
 }), { config, cliOptions: program })
 

@@ -105,6 +105,10 @@ export type PostGraphileOptions = {
   // (case insensitive).
   /* @middlewareOnly */
   bodySizeLimit?: string,
+  // [Experimental] Enable the middleware to process multiple GraphQL queries
+  // in one request
+  /* @middlewareOnly */
+  enableQueryBatching?: string,
   // The secret for your JSON web tokens. This will be used to verify tokens in
   // the `Authorization` header, and signing JWT tokens you return in
   // procedures.
