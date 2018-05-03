@@ -289,6 +289,7 @@ export default (function PgBackwardRelationPlugin(
               },
               {
                 isPgFieldConnection: true,
+                isPgBackwardRelationField: true,
                 pgFieldIntrospection: table,
               }
             );

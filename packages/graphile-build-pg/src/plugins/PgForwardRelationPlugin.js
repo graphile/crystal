@@ -162,6 +162,7 @@ export default (function PgForwardRelationPlugin(builder) {
             },
             {
               pgFieldIntrospection: constraint,
+              isPgForwardRelationField: true,
             }
           );
           return memo;
