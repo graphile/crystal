@@ -4,7 +4,7 @@ export PATH="$PATH:`pwd`/node_modules/.bin"
 
 set -e
 echo "[1/4]: Building Code"
-npm run prepublish:all
+npm run prepack:all
 
 echo "[2/4]: Linting Code"
 npm run lint

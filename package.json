@@ -21,7 +21,7 @@
     "flow": "flow",
     "flow:check": "flow check",
     "test": "lerna run test",
-    "prepublish:all": "for I in packages/*/; do echo \"cd $I && npm run prepublish\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently",
+    "prepack:all": "for I in packages/*/; do echo \"cd $I && npm run prepack\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently",
     "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
     "clean": "for I in packages/*/; do rm -Rf \"$I/node8plus/\"; done"
   },
