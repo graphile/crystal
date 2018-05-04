@@ -4,7 +4,7 @@
   "scripts": {
     "watch": "sleep 1000000000",
     "test": "true",
-    "prepublish": "true"
+    "prepack": "true"
   },
   "description": "You probably want postgraphile or graphile-build",
   "main": "index.js",

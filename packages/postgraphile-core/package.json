@@ -5,7 +5,7 @@
   "main": "node8plus/index.js",
   "scripts": {
     "test": "scripts/test",
-    "prepublish": "mkdir -p node8plus && babel -s true --out-dir node8plus src && flow-copy-source src node8plus",
+    "prepack": "mkdir -p node8plus && babel -s true --out-dir node8plus src && flow-copy-source src node8plus",
     "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
   },
   "repository": {
