@@ -294,7 +294,7 @@ The specific specs PostGraphile implements are:
 
 We officially only support Node v8.6+; if you require support for an earlier
 version of Node please raise an issue explaining why you can't update to the
-latest Node LTS and we'll wee what we can do.
+latest Node LTS and we'll see what we can do.
 
 We officially support PostgreSQL 9.6+, but the tests run against PostgreSQL 9.4
 so all our core functionality should work on that DB too.
