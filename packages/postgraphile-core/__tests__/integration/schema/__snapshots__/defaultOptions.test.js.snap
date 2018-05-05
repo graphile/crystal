@@ -500,6 +500,32 @@ type CompoundType {
   e: EnumCaps
   f: EnumWithEmptyString
   fooBar: Int
+  g: Interval
+}
+
+\\"\\"\\"All input for the \`compoundTypeArrayMutation\` mutation.\\"\\"\\"
+input CompoundTypeArrayMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+\\"\\"\\"The output of our \`compoundTypeArrayMutation\` mutation.\\"\\"\\"
+type CompoundTypeArrayMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
 }
 
 \\"\\"\\"An input for mutations affecting \`CompoundType\`\\"\\"\\"
@@ -511,6 +537,7 @@ input CompoundTypeInput {
   e: EnumCaps
   f: EnumWithEmptyString
   fooBar: Int
+  g: IntervalInput
 }
 
 \\"\\"\\"All input for the \`compoundTypeMutation\` mutation.\\"\\"\\"
@@ -562,6 +589,31 @@ type CompoundTypesEdge {
 
   \\"\\"\\"The \`CompoundType\` at the end of the edge.\\"\\"\\"
   node: CompoundType
+}
+
+\\"\\"\\"All input for the \`compoundTypeSetMutation\` mutation.\\"\\"\\"
+input CompoundTypeSetMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+\\"\\"\\"The output of our \`compoundTypeSetMutation\` mutation.\\"\\"\\"
+type CompoundTypeSetMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
 }
 
 type Comptype {
@@ -2966,12 +3018,26 @@ type Mutation {
     \\"\\"\\"
     input: AuthenticatePayloadInput!
   ): AuthenticatePayloadPayload
+  compoundTypeArrayMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CompoundTypeArrayMutationInput!
+  ): CompoundTypeArrayMutationPayload
   compoundTypeMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: CompoundTypeMutationInput!
   ): CompoundTypeMutationPayload
+
+  \\"\\"\\"Reads and enables pagination through a set of \`CompoundType\`.\\"\\"\\"
+  compoundTypeSetMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CompoundTypeSetMutationInput!
+  ): CompoundTypeSetMutationPayload
 
   \\"\\"\\"Creates a single \`CompoundKey\`.\\"\\"\\"
   createCompoundKey(
@@ -4194,6 +4260,7 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean
@@ -5337,6 +5404,7 @@ type Query implements Node {
     nodeId: ID!
   ): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
+  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
   \\"\\"\\"Reads and enables pagination through a set of \`CompoundType\`.\\"\\"\\"

@@ -224,10 +224,13 @@ export default function makeProcField(
             sqlArgValues.unshift(sqlValue);
           }
         }
-        return sql.fragment`${sql.identifier(
+        const functionCall = sql.fragment`${sql.identifier(
           proc.namespace.name,
           proc.name
         )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`;
+        return rawReturnType.isPgArray
+          ? sql.fragment`unnest(${functionCall})`
+          : functionCall;
       }
       function makeQuery(
         parsedResolveInfoFragment,
@@ -247,7 +250,10 @@ export default function makeProcField(
             withPagination: !isMutation && proc.returnsSet,
             withPaginationAsFields: !isMutation && proc.returnsSet && !computed,
             asJson: !proc.returnsSet && computed && !returnFirstValueAsValue,
-            addNullCase: !proc.returnsSet && isTableLike,
+            asJsonAggregate:
+              !proc.returnsSet && computed && rawReturnType.isPgArray,
+            addNullCase:
+              !proc.returnsSet && !rawReturnType.isPgArray && isTableLike,
           },
           innerQueryBuilder => {
             if (!isTableLike) {
@@ -433,7 +439,6 @@ export default function makeProcField(
                   functionAlias,
                   functionAlias
                 );
-                const returnType = rawReturnType;
                 const intermediateIdentifier = sql.identifier(Symbol());
                 const isVoid = returnType.id === "2278";
                 const isPgClass =
@@ -491,11 +496,13 @@ export default function makeProcField(
                 } else {
                   if (proc.returnsSet && !isMutation) {
                     // Connection
-                    return addStartEndCursor(row);
-                  } else if (proc.returnsSet) {
-                    return rows;
+                    return addStartEndCursor({
+                      data: row.data.map(row => pg2gql(row, returnType)),
+                    });
+                  } else if (proc.returnsSet || rawReturnType.isPgArray) {
+                    return rows.map(row => pg2gql(row, returnType));
                   } else {
-                    return row;
+                    return pg2gql(row, returnType);
                   }
                 }
               })();

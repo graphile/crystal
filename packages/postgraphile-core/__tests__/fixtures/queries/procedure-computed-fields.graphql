@@ -30,6 +30,7 @@ query {
     nodes {
       name
       firstName
+      computedCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
       friends {
         nodes {
           name

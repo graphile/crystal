@@ -116,6 +116,19 @@ type CompoundType {
   e: EnumCaps
   f: EnumWithEmptyString
   fooBar: Int
+  g: Interval
+}
+
+\\"\\"\\"An input for mutations affecting \`CompoundType\`\\"\\"\\"
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
 }
 
 \\"\\"\\"A connection to a list of \`CompoundType\` values.\\"\\"\\"
@@ -250,6 +263,60 @@ input FloatRangeInput {
 
   \\"\\"\\"The starting bound of our range.\\"\\"\\"
   start: FloatRangeBoundInput
+}
+
+\\"\\"\\"
+An interval of time that has passed where the smallest distinct unit is a second.
+\\"\\"\\"
+type Interval {
+  \\"\\"\\"A quantity of days.\\"\\"\\"
+  days: Int
+
+  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  hours: Int
+
+  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  minutes: Int
+
+  \\"\\"\\"A quantity of months.\\"\\"\\"
+  months: Int
+
+  \\"\\"\\"
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  \\"\\"\\"
+  seconds: Float
+
+  \\"\\"\\"A quantity of years.\\"\\"\\"
+  years: Int
+}
+
+\\"\\"\\"
+An interval of time that has passed where the smallest distinct unit is a second.
+\\"\\"\\"
+input IntervalInput {
+  \\"\\"\\"A quantity of days.\\"\\"\\"
+  days: Int
+
+  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  hours: Int
+
+  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  minutes: Int
+
+  \\"\\"\\"A quantity of months.\\"\\"\\"
+  months: Int
+
+  \\"\\"\\"
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  \\"\\"\\"
+  seconds: Float
+
+  \\"\\"\\"A quantity of years.\\"\\"\\"
+  years: Int
 }
 
 \\"\\"\\"All input for the \`intSetMutation\` mutation.\\"\\"\\"
@@ -752,6 +819,7 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean
