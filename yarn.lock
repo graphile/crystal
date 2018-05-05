@@ -3306,13 +3306,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@4.0.0-beta.4:
-  version "4.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-beta.4.tgz#470e6fde63ea26ad0a89269a1f5be7deed19ba85"
+graphile-build-pg@4.0.0-beta.5:
+  version "4.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-beta.5.tgz#bee2f1c731f18b02c37b9a80a57c2926c71120f7"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-beta.4"
+    graphile-build "4.0.0-beta.5"
     graphql-iso-date "^3.2.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3320,12 +3320,12 @@ graphile-build-pg@4.0.0-beta.4:
     pg-sql2 "2.0.0"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-beta.4:
-  version "4.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-beta.4.tgz#f8db033994034d5339d1a945cccba4f1f6c1061e"
+graphile-build@4.0.0-beta.5:
+  version "4.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-beta.5.tgz#fb218754c65441a78cc1e3ff38161337b46aa963"
   dependencies:
     debug ">=2 <3"
-    graphql-parse-resolve-info "4.0.0-beta.4"
+    graphql-parse-resolve-info "4.0.0-beta.5"
     lodash ">=4 <5"
     pluralize "7.0.0"
 
@@ -3400,9 +3400,9 @@ graphql-language-service-utils@^1.1.0:
     graphql-config "1.1.4"
     graphql-language-service-types "^1.1.0"
 
-graphql-parse-resolve-info@4.0.0-beta.4:
-  version "4.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-beta.4.tgz#a91b5aa1a4fcb6efa77987ad510b3a3f5a6157ac"
+graphql-parse-resolve-info@4.0.0-beta.5:
+  version "4.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-beta.5.tgz#6840f739be7e0d3a166463f5144addd735b84663"
   dependencies:
     debug ">=2 <3"
 
@@ -6272,12 +6272,12 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.3.0"
 
-postgraphile-core@4.0.0-beta.4:
-  version "4.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-beta.4.tgz#0942724ec2482cfe45d5cfa2bfda945f2ef85424"
+postgraphile-core@4.0.0-beta.5:
+  version "4.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-beta.5.tgz#b004ad239b69814bccab8b29466ca74806c9c043"
   dependencies:
-    graphile-build "4.0.0-beta.4"
-    graphile-build-pg "4.0.0-beta.4"
+    graphile-build "4.0.0-beta.5"
+    graphile-build-pg "4.0.0-beta.5"
 
 postgres-array@~1.0.0:
   version "1.0.2"
