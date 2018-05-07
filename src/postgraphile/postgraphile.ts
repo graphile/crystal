@@ -21,6 +21,7 @@ export type PostGraphileOptions = {
   // superuser. When enabled PostGraphile will try to add this trigger, if you
   // did not connect as a superuser you will get a warning and the trigger
   // won’t be added.
+  /* @middlewareOnly */
   watchPg?: boolean,
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
