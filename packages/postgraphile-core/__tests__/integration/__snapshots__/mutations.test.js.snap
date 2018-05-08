@@ -1005,6 +1005,111 @@ Object {
     "mult4": Object {
       "integer": 10,
     },
+    "mutationCompoundTypeArray": Object {
+      "compoundTypes": Array [
+        Object {
+          "a": 419,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "BAR_FOO",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+        Object {
+          "a": null,
+          "b": null,
+          "c": null,
+          "d": null,
+          "e": null,
+          "f": null,
+          "fooBar": null,
+          "g": null,
+        },
+        Object {
+          "a": 420,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "BAR_FOO",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+      ],
+    },
+    "mutationIntervalArray": Object {
+      "intervals": Array [
+        Object {
+          "days": null,
+          "hours": null,
+          "minutes": null,
+          "months": null,
+          "seconds": 12,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 3,
+          "minutes": null,
+          "months": null,
+          "seconds": null,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 9,
+          "minutes": 36,
+          "months": null,
+          "seconds": 7,
+          "years": null,
+        },
+      ],
+    },
+    "mutationIntervalSet": Object {
+      "intervals": Array [
+        Object {
+          "days": null,
+          "hours": null,
+          "minutes": null,
+          "months": null,
+          "seconds": 12,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 3,
+          "minutes": null,
+          "months": null,
+          "seconds": null,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 9,
+          "minutes": 36,
+          "months": null,
+          "seconds": 7,
+          "years": null,
+        },
+      ],
+    },
+    "mutationTextArray": Object {
+      "strings": Array [
+        "str1",
+        "str2",
+        "str3",
+      ],
+    },
     "noArgsMutation": Object {
       "clientMutationId": "x",
       "integer": 2,

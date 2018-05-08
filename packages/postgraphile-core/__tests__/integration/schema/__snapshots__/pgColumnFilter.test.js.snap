@@ -164,6 +164,36 @@ strings and not numbers.
 \\"\\"\\"
 scalar BigInt
 
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
+\\"\\"\\"Awesome feature!\\"\\"\\"
+type CompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+\\"\\"\\"An input for mutations affecting \`CompoundType\`\\"\\"\\"
+input CompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
+}
+
 type Comptype {
   isOptimised: Boolean
   schedule: Datetime
@@ -1157,6 +1187,19 @@ type DeleteViewTablePayload {
   ): ViewTablesEdge
 }
 
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
+}
+
 type ForeignKey {
   compoundKey1: Int
   compoundKey2: Int
@@ -1285,6 +1328,60 @@ enum InputsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"
+An interval of time that has passed where the smallest distinct unit is a second.
+\\"\\"\\"
+type Interval {
+  \\"\\"\\"A quantity of days.\\"\\"\\"
+  days: Int
+
+  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  hours: Int
+
+  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  minutes: Int
+
+  \\"\\"\\"A quantity of months.\\"\\"\\"
+  months: Int
+
+  \\"\\"\\"
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  \\"\\"\\"
+  seconds: Float
+
+  \\"\\"\\"A quantity of years.\\"\\"\\"
+  years: Int
+}
+
+\\"\\"\\"
+An interval of time that has passed where the smallest distinct unit is a second.
+\\"\\"\\"
+input IntervalInput {
+  \\"\\"\\"A quantity of days.\\"\\"\\"
+  days: Int
+
+  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  hours: Int
+
+  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  minutes: Int
+
+  \\"\\"\\"A quantity of months.\\"\\"\\"
+  months: Int
+
+  \\"\\"\\"
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  \\"\\"\\"
+  seconds: Float
+
+  \\"\\"\\"A quantity of years.\\"\\"\\"
+  years: Int
 }
 
 \\"\\"\\"
@@ -1584,6 +1681,30 @@ type Mutation {
     \\"\\"\\"
     input: DeleteViewTableByIdInput!
   ): DeleteViewTablePayload
+  mutationCompoundTypeArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationCompoundTypeArrayInput!
+  ): MutationCompoundTypeArrayPayload
+  mutationIntervalArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationIntervalArrayInput!
+  ): MutationIntervalArrayPayload
+  mutationIntervalSet(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationIntervalSetInput!
+  ): MutationIntervalSetPayload
+  mutationTextArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationTextArrayInput!
+  ): MutationTextArrayPayload
   normalRand(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1788,6 +1909,103 @@ type Mutation {
   ): UpdateViewTablePayload
 }
 
+\\"\\"\\"All input for the \`mutationCompoundTypeArray\` mutation.\\"\\"\\"
+input MutationCompoundTypeArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+\\"\\"\\"The output of our \`mutationCompoundTypeArray\` mutation.\\"\\"\\"
+type MutationCompoundTypeArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationIntervalArray\` mutation.\\"\\"\\"
+input MutationIntervalArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationIntervalArray\` mutation.\\"\\"\\"
+type MutationIntervalArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  intervals: [Interval]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationIntervalSet\` mutation.\\"\\"\\"
+input MutationIntervalSetInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationIntervalSet\` mutation.\\"\\"\\"
+type MutationIntervalSetPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  intervals: [Interval]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationTextArray\` mutation.\\"\\"\\"
+input MutationTextArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationTextArray\` mutation.\\"\\"\\"
+type MutationTextArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  strings: [String]
+}
+
 \\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
 interface Node {
   \\"\\"\\"
@@ -1956,6 +2174,28 @@ type Post implements Node {
   authorId: Int
   body: String
   comptypes: [Comptype]
+  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  computedIntervalArray: [Interval]
+  computedIntervalSet(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): PostComputedIntervalSetConnection!
+  computedTextArray: [String]
   enums: [AnEnum]
   headlineTrimmed(length: Int, omission: String): String
   headlineTrimmedNoDefaults(length: Int, omission: String): String
@@ -1966,6 +2206,26 @@ type Post implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   nodeId: ID!
+}
+
+\\"\\"\\"A connection to a list of \`Interval\` values.\\"\\"\\"
+type PostComputedIntervalSetConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Interval\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PostComputedIntervalSetEdge!]!
+
+  \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
+  nodes: [Interval!]!
+}
+
+\\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
+type PostComputedIntervalSetEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Interval\` at the end of the edge.\\"\\"\\"
+  node: Interval
 }
 
 \\"\\"\\"
@@ -2622,6 +2882,28 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  queryIntervalArray: [Interval]
+  queryIntervalSet(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): QueryIntervalSetConnection!
+  queryTextArray: [String]
 
   \\"\\"\\"Reads a single \`Reserved\` using its globally unique \`ID\`.\\"\\"\\"
   reserved(
@@ -2693,6 +2975,26 @@ type Query implements Node {
     nodeId: ID!
   ): ViewTable
   viewTableById(id: Int!): ViewTable
+}
+
+\\"\\"\\"A connection to a list of \`Interval\` values.\\"\\"\\"
+type QueryIntervalSetConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Interval\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [QueryIntervalSetEdge!]!
+
+  \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
+  nodes: [Interval!]!
+}
+
+\\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
+type QueryIntervalSetEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Interval\` at the end of the edge.\\"\\"\\"
+  node: Interval
 }
 
 type Reserved implements Node {
@@ -3860,6 +4162,11 @@ type UpdateViewTablePayload {
     orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewTablesEdge
 }
+
+\\"\\"\\"
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+\\"\\"\\"
+scalar UUID
 
 type ViewTable implements Node {
   col1: Int

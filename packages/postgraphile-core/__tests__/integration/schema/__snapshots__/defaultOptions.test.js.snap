@@ -3530,6 +3530,30 @@ type Mutation {
     \\"\\"\\"
     input: Mult4Input!
   ): Mult4Payload
+  mutationCompoundTypeArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationCompoundTypeArrayInput!
+  ): MutationCompoundTypeArrayPayload
+  mutationIntervalArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationIntervalArrayInput!
+  ): MutationIntervalArrayPayload
+  mutationIntervalSet(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationIntervalSetInput!
+  ): MutationIntervalSetPayload
+  mutationTextArray(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationTextArrayInput!
+  ): MutationTextArrayPayload
   noArgsMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3874,6 +3898,103 @@ type Mutation {
     \\"\\"\\"
     input: UpdateViewTableByIdInput!
   ): UpdateViewTablePayload
+}
+
+\\"\\"\\"All input for the \`mutationCompoundTypeArray\` mutation.\\"\\"\\"
+input MutationCompoundTypeArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+\\"\\"\\"The output of our \`mutationCompoundTypeArray\` mutation.\\"\\"\\"
+type MutationCompoundTypeArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationIntervalArray\` mutation.\\"\\"\\"
+input MutationIntervalArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationIntervalArray\` mutation.\\"\\"\\"
+type MutationIntervalArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  intervals: [Interval]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationIntervalSet\` mutation.\\"\\"\\"
+input MutationIntervalSetInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationIntervalSet\` mutation.\\"\\"\\"
+type MutationIntervalSetPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  intervals: [Interval]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationTextArray\` mutation.\\"\\"\\"
+input MutationTextArrayInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationTextArray\` mutation.\\"\\"\\"
+type MutationTextArrayPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  strings: [String]
 }
 
 type MyTable implements Node {
@@ -4260,7 +4381,6 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
-  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean
@@ -4577,6 +4697,28 @@ type Post implements Node {
   authorId: Int
   body: String
   comptypes: [Comptype]
+  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  computedIntervalArray: [Interval]
+  computedIntervalSet(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): PostComputedIntervalSetConnection!
+  computedTextArray: [String]
   enums: [AnEnum]
   headline: String!
   headlineTrimmed(length: Int, omission: String): String
@@ -4591,6 +4733,26 @@ type Post implements Node {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`Post\`.\\"\\"\\"
   personByAuthorId: Person
+}
+
+\\"\\"\\"A connection to a list of \`Interval\` values.\\"\\"\\"
+type PostComputedIntervalSetConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Interval\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PostComputedIntervalSetEdge!]!
+
+  \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
+  nodes: [Interval]!
+}
+
+\\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
+type PostComputedIntervalSetEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Interval\` at the end of the edge.\\"\\"\\"
+  node: Interval
 }
 
 \\"\\"\\"
@@ -5602,6 +5764,28 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  queryIntervalArray: [Interval]
+  queryIntervalSet(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): QueryIntervalSetConnection!
+  queryTextArray: [String]
 
   \\"\\"\\"Reads a single \`Reserved\` using its globally unique \`ID\`.\\"\\"\\"
   reserved(
@@ -5703,6 +5887,26 @@ type Query implements Node {
     nodeId: ID!
   ): ViewTable
   viewTableById(id: Int!): ViewTable
+}
+
+\\"\\"\\"A connection to a list of \`Interval\` values.\\"\\"\\"
+type QueryIntervalSetConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Interval\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [QueryIntervalSetEdge!]!
+
+  \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
+  nodes: [Interval]!
+}
+
+\\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
+type QueryIntervalSetEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Interval\` at the end of the edge.\\"\\"\\"
+  node: Interval
 }
 
 type Reserved implements Node {
