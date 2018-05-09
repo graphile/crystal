@@ -404,6 +404,26 @@ create table c.my_table (
   json_data jsonb
 );
 
+
+-- https://github.com/graphile/postgraphile/issues/756
+create domain c.not_null_timestamp timestamptz not null default '1999-06-11T00:00:00Z';
+create table c.issue756 (
+  id serial primary key,
+  ts c.not_null_timestamp
+);
+create function c.issue756_mutation() returns c.issue756 as $$
+begin
+  return null;
+end;
+$$ language plpgsql volatile;
+create function c.issue756_set_mutation() returns setof c.issue756 as $$
+begin
+  return query insert into c.issue756 default values returning *;
+  return next null;
+  return query insert into c.issue756 default values returning *;
+end;
+$$ language plpgsql volatile;
+
 -- Begin tests for smart comments
 
 -- Rename table and columns

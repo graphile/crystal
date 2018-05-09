@@ -122,6 +122,9 @@ export default (function PgTypesPlugin(
       if (val == null) {
         return val;
       }
+      if (val.__isNull) {
+        return null;
+      }
       if (pg2GqlMapper[type.id]) {
         return pg2GqlMapper[type.id].map(val);
       } else if (type.domainBaseType) {

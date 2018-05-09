@@ -35,6 +35,8 @@ mutation {
     post: {id: 15, headline: "headline_", body: "body"},
     suffix: "test"
   }) { post { id headline } }
+  issue756Mutation(input:{}) { issue756 { id ts } }
+  issue756SetMutation(input:{}) { issue756S { id ts } }
 
   mutationCompoundTypeArray(input: {object: {a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5}, fooBar: 8}}) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
   mutationTextArray(input: {}) { strings }

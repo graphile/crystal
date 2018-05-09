@@ -814,6 +814,41 @@ type CreateInputPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`Issue756\` mutation.\\"\\"\\"
+input CreateIssue756Input {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Issue756\` to be created by this mutation.\\"\\"\\"
+  issue756: Issue756Input!
+}
+
+\\"\\"\\"The output of our create \`Issue756\` mutation.\\"\\"\\"
+type CreateIssue756Payload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Issue756\` that was created by this mutation.\\"\\"\\"
+  issue756: Issue756
+
+  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
+  issue756Edge(
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`LeftArm\` mutation.\\"\\"\\"
 input CreateLeftArmInput {
   \\"\\"\\"
@@ -1619,6 +1654,54 @@ type DeleteInputPayload {
     \\"\\"\\"The method to use when ordering \`Input\`.\\"\\"\\"
     orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
   ): InputsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteIssue756ById\` mutation.\\"\\"\\"
+input DeleteIssue756ByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteIssue756\` mutation.\\"\\"\\"
+input DeleteIssue756Input {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Issue756\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Issue756\` mutation.\\"\\"\\"
+type DeleteIssue756Payload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedIssue756Id: ID
+
+  \\"\\"\\"The \`Issue756\` that was deleted by this mutation.\\"\\"\\"
+  issue756: Issue756
+
+  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
+  issue756Edge(
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2646,6 +2729,139 @@ type IntSetQueryEdge {
   node: Int
 }
 
+type Issue756 implements Node {
+  id: Int!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  ts: NotNullTimestamp!
+}
+
+\\"\\"\\"
+A condition to be used against \`Issue756\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input Issue756Condition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`ts\` field.\\"\\"\\"
+  ts: NotNullTimestamp
+}
+
+\\"\\"\\"An input for mutations affecting \`Issue756\`\\"\\"\\"
+input Issue756Input {
+  id: Int
+  ts: NotNullTimestamp!
+}
+
+\\"\\"\\"All input for the \`issue756Mutation\` mutation.\\"\\"\\"
+input Issue756MutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`issue756Mutation\` mutation.\\"\\"\\"
+type Issue756MutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  issue756: Issue756
+
+  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
+  issue756Edge(
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"
+Represents an update to a \`Issue756\`. Fields that are set will be updated.
+\\"\\"\\"
+input Issue756Patch {
+  id: Int
+  ts: NotNullTimestamp
+}
+
+\\"\\"\\"A connection to a list of \`Issue756\` values.\\"\\"\\"
+type Issue756SConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Issue756\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [Issue756SEdge!]!
+
+  \\"\\"\\"A list of \`Issue756\` objects.\\"\\"\\"
+  nodes: [Issue756]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Issue756\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`Issue756\` edge in the connection.\\"\\"\\"
+type Issue756SEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Issue756\` at the end of the edge.\\"\\"\\"
+  node: Issue756
+}
+
+\\"\\"\\"All input for the \`issue756SetMutation\` mutation.\\"\\"\\"
+input Issue756SetMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`issue756SetMutation\` mutation.\\"\\"\\"
+type Issue756SetMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
+  issue756Edge(
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+  issue756S: [Issue756]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"Methods to use when ordering \`Issue756\`.\\"\\"\\"
+enum Issue756SOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TS_ASC
+  TS_DESC
+}
+
 \\"\\"\\"
 A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 \\"\\"\\"
@@ -3079,6 +3295,14 @@ type Mutation {
     input: CreateInputInput!
   ): CreateInputPayload
 
+  \\"\\"\\"Creates a single \`Issue756\`.\\"\\"\\"
+  createIssue756(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateIssue756Input!
+  ): CreateIssue756Payload
+
   \\"\\"\\"Creates a single \`LeftArm\`.\\"\\"\\"
   createLeftArm(
     \\"\\"\\"
@@ -3246,6 +3470,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteInputByIdInput!
   ): DeleteInputPayload
+
+  \\"\\"\\"Deletes a single \`Issue756\` using its globally unique id.\\"\\"\\"
+  deleteIssue756(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteIssue756Input!
+  ): DeleteIssue756Payload
+
+  \\"\\"\\"Deletes a single \`Issue756\` using a unique key.\\"\\"\\"
+  deleteIssue756ById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteIssue756ByIdInput!
+  ): DeleteIssue756Payload
 
   \\"\\"\\"Deletes a single \`LeftArm\` using its globally unique id.\\"\\"\\"
   deleteLeftArm(
@@ -3482,6 +3722,20 @@ type Mutation {
     \\"\\"\\"
     input: IntSetMutationInput!
   ): IntSetMutationPayload
+  issue756Mutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: Issue756MutationInput!
+  ): Issue756MutationPayload
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Issue756\`.\\"\\"\\"
+  issue756SetMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: Issue756SetMutationInput!
+  ): Issue756SetMutationPayload
   jsonIdentityMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3658,6 +3912,22 @@ type Mutation {
     \\"\\"\\"
     input: UpdateInputByIdInput!
   ): UpdateInputPayload
+
+  \\"\\"\\"Updates a single \`Issue756\` using its globally unique id and a patch.\\"\\"\\"
+  updateIssue756(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateIssue756Input!
+  ): UpdateIssue756Payload
+
+  \\"\\"\\"Updates a single \`Issue756\` using a unique key and a patch.\\"\\"\\"
+  updateIssue756ById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateIssue756ByIdInput!
+  ): UpdateIssue756Payload
 
   \\"\\"\\"Updates a single \`LeftArm\` using its globally unique id and a patch.\\"\\"\\"
   updateLeftArm(
@@ -4189,6 +4459,8 @@ type NormalRandPayload {
   \\"\\"\\"
   query: Query
 }
+
+scalar NotNullTimestamp
 
 scalar NotNullUrl
 
@@ -5073,6 +5345,35 @@ type Query implements Node {
     orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
   ): InputsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`Issue756\`.\\"\\"\\"
+  allIssue756S(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: Issue756Condition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`LeftArm\`.\\"\\"\\"
   allLeftArms(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -5693,6 +5994,13 @@ type Query implements Node {
     y: Int
     z: Int
   ): IntSetQueryConnection!
+
+  \\"\\"\\"Reads a single \`Issue756\` using its globally unique \`ID\`.\\"\\"\\"
+  issue756(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Issue756\`.\\"\\"\\"
+    nodeId: ID!
+  ): Issue756
+  issue756ById(id: Int!): Issue756
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
 
@@ -7160,6 +7468,63 @@ type UpdateInputPayload {
     \\"\\"\\"The method to use when ordering \`Input\`.\\"\\"\\"
     orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]
   ): InputsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateIssue756ById\` mutation.\\"\\"\\"
+input UpdateIssue756ByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Issue756\` being updated.
+  \\"\\"\\"
+  issue756Patch: Issue756Patch!
+}
+
+\\"\\"\\"All input for the \`updateIssue756\` mutation.\\"\\"\\"
+input UpdateIssue756Input {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Issue756\` being updated.
+  \\"\\"\\"
+  issue756Patch: Issue756Patch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Issue756\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`Issue756\` mutation.\\"\\"\\"
+type UpdateIssue756Payload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Issue756\` that was updated by this mutation.\\"\\"\\"
+  issue756: Issue756
+
+  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
+  issue756Edge(
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

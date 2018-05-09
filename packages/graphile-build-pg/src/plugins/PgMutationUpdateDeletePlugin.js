@@ -142,14 +142,14 @@ export default (async function PgMutationUpdateDeletePlugin(
                   let row;
                   try {
                     await pgClient.query("SAVEPOINT graphql_mutation");
-                    const result = await viaTemporaryTable(
+                    const rows = await viaTemporaryTable(
                       pgClient,
                       sqlTypeIdentifier,
                       sqlMutationQuery,
                       modifiedRowAlias,
                       query
                     );
-                    row = result.rows[0];
+                    row = rows[0];
                     await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
                   } catch (e) {
                     await pgClient.query(

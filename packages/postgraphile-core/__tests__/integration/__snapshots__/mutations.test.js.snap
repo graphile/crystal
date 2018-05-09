@@ -881,16 +881,7 @@ Object {
             "seconds": null,
           },
         },
-        Object {
-          "a": null,
-          "b": null,
-          "c": null,
-          "d": null,
-          "e": null,
-          "f": null,
-          "fooBar": null,
-          "g": null,
-        },
+        null,
         Object {
           "a": 420,
           "b": "easy cheesy baked potatoes",
@@ -972,6 +963,22 @@ Object {
         6,
       ],
     },
+    "issue756Mutation": Object {
+      "issue756": null,
+    },
+    "issue756SetMutation": Object {
+      "issue756S": Array [
+        Object {
+          "id": 1,
+          "ts": "1999-06-10T20:00:00-04:00",
+        },
+        null,
+        Object {
+          "id": 2,
+          "ts": "1999-06-10T20:00:00-04:00",
+        },
+      ],
+    },
     "jsonIdentityMutation": Object {
       "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     },
@@ -1021,16 +1028,7 @@ Object {
             "seconds": null,
           },
         },
-        Object {
-          "a": null,
-          "b": null,
-          "c": null,
-          "d": null,
-          "e": null,
-          "f": null,
-          "fooBar": null,
-          "g": null,
-        },
+        null,
         Object {
           "a": 420,
           "b": "easy cheesy baked potatoes",

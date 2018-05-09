@@ -181,14 +181,14 @@ export default (function PgMutationCreatePlugin(
                     let row;
                     try {
                       await pgClient.query("SAVEPOINT graphql_mutation");
-                      const result = await viaTemporaryTable(
+                      const rows = await viaTemporaryTable(
                         pgClient,
                         sql.identifier(table.namespace.name, table.name),
                         mutationQuery,
                         insertedRowAlias,
                         query
                       );
-                      row = result.rows[0];
+                      row = rows[0];
                       await pgClient.query(
                         "RELEASE SAVEPOINT graphql_mutation"
                       );

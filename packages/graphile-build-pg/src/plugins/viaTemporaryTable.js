@@ -54,13 +54,14 @@ export default async function viaTemporaryTable(
 
   if (!sqlTypeIdentifier) {
     // It returns void, just perform the query!
-    return await performQuery(
+    const { rows } = await performQuery(
       pgClient,
       sql.query`
       with ${sqlResultSourceAlias} as (
         ${sqlMutationQuery}
       ) ${sqlResultQuery}`
     );
+    return rows;
   } else {
     /*
      * In this code we're converting the rows to a string representation within
@@ -74,7 +75,14 @@ export default async function viaTemporaryTable(
      * there are a log of potential pitfalls!
      */
     const selectionField = isPgClassLike
-      ? sqlResultSourceAlias
+      ? /*
+         * This `when foo is null then null` check might *seem* redundant, but it
+         * is not - e.g. the compound type `(,,,,,,,)::my_type` and
+         * `null::my_type` differ; however the former also returns true to `foo
+         * is null`. We use this check to coalesce both into the canonical `null`
+         * representation to make it easier to deal with below.
+         */
+        sql.query`(case when ${sqlResultSourceAlias} is null then null else ${sqlResultSourceAlias} end)`
       : sql.query`(${sqlResultSourceAlias}.${sqlResultSourceAlias})::${sqlTypeIdentifier}`;
     const result = await performQuery(
       pgClient,
@@ -85,23 +93,39 @@ export default async function viaTemporaryTable(
       select (${selectionField})::text from ${sqlResultSourceAlias}`
     );
     const { rows } = result;
-    const firstRow = rows[0];
+    const firstNonNullRow = rows.find(row => row !== null);
     // TODO: we should be able to have `pg` not interpret the results as
     // objects and instead just return them as arrays - then we can just do
     // `row[0]`. PR welcome!
-    const firstKey = firstRow && Object.keys(firstRow)[0];
-    const values = rows.map(row => row[firstKey]);
+    const firstKey = firstNonNullRow && Object.keys(firstNonNullRow)[0];
+    const rawValues = rows.map(row => row && row[firstKey]);
+    const values = rawValues.filter(rawValue => rawValue !== null);
     const convertFieldBack = isPgClassLike
       ? sql.query`(str::${sqlTypeIdentifier}).*`
       : sql.query`str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}`;
-    return await performQuery(
-      pgClient,
-      sql.query`
-      with ${sqlResultSourceAlias} as (
-        select ${convertFieldBack}
-        from unnest((${sql.value(values)})::text[]) str
-      )
-      ${sqlResultQuery}`
+    const { rows: filteredValuesResults } =
+      values.length > 0
+        ? await performQuery(
+            pgClient,
+            sql.query`\
+              with ${sqlResultSourceAlias} as (
+                select ${convertFieldBack}
+                from unnest((${sql.value(values)})::text[]) str
+              )
+              ${sqlResultQuery}
+              `
+          )
+        : { rows: [] };
+    const finalRows = rawValues.map(
+      rawValue =>
+        /*
+         * We can't simply return 'null' here because this is expected to have
+         * come from PG, and that would never return 'null' for a row - only
+         * the fields within said row. Using `__isNull` here is a simple
+         * workaround to this, that's caught by `pg2gql`.
+         */
+        rawValue === null ? { __isNull: true } : filteredValuesResults.shift()
     );
+    return finalRows;
   }
 }
