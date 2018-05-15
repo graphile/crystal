@@ -10,8 +10,11 @@ const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgAllRows(
   builder,
-  { pgViewUniqueKey: viewUniqueKey }
+  { pgViewUniqueKey: viewUniqueKey, pgSimpleCollections }
 ) {
+  const hasConnections = pgSimpleCollections !== "only";
+  const hasSimpleCollections =
+    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -24,6 +27,7 @@ export default (async function PgAllRows(
         pgSql: sql,
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         inflection,
+        graphql: { GraphQLList, GraphQLNonNull },
       },
       { fieldWithHooks, scope: { isRootQuery } }
     ) => {
@@ -73,14 +77,20 @@ export default (async function PgAllRows(
             }
             const schema = table.namespace;
             const sqlFullTableName = sql.identifier(schema.name, table.name);
-            if (TableType && ConnectionType) {
-              const fieldName = inflection.allRows(table);
+            function makeField(isConnection) {
+              const fieldName = isConnection
+                ? inflection.allRows(table)
+                : inflection.allRowsSimple(table);
               memo[fieldName] = fieldWithHooks(
                 fieldName,
                 ({ getDataFromParsedResolveInfoFragment }) => {
                   return {
-                    description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
-                    type: ConnectionType,
+                    description: isConnection
+                      ? `Reads and enables pagination through a set of \`${tableTypeName}\`.`
+                      : `Reads a set of \`${tableTypeName}\`.`,
+                    type: isConnection
+                      ? ConnectionType
+                      : new GraphQLList(new GraphQLNonNull(TableType)),
                     args: {},
                     async resolve(parent, args, { pgClient }, resolveInfo) {
                       const parsedResolveInfoFragment = parseResolveInfo(
@@ -95,7 +105,7 @@ export default (async function PgAllRows(
                         undefined,
                         resolveData,
                         {
-                          withPaginationAsFields: true,
+                          withPaginationAsFields: isConnection,
                         },
                         builder => {
                           if (primaryKeys) {
@@ -134,19 +144,28 @@ export default (async function PgAllRows(
                       );
                       const { text, values } = sql.compile(query);
                       if (debugSql.enabled) debugSql(text);
-                      const { rows: [row] } = await pgClient.query(
-                        text,
-                        values
-                      );
-                      return addStartEndCursor(row);
+                      const result = await pgClient.query(text, values);
+                      if (isConnection) {
+                        const { rows: [row] } = result;
+                        return addStartEndCursor(row);
+                      } else {
+                        return result.rows;
+                      }
                     },
                   };
                 },
                 {
-                  isPgFieldConnection: true,
+                  isPgFieldConnection: isConnection,
+                  isPgFieldSimpleCollection: !isConnection,
                   pgFieldIntrospection: table,
                 }
               );
+            }
+            if (TableType && ConnectionType && hasConnections) {
+              makeField(true);
+            }
+            if (TableType && hasSimpleCollections) {
+              makeField(false);
             }
             return memo;
           }, {}),
