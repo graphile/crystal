@@ -439,7 +439,7 @@ export default function makeProcField(
                 if (proc.returnsSet && !isMutation) {
                   return addStartEndCursor({
                     ...value,
-                    data: value.data.map(scalarAwarePg2gql),
+                    data: value.data ? value.data.map(scalarAwarePg2gql) : null,
                   });
                 } else if (proc.returnsSet || rawReturnType.isPgArray) {
                   return value.map(v => pg2gql(v, returnType));
@@ -528,7 +528,7 @@ export default function makeProcField(
                     // Connection
                     return addStartEndCursor({
                       ...row,
-                      data: row.data.map(scalarAwarePg2gql),
+                      data: row.data ? row.data.map(scalarAwarePg2gql) : null,
                     });
                   } else if (proc.returnsSet || rawReturnType.isPgArray) {
                     return rows.map(row => pg2gql(row, returnType));
