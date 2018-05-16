@@ -2,6 +2,23 @@
 import type { Plugin } from "graphile-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
+const hasNonNullKey = row => {
+  if (
+    Array.isArray(row.__identifiers) &&
+    row.__identifiers.every(i => i != null)
+  ) {
+    return true;
+  }
+  for (const k in row) {
+    if (row.hasOwnProperty(k)) {
+      if ((k[0] !== "_" || k[1] !== "_") && row[k] !== null) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 export default (function PgTablesPlugin(
   builder,
   { pgForbidSetofFunctionsToReturnNull = false }
@@ -9,13 +26,7 @@ export default (function PgTablesPlugin(
   const handleNullRow = pgForbidSetofFunctionsToReturnNull
     ? row => row
     : row => {
-        if (
-          Object.keys(row)
-            .filter(str => !str.startsWith("__"))
-            .some(key => row[key] !== null) ||
-          (Array.isArray(row.__identifiers) &&
-            row.__identifiers.every(i => i != null))
-        ) {
+        if (hasNonNullKey(row)) {
           return row;
         } else {
           return null;

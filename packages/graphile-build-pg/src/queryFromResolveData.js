@@ -5,6 +5,8 @@ import type { SQL } from "pg-sql2";
 import type { DataForType } from "graphile-build";
 import isSafeInteger from "lodash/isSafeInteger";
 
+const identity = _ => _ !== null && _ !== undefined;
+
 export default (
   from: SQL,
   fromAlias: ?SQL,
@@ -34,7 +36,7 @@ export default (
     (calculateHasPreviousPage && calculateHasPreviousPage.length > 0) ||
     false;
   const rawCursorPrefix =
-    reallyRawCursorPrefix && reallyRawCursorPrefix.filter(_ => _);
+    reallyRawCursorPrefix && reallyRawCursorPrefix.filter(identity);
 
   const queryBuilder = new QueryBuilder();
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
