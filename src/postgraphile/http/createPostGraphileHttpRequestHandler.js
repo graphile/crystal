@@ -186,6 +186,9 @@ export default function createPostGraphileHttpRequestHandler(options) {
     return formattedError
   }
 
+  const DEFAULT_HANDLE_ERRORS = errors => errors.map(formatError)
+  const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS
+
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
   // not call `next`). Middlewares that handle a request like favicon
@@ -495,7 +498,6 @@ export default function createPostGraphileHttpRequestHandler(options) {
         paramsList = [paramsList]
       }
       paramsList = pluginHook('postgraphile:httpParamsList', paramsList, { options, req, res, returnArray, httpError })
-      const handleErrors = options.handleErrors || (errors => errors.map(formatError))
       results = await Promise.all(paramsList.map(async (params) => {
         let queryDocumentAst
         let result
