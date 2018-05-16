@@ -57,14 +57,19 @@ export default (function PgConnectionArgOrderBy(builder) {
         inflection,
       },
       {
-        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        scope: {
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgFieldIntrospection: table,
+        },
         addArgDataGenerator,
         Self,
         field,
       }
     ) => {
+      const shouldAddOrderBy = isPgFieldConnection || isPgFieldSimpleCollection;
       if (
-        !isPgFieldConnection ||
+        !shouldAddOrderBy ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
