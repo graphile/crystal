@@ -14,8 +14,11 @@ const ONLY = 2;
 
 export default (function PgBackwardRelationPlugin(
   builder,
-  { pgLegacyRelations }
+  { pgLegacyRelations, pgSimpleCollections }
 ) {
+  const hasConnections = pgSimpleCollections !== "only";
+  const hasSimpleCollections =
+    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   const legacyRelationMode =
     {
       only: ONLY,
@@ -322,8 +325,12 @@ export default (function PgBackwardRelationPlugin(
               );
             }
           }
-          makeFields(true);
-          makeFields(false);
+          if (hasConnections) {
+            makeFields(true);
+          }
+          if (hasSimpleCollections) {
+            makeFields(false);
+          }
           return memo;
         }, {}),
         `Adding backward relations for ${Self.name}`
