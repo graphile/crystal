@@ -497,7 +497,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     // a result. We also keep track of `params`.
     let paramsList
     let results
-    const queryTimeStart = process.hrtime()
+    const queryTimeStart = !options.disableQueryLog && process.hrtime()
     let pgRole
 
     if (debugRequest.enabled) debugRequest('GraphQL query request has begun.')
