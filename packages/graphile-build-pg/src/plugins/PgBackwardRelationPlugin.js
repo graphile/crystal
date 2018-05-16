@@ -237,7 +237,7 @@ export default (function PgBackwardRelationPlugin(
                         queryBuilder.select(() => {
                           const resolveData = getDataFromParsedResolveInfoFragment(
                             parsedResolveInfoFragment,
-                            ConnectionType
+                            isConnection ? ConnectionType : TableType
                           );
                           const tableAlias = sql.identifier(Symbol());
                           const foreignTableAlias = queryBuilder.getTableAlias();
@@ -248,6 +248,7 @@ export default (function PgBackwardRelationPlugin(
                             {
                               withPagination: isConnection,
                               withPaginationAsFields: false,
+                              asJsonAggregate: !isConnection,
                             },
                             innerQueryBuilder => {
                               if (primaryKeys) {
