@@ -1820,6 +1820,23 @@ type Person implements Node {
   ): CompoundKeysConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`CompoundKey\`.\\"\\"\\"
+  compoundKeysByPersonId1Simple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: CompoundKeyCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
+    orderBy: [CompoundKeysOrderBy!]
+  ): [CompoundKey!]!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`CompoundKey\`.\\"\\"\\"
   compoundKeysByPersonId2(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -1847,6 +1864,23 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`CompoundKey\`.\\"\\"\\"
+  compoundKeysByPersonId2Simple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: CompoundKeyCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
+    orderBy: [CompoundKeysOrderBy!]
+  ): [CompoundKey!]!
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean
@@ -2131,6 +2165,23 @@ type Query implements Node {
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection
 
+  \\"\\"\\"Reads a set of \`CompoundKey\`.\\"\\"\\"
+  allCompoundKeysSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: CompoundKeyCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
+    orderBy: [CompoundKeysOrderBy!]
+  ): [CompoundKey!]
+
   \\"\\"\\"Reads and enables pagination through a set of \`EdgeCase\`.\\"\\"\\"
   allEdgeCases(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2159,6 +2210,23 @@ type Query implements Node {
     \\"\\"\\"The method to use when ordering \`EdgeCase\`.\\"\\"\\"
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
+
+  \\"\\"\\"Reads a set of \`EdgeCase\`.\\"\\"\\"
+  allEdgeCasesSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: EdgeCaseCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`EdgeCase\`.\\"\\"\\"
+    orderBy: [EdgeCasesOrderBy!]
+  ): [EdgeCase!]
 
   \\"\\"\\"Reads and enables pagination through a set of \`Issue756\`.\\"\\"\\"
   allIssue756S(
@@ -2189,6 +2257,23 @@ type Query implements Node {
     orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
   ): Issue756SConnection
 
+  \\"\\"\\"Reads a set of \`Issue756\`.\\"\\"\\"
+  allIssue756SSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: Issue756Condition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
+    orderBy: [Issue756SOrderBy!]
+  ): [Issue756!]
+
   \\"\\"\\"Reads and enables pagination through a set of \`LeftArm\`.\\"\\"\\"
   allLeftArms(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2217,6 +2302,23 @@ type Query implements Node {
     \\"\\"\\"The method to use when ordering \`LeftArm\`.\\"\\"\\"
     orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LeftArmsConnection
+
+  \\"\\"\\"Reads a set of \`LeftArm\`.\\"\\"\\"
+  allLeftArmsSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: LeftArmCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`LeftArm\`.\\"\\"\\"
+    orderBy: [LeftArmsOrderBy!]
+  ): [LeftArm!]
 
   \\"\\"\\"Reads and enables pagination through a set of \`MyTable\`.\\"\\"\\"
   allMyTables(
@@ -2247,6 +2349,23 @@ type Query implements Node {
     orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): MyTablesConnection
 
+  \\"\\"\\"Reads a set of \`MyTable\`.\\"\\"\\"
+  allMyTablesSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MyTableCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MyTable\`.\\"\\"\\"
+    orderBy: [MyTablesOrderBy!]
+  ): [MyTable!]
+
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   allPeople(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2276,6 +2395,23 @@ type Query implements Node {
     orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
+  \\"\\"\\"Reads a set of \`Person\`.\\"\\"\\"
+  allPeopleSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
+  ): [Person!]
+
   \\"\\"\\"Reads and enables pagination through a set of \`PersonSecret\`.\\"\\"\\"
   allPersonSecrets(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2304,6 +2440,23 @@ type Query implements Node {
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection
+
+  \\"\\"\\"Reads a set of \`PersonSecret\`.\\"\\"\\"
+  allPersonSecretsSimple(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonSecretCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
+    orderBy: [PersonSecretsOrderBy!]
+  ): [PersonSecret!]
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   badlyBehavedFunction(
