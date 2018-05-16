@@ -200,6 +200,31 @@ export default function createPostGraphileHttpRequestHandler(options) {
     bodyParser.text({ type: 'application/graphql' }),
   ]
 
+  // We'll turn this into one function now so it can be better JIT optimised
+  const bodyParserMiddlewaresComposed = bodyParserMiddlewares.reduce(
+    (parent, fn) => {
+      return (req, res, next) => {
+        parent(req, res, error => {
+          if (error) {
+            return next(error)
+          }
+          fn(req, res, next)
+        })
+      }
+    }
+  )
+
+  // And we really want that function to be await-able
+  const parseBody = (req, res) => new Promise((resolve, reject) => {
+    bodyParserMiddlewaresComposed(req, res, error => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    })
+  })
+
   // Takes the original GraphiQL HTML file and replaces the default config object.
   const graphiqlHtml = origGraphiqlHtml.then(html =>
     html.replace(
@@ -423,30 +448,13 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // It should never really change unless we are in watch mode.
       const gqlSchema = await getGqlSchema()
 
-      // Run all of our middleware by converting them into promises and
-      // chaining them together. Remember that if we have a middleware that
-      // never calls `next`, we will have a promise that never resolves! Avoid
-      // those middlewares.
-      //
-      // Note that we also run our middleware after we make sure we are on the
+      // Note that we run our middleware after we make sure we are on the
       // correct route. This is so that if our middleware modifies the `req` or
       // `res` objects, only we downstream will see the modifications.
       //
       // We also run our middleware inside the `try` so that we get the GraphQL
       // error reporting style for syntax errors.
-      await bodyParserMiddlewares.reduce(
-        (promise, middleware) =>
-          promise.then(
-            () =>
-              new Promise((resolve, reject) => {
-                middleware(req, res, error => {
-                  if (error) reject(error)
-                  else resolve()
-                })
-              }),
-          ),
-        Promise.resolve(),
-      )
+      await parseBody(req, res)
 
       // If this is not one of the correct methods, throw an error.
       if (req.method !== 'POST') {
