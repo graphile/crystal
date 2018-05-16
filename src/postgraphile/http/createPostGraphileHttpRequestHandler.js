@@ -230,11 +230,13 @@ export default function createPostGraphileHttpRequestHandler(options) {
       addCORSHeaders(res)
 
     const { pathname } = parseUrl(req)
+    const isGraphqlRoute = pathname === graphqlRoute
+
     // ========================================================================
     // Serve GraphiQL and Related Assets
     // ========================================================================
 
-    if (options.graphiql) {
+    if (options.graphiql && !isGraphqlRoute) {
       // ======================================================================
       // Favicon
       // ======================================================================
@@ -381,7 +383,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     }
 
     // Don’t handle any requests if this is not the correct route.
-    if (pathname !== graphqlRoute) return next()
+    if (!isGraphqlRoute) return next()
 
     // ========================================================================
     // Execute GraphQL Queries
