@@ -269,21 +269,6 @@ export default (function PgBasicsPlugin(
               .join("-and-")}`
           );
         },
-        singleRelationByKeysSimple(
-          detailedKeys: Keys,
-          table: PgClass,
-          _foreignTable: PgClass,
-          constraint: PgConstraint
-        ) {
-          if (constraint.tags.fieldName) {
-            return constraint.tags.fieldName;
-          }
-          return this.camelCase(
-            `${this._singularizedTableName(table)}-by-${detailedKeys
-              .map(key => this.column(key))
-              .join("-and-")}-simple`
-          );
-        },
         manyRelationByKeys(
           detailedKeys: Keys,
           table: PgClass,
@@ -311,7 +296,9 @@ export default (function PgBasicsPlugin(
           return this.camelCase(
             `${this.pluralize(
               this._singularizedTableName(table)
-            )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-simple`
+            )}-by-${detailedKeys
+              .map(key => this.column(key))
+              .join("-and-")}-simple`
           );
         },
         rowByUniqueKeys(
