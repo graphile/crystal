@@ -203,14 +203,14 @@ async function setupPgClientTransaction({
 
   // Instantiate a map of local settings. This map will be transformed into a
   // Sql query.
-  const localSettings = new Map<string, mixed>()
+  const localSettings: Array<[string, string]> = []
 
   // Set the custom provided settings before jwt claims and role are set
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
     for (const key in pgSettings) {
       if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
-        localSettings.set(key, String(pgSettings[key]))
+        localSettings.push([key, String(pgSettings[key])])
       }
     }
   }
@@ -218,19 +218,21 @@ async function setupPgClientTransaction({
   // If there is a rule, we want to set the root `role` setting locally
   // to be our role. The role may only be null if we have no default role.
   if (typeof role === 'string') {
-    localSettings.set('role', role)
+    localSettings.push(['role', role])
   }
 
   // If we have some JWT claims, we want to set those claims as local
   // settings with the namespace `jwt.claims`.
-  for (const key of Object.keys(jwtClaims)) {
-    localSettings.set(`jwt.claims.${key}`, jwtClaims[key])
+  for (const key in jwtClaims) {
+    if (jwtClaims.hasOwnProperty(key) && isPgSettingValid(jwtClaims[key])) {
+      localSettings.push([`jwt.claims.${key}`, String(jwtClaims[key])])
+    }
   }
 
   // If there is at least one local setting.
-  if (localSettings.size !== 0) {
+  if (localSettings.length !== 0) {
     // Actually create our query.
-    const query = sql.compile(sql.query`select ${sql.join(Array.from(localSettings).map(([key, value]) =>
+    const query = sql.compile(sql.query`select ${sql.join(localSettings.map(([key, value]) =>
       // Make sure that the third config is always `true` so that we are only
       // ever setting variables on the transaction.
       sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
