@@ -127,6 +127,7 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
   .option('--enable-query-batching', '[experimental] enable the server to process multiple GraphQL queries in one request')
+  .option('--disable-query-log', 'disable logging queries to console')
 
 pluginHook('cli:flags:add:webserver', addFlag)
 
@@ -232,6 +233,7 @@ const {
   enableQueryBatching,
   setofFunctionsContainNulls = true,
   legacyJsonUuid,
+  disableQueryLog,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -340,7 +342,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   watchPg,
   showErrorStack,
   extendedErrors,
-  disableQueryLog: false,
+  disableQueryLog,
   enableCors,
   exportJsonSchemaPath,
   exportGqlSchemaPath,
