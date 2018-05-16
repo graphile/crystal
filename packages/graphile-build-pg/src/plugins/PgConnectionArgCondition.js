@@ -68,13 +68,19 @@ export default (function PgConnectionArgCondition(builder) {
         inflection,
       } = build;
       const {
-        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        scope: {
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgFieldIntrospection: table,
+        },
         addArgDataGenerator,
         Self,
         field,
       } = context;
+      const shouldAddCondition =
+        isPgFieldConnection || isPgFieldSimpleCollection;
       if (
-        !isPgFieldConnection ||
+        !shouldAddCondition ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
