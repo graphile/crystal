@@ -229,6 +229,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     if (options.enableCors || POSTGRAPHILE_ENV === 'development')
       addCORSHeaders(res)
 
+    const parsedUrl = parseUrl(req)
     // ========================================================================
     // Serve GraphiQL and Related Assets
     // ========================================================================
@@ -240,7 +241,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
-      if (parseUrl(req).pathname === '/favicon.ico') {
+      if (parsedUrl.pathname === '/favicon.ico') {
         // If this is the wrong method, we should let the client know.
         if (!(req.method === 'GET' || req.method === 'HEAD')) {
           res.statusCode = req.method === 'OPTIONS' ? 200 : 405
@@ -270,7 +271,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // Serve the assets for GraphiQL on a namespaced path. This will basically
       // serve up the built GraphiQL directory.
-      if (parseUrl(req).pathname.startsWith('/_postgraphile/graphiql/')) {
+      if (parsedUrl.pathname.startsWith('/_postgraphile/graphiql/')) {
         // If using the incorrect method, let the user know.
         if (!(req.method === 'GET' || req.method === 'HEAD')) {
           res.statusCode = req.method === 'OPTIONS' ? 200 : 405
@@ -284,7 +285,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
         const assetPath = resolvePath(
           joinPath(
             graphiqlDirectory,
-            parseUrl(req).pathname.slice('/_postgraphile/graphiql/'.length),
+            parsedUrl.pathname.slice('/_postgraphile/graphiql/'.length),
           ),
         )
 
@@ -333,7 +334,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (parseUrl(req).pathname === '/_postgraphile/stream') {
+      if (parsedUrl.pathname === '/_postgraphile/stream') {
         if (!options.watchPg || req.headers.accept !== 'text/event-stream') {
           res.statusCode = 405
           res.end()
@@ -348,7 +349,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // ======================================================================
 
       // If this is the GraphiQL route, show GraphiQL and stop execution.
-      if (parseUrl(req).pathname === graphiqlRoute) {
+      if (parsedUrl.pathname === graphiqlRoute) {
         // If we are developing PostGraphile, instead just redirect.
         if (POSTGRAPHILE_ENV === 'development') {
           res.writeHead(302, { Location: 'http://localhost:5783' })
@@ -380,7 +381,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     }
 
     // Don’t handle any requests if this is not the correct route.
-    if (parseUrl(req).pathname !== graphqlRoute) return next()
+    if (parsedUrl.pathname !== graphqlRoute) return next()
 
     // ========================================================================
     // Execute GraphQL Queries
