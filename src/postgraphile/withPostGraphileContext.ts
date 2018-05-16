@@ -48,7 +48,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   const pgClient = await pgPool.connect()
 
   // Enhance our Postgres client with debugging stuffs.
-  debugPgClient(pgClient)
+  if (debugPg.enabled || debugPgError.enabled) debugPgClient(pgClient)
 
   // Begin our transaction and set it up.
   await pgClient.query('begin')
@@ -208,8 +208,8 @@ async function setupPgClientTransaction({
   // Set the custom provided settings before jwt claims and role are set
   // this prevents an accidentional overwriting
   if (typeof pgSettings === 'object') {
-    for (const key of Object.keys(pgSettings)) {
-      if (isPgSettingValid(pgSettings[key])) {
+    for (const key in pgSettings) {
+      if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
         localSettings.set(key, String(pgSettings[key]))
       }
     }
@@ -257,10 +257,10 @@ const debugPgError = createDebugger('postgraphile:postgres:error')
 function debugPgClient(pgClient: Client): Client {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
-  if (debugPg.enabled || debugPgError.enabled) {
+  if (!pgClient[$$pgClientOrigQuery]) {
     // Set the original query method to a key on our client. If that key is
     // already set, use that.
-    pgClient[$$pgClientOrigQuery] = pgClient[$$pgClientOrigQuery] || pgClient.query
+    pgClient[$$pgClientOrigQuery] = pgClient.query
 
     // tslint:disable-next-line only-arrow-functions
     pgClient.query = function (...args: Array<any>): any {
@@ -306,13 +306,13 @@ function getPath(inObject: mixed, path: Array<string>): any {
  * @private
  */
 function isPgSettingValid(pgSetting: mixed): boolean {
-  const supportedSettingTypes = ['string', 'number']
-  if (supportedSettingTypes.indexOf(typeof pgSetting) >= 0) {
-    return true
-  }
   if (pgSetting === undefined || pgSetting === null) {
     return false
   }
-  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type ${supportedSettingTypes.join(' or ')}.`)
+  const typeOfPgSetting = typeof pgSetting
+  if (typeOfPgSetting === 'string' || typeOfPgSetting === 'number') {
+    return true
+  }
+  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type string or number.`)
 }
 // tslint:enable no-any
