@@ -226,7 +226,7 @@ export default (function PgBasicsPlugin(
         },
         allRowsSimple(table: PgClass) {
           return this.camelCase(
-            `all-${this.pluralize(this._singularizedTableName(table))}-simple`
+            `all-${this.pluralize(this._singularizedTableName(table))}-list`
           );
         },
         functionMutationName(proc: PgProc) {
@@ -298,7 +298,7 @@ export default (function PgBasicsPlugin(
               this._singularizedTableName(table)
             )}-by-${detailedKeys
               .map(key => this.column(key))
-              .join("-and-")}-simple`
+              .join("-and-")}-list`
           );
         },
         rowByUniqueKeys(

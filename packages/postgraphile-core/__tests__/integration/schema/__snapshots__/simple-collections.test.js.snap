@@ -1820,7 +1820,7 @@ type Person implements Node {
   ): CompoundKeysConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`CompoundKey\`.\\"\\"\\"
-  compoundKeysByPersonId1Simple(
+  compoundKeysByPersonId1List(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -1866,7 +1866,7 @@ type Person implements Node {
   ): CompoundKeysConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`CompoundKey\`.\\"\\"\\"
-  compoundKeysByPersonId2Simple(
+  compoundKeysByPersonId2List(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2166,7 +2166,7 @@ type Query implements Node {
   ): CompoundKeysConnection
 
   \\"\\"\\"Reads a set of \`CompoundKey\`.\\"\\"\\"
-  allCompoundKeysSimple(
+  allCompoundKeysList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2212,7 +2212,7 @@ type Query implements Node {
   ): EdgeCasesConnection
 
   \\"\\"\\"Reads a set of \`EdgeCase\`.\\"\\"\\"
-  allEdgeCasesSimple(
+  allEdgeCasesList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2258,7 +2258,7 @@ type Query implements Node {
   ): Issue756SConnection
 
   \\"\\"\\"Reads a set of \`Issue756\`.\\"\\"\\"
-  allIssue756SSimple(
+  allIssue756SList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2304,7 +2304,7 @@ type Query implements Node {
   ): LeftArmsConnection
 
   \\"\\"\\"Reads a set of \`LeftArm\`.\\"\\"\\"
-  allLeftArmsSimple(
+  allLeftArmsList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2350,7 +2350,7 @@ type Query implements Node {
   ): MyTablesConnection
 
   \\"\\"\\"Reads a set of \`MyTable\`.\\"\\"\\"
-  allMyTablesSimple(
+  allMyTablesList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2396,7 +2396,7 @@ type Query implements Node {
   ): PeopleConnection
 
   \\"\\"\\"Reads a set of \`Person\`.\\"\\"\\"
-  allPeopleSimple(
+  allPeopleList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
@@ -2442,7 +2442,7 @@ type Query implements Node {
   ): PersonSecretsConnection
 
   \\"\\"\\"Reads a set of \`PersonSecret\`.\\"\\"\\"
-  allPersonSecretsSimple(
+  allPersonSecretsList(
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
