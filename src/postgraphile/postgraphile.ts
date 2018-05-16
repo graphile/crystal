@@ -161,6 +161,11 @@ export type PostGraphileOptions = {
   // `makePluginHook(plugins)` passing a list of plugin objects.
   /* @middlewareOnly */
   pluginHook?: PluginHookFn,
+  // Should we use relay pagination, or simple collections?
+  // "omit" (default) - relay connections only,
+  // "only" - simple collections only (no Relay connections),
+  // "both" - both
+  simpleCollections?: 'omit' | 'both' | 'only',
 }
 
 type PostgraphileSchemaBuilder = {
