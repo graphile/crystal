@@ -412,7 +412,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
     const queryTimeStart = process.hrtime()
     let pgRole
 
-    debugRequest('GraphQL query request has begun.')
+    if (debugRequest.enabled) debugRequest('GraphQL query request has begun.')
     let returnArray = false
 
     // This big `try`/`catch`/`finally` block represents the execution of our
@@ -541,7 +541,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
             throw error
           }
 
-          debugRequest('GraphQL query is parsed.')
+          if (debugRequest.enabled) debugRequest('GraphQL query is parsed.')
 
           // Validate our GraphQL query using given rules.
           const validationRules = pluginHook('postgraphile:validationRules', specifiedRules, {
@@ -559,7 +559,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           if (validationErrors.length > 0) {
             result = { errors: validationErrors, statusCode: 400 }
           } else {
-            debugRequest('GraphQL query is validated.')
+            if (debugRequest.enabled) debugRequest('GraphQL query is validated.')
 
             // Lazily log the query. If this debugger isn’t enabled, don’t run it.
             if (debugGraphql.enabled)
@@ -624,7 +624,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
               )
             }, 0)
           }
-          debugRequest('GraphQL query has been executed.')
+          if (debugRequest.enabled) debugRequest('GraphQL query has been executed.')
         }
         return result
       }))
@@ -654,7 +654,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       res.end(JSON.stringify(returnArray ? results : results[0]))
 
-      debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.')
+      if (debugRequest.enabled) debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.')
 
     }
   }
