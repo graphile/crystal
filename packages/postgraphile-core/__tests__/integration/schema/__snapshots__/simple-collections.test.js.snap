@@ -1908,6 +1908,9 @@ type Person implements Node {
     offset: Int
   ): PeopleConnection!
 
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  friendsList: [Person]
+
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
 
@@ -2479,6 +2482,9 @@ type Query implements Node {
     offset: Int
   ): PeopleConnection!
 
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  badlyBehavedFunctionList: [Person]
+
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
     \\"\\"\\"
@@ -2508,6 +2514,9 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): CompoundTypesConnection!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`CompoundType\`.\\"\\"\\"
+  compoundTypeSetQueryList: [CompoundType]
   intSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -2530,6 +2539,7 @@ type Query implements Node {
     y: Int
     z: Int
   ): IntSetQueryConnection!
+  intSetQueryList(x: Int, y: Int, z: Int): [Int]
 
   \\"\\"\\"Reads a single \`Issue756\` using its globally unique \`ID\`.\\"\\"\\"
   issue756(
@@ -2611,6 +2621,9 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): PeopleConnection!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  tableSetQueryList: [Person]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
