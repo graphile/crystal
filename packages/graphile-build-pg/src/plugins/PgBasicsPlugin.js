@@ -235,6 +235,9 @@ export default (function PgBasicsPlugin(
         functionQueryName(proc: PgProc) {
           return this.camelCase(this._functionName(proc));
         },
+        functionQueryNameList(proc: PgProc) {
+          return this.camelCase(`${this._functionName(proc)}-list`);
+        },
         functionPayloadType(proc: PgProc) {
           return this.upperCamelCase(`${this._functionName(proc)}-payload`);
         },

@@ -53,10 +53,12 @@ export default function makeProcField(
     fieldWithHooks,
     computed = false,
     isMutation = false,
+    forceList = false,
   }: {
     fieldWithHooks: FieldWithHooksFunction,
     computed?: boolean,
     isMutation?: boolean,
+    forceList?: boolean,
   }
 ) {
   const { pluralize, camelCase } = inflection;
@@ -125,7 +127,7 @@ export default function makeProcField(
     (TableType && isCompositeType(TableType)) || false;
   if (isTableLike) {
     if (proc.returnsSet) {
-      if (isMutation) {
+      if (isMutation || forceList) {
         type = new GraphQLList(TableType);
       } else {
         const ConnectionType = getTypeByName(
@@ -156,22 +158,17 @@ export default function makeProcField(
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(proc);
       const ConnectionType = getTypeByName(connectionTypeName);
-      if (ConnectionType) {
-        if (isMutation) {
-          // Cannot return a connection because it would have to run the mutation again
-          type = new GraphQLList(Type);
-          returnFirstValueAsValue = true;
-        } else {
-          type = new GraphQLNonNull(ConnectionType);
-          fieldScope.isPgFieldConnection = true;
-          // We don't return the first value as the value here because it gets
-          // sent down into PgScalarFunctionConnectionPlugin so the relevant
-          // EdgeType can return cursor / node; i.e. we might want to add an
-          // `__cursor` field so we can't just use a scalar.
-        }
-      } else {
-        returnFirstValueAsValue = true;
+      if (isMutation || forceList || !ConnectionType) {
+        // Cannot return a connection because it would have to run the mutation again
         type = new GraphQLList(Type);
+        returnFirstValueAsValue = true;
+      } else {
+        type = new GraphQLNonNull(ConnectionType);
+        fieldScope.isPgFieldConnection = true;
+        // We don't return the first value as the value here because it gets
+        // sent down into PgScalarFunctionConnectionPlugin so the relevant
+        // EdgeType can return cursor / node; i.e. we might want to add an
+        // `__cursor` field so we can't just use a scalar.
       }
     } else {
       returnFirstValueAsValue = true;
