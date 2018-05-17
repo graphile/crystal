@@ -250,11 +250,15 @@ export default function makeProcField(
           functionAlias,
           resolveData,
           {
-            withPagination: !isMutation && proc.returnsSet,
-            withPaginationAsFields: !isMutation && proc.returnsSet && !computed,
-            asJson: !proc.returnsSet && computed && !returnFirstValueAsValue,
+            withPagination: !forceList && !isMutation && proc.returnsSet,
+            withPaginationAsFields:
+              !forceList && !isMutation && proc.returnsSet && !computed,
+            asJson:
+              computed &&
+              (forceList || (!proc.returnsSet && !returnFirstValueAsValue)),
             asJsonAggregate:
-              !proc.returnsSet && computed && rawReturnType.isPgArray,
+              computed &&
+              (forceList || (!proc.returnsSet && rawReturnType.isPgArray)),
             addNullCase:
               !proc.returnsSet && !rawReturnType.isPgArray && isTableLike,
           },
@@ -433,7 +437,7 @@ export default function makeProcField(
                   return pg2gql(value, returnType);
                 }
               } else {
-                if (proc.returnsSet && !isMutation) {
+                if (proc.returnsSet && !isMutation && !forceList) {
                   return addStartEndCursor({
                     ...value,
                     data: value.data ? value.data.map(scalarAwarePg2gql) : null,

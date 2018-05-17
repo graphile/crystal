@@ -257,6 +257,15 @@ export default (function PgBasicsPlugin(
         ) {
           return proc.tags.fieldName || this.camelCase(pseudoColumnName);
         },
+        computedColumnList(
+          pseudoColumnName: string,
+          proc: PgProc,
+          _table: PgClass
+        ) {
+          return proc.tags.fieldName
+            ? proc.tags.fieldName + "List"
+            : this.camelCase(`${pseudoColumnName}-list`);
+        },
         singleRelationByKeys(
           detailedKeys: Keys,
           table: PgClass,
