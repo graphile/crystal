@@ -425,13 +425,13 @@ export default function makeProcField(
               const alias = getAliasFromResolveInfo(resolveInfo);
               const value = data[alias];
               if (returnFirstValueAsValue) {
-                if (proc.returnsSet) {
+                if (proc.returnsSet && !forceList) {
                   // EITHER `isMutation` is true, or `ConnectionType` does not
                   // exist - either way, we're not returning a connection.
                   return value.data
                     .map(firstValue)
                     .map(v => pg2gql(v, returnType));
-                } else if (rawReturnType.isPgArray) {
+                } else if (proc.returnsSet || rawReturnType.isPgArray) {
                   return value.map(firstValue).map(v => pg2gql(v, returnType));
                 } else {
                   return pg2gql(value, returnType);
@@ -512,7 +512,7 @@ export default function makeProcField(
               const [row] = rows;
               const result = (() => {
                 if (returnFirstValueAsValue) {
-                  if (proc.returnsSet && !isMutation) {
+                  if (proc.returnsSet && !isMutation && !forceList) {
                     // EITHER `isMutation` is true, or `ConnectionType` does
                     // not exist - either way, we're not returning a
                     // connection.
@@ -525,7 +525,7 @@ export default function makeProcField(
                     return pg2gql(firstValue(row), returnType);
                   }
                 } else {
-                  if (proc.returnsSet && !isMutation) {
+                  if (proc.returnsSet && !isMutation && !forceList) {
                     // Connection
                     return addStartEndCursor({
                       ...row,
