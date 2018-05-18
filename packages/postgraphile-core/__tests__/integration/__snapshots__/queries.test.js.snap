@@ -4674,8 +4674,554 @@ Object {
 exports[`simple-procedure-computed-fields.graphql 1`] = `
 Object {
   "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "compoundKeysByPersonId1List": Array [
+            Object {
+              "personId1": 1,
+              "personId2": 2,
+            },
+          ],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2List": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 1,
+            },
+          ],
+          "id": 1,
+          "name": "John Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "You hit me with a cricket bat.",
+                "headlineTrimmed": "You hit m…",
+              },
+              Object {
+                "authorId": 1,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "Large bet on myself in round one.",
+                "headlineTrimmed": "Large bet…",
+              },
+            ],
+          },
+          "postsByAuthorIdList": Array [
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "I hate yogurt. It’s just stuff with bits in.",
+              "headlineTrimmed": "I hate yo…",
+            },
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Is that a cooking show?",
+              "headlineTrimmed": "Is that a…",
+            },
+          ],
+          "roundOnePost": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "Large bet on myself in round one.",
+                "headlineTrimmed": "Large bet…",
+              },
+            ],
+          },
+          "roundOnePostList": Array [
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Large bet on myself in round one.",
+              "headlineTrimmed": "Large bet…",
+            },
+          ],
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "compoundKeysByPersonId1List": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 1,
+            },
+            Object {
+              "personId1": 2,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 2,
+              "personId2": 5,
+            },
+          ],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2List": Array [
+            Object {
+              "personId1": 1,
+              "personId2": 2,
+            },
+          ],
+          "id": 2,
+          "name": "Sara Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 2,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+                "headlineTrimmed": "It’s a fe…",
+              },
+              Object {
+                "authorId": 2,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "What’s with you kids? Every other day it’s food, food, food.",
+                "headlineTrimmed": "What’s wi…",
+              },
+            ],
+          },
+          "postsByAuthorIdList": Array [
+            Object {
+              "authorId": 2,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+              "headlineTrimmed": "No… It’s …",
+            },
+            Object {
+              "authorId": 2,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+              "headlineTrimmed": "It’s a fe…",
+            },
+          ],
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+          "roundOnePostList": Array [],
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId1List": Array [],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2List": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 4,
+              "personId2": 3,
+            },
+          ],
+          "id": 3,
+          "name": "Budd Deey",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 3,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "You know how I sometimes have really brilliant ideas?",
+                "headlineTrimmed": "You know …",
+              },
+              Object {
+                "authorId": 3,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "They’re not aliens, they’re Earth…liens!",
+                "headlineTrimmed": "They’re n…",
+              },
+            ],
+          },
+          "postsByAuthorIdList": Array [
+            Object {
+              "authorId": 3,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Stop talking, brain thinking. Hush.",
+              "headlineTrimmed": "Stop talk…",
+            },
+            Object {
+              "authorId": 3,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "You know how I sometimes have really brilliant ideas?",
+              "headlineTrimmed": "You know …",
+            },
+          ],
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+          "roundOnePostList": Array [],
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "compoundKeysByPersonId1List": Array [
+            Object {
+              "personId1": 4,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 4,
+              "personId2": 4,
+            },
+          ],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2List": Array [
+            Object {
+              "personId1": 4,
+              "personId2": 4,
+            },
+          ],
+          "id": 4,
+          "name": "Kathryn Ramirez",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "postsByAuthorIdList": Array [],
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+          "roundOnePostList": Array [],
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId1List": Array [],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2List": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 5,
+            },
+          ],
+          "id": 5,
+          "name": "Joe Tucker",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 5,
+                "computedIntervalSet": Object {
+                  "nodes": Array [
+                    Object {
+                      "seconds": 12,
+                    },
+                  ],
+                },
+                "computedIntervalSetList": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+                "headlineTrimmed": "Please, D…",
+              },
+            ],
+          },
+          "postsByAuthorIdList": Array [
+            Object {
+              "authorId": 5,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              "headlineTrimmed": "Please, D…",
+            },
+          ],
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+          "roundOnePostList": Array [],
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId1List": Array [],
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2List": Array [],
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "postsByAuthorIdList": Array [],
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+          "roundOnePostList": Array [],
+        },
+      ],
+    },
     "allPeopleList": Array [
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 1,
+              "personId2": 2,
+            },
+          ],
+        },
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 1,
+            },
+          ],
+        },
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+        ],
         "firstName": "John",
         "friends": Object {
           "nodes": Array [
@@ -4705,9 +5251,168 @@ Object {
             },
           ],
         },
+        "id": 1,
         "name": "John Smith",
+        "postsByAuthorId": Object {
+          "nodes": Array [
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "You hit me with a cricket bat.",
+              "headlineTrimmed": "You hit m…",
+            },
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Large bet on myself in round one.",
+              "headlineTrimmed": "Large bet…",
+            },
+          ],
+        },
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 1,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "headlineTrimmed": "I hate yo…",
+          },
+          Object {
+            "authorId": 1,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "Is that a cooking show?",
+            "headlineTrimmed": "Is that a…",
+          },
+        ],
+        "roundOnePost": Object {
+          "nodes": Array [
+            Object {
+              "authorId": 1,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Large bet on myself in round one.",
+              "headlineTrimmed": "Large bet…",
+            },
+          ],
+        },
+        "roundOnePostList": Array [
+          Object {
+            "authorId": 1,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "Large bet on myself in round one.",
+            "headlineTrimmed": "Large bet…",
+          },
+        ],
       },
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 1,
+            },
+            Object {
+              "personId1": 2,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 2,
+              "personId2": 5,
+            },
+          ],
+        },
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 1,
+              "personId2": 2,
+            },
+          ],
+        },
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
         "firstName": "Sara",
         "friends": Object {
           "nodes": Array [
@@ -4737,9 +5442,114 @@ Object {
             },
           ],
         },
+        "id": 2,
         "name": "Sara Smith",
+        "postsByAuthorId": Object {
+          "nodes": Array [
+            Object {
+              "authorId": 2,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+              "headlineTrimmed": "It’s a fe…",
+            },
+            Object {
+              "authorId": 2,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "What’s with you kids? Every other day it’s food, food, food.",
+              "headlineTrimmed": "What’s wi…",
+            },
+          ],
+        },
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 2,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "headlineTrimmed": "No… It’s …",
+          },
+          Object {
+            "authorId": 2,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+            "headlineTrimmed": "It’s a fe…",
+          },
+        ],
+        "roundOnePost": Object {
+          "nodes": Array [],
+        },
+        "roundOnePostList": Array [],
       },
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [],
+        },
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 4,
+              "personId2": 3,
+            },
+          ],
+        },
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+        ],
         "firstName": "Budd",
         "friends": Object {
           "nodes": Array [
@@ -4769,9 +5579,124 @@ Object {
             },
           ],
         },
+        "id": 3,
         "name": "Budd Deey",
+        "postsByAuthorId": Object {
+          "nodes": Array [
+            Object {
+              "authorId": 3,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "You know how I sometimes have really brilliant ideas?",
+              "headlineTrimmed": "You know …",
+            },
+            Object {
+              "authorId": 3,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "They’re not aliens, they’re Earth…liens!",
+              "headlineTrimmed": "They’re n…",
+            },
+          ],
+        },
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 3,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "Stop talking, brain thinking. Hush.",
+            "headlineTrimmed": "Stop talk…",
+          },
+          Object {
+            "authorId": 3,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "You know how I sometimes have really brilliant ideas?",
+            "headlineTrimmed": "You know …",
+          },
+        ],
+        "roundOnePost": Object {
+          "nodes": Array [],
+        },
+        "roundOnePostList": Array [],
       },
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 4,
+              "personId2": 3,
+            },
+            Object {
+              "personId1": 4,
+              "personId2": 4,
+            },
+          ],
+        },
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 4,
+              "personId2": 4,
+            },
+          ],
+        },
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
         "firstName": "Kathryn",
         "friends": Object {
           "nodes": Array [
@@ -4796,9 +5721,36 @@ Object {
             },
           ],
         },
+        "id": 4,
         "name": "Kathryn Ramirez",
+        "postsByAuthorId": Object {
+          "nodes": Array [],
+        },
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Object {
+          "nodes": Array [],
+        },
+        "roundOnePostList": Array [],
       },
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [],
+        },
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [
+            Object {
+              "personId1": 2,
+              "personId2": 5,
+            },
+          ],
+        },
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
         "firstName": "Joe",
         "friends": Object {
           "nodes": Array [
@@ -4811,14 +5763,76 @@ Object {
             },
           ],
         },
+        "id": 5,
         "name": "Joe Tucker",
+        "postsByAuthorId": Object {
+          "nodes": Array [
+            Object {
+              "authorId": 5,
+              "computedIntervalSet": Object {
+                "nodes": Array [
+                  Object {
+                    "seconds": 12,
+                  },
+                ],
+              },
+              "computedIntervalSetList": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+              "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              "headlineTrimmed": "Please, D…",
+            },
+          ],
+        },
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 5,
+            "computedIntervalSet": Object {
+              "nodes": Array [
+                Object {
+                  "seconds": 12,
+                },
+              ],
+            },
+            "computedIntervalSetList": Array [
+              Object {
+                "seconds": 12,
+              },
+            ],
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            "headlineTrimmed": "Please, D…",
+          },
+        ],
+        "roundOnePost": Object {
+          "nodes": Array [],
+        },
+        "roundOnePostList": Array [],
       },
       Object {
+        "compoundKeysByPersonId1": Object {
+          "nodes": Array [],
+        },
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2": Object {
+          "nodes": Array [],
+        },
+        "compoundKeysByPersonId2List": Array [],
         "firstName": "Twenty",
         "friends": Object {
           "nodes": Array [],
         },
+        "id": 6,
         "name": "Twenty Seventwo",
+        "postsByAuthorId": Object {
+          "nodes": Array [],
+        },
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Object {
+          "nodes": Array [],
+        },
+        "roundOnePostList": Array [],
       },
     ],
   },
