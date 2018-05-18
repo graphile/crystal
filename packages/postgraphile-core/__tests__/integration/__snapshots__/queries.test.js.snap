@@ -4441,6 +4441,808 @@ Object {
 }
 `;
 
+exports[`simple-collections.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Array [
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "email": "joe.tucker@email.com",
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      Object {
+        "email": "graphile-build.issue.27.exists@example.com",
+        "id": 6,
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "b": Array [
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+    ],
+    "c": Array [
+      Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+      },
+      Object {
+        "email": "joe.tucker@email.com",
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "graphile-build.issue.27.exists@example.com",
+        "id": 6,
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "d": Array [
+      Object {
+        "email": "graphile-build.issue.27.exists@example.com",
+        "id": 6,
+        "name": "Twenty Seventwo",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "joe.tucker@email.com",
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+      },
+    ],
+    "e": Array [
+      Object {
+        "authorId": 2,
+        "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+      },
+      Object {
+        "authorId": 2,
+        "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+      },
+      Object {
+        "authorId": 2,
+        "headline": "What’s with you kids? Every other day it’s food, food, food.",
+      },
+    ],
+    "f": Array [
+      Object {
+        "authorId": 2,
+        "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+      },
+      Object {
+        "authorId": 2,
+        "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+      },
+    ],
+    "g": Array [
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+    ],
+    "h": Array [],
+    "i": Array [
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "name": "Budd Deey",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "email": "joe.tucker@email.com",
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      Object {
+        "email": "graphile-build.issue.27.exists@example.com",
+        "id": 6,
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "j": Array [
+      Object {
+        "email": "john.smith@email.com",
+        "id": 1,
+        "name": "John Smith",
+      },
+      Object {
+        "email": "sara.smith@email.com",
+        "id": 2,
+        "name": "Sara Smith",
+      },
+      Object {
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "email": "joe.tucker@email.com",
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      Object {
+        "email": "graphile-build.issue.27.exists@example.com",
+        "id": 6,
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "k": Array [
+      Object {
+        "authorId": 5,
+        "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      },
+      Object {
+        "authorId": 3,
+        "headline": "You know how I sometimes have really brilliant ideas?",
+      },
+      Object {
+        "authorId": 3,
+        "headline": "They’re not aliens, they’re Earth…liens!",
+      },
+    ],
+  },
+}
+`;
+
+exports[`simple-procedure-computed-fields.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeopleList": Array [
+      Object {
+        "firstName": "John",
+        "friends": Object {
+          "nodes": Array [
+            Object {
+              "firstName": "Sara",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "name": "Budd Deey",
+                  },
+                ],
+              },
+              "name": "Sara Smith",
+            },
+            Object {
+              "firstName": "Budd",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+              },
+              "name": "Budd Deey",
+            },
+          ],
+        },
+        "name": "John Smith",
+      },
+      Object {
+        "firstName": "Sara",
+        "friends": Object {
+          "nodes": Array [
+            Object {
+              "firstName": "Budd",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+              },
+              "name": "Budd Deey",
+            },
+            Object {
+              "firstName": "Kathryn",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Joe",
+                    "name": "Joe Tucker",
+                  },
+                ],
+              },
+              "name": "Kathryn Ramirez",
+            },
+          ],
+        },
+        "name": "Sara Smith",
+      },
+      Object {
+        "firstName": "Budd",
+        "friends": Object {
+          "nodes": Array [
+            Object {
+              "firstName": "Kathryn",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Joe",
+                    "name": "Joe Tucker",
+                  },
+                ],
+              },
+              "name": "Kathryn Ramirez",
+            },
+            Object {
+              "firstName": "Joe",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Twenty",
+                    "name": "Twenty Seventwo",
+                  },
+                ],
+              },
+              "name": "Joe Tucker",
+            },
+          ],
+        },
+        "name": "Budd Deey",
+      },
+      Object {
+        "firstName": "Kathryn",
+        "friends": Object {
+          "nodes": Array [
+            Object {
+              "firstName": "Joe",
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Twenty",
+                    "name": "Twenty Seventwo",
+                  },
+                ],
+              },
+              "name": "Joe Tucker",
+            },
+            Object {
+              "firstName": "Twenty",
+              "friends": Object {
+                "nodes": Array [],
+              },
+              "name": "Twenty Seventwo",
+            },
+          ],
+        },
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "firstName": "Joe",
+        "friends": Object {
+          "nodes": Array [
+            Object {
+              "firstName": "Twenty",
+              "friends": Object {
+                "nodes": Array [],
+              },
+              "name": "Twenty Seventwo",
+            },
+          ],
+        },
+        "name": "Joe Tucker",
+      },
+      Object {
+        "firstName": "Twenty",
+        "friends": Object {
+          "nodes": Array [],
+        },
+        "name": "Twenty Seventwo",
+      },
+    ],
+  },
+}
+`;
+
+exports[`simple-procedure-query.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPostsList": Array [
+      Object {
+        "computedIntervalSetList": Array [
+          Object {
+            "minutes": null,
+            "seconds": 12,
+          },
+          Object {
+            "minutes": null,
+            "seconds": null,
+          },
+          Object {
+            "minutes": 36,
+            "seconds": 7,
+          },
+        ],
+        "id": 1,
+      },
+    ],
+    "compoundTypeSetQueryList": Array [
+      Object {
+        "a": 1,
+        "b": "2",
+        "c": "BLUE",
+        "d": null,
+        "e": "_0_BAR",
+        "f": "_EMPTY_",
+        "g": Object {
+          "hours": null,
+          "minutes": null,
+          "seconds": 18,
+        },
+      },
+    ],
+    "intSetQueryList": Array [
+      1,
+      2,
+      3,
+      4,
+      5,
+      null,
+      6,
+    ],
+    "queryIntervalSetList": Array [
+      Object {
+        "days": null,
+        "hours": null,
+        "minutes": null,
+        "months": null,
+        "seconds": 12,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 3,
+        "minutes": null,
+        "months": null,
+        "seconds": null,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 9,
+        "minutes": 36,
+        "months": null,
+        "seconds": 7,
+        "years": null,
+      },
+    ],
+    "staticBigIntegerList": Array [
+      "30894622507013190",
+      "30894622507013191",
+      "30894622507013192",
+      "30894622507013193",
+      "30894622507013194",
+      "30894622507013195",
+      "30894622507013196",
+      "30894622507013197",
+      "30894622507013198",
+      "30894622507013199",
+      "30894622507013200",
+    ],
+    "tableSetQueryList": Array [
+      Object {
+        "name": "John Smith",
+      },
+      Object {
+        "name": "Sara Smith",
+      },
+      Object {
+        "name": "Budd Deey",
+      },
+      Object {
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "name": "Joe Tucker",
+      },
+      Object {
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "tableSetQueryWithOffset6": Array [
+      Object {
+        "name": "Budd Deey",
+      },
+      Object {
+        "name": "Kathryn Ramirez",
+      },
+    ],
+  },
+}
+`;
+
+exports[`simple-relations-head-tail.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeysList": Array [
+      Object {
+        "personId1": 1,
+        "personId2": 2,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 1,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 3,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 5,
+      },
+      Object {
+        "personId1": 4,
+        "personId2": 3,
+      },
+      Object {
+        "personId1": 4,
+        "personId2": 4,
+      },
+    ],
+    "allPeopleList": Array [
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+        ],
+        "id": 1,
+        "name": "John Smith",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 1,
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+          },
+          Object {
+            "authorId": 1,
+            "headline": "Is that a cooking show?",
+          },
+        ],
+        "roundOnePost": Array [
+          Object {
+            "authorId": 1,
+            "headline": "Large bet on myself in round one.",
+          },
+        ],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
+        "id": 2,
+        "name": "Sara Smith",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+          Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+        ],
+        "id": 3,
+        "name": "Budd Deey",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 3,
+            "headline": "Stop talking, brain thinking. Hush.",
+          },
+          Object {
+            "authorId": 3,
+            "headline": "You know how I sometimes have really brilliant ideas?",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
+        "id": 4,
+        "name": "Kathryn Ramirez",
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
+        "id": 5,
+        "name": "Joe Tucker",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 5,
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [],
+        "id": 6,
+        "name": "Twenty Seventwo",
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Array [],
+      },
+    ],
+  },
+}
+`;
+
+exports[`simple-relations-tail-head.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeysList": Array [
+      Object {
+        "extra": null,
+        "personByPersonId1": Object {
+          "email": "john.smith@email.com",
+          "name": "John Smith",
+        },
+        "personByPersonId2": Object {
+          "email": "sara.smith@email.com",
+          "name": "Sara Smith",
+        },
+        "personId1": 1,
+        "personId2": 2,
+      },
+      Object {
+        "extra": false,
+        "personByPersonId1": Object {
+          "email": "sara.smith@email.com",
+          "name": "Sara Smith",
+        },
+        "personByPersonId2": Object {
+          "email": "john.smith@email.com",
+          "name": "John Smith",
+        },
+        "personId1": 2,
+        "personId2": 1,
+      },
+      Object {
+        "extra": null,
+        "personByPersonId1": Object {
+          "email": "sara.smith@email.com",
+          "name": "Sara Smith",
+        },
+        "personByPersonId2": Object {
+          "email": "budd.deey@email.com",
+          "name": "Budd Deey",
+        },
+        "personId1": 2,
+        "personId2": 3,
+      },
+      Object {
+        "extra": true,
+        "personByPersonId1": Object {
+          "email": "sara.smith@email.com",
+          "name": "Sara Smith",
+        },
+        "personByPersonId2": Object {
+          "email": "joe.tucker@email.com",
+          "name": "Joe Tucker",
+        },
+        "personId1": 2,
+        "personId2": 5,
+      },
+      Object {
+        "extra": true,
+        "personByPersonId1": Object {
+          "email": "kathryn.ramirez@email.com",
+          "name": "Kathryn Ramirez",
+        },
+        "personByPersonId2": Object {
+          "email": "budd.deey@email.com",
+          "name": "Budd Deey",
+        },
+        "personId1": 4,
+        "personId2": 3,
+      },
+      Object {
+        "extra": false,
+        "personByPersonId1": Object {
+          "email": "kathryn.ramirez@email.com",
+          "name": "Kathryn Ramirez",
+        },
+        "personByPersonId2": Object {
+          "email": "kathryn.ramirez@email.com",
+          "name": "Kathryn Ramirez",
+        },
+        "personId1": 4,
+        "personId2": 4,
+      },
+    ],
+    "allForeignKeysList": Array [
+      Object {
+        "compoundKey1": 2,
+        "compoundKey2": 1,
+        "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+          "extra": false,
+          "personId1": 2,
+          "personId2": 1,
+        },
+        "personByPersonId": Object {
+          "email": "joe.tucker@email.com",
+          "name": "Joe Tucker",
+        },
+        "personId": 5,
+      },
+      Object {
+        "compoundKey1": 4,
+        "compoundKey2": 4,
+        "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+          "extra": false,
+          "personId1": 4,
+          "personId2": 4,
+        },
+        "personByPersonId": null,
+        "personId": null,
+      },
+      Object {
+        "compoundKey1": 2,
+        "compoundKey2": 1,
+        "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+          "extra": false,
+          "personId1": 2,
+          "personId2": 1,
+        },
+        "personByPersonId": null,
+        "personId": null,
+      },
+    ],
+  },
+}
+`;
+
 exports[`types.graphql 1`] = `
 Object {
   "data": Object {

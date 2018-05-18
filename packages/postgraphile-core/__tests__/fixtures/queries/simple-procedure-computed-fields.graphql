@@ -1,0 +1,18 @@
+{
+  allPeopleList {
+    name
+    firstName
+    friends {
+      nodes {
+        name
+        firstName
+        friends(first: 1) {
+          nodes {
+            name
+            firstName
+          }
+        }
+      }
+    }
+  }
+}
