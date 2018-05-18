@@ -127,8 +127,11 @@ export default function makeProcField(
     (TableType && isCompositeType(TableType)) || false;
   if (isTableLike) {
     if (proc.returnsSet) {
-      if (isMutation || forceList) {
+      if (isMutation) {
         type = new GraphQLList(TableType);
+      } else if (forceList) {
+        type = new GraphQLList(TableType);
+        fieldScope.isPgFieldSimpleCollection = true;
       } else {
         const ConnectionType = getTypeByName(
           inflection.connection(TableType.name)
@@ -158,10 +161,14 @@ export default function makeProcField(
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(proc);
       const ConnectionType = getTypeByName(connectionTypeName);
-      if (isMutation || forceList || !ConnectionType) {
+      if (isMutation) {
         // Cannot return a connection because it would have to run the mutation again
         type = new GraphQLList(Type);
         returnFirstValueAsValue = true;
+      } else if (forceList || !ConnectionType) {
+        type = new GraphQLList(Type);
+        returnFirstValueAsValue = true;
+        fieldScope.isPgFieldSimpleCollection = true;
       } else {
         type = new GraphQLNonNull(ConnectionType);
         fieldScope.isPgFieldConnection = true;

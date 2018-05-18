@@ -1909,7 +1909,13 @@ type Person implements Node {
   ): PeopleConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
-  friendsList: [Person]
+  friendsList(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+  ): [Person]
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
@@ -2483,7 +2489,13 @@ type Query implements Node {
   ): PeopleConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
-  badlyBehavedFunctionList: [Person]
+  badlyBehavedFunctionList(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+  ): [Person]
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -2516,7 +2528,13 @@ type Query implements Node {
   ): CompoundTypesConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`CompoundType\`.\\"\\"\\"
-  compoundTypeSetQueryList: [CompoundType]
+  compoundTypeSetQueryList(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+  ): [CompoundType]
   intSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -2539,7 +2557,16 @@ type Query implements Node {
     y: Int
     z: Int
   ): IntSetQueryConnection!
-  intSetQueryList(x: Int, y: Int, z: Int): [Int]
+  intSetQueryList(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+    x: Int
+    y: Int
+    z: Int
+  ): [Int]
 
   \\"\\"\\"Reads a single \`Issue756\` using its globally unique \`ID\`.\\"\\"\\"
   issue756(
@@ -2623,7 +2650,13 @@ type Query implements Node {
   ): PeopleConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
-  tableSetQueryList: [Person]
+  tableSetQueryList(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
+    offset: Int
+  ): [Person]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
