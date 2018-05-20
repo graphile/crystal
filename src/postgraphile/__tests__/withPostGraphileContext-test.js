@@ -740,3 +740,32 @@ describe('jwtVerifyOptions', () => {
     expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
   })
 })
+
+describe('preRequest', () => {
+  let pgClient
+  let pgPool
+  beforeEach(() => {
+    pgClient = { query: jest.fn(), release: jest.fn() }
+    pgPool = { connect: jest.fn(() => pgClient) }
+  })
+
+  test('will succeed if preRequest is provided', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        preRequest: 'myschema.test_func',
+      },
+      () => {},
+    )
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select myschema.test_func()',
+          values: [],
+        },
+      ],
+      ['commit'],
+    ])
+  })
+})

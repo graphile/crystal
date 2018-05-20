@@ -17,6 +17,7 @@ export type WithPostGraphileContextFn = (
     jwtVerifyOptions?: jwt.VerifyOptions,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    preRequest?: string,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ) => Promise<ExecutionResult>
@@ -31,6 +32,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     jwtVerifyOptions?: jwt.VerifyOptions,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    preRequest?: string,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
@@ -43,6 +45,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     jwtVerifyOptions,
     pgDefaultRole,
     pgSettings,
+    preRequest,
   } = options
   // Connect a new Postgres client and start a transaction.
   const pgClient = await pgPool.connect()
@@ -64,6 +67,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
       jwtVerifyOptions,
       pgDefaultRole,
       pgSettings,
+      preRequest,
     })
 
     return await callback({
@@ -114,6 +118,7 @@ const withPostGraphileContext: WithPostGraphileContextFn = async (
     jwtVerifyOptions?: jwt.VerifyOptions,
     pgDefaultRole?: string,
     pgSettings?: { [key: string]: mixed },
+    preRequest?: string,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
@@ -142,6 +147,7 @@ async function setupPgClientTransaction({
   jwtVerifyOptions,
   pgDefaultRole,
   pgSettings,
+  preRequest,
 }: {
   pgClient: Client,
   jwtToken?: string,
@@ -151,6 +157,7 @@ async function setupPgClientTransaction({
   jwtVerifyOptions?: jwt.VerifyOptions,
   pgDefaultRole?: string,
   pgSettings?: { [key: string]: mixed },
+  preRequest?: string,
 }): Promise<string | undefined> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
@@ -238,6 +245,16 @@ async function setupPgClientTransaction({
 
     // Execute the query.
     await pgClient.query(query)
+  }
+
+  if (typeof preRequest === 'string') {
+    const query = sql.compile(sql.query`select ${sql.raw(`${preRequest}()`)}`)
+    try {
+      await pgClient.query(query)
+    } catch (error) {
+      error.statusCode = 403
+      throw error
+    }
   }
 
   return role
