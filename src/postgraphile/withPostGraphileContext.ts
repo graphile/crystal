@@ -68,12 +68,6 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null
 
-  // Connect a new Postgres client
-  const pgClient = await pgPool.connect()
-
-  // Enhance our Postgres client with debugging stuffs.
-  if (debugPg.enabled || debugPgError.enabled) debugPgClient(pgClient)
-
   const { role: pgRole, localSettings } = await getSettingsForPgClientTransaction({
     jwtToken,
     jwtSecret,
@@ -86,6 +80,14 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
 
   // If we can avoid transactions, we get greater performance.
   const needTransaction = pgForceTransaction || localSettings.length > 0 || (operationType !== 'query' && operationType !== 'subscription')
+
+  // Now we've caught as many errors as we can at this stage, let's create a DB connection.
+
+  // Connect a new Postgres client
+  const pgClient = await pgPool.connect()
+
+  // Enhance our Postgres client with debugging stuffs.
+  if (debugPg.enabled || debugPgError.enabled) debugPgClient(pgClient)
 
   // Begin our transaction, if necessary.
   if (needTransaction) {
