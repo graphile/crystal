@@ -132,7 +132,7 @@ const withPostGraphileContextFromReqResGenerator = options => {
  * @param {GraphQLSchema} graphqlSchema
  */
 export default function createPostGraphileHttpRequestHandler(options) {
-  const MEGABYTE = 1024 * 1024;
+  const MEGABYTE = 1024 * 1024
   const {
     getGqlSchema,
     pgPool,
@@ -220,7 +220,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
           fn(req, res, next)
         })
       }
-    }
+    },
   )
 
   // And we really want that function to be await-able
@@ -248,7 +248,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
   const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
     options,
-    httpError
+    httpError,
   })
 
   // Typically clients use static queries, so we can cache the parse and
@@ -292,11 +292,11 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // Validate our GraphQL query using given rules.
       const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, staticValidationRules)
-      const result = { queryDocumentAst, validationErrors }
+      const cacheResult = { queryDocumentAst, validationErrors }
       if (canCache) {
-        queryCache.set(hash, result)
+        queryCache.set(hash, cacheResult)
       }
-      return result
+      return cacheResult
     }
   }
 
@@ -601,7 +601,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
             )
 
           let validationErrors
-          ;({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, params.query))
+          ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, params.query))
 
           if (validationErrors.length === 0) {
             // You are strongly encouraged to use

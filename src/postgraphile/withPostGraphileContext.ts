@@ -57,7 +57,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
       const definition = queryDocumentAst.definitions[i]
       if (definition.kind === Kind.OPERATION_DEFINITION) {
         if (!operationName && operation) {
-          throw new Error('Multiple unnamed operations present in GraphQL query.');
+          throw new Error('Multiple unnamed operations present in GraphQL query.')
         } else if (!operationName || (definition.name && definition.name.value === operationName)) {
           operation = definition
         }

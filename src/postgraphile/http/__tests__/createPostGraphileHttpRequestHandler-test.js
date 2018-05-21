@@ -311,7 +311,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer({
-        pgDefaultRole: 'bob'
+        pgDefaultRole: 'bob',
       })
       await request(server)
         .post('/graphql')
@@ -324,10 +324,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            "text": "select set_config($1, $2, true)",
-            "values": [
-              "role",
-              "bob",
+            'text': 'select set_config($1, $2, true)',
+            'values': [
+              'role',
+              'bob',
             ],
           },
         ],
