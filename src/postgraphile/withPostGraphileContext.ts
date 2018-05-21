@@ -266,8 +266,15 @@ async function getSettingsForPgClientTransaction({
   // If we have some JWT claims, we want to set those claims as local
   // settings with the namespace `jwt.claims`.
   for (const key in jwtClaims) {
-    if (jwtClaims.hasOwnProperty(key) && isPgSettingValid(jwtClaims[key])) {
-      localSettings.push([`jwt.claims.${key}`, String(jwtClaims[key])])
+    if (jwtClaims.hasOwnProperty(key)) {
+      const rawValue = jwtClaims[key]
+      // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
+      const value: mixed = rawValue != null && typeof rawValue === 'object'
+        ? JSON.stringify(rawValue)
+        : rawValue
+      if (isPgSettingValid(value)) {
+        localSettings.push([`jwt.claims.${key}`, String(value)])
+      }
     }
   }
 
