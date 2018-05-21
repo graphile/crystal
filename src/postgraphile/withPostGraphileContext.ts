@@ -33,6 +33,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgSettings?: { [key: string]: mixed },
     queryDocumentAst?: DocumentNode,
     operationName?: string,
+    pgForceTransaction?: boolean,
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
@@ -47,17 +48,11 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgSettings,
     queryDocumentAst,
     operationName,
+    pgForceTransaction,
   } = options
 
-    /*
-  const operationAst: OperationDefinition = operationName && queryDocumentAst
-    ? queryDocumentAst.definitions.find(d => d.kind === 'OperationDefinition' && d.name != null && d.name.value === operationName)
-      || queryDocumentAst.definitions.find(d => d.kind === 'OperationDefinition')
-    : null
-     */
-
   let operation: OperationDefinitionNode | void
-  if (queryDocumentAst) {
+  if (!pgForceTransaction && queryDocumentAst) {
     for (let i = 0, l = queryDocumentAst.definitions.length; i < l; i++) { // tslint:disable-line
       const definition = queryDocumentAst.definitions[i]
       if (definition.kind === Kind.OPERATION_DEFINITION) {
@@ -70,8 +65,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     }
   }
 
+  // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null
-  // Connect a new Postgres client and start a transaction.
+
+  // Connect a new Postgres client
   const pgClient = await pgPool.connect()
 
   // Enhance our Postgres client with debugging stuffs.
@@ -87,26 +84,23 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgSettings,
   })
 
-  const needTransaction = localSettings.length > 0 || (operationType !== 'query' && operationType !== 'subscription')
+  // If we can avoid transactions, we get greater performance.
+  const needTransaction = pgForceTransaction || localSettings.length > 0 || (operationType !== 'query' && operationType !== 'subscription')
 
-  // Begin our transaction and set it up if necessary
+  // Begin our transaction, if necessary.
   if (needTransaction) {
     await pgClient.query('begin')
   }
 
-  // Run the function with a context object that can be passed through
   try {
-
-    // If there is at least one local setting.
+    // If there is at least one local setting, load it into the database.
     if (needTransaction && localSettings.length !== 0) {
-      // Actually create our query.
       const query = sql.compile(sql.query`select ${sql.join(localSettings.map(([key, value]) =>
         // Make sure that the third config is always `true` so that we are only
         // ever setting variables on the transaction.
         sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
       ), ', ')}`)
 
-      // Execute the query.
       await pgClient.query(query)
     }
 
