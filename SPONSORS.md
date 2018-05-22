@@ -15,3 +15,5 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Mtpc
 * Evgeniy Foucault
 * Alec Wenzowski
+* Clay Smith
+* Matt Bretl (also a major community contributor!)
