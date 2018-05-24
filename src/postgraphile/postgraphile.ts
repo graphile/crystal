@@ -139,6 +139,12 @@ export type PostGraphileOptions = {
   // ONLY use this option if you require the v3 typenames 'Json' and 'Uuid'
   // over 'JSON' and 'UUID'
   legacyJsonUuid?: boolean,
+  // The name of a Postgres stored procedure to execute immediately after
+  // the JWT is serialized in the transaction, but before any queries are
+  // performed.  Can be of the form: `my_schema.my_function`. You may use
+  // quotes as needed:
+  // `"my-special-schema".my_function`.
+  preRequest?: string,
   // Turns off GraphQL query logging. By default PostGraphile will log every
   // GraphQL query it processes along with some other information. Set this to
   // `true` to disable that feature.

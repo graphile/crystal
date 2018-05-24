@@ -82,6 +82,7 @@ program
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
+  .option('--pre-request <string>', 'the Postgres identifier for a function that will be called before each request')
 
 pluginHook('cli:flags:add:standard', addFlag)
 
@@ -195,6 +196,7 @@ const {
   port = 5000,
   maxPoolSize,
   defaultRole: pgDefaultRole,
+  preRequest,
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
   disableGraphiql = false,
@@ -337,6 +339,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   jwtRole,
   jwtVerifyOptions,
   pgDefaultRole,
+  preRequest,
   watchPg,
   showErrorStack,
   extendedErrors,
