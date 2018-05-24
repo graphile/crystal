@@ -44,9 +44,10 @@ type PostGraphileOptions = {
   readCache?: string,
   writeCache?: string,
   setWriteCacheCallback?: (fn: () => Promise<void>) => void,
-  legacyRelations?: "only" | "deprecated",
+  legacyRelations?: "only" | "deprecated" | "omit",
   setofFunctionsContainNulls?: boolean,
   legacyJsonUuid?: boolean,
+  simpleCollections?: "only" | "both" | "omit",
 };
 
 type PgConfig = Client | Pool | string;
@@ -144,6 +145,7 @@ const getPostGraphileBuilder = async (
     legacyRelations = "deprecated", // TODO: Change to 'omit' in v5
     setofFunctionsContainNulls = true,
     legacyJsonUuid = false,
+    simpleCollections = "omit",
   } = options;
 
   if (
@@ -153,6 +155,15 @@ const getPostGraphileBuilder = async (
     throw new Error(
       "Invalid configuration for legacy relations: " +
         JSON.stringify(legacyRelations)
+    );
+  }
+  if (
+    simpleCollections &&
+    ["only", "both", "omit"].indexOf(simpleCollections) < 0
+  ) {
+    throw new Error(
+      "Invalid configuration for simple collections: " +
+        JSON.stringify(simpleCollections)
     );
   }
   if (replaceAllPlugins) {
@@ -271,6 +282,7 @@ const getPostGraphileBuilder = async (
         pgLegacyJsonUuid: legacyJsonUuid,
         persistentMemoizeWithKey,
         pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
+        pgSimpleCollections: simpleCollections,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!

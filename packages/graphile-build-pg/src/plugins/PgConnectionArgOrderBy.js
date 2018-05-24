@@ -57,14 +57,19 @@ export default (function PgConnectionArgOrderBy(builder) {
         inflection,
       },
       {
-        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        scope: {
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgFieldIntrospection: table,
+        },
         addArgDataGenerator,
         Self,
         field,
       }
     ) => {
+      const shouldAddOrderBy = isPgFieldConnection || isPgFieldSimpleCollection;
       if (
-        !isPgFieldConnection ||
+        !shouldAddOrderBy ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
@@ -78,18 +83,27 @@ export default (function PgConnectionArgOrderBy(builder) {
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)
       );
+      const cursorPrefixFromOrderBy = orderBy => {
+        if (orderBy) {
+          let cursorPrefixes = [];
+          for (const item of orderBy) {
+            if (item.alias) {
+              cursorPrefixes.push(sql.literal(item.alias));
+            }
+          }
+          if (cursorPrefixes.length > 0) {
+            return cursorPrefixes;
+          }
+        }
+        return null;
+      };
 
       addArgDataGenerator(function connectionOrderBy({ orderBy: rawOrderBy }) {
         const orderBy = rawOrderBy
           ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
           : null;
         return {
-          pgCursorPrefix:
-            orderBy && orderBy.some(item => item.alias)
-              ? orderBy
-                  .filter(item => item.alias)
-                  .map(item => sql.literal(item.alias))
-              : null,
+          pgCursorPrefix: cursorPrefixFromOrderBy(orderBy),
           pgQuery: queryBuilder => {
             if (orderBy != null) {
               orderBy.forEach(item => {

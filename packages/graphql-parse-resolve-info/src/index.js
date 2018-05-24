@@ -78,18 +78,16 @@ export function getAliasFromResolveInfo(
   resolveInfo: GraphQLResolveInfo
 ): string {
   const asts = resolveInfo.fieldNodes || resolveInfo.fieldASTs;
-  const alias = asts.reduce(function(alias, val) {
-    if (!alias) {
-      if (val.kind === "Field") {
-        alias = val.alias ? val.alias.value : val.name && val.name.value;
+  for (let i = 0, l = asts.length; i < l; i++) {
+    const val = asts[i];
+    if (val.kind === "Field") {
+      const alias = val.alias ? val.alias.value : val.name && val.name.value;
+      if (alias) {
+        return alias;
       }
     }
-    return alias;
-  }, null);
-  if (!alias) {
-    throw new Error("Could not determine alias?!");
   }
-  return alias;
+  throw new Error("Could not determine alias?!");
 }
 
 export function parseResolveInfo(

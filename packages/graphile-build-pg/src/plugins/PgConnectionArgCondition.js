@@ -68,13 +68,19 @@ export default (function PgConnectionArgCondition(builder) {
         inflection,
       } = build;
       const {
-        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        scope: {
+          isPgFieldConnection,
+          isPgFieldSimpleCollection,
+          pgFieldIntrospection: table,
+        },
         addArgDataGenerator,
         Self,
         field,
       } = context;
+      const shouldAddCondition =
+        isPgFieldConnection || isPgFieldSimpleCollection;
       if (
-        !isPgFieldConnection ||
+        !shouldAddCondition ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
@@ -87,31 +93,32 @@ export default (function PgConnectionArgCondition(builder) {
         inflection.conditionType(TableType.name)
       );
 
+      const relevantAttributes = introspectionResultsByKind.attribute
+        .filter(attr => attr.classId === table.id)
+        .filter(attr => pgColumnFilter(attr, build, context))
+        .filter(attr => !omit(attr, "filter"));
+
       addArgDataGenerator(function connectionCondition({ condition }) {
         return {
           pgQuery: queryBuilder => {
             if (condition != null) {
-              introspectionResultsByKind.attribute
-                .filter(attr => attr.classId === table.id)
-                .filter(attr => pgColumnFilter(attr, build, context))
-                .filter(attr => !omit(attr, "filter"))
-                .forEach(attr => {
-                  const fieldName = inflection.column(attr);
-                  const val = condition[fieldName];
-                  if (val != null) {
-                    queryBuilder.where(
-                      sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                        attr.name
-                      )} = ${gql2pg(val, attr.type)}`
-                    );
-                  } else if (val === null) {
-                    queryBuilder.where(
-                      sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                        attr.name
-                      )} IS NULL`
-                    );
-                  }
-                });
+              relevantAttributes.forEach(attr => {
+                const fieldName = inflection.column(attr);
+                const val = condition[fieldName];
+                if (val != null) {
+                  queryBuilder.where(
+                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                      attr.name
+                    )} = ${gql2pg(val, attr.type)}`
+                  );
+                } else if (val === null) {
+                  queryBuilder.where(
+                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                      attr.name
+                    )} IS NULL`
+                  );
+                }
+              });
             }
           },
         };

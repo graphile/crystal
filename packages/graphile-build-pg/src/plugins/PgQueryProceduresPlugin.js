@@ -7,7 +7,13 @@ import omit from "../omit";
 
 const debugWarn = debugFactory("graphile-build-pg:warn");
 
-export default (function PgQueryProceduresPlugin(builder) {
+export default (function PgQueryProceduresPlugin(
+  builder,
+  { pgSimpleCollections }
+) {
+  const hasConnections = pgSimpleCollections !== "only";
+  const hasSimpleCollections =
+    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   builder.hook(
     "GraphQLObjectType:fields",
     (fields, build, { scope: { isRootQuery }, fieldWithHooks }) => {
@@ -64,21 +70,32 @@ export default (function PgQueryProceduresPlugin(builder) {
               return memo;
             }
 
-            const fieldName = inflection.functionQueryName(proc);
-            try {
-              memo[fieldName] = makeProcField(fieldName, proc, build, {
-                fieldWithHooks,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.warn(
-                chalk.bold.yellow(
-                  `Failed to add function '${proc.namespace.name}.${
-                    proc.name
-                  }'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
-                )
-              );
-              debugWarn(e);
+            function makeField(forceList) {
+              const fieldName = forceList
+                ? inflection.functionQueryNameList(proc)
+                : inflection.functionQueryName(proc);
+              try {
+                memo[fieldName] = makeProcField(fieldName, proc, build, {
+                  fieldWithHooks,
+                  forceList,
+                });
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  chalk.bold.yellow(
+                    `Failed to add function '${proc.namespace.name}.${
+                      proc.name
+                    }'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                  )
+                );
+                debugWarn(e);
+              }
+            }
+            if (!proc.returnsSet || hasConnections) {
+              makeField(false);
+            }
+            if (proc.returnsSet && hasSimpleCollections) {
+              makeField(true);
             }
             return memo;
           }, {}),

@@ -4,7 +4,13 @@ import omit from "../omit";
 
 import type { Plugin } from "graphile-build";
 
-export default (function PgComputedColumnsPlugin(builder) {
+export default (function PgComputedColumnsPlugin(
+  builder,
+  { pgSimpleCollections }
+) {
+  const hasConnections = pgSimpleCollections !== "only";
+  const hasSimpleCollections =
+    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   builder.hook(
     "GraphQLObjectType:fields",
     (
@@ -84,15 +90,22 @@ export default (function PgComputedColumnsPlugin(builder) {
             }
 
             const pseudoColumnName = proc.name.substr(table.name.length + 1);
-            const fieldName = inflection.computedColumn(
-              pseudoColumnName,
-              proc,
-              table
-            );
-            memo[fieldName] = makeProcField(fieldName, proc, build, {
-              fieldWithHooks,
-              computed: true,
-            });
+            function makeField(forceList) {
+              const fieldName = forceList
+                ? inflection.computedColumnList(pseudoColumnName, proc, table)
+                : inflection.computedColumn(pseudoColumnName, proc, table);
+              memo[fieldName] = makeProcField(fieldName, proc, build, {
+                fieldWithHooks,
+                computed: true,
+                forceList,
+              });
+            }
+            if (!proc.returnsSet || hasConnections) {
+              makeField(false);
+            }
+            if (proc.returnsSet && hasSimpleCollections) {
+              makeField(true);
+            }
             return memo;
           }, {}),
         `Adding computed column to '${Self.name}'`

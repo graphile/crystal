@@ -224,11 +224,19 @@ export default (function PgBasicsPlugin(
             `all-${this.pluralize(this._singularizedTableName(table))}`
           );
         },
+        allRowsSimple(table: PgClass) {
+          return this.camelCase(
+            `all-${this.pluralize(this._singularizedTableName(table))}-list`
+          );
+        },
         functionMutationName(proc: PgProc) {
           return this.camelCase(this._functionName(proc));
         },
         functionQueryName(proc: PgProc) {
           return this.camelCase(this._functionName(proc));
+        },
+        functionQueryNameList(proc: PgProc) {
+          return this.camelCase(`${this._functionName(proc)}-list`);
         },
         functionPayloadType(proc: PgProc) {
           return this.upperCamelCase(`${this._functionName(proc)}-payload`);
@@ -248,6 +256,15 @@ export default (function PgBasicsPlugin(
           _table: PgClass
         ) {
           return proc.tags.fieldName || this.camelCase(pseudoColumnName);
+        },
+        computedColumnList(
+          pseudoColumnName: string,
+          proc: PgProc,
+          _table: PgClass
+        ) {
+          return proc.tags.fieldName
+            ? proc.tags.fieldName + "List"
+            : this.camelCase(`${pseudoColumnName}-list`);
         },
         singleRelationByKeys(
           detailedKeys: Keys,
@@ -277,6 +294,23 @@ export default (function PgBasicsPlugin(
             `${this.pluralize(
               this._singularizedTableName(table)
             )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`
+          );
+        },
+        manyRelationByKeysSimple(
+          detailedKeys: Keys,
+          table: PgClass,
+          _foreignTable: PgClass,
+          constraint: PgConstraint
+        ) {
+          if (constraint.tags.foreignFieldName) {
+            return constraint.tags.foreignFieldName;
+          }
+          return this.camelCase(
+            `${this.pluralize(
+              this._singularizedTableName(table)
+            )}-by-${detailedKeys
+              .map(key => this.column(key))
+              .join("-and-")}-list`
           );
         },
         rowByUniqueKeys(
