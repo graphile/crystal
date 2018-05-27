@@ -4,59 +4,53 @@ import type { Plugin } from "graphile-build";
 import omit from "../omit";
 
 export default (function PgConnectionArgOrderBy(builder) {
-  builder.hook(
-    "init",
-    (
-      _,
-      {
-        newWithHooks,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        graphql: { GraphQLEnumType },
-        inflection,
-      }
-    ) => {
-      introspectionResultsByKind.class
-        .filter(table => table.isSelectable && !omit(table, "order"))
-        .filter(table => !!table.namespace)
-        .forEach(table => {
-          const tableTypeName = inflection.tableType(table);
-          /* const TableOrderByType = */
-          newWithHooks(
-            GraphQLEnumType,
-            {
-              name: inflection.orderByType(tableTypeName),
-              description: `Methods to use when ordering \`${tableTypeName}\`.`,
-              values: {
-                NATURAL: {
-                  value: {
-                    alias: null,
-                    specs: [],
-                  },
+  builder.hook("init", (_, build) => {
+    const {
+      newWithHooks,
+      pgIntrospectionResultsByKind: introspectionResultsByKind,
+      graphql: { GraphQLEnumType },
+      inflection,
+    } = build;
+    introspectionResultsByKind.class
+      .filter(table => table.isSelectable && !omit(table, "order"))
+      .filter(table => !!table.namespace)
+      .forEach(table => {
+        const tableTypeName = inflection.tableType(table);
+        /* const TableOrderByType = */
+        newWithHooks(
+          GraphQLEnumType,
+          {
+            name: inflection.orderByType(tableTypeName),
+            description: `Methods to use when ordering \`${tableTypeName}\`.`,
+            values: {
+              NATURAL: {
+                value: {
+                  alias: null,
+                  specs: [],
                 },
               },
             },
-            {
-              pgIntrospection: table,
-              isPgRowSortEnum: true,
-            }
-          );
-        });
-      return _;
-    }
-  );
+          },
+          {
+            pgIntrospection: table,
+            isPgRowSortEnum: true,
+          }
+        );
+      });
+    return _;
+  });
   builder.hook(
     "GraphQLObjectType:fields:field:args",
-    (
-      args,
-      {
+    (args, build, context) => {
+      const {
         extend,
         getTypeByName,
         pgGetGqlTypeByTypeId,
         pgSql: sql,
         graphql: { GraphQLList, GraphQLNonNull },
         inflection,
-      },
-      {
+      } = build;
+      const {
         scope: {
           isPgFieldConnection,
           isPgFieldSimpleCollection,
@@ -65,8 +59,7 @@ export default (function PgConnectionArgOrderBy(builder) {
         addArgDataGenerator,
         Self,
         field,
-      }
-    ) => {
+      } = context;
       const shouldAddOrderBy = isPgFieldConnection || isPgFieldSimpleCollection;
       if (
         !shouldAddOrderBy ||

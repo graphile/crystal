@@ -6,11 +6,9 @@ export default (function ClientMutationIdDescriptionPlugin(
 ) {
   builder.hook(
     "GraphQLInputObjectType:fields:field",
-    (
-      field: { name?: string },
-      { extend },
-      { scope: { isMutationInput, fieldName }, Self }
-    ) => {
+    (field: { name?: string }, build, context) => {
+      const { extend } = build;
+      const { scope: { isMutationInput, fieldName }, Self } = context;
       if (
         !isMutationInput ||
         fieldName !== "clientMutationId" ||
@@ -19,7 +17,7 @@ export default (function ClientMutationIdDescriptionPlugin(
         return field;
       }
       if (!field || !Self) {
-        debugger // eslint-disable-line
+        debugger; // eslint-disable-line
       }
       return extend(
         field,
@@ -34,11 +32,9 @@ export default (function ClientMutationIdDescriptionPlugin(
 
   builder.hook(
     "GraphQLObjectType:fields:field",
-    (
-      field: { name?: string },
-      { extend },
-      { scope: { isMutationPayload, fieldName }, Self }
-    ) => {
+    (field: { name?: string }, build, context) => {
+      const { extend } = build;
+      const { scope: { isMutationPayload, fieldName }, Self } = context;
       if (
         !isMutationPayload ||
         fieldName !== "clientMutationId" ||
@@ -47,7 +43,7 @@ export default (function ClientMutationIdDescriptionPlugin(
         return field;
       }
       if (!field || !Self) {
-        debugger // eslint-disable-line
+        debugger; // eslint-disable-line
       }
       return extend(
         field,
@@ -62,12 +58,14 @@ export default (function ClientMutationIdDescriptionPlugin(
 
   builder.hook(
     "GraphQLObjectType:fields:field:args",
-    (args: {}, { extend }, { scope: { isRootMutation }, Self, field }) => {
+    (args: {}, build, context) => {
+      const { extend } = build;
+      const { scope: { isRootMutation }, Self, field } = context;
       if (!isRootMutation || !args.input || args.input.description) {
         return args;
       }
       if (!field || !Self) {
-        debugger // eslint-disable-line
+        debugger; // eslint-disable-line
       }
       return Object.assign({}, args, {
         input: extend(

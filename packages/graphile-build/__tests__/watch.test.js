@@ -41,52 +41,47 @@ const makePluginEtc = (defaultCounter = 0) => {
         dummyCounter: counter,
       });
     });
-    builder.hook(
-      "GraphQLObjectType:fields",
-      (
-        fields,
+    builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+      const {
+        dummyCounter,
+        extend,
+        getTypeByName,
+        newWithHooks,
+        parseResolveInfo,
+        resolveAlias,
+      } = build;
+      const { scope: { isRootQuery }, fieldWithHooks } = context;
+      if (!isRootQuery) return fields;
+      const Dummy = newWithHooks(
+        GraphQLObjectType,
         {
-          dummyCounter,
-          extend,
-          getTypeByName,
-          newWithHooks,
-          parseResolveInfo,
-          resolveAlias,
-        },
-        { scope: { isRootQuery }, fieldWithHooks }
-      ) => {
-        if (!isRootQuery) return fields;
-        const Dummy = newWithHooks(
-          GraphQLObjectType,
-          {
-            name: `Dummy${dummyCounter}`,
-            fields: ({ addDataGeneratorForField }) => {
-              return {
-                n: {
-                  type: new GraphQLNonNull(GraphQLInt),
-                  resolve: () => dummyCounter,
-                },
-              };
-            },
+          name: `Dummy${dummyCounter}`,
+          fields: ({ addDataGeneratorForField }) => {
+            return {
+              n: {
+                type: new GraphQLNonNull(GraphQLInt),
+                resolve: () => dummyCounter,
+              },
+            };
           },
-          {}
-        );
-        return extend(fields, {
-          dummy: fieldWithHooks(
-            "dummy",
-            ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
-              return {
-                type: Dummy,
-                resolve() {
-                  return {};
-                },
-              };
-            },
-            { isDummyField: true }
-          ),
-        });
-      }
-    );
+        },
+        {}
+      );
+      return extend(fields, {
+        dummy: fieldWithHooks(
+          "dummy",
+          ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+            return {
+              type: Dummy,
+              resolve() {
+                return {};
+              },
+            };
+          },
+          { isDummyField: true }
+        ),
+      });
+    });
   };
 
   return {
@@ -159,11 +154,13 @@ test("schema is updated when rebuild triggered", async () => {
   const getNFrom = async schema => {
     const result = await graphql(
       schema,
-      `query {
-        dummy {
-          n
+      `
+        query {
+          dummy {
+            n
+          }
         }
-      }`
+      `
     );
     if (result.errors) {
       console.log(result.errors.map(e => e.originalError));

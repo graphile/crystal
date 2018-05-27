@@ -6,10 +6,9 @@ const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 export default (function PgConnectionArgs(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
-    (
-      args,
-      { extend, getTypeByName, graphql: { GraphQLInt } },
-      {
+    (args, build, context) => {
+      const { extend, getTypeByName, graphql: { GraphQLInt } } = build;
+      const {
         scope: {
           isPgFieldConnection,
           isPgFieldSimpleCollection,
@@ -18,8 +17,7 @@ export default (function PgConnectionArgs(builder) {
         addArgDataGenerator,
         field,
         Self,
-      }
-    ) => {
+      } = context;
       if (
         !(isPgFieldConnection || isPgFieldSimpleCollection) ||
         !source ||

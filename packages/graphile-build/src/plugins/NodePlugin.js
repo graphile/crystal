@@ -84,7 +84,9 @@ export default (function NodePlugin(
 
   builder.hook("init", function defineNodeInterfaceType(
     _: {},
-    {
+    build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |}
+  ) {
+    const {
       $$isQuery,
       $$nodeType,
       getTypeByName,
@@ -95,8 +97,7 @@ export default (function NodePlugin(
         GraphQLInterfaceType,
         getNullableType,
       },
-    }: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |}
-  ) {
+    } = build;
     newWithHooks(
       GraphQLInterfaceType,
       {
@@ -124,9 +125,11 @@ export default (function NodePlugin(
 
   builder.hook("GraphQLObjectType:interfaces", function addNodeIdToQuery(
     interfaces: Array<GraphQLInterfaceType>,
-    { getTypeByName },
-    { scope: { isRootQuery } }
+    build,
+    context
   ) {
+    const { getTypeByName } = build;
+    const { scope: { isRootQuery } } = context;
     if (!isRootQuery) {
       return interfaces;
     }
@@ -143,11 +146,9 @@ export default (function NodePlugin(
     (
       fields: {},
       build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |},
-      {
-        scope: { isRootQuery },
-        fieldWithHooks,
-      }: {| ...Context, ...ContextGraphQLObjectTypeFields |}
+      context: {| ...Context, ...ContextGraphQLObjectTypeFields |}
     ) => {
+      const { scope: { isRootQuery }, fieldWithHooks } = context;
       if (!isRootQuery) {
         return fields;
       }

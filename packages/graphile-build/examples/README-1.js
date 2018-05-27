@@ -9,27 +9,25 @@ function MyRandomFieldPlugin(
   builder,
   { myDefaultMin = 1, myDefaultMax = 100 }
 ) {
-  builder.hook(
-    "GraphQLObjectType:fields",
-    (fields, { extend, graphql: { GraphQLInt } }) => {
-      return extend(fields, {
-        random: {
-          type: GraphQLInt,
-          args: {
-            sides: {
-              type: GraphQLInt,
-            },
-          },
-          resolve(_, { sides = myDefaultMax }) {
-            return (
-              Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
-              myDefaultMin
-            );
+  builder.hook("GraphQLObjectType:fields", (fields, build) => {
+    const { extend, graphql: { GraphQLInt } } = build;
+    return extend(fields, {
+      random: {
+        type: GraphQLInt,
+        args: {
+          sides: {
+            type: GraphQLInt,
           },
         },
-      });
-    }
-  );
+        resolve(_, { sides = myDefaultMax }) {
+          return (
+            Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
+            myDefaultMin
+          );
+        },
+      },
+    });
+  });
 }
 
 (async function() {
@@ -41,7 +39,16 @@ function MyRandomFieldPlugin(
   });
 
   // Run our query
-  const result = await graphql(schema, `query { random }`, null, {});
+  const result = await graphql(
+    schema,
+    `
+      query {
+        random
+      }
+    `,
+    null,
+    {}
+  );
   console.log(result); // { data: { random: 4 } }
 })().catch(e => {
   console.error(e);

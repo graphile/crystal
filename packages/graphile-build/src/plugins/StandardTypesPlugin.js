@@ -26,62 +26,55 @@ export default (function StandardTypesPlugin(builder) {
     build.addType(Cursor);
     return build;
   });
-  builder.hook(
-    "init",
-    (
-      _: {},
+  builder.hook("init", (_: {}, build) => {
+    const {
+      newWithHooks,
+      graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
+    } = build;
+    // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+    /* const PageInfo = */
+    newWithHooks(
+      GraphQLObjectType,
       {
-        newWithHooks,
-        graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
+        name: "PageInfo",
+        description: "Information about pagination in a connection.",
+        fields: ({ fieldWithHooks }) => ({
+          hasNextPage: fieldWithHooks(
+            "hasNextPage",
+            ({ addDataGenerator }) => {
+              addDataGenerator(() => {
+                return {
+                  calculateHasNextPage: true,
+                };
+              });
+              return {
+                description: "When paginating forwards, are there more items?",
+                type: new GraphQLNonNull(GraphQLBoolean),
+              };
+            },
+            { isPageInfoHasNextPageField: true }
+          ),
+          hasPreviousPage: fieldWithHooks(
+            "hasPreviousPage",
+            ({ addDataGenerator }) => {
+              addDataGenerator(() => {
+                return {
+                  calculateHasPreviousPage: true,
+                };
+              });
+              return {
+                description: "When paginating backwards, are there more items?",
+                type: new GraphQLNonNull(GraphQLBoolean),
+              };
+            },
+            { isPageInfoHasPreviousPageField: true }
+          ),
+        }),
+      },
+      {
+        isPageInfo: true,
       }
-    ) => {
-      // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-      /* const PageInfo = */
-      newWithHooks(
-        GraphQLObjectType,
-        {
-          name: "PageInfo",
-          description: "Information about pagination in a connection.",
-          fields: ({ fieldWithHooks }) => ({
-            hasNextPage: fieldWithHooks(
-              "hasNextPage",
-              ({ addDataGenerator }) => {
-                addDataGenerator(() => {
-                  return {
-                    calculateHasNextPage: true,
-                  };
-                });
-                return {
-                  description:
-                    "When paginating forwards, are there more items?",
-                  type: new GraphQLNonNull(GraphQLBoolean),
-                };
-              },
-              { isPageInfoHasNextPageField: true }
-            ),
-            hasPreviousPage: fieldWithHooks(
-              "hasPreviousPage",
-              ({ addDataGenerator }) => {
-                addDataGenerator(() => {
-                  return {
-                    calculateHasPreviousPage: true,
-                  };
-                });
-                return {
-                  description:
-                    "When paginating backwards, are there more items?",
-                  type: new GraphQLNonNull(GraphQLBoolean),
-                };
-              },
-              { isPageInfoHasPreviousPageField: true }
-            ),
-          }),
-        },
-        {
-          isPageInfo: true,
-        }
-      );
-      return _;
-    }
-  );
+    );
+    return _;
+  });
 }: Plugin);

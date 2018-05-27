@@ -11,56 +11,51 @@ export default (function PgComputedColumnsPlugin(
   const hasConnections = pgSimpleCollections !== "only";
   const hasSimpleCollections =
     pgSimpleCollections === "only" || pgSimpleCollections === "both";
-  builder.hook(
-    "GraphQLObjectType:fields",
-    (
+  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    const {
+      scope: {
+        isPgRowType,
+        isPgCompoundType,
+        isInputType,
+        pgIntrospection: table,
+      },
+      fieldWithHooks,
+      Self,
+    } = context;
+    if (
+      isInputType ||
+      !(isPgRowType || isPgCompoundType) ||
+      !table ||
+      table.kind !== "class" ||
+      !table.namespace
+    ) {
+      return fields;
+    }
+    const {
+      extend,
+      pgIntrospectionResultsByKind: introspectionResultsByKind,
+      inflection,
+    } = build;
+    const tableType = introspectionResultsByKind.type.filter(
+      type =>
+        type.type === "c" &&
+        type.namespaceId === table.namespaceId &&
+        type.classId === table.id
+    )[0];
+    if (!tableType) {
+      throw new Error("Could not determine the type for this table");
+    }
+    return extend(
       fields,
-      build,
-      {
-        scope: {
-          isPgRowType,
-          isPgCompoundType,
-          isInputType,
-          pgIntrospection: table,
-        },
-        fieldWithHooks,
-        Self,
-      }
-    ) => {
-      if (
-        isInputType ||
-        !(isPgRowType || isPgCompoundType) ||
-        !table ||
-        table.kind !== "class" ||
-        !table.namespace
-      ) {
-        return fields;
-      }
-      const {
-        extend,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        inflection,
-      } = build;
-      const tableType = introspectionResultsByKind.type.filter(
-        type =>
-          type.type === "c" &&
-          type.namespaceId === table.namespaceId &&
-          type.classId === table.id
-      )[0];
-      if (!tableType) {
-        throw new Error("Could not determine the type for this table");
-      }
-      return extend(
-        fields,
-        introspectionResultsByKind.procedure
-          .filter(proc => proc.isStable)
-          .filter(proc => proc.namespaceId === table.namespaceId)
-          .filter(proc => proc.name.startsWith(`${table.name}_`))
-          .filter(proc => proc.argTypeIds.length > 0)
-          .filter(proc => proc.argTypeIds[0] === tableType.id)
-          .filter(proc => !omit(proc, "execute"))
-          .reduce((memo, proc) => {
-            /*
+      introspectionResultsByKind.procedure
+        .filter(proc => proc.isStable)
+        .filter(proc => proc.namespaceId === table.namespaceId)
+        .filter(proc => proc.name.startsWith(`${table.name}_`))
+        .filter(proc => proc.argTypeIds.length > 0)
+        .filter(proc => proc.argTypeIds[0] === tableType.id)
+        .filter(proc => !omit(proc, "execute"))
+        .reduce((memo, proc) => {
+          /*
             proc =
               { kind: 'procedure',
                 name: 'integration_webhook_secret',
@@ -74,42 +69,41 @@ export default (function PgComputedColumnsPlugin(
                 argNames: [ 'integration' ],
                 argDefaultsNum: 0 }
             */
-            const argTypes = proc.argTypeIds.map(
-              typeId => introspectionResultsByKind.typeById[typeId]
-            );
-            if (
-              argTypes
-                .slice(1)
-                .some(
-                  type =>
-                    type.type === "c" && type.class && type.class.isSelectable
-                )
-            ) {
-              // Accepts two input tables? Skip.
-              return memo;
-            }
-
-            const pseudoColumnName = proc.name.substr(table.name.length + 1);
-            function makeField(forceList) {
-              const fieldName = forceList
-                ? inflection.computedColumnList(pseudoColumnName, proc, table)
-                : inflection.computedColumn(pseudoColumnName, proc, table);
-              memo[fieldName] = makeProcField(fieldName, proc, build, {
-                fieldWithHooks,
-                computed: true,
-                forceList,
-              });
-            }
-            if (!proc.returnsSet || hasConnections) {
-              makeField(false);
-            }
-            if (proc.returnsSet && hasSimpleCollections) {
-              makeField(true);
-            }
+          const argTypes = proc.argTypeIds.map(
+            typeId => introspectionResultsByKind.typeById[typeId]
+          );
+          if (
+            argTypes
+              .slice(1)
+              .some(
+                type =>
+                  type.type === "c" && type.class && type.class.isSelectable
+              )
+          ) {
+            // Accepts two input tables? Skip.
             return memo;
-          }, {}),
-        `Adding computed column to '${Self.name}'`
-      );
-    }
-  );
+          }
+
+          const pseudoColumnName = proc.name.substr(table.name.length + 1);
+          function makeField(forceList) {
+            const fieldName = forceList
+              ? inflection.computedColumnList(pseudoColumnName, proc, table)
+              : inflection.computedColumn(pseudoColumnName, proc, table);
+            memo[fieldName] = makeProcField(fieldName, proc, build, {
+              fieldWithHooks,
+              computed: true,
+              forceList,
+            });
+          }
+          if (!proc.returnsSet || hasConnections) {
+            makeField(false);
+          }
+          if (proc.returnsSet && hasSimpleCollections) {
+            makeField(true);
+          }
+          return memo;
+        }, {}),
+      `Adding computed column to '${Self.name}'`
+    );
+  });
 }: Plugin);

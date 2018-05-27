@@ -4,15 +4,13 @@ import type { Plugin } from "graphile-build";
 export default (function PgConnectionArgOrderByDefaultValue(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
-    (
-      args,
-      { extend, getTypeByName, pgGetGqlTypeByTypeId, inflection },
-      {
+    (args, build, context) => {
+      const { extend, getTypeByName, pgGetGqlTypeByTypeId, inflection } = build;
+      const {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         Self,
         field,
-      }
-    ) => {
+      } = context;
       if (
         !isPgFieldConnection ||
         !table ||

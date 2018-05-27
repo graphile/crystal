@@ -4,25 +4,24 @@ import makeProcField from "./makeProcField";
 import omit from "../omit";
 
 export default (function PgMutationProceduresPlugin(builder) {
-  builder.hook(
-    "GraphQLObjectType:fields",
-    (fields, build, { scope: { isRootMutation }, fieldWithHooks }) => {
-      if (!isRootMutation) {
-        return fields;
-      }
-      const {
-        extend,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
-        inflection,
-      } = build;
-      return extend(
-        fields,
-        introspectionResultsByKind.procedure
-          .filter(proc => !proc.isStable)
-          .filter(proc => !!proc.namespace)
-          .filter(proc => !omit(proc, "execute"))
-          .reduce((memo, proc) => {
-            /*
+  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    const {
+      extend,
+      pgIntrospectionResultsByKind: introspectionResultsByKind,
+      inflection,
+    } = build;
+    const { scope: { isRootMutation }, fieldWithHooks } = context;
+    if (!isRootMutation) {
+      return fields;
+    }
+    return extend(
+      fields,
+      introspectionResultsByKind.procedure
+        .filter(proc => !proc.isStable)
+        .filter(proc => !!proc.namespace)
+        .filter(proc => !omit(proc, "execute"))
+        .reduce((memo, proc) => {
+          /*
             proc =
               { kind: 'procedure',
                 name: 'integration_webhook_secret',
@@ -37,15 +36,14 @@ export default (function PgMutationProceduresPlugin(builder) {
                 argDefaultsNum: 0 }
             */
 
-            const fieldName = inflection.functionMutationName(proc);
-            memo[fieldName] = makeProcField(fieldName, proc, build, {
-              fieldWithHooks,
-              isMutation: true,
-            });
-            return memo;
-          }, {}),
-        `Adding mutation procedure to root Mutation field`
-      );
-    }
-  );
+          const fieldName = inflection.functionMutationName(proc);
+          memo[fieldName] = makeProcField(fieldName, proc, build, {
+            fieldWithHooks,
+            isMutation: true,
+          });
+          return memo;
+        }, {}),
+      `Adding mutation procedure to root Mutation field`
+    );
+  });
 }: Plugin);

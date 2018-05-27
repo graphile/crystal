@@ -16,26 +16,24 @@ function isValidMutation(Mutation) {
 }
 
 export default (async function MutationPlugin(builder) {
-  builder.hook(
-    "GraphQLSchema",
-    (schema: {}, { newWithHooks, extend, graphql: { GraphQLObjectType } }) => {
-      const Mutation = newWithHooks(
-        GraphQLObjectType,
-        {
-          name: "Mutation",
-          description:
-            "The root mutation type which contains root level fields which mutate data.",
-        },
-        { isRootMutation: true },
-        true
-      );
-      if (isValidMutation(Mutation)) {
-        return extend(schema, {
-          mutation: Mutation,
-        });
-      } else {
-        return schema;
-      }
+  builder.hook("GraphQLSchema", (schema: {}, build) => {
+    const { newWithHooks, extend, graphql: { GraphQLObjectType } } = build;
+    const Mutation = newWithHooks(
+      GraphQLObjectType,
+      {
+        name: "Mutation",
+        description:
+          "The root mutation type which contains root level fields which mutate data.",
+      },
+      { isRootMutation: true },
+      true
+    );
+    if (isValidMutation(Mutation)) {
+      return extend(schema, {
+        mutation: Mutation,
+      });
+    } else {
+      return schema;
     }
-  );
+  });
 }: Plugin);

@@ -7,13 +7,11 @@ export default (function MutationPayloadQueryPlugin(builder) {
     "GraphQLObjectType:fields",
     (
       fields: {},
-      {
-        $$isQuery,
-        extend,
-        getTypeByName,
-      }: {| ...Build, ...BuildExtensionQuery |},
-      { scope: { isMutationPayload }, Self }
+      build: {| ...Build, ...BuildExtensionQuery |},
+      context
     ): {} => {
+      const { $$isQuery, extend, getTypeByName } = build;
+      const { scope: { isMutationPayload }, Self } = context;
       if (!isMutationPayload) {
         return fields;
       }
