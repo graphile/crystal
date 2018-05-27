@@ -31,7 +31,8 @@ export default (function PgBackwardRelationPlugin(
       pgGetGqlTypeByTypeId,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
-      getAliasFromResolveInfo,
+      getSafeAliasFromResolveInfo,
+      getSafeAliasFromAlias,
       graphql: { GraphQLNonNull, GraphQLList },
       inflection,
     } = build;
@@ -181,7 +182,7 @@ export default (function PgBackwardRelationPlugin(
                         }
                       );
                       return sql.fragment`(${query})`;
-                    }, parsedResolveInfoFragment.alias);
+                    }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                   },
                 };
               });
@@ -190,8 +191,8 @@ export default (function PgBackwardRelationPlugin(
                 type: gqlTableType,
                 args: {},
                 resolve: (data, _args, _context, resolveInfo) => {
-                  const alias = getAliasFromResolveInfo(resolveInfo);
-                  return data[alias];
+                  const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+                  return data[safeAlias];
                 },
               };
             },
@@ -275,7 +276,7 @@ export default (function PgBackwardRelationPlugin(
                           }
                         );
                         return sql.fragment`(${query})`;
-                      }, parsedResolveInfoFragment.alias);
+                      }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                     },
                   };
                 });
@@ -292,11 +293,11 @@ export default (function PgBackwardRelationPlugin(
                       ),
                   args: {},
                   resolve: (data, _args, _context, resolveInfo) => {
-                    const alias = getAliasFromResolveInfo(resolveInfo);
+                    const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
                     if (isConnection) {
-                      return addStartEndCursor(data[alias]);
+                      return addStartEndCursor(data[safeAlias]);
                     } else {
-                      return data[alias];
+                      return data[safeAlias];
                     }
                   },
                   deprecationReason: isDeprecated

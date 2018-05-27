@@ -3955,9 +3955,9 @@ pg-pool@~2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-2.0.3.tgz#c022032c8949f312a4f91fb6409ce04076be3257"
 
-pg-sql2@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-2.0.0.tgz#9b89c0fc31d99450f08777d5b3501e27f81d3d2e"
+pg-sql2@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-2.1.0.tgz#f86978278451482099e4f8e8db8b7486ecb67e3f"
   dependencies:
     debug ">=2 <3"
 

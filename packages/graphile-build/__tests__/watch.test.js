@@ -48,7 +48,6 @@ const makePluginEtc = (defaultCounter = 0) => {
         getTypeByName,
         newWithHooks,
         parseResolveInfo,
-        resolveAlias,
       } = build;
       const { scope: { isRootQuery }, fieldWithHooks } = context;
       if (!isRootQuery) return fields;

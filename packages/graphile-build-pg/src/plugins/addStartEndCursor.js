@@ -3,7 +3,7 @@ import type { Plugin } from "graphile-build";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
 function cursorify(val) {
-  return val && val.__cursor ? base64(JSON.stringify(val.__cursor)) : val;
+  return val && val.__cursor ? base64(JSON.stringify(val.__cursor)) : null;
 }
 
 export default (function addStartEndCursor(value) {

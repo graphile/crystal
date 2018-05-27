@@ -29,7 +29,8 @@ export default function makeProcField(
     getTypeByName,
     pgSql: sql,
     parseResolveInfo,
-    getAliasFromResolveInfo,
+    getSafeAliasFromResolveInfo,
+    getSafeAliasFromAlias,
     gql2pg,
     pg2gql,
     newWithHooks,
@@ -314,7 +315,7 @@ export default function makeProcField(
                   functionAlias
                 );
                 return sql.fragment`(${query})`;
-              }, parsedResolveInfoFragment.alias);
+              }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
             },
           };
         });
@@ -429,8 +430,8 @@ export default function makeProcField(
         args: args,
         resolve: computed
           ? (data, _args, _context, resolveInfo) => {
-              const alias = getAliasFromResolveInfo(resolveInfo);
-              const value = data[alias];
+              const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+              const value = data[safeAlias];
               if (returnFirstValueAsValue) {
                 if (proc.returnsSet && !forceList) {
                   // EITHER `isMutation` is true, or `ConnectionType` does not

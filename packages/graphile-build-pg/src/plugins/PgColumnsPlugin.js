@@ -15,7 +15,6 @@ export default (function PgColumnsPlugin(builder) {
       pgSql: sql,
       pg2gql,
       graphql: { GraphQLString, GraphQLNonNull },
-      getAliasFromResolveInfo,
       pgTweakFragmentForType,
       pgColumnFilter,
       inflection,
@@ -66,7 +65,6 @@ export default (function PgColumnsPlugin(builder) {
               const ReturnType =
                 pgGetGqlTypeByTypeId(attr.typeId) || GraphQLString;
               addDataGenerator(parsedResolveInfoFragment => {
-                const { alias } = parsedResolveInfoFragment;
                 return {
                   pgQuery: queryBuilder => {
                     const getSelectValueForFieldAndType = (
@@ -114,7 +112,7 @@ export default (function PgColumnsPlugin(builder) {
                         )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
                         attr.type
                       ),
-                      alias
+                      fieldName
                     );
                   },
                 };
@@ -126,9 +124,8 @@ export default (function PgColumnsPlugin(builder) {
                   !attr.isNotNull && !attr.type.domainIsNotNull,
                   ReturnType
                 ),
-                resolve: (data, _args, _context, resolveInfo) => {
-                  const alias = getAliasFromResolveInfo(resolveInfo);
-                  return pg2gql(data[alias], attr.type);
+                resolve: (data, _args, _context, _resolveInfo) => {
+                  return pg2gql(data[fieldName], attr.type);
                 },
               };
             },

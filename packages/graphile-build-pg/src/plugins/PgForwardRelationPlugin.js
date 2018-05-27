@@ -10,7 +10,8 @@ export default (function PgForwardRelationPlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
-      getAliasFromResolveInfo,
+      getSafeAliasFromResolveInfo,
+      getSafeAliasFromAlias,
       pgGetGqlTypeByTypeId,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
@@ -138,7 +139,7 @@ export default (function PgForwardRelationPlugin(builder) {
                       }
                     );
                     return sql.fragment`(${query})`;
-                  }, parsedResolveInfoFragment.alias);
+                  }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                 },
               };
             });
@@ -147,8 +148,8 @@ export default (function PgForwardRelationPlugin(builder) {
               type: gqlForeignTableType, // Nullable since RLS may forbid fetching
               resolve: (rawData, _args, _context, resolveInfo) => {
                 const data = isMutationPayload ? rawData.data : rawData;
-                const alias = getAliasFromResolveInfo(resolveInfo);
-                return data[alias];
+                const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+                return data[safeAlias];
               },
             };
           },

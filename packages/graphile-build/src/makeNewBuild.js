@@ -10,11 +10,12 @@ import type {
 import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
-  getAliasFromResolveInfo,
+  getAliasFromResolveInfo as rawGetAliasFromResolveInfo,
 } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
+import LRUCache from "lru-cache";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
 
 import type SchemaBuilder, {
@@ -25,6 +26,7 @@ import type SchemaBuilder, {
 } from "./SchemaBuilder";
 
 import extend from "./extend";
+import { createHash } from "crypto";
 
 import { version } from "../package.json";
 
@@ -32,6 +34,71 @@ const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphile-build");
 const debugWarn = debugFactory("graphile-build:warn");
+
+/*
+ * This should be more than enough for normal usage. If you come under a
+ * sophisticated attack then the attacker can empty this of useful values (with
+ * a lot of work) but because we use SHA1 hashes under the covers the aliases
+ * will still be consistent even after the LRU cache is exhausted. And SHA1 can
+ * produce half a million hashes per second on my machine, the LRU only gives
+ * us a 10x speedup!
+ */
+const hashCache = LRUCache(100000);
+
+/*
+ * This function must never return a string longer than 56 characters.
+ *
+ * This function must only output alphanumeric and underscore characters.
+ *
+ * Collisions in SHA1 aren't problematic here (for us; they will be problematic
+ * for the user deliberately causing them, but that's their own fault!), so
+ * we'll happily take the performance boost over SHA256.
+ */
+function hashFieldAlias(str) {
+  const precomputed = hashCache.get(str);
+  if (precomputed) return precomputed;
+  const hash = createHash("sha1")
+    .update(str)
+    .digest("hex");
+  hashCache.set(str, hash);
+  return hash;
+}
+
+/*
+ * This function may be replaced at any time, but all versions of it will
+ * always return a representation of `alias` (a valid GraphQL identifier)
+ * that:
+ *
+ *   1. won't conflict with normal GraphQL field names
+ *   2. won't be over 60 characters long (allows for systems with alias length limits, such as PG)
+ *   3. will give the same value when called multiple times within the same GraphQL query
+ *   4. matches the regex /^[@!-_A-Za-z0-9]+$/
+ *   5. will not be prefixed with `__` (as that will conflict with other Graphile internals)
+ *
+ * It does not guarantee that this alias will be human readable!
+ */
+function getSafeAliasFromAlias(alias) {
+  if (alias.length <= 60 && !alias.startsWith("@")) {
+    // Use the `@` to prevent conflicting with normal GraphQL field names, but otherwise let it through verbatim.
+    return `@${alias}`;
+  } else if (alias.length > 1024) {
+    throw new Error(
+      `GraphQL alias '${alias}' is too long, use shorter aliases (max length 1024).`
+    );
+  } else {
+    return `@@${hashFieldAlias(alias)}`;
+  }
+}
+
+/*
+ * This provides a "safe" version of the alias from ResolveInfo, guaranteed to
+ * never be longer than 60 characters. This makes it suitable as a PostgreSQL
+ * identifier.
+ */
+function getSafeAliasFromResolveInfo(resolveInfo) {
+  const alias = rawGetAliasFromResolveInfo(resolveInfo);
+  return getSafeAliasFromAlias(alias);
+}
 
 type MetaData = {
   [string]: Array<mixed>,
@@ -167,9 +234,11 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
     graphql,
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,
-    getAliasFromResolveInfo,
+    getSafeAliasFromAlias,
+    getAliasFromResolveInfo: getSafeAliasFromResolveInfo, // DEPRECATED: do not use this!
+    getSafeAliasFromResolveInfo,
     resolveAlias(data, _args, _context, resolveInfo) {
-      const alias = getAliasFromResolveInfo(resolveInfo);
+      const alias = getSafeAliasFromResolveInfo(resolveInfo);
       return data[alias];
     },
     addType(type: GraphQLNamedType): void {

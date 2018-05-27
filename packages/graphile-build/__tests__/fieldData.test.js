@@ -37,6 +37,7 @@ const DummyConnectionPlugin = async builder => {
       newWithHooks,
       parseResolveInfo,
       resolveAlias,
+      getSafeAliasFromAlias,
     } = build;
     const { scope: { isRootQuery }, fieldWithHooks } = context;
     if (!isRootQuery) return fields;
@@ -48,17 +49,17 @@ const DummyConnectionPlugin = async builder => {
         fields: ({ addDataGeneratorForField }) => {
           addDataGeneratorForField("id", ({ alias }) => {
             return {
-              map: obj => ({ [alias]: obj.ID }),
+              map: obj => ({ [getSafeAliasFromAlias(alias)]: obj.ID }),
             };
           });
           addDataGeneratorForField("caps", ({ alias }) => {
             return {
-              map: obj => ({ [alias]: obj.CAPS }),
+              map: obj => ({ [getSafeAliasFromAlias(alias)]: obj.CAPS }),
             };
           });
           addDataGeneratorForField("random", ({ alias }) => {
             return {
-              map: () => ({ [alias]: Math.floor(Math.random() * 10000) }),
+              map: () => ({ [getSafeAliasFromAlias(alias)]: Math.floor(Math.random() * 10000) }),
             };
           });
           return {

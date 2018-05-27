@@ -12,7 +12,6 @@ import type {
 import EventEmitter from "events";
 import type {
   simplifyParsedResolveInfoFragmentWithType,
-  getAliasFromResolveInfo,
   parseResolveInfo,
 } from "graphql-parse-resolve-info";
 import type { GraphQLResolveInfo } from "graphql/type/definition";
@@ -44,7 +43,9 @@ export type Build = {|
   graphql: *,
   parseResolveInfo: parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType: simplifyParsedResolveInfoFragmentWithType,
-  getAliasFromResolveInfo: getAliasFromResolveInfo,
+  // DEPRECATED: getAliasFromResolveInfo: (resolveInfo: GraphQLResolveInfo) => string,
+  getSafeAliasFromResolveInfo: (resolveInfo: GraphQLResolveInfo) => string,
+  getSafeAliasFromAlias: (alias: string) => string,
   resolveAlias(
     data: {},
     _args: mixed,

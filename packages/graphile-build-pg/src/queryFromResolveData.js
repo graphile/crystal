@@ -266,7 +266,7 @@ export default (
     } else {
       return sql.fragment`${sqlWith} select json_build_object(${sql.join(
         fields.map(
-          ([expr, alias]) => sql.fragment`${sql.literal(alias)}, ${expr}`
+          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`
         ),
         ", "
       )}) ${sqlFrom}`;
