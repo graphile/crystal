@@ -91,6 +91,7 @@ program
   .option('-N, --no-setof-functions-contain-nulls', 'if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('--simple-collections [omit|both|only]', '"omit" (default) - relay connections only, "only" - simple collections only (no Relay connections), "both" - both')
 
 pluginHook('cli:flags:add:schema', addFlag)
 
@@ -127,6 +128,7 @@ program
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
   .option('--enable-query-batching', '[experimental] enable the server to process multiple GraphQL queries in one request')
+  .option('--disable-query-log', 'disable logging queries to console')
 
 pluginHook('cli:flags:add:webserver', addFlag)
 
@@ -232,6 +234,8 @@ const {
   enableQueryBatching,
   setofFunctionsContainNulls = true,
   legacyJsonUuid,
+  disableQueryLog,
+  simpleCollections,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -340,7 +344,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   watchPg,
   showErrorStack,
   extendedErrors,
-  disableQueryLog: false,
+  disableQueryLog,
   enableCors,
   exportJsonSchemaPath,
   exportGqlSchemaPath,
@@ -354,6 +358,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   legacyJsonUuid,
   enableQueryBatching,
   pluginHook,
+  simpleCollections,
 }), { config, cliOptions: program })
 
 if (noServer) {

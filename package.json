@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "4.0.0-beta.9",
+  "version": "4.0.0-beta.9.3",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘 (previously known as PostGraphQL)",
   "author": "Benjie Gillam <benjie@graphile.org> (https://twitter.com/benjie)",
   "license": "MIT",
@@ -43,11 +43,12 @@
     "http-errors": "^1.5.1",
     "jsonwebtoken": "^8.0.0",
     "lodash": ">=3.5 <5",
+    "lru-cache": "4.1.3",
     "parseurl": "^1.3.1",
     "pg": ">=6.1.0 <8",
     "pg-connection-string": "^0.1.3",
     "pg-sql2": "2.0.0",
-    "postgraphile-core": "4.0.0-beta.7",
+    "postgraphile-core": "4.0.0-beta.7.2",
     "send": "^0.16.1",
     "tslib": "^1.5.0"
   },

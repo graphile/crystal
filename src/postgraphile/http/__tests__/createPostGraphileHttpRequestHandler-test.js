@@ -274,6 +274,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     })
 
     test('will connect and release a Postgres client from the pool on every request', async () => {
+      // Note: no BEGIN/END because we don't need it here
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
@@ -285,15 +286,33 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } })
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
-    test('will setup a transaction for requests that use the Postgres client', async () => {
+    test('will connect and release a Postgres client with a transaction from the pool on every mutation request', async () => {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer()
+      await request(server)
+        .post('/graphql')
+        .send({ query: 'mutation{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } })
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+    })
+
+    test('will setup a transaction for requests that use the Postgres client and have config', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        pgDefaultRole: 'bob',
+      })
       await request(server)
         .post('/graphql')
         .send({ query: '{query}' })
@@ -303,6 +322,15 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       expect(pgPool.connect.mock.calls).toEqual([[]])
       expect(pgClient.query.mock.calls).toEqual([
         ['begin'],
+        [
+          {
+            'text': 'select set_config($1, $2, true)',
+            'values': [
+              'role',
+              'bob',
+            ],
+          },
+        ],
         ['EXECUTE'],
         ['commit'],
       ])
