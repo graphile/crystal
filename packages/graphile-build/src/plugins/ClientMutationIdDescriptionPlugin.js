@@ -16,9 +16,6 @@ export default (function ClientMutationIdDescriptionPlugin(
       ) {
         return field;
       }
-      if (!field || !Self) {
-        debugger; // eslint-disable-line
-      }
       return extend(
         field,
         {
@@ -42,9 +39,6 @@ export default (function ClientMutationIdDescriptionPlugin(
       ) {
         return field;
       }
-      if (!field || !Self) {
-        debugger; // eslint-disable-line
-      }
       return extend(
         field,
         {
@@ -63,9 +57,6 @@ export default (function ClientMutationIdDescriptionPlugin(
       const { scope: { isRootMutation }, Self, field } = context;
       if (!isRootMutation || !args.input || args.input.description) {
         return args;
-      }
-      if (!field || !Self) {
-        debugger; // eslint-disable-line
       }
       return Object.assign({}, args, {
         input: extend(
