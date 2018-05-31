@@ -308,7 +308,16 @@ export default function createPostGraphileHttpRequestHandler(options) {
    * @param {IncomingMessage} req
    * @param {ServerResponse} res
    */
-  const requestHandler = async (req, res, next) => {
+  const requestHandler = async (incomingReq, res, next) => {
+    // You can use this hook either to modify the incoming request or to tell
+    // PostGraphile not to handle the request further (return null). NOTE: if
+    // you return `null` from this hook then you are also responsible for
+    // calling `next()` (should that be required).
+    const req = pluginHook('postgraphile:http:handler', incomingReq, {options, res, next})
+    if (req == null) {
+      return
+    }
+
     // Add our CORS headers to be good web citizens (there are perf
     // implications though so be careful!)
     //
