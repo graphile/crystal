@@ -445,7 +445,7 @@ export default (function PgTypesPlugin(
     };
 
     const parseMoney = str => {
-      const numerical = str.replace(/[^0-9.,]/g, "");
+      const numerical = str.replace(/[^0-9.,-]/g, "");
       const lastCommaIndex = numerical.lastIndexOf(",");
       if (lastCommaIndex >= 0 && lastCommaIndex === numerical.length - 3) {
         // Assume string is of the form '123.456,78'
