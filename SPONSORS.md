@@ -6,14 +6,14 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 ## Leaders
 
 * Chad Furman
-* Diwank Tomer
 * Joe Dennis
 * James Allain
+* Alec Wenzowski
 
 ## Supporters
 
 * Mtpc
 * Evgeniy Foucault
-* Alec Wenzowski
 * Clay Smith
 * Matt Bretl (also a major community contributor!)
+* Steven McDowall
