@@ -1,6 +1,4 @@
-<img width="100" height="100" style="float: right;" title="Graphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/graphile.optimized.svg" />
-
-<div style="float: left">
+<img width="100" height="100" title="Graphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/graphile.optimized.svg" />
 
 # Graphile-Build
 
@@ -9,15 +7,12 @@
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
-</div>
- 
-<div style="clear: both;"></div>
 Build high-performance easily-extensible GraphQL schemas by combining plugins.
 
 _NOTE: if you're looking for a performant GraphQL API based on a PostgreSQL database you're probably looking for [PostGraphile](https://github.com/graphile/postgraphile) (previously
 'PostGraphQL'); the schema building tools in this repository are used to power PostGraphile among other things._
 
-This repository is a monorepo (managed by [lerna][]) which comprises the following packages:
+This repository is a monorepo (managed by [lerna][]):
 
 **[graphile-build][]**: The core package: a simple plugin system that enables you to build a GraphQL schema out of plugins
 
@@ -37,10 +32,13 @@ SQL database)
 
 ## History
 
-This system was originally built by [Benjie](https://twitter.com/benjie) over a couple of weeks as a proof of concept, growing out of a need for more efficient SQL queries, easier
-extensibility and greater customisation in [PostGraphQL][]. Over the next year it slowly matured into the system it is today. I'm extremely grateful to
-[Caleb Meredith][] for the stellar work he put into PostGraphQL, and to the
-community who helped me come up with this idea.
+This system was originally built by [Benjie](https://twitter.com/benjie) over a
+couple of weeks as a proof of concept, growing out of a need for more efficient
+SQL queries, easier extensibility and greater customisation in [PostGraphQL][postgraphile].
+Over the next year thanks to the input of the community and ongoing development
+and testing it matured into the production-ready system it is today. I'm
+extremely grateful to [Caleb Meredith][] for the stellar work he put into
+PostGraphQL, and to the community who helped me come up with this idea.
 
 ## Development
 
@@ -71,7 +69,7 @@ If you get an error like the below:
 `GraphQL conflict for 'GraphQLObjectType' detected! Multiple versions of graphql exist in your node_modules?`
 
 it means the `peerDependencies` have been installed locally in each package
-which is not what we want (we want them installed in the root `node_modules`.
+which is not what we want (we want them installed in the root `node_modules`).
 
 To solve this, we need to re-bootstrap:
 
@@ -81,7 +79,7 @@ yarn
 lerna bootstrap
 ```
 
-[postgraphql]: https://github.com/graphile/postgraphile
+[postgraphile]: https://github.com/graphile/postgraphile
 [caleb meredith]: https://github.com/calebmer
 [lerna]: https://github.com/lerna/lerna
 [graphile-build]: packages/graphile-build/
