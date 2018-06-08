@@ -1,16 +1,21 @@
-# GraphQL-Build
+<img width="100" height="100" style="float: right;" title="Graphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/graphile.optimized.svg" />
+
+<div style="float: left">
+
+# Graphile-Build
 
 ![MIT license](https://img.shields.io/npm/l/graphile-build.svg)
 [![Gitter chat room](https://badges.gitter.im/graphile/postgraphile.svg)](https://gitter.im/graphile/postgraphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
-Build a high-performance easily-extensible GraphQL schema by combining plugins.
+</div>
+ 
+<div style="clear: both;"></div>
+Build high-performance easily-extensible GraphQL schemas by combining plugins.
 
-_NOTE: you might actually be looking for PostGraphile (previously
-'PostGraphQL') which can be found
-[here](https://github.com/graphile/postgraphile); the schema building tools
-in this repository are used to power PostGraphile among other things._
+_NOTE: if you're looking for a performant GraphQL API based on a PostgreSQL database you're probably looking for [PostGraphile](https://github.com/graphile/postgraphile) (previously
+'PostGraphQL'); the schema building tools in this repository are used to power PostGraphile among other things._
 
 This repository is a monorepo (managed by [lerna][]) which comprises the following packages:
 
@@ -23,29 +28,17 @@ don't use that plugin! (Surfacing plugin dependencies has not been built yet,
 so be careful when you disable a plugin.)
 
 **[postgraphile-core][]**: Intended to be used by [PostGraphile][] in
-order to provide its schema functionality (excluding HTTP handling, etc)
+order to provide its GraphQL schema functionality (excluding HTTP handling, etc)
 
 **[graphql-parse-resolve-info][]**: Parses a GraphQLResolveInfo object into a
 tree of the fields that are being requested to enable optimisations to your
 GraphQL schema (e.g. we use it to determine which fields are required from the
 SQL database)
 
-## Status
-
-* [graphile-build][] - working (but needs tests, more documentation, refactoring,
-  and probably needs to support more hooks)
-
-* [graphile-build-pg][] / [postgraphile-core][] - working - passes the PostGraphQL v3
-  integration tests for queries and mutations
-
-* [graphql-parse-resolve-info][] - complete (but needs dedicated tests because
-  it's currently only tested by virtue of the postgraphile-core tests depending
-  on it)
-
 ## History
 
-This system grew out of a need for more efficient SQL queries, easier
-extensibility and customisation in [PostGraphQL][]. I'm extremely grateful to
+This system was originally built by [Benjie](https://twitter.com/benjie) over a couple of weeks as a proof of concept, growing out of a need for more efficient SQL queries, easier
+extensibility and greater customisation in [PostGraphQL][]. Over the next year it slowly matured into the system it is today. I'm extremely grateful to
 [Caleb Meredith][] for the stellar work he put into PostGraphQL, and to the
 community who helped me come up with this idea.
 
@@ -67,9 +60,9 @@ lerna run test
 If the above succeeds, you're good to go! If not, please reach out on twitter:
 [@benjie](https://twitter.com/benjie).
 
-### Working with docker
+### Working with Docker
 
-If you want to work in a docker environment you can follow [the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
+If you want to work in a Docker environment you can follow [the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
 
 ### GraphQL conflict
 
