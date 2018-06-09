@@ -3306,13 +3306,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphile-build-pg@4.0.0-beta.8:
-  version "4.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-beta.8.tgz#096735a79cf938b1c54bc80aeb46a6712daae4b5"
+graphile-build-pg@4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.1.tgz#178b6389b5dfe8d1793d5a3f16ce5ca7bb567d98"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-beta.8"
+    graphile-build "4.0.0-rc.1"
     graphql-iso-date "^3.2.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3320,12 +3320,12 @@ graphile-build-pg@4.0.0-beta.8:
     pg-sql2 "2.1.0"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-beta.8:
-  version "4.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-beta.8.tgz#3e1ef87f21c581b7d9418077e677c4769b9e1801"
+graphile-build@4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.1.tgz#c6037491498fd498b129c3b1053ced9d6cc5bd3f"
   dependencies:
     debug ">=2 <3"
-    graphql-parse-resolve-info "4.0.0-beta.8"
+    graphql-parse-resolve-info "4.0.0-rc.1"
     lodash ">=4 <5"
     pluralize "7.0.0"
 
@@ -3400,9 +3400,9 @@ graphql-language-service-utils@^1.1.0:
     graphql-config "1.1.4"
     graphql-language-service-types "^1.1.0"
 
-graphql-parse-resolve-info@4.0.0-beta.8:
-  version "4.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-beta.8.tgz#71be1a339ec0e36f26de432e4c77722e7c5c1ff5"
+graphql-parse-resolve-info@4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/graphql-parse-resolve-info/-/graphql-parse-resolve-info-4.0.0-rc.1.tgz#66ce65d4ef004000c69f2c34e2b10dc7aab74e6e"
   dependencies:
     debug ">=2 <3"
 
@@ -6279,12 +6279,12 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.3.0"
 
-postgraphile-core@4.0.0-beta.8:
-  version "4.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-beta.8.tgz#eb196fca611351ab81f79cfb265e7d51775c89ab"
+postgraphile-core@4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.1.tgz#b980ae3e658acaee760d465cfe1b727a465a3027"
   dependencies:
-    graphile-build "4.0.0-beta.8"
-    graphile-build-pg "4.0.0-beta.8"
+    graphile-build "4.0.0-rc.1"
+    graphile-build-pg "4.0.0-rc.1"
 
 postgres-array@~1.0.0:
   version "1.0.2"
