@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "4.0.0-beta.8",
+  "version": "4.0.0-rc.1",
   "description": "Build a GraphQL schema from plugins",
   "main": "node8plus/index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "homepage": "https://github.com/graphile/graphile-build#readme",
   "dependencies": {
     "debug": ">=2 <3",
-    "graphql-parse-resolve-info": "4.0.0-beta.8",
+    "graphql-parse-resolve-info": "4.0.0-rc.1",
     "lodash": ">=4 <5",
     "pluralize": "7.0.0"
   },
