@@ -1,23 +1,8 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import {
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLScalarType,
-  isInputType,
-  getNamedType,
-} from "graphql";
-import { Kind } from "graphql/language";
 import { types as pgTypes } from "pg";
 
-import { GraphQLJSON, GraphQLJson } from "../GraphQLJSON";
+import makeGraphQLJSONTypes from "../GraphQLJSON";
 
 import rawParseInterval from "postgres-interval";
 import LRU from "lru-cache";
@@ -25,27 +10,6 @@ import LRU from "lru-cache";
 function indent(str) {
   return "  " + str.replace(/\n/g, "\n  ");
 }
-
-const stringType = (name, description) =>
-  new GraphQLScalarType({
-    name,
-    description,
-    serialize: value => String(value),
-    parseValue: value => String(value),
-    parseLiteral: ast => {
-      if (ast.kind !== Kind.STRING) {
-        throw new Error("Can only parse string values");
-      }
-      return ast.value;
-    },
-  });
-/*
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime,
-} = require("graphql-iso-date");
-*/
 
 const parseCache = LRU(500);
 function parseInterval(str) {
@@ -108,7 +72,23 @@ export default (function PgTypesPlugin(
       addType,
       pgSql: sql,
       inflection,
+      graphql,
     } = build;
+    const {
+      GraphQLNonNull,
+      GraphQLString,
+      GraphQLInt,
+      GraphQLFloat,
+      GraphQLBoolean,
+      GraphQLList,
+      GraphQLEnumType,
+      GraphQLObjectType,
+      GraphQLInputObjectType,
+      GraphQLScalarType,
+      isInputType,
+      getNamedType,
+      Kind,
+    } = graphql;
 
     const gqlTypeByTypeIdGenerator = {};
     const gqlInputTypeByTypeIdGenerator = {};
@@ -236,6 +216,20 @@ export default (function PgTypesPlugin(
       return memo;
     }, {});
 
+    const stringType = (name, description) =>
+      new GraphQLScalarType({
+        name,
+        description,
+        serialize: value => String(value),
+        parseValue: value => String(value),
+        parseLiteral: ast => {
+          if (ast.kind !== Kind.STRING) {
+            throw new Error("Can only parse string values");
+          }
+          return ast.value;
+        },
+      });
+
     const BigFloat = stringType(
       "BigFloat",
       "A floating point number that requires more precision than IEEE 754 binary 64"
@@ -337,6 +331,8 @@ export default (function PgTypesPlugin(
       pgLegacyJsonUuid ? "Uuid" : "UUID",
       "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
     );
+
+    const { GraphQLJSON, GraphQLJson } = makeGraphQLJSONTypes(graphql);
 
     // pgExtendedTypes might change what types we use for things
     const JSONType = pgExtendedTypes
