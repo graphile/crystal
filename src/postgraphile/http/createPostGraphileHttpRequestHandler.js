@@ -195,12 +195,22 @@ export default function createPostGraphileHttpRequestHandler(options) {
   const DEFAULT_HANDLE_ERRORS = errors => errors.map(formatError)
   const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS
 
+  function convertKoaBodyParserToConnect(req, res, next) {
+    if (req._koaCtx && req._koaCtx.request && req._koaCtx.request.body) {
+      req._body = true
+      req.body = req._koaCtx.request.body
+    }
+    next()
+  }
+
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
   // not call `next`). Middlewares that handle a request like favicon
   // middleware will result in a promise that never resolves, and we don’t
   // want that.
   const bodyParserMiddlewares = [
+    // Convert koa body to connect-compatible body
+    convertKoaBodyParserToConnect,
     // Parse JSON bodies.
     bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
@@ -221,6 +231,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
         })
       }
     },
+    (req, res, next) => next(),
   )
 
   // And we really want that function to be await-able
@@ -752,6 +763,9 @@ export default function createPostGraphileHttpRequestHandler(options) {
       // Set the correct `koa` variable names…
       const ctx = a
       const next = b
+
+      // Hack the req object so we can get back to ctx
+      ctx.req._koaCtx = ctx
 
       // Execute our request handler. If an error is thrown, we don’t call
       // `next` with an error. Instead we return the promise and let `koa`
