@@ -767,12 +767,7 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // Hack the req object so we can get back to ctx
       ctx.req._koaCtx = ctx
-      ctx.res.writeHead = () => {
-        throw new Error('res.writeHead not supported in Koa environment')
-      }
-      ctx.res.send = () => {
-        throw new Error('res.send not supported in Koa environment')
-      }
+
       const oldEnd = ctx.res.end
       ctx.res.end = (body) => {
         ctx.response.body = body
