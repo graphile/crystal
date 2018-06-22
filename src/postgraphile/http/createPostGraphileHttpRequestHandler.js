@@ -766,11 +766,29 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // Hack the req object so we can get back to ctx
       ctx.req._koaCtx = ctx
+      ctx.res.send = () => {
+        throw new Error('res.send not supported in Koa environment')
+      }
+      const oldEnd = ctx.res.end
+      ctx.res.end = (body) => {
+        ctx.response.body = body
+      }
 
       // Execute our request handler. If an error is thrown, we don’t call
       // `next` with an error. Instead we return the promise and let `koa`
       // handle the error.
-      return requestHandler(ctx.req, ctx.res, next)
+      return (async () => {
+        let result
+        try {
+          result = await requestHandler(ctx.req, ctx.res, next)
+        } finally {
+          ctx.res.end = oldEnd
+          if (ctx.res.statusCode && ctx.res.statusCode !== 200) {
+            ctx.response.status = ctx.res.statusCode
+          }
+        }
+        return result
+      })()
     } else {
       // Set the correct `connect` style variable names. If there was no `next`
       // defined (likely the case if the client is using `http`) we use the
