@@ -10,8 +10,8 @@ export default (async function PgRowByUniqueConstraint(builder) {
     const {
       extend,
       parseResolveInfo,
-      pgGetGqlTypeByTypeId,
-      pgGetGqlInputTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+      pgGetGqlInputTypeByTypeIdAndModifier,
       gql2pg,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
@@ -28,7 +28,10 @@ export default (async function PgRowByUniqueConstraint(builder) {
         .filter(table => !!table.namespace)
         .filter(table => !omit(table, "read"))
         .reduce((memo, table) => {
-          const TableType = pgGetGqlTypeByTypeId(table.type.id);
+          const TableType = pgGetGqlTypeByTypeIdAndModifier(
+            table.type.id,
+            null
+          );
           const sqlFullTableName = sql.identifier(
             table.namespace.name,
             table.name
@@ -66,7 +69,10 @@ export default (async function PgRowByUniqueConstraint(builder) {
                   return {
                     type: TableType,
                     args: keys.reduce((memo, key) => {
-                      const InputType = pgGetGqlInputTypeByTypeId(key.typeId);
+                      const InputType = pgGetGqlInputTypeByTypeIdAndModifier(
+                        key.typeId,
+                        key.typeModifier
+                      );
                       if (!InputType) {
                         throw new Error(
                           `Could not find input type for key '${

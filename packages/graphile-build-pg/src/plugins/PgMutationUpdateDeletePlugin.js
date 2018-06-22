@@ -25,8 +25,8 @@ export default (async function PgMutationUpdateDeletePlugin(
       parseResolveInfo,
       getTypeByName,
       gql2pg,
-      pgGetGqlTypeByTypeId,
-      pgGetGqlInputTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+      pgGetGqlInputTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       getNodeType,
@@ -61,7 +61,13 @@ export default (async function PgMutationUpdateDeletePlugin(
                   !omit(table, "delete"))
             )
             .reduce((memo, table) => {
-              const TableType = pgGetGqlTypeByTypeId(table.type.id);
+              const TableType = pgGetGqlTypeByTypeIdAndModifier(
+                table.type.id,
+                null
+              );
+              if (!TableType) {
+                return memo;
+              }
               async function commonCodeRenameMe(
                 pgClient,
                 resolveInfo,
@@ -172,7 +178,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                 const attributes = introspectionResultsByKind.attribute
                   .filter(attr => attr.classId === table.id)
                   .sort((a, b) => a.num - b.num);
-                const Table = pgGetGqlTypeByTypeId(table.type.id);
+                const Table = pgGetGqlTypeByTypeIdAndModifier(
+                  table.type.id,
+                  null
+                );
                 const tableTypeName = Table.name;
                 const TablePatch = getTypeByName(
                   inflection.patchType(Table.name)
@@ -433,7 +442,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                           memo[inflection.column(key)] = {
                             description: key.description,
                             type: new GraphQLNonNull(
-                              pgGetGqlInputTypeByTypeId(key.typeId)
+                              pgGetGqlInputTypeByTypeIdAndModifier(
+                                key.typeId,
+                                key.typeModifier
+                              )
                             ),
                           };
                           return memo;

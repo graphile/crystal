@@ -3814,12 +3814,6 @@ type Mutation {
     \\"\\"\\"
     input: NoArgsMutationInput!
   ): NoArgsMutationPayload
-  normalRand(
-    \\"\\"\\"
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
-    input: NormalRandInput!
-  ): NormalRandPayload
 
   \\"\\"\\"Reads and enables pagination through a set of \`Post\`.\\"\\"\\"
   postMany(
@@ -4430,34 +4424,6 @@ enum NonUpdatableViewsOrderBy {
   COLUMN_ASC
   COLUMN_DESC
   NATURAL
-}
-
-\\"\\"\\"All input for the \`normalRand\` mutation.\\"\\"\\"
-input NormalRandInput {
-  arg0: Int!
-  arg1: Float!
-  arg2: Float!
-
-  \\"\\"\\"
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
-  clientMutationId: String
-}
-
-\\"\\"\\"The output of our \`normalRand\` mutation.\\"\\"\\"
-type NormalRandPayload {
-  \\"\\"\\"
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
-  clientMutationId: String
-  floats: [Float]
-
-  \\"\\"\\"
-  Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
-  query: Query
 }
 
 scalar NotNullTimestamp
@@ -5891,72 +5857,6 @@ type Query implements Node {
     offset: Int
   ): CompoundTypesConnection!
 
-  \\"\\"\\"Reads and enables pagination through a set of \`TablefuncCrosstab2\`.\\"\\"\\"
-  crosstab2(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
-    after: Cursor
-    arg0: String!
-
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
-    before: Cursor
-
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    \\"\\"\\"
-    offset: Int
-  ): TablefuncCrosstab2SConnection!
-
-  \\"\\"\\"Reads and enables pagination through a set of \`TablefuncCrosstab3\`.\\"\\"\\"
-  crosstab3(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
-    after: Cursor
-    arg0: String!
-
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
-    before: Cursor
-
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    \\"\\"\\"
-    offset: Int
-  ): TablefuncCrosstab3SConnection!
-
-  \\"\\"\\"Reads and enables pagination through a set of \`TablefuncCrosstab4\`.\\"\\"\\"
-  crosstab4(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
-    after: Cursor
-    arg0: String!
-
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
-    before: Cursor
-
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
-    first: Int
-
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
-    last: Int
-
-    \\"\\"\\"
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    \\"\\"\\"
-    offset: Int
-  ): TablefuncCrosstab4SConnection!
-
   \\"\\"\\"Reads a single \`DefaultValue\` using its globally unique \`ID\`.\\"\\"\\"
   defaultValue(
     \\"\\"\\"
@@ -6641,111 +6541,6 @@ type StaticBigIntegerEdge {
 
   \\"\\"\\"The \`BigInt\` at the end of the edge.\\"\\"\\"
   node: BigInt
-}
-
-type TablefuncCrosstab2 {
-  category1: String
-  category2: String
-  rowName: String
-}
-
-\\"\\"\\"A connection to a list of \`TablefuncCrosstab2\` values.\\"\\"\\"
-type TablefuncCrosstab2SConnection {
-  \\"\\"\\"
-  A list of edges which contains the \`TablefuncCrosstab2\` and cursor to aid in pagination.
-  \\"\\"\\"
-  edges: [TablefuncCrosstab2SEdge!]!
-
-  \\"\\"\\"A list of \`TablefuncCrosstab2\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab2]!
-
-  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
-  pageInfo: PageInfo!
-
-  \\"\\"\\"
-  The count of *all* \`TablefuncCrosstab2\` you could get from the connection.
-  \\"\\"\\"
-  totalCount: Int
-}
-
-\\"\\"\\"A \`TablefuncCrosstab2\` edge in the connection.\\"\\"\\"
-type TablefuncCrosstab2SEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
-  cursor: Cursor
-
-  \\"\\"\\"The \`TablefuncCrosstab2\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab2
-}
-
-type TablefuncCrosstab3 {
-  category1: String
-  category2: String
-  category3: String
-  rowName: String
-}
-
-\\"\\"\\"A connection to a list of \`TablefuncCrosstab3\` values.\\"\\"\\"
-type TablefuncCrosstab3SConnection {
-  \\"\\"\\"
-  A list of edges which contains the \`TablefuncCrosstab3\` and cursor to aid in pagination.
-  \\"\\"\\"
-  edges: [TablefuncCrosstab3SEdge!]!
-
-  \\"\\"\\"A list of \`TablefuncCrosstab3\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab3]!
-
-  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
-  pageInfo: PageInfo!
-
-  \\"\\"\\"
-  The count of *all* \`TablefuncCrosstab3\` you could get from the connection.
-  \\"\\"\\"
-  totalCount: Int
-}
-
-\\"\\"\\"A \`TablefuncCrosstab3\` edge in the connection.\\"\\"\\"
-type TablefuncCrosstab3SEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
-  cursor: Cursor
-
-  \\"\\"\\"The \`TablefuncCrosstab3\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab3
-}
-
-type TablefuncCrosstab4 {
-  category1: String
-  category2: String
-  category3: String
-  category4: String
-  rowName: String
-}
-
-\\"\\"\\"A connection to a list of \`TablefuncCrosstab4\` values.\\"\\"\\"
-type TablefuncCrosstab4SConnection {
-  \\"\\"\\"
-  A list of edges which contains the \`TablefuncCrosstab4\` and cursor to aid in pagination.
-  \\"\\"\\"
-  edges: [TablefuncCrosstab4SEdge!]!
-
-  \\"\\"\\"A list of \`TablefuncCrosstab4\` objects.\\"\\"\\"
-  nodes: [TablefuncCrosstab4]!
-
-  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
-  pageInfo: PageInfo!
-
-  \\"\\"\\"
-  The count of *all* \`TablefuncCrosstab4\` you could get from the connection.
-  \\"\\"\\"
-  totalCount: Int
-}
-
-\\"\\"\\"A \`TablefuncCrosstab4\` edge in the connection.\\"\\"\\"
-type TablefuncCrosstab4SEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
-  cursor: Cursor
-
-  \\"\\"\\"The \`TablefuncCrosstab4\` at the end of the edge.\\"\\"\\"
-  node: TablefuncCrosstab4
 }
 
 \\"\\"\\"All input for the \`tableMutation\` mutation.\\"\\"\\"

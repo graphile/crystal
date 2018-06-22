@@ -12,7 +12,7 @@ export default (function PgScalarFunctionConnectionPlugin(
       newWithHooks,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       graphql: {
         GraphQLObjectType,
         GraphQLNonNull,
@@ -37,7 +37,11 @@ export default (function PgScalarFunctionConnectionPlugin(
           // Just use the standard table connection from PgTablesPlugin
           return;
         }
-        const NodeType = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
+        // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod
+        // on function arguments and return types, however maybe a later
+        // version of PG will?
+        const NodeType =
+          pgGetGqlTypeByTypeIdAndModifier(returnType.id, null) || GraphQLString;
         const EdgeType = newWithHooks(
           GraphQLObjectType,
           {

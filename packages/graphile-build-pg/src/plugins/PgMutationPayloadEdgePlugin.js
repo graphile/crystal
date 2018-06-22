@@ -8,7 +8,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
     const {
       extend,
       getTypeByName,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgSql: sql,
       graphql: { GraphQLList, GraphQLNonNull },
       pgIntrospectionResultsByKind: introspectionResultsByKind,
@@ -31,7 +31,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
     ) {
       return fields;
     }
-    const TableType = pgGetGqlTypeByTypeId(table.type.id);
+    const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
     const tableTypeName = TableType.name;
     const TableOrderByType = getTypeByName(
       inflection.orderByType(tableTypeName)

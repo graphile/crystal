@@ -20,7 +20,7 @@ export default (async function PgAllRows(
       parseResolveInfo,
       extend,
       getTypeByName,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgSql: sql,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
@@ -39,7 +39,13 @@ export default (async function PgAllRows(
           if (omit(table, "all")) {
             return memo;
           }
-          const TableType = pgGetGqlTypeByTypeId(table.type.id);
+          const TableType = pgGetGqlTypeByTypeIdAndModifier(
+            table.type.id,
+            null
+          );
+          if (!TableType) {
+            return memo;
+          }
           const tableTypeName = TableType.name;
           const ConnectionType = getTypeByName(
             inflection.connection(TableType.name)

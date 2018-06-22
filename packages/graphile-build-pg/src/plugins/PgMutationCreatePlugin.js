@@ -20,8 +20,8 @@ export default (function PgMutationCreatePlugin(
       newWithHooks,
       parseResolveInfo,
       pgIntrospectionResultsByKind,
-      pgGetGqlTypeByTypeId,
-      pgGetGqlInputTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+      pgGetGqlInputTypeByTypeIdAndModifier,
       pgSql: sql,
       gql2pg,
       graphql: {
@@ -45,7 +45,7 @@ export default (function PgMutationCreatePlugin(
         .filter(table => table.isSelectable)
         .filter(table => table.isInsertable && !omit(table, "create"))
         .reduce((memo, table) => {
-          const Table = pgGetGqlTypeByTypeId(table.type.id);
+          const Table = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
           if (!Table) {
             debug(
               `There was no table type for table '${table.namespace.name}.${
@@ -54,7 +54,10 @@ export default (function PgMutationCreatePlugin(
             );
             return memo;
           }
-          const TableInput = pgGetGqlInputTypeByTypeId(table.type.id);
+          const TableInput = pgGetGqlInputTypeByTypeIdAndModifier(
+            table.type.id,
+            null
+          );
           if (!TableInput) {
             debug(
               `There was no input type for table '${table.namespace.name}.${

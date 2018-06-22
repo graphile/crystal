@@ -5,7 +5,12 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
     (args, build, context) => {
-      const { extend, getTypeByName, pgGetGqlTypeByTypeId, inflection } = build;
+      const {
+        extend,
+        getTypeByName,
+        pgGetGqlTypeByTypeIdAndModifier,
+        inflection,
+      } = build;
       const {
         scope: { isPgFieldConnection, pgFieldIntrospection: table },
         Self,
@@ -21,7 +26,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
       ) {
         return args;
       }
-      const TableType = pgGetGqlTypeByTypeId(table.type.id);
+      const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
       const tableTypeName = TableType.name;
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)

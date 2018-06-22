@@ -24,8 +24,8 @@ export default function makeProcField(
   proc: PgProc,
   {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
-    pgGetGqlTypeByTypeId,
-    pgGetGqlInputTypeByTypeId,
+    pgGetGqlTypeByTypeIdAndModifier,
+    pgGetGqlInputTypeByTypeIdAndModifier,
     getTypeByName,
     pgSql: sql,
     parseResolveInfo,
@@ -35,7 +35,7 @@ export default function makeProcField(
     pg2gql,
     newWithHooks,
     pgStrictFunctions: strictFunctions,
-    pgTweakFragmentForType,
+    pgTweakFragmentForTypeAndModifier,
     graphql: {
       GraphQLNonNull,
       GraphQLList,
@@ -96,7 +96,9 @@ export default function makeProcField(
   const notNullArgCount =
     proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
-    const Type = pgGetGqlInputTypeByTypeId(type.id) || GraphQLString;
+    // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod on function return values, but maybe a later version might
+    const Type =
+      pgGetGqlInputTypeByTypeIdAndModifier(type.id, null) || GraphQLString;
     if (idx >= notNullArgCount) {
       return Type;
     } else {
@@ -122,7 +124,8 @@ export default function makeProcField(
   payloadTypeScope.pgIntrospection = proc;
   let returnFirstValueAsValue = false;
   const TableType =
-    returnTypeTable && pgGetGqlTypeByTypeId(returnTypeTable.type.id);
+    returnTypeTable &&
+    pgGetGqlTypeByTypeIdAndModifier(returnTypeTable.type.id, null);
 
   const isTableLike: boolean =
     (TableType && isCompositeType(TableType)) || false;
@@ -158,7 +161,9 @@ export default function makeProcField(
       payloadTypeScope.pgIntrospectionTable = returnTypeTable;
     }
   } else {
-    const Type = pgGetGqlTypeByTypeId(returnType.id) || GraphQLString;
+    // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod on function return values, but maybe a later version might
+    const Type =
+      pgGetGqlTypeByTypeIdAndModifier(returnType.id, null) || GraphQLString;
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(proc);
       const ConnectionType = getTypeByName(connectionTypeName);
@@ -274,17 +279,21 @@ export default function makeProcField(
             if (!isTableLike) {
               if (returnTypeTable) {
                 innerQueryBuilder.select(
-                  pgTweakFragmentForType(
+                  pgTweakFragmentForTypeAndModifier(
                     sql.fragment`${functionAlias}`,
-                    returnTypeTable.type
+                    returnTypeTable.type,
+                    null,
+                    resolveData
                   ),
                   "value"
                 );
               } else {
                 innerQueryBuilder.select(
-                  pgTweakFragmentForType(
+                  pgTweakFragmentForTypeAndModifier(
                     sql.fragment`${functionAlias}.${functionAlias}`,
-                    returnType
+                    returnType,
+                    null, // We can't determine a type modifier for functions
+                    resolveData
                   ),
                   "value"
                 );

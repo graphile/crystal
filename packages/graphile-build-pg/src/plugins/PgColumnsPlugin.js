@@ -10,12 +10,12 @@ export default (function PgColumnsPlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       pg2gql,
       graphql: { GraphQLString, GraphQLNonNull },
-      pgTweakFragmentForType,
+      pgTweakFragmentForTypeAndModifier,
       pgColumnFilter,
       inflection,
     } = build;
@@ -63,13 +63,17 @@ export default (function PgColumnsPlugin(builder) {
             fieldName,
             ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
               const ReturnType =
-                pgGetGqlTypeByTypeId(attr.typeId) || GraphQLString;
+                pgGetGqlTypeByTypeIdAndModifier(
+                  attr.typeId,
+                  attr.typeModifier
+                ) || GraphQLString;
               addDataGenerator(parsedResolveInfoFragment => {
                 return {
                   pgQuery: queryBuilder => {
-                    const getSelectValueForFieldAndType = (
+                    const getSelectValueForFieldAndTypeAndModifier = (
                       sqlFullName,
-                      type
+                      type,
+                      typeModifier
                     ) => {
                       if (type.isPgArray) {
                         const ident = sql.identifier(Symbol());
@@ -80,37 +84,46 @@ export default (function PgColumnsPlugin(builder) {
                             when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
                             else
                               (
-                                select json_agg(${getSelectValueForFieldAndType(
+                                select json_agg(${getSelectValueForFieldAndTypeAndModifier(
                                   ident,
-                                  type.arrayItemType
+                                  type.arrayItemType,
+                                  typeModifier
                                 )})
                                 from unnest(${sqlFullName}) as ${ident}
                               )
                             end
                           )
                         `;
-                      } else if (type.type === "c") {
+                      } else {
                         const resolveData = getDataFromParsedResolveInfoFragment(
                           parsedResolveInfoFragment,
                           ReturnType
                         );
-                        const jsonBuildObject = queryFromResolveData(
-                          sql.identifier(Symbol()), // Ignore!
-                          sqlFullName,
-                          resolveData,
-                          { onlyJsonField: true, addNullCase: true }
-                        );
-                        return jsonBuildObject;
-                      } else {
-                        return pgTweakFragmentForType(sqlFullName, type);
+                        if (type.type === "c") {
+                          const jsonBuildObject = queryFromResolveData(
+                            sql.identifier(Symbol()), // Ignore!
+                            sqlFullName,
+                            resolveData,
+                            { onlyJsonField: true, addNullCase: true }
+                          );
+                          return jsonBuildObject;
+                        } else {
+                          return pgTweakFragmentForTypeAndModifier(
+                            sqlFullName,
+                            type,
+                            typeModifier,
+                            resolveData
+                          );
+                        }
                       }
                     };
                     queryBuilder.select(
-                      getSelectValueForFieldAndType(
+                      getSelectValueForFieldAndTypeAndModifier(
                         sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
                           attr.name
                         )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
-                        attr.type
+                        attr.type,
+                        attr.typeModifier
                       ),
                       fieldName
                     );
@@ -139,7 +152,7 @@ export default (function PgColumnsPlugin(builder) {
   builder.hook("GraphQLInputObjectType:fields", (fields, build, context) => {
     const {
       extend,
-      pgGetGqlInputTypeByTypeId,
+      pgGetGqlInputTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       graphql: { GraphQLString, GraphQLNonNull },
       pgColumnFilter,
@@ -189,7 +202,10 @@ export default (function PgColumnsPlugin(builder) {
                 isPgPatch ||
                   (!attr.isNotNull && !attr.type.domainIsNotNull) ||
                   attr.hasDefault,
-                pgGetGqlInputTypeByTypeId(attr.typeId) || GraphQLString
+                pgGetGqlInputTypeByTypeIdAndModifier(
+                  attr.typeId,
+                  attr.typeModifier
+                ) || GraphQLString
               ),
             }),
             { pgFieldIntrospection: attr }

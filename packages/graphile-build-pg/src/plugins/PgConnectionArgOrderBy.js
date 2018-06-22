@@ -45,7 +45,7 @@ export default (function PgConnectionArgOrderBy(builder) {
       const {
         extend,
         getTypeByName,
-        pgGetGqlTypeByTypeId,
+        pgGetGqlTypeByTypeIdAndModifier,
         pgSql: sql,
         graphql: { GraphQLList, GraphQLNonNull },
         inflection,
@@ -71,7 +71,7 @@ export default (function PgConnectionArgOrderBy(builder) {
       ) {
         return args;
       }
-      const TableType = pgGetGqlTypeByTypeId(table.type.id);
+      const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
       const tableTypeName = TableType.name;
       const TableOrderByType = getTypeByName(
         inflection.orderByType(tableTypeName)

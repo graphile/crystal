@@ -7,7 +7,7 @@ import omit from "../omit";
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 const debugSql = debugFactory("graphile-build-pg:sql");
 
-export default (async function PgRowByUniqueConstraint(builder) {
+export default (async function PgRowNode(builder) {
   builder.hook("GraphQLObjectType", (object, build, context) => {
     const {
       addNodeFetcherForTypeName,
@@ -76,7 +76,7 @@ export default (async function PgRowByUniqueConstraint(builder) {
       nodeIdFieldName,
       extend,
       parseResolveInfo,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       gql2pg,
@@ -94,7 +94,10 @@ export default (async function PgRowByUniqueConstraint(builder) {
         .filter(table => !!table.namespace)
         .filter(table => !omit(table, "read"))
         .reduce((memo, table) => {
-          const TableType = pgGetGqlTypeByTypeId(table.type.id);
+          const TableType = pgGetGqlTypeByTypeIdAndModifier(
+            table.type.id,
+            null
+          );
           const sqlFullTableName = sql.identifier(
             table.namespace.name,
             table.name

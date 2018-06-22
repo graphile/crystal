@@ -28,7 +28,7 @@ export default (function PgBackwardRelationPlugin(
     const {
       extend,
       getTypeByName,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       getSafeAliasFromResolveInfo,
@@ -60,7 +60,10 @@ export default (function PgBackwardRelationPlugin(
         }
         const table = introspectionResultsByKind.classById[constraint.classId];
         const tableTypeName = inflection.tableType(table);
-        const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
+        const gqlTableType = pgGetGqlTypeByTypeIdAndModifier(
+          table.type.id,
+          null
+        );
         if (!gqlTableType) {
           debug(
             `Could not determine type for table with id ${constraint.classId}`
@@ -70,7 +73,10 @@ export default (function PgBackwardRelationPlugin(
         const foreignTable =
           introspectionResultsByKind.classById[constraint.foreignClassId];
         const foreignTableTypeName = inflection.tableType(foreignTable);
-        const gqlForeignTableType = pgGetGqlTypeByTypeId(foreignTable.type.id);
+        const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
+          foreignTable.type.id,
+          null
+        );
         if (!gqlForeignTableType) {
           debug(
             `Could not determine type for foreign table with id ${
@@ -283,7 +289,10 @@ export default (function PgBackwardRelationPlugin(
                 const ConnectionType = getTypeByName(
                   inflection.connection(gqlTableType.name)
                 );
-                const TableType = pgGetGqlTypeByTypeId(table.type.id);
+                const TableType = pgGetGqlTypeByTypeIdAndModifier(
+                  table.type.id,
+                  null
+                );
                 return {
                   description: `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
                   type: isConnection

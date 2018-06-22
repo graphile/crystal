@@ -7,6 +7,7 @@ import pg from "pg";
 import debugFactory from "debug";
 import chalk from "chalk";
 import throttle from "lodash/throttle";
+import flatMap from "lodash/flatMap";
 import { quacksLikePgPool } from "../withPgClient";
 
 import { version } from "../../package.json";
@@ -54,6 +55,7 @@ export type PgClass = {
   isInsertable: boolean,
   isUpdatable: boolean,
   isDeletable: boolean,
+  isExtensionConfigurationTable: boolean,
   namespace: PgNamespace,
   type: PgType,
   tags: { [string]: string },
@@ -74,6 +76,7 @@ export type PgType = {
   isPgArray: boolean,
   classId: ?string,
   domainBaseTypeId: ?string,
+  domainTypeModifier: ?number,
   tags: { [string]: string },
 };
 
@@ -84,6 +87,7 @@ export type PgAttribute = {
   name: string,
   description: ?string,
   typeId: string,
+  typeModifier: number,
   isNotNull: boolean,
   hasDefault: boolean,
   class: PgClass,
@@ -105,6 +109,18 @@ export type PgConstraint = {
   tags: { [string]: string },
 };
 
+export type PgExtension = {
+  kind: "extension",
+  id: string,
+  name: string,
+  namespaceId: string,
+  relocatable: boolean,
+  version: string,
+  configurationClassIds?: Array<string>,
+  description: ?string,
+  tags: { [string]: string },
+};
+
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
     rawReadFile(filename, encoding, (err, res) => {
@@ -122,6 +138,7 @@ export default (async function PgIntrospectionPlugin(
     pgEnableTags,
     persistentMemoizeWithKey = (key, fn) => fn(),
     pgThrowOnMissingSchema = false,
+    pgIncludeExtensionResources = false,
   }
 ) {
   async function introspect() {
@@ -141,7 +158,10 @@ export default (async function PgIntrospectionPlugin(
       await persistentMemoizeWithKey(cacheKey, () =>
         withPgClient(pgConfig, async pgClient => {
           const introspectionQuery = await readFile(INTROSPECTION_PATH, "utf8");
-          const { rows } = await pgClient.query(introspectionQuery, [schemas]);
+          const { rows } = await pgClient.query(introspectionQuery, [
+            schemas,
+            pgIncludeExtensionResources,
+          ]);
 
           const result = rows.reduce(
             (memo, { object }) => {
@@ -155,6 +175,7 @@ export default (async function PgIntrospectionPlugin(
               type: [],
               constraint: [],
               procedure: [],
+              extension: [],
             }
           );
 
@@ -166,6 +187,7 @@ export default (async function PgIntrospectionPlugin(
             "type",
             "constraint",
             "procedure",
+            "extension",
           ].forEach(kind => {
             result[kind].forEach(object => {
               if (pgEnableTags && object.description) {
@@ -176,6 +198,15 @@ export default (async function PgIntrospectionPlugin(
                 object.tags = {};
               }
             });
+          });
+
+          const extensionConfigurationClassIds = flatMap(
+            result.extension,
+            e => e.configurationClassIds
+          );
+          result.class.forEach(klass => {
+            klass.isExtensionConfigurationTable =
+              extensionConfigurationClassIds.indexOf(klass.id) >= 0;
           });
 
           for (const k in result) {
@@ -229,22 +260,45 @@ export default (async function PgIntrospectionPlugin(
       "classId",
       "num"
     );
+    introspectionResultsByKind.extensionById = xByY(
+      introspectionResultsByKind.extension,
+      "id"
+    );
 
     const relate = (array, newAttr, lookupAttr, lookup, missingOk = false) => {
       array.forEach(entry => {
         const key = entry[lookupAttr];
-        const result = lookup[key];
-        if (key && !result) {
-          if (missingOk) {
-            return;
+        if (Array.isArray(key)) {
+          entry[newAttr] = key
+            .map(innerKey => {
+              const result = lookup[innerKey];
+              if (innerKey && !result) {
+                if (missingOk) {
+                  return;
+                }
+                throw new Error(
+                  `Could not look up '${newAttr}' by '${lookupAttr}' ('${innerKey}') on '${JSON.stringify(
+                    entry
+                  )}'`
+                );
+              }
+              return result;
+            })
+            .filter(_ => _);
+        } else {
+          const result = lookup[key];
+          if (key && !result) {
+            if (missingOk) {
+              return;
+            }
+            throw new Error(
+              `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
+                entry
+              )}'`
+            );
           }
-          throw new Error(
-            `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
-              entry
-            )}'`
-          );
+          entry[newAttr] = result;
         }
-        entry[newAttr] = result;
       });
     };
 
@@ -306,6 +360,22 @@ export default (async function PgIntrospectionPlugin(
       "arrayItemTypeId",
       introspectionResultsByKind.typeById,
       true // Because not all types are arrays
+    );
+
+    relate(
+      introspectionResultsByKind.extension,
+      "namespace",
+      "namespaceId",
+      introspectionResultsByKind.namespaceById,
+      true // Because the extension could be a defined in a different namespace
+    );
+
+    relate(
+      introspectionResultsByKind.extension,
+      "configurationClasses",
+      "configurationClassIds",
+      introspectionResultsByKind.classById,
+      true // Because the configuration table could be a defined in a different namespace
     );
 
     return introspectionResultsByKind;

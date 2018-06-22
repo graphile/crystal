@@ -48,6 +48,7 @@ type PostGraphileOptions = {
   setofFunctionsContainNulls?: boolean,
   legacyJsonUuid?: boolean,
   simpleCollections?: "only" | "both" | "omit",
+  includeExtensionResources?: boolean,
 };
 
 type PgConfig = Client | Pool | string;
@@ -146,6 +147,7 @@ const getPostGraphileBuilder = async (
     setofFunctionsContainNulls = true,
     legacyJsonUuid = false,
     simpleCollections = "omit",
+    includeExtensionResources = false,
   } = options;
 
   if (
@@ -283,6 +285,7 @@ const getPostGraphileBuilder = async (
         persistentMemoizeWithKey,
         pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
         pgSimpleCollections: simpleCollections,
+        pgIncludeExtensionResources: includeExtensionResources,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!

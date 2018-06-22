@@ -41,8 +41,8 @@ export default (function PgTablesPlugin(
       pgSql: sql,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
-      pgGetGqlTypeByTypeId,
-      pgGetGqlInputTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+      pgGetGqlInputTypeByTypeIdAndModifier,
       pgRegisterGqlTypeByTypeId,
       pgRegisterGqlInputTypeByTypeId,
       pg2GqlMapper,
@@ -359,7 +359,10 @@ export default (function PgTablesPlugin(
       pgRegisterGqlInputTypeByTypeId(
         tablePgType.id,
         () => {
-          const TableType = pgGetGqlTypeByTypeId(tablePgType.id);
+          const TableType = pgGetGqlTypeByTypeIdAndModifier(
+            tablePgType.id,
+            null
+          );
           return getTypeByName(inflection.inputType(TableType));
         },
         true
@@ -376,7 +379,10 @@ export default (function PgTablesPlugin(
         pgRegisterGqlTypeByTypeId(
           arrayTablePgType.id,
           () => {
-            const TableType = pgGetGqlTypeByTypeId(tablePgType.id);
+            const TableType = pgGetGqlTypeByTypeIdAndModifier(
+              tablePgType.id,
+              null
+            );
             return new GraphQLList(TableType);
           },
           true
@@ -384,7 +390,10 @@ export default (function PgTablesPlugin(
         pgRegisterGqlInputTypeByTypeId(
           arrayTablePgType.id,
           () => {
-            const TableInputType = pgGetGqlInputTypeByTypeId(tablePgType.id);
+            const TableInputType = pgGetGqlInputTypeByTypeIdAndModifier(
+              tablePgType.id,
+              null
+            );
             return new GraphQLList(TableInputType);
           },
           true

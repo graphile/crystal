@@ -12,7 +12,7 @@ export default (function PgForwardRelationPlugin(builder) {
       extend,
       getSafeAliasFromResolveInfo,
       getSafeAliasFromAlias,
-      pgGetGqlTypeByTypeId,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       inflection,
@@ -51,7 +51,10 @@ export default (function PgForwardRelationPlugin(builder) {
         if (omit(constraint, "read")) {
           return memo;
         }
-        const gqlTableType = pgGetGqlTypeByTypeId(table.type.id);
+        const gqlTableType = pgGetGqlTypeByTypeIdAndModifier(
+          table.type.id,
+          null
+        );
         const tableTypeName = gqlTableType.name;
         if (!gqlTableType) {
           debug(
@@ -61,7 +64,10 @@ export default (function PgForwardRelationPlugin(builder) {
         }
         const foreignTable =
           introspectionResultsByKind.classById[constraint.foreignClassId];
-        const gqlForeignTableType = pgGetGqlTypeByTypeId(foreignTable.type.id);
+        const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
+          foreignTable.type.id,
+          null
+        );
         const foreignTableTypeName = gqlForeignTableType.name;
         if (!gqlForeignTableType) {
           debug(
