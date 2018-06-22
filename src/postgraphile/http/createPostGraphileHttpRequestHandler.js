@@ -462,7 +462,8 @@ export default function createPostGraphileHttpRequestHandler(options) {
       if (pathname === graphiqlRoute) {
         // If we are developing PostGraphile, instead just redirect.
         if (POSTGRAPHILE_ENV === 'development') {
-          res.writeHead(302, { Location: 'http://localhost:5783' })
+          res.statusCode = 302
+          res.setHeader('Location', 'http://localhost:5783')
           res.end()
           return
         }
@@ -766,6 +767,9 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
       // Hack the req object so we can get back to ctx
       ctx.req._koaCtx = ctx
+      ctx.res.writeHead = () => {
+        throw new Error('res.writeHead not supported in Koa environment')
+      }
       ctx.res.send = () => {
         throw new Error('res.send not supported in Koa environment')
       }
