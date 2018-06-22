@@ -262,7 +262,7 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
   await withPostGraphileContext(
     {
       pgPool,
-      jwtToken: jwt.sign({ aud: 'postgraphile' }, 'secret', {
+      jwtToken: jwt.sign({ aud: 'postgraphile', true: true, false: false }, 'secret', {
         noTimestamp: true,
       }),
       jwtSecret: 'secret',
@@ -272,6 +272,8 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
         'some.setting.not.defined': undefined,
         'some.setting.zero': 0,
         'number.setting': 42,
+        'boolean.true': true,
+        'boolean.false': false,
       },
     },
     () => {},
@@ -281,7 +283,7 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
     [
       {
         text:
-          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)',
+        'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)',
         values: [
           'foo.bar',
           'test1',
@@ -289,8 +291,16 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
           '0',
           'number.setting',
           '42',
+          'boolean.true',
+          'true',
+          'boolean.false',
+          'false',
           'jwt.claims.aud',
           'postgraphile',
+          'jwt.claims.true',
+          'true',
+          'jwt.claims.false',
+          'false',
         ],
       },
     ],
@@ -320,7 +330,7 @@ test('extra pgSettings that are objects throw an error', async () => {
     message = error.message
   }
   expect(message).toBe(
-    'Error converting pgSetting: object needs to be of type string or number.',
+    'Error converting pgSetting: object needs to be of type string, number or boolean.',
   )
 })
 
@@ -346,33 +356,7 @@ test('extra pgSettings that are symbols throw an error', async () => {
     message = error.message
   }
   expect(message).toBe(
-    'Error converting pgSetting: symbol needs to be of type string or number.',
-  )
-})
-
-test('extra pgSettings that are booleans throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  let message
-  try {
-    await withPostGraphileContext(
-      {
-        pgPool,
-        jwtToken: jwt.sign({ aud: 'postgraphile' }, 'secret', {
-          noTimestamp: true,
-        }),
-        jwtSecret: 'secret',
-        pgSettings: {
-          'some.boolean': true,
-        },
-      },
-      () => {},
-    )
-  } catch (error) {
-    message = error.message
-  }
-  expect(message).toBe(
-    'Error converting pgSetting: boolean needs to be of type string or number.',
+    'Error converting pgSetting: symbol needs to be of type string, number or boolean.',
   )
 })
 

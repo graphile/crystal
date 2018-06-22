@@ -353,9 +353,10 @@ function isPgSettingValid(pgSetting: mixed): boolean {
     return false
   }
   const typeOfPgSetting = typeof pgSetting
-  if (typeOfPgSetting === 'string' || typeOfPgSetting === 'number') {
+  if (typeOfPgSetting === 'string' || typeOfPgSetting === 'number' || typeOfPgSetting === 'boolean') {
     return true
   }
-  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type string or number.`)
+  // TODO: booleans!
+  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type string, number or boolean.`)
 }
 // tslint:enable no-any
