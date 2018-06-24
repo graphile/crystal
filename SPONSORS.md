@@ -9,6 +9,7 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Joe Dennis
 * James Allain
 * Alec Wenzowski
+* MissionMode
 
 ## Supporters
 
@@ -17,3 +18,5 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Clay Smith
 * Matt Bretl (also a major community contributor!)
 * Steven McDowall
+* Michael Tng
+* Bureau Moelijke Dingen
