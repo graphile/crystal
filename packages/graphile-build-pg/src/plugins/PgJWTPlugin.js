@@ -1,7 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
-import parseIdentifier from "../parseIdentifier";
 
 export default (function PgJWTPlugin(
   builder,
@@ -17,6 +16,7 @@ export default (function PgJWTPlugin(
       pgTweaksByTypeId,
       graphql: { GraphQLScalarType },
       inflection,
+      pgParseIdentifier: parseIdentifier,
     } = build;
     if (!pgJwtTypeIdentifier) {
       return _;

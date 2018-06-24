@@ -1,8 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
-import omit from "../omit";
 const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgRowByUniqueConstraint(builder) {
@@ -17,6 +15,8 @@ export default (async function PgRowByUniqueConstraint(builder) {
       pgSql: sql,
       graphql: { GraphQLNonNull },
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
     } = build;
     const { scope: { isRootQuery }, fieldWithHooks } = context;
     if (!isRootQuery) {

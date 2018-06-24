@@ -1,9 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
-import viaTemporaryTable from "./viaTemporaryTable";
-import omit from "../omit";
 
 const debug = debugFactory("graphile-build-pg");
 
@@ -32,6 +29,9 @@ export default (function PgMutationCreatePlugin(
       },
       pgColumnFilter,
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
+      pgViaTemporaryTable: viaTemporaryTable,
     } = build;
     const { scope: { isRootMutation }, fieldWithHooks } = context;
     if (!isRootMutation) {

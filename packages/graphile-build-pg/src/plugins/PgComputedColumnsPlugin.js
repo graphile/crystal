@@ -1,7 +1,4 @@
 // @flow
-import makeProcField from "./makeProcField";
-import omit from "../omit";
-
 import type { Plugin } from "graphile-build";
 
 export default (function PgComputedColumnsPlugin(
@@ -35,6 +32,8 @@ export default (function PgComputedColumnsPlugin(
       extend,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
+      pgOmit: omit,
+      pgMakeProcField: makeProcField,
     } = build;
     const tableType = introspectionResultsByKind.type.filter(
       type =>

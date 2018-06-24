@@ -1,7 +1,6 @@
 // @flow
 import isString from "lodash/isString";
 import type { Plugin } from "graphile-build";
-import omit from "../omit";
 
 export default (function PgConnectionArgOrderBy(builder) {
   builder.hook("init", (_, build) => {
@@ -10,6 +9,7 @@ export default (function PgConnectionArgOrderBy(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       graphql: { GraphQLEnumType },
       inflection,
+      pgOmit: omit,
     } = build;
     introspectionResultsByKind.class
       .filter(table => table.isSelectable && !omit(table, "order"))
@@ -49,6 +49,7 @@ export default (function PgConnectionArgOrderBy(builder) {
         pgSql: sql,
         graphql: { GraphQLList, GraphQLNonNull },
         inflection,
+        pgOmit: omit,
       } = build;
       const {
         scope: {

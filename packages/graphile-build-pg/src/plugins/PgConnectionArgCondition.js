@@ -1,6 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import omit from "../omit";
 
 export default (function PgConnectionArgCondition(builder) {
   builder.hook("init", (_, build) => {
@@ -11,6 +10,7 @@ export default (function PgConnectionArgCondition(builder) {
       graphql: { GraphQLInputObjectType, GraphQLString },
       pgColumnFilter,
       inflection,
+      pgOmit: omit,
     } = build;
     introspectionResultsByKind.class
       .filter(table => table.isSelectable && !omit(table, "filter"))
@@ -69,6 +69,7 @@ export default (function PgConnectionArgCondition(builder) {
         pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgColumnFilter,
         inflection,
+        pgOmit: omit,
       } = build;
       const {
         scope: {

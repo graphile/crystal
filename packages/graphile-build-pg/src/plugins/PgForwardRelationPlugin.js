@@ -1,8 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import debugFactory from "debug";
-import queryFromResolveData from "../queryFromResolveData";
-import omit from "../omit";
 
 const debug = debugFactory("graphile-build-pg");
 
@@ -16,6 +14,8 @@ export default (function PgForwardRelationPlugin(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
     } = build;
     const {
       scope: {

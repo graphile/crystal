@@ -1,7 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import makeProcField from "./makeProcField";
-import omit from "../omit";
 
 export default (function PgMutationProceduresPlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
@@ -9,6 +7,8 @@ export default (function PgMutationProceduresPlugin(builder) {
       extend,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
+      pgMakeProcField: makeProcField,
+      pgOmit: omit,
     } = build;
     const { scope: { isRootMutation }, fieldWithHooks } = context;
     if (!isRootMutation) {

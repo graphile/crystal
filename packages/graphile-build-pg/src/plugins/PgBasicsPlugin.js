@@ -10,6 +10,13 @@ import type {
   PgConstraint,
 } from "./PgIntrospectionPlugin";
 
+import queryFromResolveData from "../queryFromResolveData";
+import addStartEndCursor from "./addStartEndCursor";
+import omit from "../omit";
+import makeProcField from "./makeProcField";
+import parseIdentifier from "../parseIdentifier";
+import viaTemporaryTable from "./viaTemporaryTable";
+
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
   column: string,
@@ -51,6 +58,12 @@ export default (function PgBasicsPlugin(
       pgSql: sql,
       pgStrictFunctions,
       pgColumnFilter,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgAddStartEndCursor: addStartEndCursor,
+      pgOmit: omit,
+      pgMakeProcField: makeProcField,
+      pgParseIdentifier: parseIdentifier,
+      pgViaTemporaryTable: viaTemporaryTable,
     });
   });
 

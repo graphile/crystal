@@ -1,6 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import omit from "../omit";
 
 export default (function PgOrderAllColumnsPlugin(builder) {
   builder.hook("GraphQLEnumType:values", (values, build, context) => {
@@ -9,6 +8,7 @@ export default (function PgOrderAllColumnsPlugin(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgColumnFilter,
       inflection,
+      pgOmit: omit,
     } = build;
     const { scope: { isPgRowSortEnum, pgIntrospection: table } } = context;
     if (!isPgRowSortEnum || !table || table.kind !== "class") {

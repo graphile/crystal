@@ -1,9 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
-import viaTemporaryTable from "./viaTemporaryTable";
-import omit from "../omit";
 
 const debug = debugFactory("graphile-build-pg");
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
@@ -39,6 +36,9 @@ export default (async function PgMutationUpdateDeletePlugin(
       },
       pgColumnFilter,
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
+      pgViaTemporaryTable: viaTemporaryTable,
     } = build;
     const { scope: { isRootMutation }, fieldWithHooks } = context;
     const { pluralize, singularize, camelCase } = inflection;

@@ -1,8 +1,5 @@
 // @flow
 import debugFactory from "debug";
-import queryFromResolveData from "../queryFromResolveData";
-import addStartEndCursor from "./addStartEndCursor";
-import viaTemporaryTable from "./viaTemporaryTable";
 
 import type { Build, FieldWithHooksFunction } from "graphile-build";
 import type { PgProc } from "./PgIntrospectionPlugin";
@@ -49,6 +46,9 @@ export default function makeProcField(
       isCompositeType,
     },
     inflection,
+    pgQueryFromResolveData: queryFromResolveData,
+    pgAddStartEndCursor: addStartEndCursor,
+    pgViaTemporaryTable: viaTemporaryTable,
   }: {| ...Build |},
   {
     fieldWithHooks,

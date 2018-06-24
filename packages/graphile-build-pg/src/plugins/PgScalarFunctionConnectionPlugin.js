@@ -1,6 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import omit from "../omit";
 const base64 = str => new Buffer(String(str)).toString("base64");
 
 export default (function PgScalarFunctionConnectionPlugin(
@@ -20,6 +19,7 @@ export default (function PgScalarFunctionConnectionPlugin(
         GraphQLString,
       },
       inflection,
+      pgOmit: omit,
     } = build;
     const nullableIf = (condition, Type) =>
       condition ? Type : new GraphQLNonNull(Type);

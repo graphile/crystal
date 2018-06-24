@@ -1,8 +1,5 @@
 // @flow
-import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
-import addStartEndCursor from "./addStartEndCursor";
-import omit from "../omit";
 
 import type { Plugin } from "graphile-build";
 
@@ -25,6 +22,9 @@ export default (async function PgAllRows(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
       graphql: { GraphQLList, GraphQLNonNull },
+      pgQueryFromResolveData: queryFromResolveData,
+      pgAddStartEndCursor: addStartEndCursor,
+      pgOmit: omit,
     } = build;
     const { fieldWithHooks, scope: { isRootQuery } } = context;
     if (!isRootQuery) {

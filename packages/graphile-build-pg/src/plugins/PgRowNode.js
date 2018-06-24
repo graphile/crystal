@@ -1,8 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import queryFromResolveData from "../queryFromResolveData";
 import debugFactory from "debug";
-import omit from "../omit";
 
 const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 const debugSql = debugFactory("graphile-build-pg:sql");
@@ -14,6 +12,8 @@ export default (async function PgRowNode(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       gql2pg,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
     } = build;
     const { scope: { isPgRowType, pgIntrospection: table } } = context;
     if (!isPgRowType || !table.namespace || omit(table, "read")) {
@@ -83,6 +83,8 @@ export default (async function PgRowNode(builder) {
       getNodeType,
       graphql: { GraphQLNonNull, GraphQLID },
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
     } = build;
     const { scope: { isRootQuery }, fieldWithHooks } = context;
     if (!isRootQuery || !nodeIdFieldName) {

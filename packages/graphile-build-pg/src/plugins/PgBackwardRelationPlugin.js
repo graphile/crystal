@@ -1,8 +1,5 @@
 // @flow
 import debugFactory from "debug";
-import queryFromResolveData from "../queryFromResolveData";
-import addStartEndCursor from "./addStartEndCursor";
-import omit from "../omit";
 
 import type { Plugin } from "graphile-build";
 
@@ -35,6 +32,9 @@ export default (function PgBackwardRelationPlugin(
       getSafeAliasFromAlias,
       graphql: { GraphQLNonNull, GraphQLList },
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgAddStartEndCursor: addStartEndCursor,
+      pgOmit: omit,
     } = build;
     const {
       scope: { isPgRowType, pgIntrospection: foreignTable },

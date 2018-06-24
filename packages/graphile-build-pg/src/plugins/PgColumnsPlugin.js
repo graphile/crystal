@@ -1,7 +1,5 @@
 // @flow
-import queryFromResolveData from "../queryFromResolveData";
 import type { Plugin } from "graphile-build";
-import omit from "../omit";
 
 const nullableIf = (GraphQLNonNull, condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
@@ -18,6 +16,8 @@ export default (function PgColumnsPlugin(builder) {
       pgTweakFragmentForTypeAndModifier,
       pgColumnFilter,
       inflection,
+      pgQueryFromResolveData: queryFromResolveData,
+      pgOmit: omit,
     } = build;
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -157,6 +157,7 @@ export default (function PgColumnsPlugin(builder) {
       graphql: { GraphQLString, GraphQLNonNull },
       pgColumnFilter,
       inflection,
+      pgOmit: omit,
     } = build;
     const {
       scope: {

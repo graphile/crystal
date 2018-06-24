@@ -1,7 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
 import isString from "lodash/isString";
-import omit from "../omit";
 
 export default (function PgMutationPayloadEdgePlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
@@ -13,6 +12,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
       graphql: { GraphQLList, GraphQLNonNull },
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
+      pgOmit: omit,
     } = build;
     const {
       scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
