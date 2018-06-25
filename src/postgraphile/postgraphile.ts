@@ -43,6 +43,17 @@ export type PostGraphileOptions = {
   // types & fields. Database mutation will only be possible through Postgres
   // functions.
   disableDefaultMutations?: boolean,
+  // By default, PostGraphile excludes fields, queries and mutations that the
+  // user isn't permitted to access; set this option true to skip these checks
+  // and expose everything.
+  ignoreRBAC?: boolean,
+  // By default, tables and functions that come from extensions are excluded
+  // from the generated GraphQL schema as general applications don't need them
+  // to be exposed to the end user. You can use this flag to include them in
+  // the generated schema. It's recommended that you expose a schema other than
+  // `public` so that the schema is not polluted with extension resources
+  // anyway.
+  includeExtensionResources?: boolean,
   // Enables adding a `stack` field to the error response.  Can be either the
   // boolean `true` (which results in a single stack string) or the string
   // `json` (which causes the stack to become an array with elements for each

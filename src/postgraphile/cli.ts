@@ -92,6 +92,8 @@ program
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   .option('--simple-collections [omit|both|only]', '"omit" (default) - relay connections only, "only" - simple collections only (no Relay connections), "both" - both')
+  .option('--ignore-rbac', 'by default, PostGraphile excludes fields, queries and mutations that the user isn\'t permitted to access; use this flag to skip these checks and expose everything')
+  .option('--include-extension-resources', 'by default, tables and functions that come from extensions are excluded; use this flag to include them')
 
 pluginHook('cli:flags:add:schema', addFlag)
 
@@ -218,6 +220,8 @@ const {
   classicIds = false,
   dynamicJson = false,
   disableDefaultMutations = false,
+  ignoreRbac = false,
+  includeExtensionResources = false,
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
@@ -344,6 +348,8 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   classicIds,
   dynamicJson,
   disableDefaultMutations,
+  ignoreRBAC: ignoreRbac,
+  includeExtensionResources,
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
