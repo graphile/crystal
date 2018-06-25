@@ -137,13 +137,14 @@ class PostGraphiQL extends React.Component {
     // If one type/field isn’t find this will be set to false and the
     // `navStack` will just reset itself.
     let allOk = true
+    let exitEarly = false
 
     // Ok, so if you look at GraphiQL source code, the `navStack` is made up of
     // objects that are either types or fields. Let’s use that to search in
     // our new schema for matching (updated) types and fields.
     const nextNavStack = navStack.map((navStackItem, i) => {
       // If we are not ok, abort!
-      if (!allOk) return null
+      if (exitEarly || !allOk) return null
 
       // Get the definition from the nav stack item.
       const typeOrField = navStackItem.def
@@ -160,7 +161,7 @@ class PostGraphiQL extends React.Component {
         // If there is no type with this name (it was removed), we are not ok
         // so set `allOk` to false and return undefined.
         if (!nextType) {
-          allOk = false
+          exitEarly = true
           return null
         }
 
@@ -201,14 +202,16 @@ class PostGraphiQL extends React.Component {
         // Otherwise we hope very much that it is correct.
         return { ...navStackItem, def: nextField }
       }
-    })
+    }).filter(_ => _)
 
     // This is very hacky but works. React is cool.
-    this.graphiql.docExplorerComponent.setState({
-      // If we are not ok, just reset the `navStack` with an empty array.
-      // Otherwise use our new stack.
-      navStack: allOk ? nextNavStack : [],
-    })
+    if (allOk) {
+      this.graphiql.docExplorerComponent.setState({
+        // If we are not ok, just reset the `navStack` with an empty array.
+        // Otherwise use our new stack.
+        navStack: nextNavStack,
+      })
+    }
   }
 
   render() {
