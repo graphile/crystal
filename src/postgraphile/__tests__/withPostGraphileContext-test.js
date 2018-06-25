@@ -628,6 +628,25 @@ describe('jwtVerifyOptions', () => {
     expect(pgClient.query.mock.calls).toEqual([])
   })
 
+  test('will throw an error if jwtAudiences is provided and jwtVerifyOptions.audience = undefined', async () => {
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtAudiences: ['some-other-audience'],
+          jwtToken: jwt.sign({ aud: 'postgrest' }, 'secret'),
+          jwtSecret: 'secret',
+          jwtVerifyOptions: { audience: undefined },
+        },
+        () => {},
+      ),
+      403,
+      'Provide either \'jwtAudiences\' or \'jwtVerifyOptions.audience\' but not both',
+    )
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([])
+  })
+
   test('will succeed with both jwtAudiences and jwtVerifyOptions if jwtVerifyOptions does not have an audience field', async () => {
     await withPostGraphileContext(
       {
@@ -657,6 +676,28 @@ describe('jwtVerifyOptions', () => {
       ],
       ['commit'],
     ])
+  })
+
+  test('will throw error if audience does not match', async () => {
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtAudiences: ['my-audience'],
+          jwtToken: jwt.sign({ aud: 'incorrect-audience' }, 'secret', {
+            noTimestamp: true,
+            subject: 'my-subject',
+          }),
+          jwtSecret: 'secret',
+          jwtVerifyOptions: { subject: 'my-subject' },
+        },
+        () => {},
+      ),
+      403,
+      'jwt audience invalid. expected: my-audience',
+    )
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([])
   })
 
   test('will throw an error if the JWT token does not have an appropriate audience', async () => {
