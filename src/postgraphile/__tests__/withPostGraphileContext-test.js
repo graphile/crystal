@@ -678,6 +678,96 @@ describe('jwtVerifyOptions', () => {
     ])
   })
 
+  test('will succeed with audience check disabled via null', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: null },
+      },
+      () => {},
+    )
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: [
+            'jwt.claims.aud',
+            'my-audience',
+            'jwt.claims.sub',
+            'my-subject',
+          ],
+        },
+      ],
+      ['commit'],
+    ])
+  })
+
+  test('will succeed with audience check disabled via empty array', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: [] },
+      },
+      () => {},
+    )
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: [
+            'jwt.claims.aud',
+            'my-audience',
+            'jwt.claims.sub',
+            'my-subject',
+          ],
+        },
+      ],
+      ['commit'],
+    ])
+  })
+
+  test('will succeed with audience check disabled via empty string', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: '' },
+      },
+      () => {},
+    )
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: [
+            'jwt.claims.aud',
+            'my-audience',
+            'jwt.claims.sub',
+            'my-subject',
+          ],
+        },
+      ],
+      ['commit'],
+    ])
+  })
+
   test('will throw error if audience does not match', async () => {
     await expectHttpError(
       withPostGraphileContext(
