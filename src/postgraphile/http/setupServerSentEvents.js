@@ -17,6 +17,7 @@ export default function setupServerSentEvents(req, res, options) {
   const stream = isKoa ? new PassThrough() : null
   if (isKoa) {
     req._koaCtx.response.body = stream
+    req._koaCtx.compress = false
   }
 
   const sse = str => {
