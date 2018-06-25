@@ -45,7 +45,10 @@ class PostGraphiQL extends React.Component {
       eventSource.addEventListener(
         'open',
         // tslint:disable-next-line no-console
-        () => console.log('PostGraphile: Listening for server sent events'),
+        () => {
+          console.log('PostGraphile: Listening for server sent events')
+          this.updateSchema()
+        },
         false,
       )
       eventSource.addEventListener(
