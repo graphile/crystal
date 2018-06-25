@@ -44,8 +44,8 @@ class PostGraphiQL extends React.Component {
       // Add event listeners that just log things in the console.
       eventSource.addEventListener(
         'open',
-        // tslint:disable-next-line no-console
         () => {
+          // tslint:disable-next-line no-console
           console.log('PostGraphile: Listening for server sent events')
           this.updateSchema()
         },
