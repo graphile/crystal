@@ -116,6 +116,9 @@ export type PostGraphileOptions = {
   jwtSecret?: string,
   // Options with which to perform JWT verification - see
   // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+  // If 'audience' property is unspecified, it will default to
+  // ['postgraphile']; to prevent audience verification set it explicitly to
+  // null.
   /* @middlewareOnly */
   jwtVerifyOptions?: jwt.VerifyOptions,
   // A comma separated list of strings that give a path in the jwt from which
@@ -128,8 +131,8 @@ export type PostGraphileOptions = {
   // form: `my_schema.my_type`. You may use quotes as needed:
   // `"my-special-schema".my_type`.
   jwtPgTypeIdentifier?: string,
-  // The audiences to use when verifing the JWT token. If not set the audience
-  // will be `['postgraphile']`.
+  // [DEPRECATED] The audience to use when verifing the JWT token. Deprecated,
+  // use `jwtVerifyOptions.audience` instead.
   /* @middlewareOnly */
   jwtAudiences?: Array<string>,
   // Some one-to-one relations were previously detected as one-to-many - should

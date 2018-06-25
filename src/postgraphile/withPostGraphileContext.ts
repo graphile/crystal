@@ -7,6 +7,8 @@ import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 import { pluginHookFromOptions } from './pluginHook'
 
+const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string => o && o.length ? o : undefined
+
 export type WithPostGraphileContextFn = (
   options: {
     pgPool: Pool,
@@ -207,12 +209,16 @@ async function getSettingsForPgClientTransaction({
       if (typeof jwtSecret !== 'string')
         throw new Error('Not allowed to provide a JWT token.')
 
-      if (jwtAudiences && jwtVerifyOptions && jwtVerifyOptions.audience)
+      if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
         throw new Error(`Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`)
 
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
-        audience: jwtAudiences || ['postgraphile'],
         ...jwtVerifyOptions,
+        audience: jwtAudiences || (
+          jwtVerifyOptions && ('audience' in (jwtVerifyOptions as object))
+          ? undefinedIfEmpty(jwtVerifyOptions.audience)
+          : ['postgraphile']
+        ),
       })
 
       const roleClaim = getPath(jwtClaims, jwtRole)
