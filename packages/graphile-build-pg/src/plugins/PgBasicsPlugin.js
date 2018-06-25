@@ -12,7 +12,17 @@ import type {
 
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
-import omit from "../omit";
+import omit, {
+  CREATE,
+  READ,
+  UPDATE,
+  DELETE,
+  ALL,
+  MANY,
+  ORDER,
+  FILTER,
+  EXECUTE,
+} from "../omit";
 import makeProcField from "./makeProcField";
 import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
@@ -48,10 +58,70 @@ export function preventEmptyResult<
   }, {});
 }
 
+function omitWithRBACChecks(
+  entity: PgProc | PgClass | PgAttribute | PgConstraint,
+  permission: string
+) {
+  const ORDINARY_TABLE = "r";
+  const VIEW = "v";
+  const MATERIALIZED_VIEW = "m";
+  const isTableLike = entity =>
+    entity &&
+    entity.kind === "class" &&
+    (entity.classKind === ORDINARY_TABLE ||
+      entity.classKind === VIEW ||
+      entity.classKind === MATERIALIZED_VIEW);
+  if (entity.kind === "procedure") {
+    if (permission === EXECUTE && !entity.aclExecutable) {
+      return true;
+    }
+  } else if (entity.kind === "class" && isTableLike(entity)) {
+    const tableEntity: PgClass = entity;
+    if (
+      (permission === READ || permission === ALL || permission === MANY) &&
+      !tableEntity.aclSelectable
+    ) {
+      return true;
+    } else if (
+      permission === CREATE &&
+      (!tableEntity.aclInsertable &&
+        !tableEntity.attributes.some(attr => attr.aclInsertable))
+    ) {
+      return true;
+    } else if (
+      permission === UPDATE &&
+      (!tableEntity.aclUpdatable &&
+        !tableEntity.attributes.some(attr => attr.aclUpdatable))
+    ) {
+      return true;
+    } else if (permission === DELETE && !tableEntity.aclDeletable) {
+      return true;
+    }
+  } else if (entity.kind === "attribute" && isTableLike(entity.class)) {
+    const attributeEntity: PgAttribute = entity;
+    if (
+      (permission === READ || permission === FILTER || permission === ORDER) &&
+      !attributeEntity.aclSelectable
+    ) {
+      return true;
+    } else if (permission === CREATE && !attributeEntity.aclInsertable) {
+      return true;
+    } else if (permission === UPDATE && !attributeEntity.aclUpdatable) {
+      return true;
+    }
+  }
+  return omit(entity, permission);
+}
+
 export default (function PgBasicsPlugin(
   builder,
-  { pgStrictFunctions = false, pgColumnFilter = defaultPgColumnFilter }
+  {
+    pgStrictFunctions = false,
+    pgColumnFilter = defaultPgColumnFilter,
+    pgIgnoreRBAC = false,
+  }
 ) {
+  const pgOmit = pgIgnoreRBAC ? omit : omitWithRBACChecks;
   builder.hook("build", build => {
     return build.extend(build, {
       graphileBuildPgVersion: version,
@@ -60,7 +130,7 @@ export default (function PgBasicsPlugin(
       pgColumnFilter,
       pgQueryFromResolveData: queryFromResolveData,
       pgAddStartEndCursor: addStartEndCursor,
-      pgOmit: omit,
+      pgOmit,
       pgMakeProcField: makeProcField,
       pgParseIdentifier: parseIdentifier,
       pgViaTemporaryTable: viaTemporaryTable,
@@ -86,6 +156,9 @@ export default (function PgBasicsPlugin(
         },
         patchType(typeName: string) {
           return this.upperCamelCase(`${typeName}-patch`);
+        },
+        baseInputType(typeName: string) {
+          return this.upperCamelCase(`${typeName}-base-input`);
         },
         patchField(itemName: string) {
           return this.camelCase(`${itemName}-patch`);

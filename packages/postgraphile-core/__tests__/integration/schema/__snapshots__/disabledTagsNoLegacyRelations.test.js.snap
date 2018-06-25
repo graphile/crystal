@@ -1205,7 +1205,7 @@ input LeftArmCondition {
 input LeftArmInput {
   id: Int
   lengthInMetres: Float
-  personId: Int!
+  personId: Int
 }
 
 \\"\\"\\"
@@ -2321,6 +2321,7 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): CompoundTypesConnection!
+  currentUserId: Int
   intSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor

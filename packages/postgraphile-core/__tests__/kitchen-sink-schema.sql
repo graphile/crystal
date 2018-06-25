@@ -6,6 +6,8 @@ create schema b;
 create schema c;
 create schema d;
 
+alter default privileges revoke execute on functions from public;
+
 -- Troublesome extensions install annoying things in our schema; we want to
 -- ensure this doesn't make us crash.
 create extension tablefunc with schema a;
@@ -30,6 +32,10 @@ create table c.person (
   created_at timestamp default current_timestamp
 );
 
+create function c.current_user_id() returns int as $$
+  select nullif(current_setting('jwt.claims.user_id', true), '')::int;
+$$ language sql stable;
+
 -- This is to test that "one-to-one" relationships work on primary keys
 create table c.person_secret (
   person_id int not null primary key references c.person on delete cascade,
@@ -43,7 +49,7 @@ comment on table c.person_secret is 'Tracks the person''s secret';
 -- This is to test that "one-to-one" relationships also work on unique keys
 create table c.left_arm (
   id serial primary key,
-  person_id int not null unique references c.person on delete cascade,
+  person_id int not null default c.current_user_id() unique references c.person on delete cascade,
   length_in_metres float
 );
 
@@ -99,7 +105,7 @@ create table a.post (
   id serial primary key,
   headline text not null,
   body text,
-  author_id int4 references c.person(id),
+  author_id int4 default c.current_user_id() references c.person(id),
   enums a.an_enum[],
   comptypes a.comptype[]
 );

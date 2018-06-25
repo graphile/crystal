@@ -5,6 +5,16 @@
 -- - `$1`: An array of strings that represent the namespaces we are introspecting.
 -- - `$2`: set true to include functions/tables/etc that come from extensions
 with
+  recursive accessible_roles(_oid) as (
+    select oid _oid, pg_roles.*
+    from pg_roles
+    where rolname = current_user
+  union all
+    select pg_roles.oid _oid, pg_roles.*
+    from pg_roles, accessible_roles, pg_auth_members
+    where pg_auth_members.roleid = pg_roles.oid
+    and pg_auth_members.member = accessible_roles._oid
+  ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-namespace.html
   namespace as (
     select
@@ -41,7 +51,8 @@ with
       pro.prorettype as "returnTypeId",
       coalesce(pro.proallargtypes, pro.proargtypes) as "argTypeIds",
       coalesce(pro.proargnames, array[]::text[]) as "argNames",
-      pro.pronargdefaults as "argDefaultsNum"
+      pro.pronargdefaults as "argDefaultsNum",
+      exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable"
     from
       pg_catalog.pg_proc as pro
       left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid
@@ -104,7 +115,11 @@ with
       -- - https://github.com/postgres/postgres/blob/3aff33aa687e47d52f453892498b30ac98a296af/src/backend/rewrite/rewriteHandler.c#L2351
       (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00010000') = B'00010000' as "isInsertable",
       (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00001000') = B'00001000' as "isUpdatable",
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00000100') = B'00000100' as "isDeletable"
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00000100') = B'00000100' as "isDeletable",
+      exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'SELECT')) as "aclSelectable",
+      exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'INSERT')) as "aclInsertable",
+      exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'UPDATE')) as "aclUpdatable",
+      exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'DELETE')) as "aclDeletable"
     from
       pg_catalog.pg_class as rel
       left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0 and dsc.classoid = (select oid from pg_catalog.pg_class where relname = 'pg_class')
@@ -133,7 +148,10 @@ with
       att.atttypid as "typeId",
       nullif(att.atttypmod, -1) as "typeModifier",
       att.attnotnull as "isNotNull",
-      att.atthasdef as "hasDefault"
+      att.atthasdef as "hasDefault",
+      exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'SELECT')) as "aclSelectable",
+      exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'INSERT')) as "aclInsertable",
+      exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'UPDATE')) as "aclUpdatable"
     from
       pg_catalog.pg_attribute as att
       left join pg_catalog.pg_description as dsc on dsc.objoid = att.attrelid and dsc.objsubid = att.attnum

@@ -49,6 +49,7 @@ type PostGraphileOptions = {
   legacyJsonUuid?: boolean,
   simpleCollections?: "only" | "both" | "omit",
   includeExtensionResources?: boolean,
+  ignoreRBAC?: boolean,
 };
 
 type PgConfig = Client | Pool | string;
@@ -148,6 +149,7 @@ const getPostGraphileBuilder = async (
     legacyJsonUuid = false,
     simpleCollections = "omit",
     includeExtensionResources = false,
+    ignoreRBAC = false,
   } = options;
 
   if (
@@ -286,6 +288,7 @@ const getPostGraphileBuilder = async (
         pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
         pgSimpleCollections: simpleCollections,
         pgIncludeExtensionResources: includeExtensionResources,
+        pgIgnoreRBAC: ignoreRBAC,
       },
       graphileBuildOptions,
       graphqlBuildOptions // DEPRECATED!

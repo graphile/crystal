@@ -93,12 +93,40 @@ export default function makeProcField(
     .slice(sliceAmount)
     .map(typeId => introspectionResultsByKind.typeById[typeId]);
   const requiredArgCount = Math.max(0, argNames.length - proc.argDefaultsNum);
+  const variantFromName = (name, _type) => {
+    if (name.match(/(_p|P)atch$/)) {
+      return "patch";
+    }
+    return null;
+  };
+  const variantFromTags = (tags, idx) => {
+    const variant = tags[`arg${idx}variant`];
+    if (variant && variant.match && variant.match(/^[0-9]+$/)) {
+      return parseInt(variant, 10);
+    }
+    return variant;
+  };
   const notNullArgCount =
     proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod on function return values, but maybe a later version might
-    const Type =
-      pgGetGqlInputTypeByTypeIdAndModifier(type.id, null) || GraphQLString;
+    const variant =
+      variantFromTags(proc.tags, idx) || variantFromName(argNames[idx], type);
+    const Type = pgGetGqlInputTypeByTypeIdAndModifier(type.id, variant);
+    if (!Type) {
+      const hint = type.class
+        ? `; you might want to use smart comments, e.g. 'COMMENT ON FUNCTION "${
+            proc.namespace.name
+          }"."${proc.name}"(${argTypes
+            .map(t => `"${t.namespaceName}"."${t.name}"`)
+            .join(", ")}) IS E'@arg${idx}variant base';"`
+        : "";
+      throw new Error(
+        `Could not determine type for argument ${idx} ('${
+          argNames[idx]
+        }') of function '${proc.name}'${hint}`
+      );
+    }
     if (idx >= notNullArgCount) {
       return Type;
     } else {

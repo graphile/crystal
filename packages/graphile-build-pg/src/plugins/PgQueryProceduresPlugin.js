@@ -83,7 +83,11 @@ export default (function PgQueryProceduresPlugin(
                 chalk.bold.yellow(
                   `Failed to add function '${proc.namespace.name}.${
                     proc.name
-                  }'; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                  }'${
+                    debugWarn.enabled
+                      ? ""
+                      : `; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
+                  }`
                 )
               );
               debugWarn(e);

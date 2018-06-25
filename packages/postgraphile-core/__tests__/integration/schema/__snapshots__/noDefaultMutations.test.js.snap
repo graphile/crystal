@@ -1373,6 +1373,7 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): CompoundTypesConnection!
+  currentUserId: Int
   intSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor

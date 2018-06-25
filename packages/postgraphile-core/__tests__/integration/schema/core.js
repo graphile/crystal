@@ -5,7 +5,7 @@ const { createPostGraphileSchema } = require("../../..");
 exports.test = (schemas, options, setup) => () =>
   withPgClient(async client => {
     if (setup) {
-      if (typeof setup === 'function') {
+      if (typeof setup === "function") {
         await setup(client);
       } else {
         await client.query(setup);

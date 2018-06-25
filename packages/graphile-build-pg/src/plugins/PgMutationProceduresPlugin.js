@@ -9,6 +9,7 @@ export default (function PgMutationProceduresPlugin(builder) {
       inflection,
       pgMakeProcField: makeProcField,
       pgOmit: omit,
+      swallowError,
     } = build;
     const { scope: { isRootMutation }, fieldWithHooks } = context;
     if (!isRootMutation) {
@@ -37,10 +38,14 @@ export default (function PgMutationProceduresPlugin(builder) {
             */
 
           const fieldName = inflection.functionMutationName(proc);
-          memo[fieldName] = makeProcField(fieldName, proc, build, {
-            fieldWithHooks,
-            isMutation: true,
-          });
+          try {
+            memo[fieldName] = makeProcField(fieldName, proc, build, {
+              fieldWithHooks,
+              isMutation: true,
+            });
+          } catch (e) {
+            swallowError(e);
+          }
           return memo;
         }, {}),
       `Adding mutation procedure to root Mutation field`

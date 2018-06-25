@@ -68,6 +68,7 @@ export type Build = {|
     // eslint-disable-next-line flowtype/no-weak-types
     [string]: (...args: Array<any>) => string,
   },
+  swallowError: (e: Error) => void,
 |};
 
 export type BuildExtensionQuery = {|

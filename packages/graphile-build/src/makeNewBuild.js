@@ -17,6 +17,7 @@ import type { ResolveTree } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
 import LRUCache from "lru-cache";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
+import swallowError from "./swallowError";
 
 import type SchemaBuilder, {
   Build,
@@ -33,7 +34,6 @@ import { version } from "../package.json";
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphile-build");
-const debugWarn = debugFactory("graphile-build:warn");
 
 /*
  * This should be more than enough for normal usage. If you come under a
@@ -150,6 +150,7 @@ function getNameFromType(Type: GraphQLNamedType | GraphQLSchema) {
 
 const {
   GraphQLSchema,
+  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLEnumType,
@@ -695,8 +696,22 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       const Self: T = new Type(finalSpec);
       if (!(Self instanceof GraphQLSchema) && returnNullOnInvalid) {
         try {
-          if (isCompositeType(Self) && !isAbstractType(Self)) {
-            Self.getFields();
+          if (
+            Self instanceof GraphQLInterfaceType ||
+            Self instanceof GraphQLObjectType ||
+            Self instanceof GraphQLInputObjectType
+          ) {
+            const _Self:
+              | GraphQLInterfaceType
+              | GraphQLInputObjectType
+              | GraphQLObjectType = Self;
+            if (typeof _Self.getFields === "function") {
+              const fields = _Self.getFields();
+              if (Object.keys(fields).length === 0) {
+                // We require there's at least one field on GraphQLObjectType and GraphQLInputObjectType records
+                return null;
+              }
+            }
           }
         } catch (e) {
           // This is the error we're expecting to handle:
@@ -705,12 +720,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             /function which returns such an object/
           );
           if (!isProbablyAnEmptyObjectError) {
-            // XXX: Improve this
-            // eslint-disable-next-line no-console
-            console.warn(
-              `An error occurred, it might be okay but it doesn't look like the error we were expecting... run with envvar 'DEBUG="graphile-build:warn"' to view the error`
-            );
-            debugWarn(e);
+            this.swallowError(e);
           }
           return null;
         }
@@ -744,5 +754,6 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       camelCase,
       constantCase,
     },
+    swallowError,
   };
 }

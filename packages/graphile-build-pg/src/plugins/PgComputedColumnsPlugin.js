@@ -34,6 +34,7 @@ export default (function PgComputedColumnsPlugin(
       inflection,
       pgOmit: omit,
       pgMakeProcField: makeProcField,
+      swallowError,
     } = build;
     const tableType = introspectionResultsByKind.type.filter(
       type =>
@@ -88,11 +89,15 @@ export default (function PgComputedColumnsPlugin(
             const fieldName = forceList
               ? inflection.computedColumnList(pseudoColumnName, proc, table)
               : inflection.computedColumn(pseudoColumnName, proc, table);
-            memo[fieldName] = makeProcField(fieldName, proc, build, {
-              fieldWithHooks,
-              computed: true,
-              forceList,
-            });
+            try {
+              memo[fieldName] = makeProcField(fieldName, proc, build, {
+                fieldWithHooks,
+                computed: true,
+                forceList,
+              });
+            } catch (e) {
+              swallowError(e);
+            }
           }
           if (!proc.returnsSet || hasConnections) {
             makeField(false);

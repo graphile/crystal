@@ -1202,7 +1202,7 @@ input LeftArmCondition {
 \\"\\"\\"An input for mutations affecting \`LeftArm\`\\"\\"\\"
 input LeftArmInput {
   lengthInMetres: Float
-  personId: Int!
+  personId: Int
   rowId: Int
 }
 
@@ -2352,6 +2352,7 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): CompoundTypesConnection!
+  currentUserId: Int
 
   \\"\\"\\"
   The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.

@@ -15,7 +15,16 @@ if [ "$TEST_DATABASE_URL" == "" ]; then
 fi;
 
 # Import latest schema (throw on error)
+psql -Xqv ON_ERROR_STOP=1 "$TEST_DATABASE_URL" <<HERE
+drop schema if exists a, b, c, d cascade;
+drop role if exists postgraphile_test_authenticator;
+drop role if exists postgraphile_test_visitor;
+create role postgraphile_test_authenticator noinherit login password 'testpassword';
+create role postgraphile_test_visitor;
+grant postgraphile_test_visitor to postgraphile_test_authenticator;
+HERE
 psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-schema.sql "$TEST_DATABASE_URL"
+psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-permissions.sql "$TEST_DATABASE_URL"
 clear
 echo "Database reset successfully ✅"
 

@@ -40,6 +40,7 @@ export type PgProc = {
   argDefaultsNum: number,
   namespace: PgNamespace,
   tags: { [string]: string },
+  aclExecutable: boolean,
 };
 
 export type PgClass = {
@@ -59,6 +60,11 @@ export type PgClass = {
   namespace: PgNamespace,
   type: PgType,
   tags: { [string]: string },
+  attributes: [PgAttribute],
+  aclSelectable: boolean,
+  aclInsertable: boolean,
+  aclUpdatable: boolean,
+  aclDeletable: boolean,
 };
 
 export type PgType = {
@@ -94,6 +100,9 @@ export type PgAttribute = {
   type: PgType,
   namespace: PgNamespace,
   tags: { [string]: string },
+  aclSelectable: boolean,
+  aclInsertable: boolean,
+  aclUpdatable: boolean,
 };
 
 export type PgConstraint = {
@@ -377,6 +386,12 @@ export default (async function PgIntrospectionPlugin(
       introspectionResultsByKind.classById,
       true // Because the configuration table could be a defined in a different namespace
     );
+
+    introspectionResultsByKind.class.forEach(klass => {
+      klass.attributes = introspectionResultsByKind.attribute.filter(
+        attr => attr.classId === klass.id
+      );
+    });
 
     return introspectionResultsByKind;
   }

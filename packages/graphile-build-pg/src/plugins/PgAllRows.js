@@ -35,10 +35,8 @@ export default (async function PgAllRows(
       introspectionResultsByKind.class
         .filter(table => table.isSelectable)
         .filter(table => table.namespace)
+        .filter(table => !omit(table, "all"))
         .reduce((memo, table) => {
-          if (omit(table, "all")) {
-            return memo;
-          }
           const TableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
             null

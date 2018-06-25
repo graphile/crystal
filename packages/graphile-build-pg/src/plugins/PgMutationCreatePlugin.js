@@ -62,9 +62,8 @@ export default (function PgMutationCreatePlugin(
             debug(
               `There was no input type for table '${table.namespace.name}.${
                 table.name
-              }', so we're not generating a create mutation for it.`
+              }', so we're going to omit it from the create mutation.`
             );
-            return memo;
           }
           const tableTypeName = inflection.tableType(table);
           const InputType = newWithHooks(
@@ -78,10 +77,14 @@ export default (function PgMutationCreatePlugin(
                     "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
                   type: GraphQLString,
                 },
-                [inflection.tableFieldName(table)]: {
-                  description: `The \`${tableTypeName}\` to be created by this mutation.`,
-                  type: new GraphQLNonNull(TableInput),
-                },
+                ...(TableInput
+                  ? {
+                      [inflection.tableFieldName(table)]: {
+                        description: `The \`${tableTypeName}\` to be created by this mutation.`,
+                        type: new GraphQLNonNull(TableInput),
+                      },
+                    }
+                  : null),
               },
             },
             {

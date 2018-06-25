@@ -10,15 +10,16 @@ import type {
 /*
  * Please only use capitals for aliases and lower case for the values.
  */
-const CREATE = "create";
-const READ = "read";
-const UPDATE = "update";
-const DELETE = "delete";
-const ALL = "all";
-const MANY = "many";
-const ORDER = "order";
-const FILTER = "filter";
-const EXECUTE = "execute";
+export const CREATE = "create";
+export const READ = "read";
+export const UPDATE = "update";
+export const DELETE = "delete";
+export const FILTER = "filter";
+export const ORDER = "order";
+export const ALL = "all";
+export const MANY = "many";
+export const EXECUTE = "execute";
+export const BASE = "base";
 
 const aliases = {
   C: CREATE,
@@ -30,6 +31,7 @@ const aliases = {
   A: ALL,
   M: MANY,
   X: EXECUTE,
+  B: BASE,
 };
 
 const PERMISSIONS_THAT_REQUIRE_READ = [UPDATE, CREATE, DELETE, ALL, MANY];
