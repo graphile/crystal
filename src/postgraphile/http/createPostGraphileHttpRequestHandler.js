@@ -426,6 +426,9 @@ export default function createPostGraphileHttpRequestHandler(options) {
 
         // Sends the asset at this path. Defaults to a `statusCode` of 200.
         res.statusCode = 200
+        if (req._koaCtx) {
+          req._koaCtx.compress = false
+        }
         await new Promise((resolve, reject) => {
           const stream = sendFile(req, assetPathRelative, {
             index: false,
