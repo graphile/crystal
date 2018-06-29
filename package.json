@@ -9,6 +9,7 @@
     "eslint": "^4.0.0",
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-flowtype": "^2.35.0",
+    "eslint-plugin-graphql": "2.1.1",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-prettier": "^2.1.2",
     "eslint_d": "5.3.1",

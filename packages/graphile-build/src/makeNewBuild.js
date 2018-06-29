@@ -213,7 +213,13 @@ if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
 }
 
 export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
-  const allTypes = {};
+  const allTypes = {
+    Int: graphql.GraphQLInt,
+    Float: graphql.GraphQLFloat,
+    String: graphql.GraphQLString,
+    Boolean: graphql.GraphQLBoolean,
+    ID: graphql.GraphQLID,
+  };
 
   // Every object type gets fieldData associated with each of its
   // fields.

@@ -20,12 +20,12 @@
     "build",
     "extension"
   ],
-  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/graphile-build/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-build#readme",
+  "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "debug": ">=2 <3",
     "graphql-parse-resolve-info": "4.0.0-rc.2",

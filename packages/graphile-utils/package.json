@@ -1,7 +1,7 @@
 {
-  "name": "postgraphile-core",
+  "name": "graphile-utils",
   "version": "4.0.0-rc.2",
-  "description": "",
+  "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
   "scripts": {
     "test": "scripts/test",
@@ -12,37 +12,38 @@
     "type": "git",
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
+  "keywords": [
+    "graphql",
+    "plugin",
+    "build",
+    "extension",
+    "utils",
+    "utilities"
+  ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
-  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/postgraphile-core",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/graphile-build/issues"
   },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-utils",
   "dependencies": {
-    "graphile-build": "4.0.0-rc.2",
-    "graphile-build-pg": "4.0.0-rc.2"
+    "debug": ">=2 <3",
+    "graphql": ">=0.9 <0.14"
+  },
+  "engines": {
+    "node": ">=8.6"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "debug": ">=2 <3",
     "eslint_d": "5.3.1",
     "flow-copy-source": "^1.2.0",
-    "jest": "^20.0.4",
-    "jsonwebtoken": "^8.1.1",
-    "pg-connection-string": "^0.1.3"
-  },
-  "peerDependencies": {
-    "graphql": ">=0.9 <0.14",
-    "pg": ">=6.1.0 <8"
+    "graphile-build": "4.0.0-rc.2",
+    "jest": "^20.0.4"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
   "files": [
-    "node8plus",
-    "index.js"
-  ],
-  "engines": {
-    "node": ">=8.6"
-  }
+    "node8plus"
+  ]
 }

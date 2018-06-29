@@ -4,7 +4,7 @@ module.exports = {
     sourceType: "module",
   },
   extends: ["eslint:recommended", "prettier"],
-  plugins: ["jest", "prettier", "flowtype"],
+  plugins: ["jest", "prettier", "flowtype", "graphql"],
   env: {
     jest: true,
     node: true,

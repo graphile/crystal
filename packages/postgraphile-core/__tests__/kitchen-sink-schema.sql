@@ -1,4 +1,4 @@
--- From https://github.com/graphile/postgraphile/blob/master/examples/kitchen-sink/schema.sql
+-- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
 drop schema if exists a, b, c, d cascade;
 
 create schema a;

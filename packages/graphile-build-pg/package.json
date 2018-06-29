@@ -27,12 +27,12 @@
     "plugins",
     "extensible"
   ],
-  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/graphile-build/issues"
   },
-  "homepage": "https://github.com/graphile/graphile-build#readme",
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-build-pg",
   "dependencies": {
     "chalk": "^2.1.0",
     "debug": ">=2 <3",
