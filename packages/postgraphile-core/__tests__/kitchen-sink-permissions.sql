@@ -16,4 +16,4 @@ grant insert(length_in_metres) on c.left_arm to postgraphile_test_visitor;
 grant update(length_in_metres) on c.left_arm to postgraphile_test_visitor;
 grant delete on c.left_arm to postgraphile_test_visitor;
 
-grant select on a.post to postgraphile_test_visitor;
+grant select(id, headline, body, author_id) on a.post to postgraphile_test_visitor;

@@ -79,7 +79,8 @@ function omitWithRBACChecks(
     const tableEntity: PgClass = entity;
     if (
       (permission === READ || permission === ALL || permission === MANY) &&
-      !tableEntity.aclSelectable
+      (!tableEntity.aclSelectable &&
+        !tableEntity.attributes.some(attr => attr.aclSelectable))
     ) {
       return true;
     } else if (
