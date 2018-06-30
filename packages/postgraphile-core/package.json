@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-core",
-  "version": "4.0.0-rc.2",
+  "version": "4.0.0-rc.3",
   "description": "",
   "main": "node8plus/index.js",
   "scripts": {
@@ -19,8 +19,8 @@
     "url": "https://github.com/graphile/graphile-build/issues"
   },
   "dependencies": {
-    "graphile-build": "4.0.0-rc.2",
-    "graphile-build-pg": "4.0.0-rc.2"
+    "graphile-build": "4.0.0-rc.3",
+    "graphile-build-pg": "4.0.0-rc.3"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
