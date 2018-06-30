@@ -1205,3 +1205,105 @@ Object {
   ],
 }
 `;
+
+exports[`rbac.createLeftArm.graphql 1`] = `
+Object {
+  "data": Object {
+    "createLeftArm": Object {
+      "leftArm": Object {
+        "id": 100,
+        "lengthInMetres": 0.66,
+        "mood": "neutral",
+        "nodeId": "WyJsZWZ0X2FybXMiLDEwMF0=",
+        "personId": 3,
+      },
+    },
+  },
+}
+`;
+
+exports[`rbac.createPerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "createPerson": Object {
+      "person": Object {
+        "about": "Unknown",
+        "aliases": Array [
+          "Jay Doe",
+          "JD",
+        ],
+        "email": "jane.doe@example.com",
+        "id": 10,
+        "name": "Jane Doe",
+        "site": Object {
+          "url": "http://example.com",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`rbac.deletePerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "deletePersonById": Object {
+      "deletedPersonId": "WyJwZW9wbGUiLDNd",
+    },
+  },
+}
+`;
+
+exports[`rbac.leftArmIdentity.graphql 1`] = `
+Object {
+  "data": Object {
+    "leftArmIdentity": Object {
+      "leftArm": Object {
+        "id": 9001,
+        "lengthInMetres": 77,
+        "mood": "jubilant",
+        "nodeId": "WyJsZWZ0X2FybXMiLDkwMDFd",
+        "personId": 99,
+      },
+    },
+  },
+}
+`;
+
+exports[`rbac.updateLeftArm.graphql 1`] = `
+Object {
+  "data": Object {
+    "updateLeftArmById": Object {
+      "leftArm": Object {
+        "id": 47,
+        "lengthInMetres": 0.65,
+        "mood": "jovial",
+        "nodeId": "WyJsZWZ0X2FybXMiLDQ3XQ==",
+        "personId": 5,
+      },
+    },
+  },
+}
+`;
+
+exports[`rbac.updatePerson.graphql 1`] = `
+Object {
+  "data": Object {
+    "updatePersonById": Object {
+      "person": Object {
+        "about": null,
+        "aliases": Array [
+          "BD",
+          "Buddy",
+        ],
+        "email": "buddy@example.com",
+        "id": 3,
+        "name": "Budd Daay",
+        "site": Object {
+          "url": "http://buddy.com",
+        },
+      },
+    },
+  },
+}
+`;

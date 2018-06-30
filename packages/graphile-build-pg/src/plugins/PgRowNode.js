@@ -57,7 +57,11 @@ export default (async function PgRowNode(builder) {
               builder.where(
                 sql.fragment`${builder.getTableAlias()}.${sql.identifier(
                   key.name
-                )} = ${gql2pg(identifiers[idx], primaryKeys[idx].type)}`
+                )} = ${gql2pg(
+                  identifiers[idx],
+                  primaryKeys[idx].type,
+                  primaryKeys[idx].typeModifier
+                )}`
               );
             });
           }
@@ -169,7 +173,8 @@ export default (async function PgRowNode(builder) {
                                 key.name
                               )} = ${gql2pg(
                                 identifiers[idx],
-                                primaryKeys[idx].type
+                                primaryKeys[idx].type,
+                                primaryKeys[idx].typeModifier
                               )}`
                             );
                           });

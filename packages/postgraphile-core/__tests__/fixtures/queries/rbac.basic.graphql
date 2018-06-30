@@ -1,0 +1,13 @@
+query {
+  personSecretByPersonId(personId: 3) { nodeId personId secret }
+  allPersonSecrets { nodes { nodeId personId secret } }
+  personForSecret: personById(id: 1) { nodeId personSecretByPersonId { nodeId personId secret } }
+
+  leftArmById(id: 42) { nodeId id personId lengthInMetres mood }
+  allLeftArms { nodes { nodeId id personId lengthInMetres mood } }
+  personForLeftArm: personById(id: 2) { nodeId leftArmByPersonId { nodeId id personId lengthInMetres mood } }
+
+  postById(id:7) { nodeId id headline body authorId }
+  allPosts { nodes { nodeId id headline body authorId } }
+  personForPosts: personById(id: 3) { nodeId postsByAuthorId { nodes { nodeId id headline body authorId } } }
+}

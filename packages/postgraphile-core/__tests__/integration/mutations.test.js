@@ -34,10 +34,20 @@ beforeAll(() => {
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
 
-    return await Promise.all([
+    const [gqlSchema, dSchema] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["d"]),
     ]);
+    // Now for RBAC-enabled tests
+    await pgClient.query("set role postgraphile_test_authenticator")
+    const [rbacSchema] = await Promise.all([
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {}),
+    ]);
+    return {
+      gqlSchema,
+      dSchema,
+      rbacSchema,
+    }
   });
 
   // Execute all of the mutations in parallel. We will not wait for them to
@@ -48,7 +58,7 @@ beforeAll(() => {
   mutationResults = mutationFileNames.map(async fileName => {
     // Wait for the schema to resolve. We need the schema to be introspected
     // before we can do anything else!
-    let [gqlSchema, dSchema] = await gqlSchemaPromise;
+    let {gqlSchema, dSchema, rbacSchema} = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async pgClient => {
       // Read the mutation from the file system.
@@ -60,7 +70,15 @@ beforeAll(() => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
 
-      const schemaToUse = fileName.startsWith("d.") ? dSchema : gqlSchema;
+      let schemaToUse
+      if (fileName.startsWith("d.")) {
+        schemaToUse = dSchema;
+      } else if (fileName.startsWith("rbac.")) {
+        await pgClient.query("select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)");
+        schemaToUse = rbacSchema;
+      } else {
+        schemaToUse = gqlSchema;
+      }
 
       // Return the result of our GraphQL query.
       const result = await graphql(schemaToUse, mutation, null, {

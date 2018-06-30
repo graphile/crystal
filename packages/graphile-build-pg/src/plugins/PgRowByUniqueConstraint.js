@@ -47,8 +47,8 @@ export default (async function PgRowByUniqueConstraint(builder) {
               if (omit(constraint, "read")) {
                 return;
               }
-              const keys = constraint.keyAttributeNums.map(
-                num => attributes.filter(attr => attr.num === num)[0]
+              const keys = constraint.keyAttributeNums.map(num =>
+                attributes.find(attr => attr.num === num)
               );
               if (keys.some(key => omit(key, "read"))) {
                 return;
@@ -105,7 +105,8 @@ export default (async function PgRowByUniqueConstraint(builder) {
                                 key.name
                               )} = ${gql2pg(
                                 args[inflection.column(key)],
-                                key.type
+                                key.type,
+                                key.typeModifier
                               )}`
                             );
                           });

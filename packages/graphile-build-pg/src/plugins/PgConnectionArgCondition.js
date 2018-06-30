@@ -113,7 +113,7 @@ export default (function PgConnectionArgCondition(builder) {
                   queryBuilder.where(
                     sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                       attr.name
-                    )} = ${gql2pg(val, attr.type)}`
+                    )} = ${gql2pg(val, attr.type, attr.typeModifier)}`
                   );
                 } else if (val === null) {
                   queryBuilder.where(

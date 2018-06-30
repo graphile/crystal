@@ -50,7 +50,8 @@ comment on table c.person_secret is 'Tracks the person''s secret';
 create table c.left_arm (
   id serial primary key,
   person_id int not null default c.current_user_id() unique references c.person on delete cascade,
-  length_in_metres float
+  length_in_metres float,
+  mood text not null default 'neutral'
 );
 
 comment on table c.left_arm is 'Tracks metadata about the left arms of various people';
@@ -105,7 +106,7 @@ create table a.post (
   id serial primary key,
   headline text not null,
   body text,
-  author_id int4 default c.current_user_id() references c.person(id),
+  author_id int4 default c.current_user_id() references c.person(id) on delete cascade,
   enums a.an_enum[],
   comptypes a.comptype[]
 );
@@ -154,21 +155,21 @@ comment on column b.updatable_view.constant is 'This is constantly 2';
 create view a.non_updatable_view as select 2;
 
 create table c.compound_key (
-  person_id_2 int references c.person(id),
-  person_id_1 int references c.person(id),
+  person_id_2 int references c.person(id) on delete cascade,
+  person_id_1 int references c.person(id) on delete cascade,
   extra boolean,
   primary key (person_id_1, person_id_2)
 );
 
 create table a.foreign_key (
-  person_id int references c.person(id),
+  person_id int references c.person(id) on delete cascade,
   compound_key_1 int,
   compound_key_2 int,
-  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2)
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2) on delete cascade
 );
 
 alter table a.foreign_key add constraint second_fkey
-  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2);
+  foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2) on delete cascade;
 
 create table c.edge_case (
   not_null_has_default boolean not null default false,
@@ -293,6 +294,9 @@ create function a.post_headline_trimmed(post a.post, length int default 10, omis
 create function a.post_headline_trimmed_strict(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable strict;
 create function a.post_headline_trimmed_no_defaults(post a.post, length int, omission text) returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
 create function a.post_many(posts a.post[]) returns setof a.post as $$ declare current_post a.post; begin foreach current_post in array posts loop return next current_post; end loop; end; $$ language plpgsql;
+
+create function c.left_arm_identity(left_arm c.left_arm) returns c.left_arm as $$ select left_arm.*; $$ language sql volatile;
+comment on function c.left_arm_identity(left_arm c.left_arm) is E'@arg0variant base\n@resultFieldName leftArm';
 
 -- Procs -> custom queries
 create function a.query_compound_type_array(object c.compound_type) returns c.compound_type[] as $$ select ARRAY[object, (null, null, null, null, null, null, null, null)::c.compound_type, (object.a + 1, object.b, object.c, object.d, object.e, object.f, object.g, object.foo_bar)::c.compound_type]; $$ language sql stable;
@@ -479,7 +483,7 @@ $$ language sql stable;
 create table d.post (
   id serial primary key,
   body text,
-  author_id int4 references d.person(id)
+  author_id int4 references d.person(id) on delete cascade
 );
 
 comment on constraint post_author_id_fkey on d.post is E'@foreignFieldName posts\n@fieldName author';
@@ -542,13 +546,13 @@ create table d.studios (
 create table d.tv_shows (
     code        integer PRIMARY KEY,
     title       varchar(40),
-    studio_id   integer references d.studios
+    studio_id   integer references d.studios on delete cascade
 );
 
 
 create table d.tv_episodes (
     code        integer PRIMARY KEY,
     title       varchar(40),
-    show_id     integer references d.tv_shows
+    show_id     integer references d.tv_shows on delete cascade
 );
 

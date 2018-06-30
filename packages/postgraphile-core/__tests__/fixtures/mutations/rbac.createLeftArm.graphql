@@ -1,0 +1,15 @@
+mutation {
+  createLeftArm(input:{
+    leftArm:{
+      lengthInMetres: 0.66
+    }
+  }) {
+    leftArm {
+      nodeId
+      id
+      personId
+      lengthInMetres
+      mood
+    }
+  }
+}

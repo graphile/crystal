@@ -62,6 +62,11 @@ beforeAll(() => {
         simpleCollections: "both",
       }),
     ]);
+    // Now for RBAC-enabled tests
+    await pgClient.query("set role postgraphile_test_authenticator");
+    const [rbac] = await Promise.all([
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {}),
+    ]);
     debug(printSchema(normal));
     return {
       normal,
@@ -71,6 +76,7 @@ beforeAll(() => {
       viewUniqueKey,
       dSchema,
       simpleCollections,
+      rbac,
     };
   });
 
@@ -87,8 +93,9 @@ beforeAll(() => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
       // Run all of our queries in parallel.
-      return await Promise.all(
-        queryFileNames.map(async fileName => {
+      const results = [];
+      for (const filename of queryFileNames) {
+        const process = async fileName => {
           // Read the query from the file system.
           const query = await readFile(
             resolvePath(queriesDir, fileName),
@@ -111,22 +118,38 @@ beforeAll(() => {
               gqlSchemas.simpleCollections,
             "simple-procedure-query.graphql": gqlSchemas.simpleCollections,
           };
-          const gqlSchema = schemas[fileName]
-            ? schemas[fileName]
-            : fileName.substr(0, 2) === "d."
-              ? gqlSchemas.dSchema
-              : gqlSchemas.normal;
-
-          // Return the result of our GraphQL query.
-          const result = await graphql(gqlSchema, query, null, {
-            pgClient: pgClient,
-          });
-          if (result.errors) {
-            console.log(result.errors.map(e => e.originalError));
+          let gqlSchema = schemas[fileName];
+          if (!gqlSchema) {
+            if (fileName.startsWith("d.")) {
+              gqlSchema = gqlSchemas.dSchema;
+            } else if (fileName.startsWith("rbac.")) {
+              gqlSchema = gqlSchemas.rbac;
+            } else {
+              gqlSchema = gqlSchemas.normal;
+            }
           }
-          return result;
-        })
-      );
+
+          await pgClient.query("savepoint test");
+          if (gqlSchema === gqlSchemas.rbac) {
+            await pgClient.query("select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)");
+          }
+
+          try {
+            // Return the result of our GraphQL query.
+            const result = await graphql(gqlSchema, query, null, {
+              pgClient: pgClient,
+            });
+            if (result.errors) {
+              console.log(result.errors.map(e => e.originalError));
+            }
+            return result;
+          } finally {
+            await pgClient.query("rollback to savepoint test");
+          }
+        }
+        results.push(await process(filename));
+      }
+      return results;
     });
   })();
 

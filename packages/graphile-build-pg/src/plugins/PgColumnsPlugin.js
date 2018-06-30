@@ -199,20 +199,26 @@ export default (function PgColumnsPlugin(builder) {
           }
           memo[fieldName] = fieldWithHooks(
             fieldName,
-            pgAddSubfield(fieldName, attr.name, attr.type, {
-              description: attr.description,
-              type: nullableIf(
-                GraphQLNonNull,
-                isPgBaseInput ||
-                  isPgPatch ||
-                  (!attr.isNotNull && !attr.type.domainIsNotNull) ||
-                  attr.hasDefault,
-                pgGetGqlInputTypeByTypeIdAndModifier(
-                  attr.typeId,
-                  attr.typeModifier
-                ) || GraphQLString
-              ),
-            }),
+            pgAddSubfield(
+              fieldName,
+              attr.name,
+              attr.type,
+              {
+                description: attr.description,
+                type: nullableIf(
+                  GraphQLNonNull,
+                  isPgBaseInput ||
+                    isPgPatch ||
+                    (!attr.isNotNull && !attr.type.domainIsNotNull) ||
+                    attr.hasDefault,
+                  pgGetGqlInputTypeByTypeIdAndModifier(
+                    attr.typeId,
+                    attr.typeModifier
+                  ) || GraphQLString
+                ),
+              },
+              attr.typeModifier
+            ),
             { pgFieldIntrospection: attr }
           );
           return memo;

@@ -252,7 +252,12 @@ export default function makeProcField(
           const argName = argNames[argIndex];
           const gqlArgName = inflection.argument(argName, argIndex);
           const value = args[gqlArgName];
-          const sqlValue = gql2pg(value, argTypes[argIndex]);
+          const variant =
+            variantFromTags(proc.tags, argIndex) ||
+            variantFromName(argNames[argIndex], type);
+
+          const sqlValue = gql2pg(value, argTypes[argIndex], variant);
+
           if (argIndex + 1 > requiredArgCount && haveNames && value == null) {
             // No need to pass argument to function
             continue;

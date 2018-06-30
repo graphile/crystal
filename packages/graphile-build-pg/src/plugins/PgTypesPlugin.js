@@ -131,14 +131,29 @@ export default (function PgTypesPlugin(
         return val;
       }
     };
-    const gql2pg = (val, type) => {
+    const gql2pg = (val, type, modifier) => {
+      if (modifier === undefined) {
+        let stack;
+        try {
+          throw new Error();
+        } catch (e) {
+          stack = e.stack;
+        }
+        // eslint-disable-next-line no-console
+        console.warn(
+          "gql2pg should be called with three arguments, the third being the type modifier (or `null`); " +
+            (stack || "")
+        );
+        // Hack for backwards compatibility:
+        modifier = null;
+      }
       if (val == null) {
         return sql.null;
       }
       if (pg2GqlMapper[type.id]) {
-        return pg2GqlMapper[type.id].unmap(val);
+        return pg2GqlMapper[type.id].unmap(val, modifier);
       } else if (type.domainBaseType) {
-        return gql2pg(val, type.domainBaseType);
+        return gql2pg(val, type.domainBaseType, type.domainTypeModifier);
       } else if (type.isPgArray) {
         if (!Array.isArray(val)) {
           throw new Error(
@@ -148,7 +163,7 @@ export default (function PgTypesPlugin(
           );
         }
         return sql.fragment`array[${sql.join(
-          val.map(v => gql2pg(v, type.arrayItemType)),
+          val.map(v => gql2pg(v, type.arrayItemType, modifier)),
           ", "
         )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
           type.name
@@ -157,23 +172,6 @@ export default (function PgTypesPlugin(
         return sql.value(val);
       }
     };
-    /*
-      type =
-        { kind: 'type',
-          id: '1021',
-          name: '_float4',
-          description: null,
-          namespaceId: '11',
-          namespaceName: 'pg_catalog',
-          type: 'b',
-          category: 'A',
-          domainIsNotNull: false,
-          arrayItemTypeId: '700',
-          classId: null,
-          domainBaseTypeId: null,
-          enumVariants: null,
-          rangeSubTypeId: null }
-      */
 
     const makeIntervalFields = () => {
       return {
@@ -679,8 +677,9 @@ export default (function PgTypesPlugin(
           },
           unmap: ({ start, end }) => {
             // Ref: https://www.postgresql.org/docs/9.6/static/rangetypes.html#RANGETYPES-CONSTRUCT
-            const lower = (start && gql2pg(start.value, subtype)) || sql.null;
-            const upper = (end && gql2pg(end.value, subtype)) || sql.null;
+            const lower =
+              (start && gql2pg(start.value, subtype, null)) || sql.null;
+            const upper = (end && gql2pg(end.value, subtype, null)) || sql.null;
             const lowerInclusive = start && !start.inclusive ? "(" : "[";
             const upperInclusive = end && !end.inclusive ? ")" : "]";
             return sql.fragment`${sql.identifier(

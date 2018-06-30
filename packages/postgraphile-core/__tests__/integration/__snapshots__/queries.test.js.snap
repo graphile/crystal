@@ -4049,6 +4049,211 @@ Object {
 }
 `;
 
+exports[`rbac.basic.graphql 1`] = `
+Object {
+  "data": Object {
+    "allLeftArms": Object {
+      "nodes": Array [
+        Object {
+          "id": 42,
+          "lengthInMetres": 0.6,
+          "mood": "neutral",
+          "nodeId": "WyJsZWZ0X2FybXMiLDQyXQ==",
+          "personId": 4,
+        },
+        Object {
+          "id": 45,
+          "lengthInMetres": 0.7,
+          "mood": "neutral",
+          "nodeId": "WyJsZWZ0X2FybXMiLDQ1XQ==",
+          "personId": 2,
+        },
+        Object {
+          "id": 47,
+          "lengthInMetres": 0.65,
+          "mood": "neutral",
+          "nodeId": "WyJsZWZ0X2FybXMiLDQ3XQ==",
+          "personId": 5,
+        },
+        Object {
+          "id": 50,
+          "lengthInMetres": 0.65,
+          "mood": "neutral",
+          "nodeId": "WyJsZWZ0X2FybXMiLDUwXQ==",
+          "personId": 1,
+        },
+      ],
+    },
+    "allPersonSecrets": Object {
+      "nodes": Array [
+        Object {
+          "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsMl0=",
+          "personId": 2,
+          "secret": "Sara Smith is not really my name!",
+        },
+        Object {
+          "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+          "personId": 3,
+          "secret": "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+        },
+        Object {
+          "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsNV0=",
+          "personId": 5,
+          "secret": "My only secret is that I have no secrets!",
+        },
+        Object {
+          "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsNl0=",
+          "personId": 6,
+          "secret": "I don't think the bug I test for will ever return!",
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "authorId": 2,
+          "body": null,
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": 1,
+          "nodeId": "WyJwb3N0cyIsMV0=",
+        },
+        Object {
+          "authorId": 1,
+          "body": null,
+          "headline": "I hate yogurt. It’s just stuff with bits in.",
+          "id": 2,
+          "nodeId": "WyJwb3N0cyIsMl0=",
+        },
+        Object {
+          "authorId": 1,
+          "body": null,
+          "headline": "Is that a cooking show?",
+          "id": 3,
+          "nodeId": "WyJwb3N0cyIsM10=",
+        },
+        Object {
+          "authorId": 1,
+          "body": null,
+          "headline": "You hit me with a cricket bat.",
+          "id": 4,
+          "nodeId": "WyJwb3N0cyIsNF0=",
+        },
+        Object {
+          "authorId": 5,
+          "body": null,
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          "id": 5,
+          "nodeId": "WyJwb3N0cyIsNV0=",
+        },
+        Object {
+          "authorId": 3,
+          "body": null,
+          "headline": "Stop talking, brain thinking. Hush.",
+          "id": 6,
+          "nodeId": "WyJwb3N0cyIsNl0=",
+        },
+        Object {
+          "authorId": 1,
+          "body": null,
+          "headline": "Large bet on myself in round one.",
+          "id": 7,
+          "nodeId": "WyJwb3N0cyIsN10=",
+        },
+        Object {
+          "authorId": 2,
+          "body": null,
+          "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          "id": 8,
+          "nodeId": "WyJwb3N0cyIsOF0=",
+        },
+        Object {
+          "authorId": 3,
+          "body": null,
+          "headline": "You know how I sometimes have really brilliant ideas?",
+          "id": 9,
+          "nodeId": "WyJwb3N0cyIsOV0=",
+        },
+        Object {
+          "authorId": 2,
+          "body": null,
+          "headline": "What’s with you kids? Every other day it’s food, food, food.",
+          "id": 10,
+          "nodeId": "WyJwb3N0cyIsMTBd",
+        },
+        Object {
+          "authorId": 3,
+          "body": null,
+          "headline": "They’re not aliens, they’re Earth…liens!",
+          "id": 11,
+          "nodeId": "WyJwb3N0cyIsMTFd",
+        },
+      ],
+    },
+    "leftArmById": Object {
+      "id": 42,
+      "lengthInMetres": 0.6,
+      "mood": "neutral",
+      "nodeId": "WyJsZWZ0X2FybXMiLDQyXQ==",
+      "personId": 4,
+    },
+    "personForLeftArm": Object {
+      "leftArmByPersonId": Object {
+        "id": 45,
+        "lengthInMetres": 0.7,
+        "mood": "neutral",
+        "nodeId": "WyJsZWZ0X2FybXMiLDQ1XQ==",
+        "personId": 2,
+      },
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+    "personForPosts": Object {
+      "nodeId": "WyJwZW9wbGUiLDNd",
+      "postsByAuthorId": Object {
+        "nodes": Array [
+          Object {
+            "authorId": 3,
+            "body": null,
+            "headline": "Stop talking, brain thinking. Hush.",
+            "id": 6,
+            "nodeId": "WyJwb3N0cyIsNl0=",
+          },
+          Object {
+            "authorId": 3,
+            "body": null,
+            "headline": "You know how I sometimes have really brilliant ideas?",
+            "id": 9,
+            "nodeId": "WyJwb3N0cyIsOV0=",
+          },
+          Object {
+            "authorId": 3,
+            "body": null,
+            "headline": "They’re not aliens, they’re Earth…liens!",
+            "id": 11,
+            "nodeId": "WyJwb3N0cyIsMTFd",
+          },
+        ],
+      },
+    },
+    "personForSecret": Object {
+      "nodeId": "WyJwZW9wbGUiLDFd",
+      "personSecretByPersonId": null,
+    },
+    "personSecretByPersonId": Object {
+      "nodeId": "WyJwZXJzb25fc2VjcmV0cyIsM10=",
+      "personId": 3,
+      "secret": "I once got stuck trying to retrieve something embarassing from between two panes of glass",
+    },
+    "postById": Object {
+      "authorId": 1,
+      "body": null,
+      "headline": "Large bet on myself in round one.",
+      "id": 7,
+      "nodeId": "WyJwb3N0cyIsN10=",
+    },
+  },
+}
+`;
+
 exports[`relation-head-tail.graphql 1`] = `
 Object {
   "data": Object {

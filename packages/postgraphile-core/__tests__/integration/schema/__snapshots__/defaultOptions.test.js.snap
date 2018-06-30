@@ -2981,6 +2981,7 @@ type JwtToken {
 type LeftArm implements Node {
   id: Int!
   lengthInMetres: Float
+  mood: String!
 
   \\"\\"\\"
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -2990,6 +2991,14 @@ type LeftArm implements Node {
   \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
   personByPersonId: Person
   personId: Int!
+}
+
+\\"\\"\\"An input representation of \`LeftArm\` with nullable fields.\\"\\"\\"
+input LeftArmBaseInput {
+  id: Int
+  lengthInMetres: Float
+  mood: String
+  personId: Int
 }
 
 \\"\\"\\"
@@ -3002,14 +3011,52 @@ input LeftArmCondition {
   \\"\\"\\"Checks for equality with the object’s \`lengthInMetres\` field.\\"\\"\\"
   lengthInMetres: Float
 
+  \\"\\"\\"Checks for equality with the object’s \`mood\` field.\\"\\"\\"
+  mood: String
+
   \\"\\"\\"Checks for equality with the object’s \`personId\` field.\\"\\"\\"
   personId: Int
+}
+
+\\"\\"\\"All input for the \`leftArmIdentity\` mutation.\\"\\"\\"
+input LeftArmIdentityInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  leftArm: LeftArmBaseInput
+}
+
+\\"\\"\\"The output of our \`leftArmIdentity\` mutation.\\"\\"\\"
+type LeftArmIdentityPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  leftArm: LeftArm
+
+  \\"\\"\\"An edge for our \`LeftArm\`. May be used by Relay 1.\\"\\"\\"
+  leftArmEdge(
+    \\"\\"\\"The method to use when ordering \`LeftArm\`.\\"\\"\\"
+    orderBy: [LeftArmsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LeftArmsEdge
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`LeftArm\`.\\"\\"\\"
+  personByPersonId: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
 }
 
 \\"\\"\\"An input for mutations affecting \`LeftArm\`\\"\\"\\"
 input LeftArmInput {
   id: Int
   lengthInMetres: Float
+  mood: String
   personId: Int
 }
 
@@ -3019,6 +3066,7 @@ Represents an update to a \`LeftArm\`. Fields that are set will be updated.
 input LeftArmPatch {
   id: Int
   lengthInMetres: Float
+  mood: String
   personId: Int
 }
 
@@ -3054,6 +3102,8 @@ enum LeftArmsOrderBy {
   ID_DESC
   LENGTH_IN_METRES_ASC
   LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
   NATURAL
   PERSON_ID_ASC
   PERSON_ID_DESC
@@ -3760,6 +3810,12 @@ type Mutation {
     \\"\\"\\"
     input: JsonbIdentityMutationPlpgsqlWithDefaultInput!
   ): JsonbIdentityMutationPlpgsqlWithDefaultPayload
+  leftArmIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: LeftArmIdentityInput!
+  ): LeftArmIdentityPayload
   mult1(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

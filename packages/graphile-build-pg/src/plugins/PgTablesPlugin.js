@@ -54,7 +54,6 @@ export default (function PgTablesPlugin(
         GraphQLList,
         GraphQLInputObjectType,
       },
-      pgColumnFilter,
       inflection,
     } = build;
     const nullableIf = (condition, Type) =>
@@ -184,53 +183,25 @@ export default (function PgTablesPlugin(
             }
           );
           cb(TableType);
-          const pgInputFields = {};
+          const pgCreateInputFields = {};
+          const pgPatchInputFields = {};
+          const pgBaseInputFields = {};
           newWithHooks(
             GraphQLInputObjectType,
             {
               description: `An input for mutations affecting \`${tableTypeName}\``,
               name: inflection.inputType(TableType),
-              fields: context => {
-                pg2GqlMapper[tablePgType.id] = {
-                  map: _ => _,
-                  unmap: obj => {
-                    return sql.fragment`row(${sql.join(
-                      attributes.map(attr => {
-                        if (!pgColumnFilter(attr, build, context)) {
-                          return sql.null; // TODO: return default instead.
-                        }
-                        const fieldName = inflection.column(attr);
-                        const pgInputField = pgInputFields[fieldName];
-                        const v = obj[fieldName];
-                        if (pgInputField && v != null) {
-                          const { type } = pgInputField;
-                          return sql.fragment`${gql2pg(
-                            v,
-                            type
-                          )}::${sql.identifier(type.namespaceName, type.name)}`;
-                        } else {
-                          return sql.null; // TODO: return default instead.
-                        }
-                      }),
-                      ","
-                    )})::${sql.identifier(
-                      tablePgType.namespaceName,
-                      tablePgType.name
-                    )}`;
-                  },
-                };
-                return {};
-              },
             },
             {
               pgIntrospection: table,
               isInputType: true,
               isPgRowType: table.isSelectable,
               isPgCompoundType: !table.isSelectable,
-              pgAddSubfield(fieldName, attrName, pgType, spec) {
-                pgInputFields[fieldName] = {
+              pgAddSubfield(fieldName, attrName, pgType, spec, typeModifier) {
+                pgCreateInputFields[fieldName] = {
                   name: attrName,
                   type: pgType,
+                  typeModifier,
                 };
                 return spec;
               },
@@ -255,8 +226,12 @@ export default (function PgTablesPlugin(
                 isPgRowType: table.isSelectable,
                 isPgCompoundType: !table.isSelectable,
                 isPgPatch: true,
-                pgAddSubfield(fieldName, _attrName, _type, spec) {
-                  // We don't use this currently
+                pgAddSubfield(fieldName, attrName, pgType, spec, typeModifier) {
+                  pgPatchInputFields[fieldName] = {
+                    name: attrName,
+                    type: pgType,
+                    typeModifier,
+                  };
                   return spec;
                 },
               },
@@ -273,13 +248,56 @@ export default (function PgTablesPlugin(
                 isPgRowType: table.isSelectable,
                 isPgCompoundType: !table.isSelectable,
                 isPgBaseInput: true,
-                pgAddSubfield(fieldName, _attrName, _type, spec) {
-                  // We don't use this currently
+                pgAddSubfield(fieldName, attrName, pgType, spec, typeModifier) {
+                  pgBaseInputFields[fieldName] = {
+                    name: attrName,
+                    type: pgType,
+                    typeModifier,
+                  };
                   return spec;
                 },
               }
             );
           }
+
+          pg2GqlMapper[tablePgType.id] = {
+            map: _ => _,
+            unmap: (obj, modifier) => {
+              let fieldLookup;
+              if (modifier === "patch") {
+                fieldLookup = pgPatchInputFields;
+              } else if (modifier === "base") {
+                fieldLookup = pgBaseInputFields;
+              } else {
+                fieldLookup = pgCreateInputFields;
+              }
+
+              const attr2sql = attr => {
+                // TODO: this should use `fieldInput[*].name` to find the attribute
+                const fieldName = inflection.column(attr);
+                const inputField = fieldLookup[fieldName];
+                const v = obj[fieldName];
+                if (inputField && v != null) {
+                  const { type, typeModifier } = inputField;
+                  return sql.fragment`${gql2pg(
+                    v,
+                    type,
+                    typeModifier
+                  )}::${sql.identifier(type.namespaceName, type.name)}`;
+                } else {
+                  return sql.null; // TODO: return default instead.
+                }
+              };
+
+              return sql.fragment`row(${sql.join(
+                attributes.map(attr2sql),
+                ","
+              )})::${sql.identifier(
+                tablePgType.namespaceName,
+                tablePgType.name
+              )}`;
+            },
+          };
 
           const EdgeType = newWithHooks(
             GraphQLObjectType,

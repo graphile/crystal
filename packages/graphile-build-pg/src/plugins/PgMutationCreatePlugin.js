@@ -167,7 +167,9 @@ export default (function PgMutationCreatePlugin(
                         )
                       ) {
                         sqlColumns.push(sql.identifier(attr.name));
-                        sqlValues.push(gql2pg(val, attr.type));
+                        sqlValues.push(
+                          gql2pg(val, attr.type, attr.typeModifier)
+                        );
                       }
                     });
 
