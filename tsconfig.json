@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "declaration": true,
+    "declarationDir": "./build",
+    "allowJs": false,
     "rootDir": "src",
     "outDir": "build",
     "target": "es2017",
@@ -14,10 +16,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noUnusedLocals": true
   },
-  "include": ["src", "typings"],
   "exclude": [
     "index.js",
     "node_modules",

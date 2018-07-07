@@ -1,6 +1,7 @@
+/* tslint:disable:no-any */
 import { PassThrough } from 'stream'
 
-export default function setupServerSentEvents(req, res, options) {
+export default function setupServerSentEvents(req: any, res: any, options: any): any {
   const { _emitter } = options
 
   // Making sure these options are set.
@@ -20,8 +21,8 @@ export default function setupServerSentEvents(req, res, options) {
     req._koaCtx.compress = false
   }
 
-  const sse = str => {
-    if (isKoa) {
+  const sse = (str: string) => {
+    if (isKoa && stream) {
       stream.write(str)
     } else {
       res.write(str)

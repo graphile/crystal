@@ -1,4 +1,4 @@
-import { Client } from 'pg'
+import { PoolClient } from 'pg'
 import pgPool from './pgPool'
 import kitchenSinkSchemaSql from './kitchenSinkSchemaSql'
 
@@ -7,7 +7,7 @@ import kitchenSinkSchemaSql from './kitchenSinkSchemaSql'
  * client. The client will be connected from the pool at the start of the test,
  * and released back at the end. All changes will be rolled back.
  */
-export default function withPgClient <T>(fn: (client: Client) => T | Promise<T>): () => Promise<T> {
+export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise<T>): () => Promise<T> {
   return async (): Promise<T> => {
     let result: T | undefined
 
