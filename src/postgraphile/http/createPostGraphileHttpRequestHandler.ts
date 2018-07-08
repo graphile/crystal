@@ -12,9 +12,10 @@ import {
   validate as validateGraphql,
   execute as executeGraphql,
   formatError as defaultFormatError,
+  GraphQLError,
+  GraphQLSchema,
   print as printGraphql,
   specifiedRules,
-  GraphQLError,
 } from 'graphql'
 import { extendedFormatError } from '../extendedFormatError'
 import { IncomingMessage, ServerResponse } from 'http'
@@ -266,7 +267,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
   })
 
   let lastGqlSchema: any
-  const parseQuery = (gqlSchema: any, queryString: string) => {
+  const parseQuery = (gqlSchema: GraphQLSchema, queryString: string) => {
     if (gqlSchema !== lastGqlSchema) {
       queryCache.reset()
       lastGqlSchema = gqlSchema
