@@ -190,7 +190,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
   const DEFAULT_HANDLE_ERRORS = (errors: Array<GraphQLError>) => errors.map(formatError)
   const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS
 
-  function convertKoaBodyParserToConnect(req: any, res: any, next: any): any {
+  function convertKoaBodyParserToConnect(req: any, _res: any, next: any): any {
     if (req._koaCtx && req._koaCtx.request && req._koaCtx.request.body) {
       req._body = true
       req.body = req._koaCtx.request.body
@@ -226,7 +226,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
         })
       }
     },
-    (req: any, res: any, next: any) => next(),
+    (_req: any, _res: any, _next: any) => _next(),
   )
 
   // And we really want that function to be await-able

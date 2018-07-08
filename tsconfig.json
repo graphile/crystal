@@ -16,7 +16,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "noUnusedLocals": true
   },
   "exclude": [
