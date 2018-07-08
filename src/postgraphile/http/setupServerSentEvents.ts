@@ -22,8 +22,8 @@ export default function setupServerSentEvents(req: any, res: any, options: any):
   }
 
   const sse = (str: string) => {
-    if (isKoa && stream) {
-      stream.write(str)
+    if (isKoa) {
+      stream!.write(str)
     } else {
       res.write(str)
 
