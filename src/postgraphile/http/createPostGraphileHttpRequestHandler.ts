@@ -781,7 +781,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       pgPool,
       withPostGraphileContextFromReqRes,
     }
-  )
+  ) as HttpRequestHandler
 }
 
 /**

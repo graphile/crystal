@@ -243,6 +243,7 @@ export namespace PostGraphile {
    */
   export interface HttpRequestHandler {
     (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): void
+    (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
     formatError: (e: GraphQLError) => GraphQLFormattedErrorExtended
     getGraphQLSchema: () => Promise<GraphQLSchema>
     pgPool: Pool
