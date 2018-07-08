@@ -1,10 +1,10 @@
-import { GraphQLErrorExtended } from './postgraphile/extendedFormatError'
-import { PluginHookFn } from './postgraphile/pluginHook'
-import { IncomingMessage, ServerResponse } from 'http'
+import { EventEmitter } from 'events'
+import { GraphQLError } from 'graphql/error'
 import { GraphQLSchema } from 'graphql'
+import { IncomingMessage, ServerResponse } from 'http'
+import { PluginHookFn } from './postgraphile/pluginHook'
 import { Pool } from 'pg'
 import jwt = require('jsonwebtoken')
-import { GraphQLError } from 'graphql/error'
 
 export namespace PostGraphile {
 
@@ -201,15 +201,52 @@ export namespace PostGraphile {
     [propName: string]: any,
   }
 
+  export type GraphQLFormattedErrorExtended = {
+    // This is ugly, really I just want `string | void` but apparently TypeScript doesn't support that.
+    [s: string]: Array<GraphQLErrorLocation> | Array<string | number> | string | void,
+    message: string,
+    locations: Array<GraphQLErrorLocation> | void,
+    path: Array<string | number> | void,
+  }
+
+  export type GraphQLErrorLocation = {
+    line: number,
+    column: number,
+  }
+
+  export type GraphQLErrorExtended = GraphQLError & {
+    hint: string,
+    detail: string,
+    code: string,
+  }
+
+  /**
+   * Creates a GraphQL request handler that can support many different `http` frameworks, including:
+   *
+   * - Native Node.js `http`.
+   * - `connect`.
+   * - `express`.
+   * - `koa` (2.0).
+   */
+  export interface ICreateRequestHandler extends PostGraphile.PostGraphileOptions {
+    // Max query cache size in MB. Default, 100
+    queryCacheMaxSize?: number
+    // The actual GraphQL schema we will use.
+    getGqlSchema: () => Promise<GraphQLSchema>,
+    // A Postgres client pool we use to connect Postgres clients.
+    pgPool: Pool,
+    _emitter: EventEmitter,
+  }
+
   /**
    * A request handler for one of many different `http` frameworks.
    */
   export interface HttpRequestHandler {
     (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): void
-    (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
+    formatError: (e: GraphQLError) => GraphQLFormattedErrorExtended
     getGraphQLSchema: () => Promise<GraphQLSchema>
-    formatError: (e: GraphQLError) => GraphQLError
     pgPool: Pool
+    withPostGraphileContextFromReqRes: (req: IncomingMessage, res: ServerResponse, moreOptions: any, fn: (ctx: mixed) => any) => Promise<any>
   }
 
 }

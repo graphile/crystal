@@ -16,34 +16,17 @@ import {
   specifiedRules,
   GraphQLError,
 } from 'graphql'
-import { EventEmitter } from 'events'
 import { extendedFormatError } from '../extendedFormatError'
-import { GraphQLSchema } from 'graphql'
 import { IncomingMessage, ServerResponse } from 'http'
+import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware'
 import { pluginHookFromOptions } from '../pluginHook'
-import { Pool } from 'pg'
 import { PostGraphile } from '../../interfaces'
 import HttpRequestHandler = PostGraphile.HttpRequestHandler
+import ICreateRequestHandler = PostGraphile.ICreateRequestHandler
+import mixed = PostGraphile.mixed
 import setupServerSentEvents from './setupServerSentEvents'
 import withPostGraphileContext from '../withPostGraphileContext'
 
-/**
- * Creates a GraphQL request handler that can support many different `http` frameworks, including:
- *
- * - Native Node.js `http`.
- * - `connect`.
- * - `express`.
- * - `koa` (2.0).
- */
-export interface ICreateRequestHandler extends PostGraphile.PostGraphileOptions {
-  // Max query cache size in MB. Default, 100
-  queryCacheMaxSize?: number
-  // The actual GraphQL schema we will use.
-  getGqlSchema: () => Promise<GraphQLSchema>,
-  // A Postgres client pool we use to connect Postgres clients.
-  pgPool: Pool,
-  _emitter: EventEmitter,
-}
 
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
@@ -111,13 +94,13 @@ const origGraphiqlHtml: Promise<string> = new Promise((resolve, reject) => {
  * We need to be able to share the withPostGraphileContext logic between HTTP
  * and websockets
  */
-function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandler): any {
+function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandler) {
   const {
     pgSettings,
     jwtSecret,
     additionalGraphQLContextFromRequest,
   } = options
-  return async (req: IncomingMessage, res: ServerResponse, moreOptions: any, fn: any) => {
+  return async (req: IncomingMessage, res: ServerResponse, moreOptions: any, fn: (ctx: mixed) => any): Promise<any> => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
@@ -183,7 +166,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
   // Formats an error using the default GraphQL `formatError` function, and
   // custom formatting using some other options.
-  const formatError = (error: Error) => {
+  const formatError = (error: GraphQLError) => {
     // Get the appropriate formatted error object, including any extended error
     // fields if the user wants them.
     const formattedError =
@@ -767,44 +750,14 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
    * - `express`.
    * - `koa` (2.0).
    */
-  const middleware: any = (a: any, b: any, c: any) => {
-    // If are arguments look like the arguments to koa middleware, this is
-    // `koa` middleware.
-    if (a.req && a.res && typeof b === 'function') {
-      // Set the correct `koa` variable names…
-      const ctx = a
-      const next = b
-
-      // Hack the req object so we can get back to ctx
-      ctx.req._koaCtx = ctx
-
-      const oldEnd = ctx.res.end
-      ctx.res.end = (body: any) => {
-        ctx.response.body = body
-      }
-
-      // Execute our request handler. If an error is thrown, we don’t call
-      // `next` with an error. Instead we return the promise and let `koa`
-      // handle the error.
-      return (async () => {
-        let result
-        try {
-          result = await requestHandler(ctx.req, ctx.res, next)
-        } finally {
-          ctx.res.end = oldEnd
-          if (ctx.res.statusCode && ctx.res.statusCode !== 200) {
-            ctx.response.status = ctx.res.statusCode
-          }
-        }
-        return result
-      })()
+  const middleware = (req: IncomingMessage, res: ServerResponse, next: (error?: mixed) => void): void => {
+    if (isKoaApp(req, res)) {
+      koaMiddleware(req as any, res, requestHandler)
     } else {
       // Set the correct `connect` style variable names. If there was no `next`
       // defined (likely the case if the client is using `http`) we use the
       // final handler.
-      const req = a
-      const res = b
-      const next = c || finalHandler(req, res)
+      next = next || finalHandler(req, res)
 
       // Execute our request handler.
       requestHandler(req, res, next).then(
@@ -817,11 +770,18 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       )
     }
   }
-  middleware.getGraphQLSchema = getGqlSchema
-  middleware.formatError = formatError
-  middleware.pgPool = pgPool
-  middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes
-  return middleware as HttpRequestHandler
+
+  // HttpRequestHandler is a fn w/ extra props.  use `assign` to get concise,
+  // union type: https://stackoverflow.com/a/41853194/1438908
+  return Object.assign(
+    middleware,
+    {
+      formatError,
+      getGraphQLSchema: getGqlSchema,
+      pgPool,
+      withPostGraphileContextFromReqRes,
+    }
+  )
 }
 
 /**
