@@ -197,6 +197,8 @@ export namespace PostGraphile {
     // "only" - simple collections only (no Relay connections),
     // "both" - both
     simpleCollections?: 'omit' | 'both' | 'only',
+    // allow arbitrary extensions for consumption by plugins
+    [propName: string]: any,
   }
 
   /**
