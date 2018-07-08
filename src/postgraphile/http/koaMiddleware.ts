@@ -1,3 +1,4 @@
+/* tslint:disable:no-any no-var-requires */
 export const isKoaApp = (req: any, res: any) => (req.req && res.res && typeof res === 'function')
 
 export const middleware = (ctx: any, next: any, requestHandler: any) => {

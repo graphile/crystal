@@ -1,3 +1,4 @@
+/* tslint:disable:no-any */
 import { EventEmitter } from 'events'
 import { GraphQLError } from 'graphql/error'
 import { GraphQLSchema } from 'graphql'

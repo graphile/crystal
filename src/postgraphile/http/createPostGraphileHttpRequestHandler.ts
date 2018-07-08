@@ -28,7 +28,6 @@ import mixed = PostGraphile.mixed
 import setupServerSentEvents from './setupServerSentEvents'
 import withPostGraphileContext from '../withPostGraphileContext'
 
-
 const chalk = require('chalk')
 const Debugger = require('debug') // tslint:disable-line variable-name
 const httpError = require('http-errors')
@@ -95,7 +94,8 @@ const origGraphiqlHtml: Promise<string> = new Promise((resolve, reject) => {
  * We need to be able to share the withPostGraphileContext logic between HTTP
  * and websockets
  */
-function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandler) {
+function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandler):
+  (req: IncomingMessage, res: ServerResponse, moreOptions: any, fn: (ctx: mixed) => any) => Promise<any> {
   const {
     pgSettings,
     jwtSecret,
@@ -782,7 +782,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       getGraphQLSchema: getGqlSchema,
       pgPool,
       withPostGraphileContextFromReqRes,
-    }
+    },
   ) as HttpRequestHandler
 }
 

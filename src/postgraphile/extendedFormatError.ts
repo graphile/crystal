@@ -49,4 +49,3 @@ export function extendedFormatError(error: GraphQLError, fields: Array<string>):
     path: error.path,
   }
 }
-
