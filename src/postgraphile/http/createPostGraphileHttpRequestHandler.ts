@@ -820,7 +820,7 @@ function addCORSHeaders(res: ServerResponse): void {
 }
 
 function createBadAuthorizationHeaderError(): void {
-  throw httpError(
+  return httpError(
     400,
     'Authorization header is not of the correct bearer scheme format.',
   )
