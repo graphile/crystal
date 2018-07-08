@@ -11,8 +11,8 @@ import { Pool } from 'pg'
 import cluster = require('cluster')
 import { makePluginHook, PostGraphilePlugin } from './pluginHook'
 import debugFactory = require('debug')
-import { Postgraphile } from '../interfaces'
-import mixed = Postgraphile.mixed
+import { PostGraphile } from '../interfaces'
+import mixed = PostGraphile.mixed
 
 const debugCli = debugFactory('postgraphile:cli')
 

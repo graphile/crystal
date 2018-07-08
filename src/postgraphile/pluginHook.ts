@@ -1,10 +1,10 @@
 /* eslint-disable */// Because we use tslint
 import { AddFlagFn } from './cli'
 import { Server } from 'http'
-import { Postgraphile } from '../interfaces'
+import { PostGraphile } from '../interfaces'
 import { WithPostGraphileContextFn } from './withPostGraphileContext'
-import HttpRequestHandler = Postgraphile.HttpRequestHandler
-import PostGraphileOptions = Postgraphile.PostGraphileOptions
+import HttpRequestHandler = PostGraphile.HttpRequestHandler
+import PostGraphileOptions = PostGraphile.PostGraphileOptions
 
 export type HookFn<T> = (arg: T, context: {}) => T
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T

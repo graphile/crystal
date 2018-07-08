@@ -6,7 +6,7 @@ import { Pool } from 'pg'
 import jwt = require('jsonwebtoken')
 import { GraphQLError } from 'graphql/error'
 
-export namespace Postgraphile {
+export namespace PostGraphile {
 
   /**
    * A narrower type than `any` that won’t swallow errors from assumptions about

@@ -22,8 +22,8 @@ import { GraphQLSchema } from 'graphql'
 import { IncomingMessage, ServerResponse } from 'http'
 import { pluginHookFromOptions } from '../pluginHook'
 import { Pool } from 'pg'
-import { Postgraphile } from '../../interfaces'
-import HttpRequestHandler = Postgraphile.HttpRequestHandler
+import { PostGraphile } from '../../interfaces'
+import HttpRequestHandler = PostGraphile.HttpRequestHandler
 import setupServerSentEvents from './setupServerSentEvents'
 import withPostGraphileContext from '../withPostGraphileContext'
 
@@ -35,7 +35,7 @@ import withPostGraphileContext from '../withPostGraphileContext'
  * - `express`.
  * - `koa` (2.0).
  */
-export interface ICreateRequestHandler extends Postgraphile.PostGraphileOptions {
+export interface ICreateRequestHandler extends PostGraphile.PostGraphileOptions {
   // Max query cache size in MB. Default, 100
   queryCacheMaxSize?: number
   // The actual GraphQL schema we will use.

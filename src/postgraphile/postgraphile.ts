@@ -6,11 +6,11 @@ import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-
 import createPostGraphileHttpRequestHandler from './http/createPostGraphileHttpRequestHandler'
 import exportPostGraphileSchema from './schema/exportPostGraphileSchema'
 import { pluginHookFromOptions } from './pluginHook'
-import { Postgraphile } from '../interfaces'
+import { PostGraphile } from '../interfaces'
 
-import PostGraphileOptions = Postgraphile.PostGraphileOptions
-import mixed = Postgraphile.mixed
-import HttpRequestHandler = Postgraphile.HttpRequestHandler
+import PostGraphileOptions = PostGraphile.PostGraphileOptions
+import mixed = PostGraphile.mixed
+import HttpRequestHandler = PostGraphile.HttpRequestHandler
 
 export type PostgraphileSchemaBuilder = {
   _emitter: EventEmitter,

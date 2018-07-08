@@ -1,7 +1,7 @@
 // TODO: Refactor this module, it has code smell…
-import { Postgraphile } from '../../interfaces'
+import { PostGraphile } from '../../interfaces'
 import { ClientBase, PoolClient } from 'pg'
-import mixed = Postgraphile.mixed
+import mixed = PostGraphile.mixed
 
 export const $$pgClient = 'pgClient'
 
