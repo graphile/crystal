@@ -429,7 +429,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
           })
             .on('end', resolve)
             .on('error', reject)
-            .pipe(res)
+            .pipe(incomingReq.res || res)
         })
       }
 
