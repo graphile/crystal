@@ -115,7 +115,7 @@ const nodeMajorVersion = parseInt(
   10,
 )
 
-/* XXX: re-enable koa tests
+// XXX: re-enable koa tests
 
 // Only test Koa in version of Node.js greater than 4 because the Koa source
 // code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
@@ -128,7 +128,6 @@ if (nodeMajorVersion > 4) {
     return http.createServer(app.callback())
   })
 }
-*/
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = options =>
