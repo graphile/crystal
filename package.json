@@ -69,6 +69,7 @@
     "graphiql": "^0.11.2",
     "jest": "^18.1.0",
     "koa": "^2.5.1",
+    "koa-compress": "^3.0.0",
     "nodemon": "^1.11.0",
     "pg-minify": "~0.5.3",
     "react": "^15.3.2",

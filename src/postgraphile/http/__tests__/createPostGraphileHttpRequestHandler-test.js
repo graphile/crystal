@@ -13,6 +13,8 @@ const connect = require('connect')
 const express = require('express')
 const sendFile = require('send')
 const event = require('events')
+const compress = require('koa-compress')
+const Koa = require('koa') // tslint:disable-line variable-name
 
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter()
@@ -121,20 +123,21 @@ const nodeMajorVersion = parseInt(
 // code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
 // not meant to be used in Node.js 4 anyway so this is fine.
 if (nodeMajorVersion > 4) {
-  const Koa = require('koa') // tslint:disable-line variable-name
-  serverCreators.set('koa', handler => {
+  serverCreators.set('koa', (handler, options = {}) => {
     const app = new Koa()
+    options.onPreCreate && options.onPreCreate(app)
     app.use(handler)
     return http.createServer(app.callback())
   })
 }
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
-  const createServer = options =>
+  const createServer = (handlerOptions, serverOptions) =>
     createServerFromHandler(
       createPostGraphileHttpRequestHandler(
-        Object.assign({}, defaultOptions, options),
+        Object.assign({}, defaultOptions, handlerOptions),
       ),
+      serverOptions,
     )
 
   describe(name, () => {
@@ -850,5 +853,23 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         additionalGraphQLContextFromRequest.mock.calls[0][1],
       ).toBeInstanceOf(http.ServerResponse)
     })
+
+    if (name === 'koa') {
+      test('compatiblity with compression middleware', async () => {
+        const server = createServer(
+          { graphiql: true },
+          {
+            onPreCreate: app => {
+              app.use(compress({
+                threshold: 0
+              }))
+            }
+          }
+        )
+        await request(server)
+          .get('/graphiql')
+          .expect('Content-Encoding', /gzip/)
+      })
+    }
   })
 }
