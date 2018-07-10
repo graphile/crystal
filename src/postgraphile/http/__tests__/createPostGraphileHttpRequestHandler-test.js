@@ -125,7 +125,7 @@ const nodeMajorVersion = parseInt(
 if (nodeMajorVersion > 4) {
   serverCreators.set('koa', (handler, options = {}) => {
     const app = new Koa()
-    options.onPreCreate && options.onPreCreate(app)
+    if (options.onPreCreate) options.onPreCreate(app)
     app.use(handler)
     return http.createServer(app.callback())
   })
@@ -861,10 +861,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           {
             onPreCreate: app => {
               app.use(compress({
-                threshold: 0
+                threshold: 0,
               }))
-            }
-          }
+            },
+          },
         )
         await request(server)
           .get('/graphiql')
