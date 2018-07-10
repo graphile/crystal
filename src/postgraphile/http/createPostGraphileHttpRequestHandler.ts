@@ -429,7 +429,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
           })
             .on('end', resolve)
             .on('error', reject)
-            .pipe(incomingReq.res || res)
+            .pipe(res)
         })
       }
 
@@ -752,25 +752,23 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
    * - `express`.
    * - `koa` (2.0).
    */
-  const middleware = (req: IncomingMessage, res: ServerResponse, next: (error?: mixed) => void): void => {
+  const middleware = async (req: IncomingMessage, res: ServerResponse, next: (error?: mixed) => void): Promise<void> => {
     if (isKoaApp(req, res)) {
-      koaMiddleware(req as any, res, requestHandler)
-    } else {
-      // Set the correct `connect` style variable names. If there was no `next`
-      // defined (likely the case if the client is using `http`) we use the
-      // final handler.
-      next = next || finalHandler(req, res)
-
-      // Execute our request handler.
-      requestHandler(req, res, next).then(
-        // If the request was fulfilled, noop.
-        () => {
-          /* noop */
-        },
-        // If the request errored out, call `next` with the error.
-        error => next(error),
-      )
+      await koaMiddleware(req as any, res, requestHandler)
+      return
     }
+    // Set the correct `connect` style variable names. If there was no `next`
+    // defined (likely the case if the client is using `http`) we use the
+    // final handler.
+    next = next || finalHandler(req, res)
+
+    // Execute our request handler.
+    requestHandler(req, res, next).then(
+      // If the request was fulfilled, noop.
+      () => { /* noop */ },
+      // If the request errored out, call `next` with the error.
+      error => next(error),
+    )
   }
 
   // HttpRequestHandler is a fn w/ extra props.  use `assign` to get concise,

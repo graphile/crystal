@@ -243,7 +243,7 @@ export namespace PostGraphile {
    * A request handler for one of many different `http` frameworks.
    */
   export interface HttpRequestHandler {
-    (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): void
+    (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): Promise<void>
     (ctx: { req: IncomingMessage, res: ServerResponse }, next: () => void): Promise<void>
     formatError: (e: GraphQLError) => GraphQLFormattedErrorExtended
     getGraphQLSchema: () => Promise<GraphQLSchema>

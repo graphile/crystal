@@ -18,7 +18,7 @@ install all dependencies and PostGraphile schemas into your default database:
 
 ```bash
 yarn # or "npm install" if you prefer
-scripts/run-kitchen-sink-sql
+scripts/run-kitchen-sink-sql [-h <hostname> -U <user>] # add optional args to psql
 scripts/dev
 ```
 
