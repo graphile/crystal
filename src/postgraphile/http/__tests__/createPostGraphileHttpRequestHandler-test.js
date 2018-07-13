@@ -855,8 +855,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     })
 
     if (name === 'koa') {
-      test('compatiblity with compression middleware', async () => {
-        const server = createServer(
+      const createKoaCompressionServer = () =>
+        createServer(
           { graphiql: true },
           {
             onPreCreate: app => {
@@ -866,9 +866,29 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
             },
           },
         )
+      test('koa serves & compresses graphiql route', async () => {
+        const server = createKoaCompressionServer()
         await request(server)
           .get('/graphiql')
+          .expect(200)
           .expect('Content-Encoding', /gzip/)
+      })
+      test('koa serves & compresses graphiql assets', async () => {
+        const server = createKoaCompressionServer()
+        await request(server)
+          .get('/_postgraphile/graphiql/anything.css')
+          .expect(200)
+        expect(
+          sendFile.mock.calls.map(([res, filepath, options]) => [
+            filepath,
+            options,
+          ]),
+        ).toEqual([
+          [
+            'anything.css',
+            { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
+          ],
+        ])
       })
     }
   })
