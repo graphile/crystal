@@ -87,20 +87,20 @@ pluginHook('cli:flags:add:standard', addFlag)
 
 // Schema configuration
 program
-  .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
-  .option('-N, --no-setof-functions-contain-nulls', 'if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
+  .option('-j, --dynamic-json', '[RECOMMENDED] enable dynamic JSON in GraphQL inputs and outputs. PostGraphile uses stringified JSON by default')
+  .option('-N, --no-setof-functions-contain-nulls', '[RECOMMENDED] if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
   .option('--simple-collections [omit|both|only]', '"omit" (default) - relay connections only, "only" - simple collections only (no Relay connections), "both" - both')
-  .option('--no-ignore-rbac', 'set this to excludes fields, queries and mutations that the user isn\'t permitted to access; this will be the default in v5')
-  .option('--include-extension-resources', 'by default, tables and functions that come from extensions are excluded; use this flag to include them')
+  .option('--no-ignore-rbac', '[RECOMMENDED] set this to excludes fields, queries and mutations that the user isn\'t permitted to access; this will be the default in v5')
+  .option('--include-extension-resources', 'by default, tables and functions that come from extensions are excluded; use this flag to include them (not recommended)')
 
 pluginHook('cli:flags:add:schema', addFlag)
 
 // Error enhancements
 program
-  .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors')
-  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
+  .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors (recommended in development)')
+  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Recommended in development: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
 
 pluginHook('cli:flags:add:errorHandling', addFlag)
 
@@ -126,11 +126,11 @@ program
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
+  .option('-o, --cors', 'enable generous CORS settings; disabled by default, if possible use a proxy instead')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
   .option('--enable-query-batching', '[experimental] enable the server to process multiple GraphQL queries in one request')
-  .option('--disable-query-log', 'disable logging queries to console')
+  .option('--disable-query-log', 'disable logging queries to console (recommended in production)')
 
 pluginHook('cli:flags:add:webserver', addFlag)
 
