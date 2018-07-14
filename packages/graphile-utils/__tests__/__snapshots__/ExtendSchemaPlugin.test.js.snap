@@ -175,6 +175,114 @@ type Query {
 "
 `;
 
+exports[`supports defining a more complex mutation 1`] = `
+"input EchoInput {
+  text: String!
+  int: Int
+  float: Float!
+  intList: [Int!]
+}
+
+type EchoOutput {
+  text: String!
+  int: Int
+  float: Float!
+  intList: [Int!]
+}
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Gives you back what you put in\\"\\"\\"
+  echo(input: EchoInput): EchoOutput
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query {
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+"
+`;
+
+exports[`supports defining a more complex mutation 2`] = `
+Object {
+  "t1": Object {
+    "float": 0.23,
+    "int": null,
+    "intList": null,
+    "text": "Hi1",
+  },
+  "t2": Object {
+    "float": 1.23,
+    "int": 42,
+    "intList": null,
+    "text": "Hi2",
+  },
+  "t3": Object {
+    "float": 2.23,
+    "int": 88,
+    "intList": Array [
+      99,
+      22,
+      33,
+    ],
+    "text": "Hi3",
+  },
+}
+`;
+
+exports[`supports defining a simple mutation 1`] = `
+"\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  add(a: Int, b: Int): Int
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query {
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+"
+`;
+
+exports[`supports defining a simple mutation 2`] = `
+Object {
+  "add": 143,
+}
+`;
+
+exports[`supports defining a simple subscription 1`] = `
+"\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query {
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+
+\\"\\"\\"
+The root subscription type which contains root level fields which mutate data.
+\\"\\"\\"
+type Subscription {
+  clockTicks(
+    \\"\\"\\"How frequently to fire a clock tick (milliseconds)\\"\\"\\"
+    frequency: Int = 100
+  ): Float
+}
+"
+`;
+
 exports[`supports defining new types 1`] = `
 "input EchoInput {
   text: String!

@@ -1,13 +1,20 @@
-import { makeExtendSchemaPlugin, makeAddInflectorsPlugin, gql, embed } from "../src";
+import {
+  makeExtendSchemaPlugin,
+  makeAddInflectorsPlugin,
+  gql,
+  embed,
+} from "../src";
 import {
   buildSchema,
   // defaultPlugins,
   StandardTypesPlugin,
   QueryPlugin,
   MutationPlugin,
+  SubscriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "graphile-build";
-import { graphql, printSchema } from "graphql";
+import { graphql, subscribe, parse, printSchema } from "graphql";
+import { $$asyncIterator } from "iterall";
 
 function TestUtils_ExtractScopePlugin(
   hook,
@@ -40,9 +47,11 @@ const simplePlugins = [
   StandardTypesPlugin,
   QueryPlugin,
   MutationPlugin,
+  SubscriptionPlugin,
   MutationPayloadQueryPlugin,
 ];
 
+let timerRunning = false;
 const resolvers = {
   Query: {
     randomNumber(_query, _args, _context, _info) {
@@ -53,6 +62,82 @@ const resolvers = {
     },
     echo(_query, args) {
       return args.input;
+    },
+  },
+  Mutation: {
+    add(_mutation, args) {
+      const { a, b } = args;
+      // So this isn't a mutation. Whatever.
+      return a + b;
+    },
+  },
+  Subscription: {
+    clockTicks: {
+      resolve(_subscription, args) {
+        const { frequency } = args;
+        if (frequency == null) {
+          throw new Error("No frequency specified");
+        }
+        return new Promise(resolve =>
+          setTimeout(() => resolve(Date.now()), frequency)
+        );
+      },
+      subscribe(_subscription, args) {
+        const { frequency } = args;
+        if (frequency == null) {
+          throw new Error("No frequency specified");
+        }
+        const callbackQueue = [];
+        const valueQueue = [];
+        // In a normal application you'd define timerRunning here:
+        //   const timerRunning = true
+        // However, in the tests we want access to this variable so I've moved
+        // it to the global scope.
+        timerRunning = true;
+        function addValue(v) {
+          if (!timerRunning) {
+            return;
+          }
+          if (callbackQueue.length) {
+            const callback = callbackQueue.shift();
+            callback({ value: v, done: false });
+          } else {
+            valueQueue.push(v);
+          }
+        }
+        function nextValue() {
+          if (valueQueue.length) {
+            return Promise.resolve(valueQueue.shift());
+          } else {
+            return new Promise(resolve => {
+              callbackQueue.push(resolve);
+            });
+          }
+        }
+        const interval = setInterval(() => addValue(Date.now()), frequency);
+        function stopIterator() {
+          if (timerRunning) {
+            timerRunning = false;
+            clearInterval(interval);
+          }
+        }
+        return {
+          next() {
+            return timerRunning ? nextValue() : this.return();
+          },
+          return() {
+            stopIterator();
+            return Promise.resolve({ value: undefined, done: true });
+          },
+          throw(e) {
+            stopIterator();
+            return Promise.reject(error);
+          },
+          [$$asyncIterator]() {
+            return this;
+          },
+        };
+      },
     },
   },
 };
@@ -188,7 +273,9 @@ it("allows adding a field with arguments named using a custom inflector", async 
       `,
       resolvers: {
         Query: {
-          [build.inflection.echoFieldName()]: resolvers.Query.echo,
+          [build.inflection.echoFieldName()]: {
+            resolve: resolvers.Query.echo,
+          },
         },
       },
     })),
@@ -361,8 +448,10 @@ it("supports defining new types", async () => {
       `,
       resolvers: {
         Query: {
-          echo(_query, args) {
-            return args.input;
+          echo: {
+            resolve(_query, args) {
+              return args.input;
+            },
           },
         },
       },
@@ -399,4 +488,176 @@ it("supports defining new types", async () => {
   );
   expect(errors).toBeFalsy();
   expect(data).toMatchSnapshot();
+});
+
+it("supports defining a simple mutation", async () => {
+  const schema = await buildSchema([
+    ...simplePlugins,
+    makeExtendSchemaPlugin(_build => ({
+      typeDefs: gql`
+        extend type Mutation {
+          add(a: Int, b: Int): Int
+        }
+      `,
+      resolvers,
+    })),
+  ]);
+  const printedSchema = printSchema(schema);
+  expect(printedSchema).toMatchSnapshot();
+  const { data, errors } = await graphql(
+    schema,
+    `
+      mutation {
+        add(a: 101, b: 42)
+      }
+    `
+  );
+  expect(errors).toBeFalsy();
+  expect(data).toMatchSnapshot();
+});
+
+it("supports defining a more complex mutation", async () => {
+  const schema = await buildSchema([
+    ...simplePlugins,
+    makeExtendSchemaPlugin(_build => ({
+      typeDefs: gql`
+        input EchoInput {
+          text: String!
+          int: Int
+          float: Float!
+          intList: [Int!]
+        }
+
+        type EchoOutput {
+          text: String!
+          int: Int
+          float: Float!
+          intList: [Int!]
+        }
+
+        extend type Mutation {
+          """
+          Gives you back what you put in
+          """
+          echo(input: EchoInput): EchoOutput
+        }
+      `,
+      resolvers: {
+        Mutation: {
+          echo: {
+            resolve(_query, args) {
+              return args.input;
+            },
+          },
+        },
+      },
+    })),
+  ]);
+  const printedSchema = printSchema(schema);
+  expect(printedSchema).toMatchSnapshot();
+  const { data, errors } = await graphql(
+    schema,
+    `
+      mutation {
+        t1: echo(input: { text: "Hi1", float: 0.23 }) {
+          text
+          int
+          float
+          intList
+        }
+        t2: echo(input: { text: "Hi2", int: 42, float: 1.23 }) {
+          text
+          int
+          float
+          intList
+        }
+        t3: echo(
+          input: { text: "Hi3", int: 88, float: 2.23, intList: [99, 22, 33] }
+        ) {
+          text
+          int
+          float
+          intList
+        }
+      }
+    `
+  );
+  expect(errors).toBeFalsy();
+  expect(data).toMatchSnapshot();
+});
+
+it("supports defining a simple subscription", async () => {
+  const schema = await buildSchema([
+    ...simplePlugins,
+    makeExtendSchemaPlugin(_build => ({
+      typeDefs: gql`
+        extend type Subscription {
+          clockTicks(
+            """
+            How frequently to fire a clock tick (milliseconds)
+            """
+            frequency: Int = 100
+          ): Float
+        }
+      `,
+      resolvers,
+    })),
+  ]);
+  const printedSchema = printSchema(schema);
+  expect(printedSchema).toMatchSnapshot();
+
+  // Let's do a standard resolve:
+  let before = Date.now();
+  expect(timerRunning).toBeFalsy();
+  const { data, errors } = await graphql(
+    schema,
+    `
+      subscription {
+        clockTicks
+      }
+    `
+  );
+  let after = Date.now();
+  expect(after).toBeGreaterThanOrEqual(before + 100);
+  expect(errors).toBeFalsy();
+  expect(data.clockTicks).toBeGreaterThanOrEqual(before);
+  expect(data.clockTicks).toBeLessThanOrEqual(after);
+  expect(timerRunning).toBeFalsy();
+
+  // Now lets try subscribing:
+  before = Date.now();
+  const iterator = await subscribe(
+    schema,
+    parse(`
+      subscription {
+        clockTicks(frequency: 50)
+      }
+    `)
+  );
+  after = Date.now();
+
+  // expect(iterator).toBeInstanceOf(AsyncIterator);
+  expect(iterator.errors).toBeFalsy();
+  expect(timerRunning).toBeTruthy();
+
+  // Lets get the next 5 values
+  let lastTick = before;
+  for (let i = 0; i < 5; i++) {
+    const { value, done } = await iterator.next();
+    expect(done).toBeFalsy();
+    const { data, errors } = value;
+    expect(errors).toBeFalsy();
+    const currentTick = data.clockTicks;
+    expect(currentTick).toBeTruthy();
+    expect(currentTick).toBeGreaterThanOrEqual(lastTick + 49);
+    lastTick = currentTick;
+  }
+  expect(timerRunning).toBeTruthy();
+
+  // And now stop the iterator
+  await iterator.return();
+  expect(timerRunning).toBeFalsy();
+  const { value, done } = await iterator.next();
+  expect(done).toBeTruthy();
+  expect(value).toBe(undefined);
 });

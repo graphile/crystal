@@ -288,18 +288,14 @@ function getArguments(args, build) {
         const name = getName(arg.name);
         const type = getType(arg.type, build);
         const description = getDescription(arg.description);
+        let defaultValue;
         if (arg.defaultValue) {
-          throw new Error(
-            `We don't support default values on args yet, PRs welcome!`
-          );
+          defaultValue = getValue(arg.defaultValue);
         }
         memo[name] = {
           type,
-          ...(description
-            ? {
-                description,
-              }
-            : null),
+          ...(defaultValue ? { defaultValue } : null),
+          ...(description ? { description } : null),
         };
       } else {
         throw new Error(
@@ -368,18 +364,39 @@ function getFields(
         };
         const deprecationReason =
           directives.deprecated && directives.deprecated.reason;
-        const resolve =
-          (resolvers[Self.name] && resolvers[Self.name][fieldName]) || null;
+        const functionToResolveObject = functionOrResolveObject =>
+          typeof functionOrResolveObject === "function"
+            ? { resolve: functionOrResolveObject }
+            : functionOrResolveObject;
+        /*
+         * We accept a resolver function directly, or an object which can
+         * define 'resolve', 'subscribe' and other relevant methods.
+         */
+        const rawResolversSpec =
+          functionToResolveObject(
+            resolvers[Self.name] && resolvers[Self.name][fieldName]
+          ) || null;
         if (directives.recurseDataGenerators) {
           recurseDataGeneratorsForField(fieldName);
         }
         memo[fieldName] = fieldWithHooks(
           fieldName,
           fieldScope => {
+            const resolversSpec = Object.keys(rawResolversSpec || {}).reduce(
+              (memo, key) => {
+                if (typeof rawResolversSpec[key] === "function") {
+                  memo[key] = augmentResolver(
+                    rawResolversSpec[key],
+                    fieldScope
+                  );
+                }
+                return memo;
+              },
+              {}
+            );
             return {
               type,
               args,
-              resolve: resolve ? augmentResolver(resolve, fieldScope) : null,
               ...(deprecationReason
                 ? {
                     deprecationReason,
@@ -390,6 +407,7 @@ function getFields(
                     description,
                   }
                 : null),
+              ...resolversSpec,
             };
           },
           scope

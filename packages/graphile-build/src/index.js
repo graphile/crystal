@@ -44,11 +44,13 @@ export const getBuilder = async (
   options: Options = {}
 ): Promise<SchemaBuilder> => {
   const builder = new SchemaBuilder();
-  for (const plugin of plugins) {
+  for (let i = 0, l = plugins.length; i < l; i++) {
+    const plugin = plugins[i];
     if (typeof plugin !== "function") {
       throw new Error(
-        "Expected a list of plugin functions, instead list contained a non-function: " +
-          util.inspect(plugin)
+        `Expected a list of plugin functions, instead list contained a non-function at index ${i}: ${util.inspect(
+          plugin
+        )}`
       );
     }
     builder._setPluginName(plugin.displayName || plugin.name);
@@ -81,6 +83,7 @@ export {
   NodePlugin,
   QueryPlugin,
   MutationPlugin,
+  SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
   // resolveNode: EXPERIMENTAL, API might change!
