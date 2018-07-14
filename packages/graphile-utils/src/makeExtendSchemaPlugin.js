@@ -5,7 +5,9 @@ export default function makeExtendSchemaPlugin(
   return builder => {
     // Add stuff to the schema
     builder.hook("build", build => {
-      const { graphql: { GraphQLInputObjectType, GraphQLObjectType } } = build;
+      const {
+        graphql: { GraphQLInputObjectType, GraphQLObjectType },
+      } = build;
       const { typeDefs, resolvers = {} } = generator(build);
       if (!typeDefs || !typeDefs.kind === "Document") {
         throw new Error(

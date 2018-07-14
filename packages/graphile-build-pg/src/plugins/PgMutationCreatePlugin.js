@@ -33,7 +33,10 @@ export default (function PgMutationCreatePlugin(
       pgOmit: omit,
       pgViaTemporaryTable: viaTemporaryTable,
     } = build;
-    const { scope: { isRootMutation }, fieldWithHooks } = context;
+    const {
+      scope: { isRootMutation },
+      fieldWithHooks,
+    } = context;
     if (!isRootMutation) {
       return fields;
     }

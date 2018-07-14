@@ -67,7 +67,9 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
             }) {
               const orderBy =
                 canOrderBy && rawOrderBy
-                  ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                  ? Array.isArray(rawOrderBy)
+                    ? rawOrderBy
+                    : [rawOrderBy]
                   : null;
               return {
                 pgQuery: queryBuilder => {
@@ -142,7 +144,9 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
               resolve(data, { orderBy: rawOrderBy }) {
                 const orderBy =
                   canOrderBy && rawOrderBy
-                    ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+                    ? Array.isArray(rawOrderBy)
+                      ? rawOrderBy
+                      : [rawOrderBy]
                     : null;
                 const order =
                   orderBy && orderBy.some(item => item.alias)

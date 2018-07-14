@@ -7,7 +7,11 @@ export default (function PgConnectionArgs(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
     (args, build, context) => {
-      const { extend, getTypeByName, graphql: { GraphQLInt } } = build;
+      const {
+        extend,
+        getTypeByName,
+        graphql: { GraphQLInt },
+      } = build;
       const {
         scope: {
           isPgFieldConnection,

@@ -17,7 +17,11 @@ function isValidSubscription(Subscription) {
 
 export default (async function SubscriptionPlugin(builder) {
   builder.hook("GraphQLSchema", (schema: {}, build) => {
-    const { newWithHooks, extend, graphql: { GraphQLObjectType } } = build;
+    const {
+      newWithHooks,
+      extend,
+      graphql: { GraphQLObjectType },
+    } = build;
     const Subscription = newWithHooks(
       GraphQLObjectType,
       {

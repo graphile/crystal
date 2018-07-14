@@ -40,7 +40,10 @@ export default (async function PgMutationUpdateDeletePlugin(
       pgOmit: omit,
       pgViaTemporaryTable: viaTemporaryTable,
     } = build;
-    const { scope: { isRootMutation }, fieldWithHooks } = context;
+    const {
+      scope: { isRootMutation },
+      fieldWithHooks,
+    } = context;
     const { pluralize, singularize, camelCase } = inflection;
     if (!isRootMutation) {
       return fields;

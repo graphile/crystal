@@ -4,28 +4,31 @@ import { Kind } from "graphql/language";
 
 export default (function StandardTypesPlugin(builder) {
   // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
-  builder.hook("build", (build: Build): Build => {
-    const stringType = (name, description) =>
-      new build.graphql.GraphQLScalarType({
-        name,
-        description,
-        serialize: value => String(value),
-        parseValue: value => String(value),
-        parseLiteral: ast => {
-          if (ast.kind !== Kind.STRING) {
-            throw new Error("Can only parse string values");
-          }
-          return ast.value;
-        },
-      });
+  builder.hook(
+    "build",
+    (build: Build): Build => {
+      const stringType = (name, description) =>
+        new build.graphql.GraphQLScalarType({
+          name,
+          description,
+          serialize: value => String(value),
+          parseValue: value => String(value),
+          parseLiteral: ast => {
+            if (ast.kind !== Kind.STRING) {
+              throw new Error("Can only parse string values");
+            }
+            return ast.value;
+          },
+        });
 
-    const Cursor = stringType(
-      "Cursor",
-      "A location in a connection that can be used for resuming pagination."
-    );
-    build.addType(Cursor);
-    return build;
-  });
+      const Cursor = stringType(
+        "Cursor",
+        "A location in a connection that can be used for resuming pagination."
+      );
+      build.addType(Cursor);
+      return build;
+    }
+  );
   builder.hook("init", (_: {}, build) => {
     const {
       newWithHooks,

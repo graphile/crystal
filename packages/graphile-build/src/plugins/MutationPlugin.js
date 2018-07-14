@@ -17,7 +17,11 @@ function isValidMutation(Mutation) {
 
 export default (async function MutationPlugin(builder) {
   builder.hook("GraphQLSchema", (schema: {}, build) => {
-    const { newWithHooks, extend, graphql: { GraphQLObjectType } } = build;
+    const {
+      newWithHooks,
+      extend,
+      graphql: { GraphQLObjectType },
+    } = build;
     const Mutation = newWithHooks(
       GraphQLObjectType,
       {

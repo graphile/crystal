@@ -131,7 +131,9 @@ beforeAll(() => {
 
           await pgClient.query("savepoint test");
           if (gqlSchema === gqlSchemas.rbac) {
-            await pgClient.query("select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)");
+            await pgClient.query(
+              "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)"
+            );
           }
 
           try {
@@ -140,13 +142,14 @@ beforeAll(() => {
               pgClient: pgClient,
             });
             if (result.errors) {
+              // eslint-disable-next-line no-console
               console.log(result.errors.map(e => e.originalError));
             }
             return result;
           } finally {
             await pgClient.query("rollback to savepoint test");
           }
-        }
+        };
         results.push(await process(filename));
       }
       return results;

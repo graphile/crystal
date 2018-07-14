@@ -39,7 +39,10 @@ const DummyConnectionPlugin = async builder => {
       resolveAlias,
       getSafeAliasFromAlias,
     } = build;
-    const { scope: { isRootQuery }, fieldWithHooks } = context;
+    const {
+      scope: { isRootQuery },
+      fieldWithHooks,
+    } = context;
     if (!isRootQuery) return fields;
     const Cursor = getTypeByName("Cursor");
     const Dummy = newWithHooks(
@@ -59,7 +62,11 @@ const DummyConnectionPlugin = async builder => {
           });
           addDataGeneratorForField("random", ({ alias }) => {
             return {
-              map: () => ({ [getSafeAliasFromAlias(alias)]: Math.floor(Math.random() * 10000) }),
+              map: () => ({
+                [getSafeAliasFromAlias(alias)]: Math.floor(
+                  Math.random() * 10000
+                ),
+              }),
             };
           });
           return {
@@ -309,6 +316,7 @@ test("no arguments", async () => {
     `
   );
   if (result.errors) {
+    // eslint-disable-next-line no-console
     console.log(result.errors.map(e => e.originalError));
   }
   expect(result.errors).toBeFalsy();
@@ -347,6 +355,7 @@ test("sort", async () => {
     `
   );
   if (result.errors) {
+    // eslint-disable-next-line no-console
     console.log(result.errors.map(e => e.originalError));
   }
   expect(result.errors).toBeFalsy();
@@ -419,6 +428,7 @@ test("sort, after", async () => {
     `
   );
   if (result.errors) {
+    // eslint-disable-next-line no-console
     console.log(result.errors.map(e => e.originalError));
   }
   expect(result.errors).toBeFalsy();

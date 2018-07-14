@@ -1,5 +1,4 @@
 const core = require("./core");
-const fs = require("fs");
 
 test(
   "prints a schema from non-root role, using RBAC permissions",

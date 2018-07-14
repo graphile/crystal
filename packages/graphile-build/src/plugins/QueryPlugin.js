@@ -6,14 +6,16 @@ export type BuildExtensionQuery = {|
 |};
 
 export default (async function QueryPlugin(builder) {
-  builder.hook("build", (build: Build): Build & BuildExtensionQuery =>
-    build.extend(
-      build,
-      {
-        $$isQuery: Symbol("isQuery"),
-      },
-      `Extending Build`
-    )
+  builder.hook(
+    "build",
+    (build: Build): Build & BuildExtensionQuery =>
+      build.extend(
+        build,
+        {
+          $$isQuery: Symbol("isQuery"),
+        },
+        `Extending Build`
+      )
   );
   builder.hook("GraphQLSchema", (schema: {}, build) => {
     const {

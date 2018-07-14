@@ -355,7 +355,9 @@ export default (function PgTypesPlugin(
 
     // pgExtendedTypes might change what types we use for things
     const JSONType = pgExtendedTypes
-      ? pgLegacyJsonUuid ? GraphQLJson : GraphQLJSON
+      ? pgLegacyJsonUuid
+        ? GraphQLJson
+        : GraphQLJSON
       : SimpleJSON;
     const UUIDType = SimpleUUID; // GraphQLUUID
     const DateType = SimpleDate; // GraphQLDate

@@ -10,7 +10,9 @@ export default (function PgOrderAllColumnsPlugin(builder) {
       inflection,
       pgOmit: omit,
     } = build;
-    const { scope: { isPgRowSortEnum, pgIntrospection: table } } = context;
+    const {
+      scope: { isPgRowSortEnum, pgIntrospection: table },
+    } = context;
     if (!isPgRowSortEnum || !table || table.kind !== "class") {
       return values;
     }

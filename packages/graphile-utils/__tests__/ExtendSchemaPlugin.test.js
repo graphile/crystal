@@ -129,7 +129,7 @@ const resolvers = {
             stopIterator();
             return Promise.resolve({ value: undefined, done: true });
           },
-          throw(e) {
+          throw(error) {
             stopIterator();
             return Promise.reject(error);
           },

@@ -26,7 +26,10 @@ export default (async function PgAllRows(
       pgAddStartEndCursor: addStartEndCursor,
       pgOmit: omit,
     } = build;
-    const { fieldWithHooks, scope: { isRootQuery } } = context;
+    const {
+      fieldWithHooks,
+      scope: { isRootQuery },
+    } = context;
     if (!isRootQuery) {
       return fields;
     }
@@ -144,7 +147,9 @@ export default (async function PgAllRows(
                     if (debugSql.enabled) debugSql(text);
                     const result = await pgClient.query(text, values);
                     if (isConnection) {
-                      const { rows: [row] } = result;
+                      const {
+                        rows: [row],
+                      } = result;
                       return addStartEndCursor(row);
                     } else {
                       return result.rows;

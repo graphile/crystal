@@ -11,7 +11,6 @@ const {
   GraphQLList,
   GraphQLScalarType,
   GraphQLSchema,
-  parse,
 } = require("graphql");
 const { Kind } = require("graphql/language");
 
@@ -225,7 +224,12 @@ test("basic", async () => {
         },
         variables
       ).then(d => {
-        console.log(d);
+        try {
+          const { errors } = d;
+          expect(errors).toBeFalsy();
+        } catch (e) {
+          return reject(e);
+        }
         if (o) {
           resolve(o);
         } else {
@@ -255,7 +259,12 @@ test("directives", async () => {
         },
         variables
       ).then(d => {
-        console.log(d);
+        try {
+          const { errors } = d;
+          expect(errors).toBeFalsy();
+        } catch (e) {
+          return reject(e);
+        }
         if (o) {
           resolve(o);
         } else {

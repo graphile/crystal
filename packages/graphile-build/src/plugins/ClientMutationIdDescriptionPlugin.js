@@ -8,7 +8,10 @@ export default (function ClientMutationIdDescriptionPlugin(
     "GraphQLInputObjectType:fields:field",
     (field: { name?: string }, build, context) => {
       const { extend } = build;
-      const { scope: { isMutationInput, fieldName }, Self } = context;
+      const {
+        scope: { isMutationInput, fieldName },
+        Self,
+      } = context;
       if (
         !isMutationInput ||
         fieldName !== "clientMutationId" ||
@@ -31,7 +34,10 @@ export default (function ClientMutationIdDescriptionPlugin(
     "GraphQLObjectType:fields:field",
     (field: { name?: string }, build, context) => {
       const { extend } = build;
-      const { scope: { isMutationPayload, fieldName }, Self } = context;
+      const {
+        scope: { isMutationPayload, fieldName },
+        Self,
+      } = context;
       if (
         !isMutationPayload ||
         fieldName !== "clientMutationId" ||
@@ -54,7 +60,11 @@ export default (function ClientMutationIdDescriptionPlugin(
     "GraphQLObjectType:fields:field:args",
     (args: {}, build, context) => {
       const { extend } = build;
-      const { scope: { isRootMutation }, Self, field } = context;
+      const {
+        scope: { isRootMutation },
+        Self,
+        field,
+      } = context;
       if (!isRootMutation || !args.input || args.input.description) {
         return args;
       }

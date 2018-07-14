@@ -18,7 +18,10 @@ export default (async function PgRowByUniqueConstraint(builder) {
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
     } = build;
-    const { scope: { isRootQuery }, fieldWithHooks } = context;
+    const {
+      scope: { isRootQuery },
+      fieldWithHooks,
+    } = context;
     if (!isRootQuery) {
       return fields;
     }
@@ -114,10 +117,9 @@ export default (async function PgRowByUniqueConstraint(builder) {
                       );
                       const { text, values } = sql.compile(query);
                       if (debugSql.enabled) debugSql(text);
-                      const { rows: [row] } = await pgClient.query(
-                        text,
-                        values
-                      );
+                      const {
+                        rows: [row],
+                      } = await pgClient.query(text, values);
                       return row;
                     },
                   };

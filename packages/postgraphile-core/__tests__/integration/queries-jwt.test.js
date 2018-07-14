@@ -1,8 +1,7 @@
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
 const { createPostGraphileSchema } = require("../..");
-const { readdirSync, readFile: rawReadFile } = require("fs");
-const { resolve: resolvePath } = require("path");
+const { readFile: rawReadFile } = require("fs");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphile-build:schema");
 const jwt = require("jsonwebtoken");
@@ -16,8 +15,6 @@ function readFile(filename, encoding) {
   });
 }
 
-const queriesDir = `${__dirname}/../fixtures/queries`;
-const queryFileNames = readdirSync(queriesDir);
 let queryResults = [];
 
 const kitchenSinkData = () =>
@@ -25,12 +22,6 @@ const kitchenSinkData = () =>
 
 const jwtSecret =
   "This is static for the tests, use a better one if you set one!";
-
-const loginMutation = `mutation {
-    authenticate(input: {a: 1, b: 2, c: 3}) {
-      jwtToken
-    }
-  }`;
 
 const tests = [
   {
@@ -56,7 +47,11 @@ const tests = [
       }
     }`,
     schema: "withJwt",
-    process: ({ data: { authenticate: { jwtToken: str } } }) => {
+    process: ({
+      data: {
+        authenticate: { jwtToken: str },
+      },
+    }) => {
       return Object.assign(jwt.verify(str, jwtSecret), {
         iat: "[timestamp]",
       });
@@ -83,10 +78,14 @@ const tests = [
       }
     }`,
     schema: "withJwt",
-    process: ({ data: { authenticatePayload: { authPayload } } }) => {
+    process: ({
+      data: {
+        authenticatePayload: { authPayload },
+      },
+    }) => {
       const { jwt: str } = authPayload;
       return Object.assign({}, authPayload, {
-        jwt: Object.assign(jwt.verify(authPayload.jwt, jwtSecret), {
+        jwt: Object.assign(jwt.verify(str, jwtSecret), {
           iat: "[timestamp]",
         }),
       });
@@ -135,6 +134,7 @@ beforeAll(() => {
             pgClient: pgClient,
           });
           if (result.errors && result.errors.length) {
+            // eslint-disable-next-line no-console
             console.log(result.errors.map(e => e.originalError || e));
           }
           return result;

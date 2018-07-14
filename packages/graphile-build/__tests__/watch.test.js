@@ -1,11 +1,8 @@
 const {
   graphql,
   GraphQLObjectType,
-  GraphQLEnumType,
   GraphQLInt,
-  GraphQLString,
   GraphQLNonNull,
-  GraphQLList,
 } = require("graphql");
 const { printSchema } = require("graphql/utilities");
 const {
@@ -42,20 +39,17 @@ const makePluginEtc = (defaultCounter = 0) => {
       });
     });
     builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+      const { dummyCounter, extend, newWithHooks } = build;
       const {
-        dummyCounter,
-        extend,
-        getTypeByName,
-        newWithHooks,
-        parseResolveInfo,
-      } = build;
-      const { scope: { isRootQuery }, fieldWithHooks } = context;
+        scope: { isRootQuery },
+        fieldWithHooks,
+      } = context;
       if (!isRootQuery) return fields;
       const Dummy = newWithHooks(
         GraphQLObjectType,
         {
           name: `Dummy${dummyCounter}`,
-          fields: ({ addDataGeneratorForField }) => {
+          fields: () => {
             return {
               n: {
                 type: new GraphQLNonNull(GraphQLInt),
@@ -69,7 +63,7 @@ const makePluginEtc = (defaultCounter = 0) => {
       return extend(fields, {
         dummy: fieldWithHooks(
           "dummy",
-          ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+          () => {
             return {
               type: Dummy,
               resolve() {
@@ -90,8 +84,6 @@ const makePluginEtc = (defaultCounter = 0) => {
       counter = n;
     },
   };
-
-  return DummyWatchPlugin;
 };
 
 test("generated schema n = 0, n = 3", async () => {
@@ -162,6 +154,7 @@ test("schema is updated when rebuild triggered", async () => {
       `
     );
     if (result.errors) {
+      // eslint-disable-next-line no-console
       console.log(result.errors.map(e => e.originalError));
     }
     expect(result.errors).toBeFalsy();

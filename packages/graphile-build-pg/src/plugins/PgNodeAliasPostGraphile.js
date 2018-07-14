@@ -3,7 +3,10 @@ import type { Plugin } from "graphile-build";
 
 export default (async function PgNodeAliasPostGraphile(builder) {
   builder.hook("GraphQLObjectType", (object, build, context) => {
-    const { setNodeAlias, inflection: { pluralize } } = build;
+    const {
+      setNodeAlias,
+      inflection: { pluralize },
+    } = build;
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
     } = context;

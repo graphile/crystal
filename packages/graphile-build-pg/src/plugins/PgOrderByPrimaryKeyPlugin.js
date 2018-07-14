@@ -7,7 +7,9 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
       extend,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
     } = build;
-    const { scope: { isPgRowSortEnum, pgIntrospection: table } } = context;
+    const {
+      scope: { isPgRowSortEnum, pgIntrospection: table },
+    } = context;
     if (!isPgRowSortEnum || !table || table.kind !== "class") {
       return values;
     }

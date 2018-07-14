@@ -15,7 +15,9 @@ export default (async function PgRowNode(builder) {
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
     } = build;
-    const { scope: { isPgRowType, pgIntrospection: table } } = context;
+    const {
+      scope: { isPgRowType, pgIntrospection: table },
+    } = context;
     if (!isPgRowType || !table.namespace || omit(table, "read")) {
       return object;
     }
@@ -68,7 +70,9 @@ export default (async function PgRowNode(builder) {
         );
         const { text, values } = sql.compile(query);
         if (debugSql.enabled) debugSql(text);
-        const { rows: [row] } = await pgClient.query(text, values);
+        const {
+          rows: [row],
+        } = await pgClient.query(text, values);
         return row;
       }
     );
@@ -90,7 +94,10 @@ export default (async function PgRowNode(builder) {
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
     } = build;
-    const { scope: { isRootQuery }, fieldWithHooks } = context;
+    const {
+      scope: { isRootQuery },
+      fieldWithHooks,
+    } = context;
     if (!isRootQuery || !nodeIdFieldName) {
       return fields;
     }
@@ -182,10 +189,9 @@ export default (async function PgRowNode(builder) {
                       );
                       const { text, values } = sql.compile(query);
                       if (debugSql.enabled) debugSql(text);
-                      const { rows: [row] } = await pgClient.query(
-                        text,
-                        values
-                      );
+                      const {
+                        rows: [row],
+                      } = await pgClient.query(text, values);
                       return row;
                     } catch (e) {
                       return null;

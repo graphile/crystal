@@ -43,44 +43,47 @@ export default (function NodePlugin(
   const nodeIdFieldName: string = inNodeIdFieldName
     ? String(inNodeIdFieldName)
     : "id";
-  builder.hook("build", (build: Build): Build & BuildExtensionNode => {
-    const nodeFetcherByTypeName = {};
-    const nodeAliasByTypeName = {};
-    const nodeTypeNameByAlias = {};
-    return build.extend(
-      build,
-      {
-        nodeIdFieldName,
-        $$nodeType: Symbol("nodeType"),
-        nodeFetcherByTypeName,
-        getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
-          return base64(
-            JSON.stringify([this.getNodeAlias(Type), ...identifiers])
-          );
+  builder.hook(
+    "build",
+    (build: Build): Build & BuildExtensionNode => {
+      const nodeFetcherByTypeName = {};
+      const nodeAliasByTypeName = {};
+      const nodeTypeNameByAlias = {};
+      return build.extend(
+        build,
+        {
+          nodeIdFieldName,
+          $$nodeType: Symbol("nodeType"),
+          nodeFetcherByTypeName,
+          getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
+            return base64(
+              JSON.stringify([this.getNodeAlias(Type), ...identifiers])
+            );
+          },
+          addNodeFetcherForTypeName(typeName, fetcher) {
+            if (nodeFetcherByTypeName[typeName]) {
+              throw new Error("There's already a fetcher for this type");
+            }
+            if (!fetcher) {
+              throw new Error("No fetcher specified");
+            }
+            nodeFetcherByTypeName[typeName] = fetcher;
+          },
+          getNodeAlias(typeName) {
+            return nodeAliasByTypeName[typeName] || typeName;
+          },
+          getNodeType(alias) {
+            return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
+          },
+          setNodeAlias(typeName, alias) {
+            nodeAliasByTypeName[typeName] = alias;
+            nodeTypeNameByAlias[alias] = typeName;
+          },
         },
-        addNodeFetcherForTypeName(typeName, fetcher) {
-          if (nodeFetcherByTypeName[typeName]) {
-            throw new Error("There's already a fetcher for this type");
-          }
-          if (!fetcher) {
-            throw new Error("No fetcher specified");
-          }
-          nodeFetcherByTypeName[typeName] = fetcher;
-        },
-        getNodeAlias(typeName) {
-          return nodeAliasByTypeName[typeName] || typeName;
-        },
-        getNodeType(alias) {
-          return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
-        },
-        setNodeAlias(typeName, alias) {
-          nodeAliasByTypeName[typeName] = alias;
-          nodeTypeNameByAlias[alias] = typeName;
-        },
-      },
-      `Adding 'Node' interface support to the Build`
-    );
-  });
+        `Adding 'Node' interface support to the Build`
+      );
+    }
+  );
 
   builder.hook("init", function defineNodeInterfaceType(
     _: {},
@@ -129,7 +132,9 @@ export default (function NodePlugin(
     context
   ) {
     const { getTypeByName } = build;
-    const { scope: { isRootQuery } } = context;
+    const {
+      scope: { isRootQuery },
+    } = context;
     if (!isRootQuery) {
       return interfaces;
     }
@@ -148,7 +153,10 @@ export default (function NodePlugin(
       build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |},
       context: {| ...Context, ...ContextGraphQLObjectTypeFields |}
     ) => {
-      const { scope: { isRootQuery }, fieldWithHooks } = context;
+      const {
+        scope: { isRootQuery },
+        fieldWithHooks,
+      } = context;
       if (!isRootQuery) {
         return fields;
       }

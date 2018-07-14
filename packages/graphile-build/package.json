@@ -30,6 +30,7 @@
     "debug": ">=2 <3",
     "graphql-parse-resolve-info": "4.0.0-rc.3",
     "lodash": ">=4 <5",
+    "lru-cache": ">=4 <5",
     "pluralize": "7.0.0"
   },
   "engines": {

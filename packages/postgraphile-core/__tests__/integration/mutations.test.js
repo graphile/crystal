@@ -3,8 +3,6 @@ const { readdirSync, readFile: rawReadFile } = require("fs");
 const { graphql } = require("graphql");
 const { withPgClient } = require("../helpers");
 const { createPostGraphileSchema } = require("../..");
-const { printSchema } = require("graphql/utilities");
-const debug = require("debug")("graphile-build:schema");
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -39,7 +37,7 @@ beforeAll(() => {
       createPostGraphileSchema(pgClient, ["d"]),
     ]);
     // Now for RBAC-enabled tests
-    await pgClient.query("set role postgraphile_test_authenticator")
+    await pgClient.query("set role postgraphile_test_authenticator");
     const [rbacSchema] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {}),
     ]);
@@ -47,7 +45,7 @@ beforeAll(() => {
       gqlSchema,
       dSchema,
       rbacSchema,
-    }
+    };
   });
 
   // Execute all of the mutations in parallel. We will not wait for them to
@@ -58,7 +56,7 @@ beforeAll(() => {
   mutationResults = mutationFileNames.map(async fileName => {
     // Wait for the schema to resolve. We need the schema to be introspected
     // before we can do anything else!
-    let {gqlSchema, dSchema, rbacSchema} = await gqlSchemaPromise;
+    let { gqlSchema, dSchema, rbacSchema } = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async pgClient => {
       // Read the mutation from the file system.
@@ -70,11 +68,13 @@ beforeAll(() => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
 
-      let schemaToUse
+      let schemaToUse;
       if (fileName.startsWith("d.")) {
         schemaToUse = dSchema;
       } else if (fileName.startsWith("rbac.")) {
-        await pgClient.query("select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)");
+        await pgClient.query(
+          "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)"
+        );
         schemaToUse = rbacSchema;
       } else {
         schemaToUse = gqlSchema;
@@ -85,6 +85,7 @@ beforeAll(() => {
         pgClient: pgClient,
       });
       if (result.errors) {
+        // eslint-disable-next-line no-console
         console.log(result.errors.map(e => e.originalError));
       }
       return result;

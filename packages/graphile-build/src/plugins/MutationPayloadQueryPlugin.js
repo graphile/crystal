@@ -11,7 +11,10 @@ export default (function MutationPayloadQueryPlugin(builder) {
       context
     ): {} => {
       const { $$isQuery, extend, getTypeByName } = build;
-      const { scope: { isMutationPayload }, Self } = context;
+      const {
+        scope: { isMutationPayload },
+        Self,
+      } = context;
       if (!isMutationPayload) {
         return fields;
       }

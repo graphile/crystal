@@ -3,7 +3,11 @@ import type { Plugin } from "graphile-build";
 
 export default (function PgConnectionTotalCount(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
-    const { extend, inflection, graphql: { GraphQLInt } } = build;
+    const {
+      extend,
+      inflection,
+      graphql: { GraphQLInt },
+    } = build;
     const {
       scope: { isPgRowConnectionType, pgIntrospection: table },
       fieldWithHooks,

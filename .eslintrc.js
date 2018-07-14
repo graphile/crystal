@@ -10,6 +10,9 @@ module.exports = {
     node: true,
     es6: true,
   },
+  globals: {
+    jasmine: false,
+  },
   rules: {
     "prettier/prettier": [
       "error",

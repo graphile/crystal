@@ -20,7 +20,10 @@ export default (function PgQueryProceduresPlugin(
       pgMakeProcField: makeProcField,
       pgOmit: omit,
     } = build;
-    const { scope: { isRootQuery }, fieldWithHooks } = context;
+    const {
+      scope: { isRootQuery },
+      fieldWithHooks,
+    } = context;
     if (!isRootQuery) {
       return fields;
     }

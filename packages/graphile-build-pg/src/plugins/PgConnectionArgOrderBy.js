@@ -94,7 +94,9 @@ export default (function PgConnectionArgOrderBy(builder) {
 
       addArgDataGenerator(function connectionOrderBy({ orderBy: rawOrderBy }) {
         const orderBy = rawOrderBy
-          ? Array.isArray(rawOrderBy) ? rawOrderBy : [rawOrderBy]
+          ? Array.isArray(rawOrderBy)
+            ? rawOrderBy
+            : [rawOrderBy]
           : null;
         return {
           pgCursorPrefix: cursorPrefixFromOrderBy(orderBy),

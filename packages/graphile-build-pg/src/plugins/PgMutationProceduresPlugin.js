@@ -11,7 +11,10 @@ export default (function PgMutationProceduresPlugin(builder) {
       pgOmit: omit,
       swallowError,
     } = build;
-    const { scope: { isRootMutation }, fieldWithHooks } = context;
+    const {
+      scope: { isRootMutation },
+      fieldWithHooks,
+    } = context;
     if (!isRootMutation) {
       return fields;
     }
