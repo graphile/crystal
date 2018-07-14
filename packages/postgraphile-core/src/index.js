@@ -149,7 +149,7 @@ const getPostGraphileBuilder = async (
     legacyJsonUuid = false,
     simpleCollections = "omit",
     includeExtensionResources = false,
-    ignoreRBAC = false,
+    ignoreRBAC = true, // TODO: Change to 'false' in v5
   } = options;
 
   if (

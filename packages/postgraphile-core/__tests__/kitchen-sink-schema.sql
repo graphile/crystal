@@ -279,7 +279,7 @@ create function b.compound_type_array_mutation(object c.compound_type) returns c
 create function c.table_query(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql stable;
 create function c.table_mutation(id int) returns a.post as $$ select * from a.post where id = $1 $$ language sql;
 create function c.table_set_query() returns setof c.person as $$ select * from c.person $$ language sql stable;
-create function c.table_set_mutation() returns setof c.person as $$ select * from c.person $$ language sql;
+create function c.table_set_mutation() returns setof c.person as $$ select * from c.person order by id asc $$ language sql;
 create function c.int_set_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;
 create function c.int_set_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
 create function c.no_args_query() returns int as $$ select 2 $$ language sql stable;
