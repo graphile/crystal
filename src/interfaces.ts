@@ -38,7 +38,9 @@ export namespace PostGraphile {
     // feature requires an event trigger to be added to the database by a
     // superuser. When enabled PostGraphile will try to add this trigger, if you
     // did not connect as a superuser you will get a warning and the trigger
-    // won’t be added.
+    // won’t be added. The trigger will not be removed, to remove it run:
+    //
+    //   `drop schema postgraphile_watch cascade;`
     /* @middlewareOnly */
     watchPg?: boolean,
     // The default Postgres role to use. If no role was provided in a provided
@@ -50,7 +52,7 @@ export namespace PostGraphile {
     dynamicJson?: boolean,
     // If none of your `RETURNS SETOF compound_type` functions mix NULLs with the
     // results then you may set this true to reduce the nullables in the GraphQL
-    // schema
+    // schema.
     setofFunctionsContainNulls?: boolean,
     // Enables classic ids for Relay support. Instead of using the field name
     // `nodeId` for globally unique ids, PostGraphile will instead use the field
@@ -61,41 +63,44 @@ export namespace PostGraphile {
     // types & fields. Database mutation will only be possible through Postgres
     // functions.
     disableDefaultMutations?: boolean,
-    // By default, PostGraphile excludes fields, queries and mutations that the
-    // user isn't permitted to access; set this option true to skip these checks
-    // and expose everything.
+    // Set false (recommended) to exclude fields, queries and mutations that the
+    // user isn't permitted to access from the generated GraphQL schema; set this
+    // option true to skip these checks and create GraphQL fields and types for
+    // everything.
+    // The default is `true`, in v5 the default will change to `false`.
     ignoreRBAC?: boolean,
     // By default, tables and functions that come from extensions are excluded
     // from the generated GraphQL schema as general applications don't need them
     // to be exposed to the end user. You can use this flag to include them in
-    // the generated schema. It's recommended that you expose a schema other than
-    // `public` so that the schema is not polluted with extension resources
-    // anyway.
+    // the generated schema (not recommended).
     includeExtensionResources?: boolean,
     // Enables adding a `stack` field to the error response.  Can be either the
     // boolean `true` (which results in a single stack string) or the string
     // `json` (which causes the stack to become an array with elements for each
-    // line of the stack).
+    // line of the stack). Recommended in development, not recommended in
+    // production.
     showErrorStack?: boolean,
-    // Enables ability to modify errors before sending them down to the client
-    // optionally can send down custom responses
+    // Extends the error response with additional details from the Postgres
+    // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
+    // Default is `[]`.
+    extendedErrors?: Array<string>,
+    // Enables ability to modify errors before sending them down to the client.
+    // Optionally can send down custom responses. If you use this then
+    // `showErrorStack` and `extendedError` may have no
+    // effect.
     /* @middlewareOnly */
     handleErrors?: ((
       errors: Array<GraphQLError>,
       req: IncomingMessage,
       res: ServerResponse,
     ) => Array<GraphQLErrorExtended>);
-    // Extends the error response with additional details from the Postgres
-    // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
-    // Default is `[]`.
-    extendedErrors?: Array<string>,
-    // an array of [Graphile Build](/graphile-build/plugins/) plugins to load
-    // after the default plugins
+    // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
+    // after the default plugins.
     appendPlugins?: Array<(builder: mixed) => {}>,
-    // an array of [Graphile Build](/graphile-build/plugins/) plugins to load
+    // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
     // before the default plugins (you probably don't want this)
     prependPlugins?: Array<(builder: mixed) => {}>,
-    // the full array of [Graphile Build](/graphile-build/plugins/) plugins to
+    // The full array of [Graphile Build](/graphile-build/plugins/) plugins to
     // use for schema generation (you almost definitely don't want this!)
     replaceAllPlugins?: Array<(builder: mixed) => {}>,
     // A file path string. Reads cached values from local cache file to improve
@@ -166,14 +171,15 @@ export namespace PostGraphile {
     jwtAudiences?: Array<string>,
     // Some one-to-one relations were previously detected as one-to-many - should
     // we export 'only' the old relation shapes, both new and old but mark the
-    // old ones as 'deprecated', or 'omit' the old relation shapes entirely
+    // old ones as 'deprecated' (default), or 'omit' (recommended) the old
+    // relation shapes entirely.
     legacyRelations?: 'only' | 'deprecated' | 'omit',
     // ONLY use this option if you require the v3 typenames 'Json' and 'Uuid'
-    // over 'JSON' and 'UUID'
+    // over 'JSON' and 'UUID'.
     legacyJsonUuid?: boolean,
     // Turns off GraphQL query logging. By default PostGraphile will log every
     // GraphQL query it processes along with some other information. Set this to
-    // `true` to disable that feature.
+    // `true` (recommended in production) to disable that feature.
     /* @middlewareOnly */
     disableQueryLog?: boolean,
     // A plain object specifying custom config values to set in the PostgreSQL
@@ -195,7 +201,7 @@ export namespace PostGraphile {
     pluginHook?: PluginHookFn,
     // Should we use relay pagination, or simple collections?
     // "omit" (default) - relay connections only,
-    // "only" - simple collections only (no Relay connections),
+    // "only" (not recommended) - simple collections only (no Relay connections),
     // "both" - both
     simpleCollections?: 'omit' | 'both' | 'only',
     // allow arbitrary extensions for consumption by plugins
