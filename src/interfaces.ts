@@ -46,9 +46,9 @@ export namespace PostGraphile {
     // The default Postgres role to use. If no role was provided in a provided
     // JWT token, this role will be used.
     pgDefaultRole?: string,
-    // Setting this to `true` enables dynamic JSON which will allow you to use
-    // any JSON as input and get any arbitrary JSON as output. By default JSON
-    // types are just a JSON string.
+    // By default, JSON and JSONB fields are presented as strings (JSON encoded)
+    // from the GraphQL schema. Setting this to `true` (recommended) enables raw
+    // JSON input and output, saving the need to parse / stringify JSON manually.
     dynamicJson?: boolean,
     // If none of your `RETURNS SETOF compound_type` functions mix NULLs with the
     // results then you may set this true to reduce the nullables in the GraphQL
@@ -79,7 +79,7 @@ export namespace PostGraphile {
     // `json` (which causes the stack to become an array with elements for each
     // line of the stack). Recommended in development, not recommended in
     // production.
-    showErrorStack?: boolean,
+    showErrorStack?: boolean | 'json',
     // Extends the error response with additional details from the Postgres
     // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
     // Default is `[]`.
@@ -98,10 +98,10 @@ export namespace PostGraphile {
     // after the default plugins.
     appendPlugins?: Array<(builder: mixed) => {}>,
     // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
-    // before the default plugins (you probably don't want this)
+    // before the default plugins (you probably don't want this).
     prependPlugins?: Array<(builder: mixed) => {}>,
     // The full array of [Graphile Build](/graphile-build/plugins/) plugins to
-    // use for schema generation (you almost definitely don't want this!)
+    // use for schema generation (you almost definitely don't want this!).
     replaceAllPlugins?: Array<(builder: mixed) => {}>,
     // A file path string. Reads cached values from local cache file to improve
     // startup time (you may want to do this in production).
