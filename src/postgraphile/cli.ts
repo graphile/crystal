@@ -125,7 +125,7 @@ program
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
   .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
-  .option('--timeout <number>', 'set the timeout value in milliseconds for sockets (defaults to 120000 = 2 minutes)', parseFloat)
+  .option('--timeout <number>', 'set the timeout value in milliseconds for sockets', parseFloat)
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
 
 pluginHook('cli:flags:add:webserver', addFlag)
@@ -193,7 +193,7 @@ const {
   schema: dbSchema,
   host: hostname = 'localhost',
   port = 5000,
-  timeout: serverTimeout = 120000,
+  timeout: serverTimeout,
   maxPoolSize,
   defaultRole: pgDefaultRole,
   graphql: graphqlRoute = '/graphql',
@@ -424,7 +424,9 @@ if (noServer) {
     const rawMiddleware = postgraphile(pgConfig, schemas, postgraphileOptions)
     const middleware = pluginHook('cli:server:middleware', rawMiddleware, { options: postgraphileOptions })
     const server = createServer(middleware)
-    server.timeout = serverTimeout
+    if (serverTimeout) {
+      server.timeout = serverTimeout
+    }
 
     pluginHook('cli:server:created', server, { options: postgraphileOptions, middleware })
 
