@@ -16,8 +16,7 @@ import mixed = PostGraphile.mixed
 
 const debugCli = debugFactory('postgraphile:cli')
 
-// tslint:disable no-console no-shadowed-variable
-// no-shadowed-variable is erroroneously reporting
+// tslint:disable no-console
 
 let config = {}
 try {
@@ -58,9 +57,9 @@ function extractPlugins(rawArgv: Array<string>): {
   return { argv, plugins }
 }
 
-const { argv: argvSansPlugins, plugins } = extractPlugins(process.argv)
+const { argv: argvSansPlugins, plugins: extractedPlugins } = extractPlugins(process.argv)
 
-const pluginHook = makePluginHook(plugins)
+const pluginHook = makePluginHook(extractedPlugins)
 
 program
   .version(manifest.version)
