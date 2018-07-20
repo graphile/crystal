@@ -327,7 +327,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
    * promise when complete. If the function doesn’t handle anything, it calls
    * `next` to let the next middleware try and handle it.
    */
-  const requestHandler = async (incomingReq: any, res: any, next: any) => {
+  const requestHandler = async (incomingReq: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => {
     // You can use this hook either to modify the incoming request or to tell
     // PostGraphile not to handle the request further (return null). NOTE: if
     // you return `null` from this hook then you are also responsible for
@@ -434,8 +434,9 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
         // Sends the asset at this path. Defaults to a `statusCode` of 200.
         res.statusCode = 200
-        if (req._koaCtx) {
-          req._koaCtx.compress = false
+        const koaCtx = (req as object)['_koaCtx']
+        if (koaCtx) {
+          koaCtx.compress = false
         }
         await new Promise((resolve, reject) => {
           sendFile(req, assetPathRelative, {
@@ -447,6 +448,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
             .on('error', reject)
             .pipe(res)
         })
+        return
       }
 
       // ======================================================================
