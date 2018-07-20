@@ -83,21 +83,24 @@ program
   .option('-m, --max-pool-size <number>', 'the maximum number of clients to keep in the Postgres pool. defaults to 10', parseFloat)
   .option('-r, --default-role <string>', 'the default Postgres role to use when a request is made. supercedes the role used to connect to the database')
 
-pluginHook('cli:flags:standard', addFlag)
+pluginHook('cli:flags:add:standard', addFlag)
 
 // Schema configuration
 program
-  .option('-j, --dynamic-json', 'enable dynamic JSON in GraphQL inputs and outputs. uses stringified JSON by default')
-  .option('-N, --no-setof-functions-contain-nulls', 'if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
+  .option('-j, --dynamic-json', '[RECOMMENDED] enable dynamic JSON in GraphQL inputs and outputs. PostGraphile uses stringified JSON by default')
+  .option('-N, --no-setof-functions-contain-nulls', '[RECOMMENDED] if none of your `RETURNS SETOF compound_type` functions mix NULLs with the results then you may enable this to reduce the nullables in the GraphQL schema')
   .option('-a, --classic-ids', 'use classic global id field name. required to support Relay 1')
   .option('-M, --disable-default-mutations', 'disable default mutations, mutation will only be possible through Postgres functions')
+  .option('--simple-collections [omit|both|only]', '"omit" (default) - relay connections only, "only" - simple collections only (no Relay connections), "both" - both')
+  .option('--no-ignore-rbac', '[RECOMMENDED] set this to excludes fields, queries and mutations that the user isn\'t permitted to access; this will be the default in v5')
+  .option('--include-extension-resources', 'by default, tables and functions that come from extensions are excluded; use this flag to include them (not recommended)')
 
 pluginHook('cli:flags:add:schema', addFlag)
 
 // Error enhancements
 program
-  .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors')
-  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Example: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
+  .option('--show-error-stack', 'show JavaScript error stacks in the GraphQL result errors (recommended in development)')
+  .option('--extended-errors <string>', 'a comma separated list of extended Postgres error fields to display in the GraphQL result. Recommended in development: \'hint,detail,errcode\'. Default: none', (option: string) => option.split(',').filter(_ => _))
 
 pluginHook('cli:flags:add:errorHandling', addFlag)
 
@@ -123,10 +126,12 @@ program
   .option('-q, --graphql <path>', 'the route to mount the GraphQL server on. defaults to `/graphql`')
   .option('-i, --graphiql <path>', 'the route to mount the GraphiQL interface on. defaults to `/graphiql`')
   .option('-b, --disable-graphiql', 'disables the GraphiQL interface. overrides the GraphiQL route option')
-  .option('-o, --cors', 'enable generous CORS settings. this is disabled by default, if possible use a proxy instead')
+  .option('-o, --cors', 'enable generous CORS settings; disabled by default, if possible use a proxy instead')
   .option('-l, --body-size-limit <string>', 'set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as \'200kB\' or \'5MB\' (case insensitive).')
   .option('--timeout <number>', 'set the timeout value in milliseconds for sockets', parseFloat)
   .option('--cluster-workers <count>', '[experimental] spawn <count> workers to increase throughput', parseFloat)
+  .option('--enable-query-batching', '[experimental] enable the server to process multiple GraphQL queries in one request')
+  .option('--disable-query-log', 'disable logging queries to console (recommended in production)')
 
 pluginHook('cli:flags:add:webserver', addFlag)
 
@@ -134,7 +139,7 @@ pluginHook('cli:flags:add:webserver', addFlag)
 program
   .option('-e, --jwt-secret <string>', 'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled')
   .option('--jwt-verify-algorithms <string>', 'a comma separated list of the names of the allowed jwt token algorithms', (option: string) => option.split(','))
-  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of audiences your jwt token can contain. If no audience is given the audience defaults to `postgraphile`', (option: string) => option.split(','))
+  .option('-A, --jwt-verify-audience <string>', 'a comma separated list of JWT audiences that will be accepted; defaults to \'postgraphile\'. To disable audience verification, set to \'\'.', (option: string) => option.split(','))
   .option('--jwt-verify-clock-tolerance <number>', 'number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers', parseFloat)
   .option('--jwt-verify-id <string>', 'the name of the allowed jwt token id')
   .option('--jwt-verify-ignore-expiration', 'if `true` do not validate the expiration of the token defaults to `false`')
@@ -152,8 +157,8 @@ pluginHook('cli:flags:add', addFlag)
 // Deprecated
 program
   .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
-  .option('--secret <string>', 'DEPRECATED: Use jwt-secret instead')
-  .option('--jwt-audiences <string>', 'DEPRECATED Use jwt-verify-audience instead', (option: string) => option.split(','))
+  .option('--secret <string>', 'DEPRECATED: Use --jwt-secret instead')
+  .option('--jwt-audiences <string>', 'DEPRECATED Use --jwt-verify-audience instead', (option: string) => option.split(','))
 
 pluginHook('cli:flags:add:deprecated', addFlag)
 
@@ -217,6 +222,8 @@ const {
   classicIds = false,
   dynamicJson = false,
   disableDefaultMutations = false,
+  ignoreRbac = true,
+  includeExtensionResources = false,
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   showErrorStack,
@@ -230,8 +237,11 @@ const {
   legacyRelations: rawLegacyRelations = 'deprecated',
   server: yesServer,
   clusterWorkers,
+  enableQueryBatching,
   setofFunctionsContainNulls = true,
   legacyJsonUuid,
+  disableQueryLog,
+  simpleCollections,
 // tslint:disable-next-line no-any
 } = Object.assign({}, config['options'], program) as any
 
@@ -308,11 +318,23 @@ const loadPlugins = (rawNames: mixed) => {
   })
 }
 
-if (jwtAudiences && jwtVerifyAudience) {
+if (jwtAudiences != null && jwtVerifyAudience != null) {
   throw new Error(`Provide either '--jwt-audiences' or '-A, --jwt-verify-audience' but not both`)
 }
 
-const jwtVerifyOptions: jwt.VerifyOptions = {
+function trimNulls(obj: object): object {
+  return Object.keys(obj).reduce(
+    (memo, key) => {
+      if (obj[key] != null) {
+        memo[key] = obj[key]
+      }
+      return memo
+    },
+    {},
+  )
+}
+
+const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
   algorithms: jwtVerifyAlgorithms,
   audience: jwtVerifyAudience,
   clockTolerance: jwtVerifyClockTolerance,
@@ -321,13 +343,15 @@ const jwtVerifyOptions: jwt.VerifyOptions = {
   ignoreNotBefore: jwtVerifyIgnoreNotBefore,
   issuer: jwtVerifyIssuer,
   subject: jwtVerifySubject,
-}
+})
 
 // The options to pass through to the schema builder, or the middleware
 const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, config['options'], {
   classicIds,
   dynamicJson,
   disableDefaultMutations,
+  ignoreRBAC: ignoreRbac,
+  includeExtensionResources,
   graphqlRoute,
   graphiqlRoute,
   graphiql: !disableGraphiql,
@@ -340,7 +364,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   watchPg,
   showErrorStack,
   extendedErrors,
-  disableQueryLog: false,
+  disableQueryLog,
   enableCors,
   exportJsonSchemaPath,
   exportGqlSchemaPath,
@@ -352,7 +376,9 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   legacyRelations,
   setofFunctionsContainNulls,
   legacyJsonUuid,
+  enableQueryBatching,
   pluginHook,
+  simpleCollections,
 }), { config, cliOptions: program })
 
 if (noServer) {

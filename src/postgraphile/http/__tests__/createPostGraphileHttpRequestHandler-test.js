@@ -274,6 +274,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     })
 
     test('will connect and release a Postgres client from the pool on every request', async () => {
+      // Note: no BEGIN/END because we don't need it here
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
@@ -285,15 +286,33 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } })
       expect(pgPool.connect.mock.calls).toEqual([[]])
-      expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+      expect(pgClient.query.mock.calls).toEqual([])
       expect(pgClient.release.mock.calls).toEqual([[]])
     })
 
-    test('will setup a transaction for requests that use the Postgres client', async () => {
+    test('will connect and release a Postgres client with a transaction from the pool on every mutation request', async () => {
       pgPool.connect.mockClear()
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer()
+      await request(server)
+        .post('/graphql')
+        .send({ query: 'mutation{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } })
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+    })
+
+    test('will setup a transaction for requests that use the Postgres client and have config', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const server = createServer({
+        pgDefaultRole: 'bob',
+      })
       await request(server)
         .post('/graphql')
         .send({ query: '{query}' })
@@ -303,6 +322,15 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       expect(pgPool.connect.mock.calls).toEqual([[]])
       expect(pgClient.query.mock.calls).toEqual([
         ['begin'],
+        [
+          {
+            'text': 'select set_config($1, $2, true)',
+            'values': [
+              'role',
+              'bob',
+            ],
+          },
+        ],
         ['EXECUTE'],
         ['commit'],
       ])
@@ -329,6 +357,58 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           {
             text: 'select set_config($1, $2, true)',
             values: ['role', 'pg_default_role'],
+          },
+        ],
+        ['EXECUTE'],
+        ['commit'],
+      ])
+      expect(pgClient.release.mock.calls).toEqual([[]])
+    })
+
+    test('adds properties from the JWT to the session', async () => {
+      pgPool.connect.mockClear()
+      pgClient.query.mockClear()
+      pgClient.release.mockClear()
+      const jwtSecret = 'secret'
+      const pgDefaultRole = 'pg_default_role'
+      const server = createServer({ jwtSecret, pgDefaultRole })
+      await request(server)
+        .post('/graphql')
+        /*
+          {
+            "aud": "postgraphile",
+            "role": "johndoe",
+            "iat": 1516239022,
+            "user_id": 2934085,
+            "number": 27,
+            "bool_true": true,
+            "bool_false": false,
+            "null": null,
+            "array": {"n": 7, "a":"fred", "c":21}
+          }
+        */
+        .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhpbGUiLCJyb2xlIjoiam9obmRvZSIsImlhdCI6MTUxNjIzOTAyMiwidXNlcl9pZCI6MjkzNDA4NSwibnVtYmVyIjoyNywiYm9vbF90cnVlIjp0cnVlLCJib29sX2ZhbHNlIjpmYWxzZSwibnVsbCI6bnVsbCwiYXJyYXkiOnsibiI6NywiYSI6ImZyZWQiLCJjIjoyMX19.MjMRJynCi1ZwiYiLduRxOQeK2FjWtT8IvSVc1_IanEg')
+        .send({ query: '{query}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { query: null } })
+      expect(pgPool.connect.mock.calls).toEqual([[]])
+      expect(pgClient.query.mock.calls).toEqual([
+        ['begin'],
+        [
+          {
+            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true), set_config($17, $18, true)',
+            values: [
+              'role', 'johndoe',
+              'jwt.claims.aud', 'postgraphile',
+              'jwt.claims.role', 'johndoe',
+              'jwt.claims.iat', '1516239022',
+              'jwt.claims.user_id', '2934085',
+              'jwt.claims.number', '27',
+              'jwt.claims.bool_true', 'true',
+              'jwt.claims.bool_false', 'false',
+              'jwt.claims.array', JSON.stringify({'n': 7, 'a': 'fred', 'c': 21}),
+            ],
           },
         ],
         ['EXECUTE'],

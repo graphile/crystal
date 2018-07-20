@@ -1,4 +1,6 @@
-export default function setupServerSentEvents (req, res, options) {
+import { PassThrough } from 'stream'
+
+export default function setupServerSentEvents(req, res, options) {
   const { _emitter } = options
 
   // Making sure these options are set.
@@ -7,18 +9,27 @@ export default function setupServerSentEvents (req, res, options) {
   req.socket.setKeepAlive(true)
 
   // Set headers for Server-Sent Events.
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-  })
+  res.statusCode = 200
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  const isKoa = !!req._koaCtx
+  const stream = isKoa ? new PassThrough() : null
+  if (isKoa) {
+    req._koaCtx.response.body = stream
+    req._koaCtx.compress = false
+  }
 
   const sse = str => {
-    res.write(str)
+    if (isKoa) {
+      stream.write(str)
+    } else {
+      res.write(str)
 
-    // support running within the compression middleware.
-    // https://github.com/expressjs/compression#server-sent-events
-    if (res.flushHeaders) res.flushHeaders()
+      // support running within the compression middleware.
+      // https://github.com/expressjs/compression#server-sent-events
+      if (res.flushHeaders) res.flushHeaders()
+    }
   }
 
   // Notify client that connection is open.
@@ -27,12 +38,18 @@ export default function setupServerSentEvents (req, res, options) {
   // Setup listeners.
   const schemaChangedCb = () => sse('event: change\ndata: schema\n\n')
 
-  if (options.watchPg)
-    _emitter.on('schemas:changed', schemaChangedCb)
+  if (options.watchPg) _emitter.on('schemas:changed', schemaChangedCb)
 
   // Clean up when connection closes.
-  req.on('close', () => {
-    res.end()
+  const cleanup = () => {
+    if (stream) {
+      stream.end()
+    } else {
+      res.end()
+    }
     _emitter.removeListener('schemas:changed', schemaChangedCb)
-  })
+  }
+  req.on('close', cleanup)
+  req.on('finish', cleanup)
+  req.on('error', cleanup)
 }

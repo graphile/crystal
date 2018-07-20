@@ -3,15 +3,21 @@
 These people and companies help accelerate the advancement of this project by
 sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 
-## Leaders
+## Featured
 
 * Chad Furman
-* Diwank Tomer
+
+## Leaders
+
 * Joe Dennis
 * James Allain
+* Alec Wenzowski
+* MissionMode
 
 ## Supporters
 
 * Mtpc
-* Evgeniy Foucault
-* Alec Wenzowski
+* Clay Smith
+* Matt Bretl (also a major community contributor!)
+* Michael Tng
+* Bureau Moelijke Dingen
