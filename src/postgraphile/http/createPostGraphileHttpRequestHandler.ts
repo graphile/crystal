@@ -283,7 +283,10 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
   })
 
   let lastGqlSchema: GraphQLSchema
-  const parseQuery = (gqlSchema: GraphQLSchema, queryString: string) => {
+  const parseQuery = (gqlSchema: GraphQLSchema, queryString: string): {
+    queryDocumentAst: DocumentNode,
+    validationErrors: Array<GraphQLError>,
+  } => {
     if (gqlSchema !== lastGqlSchema) {
       queryCache.reset()
       lastGqlSchema = gqlSchema
@@ -592,7 +595,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       }
       paramsList = pluginHook('postgraphile:httpParamsList', paramsList, { options, req, res, returnArray, httpError })
       results = await Promise.all(paramsList.map(async (params: any) => {
-        let queryDocumentAst: any
+        let queryDocumentAst: DocumentNode
         let result: any
         let meta = {}
         try {
@@ -633,7 +636,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
               `Operation name must be a string, not '${typeof params.operationName}'.`,
             )
 
-          let validationErrors
+          let validationErrors: Array<GraphQLError>
           ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, params.query))
 
           if (validationErrors.length === 0) {
