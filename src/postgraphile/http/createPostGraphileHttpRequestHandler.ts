@@ -15,6 +15,7 @@ import {
   GraphQLSchema,
   print as printGraphql,
   specifiedRules,
+  DocumentNode,
 } from 'graphql'
 import { extendedFormatError } from '../extendedFormatError'
 import { IncomingMessage, ServerResponse } from 'http'
@@ -271,12 +272,17 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
   // validate stages for when we see the same query again. Limit the store size
   // to 100MB (or queryCacheMaxSize) so it doesn't consume too much RAM.
   const SHA1_BASE64_LENGTH = 28
+  type CacheEntry = {
+    queryDocumentAst: DocumentNode,
+    validationErrors: Array<GraphQLError>,
+    length: number,
+  }
   const queryCache = LRU({
     max: queryCacheMaxSize,
-    length: (n: any) => n.length + SHA1_BASE64_LENGTH,
+    length: (n: CacheEntry, _key: string) => n.length + SHA1_BASE64_LENGTH,
   })
 
-  let lastGqlSchema: any
+  let lastGqlSchema: GraphQLSchema
   const parseQuery = (gqlSchema: GraphQLSchema, queryString: string) => {
     if (gqlSchema !== lastGqlSchema) {
       queryCache.reset()
@@ -308,7 +314,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
       // Validate our GraphQL query using given rules.
       const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, staticValidationRules)
-      const cacheResult = { queryDocumentAst, validationErrors }
+      const cacheResult: CacheEntry = { queryDocumentAst, validationErrors, length: queryString.length }
       if (canCache) {
         queryCache.set(hash, cacheResult)
       }
