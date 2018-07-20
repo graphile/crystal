@@ -227,22 +227,15 @@ export namespace PostGraphile {
     code: string,
   }
 
-  /**
-   * Creates a GraphQL request handler that can support many different `http` frameworks, including:
-   *
-   * - Native Node.js `http`.
-   * - `connect`.
-   * - `express`.
-   * - `koa` (2.0).
-   */
+  // Used by `createPostGraphileHttpRequestHandler`
   export interface ICreateRequestHandler extends PostGraphile.PostGraphileOptions {
-    // Max query cache size in MB. Default, 100
-    queryCacheMaxSize?: number
     // The actual GraphQL schema we will use.
     getGqlSchema: () => Promise<GraphQLSchema>,
     // A Postgres client pool we use to connect Postgres clients.
     pgPool: Pool,
     _emitter: EventEmitter,
+    // Max query cache size in MB. Default, 100
+    queryCacheMaxSize?: number
   }
 
   /**
