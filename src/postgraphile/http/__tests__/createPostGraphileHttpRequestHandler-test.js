@@ -14,7 +14,7 @@ const express = require('express')
 const sendFile = require('send')
 const event = require('events')
 const compress = require('koa-compress')
-const Koa = require('koa') // tslint:disable-line variable-name
+const koa = require('koa')
 
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter()
@@ -108,28 +108,12 @@ const serverCreators = new Map([
   ],
 ])
 
-// Parse out the Node.js version number. The version will be in a semantic
-// versioning format with maybe a `v` in front. We remove that `v`, split by
-// `.`, get the first item in the split array, and parse that as an integer to
-// get the Node.js major version number.
-const nodeMajorVersion = parseInt(
-  process.version.replace(/^v/, '').split('.')[0],
-  10,
-)
-
-// XXX: re-enable koa tests
-
-// Only test Koa in version of Node.js greater than 4 because the Koa source
-// code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
-// not meant to be used in Node.js 4 anyway so this is fine.
-if (nodeMajorVersion > 4) {
-  serverCreators.set('koa', (handler, options = {}) => {
-    const app = new Koa()
-    if (options.onPreCreate) options.onPreCreate(app)
-    app.use(handler)
-    return http.createServer(app.callback())
-  })
-}
+serverCreators.set('koa', (handler, options = {}) => {
+  const app = new koa()
+  if (options.onPreCreate) options.onPreCreate(app)
+  app.use(handler)
+  return http.createServer(app.callback())
+})
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = (handlerOptions, serverOptions) =>
