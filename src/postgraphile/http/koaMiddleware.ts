@@ -1,17 +1,28 @@
-/* tslint:disable:no-any no-var-requires */
-export const isKoaApp = (req: any, res: any) => (req.req && req.res && typeof res === 'function')
+/* tslint:disable:no-any */
+import { IncomingMessage, ServerResponse } from 'http'
+import { Context as KoaContext } from 'koa'
 
-export const middleware = async (ctx: any, next: any, requestHandler: any) => {
+export const isKoaApp = (a: any, b: any) => a.req && a.res && typeof b === 'function'
+
+export const middleware = async (
+  ctx: KoaContext,
+  next: (err: Error) => Promise<void>,
+  requestHandler: (req: IncomingMessage, res: ServerResponse, next: (err: Error) => Promise<any>) => Promise<any>,
+) => {
   // Hack the req object so we can get back to ctx
-  ctx.req._koaCtx = ctx
+  (ctx.req as object)['_koaCtx'] = ctx
 
+  // Hack the end function to instead write the response body.
+  // (This shouldn't be called by any PostGraphile code.)
   const oldEnd = ctx.res.end
-  // mock express .end() api into koa
-  ctx.res.end = (body: any) => {
-    // setting the ctx.status pins the Koa internal status code,
-    // otherwise setting response.body changes the status implicitly
+  (ctx.res as object)['end'] = (body: any, cb: () => void) => {
+    // Setting ctx.response.body changes koa's status implicitly, unless it
+    // already has one set:
     ctx.status = ctx.res.statusCode
     ctx.response.body = (body === undefined) ? '' : body
+    if (typeof cb === 'function') {
+      cb()
+    }
   }
 
   // Execute our request handler. If an error is thrown, we don’t call
@@ -21,7 +32,10 @@ export const middleware = async (ctx: any, next: any, requestHandler: any) => {
   try {
     result = await requestHandler(ctx.req, ctx.res, next)
   } finally {
-    ctx.res.end = oldEnd
+    (ctx.res as object)['end'] = oldEnd
+    if (ctx.res.statusCode && ctx.res.statusCode !== 200) {
+      ctx.response.status = ctx.res.statusCode
+    }
   }
   return result
 }
