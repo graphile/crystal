@@ -532,7 +532,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
     // Statements inside the `try` will assign to `result` when they get
     // a result. We also keep track of `params`.
     let paramsList: any
-    let results: Array<{data?: any, errors?: Array<GraphQLError>}> = []
+    let results: Array<{data?: any, errors?: Array<GraphQLError>, statusCode?: number}> = []
     const queryTimeStart = !options.disableQueryLog && process.hrtime()
     let pgRole: string
 
@@ -745,17 +745,16 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
         console.error(error.stack)
     } finally {
       // Finally, we send the client the results.
-      const firstResult: any = results[0] || {}
       if (!returnArray) {
-        if (res.statusCode === 200 && firstResult.statusCode) {
-          res.statusCode = firstResult.statusCode
+        if (res.statusCode === 200 && results[0].statusCode) {
+          res.statusCode = results[0].statusCode!
         }
-        delete firstResult.statusCode
+        delete results[0].statusCode
       }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8')
 
-      res.end(JSON.stringify(returnArray ? results : firstResult))
+      res.end(JSON.stringify(returnArray ? results : results[0]!))
 
       if (debugRequest.enabled) debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.')
 
