@@ -26,6 +26,7 @@ import ICreateRequestHandler = PostGraphile.ICreateRequestHandler
 import mixed = PostGraphile.mixed
 import setupServerSentEvents from './setupServerSentEvents'
 import withPostGraphileContext from '../withPostGraphileContext'
+import { Context as KoaContext } from 'koa'
 
 import chalk = require('chalk')
 import Debugger = require('debug') // tslint:disable-line variable-name
@@ -37,7 +38,7 @@ import sendFile = require('send')
 import LRU = require('lru-cache')
 import crypto = require('crypto')
 
-const calculateQueryHash = (query: string) => crypto.createHash('sha1').update(query).digest('base64')
+const calculateQueryHash = (queryString: string) => crypto.createHash('sha1').update(queryString).digest('base64')
 
 // Fast way of checking if an object is empty,
 // faster than `Object.keys(value).length === 0`
@@ -100,7 +101,7 @@ function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandl
     jwtSecret,
     additionalGraphQLContextFromRequest,
   } = options
-  return async (req: IncomingMessage, res: ServerResponse, moreOptions: any, fn: (ctx: mixed) => any): Promise<any> => {
+  return async (req, res, moreOptions, fn) => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
@@ -124,6 +125,14 @@ function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandl
   }
 }
 
+/**
+ * Creates a GraphQL request handler that can support many different `http` frameworks, including:
+ *
+ * - Native Node.js `http`.
+ * - `connect`.
+ * - `express`.
+ * - `koa` (2.0).
+ */
 export default function createPostGraphileHttpRequestHandler(options: ICreateRequestHandler): HttpRequestHandler {
   const MEGABYTE = 1024 * 1024
   const {
@@ -176,10 +185,9 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
-    error.stack = error.stack || '[empty stack]'
     if (options.showErrorStack)
       formattedError.stack =
-        options.showErrorStack
+        error.stack != null && options.showErrorStack === 'json'
           ? error.stack.split('\n')
           : error.stack
 
@@ -215,9 +223,12 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
   // We'll turn this into one function now so it can be better JIT optimised
   const bodyParserMiddlewaresComposed = bodyParserMiddlewares.reduce(
-    (parent: any, fn) => {
-      return (req: IncomingMessage, res: ServerResponse, next: any) => {
-        parent(req, res, (error: Error) => {
+    (
+      parent: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void,
+      fn: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void,
+    ): (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void => {
+      return (req, res, next) => {
+        parent(req, res, error => {
           if (error) {
             return next(error)
           }
@@ -225,7 +236,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
         })
       }
     },
-    (_req: any, _res: any, _next: any) => _next(),
+    (_req: IncomingMessage, _res: ServerResponse, next: (err?: Error) => void) => next(),
   )
 
   // And we really want that function to be await-able
