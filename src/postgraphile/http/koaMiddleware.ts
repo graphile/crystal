@@ -6,8 +6,8 @@ export const isKoaApp = (a: any, b: any) => a.req && a.res && typeof b === 'func
 
 export const middleware = async (
   ctx: KoaContext,
-  next: (err: Error) => Promise<void>,
-  requestHandler: (req: IncomingMessage, res: ServerResponse, next: (err: Error) => Promise<any>) => Promise<any>,
+  next: (err?: Error) => Promise<void>,
+  requestHandler: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => Promise<any>) => Promise<any>,
 ) => {
   // Hack the req object so we can get back to ctx
   (ctx.req as object)['_koaCtx'] = ctx
