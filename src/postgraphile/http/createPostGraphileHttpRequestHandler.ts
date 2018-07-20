@@ -772,36 +772,38 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
    * - `express`.
    * - `koa` (2.0).
    */
-  const middleware = async (req: IncomingMessage, res: ServerResponse, next: (error?: mixed) => void): Promise<void> => {
-    if (isKoaApp(req, res)) {
-      await koaMiddleware(req as any, res, requestHandler)
-      return
+  const middleware: any = (a: any, b: any, c: any) => {
+    // If are arguments look like the arguments to koa middleware, this is
+    // `koa` middleware.
+    if (isKoaApp(a, b)) {
+      // Set the correct `koa` variable names…
+      const ctx = (a as KoaContext)
+      const next = (b as (err?: Error) => Promise<any>)
+      return koaMiddleware(ctx, next, requestHandler)
+    } else {
+      // Set the correct `connect` style variable names. If there was no `next`
+      // defined (likely the case if the client is using `http`) we use the
+      // final handler.
+      const req = (a as IncomingMessage)
+      const res = (b as ServerResponse)
+      const next = c || finalHandler(req, res)
+
+      // Execute our request handler.
+      requestHandler(req, res, next).then(
+        // If the request was fulfilled, noop.
+        () => {
+          /* noop */
+        },
+        // If the request errored out, call `next` with the error.
+        error => next(error),
+      )
     }
-    // Set the correct `connect` style variable names. If there was no `next`
-    // defined (likely the case if the client is using `http`) we use the
-    // final handler.
-    next = next || finalHandler(req, res)
-
-    // Execute our request handler.
-    requestHandler(req, res, next).then(
-      // If the request was fulfilled, noop.
-      () => { /* noop */ },
-      // If the request errored out, call `next` with the error.
-      error => next(error),
-    )
   }
-
-  // HttpRequestHandler is a fn w/ extra props.  use `assign` to get concise,
-  // union type: https://stackoverflow.com/a/41853194/1438908
-  return Object.assign(
-    middleware,
-    {
-      formatError,
-      getGraphQLSchema: getGqlSchema,
-      pgPool,
-      withPostGraphileContextFromReqRes,
-    },
-  ) as HttpRequestHandler
+  middleware.getGraphQLSchema = getGqlSchema
+  middleware.formatError = formatError
+  middleware.pgPool = pgPool
+  middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes
+  return (middleware as HttpRequestHandler)
 }
 
 /**
