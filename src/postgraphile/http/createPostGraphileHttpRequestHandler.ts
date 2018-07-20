@@ -1,5 +1,4 @@
-/* eslint-disable */// Because we use tslint
-/* tslint:disable:no-any no-var-requires */
+/* tslint:disable:no-any */
 import {
   join as joinPath,
   resolve as resolvePath,
@@ -28,15 +27,15 @@ import mixed = PostGraphile.mixed
 import setupServerSentEvents from './setupServerSentEvents'
 import withPostGraphileContext from '../withPostGraphileContext'
 
-const chalk = require('chalk')
-const Debugger = require('debug') // tslint:disable-line variable-name
-const httpError = require('http-errors')
-const parseUrl = require('parseurl')
-const finalHandler = require('finalhandler')
-const bodyParser = require('body-parser')
-const sendFile = require('send')
-const LRU = require('lru-cache')
-const crypto = require('crypto')
+import chalk = require('chalk')
+import Debugger = require('debug') // tslint:disable-line variable-name
+import httpError = require('http-errors')
+import parseUrl = require('parseurl')
+import finalHandler = require('finalhandler')
+import bodyParser = require('body-parser')
+import sendFile = require('send')
+import LRU = require('lru-cache')
+import crypto = require('crypto')
 
 const calculateQueryHash = (query: string) => crypto.createHash('sha1').update(query).digest('base64')
 
