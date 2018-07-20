@@ -36,6 +36,7 @@
   "dependencies": {
     "@types/graphql": "^0.8.2",
     "@types/jsonwebtoken": "<7.2.1",
+    "@types/koa": "2.0.46",
     "@types/pg": "^7.4.10",
     "body-parser": "^1.15.2",
     "chalk": "^1.1.3",
