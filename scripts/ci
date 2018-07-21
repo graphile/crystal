@@ -1,9 +1,6 @@
 #!/bin/bash
 
 set -e
-echo "[0/3]: Attempting install of koa"
-yarn add koa || true
-
 echo "[1/3]: Building Code"
 scripts/build
 

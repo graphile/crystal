@@ -1,4 +1,8 @@
 import { GraphQLError } from 'graphql/error'
+import { PostGraphile } from '../interfaces'
+import GraphQLErrorExtended = PostGraphile.GraphQLErrorExtended
+import GraphQLFormattedErrorExtended = PostGraphile.GraphQLFormattedErrorExtended
+import mixed = PostGraphile.mixed
 
 /**
  * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
@@ -44,23 +48,4 @@ export function extendedFormatError(error: GraphQLError, fields: Array<string>):
     locations: error.locations,
     path: error.path,
   }
-}
-
-export type GraphQLFormattedErrorExtended = {
-  // This is ugly, really I just want `string | void` but apparently TypeScript doesn't support that.
-  [s: string]: Array<GraphQLErrorLocation> | Array<string | number> | string | void,
-  message: string,
-  locations: Array<GraphQLErrorLocation> | void,
-  path: Array<string | number> | void,
-}
-
-export type GraphQLErrorLocation = {
-  line: number,
-  column: number,
-}
-
-export type GraphQLErrorExtended = GraphQLError & {
-  hint: string,
-  detail: string,
-  code: string,
 }

@@ -11,6 +11,8 @@ import { Pool } from 'pg'
 import cluster = require('cluster')
 import { makePluginHook, PostGraphilePlugin } from './pluginHook'
 import debugFactory = require('debug')
+import { PostGraphile } from '../interfaces'
+import mixed = PostGraphile.mixed
 
 const debugCli = debugFactory('postgraphile:cli')
 
@@ -55,9 +57,9 @@ function extractPlugins(rawArgv: Array<string>): {
   return { argv, plugins }
 }
 
-const { argv: argvSansPlugins, plugins } = extractPlugins(process.argv)
+const { argv: argvSansPlugins, plugins: extractedPlugins } = extractPlugins(process.argv)
 
-const pluginHook = makePluginHook(plugins)
+const pluginHook = makePluginHook(extractedPlugins)
 
 program
   .version(manifest.version)

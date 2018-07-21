@@ -13,6 +13,8 @@ const connect = require('connect')
 const express = require('express')
 const sendFile = require('send')
 const event = require('events')
+const compress = require('koa-compress')
+const koa = require('koa')
 
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter()
@@ -106,36 +108,20 @@ const serverCreators = new Map([
   ],
 ])
 
-// Parse out the Node.js version number. The version will be in a semantic
-// versioning format with maybe a `v` in front. We remove that `v`, split by
-// `.`, get the first item in the split array, and parse that as an integer to
-// get the Node.js major version number.
-const nodeMajorVersion = parseInt(
-  process.version.replace(/^v/, '').split('.')[0],
-  10,
-)
-
-/* XXX: re-enable koa tests
-
-// Only test Koa in version of Node.js greater than 4 because the Koa source
-// code has some ES2015 syntax in it which breaks in Node.js 4 and lower. Koa is
-// not meant to be used in Node.js 4 anyway so this is fine.
-if (nodeMajorVersion > 4) {
-  const Koa = require('koa') // tslint:disable-line variable-name
-  serverCreators.set('koa', handler => {
-    const app = new Koa()
-    app.use(handler)
-    return http.createServer(app.callback())
-  })
-}
-*/
+serverCreators.set('koa', (handler, options = {}) => {
+  const app = new koa()
+  if (options.onPreCreate) options.onPreCreate(app)
+  app.use(handler)
+  return http.createServer(app.callback())
+})
 
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
-  const createServer = options =>
+  const createServer = (handlerOptions, serverOptions) =>
     createServerFromHandler(
       createPostGraphileHttpRequestHandler(
-        Object.assign({}, defaultOptions, options),
+        Object.assign({}, defaultOptions, handlerOptions),
       ),
+      serverOptions,
     )
 
   describe(name, () => {
@@ -851,5 +837,43 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         additionalGraphQLContextFromRequest.mock.calls[0][1],
       ).toBeInstanceOf(http.ServerResponse)
     })
+
+    if (name === 'koa') {
+      const createKoaCompressionServer = () =>
+        createServer(
+          { graphiql: true },
+          {
+            onPreCreate: app => {
+              app.use(compress({
+                threshold: 0,
+              }))
+            },
+          },
+        )
+      test('koa serves & compresses graphiql route', async () => {
+        const server = createKoaCompressionServer()
+        await request(server)
+          .get('/graphiql')
+          .expect(200)
+          .expect('Content-Encoding', /gzip/)
+      })
+      test('koa serves & compresses graphiql assets', async () => {
+        const server = createKoaCompressionServer()
+        await request(server)
+          .get('/_postgraphile/graphiql/anything.css')
+          .expect(200)
+        expect(
+          sendFile.mock.calls.map(([res, filepath, options]) => [
+            filepath,
+            options,
+          ]),
+        ).toEqual([
+          [
+            'anything.css',
+            { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
+          ],
+        ])
+      })
+    }
   })
 }

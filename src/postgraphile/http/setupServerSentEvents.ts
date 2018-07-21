@@ -1,6 +1,10 @@
+/* tslint:disable:no-any */
 import { PassThrough } from 'stream'
+import { IncomingMessage, ServerResponse } from 'http'
+import { PostGraphile } from '../../interfaces'
+import ICreateRequestHandler = PostGraphile.ICreateRequestHandler
 
-export default function setupServerSentEvents(req, res, options) {
+export default function setupServerSentEvents(req: IncomingMessage, res: ServerResponse, options: ICreateRequestHandler): void {
   const { _emitter } = options
 
   // Making sure these options are set.
@@ -13,22 +17,23 @@ export default function setupServerSentEvents(req, res, options) {
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
-  const isKoa = !!req._koaCtx
+  const koaCtx = (req as object)['_koaCtx']
+  const isKoa = !!koaCtx
   const stream = isKoa ? new PassThrough() : null
   if (isKoa) {
-    req._koaCtx.response.body = stream
-    req._koaCtx.compress = false
+    koaCtx.response.body = stream
+    koaCtx.compress = false
   }
 
-  const sse = str => {
+  const sse = (str: string) => {
     if (isKoa) {
-      stream.write(str)
+      stream!.write(str)
     } else {
       res.write(str)
 
       // support running within the compression middleware.
       // https://github.com/expressjs/compression#server-sent-events
-      if (res.flushHeaders) res.flushHeaders()
+      if (typeof (res as any).flushHeaders === 'function') (res as any).flushHeaders()
     }
   }
 

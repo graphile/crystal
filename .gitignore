@@ -5,3 +5,4 @@ build/
 TODO.md
 package-lock.json
 *.log
+.vscode

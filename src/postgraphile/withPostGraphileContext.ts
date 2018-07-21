@@ -1,11 +1,13 @@
 /* eslint-disable */// Because we use tslint
 import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
-import { Pool, Client } from 'pg'
+import { Pool, PoolClient } from 'pg'
 import { ExecutionResult, DocumentNode, OperationDefinitionNode, Kind } from 'graphql'
 import * as sql from 'pg-sql2'
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext'
 import { pluginHookFromOptions } from './pluginHook'
+import { PostGraphile } from '../interfaces'
+import mixed = PostGraphile.mixed
 
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string => o && o.length ? o : undefined
 
@@ -303,7 +305,7 @@ const debugPgError = createDebugger('postgraphile:postgres:error')
  * @private
  */
 // tslint:disable no-any
-function debugPgClient(pgClient: Client): Client {
+function debugPgClient(pgClient: PoolClient): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {
