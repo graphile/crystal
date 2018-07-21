@@ -1,5 +1,9 @@
-/* eslint-disable */// Because we use tslint
-import { postgraphile, createPostGraphileSchema, watchPostGraphileSchema, withPostGraphileContext } from './postgraphile'
+import {
+  postgraphile,
+  createPostGraphileSchema,
+  watchPostGraphileSchema,
+  withPostGraphileContext,
+} from './postgraphile'
 import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook'
 
 export default postgraphile
@@ -11,7 +15,6 @@ export {
   withPostGraphileContext,
   makePluginHook,
   PostGraphilePlugin,
-
   // Backwards compatability
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,

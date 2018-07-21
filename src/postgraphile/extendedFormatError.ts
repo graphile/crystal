@@ -7,7 +7,7 @@ import mixed = PostGraphile.mixed
 /**
  * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
  */
-function pickPgError(err: mixed, inFields: string | Array<string>): {[s: string]: string | void} {
+function pickPgError(err: mixed, inFields: string | Array<string>): { [s: string]: string | void } {
   const result: mixed = {}
   let fields
   if (Array.isArray(inFields)) {
@@ -37,7 +37,10 @@ function pickPgError(err: mixed, inFields: string | Array<string>): {[s: string]
  * extract additional error codes from the postgres error, such as 'hint',
  * 'detail', 'errcode', 'where', etc. - see `extendedErrors` option.
  */
-export function extendedFormatError(error: GraphQLError, fields: Array<string>): GraphQLFormattedErrorExtended {
+export function extendedFormatError(
+  error: GraphQLError,
+  fields: Array<string>,
+): GraphQLFormattedErrorExtended {
   if (!error) {
     throw new Error('Received null or undefined error.')
   }

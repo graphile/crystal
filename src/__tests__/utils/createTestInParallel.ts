@@ -5,7 +5,10 @@
  *
  * This function will break the timing numbers in the Jest console.
  */
-export default function createTestInParallel(): (name: string, fn: () => void | Promise<void>) => void {
+export default function createTestInParallel(): (
+  name: string,
+  fn: () => void | Promise<void>,
+) => void {
   // All of the test functions. We collect them in a single array so that we can
   // call them all at once.
   const testFns: Array<() => void | Promise<void>> = []

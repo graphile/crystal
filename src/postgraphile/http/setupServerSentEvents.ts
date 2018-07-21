@@ -4,7 +4,11 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { PostGraphile } from '../../interfaces'
 import ICreateRequestHandler = PostGraphile.ICreateRequestHandler
 
-export default function setupServerSentEvents(req: IncomingMessage, res: ServerResponse, options: ICreateRequestHandler): void {
+export default function setupServerSentEvents(
+  req: IncomingMessage,
+  res: ServerResponse,
+  options: ICreateRequestHandler,
+): void {
   const { _emitter } = options
 
   // Making sure these options are set.

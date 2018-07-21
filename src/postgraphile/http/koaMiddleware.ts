@@ -7,19 +7,23 @@ export const isKoaApp = (a: any, b: any) => a.req && a.res && typeof b === 'func
 export const middleware = async (
   ctx: KoaContext,
   next: (err?: Error) => Promise<void>,
-  requestHandler: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => Promise<any>) => Promise<any>,
+  requestHandler: (
+    req: IncomingMessage,
+    res: ServerResponse,
+    next: (err?: Error) => Promise<any>,
+  ) => Promise<any>,
 ) => {
   // Hack the req object so we can get back to ctx
-  (ctx.req as object)['_koaCtx'] = ctx
+  ;(ctx.req as object)['_koaCtx'] = ctx
 
   // Hack the end function to instead write the response body.
   // (This shouldn't be called by any PostGraphile code.)
-  const oldEnd = ctx.res.end;
-  (ctx.res as object)['end'] = (body: any, cb: () => void) => {
+  const oldEnd = ctx.res.end
+  ;(ctx.res as object)['end'] = (body: any, cb: () => void) => {
     // Setting ctx.response.body changes koa's status implicitly, unless it
     // already has one set:
     ctx.status = ctx.res.statusCode
-    ctx.response.body = (body === undefined) ? '' : body
+    ctx.response.body = body === undefined ? '' : body
     if (typeof cb === 'function') {
       cb()
     }
@@ -32,7 +36,7 @@ export const middleware = async (
   try {
     result = await requestHandler(ctx.req, ctx.res, next)
   } finally {
-    (ctx.res as object)['end'] = oldEnd
+    ;(ctx.res as object)['end'] = oldEnd
     if (ctx.res.statusCode && ctx.res.statusCode !== 200) {
       ctx.response.status = ctx.res.statusCode
     }

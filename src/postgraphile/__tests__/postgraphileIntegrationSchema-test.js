@@ -19,8 +19,7 @@ const testFixtures = [
   },
   {
     name: 'prints a schema with Relay 1 style ids',
-    createSchema: client =>
-      createPostGraphileSchema(client, 'c', { classicIds: true }),
+    createSchema: client => createPostGraphileSchema(client, 'c', { classicIds: true }),
   },
   {
     name: 'prints a schema with a JWT generating mutation',

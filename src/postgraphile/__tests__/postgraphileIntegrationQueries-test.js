@@ -58,14 +58,10 @@ beforeAll(() => {
         queryFileNames.map(async fileName => {
           // Read the query from the file system.
           const query = await new Promise((resolve, reject) => {
-            readFile(
-              resolvePath(queriesDir, fileName),
-              'utf8',
-              (error, data) => {
-                if (error) reject(error)
-                else resolve(data)
-              },
-            )
+            readFile(resolvePath(queriesDir, fileName), 'utf8', (error, data) => {
+              if (error) reject(error)
+              else resolve(data)
+            })
           })
           // Get the appropriate GraphQL schema for this fixture. We want to test
           // some specific fixtures against a schema configured slightly

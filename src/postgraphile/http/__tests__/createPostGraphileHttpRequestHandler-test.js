@@ -40,8 +40,7 @@ const gqlSchema = new GraphQLSchema({
       },
       query: {
         type: GraphQLString,
-        resolve: (source, args, context) =>
-          context[$$pgClient].query('EXECUTE'),
+        resolve: (source, args, context) => context[$$pgClient].query('EXECUTE'),
       },
       testError: {
         type: GraphQLString,
@@ -118,9 +117,7 @@ serverCreators.set('koa', (handler, options = {}) => {
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   const createServer = (handlerOptions, serverOptions) =>
     createServerFromHandler(
-      createPostGraphileHttpRequestHandler(
-        Object.assign({}, defaultOptions, handlerOptions),
-      ),
+      createPostGraphileHttpRequestHandler(Object.assign({}, defaultOptions, handlerOptions)),
       serverOptions,
     )
 
@@ -310,11 +307,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            'text': 'select set_config($1, $2, true)',
-            'values': [
-              'role',
-              'bob',
-            ],
+            text: 'select set_config($1, $2, true)',
+            values: ['role', 'bob'],
           },
         ],
         ['EXECUTE'],
@@ -373,7 +367,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
             "array": {"n": 7, "a":"fred", "c":21}
           }
         */
-        .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhpbGUiLCJyb2xlIjoiam9obmRvZSIsImlhdCI6MTUxNjIzOTAyMiwidXNlcl9pZCI6MjkzNDA4NSwibnVtYmVyIjoyNywiYm9vbF90cnVlIjp0cnVlLCJib29sX2ZhbHNlIjpmYWxzZSwibnVsbCI6bnVsbCwiYXJyYXkiOnsibiI6NywiYSI6ImZyZWQiLCJjIjoyMX19.MjMRJynCi1ZwiYiLduRxOQeK2FjWtT8IvSVc1_IanEg')
+        .set(
+          'Authorization',
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJwb3N0Z3JhcGhpbGUiLCJyb2xlIjoiam9obmRvZSIsImlhdCI6MTUxNjIzOTAyMiwidXNlcl9pZCI6MjkzNDA4NSwibnVtYmVyIjoyNywiYm9vbF90cnVlIjp0cnVlLCJib29sX2ZhbHNlIjpmYWxzZSwibnVsbCI6bnVsbCwiYXJyYXkiOnsibiI6NywiYSI6ImZyZWQiLCJjIjoyMX19.MjMRJynCi1ZwiYiLduRxOQeK2FjWtT8IvSVc1_IanEg',
+        )
         .send({ query: '{query}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -383,17 +380,27 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         ['begin'],
         [
           {
-            text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true), set_config($17, $18, true)',
+            text:
+              'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true), set_config($17, $18, true)',
             values: [
-              'role', 'johndoe',
-              'jwt.claims.aud', 'postgraphile',
-              'jwt.claims.role', 'johndoe',
-              'jwt.claims.iat', '1516239022',
-              'jwt.claims.user_id', '2934085',
-              'jwt.claims.number', '27',
-              'jwt.claims.bool_true', 'true',
-              'jwt.claims.bool_false', 'false',
-              'jwt.claims.array', JSON.stringify({'n': 7, 'a': 'fred', 'c': 21}),
+              'role',
+              'johndoe',
+              'jwt.claims.aud',
+              'postgraphile',
+              'jwt.claims.role',
+              'johndoe',
+              'jwt.claims.iat',
+              '1516239022',
+              'jwt.claims.user_id',
+              '2934085',
+              'jwt.claims.number',
+              '27',
+              'jwt.claims.bool_true',
+              'true',
+              'jwt.claims.bool_false',
+              'false',
+              'jwt.claims.array',
+              JSON.stringify({ n: 7, a: 'fred', c: 21 }),
             ],
           },
         ],
@@ -466,7 +473,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .send({ query: '{hello}', variables: 2 })
         .expect(400)
         .expect({
-          errors: [{ message: 'Variables must be an object, not \'number\'.' }],
+          errors: [{ message: "Variables must be an object, not 'number'." }],
         })
     })
 
@@ -477,9 +484,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .send({ query: '{hello}', operationName: 2 })
         .expect(400)
         .expect({
-          errors: [
-            { message: 'Operation name must be a string, not \'number\'.' },
-          ],
+          errors: [{ message: "Operation name must be a string, not 'number'." }],
         })
     })
 
@@ -537,7 +542,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.query.mockClear()
       pgClient.release.mockClear()
       const server = createServer({
-        handleErrors: (errors) => {
+        handleErrors: errors => {
           return errors.map(error => {
             error.message = 'my custom error message'
             error.hint = 'my custom error hint'
@@ -634,24 +639,10 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .get('/_postgraphile/graphiql/../../../../etc/passwd')
         .expect(403)
-      expect(
-        sendFile.mock.calls.map(([res, filepath, options]) => [
-          filepath,
-          options,
-        ]),
-      ).toEqual([
-        [
-          'anything.css',
-          { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
-        ],
-        [
-          'something.js',
-          { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
-        ],
-        [
-          'very/deeply/nested',
-          { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
-        ],
+      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
+        ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+        ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
+        ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
       ])
     })
 
@@ -801,9 +792,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     })
 
     test('will call additionalGraphQLContextFromRequest if provided and add the response to the context', async () => {
-      const helloResolver = jest.fn(
-        (source, args, context) => context.additional,
-      )
+      const helloResolver = jest.fn((source, args, context) => context.additional)
       const contextCheckGqlSchema = new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
@@ -830,12 +819,12 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'foo' } })
       expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1)
-      expect(
-        additionalGraphQLContextFromRequest.mock.calls[0][0],
-      ).toBeInstanceOf(http.IncomingMessage)
-      expect(
-        additionalGraphQLContextFromRequest.mock.calls[0][1],
-      ).toBeInstanceOf(http.ServerResponse)
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(
+        http.IncomingMessage,
+      )
+      expect(additionalGraphQLContextFromRequest.mock.calls[0][1]).toBeInstanceOf(
+        http.ServerResponse,
+      )
     })
 
     if (name === 'koa') {
@@ -844,9 +833,11 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           { graphiql: true },
           {
             onPreCreate: app => {
-              app.use(compress({
-                threshold: 0,
-              }))
+              app.use(
+                compress({
+                  threshold: 0,
+                }),
+              )
             },
           },
         )
@@ -862,16 +853,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         await request(server)
           .get('/_postgraphile/graphiql/anything.css')
           .expect(200)
-        expect(
-          sendFile.mock.calls.map(([res, filepath, options]) => [
-            filepath,
-            options,
-          ]),
-        ).toEqual([
-          [
-            'anything.css',
-            { index: false, dotfiles: 'ignore', root: graphiqlDirectory },
-          ],
+        expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
+          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ])
       })
     }
