@@ -10,13 +10,11 @@ export const $$pgClient = 'pgClient'
  * client does not exist.
  */
 export default function getPgClientFromContext(context: mixed): PoolClient {
-  if (context == null || typeof context !== 'object')
-    throw new Error('Context must be an object.')
+  if (context == null || typeof context !== 'object') throw new Error('Context must be an object.')
 
   const client = context[$$pgClient]
 
-  if (client == null)
-    throw new Error('Postgres client does not exist on the context.')
+  if (client == null) throw new Error('Postgres client does not exist on the context.')
 
   if (!(client instanceof ClientBase))
     throw new Error('Postgres client on context is of the incorrect type.')

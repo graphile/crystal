@@ -45,12 +45,7 @@ test('will record queries run inside the transaction', async () => {
     client[$$pgClient].query(query1)
     client[$$pgClient].query(query2)
   })
-  expect(pgClient.query.mock.calls).toEqual([
-    ['begin'],
-    [query1],
-    [query2],
-    ['commit'],
-  ])
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [query1], [query2], ['commit']])
 })
 
 test('will return the value from the callback', async () => {
@@ -64,9 +59,7 @@ test('will return the asynchronous value from the callback', async () => {
   const value = Symbol()
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
-  expect(
-    await withPostGraphileContext({ pgPool }, () => Promise.resolve(value)),
-  ).toBe(value)
+  expect(await withPostGraphileContext({ pgPool }, () => Promise.resolve(value))).toBe(value)
 })
 
 test('will throw an error if there was a `jwtToken`, but no `jwtSecret`', async () => {
@@ -85,10 +78,7 @@ test('will throw an error for a malformed `jwtToken`', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() }
   const pgPool = { connect: jest.fn(() => pgClient) }
   await expectHttpError(
-    withPostGraphileContext(
-      { pgPool, jwtToken: 'asd', jwtSecret: 'secret' },
-      () => {},
-    ),
+    withPostGraphileContext({ pgPool, jwtToken: 'asd', jwtSecret: 'secret' }, () => {}),
     403,
     'jwt malformed',
   )
@@ -240,8 +230,7 @@ test('will add extra settings as available', async () => {
     ['begin'],
     [
       {
-        text:
-          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+        text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
         values: [
           'foo.bar',
           'test1',
@@ -283,7 +272,7 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
     [
       {
         text:
-        'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)',
+          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)',
         values: [
           'foo.bar',
           'test1',
@@ -430,7 +419,9 @@ test('will set a role provided in the JWT', async () => {
       jwtToken: jwt.sign(
         { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
         'secret',
-        { noTimestamp: true },
+        {
+          noTimestamp: true,
+        },
       ),
       jwtSecret: 'secret',
     },
@@ -471,7 +462,9 @@ test('will set a role provided in the JWT superceding the default role', async (
       jwtToken: jwt.sign(
         { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
         'secret',
-        { noTimestamp: true },
+        {
+          noTimestamp: true,
+        },
       ),
       jwtSecret: 'secret',
       pgDefaultRole: 'test_default_role',
@@ -622,7 +615,7 @@ describe('jwtVerifyOptions', () => {
         () => {},
       ),
       403,
-      'Provide either \'jwtAudiences\' or \'jwtVerifyOptions.audience\' but not both',
+      "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
     )
     // Never set up the transaction due to error
     expect(pgClient.query.mock.calls).toEqual([])
@@ -641,7 +634,7 @@ describe('jwtVerifyOptions', () => {
         () => {},
       ),
       403,
-      'Provide either \'jwtAudiences\' or \'jwtVerifyOptions.audience\' but not both',
+      "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
     )
     // Never set up the transaction due to error
     expect(pgClient.query.mock.calls).toEqual([])
@@ -666,12 +659,7 @@ describe('jwtVerifyOptions', () => {
       [
         {
           text: 'select set_config($1, $2, true), set_config($3, $4, true)',
-          values: [
-            'jwt.claims.aud',
-            'my-audience',
-            'jwt.claims.sub',
-            'my-subject',
-          ],
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
         },
       ],
       ['commit'],
@@ -696,12 +684,7 @@ describe('jwtVerifyOptions', () => {
       [
         {
           text: 'select set_config($1, $2, true), set_config($3, $4, true)',
-          values: [
-            'jwt.claims.aud',
-            'my-audience',
-            'jwt.claims.sub',
-            'my-subject',
-          ],
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
         },
       ],
       ['commit'],
@@ -726,12 +709,7 @@ describe('jwtVerifyOptions', () => {
       [
         {
           text: 'select set_config($1, $2, true), set_config($3, $4, true)',
-          values: [
-            'jwt.claims.aud',
-            'my-audience',
-            'jwt.claims.sub',
-            'my-subject',
-          ],
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
         },
       ],
       ['commit'],
@@ -756,12 +734,7 @@ describe('jwtVerifyOptions', () => {
       [
         {
           text: 'select set_config($1, $2, true), set_config($3, $4, true)',
-          values: [
-            'jwt.claims.aud',
-            'my-audience',
-            'jwt.claims.sub',
-            'my-subject',
-          ],
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
         },
       ],
       ['commit'],
@@ -833,10 +806,7 @@ describe('jwtVerifyOptions', () => {
         {
           pgPool,
           jwtSecret: 'secret',
-          jwtToken: jwt.sign(
-            { aud: 'postgraphile', iss: 'alpha:nasa' },
-            'secret',
-          ),
+          jwtToken: jwt.sign({ aud: 'postgraphile', iss: 'alpha:nasa' }, 'secret'),
           jwtVerifyOptions: { issuer: ['alpha:aliens', 'alpha:ufo'] },
         },
         () => {},
@@ -848,7 +818,7 @@ describe('jwtVerifyOptions', () => {
     expect(pgClient.query.mock.calls).toEqual([])
   })
 
-  test('will default to an audience of [\'postgraphile\'] if no audience params are provided', async () => {
+  test("will default to an audience of ['postgraphile'] if no audience params are provided", async () => {
     await expectHttpError(
       withPostGraphileContext(
         {

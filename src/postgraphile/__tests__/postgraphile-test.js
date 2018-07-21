@@ -22,9 +22,7 @@ test('will use a connected client from the pool, the schemas, and options to cre
   const schemas = [Symbol('schemas')]
   const options = Symbol('options')
   await postgraphile(pgPool, schemas, options)
-  expect(createPostGraphileSchema.mock.calls).toEqual([
-    [pgPool, schemas, options],
-  ])
+  expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, schemas, options]])
 })
 
 test('will use a connected client from the pool, the default schema, and options to create a GraphQL schema', async () => {
@@ -34,9 +32,7 @@ test('will use a connected client from the pool, the default schema, and options
   const options = Symbol('options')
   const pgClient = { release: jest.fn() }
   await postgraphile(pgPool, options)
-  expect(createPostGraphileSchema.mock.calls).toEqual([
-    [pgPool, ['public'], options],
-  ])
+  expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, ['public'], options]])
 })
 
 test('will use a created GraphQL schema to create the HTTP request handler and pass down options', async () => {
@@ -49,24 +45,19 @@ test('will use a created GraphQL schema to create the HTTP request handler and p
   await postgraphile(pgPool, [], options)
   expect(createPostGraphileHttpRequestHandler.mock.calls.length).toBe(1)
   expect(createPostGraphileHttpRequestHandler.mock.calls[0].length).toBe(1)
-  expect(
-    Object.keys(createPostGraphileHttpRequestHandler.mock.calls[0][0]),
-  ).toEqual(['a', 'b', 'c', 'getGqlSchema', 'pgPool', '_emitter'])
-  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].pgPool).toBe(
-    pgPool,
-  )
-  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].a).toBe(
-    options.a,
-  )
-  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].b).toBe(
-    options.b,
-  )
-  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].c).toBe(
-    options.c,
-  )
-  expect(
-    await createPostGraphileHttpRequestHandler.mock.calls[0][0].getGqlSchema(),
-  ).toBe(gqlSchema)
+  expect(Object.keys(createPostGraphileHttpRequestHandler.mock.calls[0][0])).toEqual([
+    'a',
+    'b',
+    'c',
+    'getGqlSchema',
+    'pgPool',
+    '_emitter',
+  ])
+  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].pgPool).toBe(pgPool)
+  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].a).toBe(options.a)
+  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].b).toBe(options.b)
+  expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].c).toBe(options.c)
+  expect(await createPostGraphileHttpRequestHandler.mock.calls[0][0].getGqlSchema()).toBe(gqlSchema)
 })
 
 test('will watch Postgres schemas when `watchPg` is true', async () => {
@@ -76,9 +67,7 @@ test('will watch Postgres schemas when `watchPg` is true', async () => {
   const pgSchemas = [Symbol('a'), Symbol('b'), Symbol('c')]
   await postgraphile(pgPool, pgSchemas, { watchPg: false })
   await postgraphile(pgPool, pgSchemas, { watchPg: true })
-  expect(createPostGraphileSchema.mock.calls).toEqual([
-    [pgPool, pgSchemas, { watchPg: false }],
-  ])
+  expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, pgSchemas, { watchPg: false }]])
 
   expect(watchPostGraphileSchema.mock.calls.length).toBe(1)
   expect(watchPostGraphileSchema.mock.calls[0].length).toBe(4)

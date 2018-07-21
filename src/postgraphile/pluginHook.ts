@@ -1,4 +1,3 @@
-/* eslint-disable */// Because we use tslint
 import { AddFlagFn } from './cli'
 import { Server } from 'http'
 import { PostGraphile } from '../interfaces'
@@ -9,7 +8,7 @@ import PostGraphileOptions = PostGraphile.PostGraphileOptions
 export type HookFn<T> = (arg: T, context: {}) => T
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T
 export interface PostGraphilePlugin {
-  'pluginHook'?: HookFn<PluginHookFn>
+  pluginHook?: HookFn<PluginHookFn>
   'cli:flags:add:standard'?: HookFn<AddFlagFn>
   'cli:flags:add:schema'?: HookFn<AddFlagFn>
   'cli:flags:add:errorHandling'?: HookFn<AddFlagFn>
@@ -25,7 +24,7 @@ export interface PostGraphilePlugin {
   'cli:server:created'?: HookFn<Server>
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>
-  'withPostGraphileContext'?: HookFn<WithPostGraphileContextFn>
+  withPostGraphileContext?: HookFn<WithPostGraphileContextFn>
 }
 type HookName = keyof PostGraphilePlugin
 
@@ -61,9 +60,9 @@ function contextIsSame(context1: {}, context2: {}): boolean {
 // arguments again.
 function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   let lastCall: {
-    argument: T,
-    context: {},
-    result: T,
+    argument: T
+    context: {}
+    result: T
   } | null = null
   return (argument: T, context: {}): T => {
     if (lastCall && lastCall.argument === argument && contextIsSame(lastCall.context, context)) {
@@ -80,24 +79,21 @@ function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   }
 }
 
-function makeHook<T>(
-  plugins: Array<PostGraphilePlugin>,
-  hookName: HookName,
-): HookFn<T> {
-  return memoizeHook<T>(plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
-    if (typeof plugin[hookName] === 'function') {
-      return (argument: T, context: {}) => {
-        return plugin[hookName](previousHook(argument, context), context)
+function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): HookFn<T> {
+  return memoizeHook<T>(
+    plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
+      if (typeof plugin[hookName] === 'function') {
+        return (argument: T, context: {}) => {
+          return plugin[hookName](previousHook(argument, context), context)
+        }
+      } else {
+        return previousHook
       }
-    } else {
-      return previousHook
-    }
-  }, identityHook))
+    }, identityHook),
+  )
 }
 
-export function makePluginHook(
-  plugins: Array<PostGraphilePlugin>,
-): PluginHookFn {
+export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn {
   const hooks = {}
   const emptyObject = {} // caching this makes memoization faster when no context is needed
   function rawPluginHook<T>(hookName: HookName, argument: T, context: {} = emptyObject): T {

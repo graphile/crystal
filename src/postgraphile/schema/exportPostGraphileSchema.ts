@@ -1,10 +1,7 @@
 import { writeFile } from 'fs'
 import { graphql, GraphQLSchema, introspectionQuery, printSchema } from 'graphql'
 
-async function writeFileAsync(
-  path: string,
-  contents: string,
-): Promise<void> {
+async function writeFileAsync(path: string, contents: string): Promise<void> {
   await new Promise((resolve, reject) => {
     writeFile(path, contents, error => {
       if (error) reject(error)
@@ -19,8 +16,8 @@ async function writeFileAsync(
 export default async function exportPostGraphileSchema(
   schema: GraphQLSchema,
   options: {
-    exportJsonSchemaPath?: string,
-    exportGqlSchemaPath?: string,
+    exportJsonSchemaPath?: string
+    exportGqlSchemaPath?: string
   } = {},
 ): Promise<void> {
   // JSON version

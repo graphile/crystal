@@ -13,8 +13,8 @@ import mixed = PostGraphile.mixed
 import HttpRequestHandler = PostGraphile.HttpRequestHandler
 
 export interface PostgraphileSchemaBuilder {
-  _emitter: EventEmitter,
-  getGraphQLSchema: () => Promise<GraphQLSchema>,
+  _emitter: EventEmitter
+  getGraphQLSchema: () => Promise<GraphQLSchema>
 }
 
 /**
@@ -22,14 +22,23 @@ export interface PostgraphileSchemaBuilder {
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Array<string>, incomingOptions: PostGraphileOptions): PostgraphileSchemaBuilder {
+export function getPostgraphileSchemaBuilder(
+  pgPool: Pool,
+  schema: string | Array<string>,
+  incomingOptions: PostGraphileOptions,
+): PostgraphileSchemaBuilder {
   const pluginHook = pluginHookFromOptions(incomingOptions)
-  const options = pluginHook('postgraphile:options', incomingOptions, { pgPool, schema })
+  const options = pluginHook('postgraphile:options', incomingOptions, {
+    pgPool,
+    schema,
+  })
   // Check for a jwtSecret without a jwtPgTypeIdentifier
   // a secret without a token identifier prevents JWT creation
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
     // tslint:disable-next-line no-console
-    console.warn('WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.')
+    console.warn(
+      'WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.',
+    )
   }
 
   if (options.handleErrors && (options.extendedErrors || options.showErrorStack)) {
@@ -63,7 +72,9 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
           exportGqlSchema(gqlSchema)
         })
         if (!gqlSchema) {
-          throw new Error('Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn\'t happened')
+          throw new Error(
+            "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
+          )
         }
       } else {
         gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options)
@@ -79,15 +90,21 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
   async function exportGqlSchema(newGqlSchema: GraphQLSchema): Promise<void> {
     try {
       await exportPostGraphileSchema(newGqlSchema, options)
-    }
-    // If we fail to export our schema, log the error and exit the process.
-    catch (error) {
+    } catch (error) {
+      // If we fail to export our schema, log the error and exit the process.
       handleFatalError(error)
     }
   }
 }
-export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, schema?: string | Array<string>, options?: PostGraphileOptions): HttpRequestHandler
-export default function postgraphile(poolOrConfig?: Pool | PoolConfig | string, options?: PostGraphileOptions): HttpRequestHandler
+export default function postgraphile(
+  poolOrConfig?: Pool | PoolConfig | string,
+  schema?: string | Array<string>,
+  options?: PostGraphileOptions,
+): HttpRequestHandler
+export default function postgraphile(
+  poolOrConfig?: Pool | PoolConfig | string,
+  options?: PostGraphileOptions,
+): HttpRequestHandler
 export default function postgraphile(
   poolOrConfig?: Pool | PoolConfig | string,
   schemaOrOptions?: string | Array<string> | PostGraphileOptions,
@@ -122,20 +139,23 @@ export default function postgraphile(
     // If it is already a `Pool`, just use it.
     poolOrConfig instanceof Pool || quacksLikePgPool(poolOrConfig)
       ? (poolOrConfig as Pool)
-      : new Pool(typeof poolOrConfig === 'string'
-        // Otherwise if it is a string, let us parse it to get a config to
-        // create a `Pool`.
-        ? parsePgConnectionString(poolOrConfig)
-        // Finally, it must just be a config itself. If it is undefined, we
-        // will just use an empty config and let the defaults take over.
-        : poolOrConfig || {},
-      )
+      : new Pool(
+          typeof poolOrConfig === 'string'
+            ? // Otherwise if it is a string, let us parse it to get a config to
+              // create a `Pool`.
+              parsePgConnectionString(poolOrConfig)
+            : // Finally, it must just be a config itself. If it is undefined, we
+              // will just use an empty config and let the defaults take over.
+              poolOrConfig || {},
+        )
 
   const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
-  return createPostGraphileHttpRequestHandler({...options,
+  return createPostGraphileHttpRequestHandler({
+    ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
-    _emitter})
+    _emitter,
+  })
 }
 
 function handleFatalError(error: Error): never {
@@ -149,14 +169,21 @@ function handleFatalError(error: Error): never {
 }
 
 function constructorName(obj: mixed): string | null {
-  return obj && typeof obj.constructor === 'function' && obj.constructor.name && String(obj.constructor.name) || null
+  return (
+    (obj &&
+      typeof obj.constructor === 'function' &&
+      obj.constructor.name &&
+      String(obj.constructor.name)) ||
+    null
+  )
 }
 
 // tslint:disable-next-line no-any
 function quacksLikePgPool(pgConfig: any): boolean {
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== 'object') return false
-  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool') return false
+  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool')
+    return false
   if (!pgConfig['Client']) return false
   if (!pgConfig['options']) return false
   if (typeof pgConfig['connect'] !== 'function') return false

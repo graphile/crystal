@@ -7,7 +7,9 @@ import kitchenSinkSchemaSql from './kitchenSinkSchemaSql'
  * client. The client will be connected from the pool at the start of the test,
  * and released back at the end. All changes will be rolled back.
  */
-export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise<T>): () => Promise<T> {
+export default function withPgClient<T>(
+  fn: (client: PoolClient) => T | Promise<T>,
+): () => Promise<T> {
   return async (): Promise<T> => {
     let result: T | undefined
 
@@ -18,11 +20,10 @@ export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise
     // is resolved correctly.
     //
     // @see https://github.com/brianc/node-postgres/issues/1142
-    if ((client as object)['errno'])
-      throw client
+    if ((client as object)['errno']) throw client
 
     await client.query('begin')
-    await client.query('set local timezone to \'+04:00\'')
+    await client.query("set local timezone to '+04:00'")
 
     // Run our kichen sink schema Sql, if there is an error we should report it
     try {

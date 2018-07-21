@@ -1,4 +1,3 @@
-/* eslint-disable */// Because we use tslint
 import createDebugger = require('debug')
 import jwt = require('jsonwebtoken')
 import { Pool, PoolClient } from 'pg'
@@ -9,35 +8,36 @@ import { pluginHookFromOptions } from './pluginHook'
 import { PostGraphile } from '../interfaces'
 import mixed = PostGraphile.mixed
 
-const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string => o && o.length ? o : undefined
+const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
+  o && o.length ? o : undefined
 
 export type WithPostGraphileContextFn = (
   options: {
-    pgPool: Pool,
-    jwtToken?: string,
-    jwtSecret?: string,
-    jwtAudiences?: Array<string>,
-    jwtRole: Array<string>,
-    jwtVerifyOptions?: jwt.VerifyOptions,
-    pgDefaultRole?: string,
-    pgSettings?: { [key: string]: mixed },
+    pgPool: Pool
+    jwtToken?: string
+    jwtSecret?: string
+    jwtAudiences?: Array<string>
+    jwtRole: Array<string>
+    jwtVerifyOptions?: jwt.VerifyOptions
+    pgDefaultRole?: string
+    pgSettings?: { [key: string]: mixed }
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ) => Promise<ExecutionResult>
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   options: {
-    pgPool: Pool,
-    jwtToken?: string,
-    jwtSecret?: string,
-    jwtAudiences?: Array<string>,
-    jwtRole: Array<string>,
-    jwtVerifyOptions?: jwt.VerifyOptions,
-    pgDefaultRole?: string,
-    pgSettings?: { [key: string]: mixed },
-    queryDocumentAst?: DocumentNode,
-    operationName?: string,
-    pgForceTransaction?: boolean,
+    pgPool: Pool
+    jwtToken?: string
+    jwtSecret?: string
+    jwtAudiences?: Array<string>
+    jwtRole: Array<string>
+    jwtVerifyOptions?: jwt.VerifyOptions
+    pgDefaultRole?: string
+    pgSettings?: { [key: string]: mixed }
+    queryDocumentAst?: DocumentNode
+    operationName?: string
+    pgForceTransaction?: boolean
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
@@ -57,7 +57,8 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
 
   let operation: OperationDefinitionNode | void
   if (!pgForceTransaction && queryDocumentAst) {
-    for (let i = 0, l = queryDocumentAst.definitions.length; i < l; i++) { // tslint:disable-line
+    // tslint:disable-next-line
+    for (let i = 0, l = queryDocumentAst.definitions.length; i < l; i++) {
       const definition = queryDocumentAst.definitions[i]
       if (definition.kind === Kind.OPERATION_DEFINITION) {
         if (!operationName && operation) {
@@ -83,7 +84,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   })
 
   // If we can avoid transactions, we get greater performance.
-  const needTransaction = pgForceTransaction || localSettings.length > 0 || (operationType !== 'query' && operationType !== 'subscription')
+  const needTransaction =
+    pgForceTransaction ||
+    localSettings.length > 0 ||
+    (operationType !== 'query' && operationType !== 'subscription')
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
 
@@ -101,11 +105,17 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   try {
     // If there is at least one local setting, load it into the database.
     if (needTransaction && localSettings.length !== 0) {
-      const query = sql.compile(sql.query`select ${sql.join(localSettings.map(([key, value]) =>
-        // Make sure that the third config is always `true` so that we are only
-        // ever setting variables on the transaction.
-        sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
-      ), ', ')}`)
+      const query = sql.compile(
+        sql.query`select ${sql.join(
+          localSettings.map(
+            ([key, value]) =>
+              // Make sure that the third config is always `true` so that we are only
+              // ever setting variables on the transaction.
+              sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
+          ),
+          ', ',
+        )}`,
+      )
 
       await pgClient.query(query)
     }
@@ -114,10 +124,9 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
       [$$pgClient]: pgClient,
       pgRole,
     })
-  }
-  // Cleanup our Postgres client by ending the transaction and releasing
-  // the client back to the pool. Always do this even if the query fails.
-  finally {
+  } finally {
+    // Cleanup our Postgres client by ending the transaction and releasing
+    // the client back to the pool. Always do this even if the query fails.
     if (needTransaction) {
       await pgClient.query('commit')
     }
@@ -152,19 +161,21 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
  */
 const withPostGraphileContext: WithPostGraphileContextFn = async (
   options: {
-    pgPool: Pool,
-    jwtToken?: string,
-    jwtSecret?: string,
-    jwtAudiences?: Array<string>,
-    jwtRole: Array<string>,
-    jwtVerifyOptions?: jwt.VerifyOptions,
-    pgDefaultRole?: string,
-    pgSettings?: { [key: string]: mixed },
+    pgPool: Pool
+    jwtToken?: string
+    jwtSecret?: string
+    jwtAudiences?: Array<string>
+    jwtRole: Array<string>
+    jwtVerifyOptions?: jwt.VerifyOptions
+    pgDefaultRole?: string
+    pgSettings?: { [key: string]: mixed }
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const pluginHook = pluginHookFromOptions(options)
-  const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, { options })
+  const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
+    options,
+  })
   return withContext(options, callback)
 }
 
@@ -188,14 +199,17 @@ async function getSettingsForPgClientTransaction({
   pgDefaultRole,
   pgSettings,
 }: {
-  jwtToken?: string,
-  jwtSecret?: string,
-  jwtAudiences?: Array<string>,
-  jwtRole: Array<string>,
-  jwtVerifyOptions?: jwt.VerifyOptions,
-  pgDefaultRole?: string,
-  pgSettings?: { [key: string]: mixed },
-}): Promise<{role: string | undefined, localSettings: Array<[string, string]>}> {
+  jwtToken?: string
+  jwtSecret?: string
+  jwtAudiences?: Array<string>
+  jwtRole: Array<string>
+  jwtVerifyOptions?: jwt.VerifyOptions
+  pgDefaultRole?: string
+  pgSettings?: { [key: string]: mixed }
+}): Promise<{
+  role: string | undefined
+  localSettings: Array<[string, string]>
+}> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole
   let jwtClaims: { [claimName: string]: mixed } = {}
@@ -208,19 +222,18 @@ async function getSettingsForPgClientTransaction({
     try {
       // If a JWT token was defined, but a secret was not provided to the server
       // throw a 403 error.
-      if (typeof jwtSecret !== 'string')
-        throw new Error('Not allowed to provide a JWT token.')
+      if (typeof jwtSecret !== 'string') throw new Error('Not allowed to provide a JWT token.')
 
       if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
         throw new Error(`Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`)
 
       jwtClaims = jwt.verify(jwtToken, jwtSecret, {
         ...jwtVerifyOptions,
-        audience: jwtAudiences || (
-          jwtVerifyOptions && ('audience' in (jwtVerifyOptions as object))
-          ? undefinedIfEmpty(jwtVerifyOptions.audience)
-          : ['postgraphile']
-        ),
+        audience:
+          jwtAudiences ||
+          (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+            ? undefinedIfEmpty(jwtVerifyOptions.audience)
+            : ['postgraphile']),
       })
 
       const roleClaim = getPath(jwtClaims, jwtRole)
@@ -229,20 +242,21 @@ async function getSettingsForPgClientTransaction({
       // default role.
       if (typeof roleClaim !== 'undefined') {
         if (typeof roleClaim !== 'string')
-          throw new Error(`JWT \`role\` claim must be a string. Instead found '${typeof jwtClaims['role']}'.`)
+          throw new Error(
+            `JWT \`role\` claim must be a string. Instead found '${typeof jwtClaims['role']}'.`,
+          )
 
         role = roleClaim
       }
-    }
-    catch (error) {
+    } catch (error) {
       // In case this error is thrown in an HTTP context, we want to add status code
       // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
       error.statusCode =
-        (('name' in error) && error.name === 'TokenExpiredError')
-        // The correct status code for an expired ( but otherwise acceptable token is 401 )
-        ? 401
-        // All other authentication errors should get a 403 status code.
-        : 403
+        'name' in error && error.name === 'TokenExpiredError'
+          ? // The correct status code for an expired ( but otherwise acceptable token is 401 )
+            401
+          : // All other authentication errors should get a 403 status code.
+            403
 
       throw error
     }
@@ -278,9 +292,8 @@ async function getSettingsForPgClientTransaction({
     if (jwtClaims.hasOwnProperty(key)) {
       const rawValue = jwtClaims[key]
       // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
-      const value: mixed = rawValue != null && typeof rawValue === 'object'
-        ? JSON.stringify(rawValue)
-        : rawValue
+      const value: mixed =
+        rawValue != null && typeof rawValue === 'object' ? JSON.stringify(rawValue) : rawValue
       if (isPgSettingValid(value)) {
         localSettings.push([`jwt.claims.${key}`, String(value)])
       }
@@ -313,7 +326,7 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     pgClient[$$pgClientOrigQuery] = pgClient.query
 
     // tslint:disable-next-line only-arrow-functions
-    pgClient.query = function (...args: Array<any>): any {
+    pgClient.query = function(...args: Array<any>): any {
       // Debug just the query text. We don’t want to debug variables because
       // there may be passwords in there.
       debugPg(args[0] && args[0].text ? args[0].text : args[0])
@@ -345,7 +358,7 @@ function getPath(inObject: mixed, path: Array<string>): any {
   while (object && index < length) {
     object = object[path[index++]]
   }
-  return (index && index === length) ? object : undefined
+  return index && index === length ? object : undefined
 }
 
 /**
@@ -360,10 +373,16 @@ function isPgSettingValid(pgSetting: mixed): boolean {
     return false
   }
   const typeOfPgSetting = typeof pgSetting
-  if (typeOfPgSetting === 'string' || typeOfPgSetting === 'number' || typeOfPgSetting === 'boolean') {
+  if (
+    typeOfPgSetting === 'string' ||
+    typeOfPgSetting === 'number' ||
+    typeOfPgSetting === 'boolean'
+  ) {
     return true
   }
   // TODO: booleans!
-  throw new Error(`Error converting pgSetting: ${typeof pgSetting} needs to be of type string, number or boolean.`)
+  throw new Error(
+    `Error converting pgSetting: ${typeof pgSetting} needs to be of type string, number or boolean.`,
+  )
 }
 // tslint:enable no-any
