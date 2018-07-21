@@ -1,34 +1,34 @@
-import { GraphQLError } from 'graphql'
-import { PostGraphile } from '../interfaces'
-import GraphQLErrorExtended = PostGraphile.GraphQLErrorExtended
-import GraphQLFormattedErrorExtended = PostGraphile.GraphQLFormattedErrorExtended
-import mixed = PostGraphile.mixed
+import { GraphQLError } from 'graphql';
+import { PostGraphile } from '../interfaces';
+import GraphQLErrorExtended = PostGraphile.GraphQLErrorExtended;
+import GraphQLFormattedErrorExtended = PostGraphile.GraphQLFormattedErrorExtended;
+import mixed = PostGraphile.mixed;
 
 /**
  * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
  */
 function pickPgError(err: mixed, inFields: string | Array<string>): { [s: string]: string | void } {
-  const result: mixed = {}
-  let fields
+  const result: mixed = {};
+  let fields;
   if (Array.isArray(inFields)) {
-    fields = inFields
+    fields = inFields;
   } else if (typeof inFields === 'string') {
-    fields = inFields.split(',')
+    fields = inFields.split(',');
   } else {
-    throw new Error('Invalid argument to extendedErrors - expected array of strings')
+    throw new Error('Invalid argument to extendedErrors - expected array of strings');
   }
 
   if (err && typeof err === 'object') {
     fields.forEach((field: string) => {
       // pg places 'errcode' on the 'code' property
       if (typeof field !== 'string') {
-        throw new Error('Invalid argument to extendedErrors - expected array of strings')
+        throw new Error('Invalid argument to extendedErrors - expected array of strings');
       }
-      const errField = field === 'errcode' ? 'code' : field
-      result[field] = err[errField] != null ? String(err[errField]) : err[errField]
-    })
+      const errField = field === 'errcode' ? 'code' : field;
+      result[field] = err[errField] != null ? String(err[errField]) : err[errField];
+    });
   }
-  return result
+  return result;
 }
 
 /**
@@ -42,13 +42,13 @@ export function extendedFormatError(
   fields: Array<string>,
 ): GraphQLFormattedErrorExtended {
   if (!error) {
-    throw new Error('Received null or undefined error.')
+    throw new Error('Received null or undefined error.');
   }
-  const originalError = error.originalError as GraphQLErrorExtended
+  const originalError = error.originalError as GraphQLErrorExtended;
   return {
     ...(originalError && fields ? pickPgError(originalError, fields) : undefined),
     message: error.message,
     locations: error.locations,
     path: error.path,
-  }
+  };
 }

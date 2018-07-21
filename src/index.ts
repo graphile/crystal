@@ -3,10 +3,10 @@ import {
   createPostGraphileSchema,
   watchPostGraphileSchema,
   withPostGraphileContext,
-} from './postgraphile'
-import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook'
+} from './postgraphile';
+import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
 
-export default postgraphile
+export default postgraphile;
 
 export {
   postgraphile,
@@ -20,4 +20,4 @@ export {
   createPostGraphileSchema as createPostGraphQLSchema,
   watchPostGraphileSchema as watchPostGraphQLSchema,
   withPostGraphileContext as withPostGraphQLContext,
-}
+};
