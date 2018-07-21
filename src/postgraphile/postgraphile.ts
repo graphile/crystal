@@ -70,9 +70,8 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
         exportGqlSchema(gqlSchema)
       }
       return gqlSchema
-    }
-    // If we fail to build our schema, log the error and exit the process.
-    catch (error) {
+    } catch (error) {
+      // If we fail to build our schema, log the error and exit the process.
       return handleFatalError(error)
     }
   }

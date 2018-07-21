@@ -27,8 +27,7 @@ export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise
     // Run our kichen sink schema Sql, if there is an error we should report it
     try {
       await client.query(await kitchenSinkSchemaSql)
-    }
-    catch (error) {
+    } catch (error) {
       // Release the client if an error was thrown.
       await client.query('rollback')
       client.release()
@@ -43,10 +42,9 @@ export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise
     // Try to run our test, if it fails we still want to cleanup the client.
     try {
       result = await fn(client)
-    }
-    // Always rollback our changes and release the client, even if the test
-    // fails.
-    finally {
+    } finally {
+      // Always rollback our changes and release the client, even if the test
+      // fails.
       await client.query('rollback')
       client.release()
     }
