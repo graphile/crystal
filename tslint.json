@@ -31,14 +31,6 @@
     "no-mergeable-namespace": false,
     "no-require-imports": false,
     "object-literal-sort-keys": false,
-    "space-before-function-paren": [
-      true,
-      {
-        "anonymous": "always",
-        "named": "never",
-        "asyncArrow": "always"
-      }
-    ],
     "array-type": [
       true,
       "generic"
@@ -59,30 +51,11 @@
       "check-whitespace"
     ],
     "ordered-imports": false,
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "semicolon": {
-      "options": [
-        "never"
-      ]
-    },
     "variable-name": [
       true,
       "ban-keywords",
       "check-format",
       "allow-leading-underscore"
-    ],
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-module",
-      "check-separator",
-      "check-type",
-      "check-typecast"
     ],
     "no-namespace": false,
     "no-implicit-dependencies": [
@@ -182,14 +155,6 @@
     ],
     "one-variable-per-declaration": true,
     "ordered-imports": false,
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "semicolon": [
-      true,
-      "never"
-    ],
     "variable-name": [
       true,
       "ban-keywords",
