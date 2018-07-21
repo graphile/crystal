@@ -39,7 +39,7 @@ import sendFile = require('send')
 import LRU = require('lru-cache')
 import crypto = require('crypto')
 
-const calculateQueryHash = (queryString: string) => crypto.createHash('sha1').update(queryString).digest('base64')
+const calculateQueryHash = (queryString: string): string => crypto.createHash('sha1').update(queryString).digest('base64')
 
 // Fast way of checking if an object is empty,
 // faster than `Object.keys(value).length === 0`
@@ -55,8 +55,8 @@ function isEmpty(value: any): boolean {
 
 const { POSTGRAPHILE_ENV } = process.env
 
-const debugGraphql = new Debugger('postgraphile:graphql')
-const debugRequest = new Debugger('postgraphile:request')
+const debugGraphql = Debugger('postgraphile:graphql')
+const debugRequest = Debugger('postgraphile:request')
 
 export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public')
 
@@ -296,8 +296,8 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
     // attempting to exhaust our memory.
     const canCache = queryString.length < 100000
 
-    const hash = canCache && calculateQueryHash(queryString)
-    const result = canCache && queryCache.get(hash)
+    const hash = canCache ? calculateQueryHash(queryString) : null
+    const result = canCache ? queryCache.get(hash!) : null
     if (result) {
       return result
     } else {
@@ -319,7 +319,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, staticValidationRules)
       const cacheResult: CacheEntry = { queryDocumentAst, validationErrors, length: queryString.length }
       if (canCache) {
-        queryCache.set(hash, cacheResult)
+        queryCache.set(hash!, cacheResult)
       }
       return cacheResult
     }
@@ -348,7 +348,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
     if (options.enableCors || POSTGRAPHILE_ENV === 'development')
       addCORSHeaders(res)
 
-    const { pathname } = parseUrl(req)
+    const { pathname = '' } = parseUrl(req) || {}
     const isGraphqlRoute = pathname === graphqlRoute
 
     // ========================================================================
@@ -568,7 +568,8 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      paramsList = typeof req.body === 'string' ? { query: req.body } : req.body
+      const body: string | object = (req as any).body
+      paramsList = typeof body === 'string' ? { query: body } : body
 
       // Validate our paramsList object a bit.
       if (paramsList == null)
@@ -705,7 +706,10 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
             result.meta = meta
           }
           // Log the query. If this debugger isn’t enabled, don’t run it.
-          if (!options.disableQueryLog && queryDocumentAst) {
+          if (
+            !options.disableQueryLog &&
+            queryDocumentAst! /* `!` is not strictly true, but stops TS complaining. */
+          ) {
             setTimeout(() => {
               const prettyQuery = printGraphql(queryDocumentAst)
                 .replace(/\s+/g, ' ')
@@ -839,7 +843,7 @@ function addCORSHeaders(res: ServerResponse): void {
   )
 }
 
-function createBadAuthorizationHeaderError(): void {
+function createBadAuthorizationHeaderError(): httpError.HttpError {
   return httpError(
     400,
     'Authorization header is not of the correct bearer scheme format.',
