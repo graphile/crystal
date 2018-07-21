@@ -18,7 +18,7 @@ export default function withPgClient <T>(fn: (client: PoolClient) => T | Promise
     // is resolved correctly.
     //
     // @see https://github.com/brianc/node-postgres/issues/1142
-    if (client['errno'])
+    if ((client as object)['errno'])
       throw client
 
     await client.query('begin')

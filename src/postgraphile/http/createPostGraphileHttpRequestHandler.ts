@@ -119,7 +119,7 @@ function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandl
         ...moreOptions,
       },
       context => {
-        const graphqlContext = Object.assign({}, additionalContext, context)
+        const graphqlContext = {...additionalContext, ...context}
         return fn(graphqlContext)
       },
     )
@@ -273,7 +273,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
   // to 50MB-worth of queries (or queryCacheMaxSize) so it doesn't consume too
   // much RAM.
   const SHA1_BASE64_LENGTH = 28
-  type CacheEntry = {
+  interface CacheEntry {
     queryDocumentAst: DocumentNode,
     validationErrors: Array<GraphQLError>,
     length: number,
@@ -599,7 +599,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
       results = await Promise.all(paramsList.map(async (params: any) => {
         let queryDocumentAst: DocumentNode
         let result: any
-        let meta = {}
+        const meta = {}
         try {
           if (!params.query) throw httpError(400, 'Must provide a query string.')
 

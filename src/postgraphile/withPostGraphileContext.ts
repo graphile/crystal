@@ -237,7 +237,7 @@ async function getSettingsForPgClientTransaction({
     catch (error) {
       // In case this error is thrown in an HTTP context, we want to add status code
       // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
-      if ( ('name' in error) && error.name === 'TokenExpiredError') {
+      if (('name' in error) && error.name === 'TokenExpiredError') {
         // The correct status code for an expired ( but otherwise acceptable token is 401 )
         error.statusCode = 401
       } else {
