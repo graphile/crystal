@@ -23,6 +23,7 @@
   },
   "repository": "github:graphile/postgraphile",
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "bin": {
     "postgraphile": "build/postgraphile/cli.js"
   },
