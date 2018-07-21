@@ -141,7 +141,7 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
     pgPool,
     pgSettings,
     pgDefaultRole,
-    queryCacheMaxSize = 100 * MEGABYTE,
+    queryCacheMaxSize = 50 * MEGABYTE,
   } = options
   const pluginHook = pluginHookFromOptions(options)
 
@@ -270,7 +270,8 @@ export default function createPostGraphileHttpRequestHandler(options: ICreateReq
 
   // Typically clients use static queries, so we can cache the parse and
   // validate stages for when we see the same query again. Limit the store size
-  // to 100MB (or queryCacheMaxSize) so it doesn't consume too much RAM.
+  // to 50MB-worth of queries (or queryCacheMaxSize) so it doesn't consume too
+  // much RAM.
   const SHA1_BASE64_LENGTH = 28
   type CacheEntry = {
     queryDocumentAst: DocumentNode,

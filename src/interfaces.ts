@@ -204,6 +204,9 @@ export namespace PostGraphile {
     // "only" (not recommended) - simple collections only (no Relay connections),
     // "both" - both
     simpleCollections?: 'omit' | 'both' | 'only',
+    // Max query cache size in MBs of queries. Default, 50MB
+    /* @middlewareOnly */
+    queryCacheMaxSize?: number
     // allow arbitrary extensions for consumption by plugins
     [propName: string]: any,
   }
@@ -234,8 +237,6 @@ export namespace PostGraphile {
     // A Postgres client pool we use to connect Postgres clients.
     pgPool: Pool,
     _emitter: EventEmitter,
-    // Max query cache size in MB. Default, 100
-    queryCacheMaxSize?: number
   }
 
   /**
