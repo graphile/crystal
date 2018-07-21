@@ -347,7 +347,7 @@ const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
 })
 
 // The options to pass through to the schema builder, or the middleware
-const postgraphileOptions = pluginHook('cli:library:options', {...config['options'], 
+const postgraphileOptions = pluginHook('cli:library:options', {...config['options'],
   classicIds,
   dynamicJson,
   disableDefaultMutations,

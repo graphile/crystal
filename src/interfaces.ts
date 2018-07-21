@@ -93,7 +93,7 @@ export namespace PostGraphile {
       errors: Array<GraphQLError>,
       req: IncomingMessage,
       res: ServerResponse,
-    ) => Array<GraphQLErrorExtended>);
+    ) => Array<GraphQLErrorExtended>)
     // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
     // after the default plugins.
     appendPlugins?: Array<(builder: mixed) => {}>,

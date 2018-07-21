@@ -133,7 +133,7 @@ export default function postgraphile(
       )
 
   const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
-  return createPostGraphileHttpRequestHandler({...options, 
+  return createPostGraphileHttpRequestHandler({...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter})

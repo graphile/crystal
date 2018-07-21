@@ -86,7 +86,8 @@
       true,
       "dev"
     ],
-    "no-string-literal": false
+    "no-string-literal": false,
+    "align": false
   },
   "jsRules": {
     "no-reference": true,
@@ -157,11 +158,7 @@
         "singleline": "never"
       }
     ],
-    "align": [
-      true,
-      "parameters",
-      "statements"
-    ],
+    "align": false,
     "arrow-parens": false,
     "class-name": true,
     "comment-format": [
