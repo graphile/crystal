@@ -7,7 +7,7 @@ import program = require('commander')
 import jwt = require('jsonwebtoken')
 import { parse as parsePgConnectionString } from 'pg-connection-string'
 import postgraphile, { getPostgraphileSchemaBuilder } from './postgraphile'
-import { Pool } from 'pg'
+import { Pool, PoolConfig } from 'pg'
 import cluster = require('cluster')
 import { makePluginHook, PostGraphilePlugin } from './pluginHook'
 import debugFactory = require('debug')
@@ -245,7 +245,7 @@ const {
   disableQueryLog,
   simpleCollections,
 // tslint:disable-next-line no-any
-} = Object.assign({}, config['options'], program) as any
+} = {...config['options'], ...program} as any
 
 let legacyRelations: 'omit' | 'deprecated' | 'only'
 if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
@@ -262,23 +262,22 @@ const noServer = !yesServer
 const schemas: Array<string> = dbSchema || (isDemo ? ['forum_example'] : ['public'])
 
 // Create our Postgres config.
-const pgConfig = Object.assign(
-  {},
+const pgConfig: PoolConfig = {
   // If we have a Postgres connection string, parse it and use that as our
   // config. If we don’t have a connection string use some environment
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
-  pgConnectionString || process.env.DATABASE_URL || isDemo ?
+  ...(pgConnectionString || process.env.DATABASE_URL || isDemo ?
     parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL) : {
       host: process.env.PGHOST || 'localhost',
-      port: process.env.PGPORT || 5432,
+      port: (process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : null) || 5432,
       database: process.env.PGDATABASE,
       user: process.env.PGUSER,
       password: process.env.PGPASSWORD,
-    },
+    }),
   // Add the max pool size to our config.
-  { max: maxPoolSize },
-)
+  max: maxPoolSize,
+}
 
 const loadPlugins = (rawNames: mixed) => {
   if (!rawNames) {
@@ -348,7 +347,7 @@ const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
 })
 
 // The options to pass through to the schema builder, or the middleware
-const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, config['options'], {
+const postgraphileOptions = pluginHook('cli:library:options', {...config['options'],
   classicIds,
   dynamicJson,
   disableDefaultMutations,
@@ -380,8 +379,7 @@ const postgraphileOptions = pluginHook('cli:library:options', Object.assign({}, 
   legacyJsonUuid,
   enableQueryBatching,
   pluginHook,
-  simpleCollections,
-}), { config, cliOptions: program })
+  simpleCollections}, { config, cliOptions: program })
 
 if (noServer) {
   // No need for a server, let's just spin up the schema builder

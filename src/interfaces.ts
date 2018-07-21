@@ -1,7 +1,6 @@
 /* tslint:disable:no-any */
 import { EventEmitter } from 'events'
-import { GraphQLError } from 'graphql/error'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLError, GraphQLSchema } from 'graphql'
 import { IncomingMessage, ServerResponse } from 'http'
 import { PluginHookFn } from './postgraphile/pluginHook'
 import { Pool } from 'pg'
@@ -32,7 +31,7 @@ export namespace PostGraphile {
   // automatically. We try and specify the options in the same order as the CLI.
   // Anything tagged `@middlewareOnly` will not appear in the schema-only docs.
   // Only comments written beginning with `//` will be put in the docs.
-  export type PostGraphileOptions = {
+  export interface PostGraphileOptions {
     // When true, PostGraphile will watch your database schemas and re-create the
     // GraphQL API whenever your schema changes, notifying you as it does. This
     // feature requires an event trigger to be added to the database by a
@@ -93,7 +92,7 @@ export namespace PostGraphile {
       errors: Array<GraphQLError>,
       req: IncomingMessage,
       res: ServerResponse,
-    ) => Array<GraphQLErrorExtended>);
+    ) => Array<GraphQLErrorExtended>)
     // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
     // after the default plugins.
     appendPlugins?: Array<(builder: mixed) => {}>,
@@ -211,7 +210,7 @@ export namespace PostGraphile {
     [propName: string]: any,
   }
 
-  export type GraphQLFormattedErrorExtended = {
+  export interface GraphQLFormattedErrorExtended {
     // This is ugly, really I just want `string | void` but apparently TypeScript doesn't support that.
     [s: string]: Array<GraphQLErrorLocation> | Array<string | number> | string | void,
     message: string,
@@ -219,7 +218,7 @@ export namespace PostGraphile {
     path: Array<string | number> | void,
   }
 
-  export type GraphQLErrorLocation = {
+  export interface GraphQLErrorLocation {
     line: number,
     column: number,
   }

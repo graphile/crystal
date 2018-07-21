@@ -12,7 +12,7 @@ import PostGraphileOptions = PostGraphile.PostGraphileOptions
 import mixed = PostGraphile.mixed
 import HttpRequestHandler = PostGraphile.HttpRequestHandler
 
-export type PostgraphileSchemaBuilder = {
+export interface PostgraphileSchemaBuilder {
   _emitter: EventEmitter,
   getGraphQLSchema: () => Promise<GraphQLSchema>,
 }
@@ -47,7 +47,7 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
   // This is not a constant because when we are in watch mode, we want to swap
   // out the `gqlSchema`.
   let gqlSchema: GraphQLSchema
-  let gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
+  const gqlSchemaPromise: Promise<GraphQLSchema> = createGqlSchema()
 
   return {
     _emitter,
@@ -70,9 +70,8 @@ export function getPostgraphileSchemaBuilder(pgPool: Pool, schema: string | Arra
         exportGqlSchema(gqlSchema)
       }
       return gqlSchema
-    }
-    // If we fail to build our schema, log the error and exit the process.
-    catch (error) {
+    } catch (error) {
+      // If we fail to build our schema, log the error and exit the process.
       return handleFatalError(error)
     }
   }
@@ -133,11 +132,10 @@ export default function postgraphile(
       )
 
   const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options)
-  return createPostGraphileHttpRequestHandler(Object.assign({}, options, {
+  return createPostGraphileHttpRequestHandler({...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
-    _emitter,
-  }))
+    _emitter})
 }
 
 function handleFatalError(error: Error): never {
