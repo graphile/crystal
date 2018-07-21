@@ -1,4 +1,4 @@
-import { GraphQLError } from 'graphql/error'
+import { GraphQLError } from 'graphql'
 import { PostGraphile } from '../interfaces'
 import GraphQLErrorExtended = PostGraphile.GraphQLErrorExtended
 import GraphQLFormattedErrorExtended = PostGraphile.GraphQLFormattedErrorExtended

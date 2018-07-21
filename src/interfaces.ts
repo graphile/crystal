@@ -1,7 +1,6 @@
 /* tslint:disable:no-any */
 import { EventEmitter } from 'events'
-import { GraphQLError } from 'graphql/error'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLError, GraphQLSchema } from 'graphql'
 import { IncomingMessage, ServerResponse } from 'http'
 import { PluginHookFn } from './postgraphile/pluginHook'
 import { Pool } from 'pg'
