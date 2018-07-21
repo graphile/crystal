@@ -119,7 +119,7 @@ function withPostGraphileContextFromReqResGenerator(options: ICreateRequestHandl
         ...moreOptions,
       },
       context => {
-        const graphqlContext = {...additionalContext, ...context}
+        const graphqlContext = {...additionalContext, ...(context as object)}
         return fn(graphqlContext)
       },
     )
