@@ -14,7 +14,7 @@ export const middleware = async (
 
   // Hack the end function to instead write the response body.
   // (This shouldn't be called by any PostGraphile code.)
-  const oldEnd = ctx.res.end
+  const oldEnd = ctx.res.end;
   (ctx.res as object)['end'] = (body: any, cb: () => void) => {
     // Setting ctx.response.body changes koa's status implicitly, unless it
     // already has one set:
