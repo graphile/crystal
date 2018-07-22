@@ -192,10 +192,7 @@ export interface PostGraphileOptions {
   // provide such information based on the incoming request - you can even use
   // this to change the response [experimental], e.g. setting cookies
   /* @middlewareOnly */
-  additionalGraphQLContextFromRequest?: (
-    req: IncomingMessage,
-    res: ServerResponse,
-  ) => Promise<{}>;
+  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>;
   // [experimental] Plugin hook function, enables functionality within
   // PostGraphile to be expanded with plugins. Generate with
   // `makePluginHook(plugins)` passing a list of plugin objects.
