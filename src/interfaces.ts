@@ -234,7 +234,7 @@ export namespace PostGraphile {
   };
 
   // Used by `createPostGraphileHttpRequestHandler`
-  export interface ICreateRequestHandler extends PostGraphile.PostGraphileOptions {
+  export interface CreateRequestHandlerOptions extends PostGraphile.PostGraphileOptions {
     // The actual GraphQL schema we will use.
     getGqlSchema: () => Promise<GraphQLSchema>;
     // A Postgres client pool we use to connect Postgres clients.

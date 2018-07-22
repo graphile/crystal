@@ -2,12 +2,12 @@
 import { PassThrough } from 'stream';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PostGraphile } from '../../interfaces';
-import ICreateRequestHandler = PostGraphile.ICreateRequestHandler;
+import CreateRequestHandlerOptions = PostGraphile.CreateRequestHandlerOptions;
 
 export default function setupServerSentEvents(
   req: IncomingMessage,
   res: ServerResponse,
-  options: ICreateRequestHandler,
+  options: CreateRequestHandlerOptions,
 ): void {
   const { _emitter } = options;
 

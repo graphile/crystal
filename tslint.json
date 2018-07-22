@@ -17,7 +17,8 @@
       "generic"
     ],
     "interface-name": [
-      false
+      true,
+      "never-prefix"
     ],
     "object-literal-key-quotes": [
       true,
