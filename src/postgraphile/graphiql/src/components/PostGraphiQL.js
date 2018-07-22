@@ -11,7 +11,6 @@ const { POSTGRAPHILE_CONFIG } = window;
  * Including a JWT setter and live schema udpate capabilities.
  */
 class PostGraphiQL extends React.Component {
-  // eslint-disable-next-line no-undef
   state = {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.

@@ -31,6 +31,7 @@
     "build": "./scripts/build",
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
+    "eslint": "eslint --ext '.js,.jsx,.ts'",
     "prettier": "prettier 'src/**/*.[tj]s'",
     "prettier:fix": "yarn prettier --write",
     "prettier:check": "yarn prettier --list-different",
