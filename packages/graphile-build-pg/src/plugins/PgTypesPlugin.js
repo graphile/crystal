@@ -254,6 +254,8 @@ export default (function PgTypesPlugin(
 
     const tweakToJson = fragment => fragment; // Since everything is to_json'd now, just pass through
     const tweakToText = fragment => sql.fragment`(${fragment})::text`;
+    const tweakToNumericText = fragment =>
+      sql.fragment`(${fragment})::numeric::text`;
     const pgTweaksByTypeIdAndModifer = {};
     const pgTweaksByTypeId = Object.assign(
       // ::text rawTypes
@@ -271,6 +273,7 @@ export default (function PgTypesPlugin(
         "1184": tweakToJson,
         "1083": tweakToJson,
         "1266": tweakToJson,
+        "790": tweakToNumericText,
       }
     );
 
@@ -461,19 +464,8 @@ export default (function PgTypesPlugin(
       },
     };
 
-    const parseMoney = str => {
-      const numerical = str.replace(/[^0-9.,-]/g, "");
-      const lastCommaIndex = numerical.lastIndexOf(",");
-      if (lastCommaIndex >= 0 && lastCommaIndex === numerical.length - 3) {
-        // Assume string is of the form '123.456,78'
-        return parseFloat(numerical.replace(/\./g, "").replace(",", "."));
-      } else {
-        // Assume string is of the form '123,456.78'
-        return parseFloat(numerical.replace(/,/g, ""));
-      }
-    };
     pg2GqlMapper[790] = {
-      map: parseMoney,
+      map: _ => _,
       unmap: val => sql.fragment`(${sql.value(val)})::money`,
     };
 
