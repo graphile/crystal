@@ -1,9 +1,7 @@
 import { AddFlagFn } from './cli';
 import { Server } from 'http';
-import { PostGraphile } from '../interfaces';
+import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
-import HttpRequestHandler = PostGraphile.HttpRequestHandler;
-import PostGraphileOptions = PostGraphile.PostGraphileOptions;
 
 export type HookFn<T> = (arg: T, context: {}) => T;
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;

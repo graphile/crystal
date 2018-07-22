@@ -1,8 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { PostGraphile } from '../interfaces';
-import GraphQLErrorExtended = PostGraphile.GraphQLErrorExtended;
-import GraphQLFormattedErrorExtended = PostGraphile.GraphQLFormattedErrorExtended;
-import mixed = PostGraphile.mixed;
+import { mixed, GraphQLErrorExtended, GraphQLFormattedErrorExtended } from '../interfaces';
 
 /**
  * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.

@@ -27,7 +27,6 @@
       "check-format",
       "allow-leading-underscore"
     ],
-    "no-namespace": false,
     "no-implicit-dependencies": [
       true,
       "dev"
