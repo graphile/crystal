@@ -713,9 +713,10 @@ export default function createPostGraphileHttpRequestHandler(
             };
 
             // If the status code is 500, let’s log our error.
-            if (result.statusCode === 500)
+            if (result.statusCode === 500) {
               // tslint:disable-next-line no-console
-              console.error(error.stack);
+              console.error(error.stack); // eslint-disable-line no-console
+            }
           } finally {
             // Format our errors so the client doesn’t get the full thing.
             if (result && result.errors) {
@@ -739,6 +740,7 @@ export default function createPostGraphileHttpRequestHandler(
 
                 // If we have enabled the query log for the Http handler, use that.
                 // tslint:disable-next-line no-console
+                // eslint-disable-line no-console
                 console.log(
                   `${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${
                     pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''

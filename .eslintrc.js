@@ -39,6 +39,7 @@ module.exports = {
     // ESLint/TypeScript support has issues with certain constructs so we have
     // to disable some important rules :(
     "no-undef": 0,
+    "no-unused-vars": 0,
 
     // TypeScript rules (there's currently no preset)
     "typescript/adjacent-overload-signatures": 'error',
