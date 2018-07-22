@@ -7,37 +7,15 @@
     "curly": false,
     "no-any": true,
     "no-inferrable-types": true,
-    "typedef": [
-      true,
-      "call-signature",
-      "property-declaration",
-      "member-variable-declaration"
-    ],
-    "no-for-in-array": false,
-    "no-invalid-this": true,
-    "no-null-keyword": false,
-    "restrict-plus-operands": false,
     "switch-default": true,
-    "linebreak-style": [
-      true,
-      "LF"
-    ],
     "max-classes-per-file": false,
     "max-file-line-count": false,
-    "max-line-length": [
-      false
-    ],
     "no-default-export": false,
-    "no-mergeable-namespace": false,
-    "no-require-imports": false,
     "object-literal-sort-keys": false,
     "array-type": [
       true,
       "generic"
     ],
-    "arrow-parens": false,
-    "completed-docs": false,
-    "file-header": false,
     "interface-name": [
       false
     ],
