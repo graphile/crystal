@@ -1,3 +1,5 @@
+/* tslint:disable:no-console */
+/* eslint-disable no-console */
 import React from 'react';
 import GraphiQL from 'graphiql';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
@@ -9,6 +11,7 @@ const { POSTGRAPHILE_CONFIG } = window;
  * Including a JWT setter and live schema udpate capabilities.
  */
 class PostGraphiQL extends React.Component {
+  // eslint-disable-next-line no-undef
   state = {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.
@@ -17,7 +20,7 @@ class PostGraphiQL extends React.Component {
 
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
-    this.updateSchema().catch(error => console.error(error)); // tslint:disable-line no-console
+    this.updateSchema().catch(error => console.error(error));
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.

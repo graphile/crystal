@@ -12,6 +12,6 @@ const dummySchema = new GraphQLSchema({
 });
 
 module.exports = {
-  createPostGraphileSchema: jest.fn(async (a, b, c) => dummySchema),
+  createPostGraphileSchema: jest.fn(async () => dummySchema),
   watchPostGraphileSchema: jest.fn(async (a, b, c, cb) => cb(dummySchema)),
 };
