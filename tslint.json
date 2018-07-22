@@ -20,15 +20,6 @@
       true,
       "never-prefix"
     ],
-    "object-literal-key-quotes": [
-      true,
-      "as-needed"
-    ],
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-whitespace"
-    ],
     "ordered-imports": false,
     "variable-name": [
       true,
