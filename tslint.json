@@ -31,8 +31,7 @@
       true,
       "dev"
     ],
-    "no-string-literal": false,
-    "align": false
+    "no-string-literal": false
   },
   "jsRules": {
     "no-reference": true,
