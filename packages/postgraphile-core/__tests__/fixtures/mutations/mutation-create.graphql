@@ -38,7 +38,7 @@ mutation {
         months: 5
         years: 6
       }
-      money: 5000
+      money: 1234567.89
       compoundType: {
         a: 123,
         b: "abc"

@@ -117,7 +117,7 @@ Object {
         },
         "json": "{\\"x\\":1,\\"y\\":2,\\"z\\":3}",
         "jsonb": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
-        "money": 5000,
+        "money": 1234567.89,
         "nestedCompoundType": Object {
           "a": Object {
             "a": 456,
