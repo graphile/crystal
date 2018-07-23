@@ -18,14 +18,18 @@ const debugCli = debugFactory('postgraphile:cli');
 
 // tslint:disable no-console
 
-let config = {};
+let postgraphileRCFile: string | null = null;
 try {
-  config = require(process.cwd() + '/.postgraphilerc'); // tslint:disable-line no-var-requires
+  postgraphileRCFile = require.resolve(process.cwd() + '/.postgraphilerc');
+} catch (e) {
+  // No postgraphileRC; carry on
+}
+let config = {};
+if (postgraphileRCFile) {
+  config = require(postgraphileRCFile); // tslint:disable-line no-var-requires
   if (!config.hasOwnProperty('options')) {
     console.warn('WARNING: Your configuration file does not export any options');
   }
-} catch (error) {
-  // Use command line options
 }
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null;
