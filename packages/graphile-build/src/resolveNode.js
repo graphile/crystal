@@ -1,5 +1,3 @@
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
-
 export default async function resolveNode(
   nodeId,
   build,
@@ -13,15 +11,14 @@ export default async function resolveNode(
     $$nodeType,
     parseResolveInfo,
     nodeFetcherByTypeName,
-    getNodeType,
+    getTypeAndIdentifiersFromNodeId,
     graphql: { getNamedType },
   } = build;
   if (nodeId === "query") {
     return $$isQuery;
   }
   try {
-    const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
-    const Type = getNodeType(alias);
+    const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
     if (!Type) {
       throw new Error("Type not found");
     }

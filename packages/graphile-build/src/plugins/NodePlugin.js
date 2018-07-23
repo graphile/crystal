@@ -12,6 +12,7 @@ import type { GraphQLType, GraphQLInterfaceType } from "graphql";
 import type { BuildExtensionQuery } from "./QueryPlugin";
 
 const base64 = str => new Buffer(String(str)).toString("base64");
+const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
 
 export type NodeFetcher = (
   data: mixed,
@@ -30,6 +31,12 @@ export type BuildExtensionNode = {|
     Type: GraphQLType,
     ...identifiers: Array<mixed>
   ): string,
+  getTypeAndIdentifiersFromNodeId(
+    nodeId: string
+  ): {
+    Type: GraphQLType,
+    identifiers: Array<mixed>,
+  },
   addNodeFetcherForTypeName(typeName: string, fetcher: NodeFetcher): void,
   getNodeAlias(typeName: string): string,
   getNodeType(alias: string): GraphQLType,
@@ -59,6 +66,13 @@ export default (function NodePlugin(
             return base64(
               JSON.stringify([this.getNodeAlias(Type), ...identifiers])
             );
+          },
+          getTypeAndIdentifiersFromNodeId(nodeId) {
+            const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
+            return {
+              Type: this.getTypeByName(nodeTypeNameByAlias[alias] || alias),
+              identifiers,
+            };
           },
           addNodeFetcherForTypeName(typeName, fetcher) {
             if (nodeFetcherByTypeName[typeName]) {
