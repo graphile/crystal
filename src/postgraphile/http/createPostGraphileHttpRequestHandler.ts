@@ -17,10 +17,7 @@ import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
-import { PostGraphile } from '../../interfaces';
-import HttpRequestHandler = PostGraphile.HttpRequestHandler;
-import ICreateRequestHandler = PostGraphile.ICreateRequestHandler;
-import mixed = PostGraphile.mixed;
+import { HttpRequestHandler, CreateRequestHandlerOptions, mixed } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import { Context as KoaContext } from 'koa';
@@ -89,7 +86,7 @@ const origGraphiqlHtml: Promise<string> = new Promise((resolve, reject) => {
  * and websockets
  */
 function withPostGraphileContextFromReqResGenerator(
-  options: ICreateRequestHandler,
+  options: CreateRequestHandlerOptions,
 ): (
   req: IncomingMessage,
   res: ServerResponse,
@@ -127,7 +124,7 @@ function withPostGraphileContextFromReqResGenerator(
  * - `koa` (2.0).
  */
 export default function createPostGraphileHttpRequestHandler(
-  options: ICreateRequestHandler,
+  options: CreateRequestHandlerOptions,
 ): HttpRequestHandler {
   const MEGABYTE = 1024 * 1024;
   const {

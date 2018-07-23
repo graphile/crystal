@@ -5,8 +5,7 @@ import { ExecutionResult, DocumentNode, OperationDefinitionNode, Kind } from 'gr
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
-import { PostGraphile } from '../interfaces';
-import mixed = PostGraphile.mixed;
+import { mixed } from '../interfaces';
 
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
   o && o.length ? o : undefined;
