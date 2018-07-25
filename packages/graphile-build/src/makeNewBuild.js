@@ -268,7 +268,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       Type: Class<T>,
       spec: ConfigType,
       inScope: Scope,
-      returnNullOnInvalid = false
+      performNonEmptyFieldsCheck = false
     ): ?T {
       const scope = inScope || {};
       if (!inScope) {
@@ -701,7 +701,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       const finalSpec: ConfigType = newSpec;
 
       const Self: T = new Type(finalSpec);
-      if (!(Self instanceof GraphQLSchema) && returnNullOnInvalid) {
+      if (!(Self instanceof GraphQLSchema) && performNonEmptyFieldsCheck) {
         try {
           if (
             Self instanceof GraphQLInterfaceType ||
@@ -723,6 +723,9 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         } catch (e) {
           // This is the error we're expecting to handle:
           // https://github.com/graphql/graphql-js/blob/831598ba76f015078ecb6c5c1fbaf133302f3f8e/src/type/definition.js#L526-L531
+          if (inScope && inScope.isRootQuery) {
+            throw e;
+          }
           const isProbablyAnEmptyObjectError = !!e.message.match(
             /function which returns such an object/
           );

@@ -110,14 +110,16 @@ export default function omit(
       return true;
     }
     if (omitSpec.indexOf(READ) >= 0) {
-      const bad = PERMISSIONS_THAT_REQUIRE_READ.find(
+      const bad = PERMISSIONS_THAT_REQUIRE_READ.filter(
         p => omitSpec.indexOf(p) === -1
       );
-      if (bad) {
+      if (bad.length > 0) {
         throw new Error(
-          `Error when processing @omit for ${entity.kind} '${
-            entity.name
-          }' - we currently don't support '${bad}' when '${READ}' is forbidden, to solve this add '${bad}' to the @omit clause or use ‘@omit‘ to omit from everything`
+          `Processing @omit for ${entity.kind} '${entity.name}' - '${bad.join(
+            ","
+          )}' must be omitted when '${READ}' is omitted. Add '${bad.join(
+            ","
+          )}' to the @omit clause, or use '@omit' to omit all actions.`
         );
       }
     }

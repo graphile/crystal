@@ -14,14 +14,14 @@ export default function swallowError(e: Error): void {
     const errorSnippet =
       e && typeof e.toString === "function"
         ? String(e)
-            .replace(/\n/g, "  ")
-            .substr(0, 75)
+            .replace(/\n.*/g, "")
+            .substr(0, 160)
             .trim()
         : null;
     if (errorSnippet) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error\n> ${errorSnippet}...`
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error\n> ${errorSnippet}…`
       );
     } else {
       // eslint-disable-next-line no-console

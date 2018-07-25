@@ -332,7 +332,19 @@ class SchemaBuilder extends EventEmitter {
       this.triggerChange = () => {
         this._generatedSchema = null;
         // XXX: optionally debounce
-        this.emit("schema", this.buildSchema());
+        try {
+          const schema = this.buildSchema();
+          this.emit("schema", schema);
+        } catch (e) {
+          // Build errors introduced while watching are ignored because it's
+          // primarily used in development.
+          // eslint-disable-next-line no-console
+          console.error(
+            "⚠️⚠️⚠️ An error occured when building the schema on watch:"
+          );
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
       };
       if (listener) {
         this.on("schema", listener);
