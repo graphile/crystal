@@ -434,6 +434,10 @@ begin
 end;
 $$ language plpgsql volatile;
 
+create function c.return_table_without_grants() returns c.compound_key as $$
+  select * from c.compound_key order by person_id_1, person_id_2 limit 1
+$$ language sql stable security definer;
+
 -- Begin tests for smart comments
 
 -- Rename table and columns
@@ -555,4 +559,3 @@ create table d.tv_episodes (
     title       varchar(40),
     show_id     integer references d.tv_shows on delete cascade
 );
-

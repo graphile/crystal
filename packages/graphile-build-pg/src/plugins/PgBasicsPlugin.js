@@ -100,15 +100,31 @@ function omitWithRBACChecks(
     }
   } else if (entity.kind === "attribute" && isTableLike(entity.class)) {
     const attributeEntity: PgAttribute = entity;
+
+    const klass = attributeEntity.class;
+    // Have we got *any* permissions on the table?
     if (
-      (permission === READ || permission === FILTER || permission === ORDER) &&
-      !attributeEntity.aclSelectable
+      klass.aclSelectable ||
+      klass.attributes.some(attr => attr.aclSelectable)
     ) {
-      return true;
-    } else if (permission === CREATE && !attributeEntity.aclInsertable) {
-      return true;
-    } else if (permission === UPDATE && !attributeEntity.aclUpdatable) {
-      return true;
+      // Yes; this is a regular table; omit if RBAC permissions tell us to.
+      if (
+        (permission === READ ||
+          permission === FILTER ||
+          permission === ORDER) &&
+        !attributeEntity.aclSelectable
+      ) {
+        return true;
+      } else if (permission === CREATE && !attributeEntity.aclInsertable) {
+        return true;
+      } else if (permission === UPDATE && !attributeEntity.aclUpdatable) {
+        return true;
+      }
+    } else {
+      // No permissions on the table at all, so normal connections will skip
+      // over it. Thus we must be being exposed via a security definer function
+      // or similar, so we should expose all fields except those that are
+      // explicitly @omit-ed.
     }
   }
   return omit(entity, permission);

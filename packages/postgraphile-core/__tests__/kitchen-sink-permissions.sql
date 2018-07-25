@@ -22,3 +22,6 @@ grant update(mood) on c.left_arm to postgraphile_test_visitor;
 grant delete on c.left_arm to postgraphile_test_visitor;
 
 grant select(id, headline, body, author_id) on a.post to postgraphile_test_visitor;
+
+-- DO NOT GRANT ANYTHING ON c.compound_key!
+grant execute on function c.return_table_without_grants() to postgraphile_test_visitor;

@@ -2490,6 +2490,7 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+  returnTableWithoutGrants: CompoundKey
   tableQuery(id: Int): Post
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"

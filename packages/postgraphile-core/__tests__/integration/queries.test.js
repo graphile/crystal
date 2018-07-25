@@ -65,7 +65,9 @@ beforeAll(() => {
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
     const [rbac] = await Promise.all([
-      createPostGraphileSchema(pgClient, ["a", "b", "c"], {}),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        ignoreRBAC: false,
+      }),
     ]);
     debug(printSchema(normal));
     return {

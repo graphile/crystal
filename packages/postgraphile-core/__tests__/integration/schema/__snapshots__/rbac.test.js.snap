@@ -1,7 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`prints a schema from non-root role, using RBAC permissions 1`] = `
-"\\"\\"\\"All input for the create \`LeftArm\` mutation.\\"\\"\\"
+"type CompoundKey implements Node {
+  extra: Boolean
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`CompoundKey\`.\\"\\"\\"
+  personByPersonId1: Person
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`CompoundKey\`.\\"\\"\\"
+  personByPersonId2: Person
+  personId1: Int!
+  personId2: Int!
+}
+
+\\"\\"\\"All input for the create \`LeftArm\` mutation.\\"\\"\\"
 input CreateLeftArmInput {
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1115,6 +1132,7 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+  returnTableWithoutGrants: CompoundKey
 }
 
 \\"\\"\\"All input for the \`updateLeftArmById\` mutation.\\"\\"\\"
@@ -7353,6 +7371,7 @@ type Query implements Node {
     nodeId: ID!
   ): ReservedPatchRecord
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
+  returnTableWithoutGrants: CompoundKey
 
   \\"\\"\\"Reads a single \`SimilarTable1\` using its globally unique \`ID\`.\\"\\"\\"
   similarTable1(

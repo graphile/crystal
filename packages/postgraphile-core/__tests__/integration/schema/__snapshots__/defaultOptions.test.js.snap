@@ -6076,6 +6076,7 @@ type Query implements Node {
     nodeId: ID!
   ): ReservedPatchRecord
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
+  returnTableWithoutGrants: CompoundKey
 
   \\"\\"\\"Reads a single \`SimilarTable1\` using its globally unique \`ID\`.\\"\\"\\"
   similarTable1(
