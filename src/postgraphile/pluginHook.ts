@@ -106,7 +106,7 @@ export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn
   const pluginHook: PluginHookFn = rawPluginHook('pluginHook', rawPluginHook, {});
   // Use this hook to check your hook is compatible with this version of
   // PostGraphile, also to get a reference to shared graphql instance.
-  pluginHook('check', null, { version, graphql });
+  pluginHook('init', null, { version, graphql });
   return pluginHook;
 }
 
