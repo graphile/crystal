@@ -816,11 +816,23 @@ export default function createPostGraphileHttpRequestHandler(
       );
     }
   };
+
   middleware.getGraphQLSchema = getGqlSchema;
   middleware.formatError = formatError;
   middleware.pgPool = pgPool;
   middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes;
-  return middleware as HttpRequestHandler;
+
+  const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
+    options,
+  });
+  // Sanity check:
+  if (!hookedMiddleware.getGraphQLSchema) {
+    throw new Error(
+      "Hook for 'postgraphile:middleware' has not copied over the helpers; e.g. missing `Object.assign(newMiddleware, oldMiddleware)`",
+    );
+  }
+
+  return hookedMiddleware as HttpRequestHandler;
 }
 
 /**

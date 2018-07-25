@@ -602,9 +602,18 @@ if (noServer) {
   } else {
     // Create’s our PostGraphile server
     const rawMiddleware = postgraphile(pgConfig, schemas, postgraphileOptions);
-    const middleware = pluginHook('cli:server:middleware', rawMiddleware, {
-      options: postgraphileOptions,
-    });
+
+    // You probably don't want this hook; likely you want
+    // `postgraphile:middleware` instead. This hook will likely be removed in
+    // future without warning.
+    const middleware = pluginHook(
+      /* DO NOT USE -> */ 'cli:server:middleware' /* <- DO NOT USE */,
+      rawMiddleware,
+      {
+        options: postgraphileOptions,
+      },
+    );
+
     const server = createServer(middleware);
     if (serverTimeout) {
       server.timeout = serverTimeout;
