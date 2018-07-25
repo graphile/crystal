@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "4.0.0-rc.4",
+  "version": "4.0.0-rc.5",
   "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "babel-cli": "^6.24.1",
     "eslint_d": "5.3.1",
     "flow-copy-source": "^1.2.0",
-    "graphile-build": "4.0.0-rc.4",
+    "graphile-build": "4.0.0-rc.5",
     "jest": "^20.0.4"
   },
   "jest": {
