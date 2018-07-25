@@ -2,6 +2,7 @@ import { AddFlagFn } from './cli';
 import { Server } from 'http';
 import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
+import { version } from '../../package.json';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;
@@ -102,6 +103,8 @@ export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn
   }
 
   const pluginHook: PluginHookFn = rawPluginHook('pluginHook', rawPluginHook, {});
+  // Use this hook to check your hook is compatible with this version of PostGraphile.
+  pluginHook('check', null, { version });
   return pluginHook;
 }
 
