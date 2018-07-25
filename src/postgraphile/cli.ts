@@ -627,50 +627,60 @@ if (noServer) {
     // Start our server by listening to a specific port and host name. Also log
     // some instructions and other interesting information.
     server.listen(port, hostname, () => {
+      const actualPort = server.address().port;
       const self = cluster.isMaster
         ? 'server'
         : `worker ${process.env.POSTGRAPHILE_WORKER_NUMBER} (pid=${process.pid})`;
+      const versionString = `v${manifest.version}`;
       if (cluster.isMaster || process.env.POSTGRAPHILE_WORKER_NUMBER === '1') {
         console.log('');
         console.log(
-          `PostGraphile ${self} listening on port ${chalk.underline(
-            server.address().port.toString(),
+          `PostGraphile ${versionString} ${self} listening on port ${chalk.underline(
+            actualPort.toString(),
           )} 🚀`,
         );
         console.log('');
-        console.log(
-          `  ‣ Connected to Postgres instance ${chalk.underline.blue(
-            isDemo
-              ? 'postgraphile_demo'
-              : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${
-                  pgConfig.database != null ? `/${pgConfig.database}` : ''
-                }`,
-          )}`,
-        );
-        console.log(
-          `  ‣ Introspected Postgres schema(s) ${schemas
-            .map(schema => chalk.magenta(schema))
-            .join(', ')}`,
-        );
-        console.log(
-          `  ‣ GraphQL endpoint served at ${chalk.underline(
-            `http://${hostname}:${port}${graphqlRoute}`,
-          )}`,
-        );
+        const safeConnectionString = isDemo
+          ? 'postgraphile_demo'
+          : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${
+              pgConfig.database != null ? `/${pgConfig.database}` : ''
+            }`;
 
-        if (!disableGraphiql)
-          console.log(
-            `  ‣ GraphiQL endpoint served at ${chalk.underline(
-              `http://${hostname}:${port}${graphiqlRoute}`,
+        const information = pluginHook(
+          'cli:greeting',
+          [
+            `Connected to Postgres instance ${chalk.underline.blue(safeConnectionString)}`,
+            `Introspected Postgres schema(s) ${schemas
+              .map(schema => chalk.magenta(schema))
+              .join(', ')}`,
+            `GraphQL API endpoint served at ${chalk.underline(
+              `http://${hostname}:${actualPort}${graphqlRoute}`,
             )}`,
-          );
+            !disableGraphiql &&
+              `GraphiQL IDE endpoint served at ${chalk.underline(
+                `http://${hostname}:${actualPort}${graphiqlRoute}`,
+              )}`,
+            `Documentation: ${chalk.underline(`https://graphile.org/postgraphile/introduction/`)}`,
+            extractedPlugins.length === 0 &&
+              `Please support PostGraphile development: ${chalk.underline(
+                `https://graphile.org/donate`,
+              )}`,
+          ],
+          {
+            options: postgraphileOptions,
+            middleware,
+            port: actualPort,
+            chalk,
+          },
+        ).filter(Boolean);
+        console.log(information.map(msg => `  ‣ ${msg}`).join('\n'));
 
         console.log('');
         console.log(chalk.gray('* * *'));
       } else {
         console.log(
-          `PostGraphile ${self} listening on port ${chalk.underline(
-            server.address().port.toString(),
+          `PostGraphile ${versionString} ${self} listening on port ${chalk.underline(
+            actualPort.toString(),
           )} 🚀`,
         );
       }
