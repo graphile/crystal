@@ -3360,13 +3360,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphile-build-pg@4.0.0-rc.4:
-  version "4.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.4.tgz#399993446cba596edeadbc21cda6a4c5d1e7f5a7"
+graphile-build-pg@4.0.0-rc.5:
+  version "4.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.5.tgz#ddb2ee53ba228cd1b102ca1907cba0c520794388"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-rc.4"
+    graphile-build "4.0.0-rc.5"
     graphql-iso-date "^3.2.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3374,9 +3374,9 @@ graphile-build-pg@4.0.0-rc.4:
     pg-sql2 "2.1.0"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-rc.4:
-  version "4.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.4.tgz#03b05d39a3bca82e4a45771ef8bc722d73e37671"
+graphile-build@4.0.0-rc.5:
+  version "4.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.5.tgz#d7c5c11d7c732c5dbe293e7262b6ce62c25f7a76"
   dependencies:
     debug ">=2 <3"
     graphql-parse-resolve-info "4.0.0-rc.4"
@@ -6343,12 +6343,12 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.0.0-rc.4:
-  version "4.0.0-rc.4"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.4.tgz#7e568926d71ee09296347ff643b3b7820173cb3e"
+postgraphile-core@4.0.0-rc.5:
+  version "4.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.5.tgz#95829f3210ccb171d4f771b903d3ffd3952ff2b7"
   dependencies:
-    graphile-build "4.0.0-rc.4"
-    graphile-build-pg "4.0.0-rc.4"
+    graphile-build "4.0.0-rc.5"
+    graphile-build-pg "4.0.0-rc.5"
 
 postgres-array@~1.0.0:
   version "1.0.2"
