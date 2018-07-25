@@ -18,6 +18,7 @@ import pluralize from "pluralize";
 import LRUCache from "lru-cache";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
 import swallowError from "./swallowError";
+import resolveNode from "./resolveNode";
 
 import type SchemaBuilder, {
   Build,
@@ -761,5 +762,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       constantCase,
     },
     swallowError,
+    // resolveNode: EXPERIMENTAL, API might change!
+    resolveNode,
   };
 }
