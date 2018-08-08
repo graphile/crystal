@@ -21,3 +21,4 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Matt Bretl (also a major community contributor!)
 * Michael Tng
 * Bureau Moelijke Dingen
+* Centre for Effective Altruism
