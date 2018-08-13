@@ -13,6 +13,7 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * James Allain
 * Alec Wenzowski
 * MissionMode
+* DOMONDA
 
 ## Supporters
 
