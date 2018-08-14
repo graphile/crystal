@@ -72,7 +72,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null;
 
-  const { role: pgRole, localSettings } = await getSettingsForPgClientTransaction({
+  const { role: pgRole, localSettings, jwtClaims } = await getSettingsForPgClientTransaction({
     jwtToken,
     jwtSecret,
     jwtAudiences,
@@ -122,6 +122,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     return await callback({
       [$$pgClient]: pgClient,
       pgRole,
+      jwtClaims,
     });
   } finally {
     // Cleanup our Postgres client by ending the transaction and releasing
@@ -208,6 +209,7 @@ async function getSettingsForPgClientTransaction({
 }): Promise<{
   role: string | undefined;
   localSettings: Array<[string, string]>;
+  jwtClaims: { [claimName: string]: mixed } | null;
 }> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
@@ -304,6 +306,7 @@ async function getSettingsForPgClientTransaction({
   return {
     localSettings,
     role,
+    jwtClaims: jwtToken ? jwtClaims : null,
   };
 }
 
