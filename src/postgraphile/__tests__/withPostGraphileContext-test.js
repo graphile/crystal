@@ -209,6 +209,22 @@ test('will add extra claims as available', async () => {
   ]);
 });
 
+test('will include JWT claims as jwtClaims in context callback', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { jwtClaims } = await withPostGraphileContext(
+    {
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphile', a: 1, b: 2, c: 3 }, 'secret', {
+        noTimestamp: true,
+      }),
+      jwtSecret: 'secret',
+    },
+    context => context,
+  );
+  expect(jwtClaims).toEqual({ aud: 'postgraphile', a: 1, b: 2, c: 3 })
+})
+
 test('will add extra settings as available', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
