@@ -122,7 +122,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     return await callback({
       [$$pgClient]: pgClient,
       pgRole,
-      jwtClaims
+      jwtClaims,
     });
   } finally {
     // Cleanup our Postgres client by ending the transaction and releasing
@@ -306,7 +306,7 @@ async function getSettingsForPgClientTransaction({
   return {
     localSettings,
     role,
-    jwtClaims
+    jwtClaims,
   };
 }
 

@@ -222,8 +222,8 @@ test('will include JWT claims as jwtClaims in context callback', async () => {
     },
     context => context,
   );
-  expect(jwtClaims).toEqual({ aud: 'postgraphile', a: 1, b: 2, c: 3 })
-})
+  expect(jwtClaims).toEqual({ aud: 'postgraphile', a: 1, b: 2, c: 3 });
+});
 
 test('jwtClaims should be an empty object if there is no JWT token', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
@@ -234,8 +234,8 @@ test('jwtClaims should be an empty object if there is no JWT token', async () =>
     },
     context => context,
   );
-  expect(jwtClaims).toEqual({})
-})
+  expect(jwtClaims).toEqual({});
+});
 
 test('will add extra settings as available', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
