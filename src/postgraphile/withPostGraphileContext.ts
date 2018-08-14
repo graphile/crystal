@@ -209,7 +209,7 @@ async function getSettingsForPgClientTransaction({
 }): Promise<{
   role: string | undefined;
   localSettings: Array<[string, string]>;
-  jwtClaims: { [claimName: string]: mixed };
+  jwtClaims: { [claimName: string]: mixed } | null;
 }> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
@@ -306,7 +306,7 @@ async function getSettingsForPgClientTransaction({
   return {
     localSettings,
     role,
-    jwtClaims,
+    jwtClaims: jwtToken ? jwtClaims : null,
   };
 }
 
