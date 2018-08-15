@@ -230,10 +230,30 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .set('Content-Type', 'application/graphql')
-        .send('{hello}')
+        .send(`{greetings(name:${JSON.stringify(shortString)})}`)
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect({ data: { hello: 'world' } });
+        .expect({ data: { greetings: `Hello, ${shortString}!` } });
+    });
+
+    test("will throw error if there's too much GraphQL data", async () => {
+      const server = createServer();
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/graphql')
+        .send(`{greetings(name:${JSON.stringify(veryLongString)})}`)
+        .expect(413);
+    });
+
+    test("will not throw error if there's lots of GraphQL data and a high limit", async () => {
+      const server = createServer({ bodySizeLimit: '1MB' });
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/graphql')
+        .send(`{greetings(name:${JSON.stringify(veryLongString)})}`)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { greetings: `Hello, ${veryLongString}!` } });
     });
 
     test('will error if query parse fails', async () => {
