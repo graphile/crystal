@@ -594,7 +594,7 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
         'jwt.claims.d': 96,
         role: 'ugh_legacy_override',
         'jwt.claims.role': 'some_other_role_again',
-      }
+      },
     },
     () => {},
   );
@@ -625,7 +625,6 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
     ['commit'],
   ]);
 });
-
 
 test('will set a role provided in the JWT superceding the default role', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
