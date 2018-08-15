@@ -273,7 +273,7 @@ async function getSettingsForPgClientTransaction({
 
   // Set the custom provided settings before jwt claims and role are set
   // this prevents an accidentional overwriting
-  if (typeof pgSettings === 'object') {
+  if (pgSettings && typeof pgSettings === 'object') {
     for (const key in pgSettings) {
       if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
         if (key === 'role') {
