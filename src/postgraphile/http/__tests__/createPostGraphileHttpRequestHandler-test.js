@@ -16,6 +16,10 @@ const event = require('events');
 const compress = require('koa-compress');
 const koa = require('koa');
 
+const shortString = 'User_Running_These_Tests';
+// Default bodySizeLimit is 100kB
+const veryLongString = '_'.repeat(100 * 1024);
+
 sendFile.mockImplementation(() => {
   const stream = new event.EventEmitter();
   stream.pipe = jest.fn(res => process.nextTick(() => res.end()));
@@ -195,10 +199,30 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .set('Content-Type', 'application/x-www-form-urlencoded')
-        .send(`query=${encodeURIComponent('{hello}')}`)
+        .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(shortString)})}`)}`)
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect({ data: { hello: 'world' } });
+        .expect({ data: { greetings: `Hello, ${shortString}!` } });
+    });
+
+    test("will throw error if there's too much form data", async () => {
+      const server = createServer();
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+        .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(veryLongString)})}`)}`)
+        .expect(413);
+    });
+
+    test("will not throw error if there's lots of form data and a high limit", async () => {
+      const server = createServer({ bodySizeLimit: '1MB' });
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/x-www-form-urlencoded')
+        .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(veryLongString)})}`)}`)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { greetings: `Hello, ${veryLongString}!` } });
     });
 
     test('will run a query on a POST request with GraphQL data', async () => {
