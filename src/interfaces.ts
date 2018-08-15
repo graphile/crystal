@@ -132,9 +132,9 @@ export interface PostGraphileOptions {
   // your API behind a reverse proxy.
   /* @middlewareOnly */
   enableCors?: boolean;
-  // Set the maximum size of JSON bodies that can be parsed (default 100kB).
-  // The size can be given as a human-readable string, such as '200kB' or '5MB'
-  // (case insensitive).
+  // Set the maximum size of HTTP request bodies that can be parsed (default
+  // 100kB).  The size can be given as a human-readable string, such as '200kB'
+  // or '5MB' (case insensitive).
   /* @middlewareOnly */
   bodySizeLimit?: string;
   // [Experimental] Enable the middleware to process multiple GraphQL queries

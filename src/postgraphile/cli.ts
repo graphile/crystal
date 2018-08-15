@@ -222,7 +222,7 @@ program
   )
   .option(
     '-l, --body-size-limit <string>',
-    "set the maximum size of JSON bodies that can be parsed (default 100kB) The size can be given as a human-readable string, such as '200kB' or '5MB' (case insensitive).",
+    "set the maximum size of the HTTP request body that can be parsed (default 100kB). The size can be given as a human-readable string, such as '200kB' or '5MB' (case insensitive).",
   )
   .option('--timeout <number>', 'set the timeout value in milliseconds for sockets', parseFloat)
   .option(
