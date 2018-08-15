@@ -207,9 +207,9 @@ export default function createPostGraphileHttpRequestHandler(
     // Parse JSON bodies.
     bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
-    bodyParser.urlencoded({ extended: false }),
+    bodyParser.urlencoded({ extended: false, limit: options.bodySizeLimit }),
     // Parse `application/graphql` content type bodies as text.
-    bodyParser.text({ type: 'application/graphql' }),
+    bodyParser.text({ type: 'application/graphql', limit: options.bodySizeLimit }),
   ];
 
   // We'll turn this into one function now so it can be better JIT optimised
