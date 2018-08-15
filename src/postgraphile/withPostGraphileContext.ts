@@ -94,7 +94,9 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   const pgClient = await pgPool.connect();
 
   // Enhance our Postgres client with debugging stuffs.
-  if (debugPg.enabled || debugPgError.enabled) debugPgClient(pgClient);
+  if ((debugPg.enabled || debugPgError.enabled) && !pgClient[$$pgClientOrigQuery]) {
+    debugPgClient(pgClient);
+  }
 
   // Begin our transaction, if necessary.
   if (needTransaction) {
