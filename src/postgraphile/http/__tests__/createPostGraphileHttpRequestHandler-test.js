@@ -192,7 +192,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: shortString },
-          })
+          }),
         )
         .expect(200)
         .expect('Content-Type', /json/)
@@ -208,7 +208,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          })
+          }),
         )
         .expect(413);
     });
@@ -222,7 +222,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          })
+          }),
         )
         .expect(200)
         .expect('Content-Type', /json/)
