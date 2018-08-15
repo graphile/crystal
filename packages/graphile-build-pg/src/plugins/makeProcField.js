@@ -285,7 +285,8 @@ export default function makeProcField(
         parsedResolveInfoFragment,
         ReturnType,
         sqlMutationQuery,
-        functionAlias
+        functionAlias,
+        parentQueryBuilder
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment,
@@ -309,6 +310,7 @@ export default function makeProcField(
               !proc.returnsSet && !rawReturnType.isPgArray && isTableLike,
           },
           innerQueryBuilder => {
+            innerQueryBuilder.parentQueryBuilder = parentQueryBuilder;
             if (!isTableLike) {
               if (returnTypeTable) {
                 innerQueryBuilder.select(
@@ -354,7 +356,8 @@ export default function makeProcField(
                   parsedResolveInfoFragment,
                   ReturnType,
                   sqlMutationQuery,
-                  functionAlias
+                  functionAlias,
+                  queryBuilder
                 );
                 return sql.fragment`(${query})`;
               }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -514,7 +517,8 @@ export default function makeProcField(
                   parsedResolveInfoFragment,
                   resolveInfo.returnType,
                   functionAlias,
-                  functionAlias
+                  functionAlias,
+                  null
                 );
                 const intermediateIdentifier = sql.identifier(Symbol());
                 const isVoid = returnType.id === "2278";
@@ -551,7 +555,8 @@ export default function makeProcField(
                   parsedResolveInfoFragment,
                   resolveInfo.returnType,
                   sqlMutationQuery,
-                  functionAlias
+                  functionAlias,
+                  null
                 );
                 const { text, values } = sql.compile(query);
                 if (debugSql.enabled) debugSql(text);

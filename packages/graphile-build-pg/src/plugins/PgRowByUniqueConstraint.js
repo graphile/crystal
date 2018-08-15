@@ -101,10 +101,10 @@ export default (async function PgRowByUniqueConstraint(builder) {
                         undefined,
                         resolveData,
                         {},
-                        builder => {
+                        queryBuilder => {
                           keys.forEach(key => {
-                            builder.where(
-                              sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                            queryBuilder.where(
+                              sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                 key.name
                               )} = ${gql2pg(
                                 args[inflection.column(key)],

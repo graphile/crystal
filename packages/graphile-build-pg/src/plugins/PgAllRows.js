@@ -108,36 +108,38 @@ export default (async function PgAllRows(
                       {
                         withPaginationAsFields: isConnection,
                       },
-                      builder => {
+                      queryBuilder => {
                         if (primaryKeys) {
-                          builder.beforeLock("orderBy", () => {
-                            if (!builder.isOrderUnique(false)) {
+                          queryBuilder.beforeLock("orderBy", () => {
+                            if (!queryBuilder.isOrderUnique(false)) {
                               // Order by PK if no order specified
-                              builder.data.cursorPrefix = ["primary_key_asc"];
+                              queryBuilder.data.cursorPrefix = [
+                                "primary_key_asc",
+                              ];
                               primaryKeys.forEach(key => {
-                                builder.orderBy(
-                                  sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                                queryBuilder.orderBy(
+                                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name
                                   )}`,
                                   true
                                 );
                               });
-                              builder.setOrderIsUnique();
+                              queryBuilder.setOrderIsUnique();
                             }
                           });
                         } else if (isView(table) && !!uniqueIdAttribute) {
-                          builder.beforeLock("orderBy", () => {
-                            if (!builder.isOrderUnique(false)) {
-                              builder.data.cursorPrefix = [
+                          queryBuilder.beforeLock("orderBy", () => {
+                            if (!queryBuilder.isOrderUnique(false)) {
+                              queryBuilder.data.cursorPrefix = [
                                 "view_unique_key_asc",
                               ];
-                              builder.orderBy(
-                                sql.fragment`${builder.getTableAlias()}.${sql.identifier(
+                              queryBuilder.orderBy(
+                                sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                                   uniqueIdAttribute.name
                                 )}`,
                                 true
                               );
-                              builder.setOrderIsUnique();
+                              queryBuilder.setOrderIsUnique();
                             }
                           });
                         }

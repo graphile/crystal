@@ -133,6 +133,7 @@ export default (function PgForwardRelationPlugin(builder) {
                       resolveData,
                       { asJson: true },
                       innerQueryBuilder => {
+                        innerQueryBuilder.parentQueryBuilder = queryBuilder;
                         keys.forEach((key, i) => {
                           innerQueryBuilder.where(
                             sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(

@@ -176,6 +176,7 @@ export default (function PgBackwardRelationPlugin(
                           withPagination: false,
                         },
                         innerQueryBuilder => {
+                          innerQueryBuilder.parentQueryBuilder = queryBuilder;
                           keys.forEach((key, i) => {
                             innerQueryBuilder.where(
                               sql.fragment`${tableAlias}.${sql.identifier(
@@ -204,6 +205,7 @@ export default (function PgBackwardRelationPlugin(
             },
             {
               pgFieldIntrospection: table,
+              isPgBackwardSingleRelationField: true,
             }
           );
         }
@@ -250,6 +252,7 @@ export default (function PgBackwardRelationPlugin(
                             asJsonAggregate: !isConnection,
                           },
                           innerQueryBuilder => {
+                            innerQueryBuilder.parentQueryBuilder = queryBuilder;
                             if (primaryKeys) {
                               innerQueryBuilder.beforeLock("orderBy", () => {
                                 // append order by primary key to the list of orders
