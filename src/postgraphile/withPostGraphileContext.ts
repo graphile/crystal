@@ -106,17 +106,23 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   try {
     // If there is at least one local setting, load it into the database.
     if (needTransaction && localSettings.length !== 0) {
-      const query = sql.compile(
-        sql.query`select ${sql.join(
-          localSettings.map(
-            ([key, value]) =>
-              // Make sure that the third config is always `true` so that we are only
-              // ever setting variables on the transaction.
-              sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
-          ),
-          ', ',
-        )}`,
-      );
+      // Later settings should win, so we're going to loop backwards and not
+      // add settings for keys we've already seen.
+      const seenKeys: Array<string> = [];
+
+      const sqlSettings: Array<sql.SQLNode> = [];
+      for (let i = localSettings.length - 1; i >= 0; i--) {
+        const [key, value] = localSettings[i];
+        if (seenKeys.indexOf(key) < 0) {
+          seenKeys.push(key);
+          // Make sure that the third config is always `true` so that we are only
+          // ever setting variables on the transaction.
+          // Also, we're using `unshift` to undo the reverse-looping we're doing
+          sqlSettings.unshift(sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`);
+        }
+      }
+
+      const query = sql.compile(sql.query`select ${sql.join(sqlSettings, ', ')}`);
 
       await pgClient.query(query);
     }
