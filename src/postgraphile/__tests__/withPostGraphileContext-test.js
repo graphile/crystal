@@ -573,6 +573,59 @@ test('will set a role provided in the JWT', async () => {
   ]);
 });
 
+test('if same settings are set by pgSettings and JWT, JWT will "win", except for the "role" because of legacy', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await withPostGraphileContext(
+    {
+      pgPool,
+      jwtToken: jwt.sign(
+        { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
+        'secret',
+        {
+          noTimestamp: true,
+        },
+      ),
+      jwtSecret: 'secret',
+      pgSettings: {
+        'jwt.claims.a': 99,
+        'jwt.claims.b': 98,
+        'jwt.claims.c': 97,
+        'jwt.claims.d': 96,
+        role: 'ugh_legacy_override',
+        'jwt.claims.role': 'some_other_role_again',
+      },
+    },
+    () => {},
+  );
+  expect(pgClient.query.mock.calls).toEqual([
+    ['begin'],
+    [
+      {
+        text:
+          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)',
+        values: [
+          'jwt.claims.d',
+          '96',
+          'role',
+          'ugh_legacy_override',
+          'jwt.claims.aud',
+          'postgraphile',
+          'jwt.claims.a',
+          '1',
+          'jwt.claims.b',
+          '2',
+          'jwt.claims.c',
+          '3',
+          'jwt.claims.role',
+          'test_jwt_role',
+        ],
+      },
+    ],
+    ['commit'],
+  ]);
+});
+
 test('will set a role provided in the JWT superceding the default role', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
