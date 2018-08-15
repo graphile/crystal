@@ -6,7 +6,6 @@ import createPostGraphileHttpRequestHandler, {
   graphiqlDirectory,
 } from '../createPostGraphileHttpRequestHandler';
 
-const path = require('path');
 const http = require('http');
 const request = require('supertest');
 const connect = require('connect');
@@ -44,7 +43,7 @@ const gqlSchema = new GraphQLSchema({
       },
       testError: {
         type: GraphQLString,
-        resolve: (source, args, context) => {
+        resolve: () => {
           const err = new Error('test message');
           err.detail = 'test detail';
           err.hint = 'test hint';
@@ -639,7 +638,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .get('/_postgraphile/graphiql/../../../../etc/passwd')
         .expect(403);
-      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
+      expect(sendFile.mock.calls.map(([_res, filepath, options]) => [filepath, options])).toEqual([
         ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
         ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
@@ -717,6 +716,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       });
       // We want to hide `console.error` warnings because we are intentionally
       // generating some here.
+      /* eslint-disable no-console */
       const origConsoleError = console.error;
       console.error = () => {
         /* noop */
@@ -729,6 +729,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       } finally {
         console.error = origConsoleError;
       }
+      /* eslint-enable no-console */
     });
 
     test('will correctly hand over pgSettings to the withPostGraphileContext call', async () => {
@@ -766,7 +767,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.query.mockClear();
       pgClient.release.mockClear();
       const server = createServer({
-        pgSettings: req => ({
+        pgSettings: _req => ({
           'foo.string': 'test1',
           'foo.number': 42,
         }),
@@ -853,9 +854,9 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         await request(server)
           .get('/_postgraphile/graphiql/anything.css')
           .expect(200);
-        expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
-          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
-        ]);
+        expect(sendFile.mock.calls.map(([_res, filepath, options]) => [filepath, options])).toEqual(
+          [['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }]],
+        );
       });
     }
   });

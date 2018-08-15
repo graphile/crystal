@@ -4,12 +4,9 @@ jest.mock('postgraphile-core');
 jest.mock('../http/createPostGraphileHttpRequestHandler');
 
 import { Pool } from 'pg';
-import { parse as parsePgConnectionString } from 'pg-connection-string';
 import { createPostGraphileSchema, watchPostGraphileSchema } from '..';
 import createPostGraphileHttpRequestHandler from '../http/createPostGraphileHttpRequestHandler';
 import postgraphile from '../postgraphile';
-
-const chalk = require('chalk');
 
 createPostGraphileHttpRequestHandler.mockImplementation(({ getGqlSchema }) =>
   Promise.resolve(getGqlSchema()).then(() => null),
@@ -30,7 +27,6 @@ test('will use a connected client from the pool, the default schema, and options
   createPostGraphileHttpRequestHandler.mockClear();
   const pgPool = new Pool();
   const options = Symbol('options');
-  const pgClient = { release: jest.fn() };
   await postgraphile(pgPool, options);
   expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, ['public'], options]]);
 });

@@ -33,6 +33,7 @@ export default function withPgClient<T>(
       await client.query('rollback');
       client.release();
       // Log the error for debugging purposes.
+      // eslint-disable-next-line no-console
       console.error(error.stack || error); // tslint:disable-line no-console
       throw error;
     }

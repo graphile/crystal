@@ -525,7 +525,7 @@ test('will set a role provided in the JWT superceding the default role', async (
   ]);
 });
 
-test('will set a role provided in the JWT', async () => {
+test('will set a role provided in the JWT (with JSON)', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
@@ -573,7 +573,7 @@ test('will set a role provided in the JWT', async () => {
   ]);
 });
 
-test('will set a role provided in the JWT superceding the default role', async () => {
+test('will set a role provided in the JWT superceding the default role (with JSON)', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
