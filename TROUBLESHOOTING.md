@@ -1,3 +1,39 @@
+<!--
+
+==================== CONTRIBUTING INSTRUCTIONS ====================
+
+We love PRs updating TROUBLESHOOTING.md with your own tips or improving those of others. Please follow the following best practices when adding new items:
+
+1. Follow the formating convention described below.
+
+2. Use neutral and respectful language, e.g. "You may sometimes meet an issue with ..." rather than "You may sometimes meet a really annoying issue with ..."
+
+3. Be concise: describe the problem with precision, and add the solution details only when it is short (the solution should be a link when is too long, e.g. to a GitHub gist).
+
+4. Cite the "motivation" in your PR. For example it might be from [postgraphile/issues](https://github.com/graphile/postgraphile/issues) or [stackoverflow](https://stackoverflow.com/search?q=postgraphile). This helps us gauge how common the issue is.
+
+
+Format:
+```
+## subject group X
+...
+
+### problem Y1 at subject X
+...
+
+Details at ...
+
+### problem Y2 at subject X
+...
+
+Details at ...
+```
+
+Thanks! 🙏
+
+====================    END OF INSTRUCTIONS    ==================== 
+-->
+
 # Troubleshooting
 
 To report or discuss details, [use the issues](https://github.com/graphile/postgraphile/issues). Pull requests to update this file with more troubleshooting tips are welcome.
