@@ -415,20 +415,29 @@ it("supports @scope directive with variable value", async () => {
 });
 
 it("supports defining new types", async () => {
+  const inputsSeen = [];
   const schema = await buildSchema([
     ...simplePlugins,
     makeExtendSchemaPlugin(_build => ({
       typeDefs: gql`
+        enum EchoCount {
+          ONCE
+          TWICE
+          FOREVER
+        }
+
         input EchoInput {
           text: String!
           int: Int
           float: Float!
+          count: EchoCount
         }
 
         type EchoOutput {
           text: String!
           int: Int
           float: Float!
+          count: EchoCount!
         }
 
         extend input EchoInput {
@@ -447,9 +456,13 @@ it("supports defining new types", async () => {
         }
       `,
       resolvers: {
+        EchoCount: {
+          FOREVER: "forever and ever and ever",
+        },
         Query: {
           echo: {
             resolve(_query, args) {
+              inputsSeen.push(args.input);
               return args.input;
             },
           },
@@ -463,31 +476,46 @@ it("supports defining new types", async () => {
     schema,
     `
       {
-        t1: echo(input: { text: "Hi1", float: 0.23 }) {
+        t1: echo(input: { text: "Hi1", float: 0.23, count: ONCE }) {
           text
           int
           float
           intList
+          count
         }
-        t2: echo(input: { text: "Hi2", int: 42, float: 1.23 }) {
+        t2: echo(input: { text: "Hi2", int: 42, float: 1.23, count: TWICE }) {
           text
           int
           float
           intList
+          count
         }
         t3: echo(
-          input: { text: "Hi3", int: 88, float: 2.23, intList: [99, 22, 33] }
+          input: {
+            text: "Hi3"
+            int: 88
+            float: 2.23
+            intList: [99, 22, 33]
+            count: FOREVER
+          }
         ) {
           text
           int
           float
           intList
+          count
         }
       }
     `
   );
   expect(errors).toBeFalsy();
   expect(data).toMatchSnapshot();
+  expect(inputsSeen.length).toEqual(3);
+  expect(inputsSeen.map(s => s.count)).toEqual([
+    "ONCE",
+    "TWICE",
+    "forever and ever and ever",
+  ]);
 });
 
 it("supports defining a simple mutation", async () => {

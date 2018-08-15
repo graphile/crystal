@@ -284,10 +284,17 @@ type Subscription {
 `;
 
 exports[`supports defining new types 1`] = `
-"input EchoInput {
+"enum EchoCount {
+  ONCE
+  TWICE
+  FOREVER
+}
+
+input EchoInput {
   text: String!
   int: Int
   float: Float!
+  count: EchoCount
   intList: [Int!]
 }
 
@@ -295,6 +302,7 @@ type EchoOutput {
   text: String!
   int: Int
   float: Float!
+  count: EchoCount!
   intList: [Int!]
 }
 
@@ -315,18 +323,21 @@ type Query {
 exports[`supports defining new types 2`] = `
 Object {
   "t1": Object {
+    "count": "ONCE",
     "float": 0.23,
     "int": null,
     "intList": null,
     "text": "Hi1",
   },
   "t2": Object {
+    "count": "TWICE",
     "float": 1.23,
     "int": 42,
     "intList": null,
     "text": "Hi2",
   },
   "t3": Object {
+    "count": "FOREVER",
     "float": 2.23,
     "int": 88,
     "intList": Array [

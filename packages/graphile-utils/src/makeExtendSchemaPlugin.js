@@ -6,7 +6,7 @@ export default function makeExtendSchemaPlugin(
     // Add stuff to the schema
     builder.hook("build", build => {
       const {
-        graphql: { GraphQLInputObjectType, GraphQLObjectType },
+        graphql: { GraphQLEnumType, GraphQLInputObjectType, GraphQLObjectType },
       } = build;
       const { typeDefs, resolvers = {} } = generator(build);
       if (!typeDefs || !typeDefs.kind === "Document") {
@@ -20,7 +20,12 @@ export default function makeExtendSchemaPlugin(
       };
       const newTypes = [];
       typeDefs.definitions.forEach(definition => {
-        if (definition.kind === "ObjectTypeExtension") {
+        if (definition.kind === "EnumTypeDefinition") {
+          newTypes.push({
+            type: GraphQLEnumType,
+            definition,
+          });
+        } else if (definition.kind === "ObjectTypeExtension") {
           const name = getName(definition.name);
           if (!typeExtensions.GraphQLObjectType[name]) {
             typeExtensions.GraphQLObjectType[name] = [];
@@ -46,7 +51,7 @@ export default function makeExtendSchemaPlugin(
           throw new Error(
             `Unexpected '${
               definition.kind
-            }' definition; we were expecting 'ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
+            }' definition; we were expecting 'GraphQLEnumType', ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
           );
         }
       });
@@ -62,10 +67,52 @@ export default function makeExtendSchemaPlugin(
         newWithHooks,
         [`ExtendSchemaPlugin_${uniqueId}_newTypes`]: newTypes,
         [`ExtendSchemaPlugin_${uniqueId}_resolvers`]: resolvers,
-        graphql: { GraphQLObjectType, GraphQLInputObjectType },
+        graphql: { GraphQLEnumType, GraphQLObjectType, GraphQLInputObjectType },
       } = build;
       newTypes.forEach(({ type, definition }) => {
-        if (type === GraphQLObjectType) {
+        if (type === GraphQLEnumType) {
+          // https://graphql.org/graphql-js/type/#graphqlenumtype
+          const name = getName(definition.name);
+          const description = getDescription(definition.description);
+          const directives = getDirectives(definition.directives);
+          const relevantResolver = resolvers[name] || {};
+          const values = definition.values.reduce((memo, value) => {
+            const valueName = getName(value.name);
+            const valueDescription = getDescription(value.description);
+            const valueDirectives = getDirectives(value.directives);
+
+            // Value cannot be expressed via SDL, so we grab the value from the resolvers instead.
+            // resolvers = {
+            //   MyEnum: {
+            //     MY_ENUM_VALUE1: 'value1',
+            //     MY_ENUM_VALUE2: 'value2',
+            //   }
+            // }
+            // Ref: https://github.com/graphql/graphql-js/issues/525#issuecomment-255834625
+            const valueValue =
+              relevantResolver[valueName] !== undefined
+                ? relevantResolver[valueName]
+                : valueName;
+
+            const valueDeprecationReason =
+              valueDirectives.deprecated && valueDirectives.deprecated.reason;
+            return {
+              ...memo,
+              [valueName]: {
+                value: valueValue,
+                deprecationReason: valueDeprecationReason,
+                description: valueDescription,
+                directives: valueDirectives,
+              },
+            };
+          }, {});
+          const scope = {
+            directives,
+            ...(directives.scope || {}),
+          };
+          newWithHooks(type, { name, values, description }, scope);
+        } else if (type === GraphQLObjectType) {
+          // https://graphql.org/graphql-js/type/#graphqlobjecttype
           const name = getName(definition.name);
           const description = getDescription(definition.description);
           const interfaces = getInterfaces(definition.interfaces, build);
@@ -100,6 +147,7 @@ export default function makeExtendSchemaPlugin(
             scope
           );
         } else if (type === GraphQLInputObjectType) {
+          // https://graphql.org/graphql-js/type/#graphqlinputobjecttype
           const name = getName(definition.name);
           const description = getDescription(definition.description);
           const directives = getDirectives(definition.directives);
@@ -122,7 +170,9 @@ export default function makeExtendSchemaPlugin(
             scope
           );
         } else {
-          throw new Error("Coding error.");
+          throw new Error(
+            `We have no code to build an object of type '${type}'; it should not have reached this area of the code.`
+          );
         }
       });
       return _;
