@@ -188,10 +188,45 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ query: '{hello}' }))
+        .send(
+          JSON.stringify({
+            query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
+            variables: { name: shortString },
+          })
+        )
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect({ data: { hello: 'world' } });
+        .expect({ data: { greetings: `Hello, ${shortString}!` } });
+    });
+
+    test("will throw error if there's too much JSON data", async () => {
+      const server = createServer();
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .send(
+          JSON.stringify({
+            query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
+            variables: { name: veryLongString },
+          })
+        )
+        .expect(413);
+    });
+
+    test("will not throw error if there's lots of JSON data and a high limit", async () => {
+      const server = createServer({ bodySizeLimit: '1MB' });
+      await request(server)
+        .post('/graphql')
+        .set('Content-Type', 'application/json')
+        .send(
+          JSON.stringify({
+            query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
+            variables: { name: veryLongString },
+          })
+        )
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { greetings: `Hello, ${veryLongString}!` } });
     });
 
     test('will run a query on a POST request with form data', async () => {
