@@ -312,6 +312,9 @@ type DeletePersonSecretPayload {
 
 scalar Email
 
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
 \\"\\"\\"
 A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
 \\"\\"\\"
@@ -657,6 +660,8 @@ enum PeopleOrderBy {
   EMAIL_DESC
   ID_ASC
   ID_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -676,6 +681,7 @@ type Person implements Node {
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"Reads a single \`LeftArm\` that is related to this \`Person\`.\\"\\"\\"
   leftArmByPersonId: LeftArm
@@ -801,6 +807,9 @@ input PersonCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
   id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`lastLoginFromIp\` field.\\"\\"\\"
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
   name: String
@@ -4003,6 +4012,9 @@ enum InputsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
 \\"\\"\\"
 An interval of time that has passed where the smallest distinct unit is a second.
 \\"\\"\\"
@@ -6076,6 +6088,8 @@ enum PeopleOrderBy {
   EMAIL_DESC
   ID_ASC
   ID_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -6206,6 +6220,7 @@ type Person implements Node {
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"Reads a single \`LeftArm\` that is related to this \`Person\`.\\"\\"\\"
   leftArmByPersonId: LeftArm
@@ -6332,6 +6347,9 @@ input PersonCondition {
   \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
   id: Int
 
+  \\"\\"\\"Checks for equality with the object’s \`lastLoginFromIp\` field.\\"\\"\\"
+  lastLoginFromIp: InternetAddress
+
   \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
   name: String
 
@@ -6349,6 +6367,7 @@ input PersonInput {
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String!
@@ -6367,6 +6386,7 @@ input PersonPatch {
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String

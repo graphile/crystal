@@ -138,6 +138,7 @@ mutation CreateMutation($config: KeyValueHash!) {
       email: "johnny.boy.smith@email.com"
       about: "Son of Sara and John Smith."
       config: $config
+      lastLoginFromIp: "172.16.1.2"
     }
   }) { ...createPersonPayload }
   c: createPerson(input: {
@@ -148,6 +149,7 @@ mutation CreateMutation($config: KeyValueHash!) {
       email: "best.pal@email.com"
       about: "My archnemisis is Budd Deey."
       config: null
+      lastLoginFromIp: "192.168.0.42"
     }
   }) { ...createPersonPayload }
   d: createCompoundKey(input: {
@@ -213,6 +215,7 @@ mutation CreateMutation($config: KeyValueHash!) {
         actually_null: null,
         null_string: "null"
       }
+      lastLoginFromIp: "10.0.1.42"
     }
   }) { ...createPersonPayload }
   h: createPerson(input: {
@@ -277,6 +280,7 @@ fragment createPersonPayload on CreatePersonPayload {
     email
     about
     config
+    lastLoginFromIp
     issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
   }
   a: personEdge(orderBy: PRIMARY_KEY_ASC) { ...peopleEdge }

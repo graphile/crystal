@@ -858,6 +858,9 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
 \\"\\"\\"
 An interval of time that has passed where the smallest distinct unit is a second.
 \\"\\"\\"
@@ -1836,6 +1839,8 @@ enum PeopleOrderBy {
   EMAIL_DESC
   ID_ASC
   ID_DESC
+  LAST_LOGIN_FROM_IP_ASC
+  LAST_LOGIN_FROM_IP_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -1939,6 +1944,7 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   id: ID!
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"Reads a single \`LeftArm\` that is related to this \`Person\`.\\"\\"\\"
   leftArmByPersonId: LeftArm
@@ -2031,6 +2037,9 @@ input PersonCondition {
   \\"\\"\\"Checks for equality with the object’s \`email\` field.\\"\\"\\"
   email: Email
 
+  \\"\\"\\"Checks for equality with the object’s \`lastLoginFromIp\` field.\\"\\"\\"
+  lastLoginFromIp: InternetAddress
+
   \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
   name: String
 
@@ -2048,6 +2057,7 @@ input PersonInput {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String!
@@ -2066,6 +2076,7 @@ input PersonPatch {
   config: KeyValueHash
   createdAt: Datetime
   email: Email
+  lastLoginFromIp: InternetAddress
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String

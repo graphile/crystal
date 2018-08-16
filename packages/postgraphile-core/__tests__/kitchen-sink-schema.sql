@@ -37,6 +37,7 @@ create table c.person (
   email b.email not null unique,
   site b.wrapped_url default null,
   config hstore,
+  last_login_from_ip inet,
   created_at timestamp default current_timestamp
 );
 

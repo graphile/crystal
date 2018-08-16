@@ -3,13 +3,13 @@ insert into a.no_primary_key (id, str) values
   (2, 'two'),
   (3, 'three');
 
-insert into c.person (id, person_full_name, email, about, config, created_at) values
-  (1, 'John Smith', 'john.smith@email.com', null, '', null),
-  (2, 'Sara Smith', 'sara.smith@email.com', null, 'a => 1', null),
-  (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', 'b => 2', null),
-  (4, 'Kathryn Ramirez', 'kathryn.ramirez@email.com', null, 'a => 3, b => 4', null),
-  (5, 'Joe Tucker', 'joe.tucker@email.com', null, 'a => 5, b => 6, actually_null => NULL, null_string => "null", "_\"_$@£$)(@*£$" => "_\"_$@£$)(@*£$"', null),
-  (6, 'Twenty Seventwo', 'graphile-build.issue.27.exists@example.com', null, 'null_1 => NULL, null_2 => null', null);
+insert into c.person (id, person_full_name, email, about, config, last_login_from_ip, created_at) values
+  (1, 'John Smith', 'john.smith@email.com', null, '', '192.168.0.1', null),
+  (2, 'Sara Smith', 'sara.smith@email.com', null, 'a => 1', '10.1.2.3', null),
+  (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', 'b => 2', '172.21.22.23', null),
+  (4, 'Kathryn Ramirez', 'kathryn.ramirez@email.com', null, 'a => 3, b => 4', '192.168.1.2', null),
+  (5, 'Joe Tucker', 'joe.tucker@email.com', null, 'a => 5, b => 6, actually_null => NULL, null_string => "null", "_\"_$@£$)(@*£$" => "_\"_$@£$)(@*£$"', '192.168.0.2', null),
+  (6, 'Twenty Seventwo', 'graphile-build.issue.27.exists@example.com', null, 'null_1 => NULL, null_2 => null', '10.1.2.254', null);
 
 alter sequence c.person_id_seq restart with 10;
 
