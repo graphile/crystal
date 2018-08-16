@@ -405,7 +405,7 @@ type CreatePersonSecretPayload {
   \\"\\"\\"
   clientMutationId: String
 
-  \\"\\"\\"Reads a single \`Person\` that is related to this \`PersonSecret\`.\\"\\"\\"
+  \\"\\"\\"The \`Person\` this \`PersonSecret\` belongs to.\\"\\"\\"
   personByPersonId: Person
 
   \\"\\"\\"The \`PersonSecret\` that was created by this mutation.\\"\\"\\"
@@ -739,7 +739,7 @@ type DeletePersonSecretPayload {
   clientMutationId: String
   deletedPersonSecretId: ID
 
-  \\"\\"\\"Reads a single \`Person\` that is related to this \`PersonSecret\`.\\"\\"\\"
+  \\"\\"\\"The \`Person\` this \`PersonSecret\` belongs to.\\"\\"\\"
   personByPersonId: Person
 
   \\"\\"\\"The \`PersonSecret\` that was deleted by this mutation.\\"\\"\\"
@@ -2024,10 +2024,10 @@ type Person implements Node {
   \\"\\"\\"
   nodeId: ID!
 
-  \\"\\"\\"Reads a single \`PersonSecret\` that is related to this \`Person\`.\\"\\"\\"
+  \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
   personSecretByPersonId: PersonSecret
 
-  \\"\\"\\"Reads and enables pagination through a set of \`PersonSecret\`.\\"\\"\\"
+  \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
   personSecretsByPersonId(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -2128,7 +2128,7 @@ type PersonSecret implements Node {
   \\"\\"\\"
   nodeId: ID!
 
-  \\"\\"\\"Reads a single \`Person\` that is related to this \`PersonSecret\`.\\"\\"\\"
+  \\"\\"\\"The \`Person\` this \`PersonSecret\` belongs to.\\"\\"\\"
   personByPersonId: Person
   personId: Int!
 
@@ -3189,7 +3189,7 @@ type UpdatePersonSecretPayload {
   \\"\\"\\"
   clientMutationId: String
 
-  \\"\\"\\"Reads a single \`Person\` that is related to this \`PersonSecret\`.\\"\\"\\"
+  \\"\\"\\"The \`Person\` this \`PersonSecret\` belongs to.\\"\\"\\"
   personByPersonId: Person
 
   \\"\\"\\"The \`PersonSecret\` that was updated by this mutation.\\"\\"\\"
