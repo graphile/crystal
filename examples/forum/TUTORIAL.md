@@ -10,27 +10,27 @@ In this tutorial we will walk through the Postgres schema design for a forum app
 
 ## Table of Contents
 
-* [Installation](#installation)
-  * [Installing Postgres](#installing-postgres)
-  * [Installing PostGraphile](#installing-postgraphile)
-* [The Basics](#the-basics)
-  * [Setting Up Your Schemas](#setting-up-your-schemas)
-  * [The Person Table](#the-person-table)
-  * [Table Documentation](#table-documentation)
-  * [The Post Table](#the-post-table)
-* [Database Functions](#database-functions)
-  * [Set Returning Functions](#set-returning-functions)
-  * [Triggers](#triggers)
-* [Authentication and Authorization](#authentication-and-authorization)
-  * [Storing Emails and Passwords](#storing-emails-and-passwords)
-  * [Registering Users](#registering-users)
-  * [Postgres Roles](#postgres-roles)
-  * [JSON Web Tokens](#json-web-tokens)
-  * [Logging In](#logging-in)
-  * [Using the Authorized User](#using-the-authorized-user)
-  * [Grants](#grants)
-  * [Row Level Security](#row-level-security)
-* [Conclusion](#conclusion)
+- [Installation](#installation)
+  - [Installing Postgres](#installing-postgres)
+  - [Installing PostGraphile](#installing-postgraphile)
+- [The Basics](#the-basics)
+  - [Setting Up Your Schemas](#setting-up-your-schemas)
+  - [The Person Table](#the-person-table)
+  - [Table Documentation](#table-documentation)
+  - [The Post Table](#the-post-table)
+- [Database Functions](#database-functions)
+  - [Set Returning Functions](#set-returning-functions)
+  - [Triggers](#triggers)
+- [Authentication and Authorization](#authentication-and-authorization)
+  - [Storing Emails and Passwords](#storing-emails-and-passwords)
+  - [Registering Users](#registering-users)
+  - [Postgres Roles](#postgres-roles)
+  - [JSON Web Tokens](#json-web-tokens)
+  - [Logging In](#logging-in)
+  - [Using the Authorized User](#using-the-authorized-user)
+  - [Grants](#grants)
+  - [Row Level Security](#row-level-security)
+- [Conclusion](#conclusion)
 
 ## Installation
 
@@ -134,12 +134,12 @@ create table forum_example.person (
 
 Now we have created a table with `id`, `first_name`, `last_name`, `about`, and `created_at` columns (we will add an `updated_at` column later). Let’s break down exactly what each line in this command does, we will only do this once. If you already understand, you can skip ahead.
 
-1. `create table forum_example.person`: This tells Postgres that we are creating a table in the `forum_example` schema named `person`. This table will represent all of our forum’s users.
-2. `id serial primary key`: This line establishes an auto-incrementing id field which is always guaranteed to be unique. The first person we create will have an id of 1, the second user will have an id of 2, and so on. The `primary key` bit is also very important. PostGraphile will use the `primary key` of a table in many places to uniquely identify an object, including the globally unique id field.
-3. `first_name text not null check (char_length(first_name) < 80)`: We want all of our users to enter their first name and last name seperately, so this column definition will create a column named `first_name`, of type `text`, that is required (`not null`), and that must be less than 80 characters long (`check (char_length(first_name) < 80)`). [Check constraints](https://www.postgresql.org/docs/9.6/static/ddl-constraints.html) are a very powerful feature in Postgres for data validation.
-4. `last_name text check (char_length(last_name) < 80)`: This is very similar to our column definition for `first_name`, except it is missing `not null`. This means that unlike the `first_name` column, `last_name` is not required.
-5. `about text`: We want users to be able to express themselves! So they get to write a mini forum post which will go on their profile page.
-6. `created_at timestamp default now()`: This final column definition will provide us with some extra meta-information about their user. If not specified explicitly, the `created_at` timestamp will default to the time the row was inserted.
+1.  `create table forum_example.person`: This tells Postgres that we are creating a table in the `forum_example` schema named `person`. This table will represent all of our forum’s users.
+2.  `id serial primary key`: This line establishes an auto-incrementing id field which is always guaranteed to be unique. The first person we create will have an id of 1, the second user will have an id of 2, and so on. The `primary key` bit is also very important. PostGraphile will use the `primary key` of a table in many places to uniquely identify an object, including the globally unique id field.
+3.  `first_name text not null check (char_length(first_name) < 80)`: We want all of our users to enter their first name and last name seperately, so this column definition will create a column named `first_name`, of type `text`, that is required (`not null`), and that must be less than 80 characters long (`check (char_length(first_name) < 80)`). [Check constraints](https://www.postgresql.org/docs/9.6/static/ddl-constraints.html) are a very powerful feature in Postgres for data validation.
+4.  `last_name text check (char_length(last_name) < 80)`: This is very similar to our column definition for `first_name`, except it is missing `not null`. This means that unlike the `first_name` column, `last_name` is not required.
+5.  `about text`: We want users to be able to express themselves! So they get to write a mini forum post which will go on their profile page.
+6.  `created_at timestamp default now()`: This final column definition will provide us with some extra meta-information about their user. If not specified explicitly, the `created_at` timestamp will default to the time the row was inserted.
 
 And that’s our person table! Pretty simple, right?
 
@@ -323,10 +323,10 @@ Don’t get too stuck on the function implementations. It is fairly easy to disc
 
 > **Note:** Any function which meets the following conditions will be treated as a computed field by PostGraphile:
 >
-> 1. The function has a table row as the first argument.
-> 2. The function is in the same schema as the table of the first argument.
-> 3. The function’s name is prefixed by the table’s name.
-> 4. The function is marked as `stable` or `immutable` which makes it a query and not a mutation.
+> 1.  The function has a table row as the first argument.
+> 2.  The function is in the same schema as the table of the first argument.
+> 3.  The function’s name is prefixed by the table’s name.
+> 4.  The function is marked as `stable` or `immutable` which makes it a query and not a mutation.
 >
 > All three of the above functions meet these conditions and as such will be computed fields. In GraphQL this ends up looking like:
 >
@@ -419,9 +419,9 @@ After we define our `forum_example_private.set_updated_at` function, we can use 
 
 That’s about it as far as Postgres functions go! They are a fun, interesting, and useful topic to understand when it comes to good Postgres schema design. Always remember, the Postgres documentation is your best friend as you try to write your own functions. Some important documentation articles we mentioned for your reference are as follows:
 
-* [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/sql-createfunction.html)
-* [`CREATE TRIGGER`](https://www.postgresql.org/docs/9.6/static/sql-createtrigger.html)
-* [`PL/pgSQL`](https://www.postgresql.org/docs/8.3/static/plpgsql.html)
+- [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/sql-createfunction.html)
+- [`CREATE TRIGGER`](https://www.postgresql.org/docs/9.6/static/sql-createtrigger.html)
+- [`PL/pgSQL`](https://www.postgresql.org/docs/8.3/static/plpgsql.html)
 
 Next up, we are going to learn about auth in Postgres and PostGraphile!
 
@@ -721,12 +721,12 @@ grant execute on function forum_example.register_person(text, text, text, text) 
 
 See how we had to grant permissions on every single Postgres object we have defined so far? Postgres permissions work as a whitelist and not a blacklist (except for functions), so therefore no one has more access than you explicitly give them. Let’s walk through the grants:
 
-1. `grant usage on schema forum_example to forum_example_anonymous, forum_example_person`: We say that anonymous users (`forum_example_anonymous`) and logged in users (`forum_example_person`) may use the objects in the `forum_example` schema. This does not mean that those roles can use anything they want in the schema, it just allows the roles to know the schema exists. Also note that we did not grant usage for the `forum_example_private` schema.
-2. `grant select on table forum_example.person to forum_example_anonymous, forum_example_person`: We give anonymous users and logged in users the ability to read all of the rows in the `forum_example.person` table.
-3. `grant update, delete on table forum_example.person to forum_example_person`: Here we give _only_ logged in users the ability to update and delete rows from the `forum_example.person` table. This means that anonymous users can never update or delete a person. However, it does mean that users can update and delete any rows in the table. We will fix this later.
-4. `grant select ...` and `grant insert, update, delete ...`: We do the same thing with these two grants as we did with the grants above. The only difference here is that we also give signed in users the ability to `insert` into `forum_example.post`. We do not allow anyone to insert directly into `forum_example.person`, instead users should use the `forum_example.register_person` function.
-5. `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
-6. `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
+1.  `grant usage on schema forum_example to forum_example_anonymous, forum_example_person`: We say that anonymous users (`forum_example_anonymous`) and logged in users (`forum_example_person`) may use the objects in the `forum_example` schema. This does not mean that those roles can use anything they want in the schema, it just allows the roles to know the schema exists. Also note that we did not grant usage for the `forum_example_private` schema.
+2.  `grant select on table forum_example.person to forum_example_anonymous, forum_example_person`: We give anonymous users and logged in users the ability to read all of the rows in the `forum_example.person` table.
+3.  `grant update, delete on table forum_example.person to forum_example_person`: Here we give _only_ logged in users the ability to update and delete rows from the `forum_example.person` table. This means that anonymous users can never update or delete a person. However, it does mean that users can update and delete any rows in the table. We will fix this later.
+4.  `grant select ...` and `grant insert, update, delete ...`: We do the same thing with these two grants as we did with the grants above. The only difference here is that we also give signed in users the ability to `insert` into `forum_example.post`. We do not allow anyone to insert directly into `forum_example.person`, instead users should use the `forum_example.register_person` function.
+5.  `grant usage on sequence forum_example.post_id_seq to forum_example_person`: When a user creates a new `forum_example.post` they will also need to get the next value in the `forum_example.post_id_seq` because we use the `serial` data type for the `id` column. A sequence also exists for our person table (`forum_example.person_id_seq`), but since we are only creating people through `forum_example.register_person` and that function specifies `security definer`, we don’t need to grant access to the person id sequence.
+6.  `grant execute ...`: We have to give the anonymous user and logged in users access to all of the Postgres functions we define. All of the functions are executable by both types of users, except `forum_example.register_person` which we only let anonymous users execute. There’s no need for logged in users to register a new user!
 
 This provides basic permissions for all of our Postgres objects, but as we mentioned before, users can still update and delete any or all persons or posts. For obvious reasons, we don’t want this, so let’s define row level security next.
 
