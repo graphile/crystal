@@ -30,14 +30,16 @@ export type mixed = {} | string | number | boolean | undefined | null;
 // Anything tagged `@middlewareOnly` will not appear in the schema-only docs.
 // Only comments written beginning with `//` will be put in the docs.
 export interface PostGraphileOptions {
-  // When true, PostGraphile will watch your database schemas and re-create the
-  // GraphQL API whenever your schema changes, notifying you as it does. This
-  // feature requires an event trigger to be added to the database by a
-  // superuser. When enabled PostGraphile will try to add this trigger, if you
-  // did not connect as a superuser you will get a warning and the trigger
-  // won’t be added. The trigger will not be removed, to remove it run:
+  // When true, PostGraphile will update the GraphQL API whenever your database
+  // schema changes. This feature requires some changes to your database in the
+  // form of the
+  // [`postgraphile_watch`](https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/res/watch-fixtures.sql)
+  // schema; PostGraphile will try to add this itself but requires DB superuser
+  // privileges to do so. If PostGraphile can't install it, you can do so
+  // manually. PostGraphile will not drop the schema when it exits, to remove
+  // it you can execute:
   //
-  //   `drop schema postgraphile_watch cascade;`
+  //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
   // The default Postgres role to use. If no role was provided in a provided
