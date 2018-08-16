@@ -7,7 +7,7 @@ const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgAllRows(
   builder,
-  { pgViewUniqueKey: viewUniqueKey, pgSimpleCollections }
+  { pgViewUniqueKey, pgSimpleCollections }
 ) {
   const hasConnections = pgSimpleCollections !== "only";
   const hasSimpleCollections =
@@ -68,6 +68,7 @@ export default (async function PgAllRows(
               num => attributes.filter(attr => attr.num === num)[0]
             );
           const isView = t => t.classKind === "v";
+          const viewUniqueKey = table.tags.uniqueKey || pgViewUniqueKey;
           const uniqueIdAttribute = viewUniqueKey
             ? attributes.find(attr => attr.name === viewUniqueKey)
             : undefined;

@@ -153,7 +153,7 @@ create view b.updatable_view as
   from
     c.person;
 
-comment on view b.updatable_view is 'YOYOYO!!';
+comment on view b.updatable_view is E'@uniqueKey x\nYOYOYO!!';
 comment on column b.updatable_view.constant is 'This is constantly 2';
 
 create view a.non_updatable_view as select 2;
