@@ -312,6 +312,11 @@ type DeletePersonSecretPayload {
 
 scalar Email
 
+\\"\\"\\"
+A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
+\\"\\"\\"
+scalar KeyValueHash
+
 \\"\\"\\"Tracks metadata about the left arms of various people\\"\\"\\"
 type LeftArm implements Node {
   id: Int!
@@ -644,6 +649,8 @@ enum PeopleOrderBy {
   ABOUT_DESC
   ALIASES_ASC
   ALIASES_DESC
+  CONFIG_ASC
+  CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
@@ -663,6 +670,7 @@ enum PeopleOrderBy {
 type Person implements Node {
   about: String
   aliases: [String]!
+  config: KeyValueHash
   createdAt: Datetime
   email: Email!
 
@@ -781,6 +789,9 @@ input PersonCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`aliases\` field.\\"\\"\\"
   aliases: [String]
+
+  \\"\\"\\"Checks for equality with the object’s \`config\` field.\\"\\"\\"
+  config: KeyValueHash
 
   \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
   createdAt: Datetime
@@ -4272,6 +4283,11 @@ type JwtToken {
   role: String
 }
 
+\\"\\"\\"
+A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
+\\"\\"\\"
+scalar KeyValueHash
+
 \\"\\"\\"Tracks metadata about the left arms of various people\\"\\"\\"
 type LeftArm implements Node {
   id: Int!
@@ -5893,6 +5909,8 @@ enum PeopleOrderBy {
   ABOUT_DESC
   ALIASES_ASC
   ALIASES_DESC
+  CONFIG_ASC
+  CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
@@ -5970,6 +5988,7 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+  config: KeyValueHash
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean
@@ -6142,6 +6161,9 @@ input PersonCondition {
   \\"\\"\\"Checks for equality with the object’s \`aliases\` field.\\"\\"\\"
   aliases: [String]
 
+  \\"\\"\\"Checks for equality with the object’s \`config\` field.\\"\\"\\"
+  config: KeyValueHash
+
   \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
   createdAt: Datetime
 
@@ -6162,6 +6184,7 @@ input PersonCondition {
 input PersonInput {
   about: String
   aliases: [String]
+  config: KeyValueHash
   createdAt: Datetime
   email: Email!
 
@@ -6179,6 +6202,7 @@ Represents an update to a \`Person\`. Fields that are set will be updated.
 input PersonPatch {
   about: String
   aliases: [String]
+  config: KeyValueHash
   createdAt: Datetime
   email: Email
 

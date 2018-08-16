@@ -1,4 +1,13 @@
-mutation {
+#!variables!{
+#  "config": {
+#    "a": "5",
+#    "b": "6",
+#    "actually_null": null,
+#    "null_string": "null",
+#    "_\"\\_$@£$)(@*£$": "_\"\\_$@£$)(@*£$"
+#  }
+#}!
+mutation CreateMutation($config: KeyValueHash!) {
   a: createType(input: {
     type: {
       id: 201
@@ -128,6 +137,7 @@ mutation {
       name: "John Smith Jr."
       email: "johnny.boy.smith@email.com"
       about: "Son of Sara and John Smith."
+      config: $config
     }
   }) { ...createPersonPayload }
   c: createPerson(input: {
@@ -137,6 +147,7 @@ mutation {
       name: "Best Pal"
       email: "best.pal@email.com"
       about: "My archnemisis is Budd Deey."
+      config: null
     }
   }) { ...createPersonPayload }
   d: createCompoundKey(input: {
@@ -196,6 +207,12 @@ mutation {
       name: "Budd Deey"
       email: "budd.deey.the.second@email.com"
       about: null
+      config: {
+        a: 5,
+        b: 6,
+        actually_null: null,
+        null_string: "null"
+      }
     }
   }) { ...createPersonPayload }
   h: createPerson(input: {
@@ -259,6 +276,7 @@ fragment createPersonPayload on CreatePersonPayload {
     name
     email
     about
+    config
     issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
   }
   a: personEdge(orderBy: PRIMARY_KEY_ASC) { ...peopleEdge }

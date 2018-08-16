@@ -75,6 +75,7 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -83,6 +84,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -91,6 +95,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -99,6 +106,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -107,6 +118,13 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -115,6 +133,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -134,6 +156,7 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -142,6 +165,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -161,6 +187,13 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -169,6 +202,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -188,6 +225,9 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -196,6 +236,13 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJKb2UgVHVja2VyIiw1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -204,6 +251,7 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -212,6 +260,10 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -220,6 +272,9 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -228,6 +283,10 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -247,6 +306,10 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -255,6 +318,9 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -263,6 +329,10 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -271,6 +341,7 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -279,6 +350,13 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9lIFR1Y2tlciIsNV1d",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -287,6 +365,9 @@ Object {
         Object {
           "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -306,6 +387,7 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -325,6 +407,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -333,6 +418,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -341,6 +430,13 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -349,6 +445,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -547,6 +647,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -555,6 +658,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -563,6 +669,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -599,6 +709,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -607,6 +721,13 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -626,6 +747,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           "node": Object {
+            "config": Object {
+              "b": "2",
+            },
             "email": "budd.deey@email.com",
             "id": 3,
             "name": "Budd Deey",
@@ -645,6 +769,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",
@@ -664,6 +792,7 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
           "node": Object {
+            "config": Object {},
             "email": "john.smith@email.com",
             "id": 1,
             "name": "John Smith",
@@ -672,6 +801,9 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
           "node": Object {
+            "config": Object {
+              "a": "1",
+            },
             "email": "sara.smith@email.com",
             "id": 2,
             "name": "Sara Smith",
@@ -680,6 +812,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "name": "Kathryn Ramirez",
@@ -688,6 +824,13 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
           "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
             "email": "joe.tucker@email.com",
             "id": 5,
             "name": "Joe Tucker",
@@ -696,6 +839,10 @@ Object {
         Object {
           "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
           "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "name": "Twenty Seventwo",

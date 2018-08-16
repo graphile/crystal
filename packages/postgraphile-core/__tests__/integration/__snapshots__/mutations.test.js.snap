@@ -232,6 +232,13 @@ Object {
       },
       "person": Object {
         "about": "Son of Sara and John Smith.",
+        "config": Object {
+          "_\\"\\\\_$@£$)(@*£$": "_\\"\\\\_$@£$)(@*£$",
+          "a": "5",
+          "actually_null": null,
+          "b": "6",
+          "null_string": "null",
+        },
         "email": "johnny.boy.smith@email.com",
         "id": 9000,
         "issue27UserExists": false,
@@ -302,6 +309,7 @@ Object {
       },
       "person": Object {
         "about": "My archnemisis is Budd Deey.",
+        "config": null,
         "email": "best.pal@email.com",
         "id": 20,
         "issue27UserExists": false,
@@ -416,6 +424,12 @@ Object {
       },
       "person": Object {
         "about": null,
+        "config": Object {
+          "a": "5",
+          "actually_null": null,
+          "b": "6",
+          "null_string": "null",
+        },
         "email": "budd.deey.the.second@email.com",
         "id": 1998,
         "issue27UserExists": false,

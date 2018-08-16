@@ -1,10 +1,10 @@
-insert into c.person (id, person_full_name, email, about, created_at) values
-  (1, 'John Smith', 'john.smith@email.com', null, null),
-  (2, 'Sara Smith', 'sara.smith@email.com', null, null),
-  (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', null),
-  (4, 'Kathryn Ramirez', 'kathryn.ramirez@email.com', null, null),
-  (5, 'Joe Tucker', 'joe.tucker@email.com', null, null),
-  (6, 'Twenty Seventwo', 'graphile-build.issue.27.exists@example.com', null, null);
+insert into c.person (id, person_full_name, email, about, config, created_at) values
+  (1, 'John Smith', 'john.smith@email.com', null, '', null),
+  (2, 'Sara Smith', 'sara.smith@email.com', null, 'a => 1', null),
+  (3, 'Budd Deey', 'budd.deey@email.com', 'Just a friendly human', 'b => 2', null),
+  (4, 'Kathryn Ramirez', 'kathryn.ramirez@email.com', null, 'a => 3, b => 4', null),
+  (5, 'Joe Tucker', 'joe.tucker@email.com', null, 'a => 5, b => 6, actually_null => NULL, null_string => "null", "_\"_$@£$)(@*£$" => "_\"_$@£$)(@*£$"', null),
+  (6, 'Twenty Seventwo', 'graphile-build.issue.27.exists@example.com', null, 'null_1 => NULL, null_2 => null', null);
 
 alter sequence c.person_id_seq restart with 10;
 

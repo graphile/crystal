@@ -35,6 +35,7 @@ fragment personConnection on PeopleConnection {
       id
       name
       email
+      config
     }
   }
 }

@@ -1,5 +1,6 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
 drop schema if exists a, b, c, d cascade;
+drop extension if exists hstore;
 
 create schema a;
 create schema b;
@@ -11,6 +12,7 @@ alter default privileges revoke execute on functions from public;
 -- Troublesome extensions install annoying things in our schema; we want to
 -- ensure this doesn't make us crash.
 create extension tablefunc with schema a;
+create extension hstore;
 
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
@@ -29,6 +31,7 @@ create table c.person (
   about text,
   email b.email not null unique,
   site b.wrapped_url default null,
+  config hstore,
   created_at timestamp default current_timestamp
 );
 

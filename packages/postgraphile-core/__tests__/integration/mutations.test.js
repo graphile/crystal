@@ -80,10 +80,21 @@ beforeAll(() => {
         schemaToUse = gqlSchema;
       }
 
+      const matches = mutation.match(/(?:^|\n)#!variables!({[\s\S]*?\n#})!\n/);
+      const variables = matches
+        ? JSON.parse(matches[1].replace(/\n#/g, "\n"))
+        : null;
+
       // Return the result of our GraphQL query.
-      const result = await graphql(schemaToUse, mutation, null, {
-        pgClient: pgClient,
-      });
+      const result = await graphql(
+        schemaToUse,
+        mutation,
+        null,
+        {
+          pgClient: pgClient,
+        },
+        variables
+      );
       if (result.errors) {
         // eslint-disable-next-line no-console
         console.log(result.errors.map(e => e.originalError));
