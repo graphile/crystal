@@ -104,7 +104,7 @@ program
   )
   .option(
     '-w, --watch',
-    'watches the Postgres schema for changes and reruns introspection if a change was detected',
+    'automatically updates your GraphQL schema when your database schema changes (NOTE: requires DB superuser to install `postgraphile_watch` schema)',
   )
   .option('-n, --host <string>', 'the hostname to be used. Defaults to `localhost`')
   .option('-p, --port <number>', 'the port to be used. Defaults to 5000', parseFloat)
