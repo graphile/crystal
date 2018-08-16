@@ -18,7 +18,9 @@ const ensureValidPlugins = (name, arr) => {
     const fn = arr[i];
     if (typeof fn !== "function") {
       throw new Error(
-        `Option '${name}' should be an array of functions, found '${typeof fn}' at index ${i}`
+        `Option '${name}' should be an array of functions, found '${
+          fn == null ? String(fn) : typeof fn
+        }' at index ${i}`
       );
     }
   }
