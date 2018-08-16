@@ -260,7 +260,7 @@ The Postgres [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/static/
 
 The following is a basic Postgres function:
 
-```sql
+```SQL
 create function add(a int, b int) returns int as $$
  select a + b
 $$ language sql stable;
@@ -580,21 +580,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoxLCJiIjoyLCJjI
 
 It will verify the token using the secret, and then will serialize the claims in that token to the database. So for our token above PostGraphile would effectively run:
 
-```sql
+```SQL
 set local jwt.claims.a to 1;
 set local jwt.claims.b to 2;
 set local jwt.claims.c to 3;
 ```
 
-This way your JWT is accessible in your database rules. To get these values back out in SQL, just run the following function:
+This way your JWT is accessible in your database rules. To get these values back out in SQL, just run the following function to get the setting (if it exists):
 
-```sql
-select current_setting('jwt.claims.a');
+```SQL
+-- For PG9.5 or below you'll need to remove the second argument (`missing_ok`) as it was added in 9.6.
+select current_setting('jwt.claims.a', true);
 ```
 
 All of the ‘claims’ or properties on the JWT are serialized to the database in this way, with one exception. If you have a `role` property in your JWT, PostGraphile will also set the Postgres role of the local transaction. So say you had a `role` of `forum_example_person`. PostGraphile would run:
 
-```sql
+```SQL
 set local role to 'forum_example_person'
 set local jwt.claims.role to 'forum_example_person'
 ```
@@ -685,13 +686,13 @@ Before we define permissions for our user, let’s utilize the fact that they ar
 create function forum_example.current_person() returns forum_example.person as $$
   select *
   from forum_example.person
-  where id = current_setting('jwt.claims.person_id')::integer
+  where id = current_setting('jwt.claims.person_id', true)::integer
 $$ language sql stable;
 
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
 ```
 
-This is a simple function that we can use in PostGraphile or our database to get the person who is currently executing the query — by means of the token in the request header. The one new concept here is `current_setting('jwt.claims.person_id')::integer`. As we discussed before, PostGraphile will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
+This is a simple function that we can use in PostGraphile or our database to get the person who is currently executing the query — by means of the token in the request header. The one new concept here is `current_setting('jwt.claims.person_id', true)::integer`. As we discussed before, PostGraphile will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
 
 Now, let’s use the JWT to define permissions.
 
@@ -753,10 +754,10 @@ Now both anonymous users and logged in users can see all of our `forum_example.p
 
 ```sql
 create policy update_person on forum_example.person for update to forum_example_person
-  using (id = current_setting('jwt.claims.person_id')::integer);
+  using (id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy delete_person on forum_example.person for delete to forum_example_person
-  using (id = current_setting('jwt.claims.person_id')::integer);
+  using (id = current_setting('jwt.claims.person_id', true)::integer);
 ```
 
 We use the current `person_id` from our JWT and only allow updates and deletes on rows with the same id. Also note how we added to `forum_example_person`. This is because we only want these policies to apply for the `forum_example_person` role.
@@ -765,13 +766,13 @@ That’s all we need to define for our person table. Now let’s define three po
 
 ```sql
 create policy insert_post on forum_example.post for insert to forum_example_person
-  with check (author_id = current_setting('jwt.claims.person_id')::integer);
+  with check (author_id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy update_post on forum_example.post for update to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy delete_post on forum_example.post for delete to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id', true)::integer);
 ```
 
 These policies are very similar to the ones before, except that the `insert_post` policy uses `with check` instead of `using` like our other policies. The difference between `with check` and `using` is roughly that `using` is applied _before_ any operation occurs to the table’s rows. So in the case of updating a post, one could not update a row that does not have the appropriate `author_id` in the first place. `with check` is run _after_ an operation is applied. If the `with check` fails the operation will be rejected. So in the case of an insert, Postgres sets all of the columns as specified and then compares against `with check` on the new row. You must use `with check` with `INSERT` commands because there are no rows to compare against before insertion, and you must use `using` with `DELETE` commands because a delete changes no rows only removes current ones.
