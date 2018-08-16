@@ -81,6 +81,17 @@ mutation {
       nullValue
     }
   }
+  l: updateNoPrimaryKeyById(input: {
+    id: 1
+    noPrimaryKeyPatch: {
+      str: "New String"
+    }
+  }) {
+    noPrimaryKey {
+      id
+      str
+    }
+  }
 }
 
 fragment updatePersonPayload on UpdatePersonPayload {

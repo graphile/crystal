@@ -856,6 +856,12 @@ Object {
         "nullValue": null,
       },
     },
+    "l": Object {
+      "noPrimaryKey": Object {
+        "id": 1,
+        "str": "New String",
+      },
+    },
   },
 }
 `;

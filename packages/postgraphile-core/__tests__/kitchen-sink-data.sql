@@ -1,3 +1,8 @@
+insert into a.no_primary_key (id, str) values
+  (1, 'one'),
+  (2, 'two'),
+  (3, 'three');
+
 insert into c.person (id, person_full_name, email, about, config, created_at) values
   (1, 'John Smith', 'john.smith@email.com', null, '', null),
   (2, 'Sara Smith', 'sara.smith@email.com', null, 'a => 1', null),

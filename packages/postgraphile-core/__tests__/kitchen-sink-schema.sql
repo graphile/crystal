@@ -24,6 +24,11 @@ create type b.wrapped_url as (
 create domain b.email as text
   check (value ~* '^.+@.+\..+$');
 
+create table a.no_primary_key (
+  id int not null unique,
+  str text not null
+);
+
 create table c.person (
   id serial primary key,
   person_full_name varchar not null,

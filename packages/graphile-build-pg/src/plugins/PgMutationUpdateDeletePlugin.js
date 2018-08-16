@@ -274,13 +274,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                 );
 
                 // NodeId
-                if (nodeIdFieldName) {
-                  const primaryKeyConstraint = introspectionResultsByKind.constraint
-                    .filter(con => con.classId === table.id)
-                    .filter(con => con.type === "p")[0];
-                  if (!primaryKeyConstraint) {
-                    return memo;
-                  }
+                const primaryKeyConstraint = introspectionResultsByKind.constraint
+                  .filter(con => con.classId === table.id)
+                  .filter(con => con.type === "p")[0];
+                if (nodeIdFieldName && primaryKeyConstraint) {
                   const primaryKeys =
                     primaryKeyConstraint &&
                     primaryKeyConstraint.keyAttributeNums.map(num =>
