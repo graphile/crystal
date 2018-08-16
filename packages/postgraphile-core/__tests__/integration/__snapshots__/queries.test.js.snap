@@ -1035,6 +1035,23 @@ Object {
 }
 `;
 
+exports[`longAliases.graphql 1`] = `
+Object {
+  "data": Object {
+    "person": Object {
+      "aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength": Object {
+        "totalCount": 2,
+      },
+      "anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength": Object {
+        "totalCount": 2,
+      },
+      "email": "sara.smith@email.com",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+  },
+}
+`;
+
 exports[`node.graphql 1`] = `
 Object {
   "data": Object {

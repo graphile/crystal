@@ -1,0 +1,16 @@
+query {
+  person: personByEmail(email: "sara.smith@email.com") {
+    nodeId
+    email
+
+    # safe alias: @@25fa9871b4d4d16ffd41359c88e7e851739819c6
+    aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength: friends {
+      totalCount
+    }
+
+    # safe alias: @@e82261e340b3c5fc784bd0d54ec53541f5a4e2fe
+    anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength: friends {
+      totalCount
+    }
+  }
+}
