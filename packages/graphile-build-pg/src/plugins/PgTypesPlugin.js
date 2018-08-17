@@ -325,7 +325,7 @@ export default (function PgTypesPlugin(
         );
       } else if (type.isPgArray) {
         const error = new Error(
-          "Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: `${type.namespaceName}.${type.name}`)"
+          `Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: "${type.namespaceName}.${type.name}")`
         );
         if (process.env.NODE_ENV === "test") {
           // This is to ensure that Graphile core does not introduce these problems
