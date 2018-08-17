@@ -860,6 +860,8 @@ function addCORSHeaders(res: ServerResponse): void {
       'Accept',
       // Used by PostGraphile for auth purposes.
       'Authorization',
+      // Used by GraphQL Playground and other Apollo-enabled servers
+      'X-Apollo-Tracing',
       // The `Content-*` headers are used when making requests with a body,
       // like in a POST request.
       'Content-Type',
