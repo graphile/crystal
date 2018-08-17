@@ -849,7 +849,7 @@ export default function createPostGraphileHttpRequestHandler(
  */
 function addCORSHeaders(res: ServerResponse): void {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Request-Method', 'HEAD, GET, POST');
+  res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
   res.setHeader(
     'Access-Control-Allow-Headers',
     [
@@ -860,6 +860,8 @@ function addCORSHeaders(res: ServerResponse): void {
       'Accept',
       // Used by PostGraphile for auth purposes.
       'Authorization',
+      // Used by GraphQL Playground and other Apollo-enabled servers
+      'X-Apollo-Tracing',
       // The `Content-*` headers are used when making requests with a body,
       // like in a POST request.
       'Content-Type',

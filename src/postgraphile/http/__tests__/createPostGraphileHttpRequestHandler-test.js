@@ -153,8 +153,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .options('/graphql')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'HEAD, GET, POST')
-        .expect('Access-Control-Allow-Headers', /Accept, Authorization/)
+        .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
+        .expect('Access-Control-Allow-Headers', /Accept, Authorization, X-Apollo-Tracing/)
         .expect('');
     });
 
@@ -163,8 +163,8 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server)
         .post('/graphql')
         .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Request-Method', 'HEAD, GET, POST')
-        .expect('Access-Control-Allow-Headers', /Accept, Authorization/);
+        .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
+        .expect('Access-Control-Allow-Headers', /Accept, Authorization, X-Apollo-Tracing/);
     });
 
     test('will not allow requests other than POST', async () => {
