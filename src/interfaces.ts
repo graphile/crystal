@@ -1,9 +1,10 @@
 /* tslint:disable:no-any */
 import { EventEmitter } from 'events';
-import { GraphQLError, GraphQLSchema } from 'graphql';
+import { GraphQLError, GraphQLSchema, SourceLocation } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
+import { Plugin } from 'graphile-build';
 import jwt = require('jsonwebtoken');
 
 /**
@@ -95,13 +96,13 @@ export interface PostGraphileOptions {
   ) => Array<GraphQLErrorExtended>);
   // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
   // after the default plugins.
-  appendPlugins?: Array<(builder: mixed) => {}>;
+  appendPlugins?: Array<Plugin>;
   // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
   // before the default plugins (you probably don't want this).
-  prependPlugins?: Array<(builder: mixed) => {}>;
+  prependPlugins?: Array<Plugin>;
   // The full array of [Graphile Build](/graphile-build/plugins/) plugins to
   // use for schema generation (you almost definitely don't want this!).
-  replaceAllPlugins?: Array<(builder: mixed) => {}>;
+  replaceAllPlugins?: Array<Plugin>;
   // A file path string. Reads cached values from local cache file to improve
   // startup time (you may want to do this in production).
   readCache?: string;
@@ -214,15 +215,10 @@ export interface PostGraphileOptions {
 
 export interface GraphQLFormattedErrorExtended {
   // This is ugly, really I just want `string | void` but apparently TypeScript doesn't support that.
-  [s: string]: Array<GraphQLErrorLocation> | Array<string | number> | string | void;
+  [s: string]: ReadonlyArray<SourceLocation> | ReadonlyArray<string | number> | string | void;
   message: string;
-  locations: Array<GraphQLErrorLocation> | void;
-  path: Array<string | number> | void;
-}
-
-export interface GraphQLErrorLocation {
-  line: number;
-  column: number;
+  locations: ReadonlyArray<SourceLocation> | void;
+  path: ReadonlyArray<string | number> | void;
 }
 
 export type GraphQLErrorExtended = GraphQLError & {
