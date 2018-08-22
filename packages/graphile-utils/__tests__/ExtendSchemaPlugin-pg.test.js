@@ -301,3 +301,53 @@ it("allows adding a simple mutation field to PG schema", async () => {
     pgClient.release();
   }
 });
+
+it("allows adding a field to an existing table, and requesting necessary data along with it", async () => {
+  const schema = await createPostGraphileSchema(pgPool, ["a"], {
+    disableDefaultMutations: true,
+    appendPlugins: [
+      makeExtendSchemaPlugin(() => ({
+        typeDefs: gql`
+          extend type User {
+            customField: String
+              @requires(columns: ["id", "name", "slightly_more_complex_column"])
+          }
+        `,
+        resolvers: {
+          User: {
+            customField: user =>
+              `User ${user.id} fetched (name: ${user.name}) ${JSON.stringify(
+                user.renamedComplexColumn
+              )}`,
+          },
+        },
+      })),
+    ],
+  });
+  const printedSchema = printSchema(schema);
+  expect(printedSchema).toMatchSnapshot();
+  const pgClient = await pgPool.connect();
+  try {
+    const { data, errors } = await graphql(
+      schema,
+      `
+        query {
+          userById(id: 1) {
+            customField
+          }
+        }
+      `,
+      null,
+      { pgClient },
+      {}
+    );
+    expect(errors).toBeFalsy();
+    expect(data).toBeTruthy();
+    expect(data.userById).toBeTruthy();
+    expect(data.userById.customField).toEqual(
+      `User 1 fetched (name: Alice) [{"number_int":1,"string_text":"hi"},{"number_int":2,"string_text":"bye"}]`
+    );
+  } finally {
+    pgClient.release();
+  }
+});

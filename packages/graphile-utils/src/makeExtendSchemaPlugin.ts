@@ -1,5 +1,5 @@
-import { SchemaBuilder, Build, Scope, Plugin, Options } from "graphile-build";
-import { QueryBuilder, SQL } from "graphile-build-pg";
+import { SchemaBuilder, Build, Context, Plugin, Options } from "graphile-build";
+import { QueryBuilder, SQL, PgClass } from "graphile-build-pg";
 import {
   // ONLY import types here, not values
   // Misc:
@@ -213,20 +213,16 @@ export default function makeExtendSchemaPlugin(
             {
               name,
               interfaces,
-              fields: ({
-                Self,
-                fieldWithHooks,
-                recurseDataGeneratorsForField,
-              }: {
+              fields: (fieldsContext: {
                 Self: typeof type;
                 fieldWithHooks: any;
                 recurseDataGeneratorsForField: any;
               }) =>
                 getFields(
-                  Self,
+                  fieldsContext.Self,
                   definition.fields,
                   resolvers,
-                  { fieldWithHooks, recurseDataGeneratorsForField },
+                  fieldsContext,
                   build
                 ),
               ...(description
@@ -269,13 +265,13 @@ export default function makeExtendSchemaPlugin(
       return _;
     });
 
-    builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    builder.hook("GraphQLObjectType:fields", (fields, build, context: any) => {
       const {
         extend,
         [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions,
         [`ExtendSchemaPlugin_${uniqueId}_resolvers`]: resolvers,
       } = build;
-      const { Self, fieldWithHooks, recurseDataGeneratorsForField } = context;
+      const { Self } = context;
       if (typeExtensions.GraphQLObjectType[Self.name]) {
         const newFields = typeExtensions.GraphQLObjectType[Self.name].reduce(
           (
@@ -286,7 +282,7 @@ export default function makeExtendSchemaPlugin(
               Self,
               extension.fields,
               resolvers,
-              { fieldWithHooks, recurseDataGeneratorsForField },
+              context,
               build
             );
             return extend(memo, moreFields);
@@ -379,7 +375,15 @@ function getInterfaces(
   return [];
 }
 
-function getValue(value: ValueNode | GraphileEmbed) {
+function getValue(
+  value: ValueNode | GraphileEmbed
+):
+  | boolean
+  | string
+  | number
+  | null
+  | Array<boolean | string | number | null>
+  | any {
   if (value.kind === "BooleanValue") {
     return !!value.value;
   } else if (value.kind === "StringValue") {
@@ -390,6 +394,8 @@ function getValue(value: ValueNode | GraphileEmbed) {
     return parseFloat(value.value);
   } else if (value.kind === "NullValue") {
     return null;
+  } else if (value.kind === "ListValue") {
+    return value.values.map(getValue);
   } else if (value.kind === "GraphileEmbed") {
     // RAW!
     return value.value;
@@ -479,12 +485,12 @@ function getArguments(
   return {};
 }
 
-type SelectGraphQLResultFromTable = (
+export type SelectGraphQLResultFromTable = (
   tableFragment: SQL,
   builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
 ) => Promise<any>;
 
-type GraphileHelpers<TSource> = Scope<TSource> & {
+export type GraphileHelpers<TSource> = Context<TSource> & {
   selectGraphQLResultFromTable: SelectGraphQLResultFromTable;
 };
 
@@ -508,9 +514,9 @@ function getFields<TSource>(
   const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
   function augmentResolver(
     resolver: AugmentedGraphQLFieldResolver<TSource, any>,
-    fieldScope: Scope<TSource>
+    fieldContext: Context<TSource>
   ) {
-    const { getDataFromParsedResolveInfoFragment } = fieldScope;
+    const { getDataFromParsedResolveInfoFragment } = fieldContext;
     const newResolver: GraphQLFieldResolver<TSource, any> = (
       parent,
       args,
@@ -541,7 +547,7 @@ function getFields<TSource>(
         return rows;
       };
       return resolver(parent, args, context, resolveInfo, {
-        ...fieldScope,
+        ...fieldContext,
         selectGraphQLResultFromTable,
       });
     };
@@ -590,14 +596,65 @@ function getFields<TSource>(
         }
         memo[fieldName] = fieldWithHooks(
           fieldName,
-          (fieldScope: Scope<TSource>) => {
+          (fieldContext: Context<TSource>) => {
+            const { pgIntrospection } = fieldContext.scope;
+            // @requires directive: pulls down necessary columns from table.
+            //
+            //   e.g. `@requires(columns: ["id", "name"])`
+            //
+            if (directives.requires && pgIntrospection.kind === "class") {
+              if (Array.isArray(directives.requires.columns)) {
+                const table: PgClass = pgIntrospection;
+                const attrs = table.attributes.filter(
+                  attr => directives.requires.columns.indexOf(attr.name) >= 0
+                );
+                const fieldNames = attrs.map(attr =>
+                  build.inflection.column(attr)
+                );
+                const ReturnTypes = attrs.map(
+                  attr =>
+                    build.pgGetGqlTypeByTypeIdAndModifier(
+                      attr.typeId,
+                      attr.typeModifier
+                    ) || build.graphql.GraphQLString
+                );
+                fieldContext.addDataGenerator(
+                  (parsedResolveInfoFragment: any) => ({
+                    pgQuery: (queryBuilder: QueryBuilder) => {
+                      attrs.forEach((attr, i) => {
+                        const columnFieldName = fieldNames[i];
+                        const ReturnType = ReturnTypes[i];
+                        queryBuilder.select(
+                          build.pgGetSelectValueForFieldAndTypeAndModifier(
+                            ReturnType,
+                            fieldContext,
+                            parsedResolveInfoFragment,
+                            sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
+                              attr.name
+                            )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
+                            attr.type,
+                            attr.typeModifier
+                          ),
+                          columnFieldName
+                        );
+                      });
+                    },
+                  })
+                );
+              } else {
+                throw new Error(
+                  `@requires(columns: ["...", ...]) directive called with invalid arguments`
+                );
+              }
+            }
+
             const resolversSpec = rawResolversSpec
               ? Object.keys(rawResolversSpec).reduce(
                   (newResolversSpec, key) => {
                     if (typeof rawResolversSpec[key] === "function") {
                       newResolversSpec[key] = augmentResolver(
                         rawResolversSpec[key],
-                        fieldScope
+                        fieldContext
                       );
                     }
                     return newResolversSpec;

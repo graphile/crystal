@@ -19,10 +19,11 @@
     "prettier": "^1.4.4"
   },
   "scripts": {
+    "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint": "eslint packages && lerna run tslint",
     "flow": "flow",
     "flow:check": "flow check",
-    "test": "lerna run test",
+    "test": "lerna run --concurrency 1 test",
     "prepack:all": "scripts/prepack-all",
     "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
     "clean": "rm -Rf packages/*/node8plus/"

@@ -5,6 +5,70 @@ const nullableIf = (GraphQLNonNull, condition, Type) =>
   condition ? Type : new GraphQLNonNull(Type);
 
 export default (function PgColumnsPlugin(builder) {
+  builder.hook("build", build => {
+    const {
+      pgSql: sql,
+      pgTweakFragmentForTypeAndModifier,
+      pgQueryFromResolveData: queryFromResolveData,
+    } = build;
+    const getSelectValueForFieldAndTypeAndModifier = (
+      ReturnType,
+      fieldScope,
+      parsedResolveInfoFragment,
+      sqlFullName,
+      type,
+      typeModifier
+    ) => {
+      const { getDataFromParsedResolveInfoFragment } = fieldScope;
+      if (type.isPgArray) {
+        const ident = sql.identifier(Symbol());
+        return sql.fragment`
+          (
+            case
+            when ${sqlFullName} is null then null
+            when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
+            else
+              (
+                select json_agg(${getSelectValueForFieldAndTypeAndModifier(
+                  ReturnType,
+                  fieldScope,
+                  parsedResolveInfoFragment,
+                  ident,
+                  type.arrayItemType,
+                  typeModifier
+                )})
+                from unnest(${sqlFullName}) as ${ident}
+              )
+            end
+          )
+        `;
+      } else {
+        const resolveData = getDataFromParsedResolveInfoFragment(
+          parsedResolveInfoFragment,
+          ReturnType
+        );
+        if (type.type === "c") {
+          const jsonBuildObject = queryFromResolveData(
+            sql.identifier(Symbol()), // Ignore!
+            sqlFullName,
+            resolveData,
+            { onlyJsonField: true, addNullCase: true }
+          );
+          return jsonBuildObject;
+        } else {
+          return pgTweakFragmentForTypeAndModifier(
+            sqlFullName,
+            type,
+            typeModifier,
+            resolveData
+          );
+        }
+      }
+    };
+    return build.extend(build, {
+      pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
+    });
+  });
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -13,11 +77,10 @@ export default (function PgColumnsPlugin(builder) {
       pgSql: sql,
       pg2gql,
       graphql: { GraphQLString, GraphQLNonNull },
-      pgTweakFragmentForTypeAndModifier,
       pgColumnFilter,
       inflection,
-      pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
+      pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
     } = build;
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
@@ -59,7 +122,8 @@ export default (function PgColumnsPlugin(builder) {
           }
           memo[fieldName] = fieldWithHooks(
             fieldName,
-            ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+            fieldContext => {
+              const { addDataGenerator } = fieldContext;
               const ReturnType =
                 pgGetGqlTypeByTypeIdAndModifier(
                   attr.typeId,
@@ -68,55 +132,11 @@ export default (function PgColumnsPlugin(builder) {
               addDataGenerator(parsedResolveInfoFragment => {
                 return {
                   pgQuery: queryBuilder => {
-                    const getSelectValueForFieldAndTypeAndModifier = (
-                      sqlFullName,
-                      type,
-                      typeModifier
-                    ) => {
-                      if (type.isPgArray) {
-                        const ident = sql.identifier(Symbol());
-                        return sql.fragment`
-                          (
-                            case
-                            when ${sqlFullName} is null then null
-                            when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
-                            else
-                              (
-                                select json_agg(${getSelectValueForFieldAndTypeAndModifier(
-                                  ident,
-                                  type.arrayItemType,
-                                  typeModifier
-                                )})
-                                from unnest(${sqlFullName}) as ${ident}
-                              )
-                            end
-                          )
-                        `;
-                      } else {
-                        const resolveData = getDataFromParsedResolveInfoFragment(
-                          parsedResolveInfoFragment,
-                          ReturnType
-                        );
-                        if (type.type === "c") {
-                          const jsonBuildObject = queryFromResolveData(
-                            sql.identifier(Symbol()), // Ignore!
-                            sqlFullName,
-                            resolveData,
-                            { onlyJsonField: true, addNullCase: true }
-                          );
-                          return jsonBuildObject;
-                        } else {
-                          return pgTweakFragmentForTypeAndModifier(
-                            sqlFullName,
-                            type,
-                            typeModifier,
-                            resolveData
-                          );
-                        }
-                      }
-                    };
                     queryBuilder.select(
                       getSelectValueForFieldAndTypeAndModifier(
+                        ReturnType,
+                        fieldContext,
+                        parsedResolveInfoFragment,
                         sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
                           attr.name
                         )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
