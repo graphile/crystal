@@ -177,7 +177,7 @@ export default function createPostGraphileHttpRequestHandler(
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
     if (options.showErrorStack)
-      formattedError.stack =
+      (formattedError as object)['stack'] =
         error.stack != null && options.showErrorStack === 'json'
           ? error.stack.split('\n')
           : error.stack;
@@ -266,7 +266,7 @@ export default function createPostGraphileHttpRequestHandler(
   const SHA1_BASE64_LENGTH = 28;
   interface CacheEntry {
     queryDocumentAst: DocumentNode;
-    validationErrors: Array<GraphQLError>;
+    validationErrors: ReadonlyArray<GraphQLError>;
     length: number;
   }
   const queryCache = LRU({
@@ -280,7 +280,7 @@ export default function createPostGraphileHttpRequestHandler(
     queryString: string,
   ): {
     queryDocumentAst: DocumentNode;
-    validationErrors: Array<GraphQLError>;
+    validationErrors: ReadonlyArray<GraphQLError>;
   } => {
     if (gqlSchema !== lastGqlSchema) {
       queryCache.reset();
@@ -642,7 +642,7 @@ export default function createPostGraphileHttpRequestHandler(
                 `Operation name must be a string, not '${typeof params.operationName}'.`,
               );
 
-            let validationErrors: Array<GraphQLError>;
+            let validationErrors: ReadonlyArray<GraphQLError>;
             ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, params.query));
 
             if (validationErrors.length === 0) {

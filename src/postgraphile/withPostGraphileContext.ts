@@ -110,7 +110,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
       // add settings for keys we've already seen.
       const seenKeys: Array<string> = [];
 
-      const sqlSettings: Array<sql.SQLNode> = [];
+      const sqlSettings: Array<sql.SQLQuery> = [];
       for (let i = localSettings.length - 1; i >= 0; i--) {
         const [key, value] = localSettings[i];
         if (seenKeys.indexOf(key) < 0) {
@@ -118,7 +118,9 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
           // Make sure that the third config is always `true` so that we are only
           // ever setting variables on the transaction.
           // Also, we're using `unshift` to undo the reverse-looping we're doing
-          sqlSettings.unshift(sql.query`set_config(${sql.value(key)}, ${sql.value(value)}, true)`);
+          sqlSettings.unshift(
+            sql.fragment`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
+          );
         }
       }
 

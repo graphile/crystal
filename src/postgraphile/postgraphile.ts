@@ -62,7 +62,7 @@ export function getPostgraphileSchemaBuilder(
   async function createGqlSchema(): Promise<GraphQLSchema> {
     try {
       if (options.watchPg) {
-        await watchPostGraphileSchema(pgPool, pgSchemas, options, (newSchema: GraphQLSchema) => {
+        await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
           gqlSchema = newSchema;
           _emitter.emit('schemas:changed');
           exportGqlSchema(gqlSchema);
