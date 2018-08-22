@@ -84,7 +84,10 @@ with
       ($2 is true or not exists(
         select 1
         from pg_catalog.pg_depend
-        where pg_depend.refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass and pg_depend.deptype = 'e' and pg_depend.objid = pro.oid
+        where pg_depend.refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass
+        and pg_depend.deptype = 'e'
+        and pg_depend.classid = 'pg_catalog.pg_proc'::pg_catalog.regclass
+        and pg_depend.objid = pro.oid
       ))
     order by
       pro.pronamespace, pro.proname
@@ -132,7 +135,10 @@ with
       ($2 is true or not exists(
         select 1
         from pg_catalog.pg_depend
-        where pg_depend.refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass and pg_depend.deptype = 'e' and pg_depend.objid = rel.oid
+        where pg_depend.refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass
+        and pg_depend.deptype = 'e'
+        and pg_depend.classid = 'pg_catalog.pg_class'::pg_catalog.regclass
+        and pg_depend.objid = rel.oid
       ))
     order by
       rel.relnamespace, rel.relname
