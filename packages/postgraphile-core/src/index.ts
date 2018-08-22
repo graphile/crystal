@@ -20,6 +20,16 @@ import {
 } from "graphile-build-pg";
 import { Pool, Client } from "pg";
 
+export {
+  Plugin,
+  Build,
+  Context,
+  SchemaBuilder,
+  SchemaListener,
+  Inflection,
+  Options,
+};
+
 type mixed = {} | string | number | boolean | undefined | null;
 
 const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
