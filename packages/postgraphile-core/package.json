@@ -5,8 +5,9 @@
   "main": "node8plus/index.js",
   "scripts": {
     "test": "scripts/test",
-    "prepack": "mkdir -p node8plus && babel -s true --out-dir node8plus src && flow-copy-source src node8plus",
-    "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
+    "prepack": "mkdir -p node8plus && tsc",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
+    "watch": "mkdir -p node8plus && tsc --watch"
   },
   "repository": {
     "type": "git",
@@ -19,17 +20,24 @@
     "url": "https://github.com/graphile/graphile-build/issues"
   },
   "dependencies": {
+    "@types/graphql": "0.13.4",
     "graphile-build": "4.0.0-rc.5",
     "graphile-build-pg": "4.0.0-rc.5"
   },
   "devDependencies": {
+    "@types/node": "10.7.1",
+    "@types/pg": "7.4.10",
     "babel-cli": "^6.24.1",
     "debug": ">=2 <3",
     "eslint_d": "5.3.1",
-    "flow-copy-source": "^1.2.0",
-    "jest": "^20.0.4",
+    "jest": "23.5.0",
     "jsonwebtoken": "^8.1.1",
-    "pg-connection-string": "^0.1.3"
+    "pg-connection-string": "^0.1.3",
+    "prettier": "^1.4.4",
+    "ts-node": "7.0.1",
+    "tslint": "5.11.0",
+    "tslint-config-prettier": "1.14.0",
+    "typescript": "3.0.1"
   },
   "peerDependencies": {
     "graphql": ">=0.9 <0.14",

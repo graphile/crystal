@@ -1,24 +1,31 @@
-import { parse, visit } from "graphql";
+import { parse, visit, ASTNode } from "graphql";
 const $$embed = Symbol("graphile-embed");
 
-export function isEmbed(obj) {
+export interface GraphileEmbed<T = any> {
+  [$$embed]: true;
+  kind: "GraphileEmbed";
+  value: T;
+}
+
+export function isEmbed(obj: any): obj is GraphileEmbed {
   return obj && obj[$$embed] === true;
 }
 
-export function embed(value) {
+export function embed<T>(value: T): GraphileEmbed<T> {
   return {
     [$$embed]: true,
-    value: {
-      kind: "GraphileEmbed",
-      value,
-    },
+    kind: "GraphileEmbed",
+    value,
   };
 }
 
-export function gql(strings, ...interpolatedValues) {
+export function gql(
+  strings: TemplateStringsArray,
+  ...interpolatedValues: Array<string | GraphileEmbed>
+) {
   const gqlStrings = [];
   const placeholders = {};
-  const createPlaceholderFor = value => {
+  const createPlaceholderFor = (value: any) => {
     const rand = String(Math.random());
     placeholders[rand] = value;
     return `"${rand}"`;
@@ -30,7 +37,7 @@ export function gql(strings, ...interpolatedValues) {
     } else {
       const interpolatedValue = interpolatedValues[idx];
       if (isEmbed(interpolatedValue)) {
-        gqlStrings.push(createPlaceholderFor(interpolatedValue.value));
+        gqlStrings.push(createPlaceholderFor(interpolatedValue));
       } else {
         if (typeof interpolatedValue !== "string") {
           throw new Error(
@@ -46,7 +53,7 @@ export function gql(strings, ...interpolatedValues) {
   }
   const ast = parse(gqlStrings.join(""));
   const visitor = {
-    enter(node, _key, _parent, _path, _ancestors) {
+    enter: (node: ASTNode) => {
       if (node.kind === "Argument") {
         if (node.value.kind === "StringValue") {
           if (placeholders[node.value.value]) {

@@ -3,7 +3,7 @@ import {
   makeAddInflectorsPlugin,
   gql,
   embed,
-} from "../src";
+} from "../";
 import {
   buildSchema,
   // defaultPlugins,

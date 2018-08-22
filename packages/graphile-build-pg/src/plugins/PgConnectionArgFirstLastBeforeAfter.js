@@ -1,7 +1,7 @@
 // @flow
 import type { Plugin } from "graphile-build";
 
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
+const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 
 export default (function PgConnectionArgs(builder) {
   builder.hook(

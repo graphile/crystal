@@ -1,5 +1,5 @@
 // @flow
-import sql from "pg-sql2";
+import * as sql from "pg-sql2";
 import type { Plugin } from "graphile-build";
 import { version } from "../../package.json";
 import type {

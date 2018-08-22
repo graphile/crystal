@@ -1,6 +1,6 @@
 // @flow
 
-import sql from "pg-sql2";
+import * as sql from "pg-sql2";
 import debugFactory from "debug";
 import type { Client } from "pg";
 import type { SQL, SQLQuery } from "pg-sql2";

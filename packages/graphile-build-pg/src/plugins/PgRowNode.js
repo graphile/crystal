@@ -2,7 +2,7 @@
 import type { Plugin } from "graphile-build";
 import debugFactory from "debug";
 
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
+const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgRowNode(builder) {

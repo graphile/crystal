@@ -1,7 +1,7 @@
 import pg from "pg";
 import { graphql, printSchema } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
-import { makeExtendSchemaPlugin, gql } from "../src";
+import { makeExtendSchemaPlugin, gql } from "../";
 
 const clean = data => {
   if (Array.isArray(data)) {

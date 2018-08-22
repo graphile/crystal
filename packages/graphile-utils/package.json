@@ -3,10 +3,12 @@
   "version": "4.0.0-rc.5",
   "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
+  "types": "node8plus/index.d.ts",
   "scripts": {
     "test": "scripts/test",
-    "prepack": "mkdir -p node8plus && babel -s true --out-dir node8plus src && flow-copy-source src node8plus",
-    "watch": "mkdir -p node8plus && babel -s true --watch --out-dir node8plus src"
+    "prepack": "mkdir -p node8plus && tsc",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
+    "watch": "mkdir -p node8plus && tsc --watch"
   },
   "repository": {
     "type": "git",
@@ -34,11 +36,15 @@
     "node": ">=8.6"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
     "eslint_d": "5.3.1",
-    "flow-copy-source": "^1.2.0",
     "graphile-build": "4.0.0-rc.5",
-    "jest": "^20.0.4"
+    "graphile-build-pg": "4.0.0-rc.5",
+    "jest": "23.5.0",
+    "prettier": "1.14.2",
+    "ts-node": "7.0.1",
+    "tslint": "5.11.0",
+    "tslint-config-prettier": "1.15.0",
+    "typescript": "3.0.1"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"

@@ -1,6 +1,6 @@
 // @flow
 import QueryBuilder from "./QueryBuilder";
-import sql from "pg-sql2";
+import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
 import type { DataForType } from "graphile-build";
 import isSafeInteger from "lodash/isSafeInteger";

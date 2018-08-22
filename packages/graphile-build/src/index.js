@@ -27,6 +27,8 @@ export {
   singularize,
 } from "./utils";
 
+export type { SchemaBuilder };
+
 export type {
   Plugin,
   Options,

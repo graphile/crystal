@@ -321,13 +321,17 @@ class SchemaBuilder extends EventEmitter {
     return this._generatedSchema;
   }
 
-  async watchSchema(listener: SchemaListener) {
-    if (this._watching || this._busy) {
-      throw new Error("We're already watching this schema!");
+  async watchSchema(listener?: SchemaListener) {
+    if (this._busy) {
+      throw new Error("An operation is in progress");
+    }
+    if (this._watching) {
+      throw new Error(
+        "We're already watching this schema! Use `builder.on('schema', callback)` instead."
+      );
     }
     try {
       this._busy = true;
-      this._watching = true;
       this._explicitSchemaListener = listener;
       this.triggerChange = () => {
         this._generatedSchema = null;
@@ -346,20 +350,24 @@ class SchemaBuilder extends EventEmitter {
           console.error(e);
         }
       };
-      if (listener) {
-        this.on("schema", listener);
-      }
       for (const fn of this.watchers) {
         await fn(this.triggerChange);
       }
+      if (listener) {
+        this.on("schema", listener);
+      }
       this.emit("schema", this.buildSchema());
+      this._watching = true;
     } finally {
       this._busy = false;
     }
   }
 
   async unwatchSchema() {
-    if (!this._watching || this._busy) {
+    if (this._busy) {
+      throw new Error("An operation is in progress");
+    }
+    if (!this._watching) {
       throw new Error("We're not watching this schema!");
     }
     this._busy = true;

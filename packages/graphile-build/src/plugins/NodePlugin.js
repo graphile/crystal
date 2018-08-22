@@ -11,8 +11,8 @@ import type { ResolveTree } from "graphql-parse-resolve-info";
 import type { GraphQLType, GraphQLInterfaceType } from "graphql";
 import type { BuildExtensionQuery } from "./QueryPlugin";
 
-const base64 = str => new Buffer(String(str)).toString("base64");
-const base64Decode = str => new Buffer(String(str), "base64").toString("utf8");
+const base64 = str => Buffer.from(String(str)).toString("base64");
+const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 
 export type NodeFetcher = (
   data: mixed,
