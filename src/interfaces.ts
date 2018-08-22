@@ -4,7 +4,7 @@ import { GraphQLError, GraphQLSchema, SourceLocation } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
-import { Plugin } from 'graphile-build';
+import { Plugin } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 
 /**

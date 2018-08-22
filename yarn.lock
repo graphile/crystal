@@ -6346,9 +6346,9 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.0.0-rc.6:
-  version "4.0.0-rc.6"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.6.tgz#2543269aa73b53e3b1fe030c87eff026acdeadb4"
+postgraphile-core@4.0.0-rc.7:
+  version "4.0.0-rc.7"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.7.tgz#6f8724a586b8f413596f6515ae2e3342f7982445"
   dependencies:
     "@types/graphql" "0.13.4"
     graphile-build "4.0.0-rc.6"
