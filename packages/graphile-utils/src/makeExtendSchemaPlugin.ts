@@ -129,10 +129,15 @@ export default function makeExtendSchemaPlugin(
             definition,
           });
         } else {
+          if ((definition.kind as any) === "TypeExtensionDefinition") {
+            throw new Error(
+              `You appear to be using a GraphQL version prior to v0.12.0 which has different syntax for schema extensions (e.g. 'TypeExtensionDefinition' instead of 'ObjectTypeExtension'). Sadly makeExtendSchemaPlugin does not support versions of graphql prior to 0.12.0, please update your version of graphql.`
+            );
+          }
           throw new Error(
             `Unexpected '${
               definition.kind
-            }' definition; we were expecting 'GraphQLEnumType', ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
+            }' definition; we were expecting 'GraphQLEnumType', 'ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
           );
         }
       });
