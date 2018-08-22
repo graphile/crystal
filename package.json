@@ -38,7 +38,7 @@
     "prepack": "./scripts/build"
   },
   "dependencies": {
-    "@types/graphql": "^0.8.2",
+    "@types/graphql": "0.13.4",
     "@types/jsonwebtoken": "<7.2.1",
     "@types/koa": "2.0.44",
     "@types/pg": "^7.4.10",
