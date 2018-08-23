@@ -1,5 +1,4 @@
 /* tslint:disable:no-any */
-import { EventEmitter } from 'events';
 import { GraphQLError, GraphQLSchema, SourceLocation } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
@@ -226,15 +225,6 @@ export type GraphQLErrorExtended = GraphQLError & {
   detail: string;
   code: string;
 };
-
-// Used by `createPostGraphileHttpRequestHandler`
-export interface CreateRequestHandlerOptions extends PostGraphileOptions {
-  // The actual GraphQL schema we will use.
-  getGqlSchema: () => Promise<GraphQLSchema>;
-  // A Postgres client pool we use to connect Postgres clients.
-  pgPool: Pool;
-  _emitter: EventEmitter;
-}
 
 /**
  * A request handler for one of many different `http` frameworks.
