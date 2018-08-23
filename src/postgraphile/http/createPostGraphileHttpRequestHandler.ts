@@ -17,7 +17,7 @@ import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, CreateRequestHandlerOptions, mixed } from '../../interfaces';
+import { HttpRequestHandler, PostGraphileOptions, mixed } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import { Context as KoaContext } from 'koa';
@@ -31,6 +31,17 @@ import bodyParser = require('body-parser');
 import sendFile = require('send');
 import LRU = require('lru-cache');
 import crypto = require('crypto');
+import { Pool } from 'pg';
+import { EventEmitter } from 'events';
+
+// Used by `createPostGraphileHttpRequestHandler`
+export interface CreateRequestHandlerOptions extends PostGraphileOptions {
+  // The actual GraphQL schema we will use.
+  getGqlSchema: () => Promise<GraphQLSchema>;
+  // A Postgres client pool we use to connect Postgres clients.
+  pgPool: Pool;
+  _emitter: EventEmitter;
+}
 
 const calculateQueryHash = (queryString: string): string =>
   crypto

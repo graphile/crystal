@@ -6,6 +6,8 @@ import {
 } from './postgraphile';
 import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
 
+export * from './interfaces';
+
 export default postgraphile;
 
 export {
