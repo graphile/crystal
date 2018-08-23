@@ -95,7 +95,7 @@ program
   )
   .option(
     '-c, --connection <string>',
-    'the Postgres connection. if not provided it will be inferred from your environment, example: postgres://user:password@domain:port/db',
+    "the PostgreSQL database name or connection string (if omitted, inferred from environmental variables). Examples: 'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=1'",
   )
   .option(
     '-s, --schema <string>',
@@ -640,29 +640,41 @@ if (noServer) {
           )} 🚀`,
         );
         console.log('');
+        const {
+          host: rawPgHost,
+          port: rawPgPort,
+          database: pgDatabase,
+          user: pgUser,
+          password: pgPassword,
+        } = pgConfig;
+        // Not using default because want to handle the empty string also.
+        const pgHost = rawPgHost || 'localhost';
+        const pgPort = (rawPgPort && parseInt(String(rawPgPort), 10)) || 5432;
         const safeConnectionString = isDemo
           ? 'postgraphile_demo'
-          : `postgres://${pgConfig.host}:${pgConfig.port || 5432}${
-              pgConfig.database != null ? `/${pgConfig.database}` : ''
-            }`;
+          : `postgres://${pgUser ? pgUser : ''}${pgPassword ? ':[SECRET]' : ''}${
+              pgUser || pgPassword ? '@' : ''
+            }${pgUser || pgPassword || pgHost !== 'localhost' || pgPort !== 5432 ? pgHost : ''}${
+              pgPort !== 5432 ? `:${pgConfig.port || 5432}` : ''
+            }${pgDatabase ? `/${pgDatabase}` : ''}`;
 
         const information = pluginHook(
           'cli:greeting',
           [
-            `Connected to Postgres instance ${chalk.underline.blue(safeConnectionString)}`,
-            `Introspected Postgres schema(s) ${schemas
-              .map(schema => chalk.magenta(schema))
-              .join(', ')}`,
-            `GraphQL API endpoint served at ${chalk.underline(
+            `GraphQL API:         ${chalk.underline.bold.blue(
               `http://${hostname}:${actualPort}${graphqlRoute}`,
             )}`,
             !disableGraphiql &&
-              `GraphiQL IDE endpoint served at ${chalk.underline(
+              `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
               )}`,
-            `Documentation: ${chalk.underline(`https://graphile.org/postgraphile/introduction/`)}`,
+            `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}`,
+            `Postgres schema(s):  ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`,
+            `Documentation:       ${chalk.underline(
+              `https://graphile.org/postgraphile/introduction/`,
+            )}`,
             extractedPlugins.length === 0 &&
-              `Please support PostGraphile development: ${chalk.underline(
+              `Please support PostGraphile development: ${chalk.underline.bold.blue(
                 `https://graphile.org/donate`,
               )}`,
           ],
