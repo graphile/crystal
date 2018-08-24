@@ -1,8 +1,8 @@
 # postgraphile-core
 
 This module implements a compatibility layer between PostGraphile v4 and
-`graphile-build`, loading the relevant `graphile-build-pg` plugins and setting
-the correct inflector depending on the PostGraphile options provided.
+`graphile-build`, loading the relevant `graphile-build-pg` plugins and
+augmenting the inflector depending on the PostGraphile options provided.
 
 Unless you want to use the low-level API you probably want to go to the
 PostGraphile (previously 'PostGraphQL') repository instead:
@@ -26,11 +26,11 @@ Example:
 ```js
 const schema = await createPostGraphileSchema(
   process.env.DATABASE_URL,
-  ['users_schema', 'posts_schema'],
+  ["users_schema", "posts_schema"],
   {
     dynamicJson: true,
     pgJwtSecret: process.env.JWT_SECRET,
-    pgJwtTypeIdentifier: 'users_schema.jwt_type',
+    pgJwtTypeIdentifier: "users_schema.jwt_type",
   }
 );
 ```
@@ -44,7 +44,7 @@ const pg = require("pg");
 
 // Create a postgres pool for efficiency
 const pgPool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
 });
 
 async function runQuery(query, variables) {
@@ -59,7 +59,7 @@ async function runQuery(query, variables) {
     {
       dynamicJson: true,
       pgJwtSecret: process.env.JWT_SECRET,
-      pgJwtTypeIdentifier: "users_schema.jwt_type"
+      pgJwtTypeIdentifier: "users_schema.jwt_type",
     }
   );
 
@@ -82,7 +82,7 @@ async function runQuery(query, variables) {
       query,
       null,
       /* CONTEXT > */ {
-        pgClient: pgClient
+        pgClient: pgClient,
       } /* < CONTEXT */,
       variables
     );
