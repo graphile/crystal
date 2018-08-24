@@ -6,9 +6,19 @@ import {
 } from './postgraphile';
 import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
 
-export * from './interfaces';
-
-export default postgraphile;
+export {
+  Plugin,
+  Build,
+  Context,
+  SchemaBuilder,
+  SchemaListener,
+  Inflection,
+  Options,
+  postGraphileBaseOverrides,
+  postGraphileClassicIdsOverrides,
+  PostGraphileInflectionPlugin,
+  PostGraphileClassicIdsInflectionPlugin,
+} from 'postgraphile-core';
 
 export {
   postgraphile,
@@ -23,3 +33,7 @@ export {
   watchPostGraphileSchema as watchPostGraphQLSchema,
   withPostGraphileContext as withPostGraphQLContext,
 };
+
+export * from './interfaces';
+
+export default postgraphile;
