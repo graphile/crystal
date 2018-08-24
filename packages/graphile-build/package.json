@@ -28,7 +28,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/graphql": "0.13.4",
+    "@types/graphql": "^0.13.4",
     "debug": ">=2 <3",
     "graphql-parse-resolve-info": "4.0.0-rc.6",
     "lodash": ">=4 <5",

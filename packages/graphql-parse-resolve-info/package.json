@@ -44,7 +44,7 @@
     "typescript": "3.0.1"
   },
   "dependencies": {
-    "@types/graphql": "0.13.4",
+    "@types/graphql": "^0.13.4",
     "debug": ">=2 <3"
   },
   "files": [
