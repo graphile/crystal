@@ -3360,13 +3360,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphile-build-pg@4.0.0-rc.8:
-  version "4.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.8.tgz#e8cb1c6f16d537792e3d36009094b7947841d58a"
+graphile-build-pg@4.0.0-rc.9:
+  version "4.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.9.tgz#241d3776bbb12b48cb7cbc599b80f51cf4133a00"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-rc.8"
+    graphile-build "4.0.0-rc.9"
     graphql-iso-date "^3.2.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3374,9 +3374,9 @@ graphile-build-pg@4.0.0-rc.8:
     pg-sql2 "2.2.1"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-rc.8:
-  version "4.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.8.tgz#e5a21affe4f35742a68281685e07a863ff391b39"
+graphile-build@4.0.0-rc.9:
+  version "4.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.9.tgz#8fb16994c65f21b7900c76dd6a67c037f5bb00ee"
   dependencies:
     "@types/graphql" "^0.13.4"
     debug ">=2 <3"
@@ -6346,13 +6346,13 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.0.0-rc.8:
-  version "4.0.0-rc.8"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.8.tgz#d0267e7a4c5df5ec662439c13a6e23471e86cf98"
+postgraphile-core@4.0.0-rc.9:
+  version "4.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.9.tgz#7dc9bf1d0da3a4f81bd68b3977d27ed174a5c72f"
   dependencies:
     "@types/graphql" "^0.13.4"
-    graphile-build "4.0.0-rc.8"
-    graphile-build-pg "4.0.0-rc.8"
+    graphile-build "4.0.0-rc.9"
+    graphile-build-pg "4.0.0-rc.9"
 
 postgres-array@~1.0.0:
   version "1.0.2"
