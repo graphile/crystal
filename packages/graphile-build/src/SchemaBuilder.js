@@ -10,6 +10,8 @@ import type {
   GraphQLObjectTypeConfig,
 } from "graphql";
 import EventEmitter from "events";
+// TODO: when we move to TypeScript, change this to:
+// import { EventEmitter } from "events";
 import type {
   simplifyParsedResolveInfoFragmentWithType,
   parseResolveInfo,

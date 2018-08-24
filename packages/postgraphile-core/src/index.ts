@@ -30,7 +30,7 @@ export {
   Options,
 };
 
-type mixed = {} | string | number | boolean | undefined | null;
+export type mixed = {} | string | number | boolean | undefined | null;
 
 const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
   if (!Array.isArray(arr)) {
@@ -48,7 +48,7 @@ const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
   }
 };
 
-interface PostGraphileOptions {
+export interface PostGraphileCoreOptions {
   dynamicJson?: boolean;
   classicIds?: boolean;
   disableDefaultMutations?: boolean;
@@ -155,7 +155,7 @@ const awaitKeys = async (obj: { [key: string]: Promise<any> }) => {
 const getPostGraphileBuilder = async (
   pgConfig: PgConfig,
   schemas: string | Array<string>,
-  options: PostGraphileOptions = {}
+  options: PostGraphileCoreOptions = {}
 ) => {
   const {
     dynamicJson,
@@ -337,7 +337,7 @@ function abort(e: Error) {
 export const createPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphileOptions = {}
+  options: PostGraphileCoreOptions = {}
 ) => {
   let writeCache: undefined | (() => Promise<void>);
   const builder = await getPostGraphileBuilder(pgConfig, schemas, {
@@ -359,7 +359,7 @@ export const createPostGraphileSchema = async (
 export const watchPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphileOptions = {},
+  options: PostGraphileCoreOptions = {},
   onNewSchema: SchemaListener
 ) => {
   if (typeof onNewSchema !== "function") {

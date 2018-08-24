@@ -14,7 +14,7 @@ import {
   GraphQLInputFieldConfigMap,
   GraphQLInputFieldConfig,
 } from "graphql";
-import * as EventEmitter from "events";
+import { EventEmitter } from "events";
 
 type mixed = {} | string | number | boolean | undefined | null;
 
