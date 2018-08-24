@@ -70,7 +70,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/graphql@0.13.4":
+"@types/graphql@0.13.4", "@types/graphql@^0.13.4":
   version "0.13.4"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.13.4.tgz#55ae9c29f0fd6b85ee536f5c72b4769d5c5e06b1"
 
