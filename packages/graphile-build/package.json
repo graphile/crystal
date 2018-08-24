@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "4.0.0-rc.8",
+  "version": "4.0.0-rc.9",
   "description": "Build a GraphQL schema from plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
