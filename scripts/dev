@@ -12,7 +12,7 @@ export BROWSER=none
 # Run Nodemon and watch the PostGraphile source code for changes.
 if [ "$1" = "--" ]; then
   shift
-  $npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts $* &
+  $npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts "$@" &
 else
   $npm_bin/nodemon \
     --watch src \
