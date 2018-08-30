@@ -252,7 +252,7 @@ program
   .option(
     '-A, --jwt-verify-audience <string>',
     "a comma separated list of JWT audiences that will be accepted; defaults to 'postgraphile'. To disable audience verification, set to ''.",
-    (option: string) => option.split(','),
+    (option: string) => option.split(',').filter(_ => _),
   )
   .option(
     '--jwt-verify-clock-tolerance <number>',
