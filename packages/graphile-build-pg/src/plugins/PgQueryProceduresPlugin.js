@@ -19,6 +19,8 @@ export default (function PgQueryProceduresPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgMakeProcField: makeProcField,
       pgOmit: omit,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const {
       scope: { isRootQuery },
@@ -76,10 +78,23 @@ export default (function PgQueryProceduresPlugin(
               ? inflection.functionQueryNameList(proc)
               : inflection.functionQueryName(proc);
             try {
-              memo[fieldName] = makeProcField(fieldName, proc, build, {
-                fieldWithHooks,
-                forceList,
-              });
+              memo = extend(
+                memo,
+                {
+                  [fieldName]: makeProcField(fieldName, proc, build, {
+                    fieldWithHooks,
+                    forceList,
+                  }),
+                },
+                `Adding query field for ${describePgEntity(
+                  proc
+                )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                  proc,
+                  {
+                    name: "newNameHere",
+                  }
+                )}`
+              );
             } catch (e) {
               // eslint-disable-next-line no-console
               console.warn(

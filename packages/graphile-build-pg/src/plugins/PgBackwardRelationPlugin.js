@@ -35,6 +35,8 @@ export default (function PgBackwardRelationPlugin(
       pgQueryFromResolveData: queryFromResolveData,
       pgAddStartEndCursor: addStartEndCursor,
       pgOmit: omit,
+      sqlCommentByAddingTags,
+      describePgEntity,
     } = build;
     const {
       scope: { isPgRowType, pgIntrospection: foreignTable },
@@ -128,7 +130,7 @@ export default (function PgBackwardRelationPlugin(
         const isDeprecated = isUnique && legacyRelationMode === DEPRECATED;
 
         const singleRelationFieldName = isUnique
-          ? inflection.singleRelationByKeys(
+          ? inflection.singleRelationByKeysBackwards(
               keys,
               table,
               foreignTable,
@@ -152,63 +154,85 @@ export default (function PgBackwardRelationPlugin(
           legacyRelationMode === DEPRECATED ||
           legacyRelationMode === ONLY;
 
-        if (shouldAddSingleRelation && !omit(table, "read")) {
-          memo[singleRelationFieldName] = fieldWithHooks(
-            singleRelationFieldName,
-            ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
-              addDataGenerator(parsedResolveInfoFragment => {
-                return {
-                  pgQuery: queryBuilder => {
-                    queryBuilder.select(() => {
-                      const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment,
-                        gqlTableType
-                      );
-                      const tableAlias = sql.identifier(Symbol());
-                      const foreignTableAlias = queryBuilder.getTableAlias();
-                      const query = queryFromResolveData(
-                        sql.identifier(schema.name, table.name),
-                        tableAlias,
-                        resolveData,
-                        {
-                          asJson: true,
-                          addNullCase: true,
-                          withPagination: false,
-                        },
-                        innerQueryBuilder => {
-                          innerQueryBuilder.parentQueryBuilder = queryBuilder;
-                          keys.forEach((key, i) => {
-                            innerQueryBuilder.where(
-                              sql.fragment`${tableAlias}.${sql.identifier(
-                                key.name
-                              )} = ${foreignTableAlias}.${sql.identifier(
-                                foreignKeys[i].name
-                              )}`
-                            );
-                          });
-                        }
-                      );
-                      return sql.fragment`(${query})`;
-                    }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
-                  },
-                };
-              });
-              return {
-                description:
-                  constraint.tags.backwardDescription ||
-                  `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
-                type: gqlTableType,
-                args: {},
-                resolve: (data, _args, _context, resolveInfo) => {
-                  const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
-                  return data[safeAlias];
-                },
-              };
-            },
+        if (
+          shouldAddSingleRelation &&
+          !omit(table, "read") &&
+          singleRelationFieldName
+        ) {
+          memo = extend(
+            memo,
             {
-              pgFieldIntrospection: table,
-              isPgBackwardSingleRelationField: true,
-            }
+              [singleRelationFieldName]: fieldWithHooks(
+                singleRelationFieldName,
+                ({
+                  getDataFromParsedResolveInfoFragment,
+                  addDataGenerator,
+                }) => {
+                  addDataGenerator(parsedResolveInfoFragment => {
+                    return {
+                      pgQuery: queryBuilder => {
+                        queryBuilder.select(() => {
+                          const resolveData = getDataFromParsedResolveInfoFragment(
+                            parsedResolveInfoFragment,
+                            gqlTableType
+                          );
+                          const tableAlias = sql.identifier(Symbol());
+                          const foreignTableAlias = queryBuilder.getTableAlias();
+                          const query = queryFromResolveData(
+                            sql.identifier(schema.name, table.name),
+                            tableAlias,
+                            resolveData,
+                            {
+                              asJson: true,
+                              addNullCase: true,
+                              withPagination: false,
+                            },
+                            innerQueryBuilder => {
+                              innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                              keys.forEach((key, i) => {
+                                innerQueryBuilder.where(
+                                  sql.fragment`${tableAlias}.${sql.identifier(
+                                    key.name
+                                  )} = ${foreignTableAlias}.${sql.identifier(
+                                    foreignKeys[i].name
+                                  )}`
+                                );
+                              });
+                            }
+                          );
+                          return sql.fragment`(${query})`;
+                        }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
+                      },
+                    };
+                  });
+                  return {
+                    description:
+                      constraint.tags.backwardDescription ||
+                      `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
+                    type: gqlTableType,
+                    args: {},
+                    resolve: (data, _args, _context, resolveInfo) => {
+                      const safeAlias = getSafeAliasFromResolveInfo(
+                        resolveInfo
+                      );
+                      return data[safeAlias];
+                    },
+                  };
+                },
+                {
+                  pgFieldIntrospection: table,
+                  isPgBackwardSingleRelationField: true,
+                }
+              ),
+            },
+            `Backward relation (single) for ${describePgEntity(
+              constraint
+            )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+              constraint,
+              {
+                foreignSingleFieldName: "newNameHere",
+              }
+            )}`
           );
         }
         function makeFields(isConnection) {
@@ -231,103 +255,131 @@ export default (function PgBackwardRelationPlugin(
                   constraint
                 );
 
-            memo[manyRelationFieldName] = fieldWithHooks(
-              manyRelationFieldName,
-              ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
-                addDataGenerator(parsedResolveInfoFragment => {
-                  return {
-                    pgQuery: queryBuilder => {
-                      queryBuilder.select(() => {
-                        const resolveData = getDataFromParsedResolveInfoFragment(
-                          parsedResolveInfoFragment,
-                          isConnection ? ConnectionType : TableType
-                        );
-                        const tableAlias = sql.identifier(Symbol());
-                        const foreignTableAlias = queryBuilder.getTableAlias();
-                        const query = queryFromResolveData(
-                          sql.identifier(schema.name, table.name),
-                          tableAlias,
-                          resolveData,
-                          {
-                            withPagination: isConnection,
-                            withPaginationAsFields: false,
-                            asJsonAggregate: !isConnection,
-                          },
-                          innerQueryBuilder => {
-                            innerQueryBuilder.parentQueryBuilder = queryBuilder;
-                            if (primaryKeys) {
-                              innerQueryBuilder.beforeLock("orderBy", () => {
-                                // append order by primary key to the list of orders
-                                if (!innerQueryBuilder.isOrderUnique(false)) {
-                                  innerQueryBuilder.data.cursorPrefix = [
-                                    "primary_key_asc",
-                                  ];
-                                  primaryKeys.forEach(key => {
-                                    innerQueryBuilder.orderBy(
-                                      sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
-                                        key.name
-                                      )}`,
-                                      true
-                                    );
-                                  });
-                                  innerQueryBuilder.setOrderIsUnique();
-                                }
-                              });
-                            }
-
-                            keys.forEach((key, i) => {
-                              innerQueryBuilder.where(
-                                sql.fragment`${tableAlias}.${sql.identifier(
-                                  key.name
-                                )} = ${foreignTableAlias}.${sql.identifier(
-                                  foreignKeys[i].name
-                                )}`
-                              );
-                            });
-                          }
-                        );
-                        return sql.fragment`(${query})`;
-                      }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
-                    },
-                  };
-                });
-                const ConnectionType = getTypeByName(
-                  inflection.connection(gqlTableType.name)
-                );
-                const TableType = pgGetGqlTypeByTypeIdAndModifier(
-                  table.type.id,
-                  null
-                );
-                return {
-                  description:
-                    constraint.tags.backwardDescription ||
-                    `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
-                  type: isConnection
-                    ? new GraphQLNonNull(ConnectionType)
-                    : new GraphQLNonNull(
-                        new GraphQLList(new GraphQLNonNull(TableType))
-                      ),
-                  args: {},
-                  resolve: (data, _args, _context, resolveInfo) => {
-                    const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
-                    if (isConnection) {
-                      return addStartEndCursor(data[safeAlias]);
-                    } else {
-                      return data[safeAlias];
-                    }
-                  },
-                  deprecationReason: isDeprecated
-                    ? // $FlowFixMe
-                      `Please use ${singleRelationFieldName} instead`
-                    : undefined,
-                };
-              },
+            memo = extend(
+              memo,
               {
-                isPgFieldConnection: isConnection,
-                isPgFieldSimpleCollection: !isConnection,
-                isPgBackwardRelationField: true,
-                pgFieldIntrospection: table,
-              }
+                [manyRelationFieldName]: fieldWithHooks(
+                  manyRelationFieldName,
+                  ({
+                    getDataFromParsedResolveInfoFragment,
+                    addDataGenerator,
+                  }) => {
+                    addDataGenerator(parsedResolveInfoFragment => {
+                      return {
+                        pgQuery: queryBuilder => {
+                          queryBuilder.select(() => {
+                            const resolveData = getDataFromParsedResolveInfoFragment(
+                              parsedResolveInfoFragment,
+                              isConnection ? ConnectionType : TableType
+                            );
+                            const tableAlias = sql.identifier(Symbol());
+                            const foreignTableAlias = queryBuilder.getTableAlias();
+                            const query = queryFromResolveData(
+                              sql.identifier(schema.name, table.name),
+                              tableAlias,
+                              resolveData,
+                              {
+                                withPagination: isConnection,
+                                withPaginationAsFields: false,
+                                asJsonAggregate: !isConnection,
+                              },
+                              innerQueryBuilder => {
+                                innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                                if (primaryKeys) {
+                                  innerQueryBuilder.beforeLock(
+                                    "orderBy",
+                                    () => {
+                                      // append order by primary key to the list of orders
+                                      if (
+                                        !innerQueryBuilder.isOrderUnique(false)
+                                      ) {
+                                        innerQueryBuilder.data.cursorPrefix = [
+                                          "primary_key_asc",
+                                        ];
+                                        primaryKeys.forEach(key => {
+                                          innerQueryBuilder.orderBy(
+                                            sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
+                                              key.name
+                                            )}`,
+                                            true
+                                          );
+                                        });
+                                        innerQueryBuilder.setOrderIsUnique();
+                                      }
+                                    }
+                                  );
+                                }
+
+                                keys.forEach((key, i) => {
+                                  innerQueryBuilder.where(
+                                    sql.fragment`${tableAlias}.${sql.identifier(
+                                      key.name
+                                    )} = ${foreignTableAlias}.${sql.identifier(
+                                      foreignKeys[i].name
+                                    )}`
+                                  );
+                                });
+                              }
+                            );
+                            return sql.fragment`(${query})`;
+                          }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
+                        },
+                      };
+                    });
+                    const ConnectionType = getTypeByName(
+                      inflection.connection(gqlTableType.name)
+                    );
+                    const TableType = pgGetGqlTypeByTypeIdAndModifier(
+                      table.type.id,
+                      null
+                    );
+                    return {
+                      description:
+                        constraint.tags.backwardDescription ||
+                        `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
+                      type: isConnection
+                        ? new GraphQLNonNull(ConnectionType)
+                        : new GraphQLNonNull(
+                            new GraphQLList(new GraphQLNonNull(TableType))
+                          ),
+                      args: {},
+                      resolve: (data, _args, _context, resolveInfo) => {
+                        const safeAlias = getSafeAliasFromResolveInfo(
+                          resolveInfo
+                        );
+                        if (isConnection) {
+                          return addStartEndCursor(data[safeAlias]);
+                        } else {
+                          return data[safeAlias];
+                        }
+                      },
+                      deprecationReason: isDeprecated
+                        ? // $FlowFixMe
+                          `Please use ${singleRelationFieldName} instead`
+                        : undefined,
+                    };
+                  },
+                  {
+                    isPgFieldConnection: isConnection,
+                    isPgFieldSimpleCollection: !isConnection,
+                    isPgBackwardRelationField: true,
+                    pgFieldIntrospection: table,
+                  }
+                ),
+              },
+
+              `Backward relation (${
+                isConnection ? "connection" : "simple collection"
+              }) for ${describePgEntity(
+                constraint
+              )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+                constraint,
+                {
+                  [isConnection
+                    ? "foreignFieldName"
+                    : "foreignSimpleFieldName"]: "newNameHere",
+                }
+              )}`
             );
           }
         }

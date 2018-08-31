@@ -78,11 +78,11 @@ export default (function PgTypesPlugin(
     const {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
-      addType,
       pgSql: sql,
       inflection,
       graphql,
     } = build;
+    const addType = build.addType.bind(build);
     const {
       GraphQLNonNull,
       GraphQLString,
@@ -217,7 +217,7 @@ export default (function PgTypesPlugin(
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
     });
-    addType(GQLInterval);
+    addType(GQLInterval, "graphile-build-pg built-in");
 
     const GQLIntervalInput = new GraphQLInputObjectType({
       name: "IntervalInput",
@@ -225,7 +225,7 @@ export default (function PgTypesPlugin(
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
     });
-    addType(GQLIntervalInput);
+    addType(GQLIntervalInput, "graphile-build-pg built-in");
 
     const stringType = (name, description) =>
       new GraphQLScalarType({
@@ -249,8 +249,8 @@ export default (function PgTypesPlugin(
       "BitString",
       "A string representing a series of binary bits"
     );
-    addType(BigFloat);
-    addType(BitString);
+    addType(BigFloat, "graphile-build-pg built-in");
+    addType(BitString, "graphile-build-pg built-in");
 
     const rawTypes = [
       1186, // interval
@@ -407,11 +407,11 @@ export default (function PgTypesPlugin(
     });
 
     // Other plugins might want to use JSON
-    addType(JSONType);
-    addType(UUIDType);
-    addType(DateType);
-    addType(DateTimeType);
-    addType(TimeType);
+    addType(JSONType, "graphile-build-pg built-in");
+    addType(UUIDType, "graphile-build-pg built-in");
+    addType(DateType, "graphile-build-pg built-in");
+    addType(DateTimeType, "graphile-build-pg built-in");
+    addType(TimeType, "graphile-build-pg built-in");
 
     const oidLookup = {
       "20": stringType(
@@ -652,8 +652,8 @@ export default (function PgTypesPlugin(
               },
             },
           });
-          addType(Range);
-          addType(RangeInput);
+          addType(Range, "graphile-build-pg built-in");
+          addType(RangeInput, "graphile-build-pg built-in");
         } else {
           RangeInput = getTypeByName(inflection.inputType(Range.name));
         }

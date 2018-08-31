@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export FORCE_COLOR=1
+
 if [ -x ".env" ]; then
   set -a
   . ./.env

@@ -22,6 +22,7 @@ export type PgNamespace = {
   kind: "namespace",
   id: string,
   name: string,
+  comment: ?string,
   description: ?string,
   tags: { [string]: string },
 };
@@ -29,8 +30,10 @@ export type PgNamespace = {
 export type PgProc = {
   kind: "procedure",
   name: string,
+  comment: ?string,
   description: ?string,
   namespaceId: string,
+  namespaceName: string,
   isStrict: boolean,
   returnsSet: boolean,
   isStable: boolean,
@@ -47,6 +50,7 @@ export type PgClass = {
   kind: "class",
   id: string,
   name: string,
+  comment: ?string,
   description: ?string,
   classKind: string,
   namespaceId: string,
@@ -71,6 +75,7 @@ export type PgType = {
   kind: "type",
   id: string,
   name: string,
+  comment: ?string,
   description: ?string,
   namespaceId: string,
   namespaceName: string,
@@ -91,6 +96,7 @@ export type PgAttribute = {
   classId: string,
   num: number,
   name: string,
+  comment: ?string,
   description: ?string,
   typeId: string,
   typeModifier: number,
@@ -110,7 +116,9 @@ export type PgConstraint = {
   name: string,
   type: string,
   classId: string,
+  class: ?PgClass,
   foreignClassId: ?string,
+  comment: ?string,
   description: ?string,
   keyAttributeNums: Array<number>,
   foreignKeyAttributeNums: Array<number>,
@@ -126,6 +134,7 @@ export type PgExtension = {
   relocatable: boolean,
   version: string,
   configurationClassIds?: Array<string>,
+  comment: ?string,
   description: ?string,
   tags: { [string]: string },
 };
@@ -199,6 +208,8 @@ export default (async function PgIntrospectionPlugin(
             "extension",
           ].forEach(kind => {
             result[kind].forEach(object => {
+              // Keep a copy of the raw comment
+              object.comment = object.description;
               if (pgEnableTags && object.description) {
                 const parsed = parseTags(object.description);
                 object.tags = parsed.tags;
@@ -369,6 +380,14 @@ export default (async function PgIntrospectionPlugin(
       "arrayItemTypeId",
       introspectionResultsByKind.typeById,
       true // Because not all types are arrays
+    );
+
+    relate(
+      introspectionResultsByKind.constraint,
+      "class",
+      "classId",
+      introspectionResultsByKind.classById,
+      true
     );
 
     relate(

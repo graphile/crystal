@@ -54,14 +54,14 @@ export type Build = {|
     _context: mixed,
     resolveInfo: GraphQLResolveInfo
   ): string,
-  addType(type: GraphQLNamedType): void,
+  addType(type: GraphQLNamedType, origin?: ?string): void,
   getTypeByName(typeName: string): ?GraphQLType,
   extend<Obj1: *, Obj2: *>(base: Obj1, extra: Obj2, hint?: string): Obj1 & Obj2,
-  newWithHooks<T: GraphQLNamedType | GraphQLSchema>(
+  newWithHooks<T: GraphQLNamedType | GraphQLSchema, ConfigType: *>(
     Class<T>,
-    spec: {},
-    scope: {},
-    returnNullOnInvalid?: boolean
+    spec: ConfigType,
+    scope: Scope,
+    performNonEmptyFieldsCheck?: boolean
   ): ?T,
   fieldDataGeneratorsByType: Map<*, *>, // @deprecated - use fieldDataGeneratorsByFieldNameByType instead
   fieldDataGeneratorsByFieldNameByType: Map<*, *>,
@@ -71,6 +71,10 @@ export type Build = {|
     [string]: (...args: Array<any>) => string,
   },
   swallowError: (e: Error) => void,
+  status: {
+    currentHookName: ?string,
+    currentHookEvent: ?string,
+  },
 |};
 
 export type BuildExtensionQuery = {|
@@ -78,6 +82,7 @@ export type BuildExtensionQuery = {|
 |};
 
 export type Scope = {
+  __origin: ?string,
   [string]: mixed,
 };
 
@@ -250,7 +255,15 @@ class SchemaBuilder extends EventEmitter {
               this.depth
             )}[${hookName}${debugStr}]:   Executing '${hookDisplayName}'`
           );
+
+          const previousHookName = build.status.currentHookName;
+          const previousHookEvent = build.status.currentHookEvent;
+          build.status.currentHookName = hookDisplayName;
+          build.status.currentHookEvent = hookName;
           newObj = hook(newObj, build, context);
+          build.status.currentHookName = previousHookName;
+          build.status.currentHookEvent = previousHookEvent;
+
           if (!newObj) {
             throw new Error(
               `Hook '${hook.displayName ||
@@ -314,7 +327,10 @@ class SchemaBuilder extends EventEmitter {
       this._generatedSchema = build.newWithHooks(
         GraphQLSchema,
         {},
-        { isSchema: true }
+        {
+          __origin: `GraphQL built-in`,
+          isSchema: true,
+        }
       );
     }
     if (!this._generatedSchema) {

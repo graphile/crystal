@@ -35,6 +35,8 @@ export default (function PgComputedColumnsPlugin(
       pgOmit: omit,
       pgMakeProcField: makeProcField,
       swallowError,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const tableType = introspectionResultsByKind.type.filter(
       type =>
@@ -90,11 +92,24 @@ export default (function PgComputedColumnsPlugin(
               ? inflection.computedColumnList(pseudoColumnName, proc, table)
               : inflection.computedColumn(pseudoColumnName, proc, table);
             try {
-              memo[fieldName] = makeProcField(fieldName, proc, build, {
-                fieldWithHooks,
-                computed: true,
-                forceList,
-              });
+              memo = extend(
+                memo,
+                {
+                  [fieldName]: makeProcField(fieldName, proc, build, {
+                    fieldWithHooks,
+                    computed: true,
+                    forceList,
+                  }),
+                },
+                `Adding computed column for ${describePgEntity(
+                  proc
+                )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                  proc,
+                  {
+                    fieldName: "newNameHere",
+                  }
+                )}`
+              );
             } catch (e) {
               swallowError(e);
             }

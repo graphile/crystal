@@ -17,6 +17,7 @@ export default (function PgJWTPlugin(
       graphql: { GraphQLScalarType },
       inflection,
       pgParseIdentifier: parseIdentifier,
+      describePgEntity,
     } = build;
     if (!pgJwtTypeIdentifier) {
       return _;
@@ -100,6 +101,9 @@ export default (function PgJWTPlugin(
           },
         },
         {
+          __origin: `Adding JWT type based on ${describePgEntity(
+            compositeType
+          )}`,
           isPgJwtType: true,
         }
       );

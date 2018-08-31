@@ -210,6 +210,7 @@ export default function makeExtendSchemaPlugin(
           const interfaces = getInterfaces(definition.interfaces, build);
           const directives = getDirectives(definition.directives);
           const scope = {
+            __origin: `makeExtendSchemaPlugin`,
             directives,
             ...(directives.scope || {}),
           };
@@ -244,6 +245,7 @@ export default function makeExtendSchemaPlugin(
           const description = getDescription(definition.description);
           const directives = getDirectives(definition.directives);
           const scope = {
+            __origin: `makeExtendSchemaPlugin`,
             directives,
             ...(directives.scope || {}),
           };

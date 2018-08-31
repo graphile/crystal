@@ -43,7 +43,10 @@ export default (async function QueryPlugin(builder) {
           },
         }),
       },
-      { isRootQuery: true },
+      {
+        __origin: `graphile-build built-in (root query type)`,
+        isRootQuery: true,
+      },
       true
     );
     if (queryType) {

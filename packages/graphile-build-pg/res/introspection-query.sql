@@ -41,6 +41,7 @@ with
       pro.proname as "name",
       dsc.description as "description",
       pro.pronamespace as "namespaceId",
+      nsp.nspname as "namespaceName",
       pro.proisstrict as "isStrict",
       pro.proretset as "returnsSet",
       case
@@ -56,6 +57,7 @@ with
     from
       pg_catalog.pg_proc as pro
       left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid
+      left join pg_catalog.pg_namespace as nsp on nsp.oid = pro.pronamespace
     where
       pro.pronamespace in (select "id" from namespace) and
       -- Currently we don’t support functions with variadic arguments. In the

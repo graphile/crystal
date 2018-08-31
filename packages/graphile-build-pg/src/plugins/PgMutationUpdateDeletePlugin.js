@@ -39,6 +39,8 @@ export default (async function PgMutationUpdateDeletePlugin(
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
       pgViaTemporaryTable: viaTemporaryTable,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const {
       scope: { isRootMutation },
@@ -266,6 +268,14 @@ export default (async function PgMutationUpdateDeletePlugin(
                     },
                   },
                   {
+                    __origin: `Adding table ${mode} mutation payload type for ${describePgEntity(
+                      table
+                    )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                      table,
+                      {
+                        name: "newNameHere",
+                      }
+                    )}`,
                     isMutationPayload: true,
                     isPgUpdatePayloadType: mode === "update",
                     isPgDeletePayloadType: mode === "delete",
@@ -320,6 +330,14 @@ export default (async function PgMutationUpdateDeletePlugin(
                       ),
                     },
                     {
+                      __origin: `Adding table ${mode} (by node ID) mutation input type for ${describePgEntity(
+                        table
+                      )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                        table,
+                        {
+                          name: "newNameHere",
+                        }
+                      )}`,
                       isPgUpdateInputType: mode === "update",
                       isPgUpdateNodeInputType: mode === "update",
                       isPgDeleteInputType: mode === "delete",
@@ -329,75 +347,83 @@ export default (async function PgMutationUpdateDeletePlugin(
                     }
                   );
 
-                  memo[fieldName] = fieldWithHooks(
-                    fieldName,
-                    context => {
-                      const { getDataFromParsedResolveInfoFragment } = context;
-                      return {
-                        description:
-                          mode === "update"
-                            ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
-                            : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
-                        type: PayloadType,
-                        args: {
-                          input: {
-                            type: new GraphQLNonNull(InputType),
-                          },
-                        },
-                        async resolve(
-                          parent,
-                          { input },
-                          { pgClient },
-                          resolveInfo
-                        ) {
-                          const nodeId = input[nodeIdFieldName];
-                          try {
-                            const [alias, ...identifiers] = JSON.parse(
-                              base64Decode(nodeId)
-                            );
-                            const NodeTypeByAlias = getNodeType(alias);
-                            if (NodeTypeByAlias !== TableType) {
-                              throw new Error("Mismatched type");
-                            }
-                            if (identifiers.length !== primaryKeys.length) {
-                              throw new Error("Invalid ID");
-                            }
-
-                            return commonCodeRenameMe(
-                              pgClient,
-                              resolveInfo,
-                              getDataFromParsedResolveInfoFragment,
-                              PayloadType,
-                              input,
-                              sql.fragment`(${sql.join(
-                                primaryKeys.map(
-                                  (key, idx) =>
-                                    sql.fragment`${sql.identifier(
-                                      key.name
-                                    )} = ${gql2pg(
-                                      identifiers[idx],
-                                      key.type,
-                                      key.typeModifier
-                                    )}`
-                                ),
-                                ") and ("
-                              )})`,
-                              context
-                            );
-                          } catch (e) {
-                            debug(e);
-                            return null;
-                          }
-                        },
-                      };
-                    },
+                  memo = extend(
+                    memo,
                     {
-                      isPgNodeMutation: true,
-                      pgFieldIntrospection: table,
-                      [mode === "update"
-                        ? "isPgUpdateMutationField"
-                        : "isPgDeleteMutationField"]: true,
-                    }
+                      [fieldName]: fieldWithHooks(
+                        fieldName,
+                        context => {
+                          const {
+                            getDataFromParsedResolveInfoFragment,
+                          } = context;
+                          return {
+                            description:
+                              mode === "update"
+                                ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
+                                : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
+                            type: PayloadType,
+                            args: {
+                              input: {
+                                type: new GraphQLNonNull(InputType),
+                              },
+                            },
+                            async resolve(
+                              parent,
+                              { input },
+                              { pgClient },
+                              resolveInfo
+                            ) {
+                              const nodeId = input[nodeIdFieldName];
+                              try {
+                                const [alias, ...identifiers] = JSON.parse(
+                                  base64Decode(nodeId)
+                                );
+                                const NodeTypeByAlias = getNodeType(alias);
+                                if (NodeTypeByAlias !== TableType) {
+                                  throw new Error("Mismatched type");
+                                }
+                                if (identifiers.length !== primaryKeys.length) {
+                                  throw new Error("Invalid ID");
+                                }
+
+                                return commonCodeRenameMe(
+                                  pgClient,
+                                  resolveInfo,
+                                  getDataFromParsedResolveInfoFragment,
+                                  PayloadType,
+                                  input,
+                                  sql.fragment`(${sql.join(
+                                    primaryKeys.map(
+                                      (key, idx) =>
+                                        sql.fragment`${sql.identifier(
+                                          key.name
+                                        )} = ${gql2pg(
+                                          identifiers[idx],
+                                          key.type,
+                                          key.typeModifier
+                                        )}`
+                                    ),
+                                    ") and ("
+                                  )})`,
+                                  context
+                                );
+                              } catch (e) {
+                                debug(e);
+                                return null;
+                              }
+                            },
+                          };
+                        },
+                        {
+                          isPgNodeMutation: true,
+                          pgFieldIntrospection: table,
+                          [mode === "update"
+                            ? "isPgUpdateMutationField"
+                            : "isPgDeleteMutationField"]: true,
+                        }
+                      ),
+                    },
+                    "Adding ${mode} mutation for ${describePgEntity(table)}"
                   );
                 }
 
@@ -460,6 +486,14 @@ export default (async function PgMutationUpdateDeletePlugin(
                       ),
                     },
                     {
+                      __origin: `Adding table ${mode} mutation input type for ${describePgEntity(
+                        constraint
+                      )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                        table,
+                        {
+                          name: "newNameHere",
+                        }
+                      )}`,
                       isPgUpdateInputType: mode === "update",
                       isPgUpdateByKeysInputType: mode === "update",
                       isPgDeleteInputType: mode === "delete",
@@ -470,58 +504,68 @@ export default (async function PgMutationUpdateDeletePlugin(
                     }
                   );
 
-                  memo[fieldName] = fieldWithHooks(
-                    fieldName,
-                    context => {
-                      const { getDataFromParsedResolveInfoFragment } = context;
-                      return {
-                        description:
-                          mode === "update"
-                            ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
-                            : `Deletes a single \`${tableTypeName}\` using a unique key.`,
-                        type: PayloadType,
-                        args: {
-                          input: {
-                            type: new GraphQLNonNull(InputType),
-                          },
-                        },
-                        async resolve(
-                          parent,
-                          { input },
-                          { pgClient },
-                          resolveInfo
-                        ) {
-                          return commonCodeRenameMe(
-                            pgClient,
-                            resolveInfo,
-                            getDataFromParsedResolveInfoFragment,
-                            PayloadType,
-                            input,
-                            sql.fragment`(${sql.join(
-                              keys.map(
-                                key =>
-                                  sql.fragment`${sql.identifier(
-                                    key.name
-                                  )} = ${gql2pg(
-                                    input[inflection.column(key)],
-                                    key.type,
-                                    key.typeModifier
-                                  )}`
-                              ),
-                              ") and ("
-                            )})`,
-                            context
-                          );
-                        },
-                      };
-                    },
+                  memo = extend(
+                    memo,
                     {
-                      isPgNodeMutation: false,
-                      pgFieldIntrospection: table,
-                      [mode === "update"
-                        ? "isPgUpdateMutationField"
-                        : "isPgDeleteMutationField"]: true,
-                    }
+                      [fieldName]: fieldWithHooks(
+                        fieldName,
+                        context => {
+                          const {
+                            getDataFromParsedResolveInfoFragment,
+                          } = context;
+                          return {
+                            description:
+                              mode === "update"
+                                ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
+                                : `Deletes a single \`${tableTypeName}\` using a unique key.`,
+                            type: PayloadType,
+                            args: {
+                              input: {
+                                type: new GraphQLNonNull(InputType),
+                              },
+                            },
+                            async resolve(
+                              parent,
+                              { input },
+                              { pgClient },
+                              resolveInfo
+                            ) {
+                              return commonCodeRenameMe(
+                                pgClient,
+                                resolveInfo,
+                                getDataFromParsedResolveInfoFragment,
+                                PayloadType,
+                                input,
+                                sql.fragment`(${sql.join(
+                                  keys.map(
+                                    key =>
+                                      sql.fragment`${sql.identifier(
+                                        key.name
+                                      )} = ${gql2pg(
+                                        input[inflection.column(key)],
+                                        key.type,
+                                        key.typeModifier
+                                      )}`
+                                  ),
+                                  ") and ("
+                                )})`,
+                                context
+                              );
+                            },
+                          };
+                        },
+                        {
+                          isPgNodeMutation: false,
+                          pgFieldIntrospection: table,
+                          [mode === "update"
+                            ? "isPgUpdateMutationField"
+                            : "isPgDeleteMutationField"]: true,
+                        }
+                      ),
+                    },
+                    `Adding ${mode} mutation for ${describePgEntity(
+                      constraint
+                    )}`
                   );
                 });
               }

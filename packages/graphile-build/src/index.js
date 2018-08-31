@@ -3,6 +3,7 @@
 import util from "util";
 import SchemaBuilder from "./SchemaBuilder";
 import {
+  SwallowErrorsPlugin,
   StandardTypesPlugin,
   NodePlugin,
   QueryPlugin,
@@ -71,6 +72,7 @@ export const buildSchema = async (
 };
 
 export const defaultPlugins: Array<Plugin> = [
+  SwallowErrorsPlugin,
   StandardTypesPlugin,
   NodePlugin,
   QueryPlugin,
@@ -81,6 +83,7 @@ export const defaultPlugins: Array<Plugin> = [
 ];
 
 export {
+  SwallowErrorsPlugin,
   StandardTypesPlugin,
   NodePlugin,
   QueryPlugin,

@@ -7,6 +7,7 @@ import SubscriptionPlugin from "./SubscriptionPlugin";
 import NodePlugin from "./NodePlugin";
 import QueryPlugin from "./QueryPlugin";
 import StandardTypesPlugin from "./StandardTypesPlugin";
+import SwallowErrorsPlugin from "./SwallowErrorsPlugin";
 
 export {
   ClientMutationIdDescriptionPlugin,
@@ -16,4 +17,5 @@ export {
   NodePlugin,
   QueryPlugin,
   StandardTypesPlugin,
+  SwallowErrorsPlugin,
 };

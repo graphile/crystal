@@ -13,6 +13,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
       pgOmit: omit,
+      describePgEntity,
     } = build;
     const {
       scope: { isMutationPayload, pgIntrospection, pgIntrospectionTable },
@@ -177,7 +178,9 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
           }
         ),
       },
-      `Adding edge field to mutation payload '${Self.name}'`
+      `Adding edge field for table ${describePgEntity(
+        table
+      )} to mutation payload '${Self.name}'`
     );
   });
 }: Plugin);

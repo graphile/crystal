@@ -135,7 +135,9 @@ export default (function NodePlugin(
           },
         },
       },
-      {}
+      {
+        __origin: `graphile-build built-in (NodePlugin); you can omit this plugin if you like, but you'll lose compatibility with Relay`,
+      }
     );
     return _;
   });
@@ -218,7 +220,7 @@ export default (function NodePlugin(
             }
           ),
         },
-        `Adding node helpers to the root Query`
+        `Adding Relay Global Object Identification support to the root Query via 'node' and '${nodeIdFieldName}' fields`
       );
     }
   );

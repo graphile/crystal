@@ -25,7 +25,7 @@ export default (function StandardTypesPlugin(builder) {
         "Cursor",
         "A location in a connection that can be used for resuming pagination."
       );
-      build.addType(Cursor);
+      build.addType(Cursor, "graphile-build built-in");
       return build;
     }
   );
@@ -75,6 +75,7 @@ export default (function StandardTypesPlugin(builder) {
         }),
       },
       {
+        __origin: `graphile-build built-in`,
         isPageInfo: true,
       }
     );

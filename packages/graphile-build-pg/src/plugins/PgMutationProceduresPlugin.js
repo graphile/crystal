@@ -10,6 +10,8 @@ export default (function PgMutationProceduresPlugin(builder) {
       pgMakeProcField: makeProcField,
       pgOmit: omit,
       swallowError,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const {
       scope: { isRootMutation },
@@ -42,10 +44,23 @@ export default (function PgMutationProceduresPlugin(builder) {
 
           const fieldName = inflection.functionMutationName(proc);
           try {
-            memo[fieldName] = makeProcField(fieldName, proc, build, {
-              fieldWithHooks,
-              isMutation: true,
-            });
+            memo = extend(
+              memo,
+              {
+                [fieldName]: makeProcField(fieldName, proc, build, {
+                  fieldWithHooks,
+                  isMutation: true,
+                }),
+              },
+              `Adding mutation field for ${describePgEntity(
+                proc
+              )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                proc,
+                {
+                  name: "newNameHere",
+                }
+              )}`
+            );
           } catch (e) {
             swallowError(e);
           }

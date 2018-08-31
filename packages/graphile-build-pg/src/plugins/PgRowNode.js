@@ -93,6 +93,8 @@ export default (async function PgRowNode(builder) {
       inflection,
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const {
       scope: { isRootQuery },
@@ -131,78 +133,89 @@ export default (async function PgRowNode(builder) {
                 num => attributes.filter(attr => attr.num === num)[0]
               );
             const fieldName = inflection.tableNode(table);
-            memo[fieldName] = fieldWithHooks(
-              fieldName,
-              ({ getDataFromParsedResolveInfoFragment }) => {
-                return {
-                  description: `Reads a single \`${
-                    TableType.name
-                  }\` using its globally unique \`ID\`.`,
-                  type: TableType,
-                  args: {
-                    [nodeIdFieldName]: {
-                      description: `The globally unique \`ID\` to be used in selecting a single \`${
-                        TableType.name
-                      }\`.`,
-                      type: new GraphQLNonNull(GraphQLID),
-                    },
-                  },
-                  async resolve(parent, args, { pgClient }, resolveInfo) {
-                    const nodeId = args[nodeIdFieldName];
-                    try {
-                      const [alias, ...identifiers] = JSON.parse(
-                        base64Decode(nodeId)
-                      );
-                      const NodeTypeByAlias = getNodeType(alias);
-                      if (NodeTypeByAlias !== TableType) {
-                        throw new Error("Mismatched type");
-                      }
-                      if (identifiers.length !== primaryKeys.length) {
-                        throw new Error("Invalid ID");
-                      }
-
-                      const parsedResolveInfoFragment = parseResolveInfo(
-                        resolveInfo
-                      );
-                      const resolveData = getDataFromParsedResolveInfoFragment(
-                        parsedResolveInfoFragment,
-                        TableType
-                      );
-                      const query = queryFromResolveData(
-                        sqlFullTableName,
-                        undefined,
-                        resolveData,
-                        {},
-                        queryBuilder => {
-                          primaryKeys.forEach((key, idx) => {
-                            queryBuilder.where(
-                              sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                key.name
-                              )} = ${gql2pg(
-                                identifiers[idx],
-                                primaryKeys[idx].type,
-                                primaryKeys[idx].typeModifier
-                              )}`
-                            );
-                          });
-                        }
-                      );
-                      const { text, values } = sql.compile(query);
-                      if (debugSql.enabled) debugSql(text);
-                      const {
-                        rows: [row],
-                      } = await pgClient.query(text, values);
-                      return row;
-                    } catch (e) {
-                      return null;
-                    }
-                  },
-                };
-              },
+            memo = extend(
+              memo,
               {
-                isPgNodeQuery: true,
-                pgFieldIntrospection: table,
-              }
+                [fieldName]: fieldWithHooks(
+                  fieldName,
+                  ({ getDataFromParsedResolveInfoFragment }) => {
+                    return {
+                      description: `Reads a single \`${
+                        TableType.name
+                      }\` using its globally unique \`ID\`.`,
+                      type: TableType,
+                      args: {
+                        [nodeIdFieldName]: {
+                          description: `The globally unique \`ID\` to be used in selecting a single \`${
+                            TableType.name
+                          }\`.`,
+                          type: new GraphQLNonNull(GraphQLID),
+                        },
+                      },
+                      async resolve(parent, args, { pgClient }, resolveInfo) {
+                        const nodeId = args[nodeIdFieldName];
+                        try {
+                          const [alias, ...identifiers] = JSON.parse(
+                            base64Decode(nodeId)
+                          );
+                          const NodeTypeByAlias = getNodeType(alias);
+                          if (NodeTypeByAlias !== TableType) {
+                            throw new Error("Mismatched type");
+                          }
+                          if (identifiers.length !== primaryKeys.length) {
+                            throw new Error("Invalid ID");
+                          }
+
+                          const parsedResolveInfoFragment = parseResolveInfo(
+                            resolveInfo
+                          );
+                          const resolveData = getDataFromParsedResolveInfoFragment(
+                            parsedResolveInfoFragment,
+                            TableType
+                          );
+                          const query = queryFromResolveData(
+                            sqlFullTableName,
+                            undefined,
+                            resolveData,
+                            {},
+                            queryBuilder => {
+                              primaryKeys.forEach((key, idx) => {
+                                queryBuilder.where(
+                                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                    key.name
+                                  )} = ${gql2pg(
+                                    identifiers[idx],
+                                    primaryKeys[idx].type,
+                                    primaryKeys[idx].typeModifier
+                                  )}`
+                                );
+                              });
+                            }
+                          );
+                          const { text, values } = sql.compile(query);
+                          if (debugSql.enabled) debugSql(text);
+                          const {
+                            rows: [row],
+                          } = await pgClient.query(text, values);
+                          return row;
+                        } catch (e) {
+                          return null;
+                        }
+                      },
+                    };
+                  },
+                  {
+                    isPgNodeQuery: true,
+                    pgFieldIntrospection: table,
+                  }
+                ),
+              },
+              `Adding row by globally unique identifier field for ${describePgEntity(
+                table
+              )}. You can rename this table via:\n\n  ${sqlCommentByAddingTags(
+                table,
+                { name: "newNameHere" }
+              )}`
             );
           }
           return memo;

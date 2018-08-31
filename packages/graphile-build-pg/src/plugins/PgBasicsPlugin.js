@@ -26,6 +26,8 @@ import omit, {
 import makeProcField from "./makeProcField";
 import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
+import chalk from "chalk";
+import pickBy from "lodash/pickBy";
 
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
@@ -33,6 +35,8 @@ type Keys = Array<{
   table: string,
   schema: ?string,
 }>;
+
+const identity = _ => _;
 
 export function preventEmptyResult<
   // eslint-disable-next-line flowtype/no-weak-types
@@ -130,6 +134,62 @@ function omitWithRBACChecks(
   return omit(entity, permission);
 }
 
+function describePgEntity(entity, includeAlias = true) {
+  const getAlias = !includeAlias
+    ? () => ""
+    : () => {
+        const tags = pickBy(
+          entity.tags,
+          (value, key) => key === "name" || key.endsWith("Name")
+        );
+        if (Object.keys(tags).length) {
+          return ` (with smart comments: ${chalk.bold(
+            Object.keys(tags)
+              .map(t => `@${t} ${tags[t]}`)
+              .join(" | ")
+          )})`;
+        }
+        return "";
+      };
+
+  try {
+    if (entity.kind === "constraint") {
+      return `constraint ${chalk.bold(
+        `"${entity.name}"`
+      )} on ${describePgEntity(entity.class, false)}${getAlias()}`;
+    } else if (entity.kind === "class") {
+      // see pg_class.relkind https://www.postgresql.org/docs/10/static/catalog-pg-class.html
+      const kind =
+        {
+          c: "composite type",
+          f: "foreign table",
+          p: "partitioned table",
+          r: "table",
+          v: "view",
+          m: "materialized view",
+        }[entity.classKind] || "table-like";
+      return `${kind} ${chalk.bold(
+        `"${entity.namespaceName}"."${entity.name}"`
+      )}${getAlias()}`;
+    } else if (entity.kind === "procedure") {
+      return `function ${chalk.bold(
+        `"${entity.namespaceName}"."${entity.name}"(...args...)`
+      )}${getAlias()}`;
+    } else if (entity.kind === "attribute") {
+      return `column ${chalk.bold(`"${entity.name}"`)} on ${describePgEntity(
+        entity.class,
+        false
+      )}${getAlias()}`;
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Error occurred while attempting to debug entity:", entity);
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return `entity of kind '${entity.kind}' with oid '${entity.oid}'`;
+}
+
 export default (function PgBasicsPlugin(
   builder,
   {
@@ -151,6 +211,81 @@ export default (function PgBasicsPlugin(
       pgMakeProcField: makeProcField,
       pgParseIdentifier: parseIdentifier,
       pgViaTemporaryTable: viaTemporaryTable,
+      describePgEntity,
+      sqlCommentByAddingTags: (entity, tagsToAdd) => {
+        // NOTE: this function is NOT intended to be SQL safe; it's for
+        // displaying in error messages. Nonetheless if you find issues with
+        // SQL compatibility, please send a PR or issue.
+
+        // Ref: https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-BACKSLASH-TABLE
+        const escape = str =>
+          str.replace(
+            /['\\\b\f\n\r\t]/g,
+            chr =>
+              ({
+                "\b": "\\b",
+                "\f": "\\f",
+                "\n": "\\n",
+                "\r": "\\r",
+                "\t": "\\t",
+              }[chr] || "\\" + chr)
+          );
+
+        // tagsToAdd is here twice to ensure that the keys in tagsToAdd come first, but that they also "win" any conflicts.
+        const tags = Object.assign({}, tagsToAdd, entity.tags, tagsToAdd);
+
+        const description = entity.description;
+        const tagsSql = Object.keys(tags)
+          .reduce((memo, tag) => {
+            const tagValue = tags[tag];
+            const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
+            const highlightOrNot = tag in tagsToAdd ? chalk.bold : identity;
+            valueArray.forEach(value => {
+              memo.push(
+                highlightOrNot(
+                  `@${escape(escape(tag))}${
+                    value === true ? "" : " " + escape(escape(value))
+                  }`
+                )
+              );
+            });
+            return memo;
+          }, [])
+          .join("\\n");
+        const commentValue = `E'${tagsSql}${
+          description ? "\\n" + escape(description) : ""
+        }'`;
+        let sqlThing;
+        if (entity.kind === "class") {
+          const identifier = `"${entity.namespaceName}"."${entity.name}"`;
+          if (entity.classKind === "r") {
+            sqlThing = `TABLE ${identifier}`;
+          } else if (entity.classKind === "v") {
+            sqlThing = `VIEW ${identifier}`;
+          } else if (entity.classKind === "m") {
+            sqlThing = `MATERIALIZED VIEW ${identifier}`;
+          } else {
+            sqlThing = `PLEASE_SEND_A_PULL_REQUEST_TO_FIX_THIS ${identifier}`;
+          }
+        } else if (entity.kind === "attribute") {
+          sqlThing = `COLUMN "${entity.class.namespaceName}"."${
+            entity.class.name
+          }"."${entity.name}"`;
+        } else if (entity.kind === "procedure") {
+          sqlThing = `FUNCTION "${entity.namespaceName}"."${
+            entity.name
+          }"(...arg types go here...)`;
+        } else if (entity.kind === "constraint") {
+          // TODO: TEST!
+          sqlThing = `CONSTRAINT "${entity.name}" ON "${
+            entity.class.namespaceName
+          }"."${entity.class.name}"`;
+        } else {
+          sqlThing = `UNKNOWN_ENTITY_PLEASE_SEND_A_PULL_REQUEST`;
+        }
+
+        return `COMMENT ON ${sqlThing} IS ${commentValue};`;
+      },
     });
   });
 
@@ -384,6 +519,25 @@ export default (function PgBasicsPlugin(
               .join("-and-")}`
           );
         },
+        singleRelationByKeysBackwards(
+          detailedKeys: Keys,
+          table: PgClass,
+          _foreignTable: PgClass,
+          constraint: PgConstraint
+        ) {
+          if (constraint.tags.foreignSingleFieldName) {
+            return constraint.tags.foreignSingleFieldName;
+          }
+          if (constraint.tags.foreignFieldName) {
+            return constraint.tags.foreignFieldName;
+          }
+          return this.singleRelationByKeys(
+            detailedKeys,
+            table,
+            _foreignTable,
+            constraint
+          );
+        },
         manyRelationByKeys(
           detailedKeys: Keys,
           table: PgClass,
@@ -405,6 +559,9 @@ export default (function PgBasicsPlugin(
           _foreignTable: PgClass,
           constraint: PgConstraint
         ) {
+          if (constraint.tags.foreignSimpleFieldName) {
+            return constraint.tags.foreignSimpleFieldName;
+          }
           if (constraint.tags.foreignFieldName) {
             return constraint.tags.foreignFieldName;
           }

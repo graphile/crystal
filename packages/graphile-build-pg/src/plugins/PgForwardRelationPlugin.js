@@ -16,6 +16,7 @@ export default (function PgForwardRelationPlugin(builder) {
       inflection,
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
+      describePgEntity,
     } = build;
     const {
       scope: {
@@ -115,57 +116,63 @@ export default (function PgForwardRelationPlugin(builder) {
           constraint
         );
 
-        memo[fieldName] = fieldWithHooks(
-          fieldName,
-          ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
-            addDataGenerator(parsedResolveInfoFragment => {
-              return {
-                pgQuery: queryBuilder => {
-                  queryBuilder.select(() => {
-                    const resolveData = getDataFromParsedResolveInfoFragment(
-                      parsedResolveInfoFragment,
-                      gqlForeignTableType
-                    );
-                    const foreignTableAlias = sql.identifier(Symbol());
-                    const query = queryFromResolveData(
-                      sql.identifier(foreignSchema.name, foreignTable.name),
-                      foreignTableAlias,
-                      resolveData,
-                      { asJson: true },
-                      innerQueryBuilder => {
-                        innerQueryBuilder.parentQueryBuilder = queryBuilder;
-                        keys.forEach((key, i) => {
-                          innerQueryBuilder.where(
-                            sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                              key.name
-                            )} = ${foreignTableAlias}.${sql.identifier(
-                              foreignKeys[i].name
-                            )}`
-                          );
-                        });
-                      }
-                    );
-                    return sql.fragment`(${query})`;
-                  }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
-                },
-              };
-            });
-            return {
-              description:
-                constraint.tags.forwardDescription ||
-                `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
-              type: gqlForeignTableType, // Nullable since RLS may forbid fetching
-              resolve: (rawData, _args, _context, resolveInfo) => {
-                const data = isMutationPayload ? rawData.data : rawData;
-                const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
-                return data[safeAlias];
-              },
-            };
-          },
+        memo = extend(
+          memo,
           {
-            pgFieldIntrospection: constraint,
-            isPgForwardRelationField: true,
-          }
+            [fieldName]: fieldWithHooks(
+              fieldName,
+              ({ getDataFromParsedResolveInfoFragment, addDataGenerator }) => {
+                addDataGenerator(parsedResolveInfoFragment => {
+                  return {
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(() => {
+                        const resolveData = getDataFromParsedResolveInfoFragment(
+                          parsedResolveInfoFragment,
+                          gqlForeignTableType
+                        );
+                        const foreignTableAlias = sql.identifier(Symbol());
+                        const query = queryFromResolveData(
+                          sql.identifier(foreignSchema.name, foreignTable.name),
+                          foreignTableAlias,
+                          resolveData,
+                          { asJson: true },
+                          innerQueryBuilder => {
+                            innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                            keys.forEach((key, i) => {
+                              innerQueryBuilder.where(
+                                sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                  key.name
+                                )} = ${foreignTableAlias}.${sql.identifier(
+                                  foreignKeys[i].name
+                                )}`
+                              );
+                            });
+                          }
+                        );
+                        return sql.fragment`(${query})`;
+                      }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
+                    },
+                  };
+                });
+                return {
+                  description:
+                    constraint.tags.forwardDescription ||
+                    `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
+                  type: gqlForeignTableType, // Nullable since RLS may forbid fetching
+                  resolve: (rawData, _args, _context, resolveInfo) => {
+                    const data = isMutationPayload ? rawData.data : rawData;
+                    const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+                    return data[safeAlias];
+                  },
+                };
+              },
+              {
+                pgFieldIntrospection: constraint,
+                isPgForwardRelationField: true,
+              }
+            ),
+          },
+          `Adding forward relation for ${describePgEntity(constraint)}`
         );
         return memo;
       }, {}),

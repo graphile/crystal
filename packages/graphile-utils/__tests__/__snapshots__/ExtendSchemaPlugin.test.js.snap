@@ -79,6 +79,7 @@ type Query {
 
 exports[`supports @scope directive with simple values 1`] = `
 Object {
+  "__origin": "graphile-build built-in (root query type)",
   "fieldDirectives": Object {
     "scope": Object {
       "floatTest": 3.141592,
@@ -115,6 +116,7 @@ type Query {
 
 exports[`supports @scope directive with variable value 1`] = `
 Object {
+  "__origin": "graphile-build built-in (root query type)",
   "embedTest": Object {
     "sub": Array [
       Array [

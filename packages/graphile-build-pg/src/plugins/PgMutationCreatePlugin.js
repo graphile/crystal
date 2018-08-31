@@ -32,6 +32,8 @@ export default (function PgMutationCreatePlugin(
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
       pgViaTemporaryTable: viaTemporaryTable,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     const {
       scope: { isRootMutation },
@@ -91,6 +93,14 @@ export default (function PgMutationCreatePlugin(
               },
             },
             {
+              __origin: `Adding table create input type for ${describePgEntity(
+                table
+              )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                table,
+                {
+                  name: "newNameHere",
+                }
+              )}`,
               isPgCreateInputType: true,
               pgInflection: table,
             }
@@ -120,103 +130,126 @@ export default (function PgMutationCreatePlugin(
               },
             },
             {
+              __origin: `Adding table create payload type for ${describePgEntity(
+                table
+              )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                table,
+                {
+                  name: "newNameHere",
+                }
+              )}`,
               isMutationPayload: true,
               isPgCreatePayloadType: true,
               pgIntrospection: table,
             }
           );
           const fieldName = inflection.createField(table);
-          memo[fieldName] = fieldWithHooks(
-            fieldName,
-            context => {
-              const { getDataFromParsedResolveInfoFragment } = context;
-              return {
-                description: `Creates a single \`${tableTypeName}\`.`,
-                type: PayloadType,
-                args: {
-                  input: {
-                    type: new GraphQLNonNull(InputType),
-                  },
-                },
-                async resolve(data, { input }, { pgClient }, resolveInfo) {
-                  const parsedResolveInfoFragment = parseResolveInfo(
-                    resolveInfo
-                  );
-                  const resolveData = getDataFromParsedResolveInfoFragment(
-                    parsedResolveInfoFragment,
-                    PayloadType
-                  );
-                  const insertedRowAlias = sql.identifier(Symbol());
-                  const query = queryFromResolveData(
-                    insertedRowAlias,
-                    insertedRowAlias,
-                    resolveData,
-                    {}
-                  );
-                  const sqlColumns = [];
-                  const sqlValues = [];
-                  const inputData = input[inflection.tableFieldName(table)];
-                  pgIntrospectionResultsByKind.attribute
-                    .filter(attr => attr.classId === table.id)
-                    .filter(attr => pgColumnFilter(attr, build, context))
-                    .filter(attr => !omit(attr, "create"))
-                    .forEach(attr => {
-                      const fieldName = inflection.column(attr);
-                      const val = inputData[fieldName];
-                      if (
-                        Object.prototype.hasOwnProperty.call(
-                          inputData,
-                          fieldName
-                        )
-                      ) {
-                        sqlColumns.push(sql.identifier(attr.name));
-                        sqlValues.push(
-                          gql2pg(val, attr.type, attr.typeModifier)
-                        );
-                      }
-                    });
+          memo = build.extend(
+            memo,
+            {
+              [fieldName]: fieldWithHooks(
+                fieldName,
+                context => {
+                  const { getDataFromParsedResolveInfoFragment } = context;
+                  return {
+                    description: `Creates a single \`${tableTypeName}\`.`,
+                    type: PayloadType,
+                    args: {
+                      input: {
+                        type: new GraphQLNonNull(InputType),
+                      },
+                    },
+                    async resolve(data, { input }, { pgClient }, resolveInfo) {
+                      const parsedResolveInfoFragment = parseResolveInfo(
+                        resolveInfo
+                      );
+                      const resolveData = getDataFromParsedResolveInfoFragment(
+                        parsedResolveInfoFragment,
+                        PayloadType
+                      );
+                      const insertedRowAlias = sql.identifier(Symbol());
+                      const query = queryFromResolveData(
+                        insertedRowAlias,
+                        insertedRowAlias,
+                        resolveData,
+                        {}
+                      );
+                      const sqlColumns = [];
+                      const sqlValues = [];
+                      const inputData = input[inflection.tableFieldName(table)];
+                      pgIntrospectionResultsByKind.attribute
+                        .filter(attr => attr.classId === table.id)
+                        .filter(attr => pgColumnFilter(attr, build, context))
+                        .filter(attr => !omit(attr, "create"))
+                        .forEach(attr => {
+                          const fieldName = inflection.column(attr);
+                          const val = inputData[fieldName];
+                          if (
+                            Object.prototype.hasOwnProperty.call(
+                              inputData,
+                              fieldName
+                            )
+                          ) {
+                            sqlColumns.push(sql.identifier(attr.name));
+                            sqlValues.push(
+                              gql2pg(val, attr.type, attr.typeModifier)
+                            );
+                          }
+                        });
 
-                  const mutationQuery = sql.query`
+                      const mutationQuery = sql.query`
                     insert into ${sql.identifier(
                       table.namespace.name,
                       table.name
                     )} ${
-                    sqlColumns.length
-                      ? sql.fragment`(
+                        sqlColumns.length
+                          ? sql.fragment`(
                         ${sql.join(sqlColumns, ", ")}
                       ) values(${sql.join(sqlValues, ", ")})`
-                      : sql.fragment`default values`
-                  } returning *`;
+                          : sql.fragment`default values`
+                      } returning *`;
 
-                  let row;
-                  try {
-                    await pgClient.query("SAVEPOINT graphql_mutation");
-                    const rows = await viaTemporaryTable(
-                      pgClient,
-                      sql.identifier(table.namespace.name, table.name),
-                      mutationQuery,
-                      insertedRowAlias,
-                      query
-                    );
-                    row = rows[0];
-                    await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
-                  } catch (e) {
-                    await pgClient.query(
-                      "ROLLBACK TO SAVEPOINT graphql_mutation"
-                    );
-                    throw e;
-                  }
-                  return {
-                    clientMutationId: input.clientMutationId,
-                    data: row,
+                      let row;
+                      try {
+                        await pgClient.query("SAVEPOINT graphql_mutation");
+                        const rows = await viaTemporaryTable(
+                          pgClient,
+                          sql.identifier(table.namespace.name, table.name),
+                          mutationQuery,
+                          insertedRowAlias,
+                          query
+                        );
+                        row = rows[0];
+                        await pgClient.query(
+                          "RELEASE SAVEPOINT graphql_mutation"
+                        );
+                      } catch (e) {
+                        await pgClient.query(
+                          "ROLLBACK TO SAVEPOINT graphql_mutation"
+                        );
+                        throw e;
+                      }
+                      return {
+                        clientMutationId: input.clientMutationId,
+                        data: row,
+                      };
+                    },
                   };
                 },
-              };
+                {
+                  pgFieldIntrospection: table,
+                  isPgCreateMutationField: true,
+                }
+              ),
             },
-            {
-              pgFieldIntrospection: table,
-              isPgCreateMutationField: true,
-            }
+            `Adding create mutation for ${describePgEntity(
+              table
+            )}. You can omit this default mutation with:\n\n  ${sqlCommentByAddingTags(
+              table,
+              {
+                omit: "create",
+              }
+            )}`
           );
           return memo;
         }, {}),

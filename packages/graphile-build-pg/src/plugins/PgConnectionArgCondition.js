@@ -11,6 +11,8 @@ export default (function PgConnectionArgCondition(builder) {
       pgColumnFilter,
       inflection,
       pgOmit: omit,
+      describePgEntity,
+      sqlCommentByAddingTags,
     } = build;
     introspectionResultsByKind.class
       .filter(table => table.isSelectable && !omit(table, "filter"))
@@ -31,25 +33,39 @@ export default (function PgConnectionArgCondition(builder) {
                 .filter(attr => !omit(attr, "filter"))
                 .reduce((memo, attr) => {
                   const fieldName = inflection.column(attr);
-                  memo[fieldName] = fieldWithHooks(
-                    fieldName,
+                  memo = build.extend(
+                    memo,
                     {
-                      description: `Checks for equality with the object’s \`${fieldName}\` field.`,
-                      type:
-                        pgGetGqlInputTypeByTypeIdAndModifier(
-                          attr.typeId,
-                          attr.typeModifier
-                        ) || GraphQLString,
+                      [fieldName]: fieldWithHooks(
+                        fieldName,
+                        {
+                          description: `Checks for equality with the object’s \`${fieldName}\` field.`,
+                          type:
+                            pgGetGqlInputTypeByTypeIdAndModifier(
+                              attr.typeId,
+                              attr.typeModifier
+                            ) || GraphQLString,
+                        },
+                        {
+                          isPgConnectionConditionInputField: true,
+                        }
+                      ),
                     },
-                    {
-                      isPgConnectionConditionInputField: true,
-                    }
+                    `Adding condition argument for ${describePgEntity(attr)}`
                   );
                   return memo;
                 }, {});
             },
           },
           {
+            __origin: `Adding condition type for ${describePgEntity(
+              table
+            )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+              table,
+              {
+                name: "newNameHere",
+              }
+            )}`,
             pgIntrospection: table,
             isPgCondition: true,
           }
