@@ -3360,13 +3360,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphile-build-pg@4.0.0-rc.9:
-  version "4.0.0-rc.9"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.9.tgz#241d3776bbb12b48cb7cbc599b80f51cf4133a00"
+graphile-build-pg@4.0.0-rc.10:
+  version "4.0.0-rc.10"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0-rc.10.tgz#111f1ecdab3b6d0076c265605360e00699373a98"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.0.0-rc.9"
+    graphile-build "4.0.0-rc.10"
     graphql-iso-date "^3.2.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3374,9 +3374,9 @@ graphile-build-pg@4.0.0-rc.9:
     pg-sql2 "2.2.1"
     postgres-interval "1.1.1"
 
-graphile-build@4.0.0-rc.9:
-  version "4.0.0-rc.9"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.9.tgz#8fb16994c65f21b7900c76dd6a67c037f5bb00ee"
+graphile-build@4.0.0-rc.10:
+  version "4.0.0-rc.10"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.0.0-rc.10.tgz#9ad8d6fe8f834eca260350a333929069a01f74ef"
   dependencies:
     "@types/graphql" "^0.13.4"
     debug ">=2 <3"
@@ -6346,13 +6346,13 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.0.0-rc.9:
-  version "4.0.0-rc.9"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.9.tgz#7dc9bf1d0da3a4f81bd68b3977d27ed174a5c72f"
+postgraphile-core@4.0.0-rc.10:
+  version "4.0.0-rc.10"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0-rc.10.tgz#5ef941ae3e09224bd4c626e0f91ec06a9896d6e1"
   dependencies:
     "@types/graphql" "^0.13.4"
-    graphile-build "4.0.0-rc.9"
-    graphile-build-pg "4.0.0-rc.9"
+    graphile-build "4.0.0-rc.10"
+    graphile-build-pg "4.0.0-rc.10"
 
 postgres-array@~1.0.0:
   version "1.0.2"
