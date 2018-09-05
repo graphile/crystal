@@ -6,3 +6,4 @@ TODO.md
 package-lock.json
 *.log
 .vscode
+/src/assets

@@ -1,6 +1,11 @@
 #!/bin/bash
 
 set -e
+
+echo "Preparing assets"
+scripts/make-assets
+
+echo "Running dev..."
 cd $(dirname $0)/..
 
 npm_bin=$(npm bin)

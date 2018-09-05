@@ -9,6 +9,9 @@ echo "Cleaning build"
 rm -rf build
 mkdir build
 
+echo "Preparing assets"
+scripts/make-assets
+
 echo "Compiling with TypeScript"
 "$npm_bin"/tsc
 find build -wholename '*/__tests__/*' -delete

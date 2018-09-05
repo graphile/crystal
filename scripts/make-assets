@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
+const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
+
+const files = fs.readdirSync(ASSETS_SOURCE_DIR);
+files.filter(f => f[0] !== '.').map(filename => {
+  const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
+  const output = `export default Buffer.from(\n  '${fileContent.toString(
+    'base64',
+  )}',\n  'base64'\n);\n`;
+  fs.writeFileSync(`${ASSETS_DEST_DIR}/${filename}.ts`, output);
+});

@@ -34,6 +34,14 @@ import crypto = require('crypto');
 import { Pool } from 'pg';
 import { EventEmitter } from 'events';
 
+/**
+ * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
+ * client.
+ *
+ * @type {Buffer}
+ */
+import favicon from '../../assets/favicon.ico';
+
 // Used by `createPostGraphileHttpRequestHandler`
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
   // The actual GraphQL schema we will use.
@@ -67,19 +75,6 @@ const debugGraphql = Debugger('postgraphile:graphql');
 const debugRequest = Debugger('postgraphile:request');
 
 export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public');
-
-/**
- * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
- * client.
- *
- * @type {Promise<Buffer>}
- */
-const favicon = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
-    if (error) reject(error);
-    else resolve(data);
-  });
-});
 
 /**
  * The GraphiQL HTML file as a string. We need it to be a string, because we
@@ -402,7 +397,7 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        res.end(await favicon);
+        res.end(favicon);
         return;
       }
 
