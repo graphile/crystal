@@ -1,5 +1,3 @@
-jest.mock('send');
-
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
@@ -8,7 +6,6 @@ const http = require('http');
 const request = require('supertest');
 const connect = require('connect');
 const express = require('express');
-const sendFile = require('send');
 const event = require('events');
 const compress = require('koa-compress');
 const koa = require('koa');
@@ -16,13 +13,6 @@ const koa = require('koa');
 const shortString = 'User_Running_These_Tests';
 // Default bodySizeLimit is 100kB
 const veryLongString = '_'.repeat(100 * 1024);
-
-sendFile.mockImplementation(() => {
-  const stream = new event.EventEmitter();
-  stream.pipe = jest.fn(res => process.nextTick(() => res.end()));
-  process.nextTick(() => stream.emit('end'));
-  return stream;
-});
 
 const gqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -876,15 +866,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
           .get('/graphiql')
           .expect(200)
           .expect('Content-Encoding', /gzip/);
-      });
-      test('koa serves & compresses graphiql assets', async () => {
-        const server = createKoaCompressionServer();
-        await request(server)
-          .get('/_postgraphile/graphiql/anything.css')
-          .expect(200);
-        expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
-          ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
-        ]);
       });
     }
   });
