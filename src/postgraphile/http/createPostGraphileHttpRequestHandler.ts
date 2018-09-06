@@ -45,6 +45,12 @@ import favicon from '../../assets/favicon.ico';
  */
 import origGraphiqlHtml from '../../assets/graphiql.html';
 
+/**
+ * When people webpack us up, e.g. for lambda, if they don't want GraphiQL then
+ * they can seriously reduce bundle size by omitting the assets.
+ */
+const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === '1';
+
 // Used by `createPostGraphileHttpRequestHandler`
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
   // The actual GraphQL schema we will use.
@@ -149,6 +155,9 @@ export default function createPostGraphileHttpRequestHandler(
       'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
     );
   }
+  if (options.graphiql && shouldOmitAssets) {
+    throw new Error('Cannot enable GraphiQL when POSTGRAPHILE_OMIT_ASSETS is set');
+  }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
@@ -239,12 +248,14 @@ export default function createPostGraphileHttpRequestHandler(
     });
 
   // Takes the original GraphiQL HTML file and replaces the default config object.
-  const graphiqlHtml = origGraphiqlHtml.replace(
-    /<\/head>/,
-    `  <script>window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
-      options.watchPg ? "'/_postgraphile/stream'" : 'null'
-    }};</script>\n  </head>`,
-  );
+  const graphiqlHtml = origGraphiqlHtml
+    ? origGraphiqlHtml.replace(
+        /<\/head>/,
+        `  <script>window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
+          options.watchPg ? "'/_postgraphile/stream'" : 'null'
+        }};</script>\n  </head>`,
+      )
+    : null;
 
   const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
 
@@ -358,7 +369,7 @@ export default function createPostGraphileHttpRequestHandler(
     // Serve GraphiQL and Related Assets
     // ========================================================================
 
-    if (options.graphiql && !isGraphqlRoute) {
+    if (!shouldOmitAssets && options.graphiql && !isGraphqlRoute) {
       // ======================================================================
       // Favicon
       // ======================================================================

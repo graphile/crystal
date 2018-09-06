@@ -96,13 +96,13 @@ async function main() {
     const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
     let output;
     if (shouldBeBinary(filename)) {
-      output = `export default Buffer.from(\n  '${fileContent.toString(
+      output = `Buffer.from(\n  '${fileContent.toString(
         'base64',
-      )}',\n  'base64'\n);\n`;
+      )}',\n  'base64'\n)`;
     } else {
-      output = `export default ${JSON.stringify(fileContent.toString('utf8'))};`;
+      output = `${JSON.stringify(fileContent.toString('utf8'))}`;
     }
-    fs.writeFileSync(`${ASSETS_DEST_DIR}/${filename}.ts`, output);
+    fs.writeFileSync(`${ASSETS_DEST_DIR}/${filename}.ts`, `export default process.env.POSTGRAPHILE_OMIT_ASSETS === '1'\n  ? null\n  : ${output};\n`);
   });
 }
 
