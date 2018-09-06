@@ -274,7 +274,6 @@ export default function createPostGraphileHttpRequestHandler(
   // validate stages for when we see the same query again. Limit the store size
   // to 50MB-worth of queries (or queryCacheMaxSize) so it doesn't consume too
   // much RAM.
-  const SHA1_BASE64_LENGTH = 28;
   interface CacheEntry {
     queryDocumentAst: DocumentNode;
     validationErrors: ReadonlyArray<GraphQLError>;
@@ -282,7 +281,11 @@ export default function createPostGraphileHttpRequestHandler(
   }
   const queryCache = LRU({
     max: queryCacheMaxSize,
-    length: (n: CacheEntry, _key: string) => n.length + SHA1_BASE64_LENGTH,
+    // The query is n.length bytes long; but by the time it's parsed and
+    // turned into a GraphQL AST it's somewhat larger in memory. We use a
+    // rough approximation here to guess at the memory size (based on some
+    // experimentation). https://github.com/graphile/postgraphile/issues/851
+    length: (n: CacheEntry, _key: string) => n.length * 110,
   });
 
   let lastGqlSchema: GraphQLSchema;
@@ -300,7 +303,7 @@ export default function createPostGraphileHttpRequestHandler(
 
     // Only cache queries that are less than 100kB, we don't want DOS attacks
     // attempting to exhaust our memory.
-    const canCache = queryString.length < 100000;
+    const canCache = queryCacheMaxSize > 0 && queryString.length < 100000;
 
     const hash = canCache ? calculateQueryHash(queryString) : null;
     const result = canCache ? queryCache.get(hash!) : null;
