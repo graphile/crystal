@@ -6,4 +6,6 @@ TODO.md
 package-lock.json
 *.log
 .vscode
-/src/assets
+/assets/graphiql.html
+/src/assets/favicon.ico.ts
+/src/assets/graphiql.html.ts

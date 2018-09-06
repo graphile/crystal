@@ -1,6 +1,0 @@
-{
-  "private": true,
-  "name": "postgraphile-graphiql",
-  "version": "1.0.0",
-  "homepage": "https://postgraphile.com/_postgraphile/graphiql"
-}
