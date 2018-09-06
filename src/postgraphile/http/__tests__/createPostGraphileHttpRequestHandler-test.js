@@ -2,11 +2,8 @@ jest.mock('send');
 
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
-import createPostGraphileHttpRequestHandler, {
-  graphiqlDirectory,
-} from '../createPostGraphileHttpRequestHandler';
+import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
 
-const path = require('path');
 const http = require('http');
 const request = require('supertest');
 const connect = require('connect');
@@ -698,53 +695,6 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       await request(server2)
         .get('/favicon.ico')
         .expect(404);
-    });
-
-    test('will serve any assets for graphiql', async () => {
-      sendFile.mockClear();
-      const server = createServer({ graphiql: true });
-      await request(server)
-        .get('/_postgraphile/graphiql/anything.css')
-        .expect(200);
-      await request(server)
-        .get('/_postgraphile/graphiql/something.js')
-        .expect(200);
-      await request(server)
-        .get('/_postgraphile/graphiql/very/deeply/nested')
-        .expect(200);
-      await request(server)
-        .get('/_postgraphile/graphiql/index.html')
-        .expect(404);
-      await request(server)
-        .get('/_postgraphile/graphiql/../../../../etc/passwd')
-        .expect(403);
-      expect(sendFile.mock.calls.map(([res, filepath, options]) => [filepath, options])).toEqual([
-        ['anything.css', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
-        ['something.js', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
-        ['very/deeply/nested', { index: false, dotfiles: 'ignore', root: graphiqlDirectory }],
-      ]);
-    });
-
-    test('will not serve some graphiql assets', async () => {
-      const server = createServer({ graphiql: true });
-      await request(server)
-        .get('/_postgraphile/graphiql/index.html')
-        .expect(404);
-      await request(server)
-        .get('/_postgraphile/graphiql/asset-manifest.json')
-        .expect(404);
-    });
-
-    test('will not serve any assets for graphiql when disabled', async () => {
-      sendFile.mockClear();
-      const server = createServer({ graphiql: false });
-      await request(server)
-        .get('/_postgraphile/graphiql/anything.css')
-        .expect(404);
-      await request(server)
-        .get('/_postgraphile/graphiql/something.js')
-        .expect(404);
-      expect(sendFile.mock.calls.length).toEqual(0);
     });
 
     test('will not allow if no text/event-stream headers are set', async () => {

@@ -9,6 +9,7 @@ const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
 const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
 
 async function main() {
+  console.log("... Building GraphiQL");
 
   // Step 1: compile GraphiQL
   await new Promise((resolve, reject) => {
@@ -16,6 +17,13 @@ async function main() {
       mode: 'production',
       target: 'web',
       entry: `${__dirname}/../postgraphiql/src/index.js`,
+      node: {
+        dgram: 'empty',
+        fs: 'empty',
+        net: 'empty',
+        tls: 'empty',
+        child_process: 'empty',
+      },
       output: {
         path: ASSETS_SOURCE_DIR,
         filename: 'graphiql.js'
@@ -29,23 +37,31 @@ async function main() {
               loader: 'babel-loader',
               options: {
                 presets: ['@babel/preset-env', '@babel/preset-react'],
-                plugins: ['@babel/plugin-proposal-class-properties'],
+                plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-transform-runtime'],
               },
             },
           },
           {
             test: /\.css$/,
-            use: {
-              loader: 'css-loader',
-            },
+            use: [
+              {loader: 'style-loader'},
+              {loader: 'css-loader'},
+            ],
           },
         ],
       },
       plugins: [
+        new webpack.DefinePlugin({
+          // Hack required due to https://unpkg.com/graphql@0.13.2/jsutils/instanceOf.js
+          'process': 'false',
+          'process.env': {
+            NODE_ENV: '"production"',
+          },
+        }),
         // Prevent webpack from attempting to import flow stuff (dynamic requires in GraphiQL)
         new webpack.ContextReplacementPlugin(
           /graphql-language-service-interface[\\/]dist$/,
-          new RegExp(`^\\./.*\\.js$`)
+          /^\.\/.*\.js$/
         ),
         new HtmlWebpackPlugin({
           filename: 'graphiql.html',
@@ -71,13 +87,21 @@ async function main() {
     });
   });
 
+  const shouldBeBinary = filename => !filename.match(/\.html$/);
+
+  console.log("... Compiling the assets");
   // Step 2: compile the assets
   const files = fs.readdirSync(ASSETS_SOURCE_DIR);
   files.filter(f => f[0] !== '.').map(filename => {
     const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
-    const output = `export default Buffer.from(\n  '${fileContent.toString(
-      'base64',
-    )}',\n  'base64'\n);\n`;
+    let output;
+    if (shouldBeBinary(filename)) {
+      output = `export default Buffer.from(\n  '${fileContent.toString(
+        'base64',
+      )}',\n  'base64'\n);\n`;
+    } else {
+      output = `export default ${JSON.stringify(fileContent.toString('utf8'))};`;
+    }
     fs.writeFileSync(`${ASSETS_DEST_DIR}/${filename}.ts`, output);
   });
 }

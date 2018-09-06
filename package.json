@@ -69,8 +69,10 @@
   "devDependencies": {
     "@babel/core": "7.0.0",
     "@babel/plugin-proposal-class-properties": "7.0.0",
+    "@babel/plugin-transform-runtime": "7.0.0",
     "@babel/preset-env": "7.0.0",
     "@babel/preset-react": "7.0.0",
+    "@babel/runtime": "7.0.0",
     "@types/chalk": "^0.4.30",
     "@types/commander": ">=2.3.30 <2.12.0",
     "@types/debug": "^0.0.29",
@@ -98,6 +100,7 @@
     "react-dom": "^15.3.2",
     "react-scripts": "^1.1.1",
     "source-map-support": "^0.4.6",
+    "style-loader": "0.23.0",
     "supertest": "^2.0.1",
     "ts-node": "^2.0.0",
     "tslint": "^5.10.0",

@@ -20,7 +20,3 @@ find build -name '__tests__' -delete
 echo "Removing tests/mocks"
 find build -wholename '*/__tests__/*' -delete
 find build -name '__tests__' -delete
-
-echo "Moving GraphiQL build output"
-mkdir -p build/postgraphile/graphiql/public
-mv src/postgraphile/graphiql/build/* build/postgraphile/graphiql/public
