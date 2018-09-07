@@ -173,6 +173,10 @@ program
   .option(
     '--prepend-plugins <string>',
     'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins',
+  )
+  .option(
+    '--skip-plugins <string>',
+    'a comma-separated list of plugins to skip',
   );
 
 pluginHook('cli:flags:add:plugins', addFlag);
@@ -377,6 +381,7 @@ const {
   appendPlugins: appendPluginNames,
   prependPlugins: prependPluginNames,
   // replaceAllPlugins is NOT exposed via the CLI
+  skipPlugins: skipPluginNames,
   readCache,
   writeCache,
   legacyRelations: rawLegacyRelations = 'deprecated',
@@ -520,6 +525,7 @@ const postgraphileOptions = pluginHook(
     bodySizeLimit,
     appendPlugins: loadPlugins(appendPluginNames),
     prependPlugins: loadPlugins(prependPluginNames),
+    skipPlugins: loadPlugins(skipPluginNames),
     readCache,
     writeCache,
     legacyRelations,
