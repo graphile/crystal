@@ -102,6 +102,8 @@ export interface PostGraphileOptions {
   // The full array of [Graphile Build](/graphile-build/plugins/) plugins to
   // use for schema generation (you almost definitely don't want this!).
   replaceAllPlugins?: Array<Plugin>;
+  // An array of [Graphile Build](/graphile-build/plugins/) plugins to skip.
+  skipPlugins?: Array<Plugin>;
   // A file path string. Reads cached values from local cache file to improve
   // startup time (you may want to do this in production).
   readCache?: string;
