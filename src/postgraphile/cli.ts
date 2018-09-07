@@ -174,10 +174,7 @@ program
     '--prepend-plugins <string>',
     'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins',
   )
-  .option(
-    '--skip-plugins <string>',
-    'a comma-separated list of plugins to skip',
-  );
+  .option('--skip-plugins <string>', 'a comma-separated list of plugins to skip');
 
 pluginHook('cli:flags:add:plugins', addFlag);
 
