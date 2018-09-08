@@ -869,6 +869,31 @@ Object {
 }
 `;
 
+exports[`pg10.identity.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "alwaysAsIdentity": Object {
+        "id": 1,
+        "t": "test",
+      },
+    },
+    "b": Object {
+      "byDefaultAsIdentity": Object {
+        "id": 1,
+        "t": "test",
+      },
+    },
+    "c": Object {
+      "byDefaultAsIdentity": Object {
+        "id": 100,
+        "t": "test",
+      },
+    },
+  },
+}
+`;
+
 exports[`procedure-mutation.graphql 1`] = `
 Object {
   "data": Object {

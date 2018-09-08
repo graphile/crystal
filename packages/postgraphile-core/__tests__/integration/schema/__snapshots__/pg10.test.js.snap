@@ -1,0 +1,645 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prints a schema to test PG10-specific features 1`] = `
+"\\"\\"\\"A connection to a list of \`AlwaysAsIdentity\` values.\\"\\"\\"
+type AlwaysAsIdentitiesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`AlwaysAsIdentity\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [AlwaysAsIdentitiesEdge!]!
+
+  \\"\\"\\"A list of \`AlwaysAsIdentity\` objects.\\"\\"\\"
+  nodes: [AlwaysAsIdentity]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"
+  The count of *all* \`AlwaysAsIdentity\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`AlwaysAsIdentity\` edge in the connection.\\"\\"\\"
+type AlwaysAsIdentitiesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`AlwaysAsIdentity\` at the end of the edge.\\"\\"\\"
+  node: AlwaysAsIdentity
+}
+
+\\"\\"\\"Methods to use when ordering \`AlwaysAsIdentity\`.\\"\\"\\"
+enum AlwaysAsIdentitiesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  T_ASC
+  T_DESC
+}
+
+type AlwaysAsIdentity implements Node {
+  id: Int!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  t: String
+}
+
+\\"\\"\\"
+A condition to be used against \`AlwaysAsIdentity\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input AlwaysAsIdentityCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`t\` field.\\"\\"\\"
+  t: String
+}
+
+\\"\\"\\"An input for mutations affecting \`AlwaysAsIdentity\`\\"\\"\\"
+input AlwaysAsIdentityInput {
+  t: String
+}
+
+\\"\\"\\"
+Represents an update to a \`AlwaysAsIdentity\`. Fields that are set will be updated.
+\\"\\"\\"
+input AlwaysAsIdentityPatch {
+  t: String
+}
+
+\\"\\"\\"A connection to a list of \`ByDefaultAsIdentity\` values.\\"\\"\\"
+type ByDefaultAsIdentitiesConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`ByDefaultAsIdentity\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ByDefaultAsIdentitiesEdge!]!
+
+  \\"\\"\\"A list of \`ByDefaultAsIdentity\` objects.\\"\\"\\"
+  nodes: [ByDefaultAsIdentity]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"
+  The count of *all* \`ByDefaultAsIdentity\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`ByDefaultAsIdentity\` edge in the connection.\\"\\"\\"
+type ByDefaultAsIdentitiesEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`ByDefaultAsIdentity\` at the end of the edge.\\"\\"\\"
+  node: ByDefaultAsIdentity
+}
+
+\\"\\"\\"Methods to use when ordering \`ByDefaultAsIdentity\`.\\"\\"\\"
+enum ByDefaultAsIdentitiesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  T_ASC
+  T_DESC
+}
+
+type ByDefaultAsIdentity implements Node {
+  id: Int!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  t: String
+}
+
+\\"\\"\\"
+A condition to be used against \`ByDefaultAsIdentity\` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ByDefaultAsIdentityCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`t\` field.\\"\\"\\"
+  t: String
+}
+
+\\"\\"\\"An input for mutations affecting \`ByDefaultAsIdentity\`\\"\\"\\"
+input ByDefaultAsIdentityInput {
+  id: Int
+  t: String
+}
+
+\\"\\"\\"
+Represents an update to a \`ByDefaultAsIdentity\`. Fields that are set will be updated.
+\\"\\"\\"
+input ByDefaultAsIdentityPatch {
+  id: Int
+  t: String
+}
+
+\\"\\"\\"All input for the create \`AlwaysAsIdentity\` mutation.\\"\\"\\"
+input CreateAlwaysAsIdentityInput {
+  \\"\\"\\"The \`AlwaysAsIdentity\` to be created by this mutation.\\"\\"\\"
+  alwaysAsIdentity: AlwaysAsIdentityInput!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our create \`AlwaysAsIdentity\` mutation.\\"\\"\\"
+type CreateAlwaysAsIdentityPayload {
+  \\"\\"\\"The \`AlwaysAsIdentity\` that was created by this mutation.\\"\\"\\"
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  \\"\\"\\"An edge for our \`AlwaysAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  alwaysAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`AlwaysAsIdentity\`.\\"\\"\\"
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`ByDefaultAsIdentity\` mutation.\\"\\"\\"
+input CreateByDefaultAsIdentityInput {
+  \\"\\"\\"The \`ByDefaultAsIdentity\` to be created by this mutation.\\"\\"\\"
+  byDefaultAsIdentity: ByDefaultAsIdentityInput!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our create \`ByDefaultAsIdentity\` mutation.\\"\\"\\"
+type CreateByDefaultAsIdentityPayload {
+  \\"\\"\\"The \`ByDefaultAsIdentity\` that was created by this mutation.\\"\\"\\"
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  \\"\\"\\"An edge for our \`ByDefaultAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  byDefaultAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`ByDefaultAsIdentity\`.\\"\\"\\"
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"All input for the \`deleteAlwaysAsIdentityById\` mutation.\\"\\"\\"
+input DeleteAlwaysAsIdentityByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteAlwaysAsIdentity\` mutation.\\"\\"\\"
+input DeleteAlwaysAsIdentityInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`AlwaysAsIdentity\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`AlwaysAsIdentity\` mutation.\\"\\"\\"
+type DeleteAlwaysAsIdentityPayload {
+  \\"\\"\\"The \`AlwaysAsIdentity\` that was deleted by this mutation.\\"\\"\\"
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  \\"\\"\\"An edge for our \`AlwaysAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  alwaysAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`AlwaysAsIdentity\`.\\"\\"\\"
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedAlwaysAsIdentityId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteByDefaultAsIdentityById\` mutation.\\"\\"\\"
+input DeleteByDefaultAsIdentityByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteByDefaultAsIdentity\` mutation.\\"\\"\\"
+input DeleteByDefaultAsIdentityInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ByDefaultAsIdentity\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`ByDefaultAsIdentity\` mutation.\\"\\"\\"
+type DeleteByDefaultAsIdentityPayload {
+  \\"\\"\\"The \`ByDefaultAsIdentity\` that was deleted by this mutation.\\"\\"\\"
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  \\"\\"\\"An edge for our \`ByDefaultAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  byDefaultAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`ByDefaultAsIdentity\`.\\"\\"\\"
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedByDefaultAsIdentityId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`AlwaysAsIdentity\`.\\"\\"\\"
+  createAlwaysAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateAlwaysAsIdentityInput!
+  ): CreateAlwaysAsIdentityPayload
+
+  \\"\\"\\"Creates a single \`ByDefaultAsIdentity\`.\\"\\"\\"
+  createByDefaultAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateByDefaultAsIdentityInput!
+  ): CreateByDefaultAsIdentityPayload
+
+  \\"\\"\\"Deletes a single \`AlwaysAsIdentity\` using its globally unique id.\\"\\"\\"
+  deleteAlwaysAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteAlwaysAsIdentityInput!
+  ): DeleteAlwaysAsIdentityPayload
+
+  \\"\\"\\"Deletes a single \`AlwaysAsIdentity\` using a unique key.\\"\\"\\"
+  deleteAlwaysAsIdentityById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteAlwaysAsIdentityByIdInput!
+  ): DeleteAlwaysAsIdentityPayload
+
+  \\"\\"\\"Deletes a single \`ByDefaultAsIdentity\` using its globally unique id.\\"\\"\\"
+  deleteByDefaultAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteByDefaultAsIdentityInput!
+  ): DeleteByDefaultAsIdentityPayload
+
+  \\"\\"\\"Deletes a single \`ByDefaultAsIdentity\` using a unique key.\\"\\"\\"
+  deleteByDefaultAsIdentityById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteByDefaultAsIdentityByIdInput!
+  ): DeleteByDefaultAsIdentityPayload
+
+  \\"\\"\\"
+  Updates a single \`AlwaysAsIdentity\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateAlwaysAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateAlwaysAsIdentityInput!
+  ): UpdateAlwaysAsIdentityPayload
+
+  \\"\\"\\"Updates a single \`AlwaysAsIdentity\` using a unique key and a patch.\\"\\"\\"
+  updateAlwaysAsIdentityById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateAlwaysAsIdentityByIdInput!
+  ): UpdateAlwaysAsIdentityPayload
+
+  \\"\\"\\"
+  Updates a single \`ByDefaultAsIdentity\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateByDefaultAsIdentity(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateByDefaultAsIdentityInput!
+  ): UpdateByDefaultAsIdentityPayload
+
+  \\"\\"\\"
+  Updates a single \`ByDefaultAsIdentity\` using a unique key and a patch.
+  \\"\\"\\"
+  updateByDefaultAsIdentityById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateByDefaultAsIdentityByIdInput!
+  ): UpdateByDefaultAsIdentityPayload
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`AlwaysAsIdentity\`.\\"\\"\\"
+  allAlwaysAsIdentities(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: AlwaysAsIdentityCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`AlwaysAsIdentity\`.\\"\\"\\"
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`ByDefaultAsIdentity\`.\\"\\"\\"
+  allByDefaultAsIdentities(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ByDefaultAsIdentityCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ByDefaultAsIdentity\`.\\"\\"\\"
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesConnection
+
+  \\"\\"\\"Reads a single \`AlwaysAsIdentity\` using its globally unique \`ID\`.\\"\\"\\"
+  alwaysAsIdentity(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`AlwaysAsIdentity\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): AlwaysAsIdentity
+  alwaysAsIdentityById(id: Int!): AlwaysAsIdentity
+
+  \\"\\"\\"Reads a single \`ByDefaultAsIdentity\` using its globally unique \`ID\`.\\"\\"\\"
+  byDefaultAsIdentity(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`ByDefaultAsIdentity\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): ByDefaultAsIdentity
+  byDefaultAsIdentityById(id: Int!): ByDefaultAsIdentity
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+
+\\"\\"\\"All input for the \`updateAlwaysAsIdentityById\` mutation.\\"\\"\\"
+input UpdateAlwaysAsIdentityByIdInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`AlwaysAsIdentity\` being updated.
+  \\"\\"\\"
+  alwaysAsIdentityPatch: AlwaysAsIdentityPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateAlwaysAsIdentity\` mutation.\\"\\"\\"
+input UpdateAlwaysAsIdentityInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`AlwaysAsIdentity\` being updated.
+  \\"\\"\\"
+  alwaysAsIdentityPatch: AlwaysAsIdentityPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`AlwaysAsIdentity\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`AlwaysAsIdentity\` mutation.\\"\\"\\"
+type UpdateAlwaysAsIdentityPayload {
+  \\"\\"\\"The \`AlwaysAsIdentity\` that was updated by this mutation.\\"\\"\\"
+  alwaysAsIdentity: AlwaysAsIdentity
+
+  \\"\\"\\"An edge for our \`AlwaysAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  alwaysAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`AlwaysAsIdentity\`.\\"\\"\\"
+    orderBy: [AlwaysAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AlwaysAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateByDefaultAsIdentityById\` mutation.\\"\\"\\"
+input UpdateByDefaultAsIdentityByIdInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ByDefaultAsIdentity\` being updated.
+  \\"\\"\\"
+  byDefaultAsIdentityPatch: ByDefaultAsIdentityPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateByDefaultAsIdentity\` mutation.\\"\\"\\"
+input UpdateByDefaultAsIdentityInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ByDefaultAsIdentity\` being updated.
+  \\"\\"\\"
+  byDefaultAsIdentityPatch: ByDefaultAsIdentityPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ByDefaultAsIdentity\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`ByDefaultAsIdentity\` mutation.\\"\\"\\"
+type UpdateByDefaultAsIdentityPayload {
+  \\"\\"\\"The \`ByDefaultAsIdentity\` that was updated by this mutation.\\"\\"\\"
+  byDefaultAsIdentity: ByDefaultAsIdentity
+
+  \\"\\"\\"An edge for our \`ByDefaultAsIdentity\`. May be used by Relay 1.\\"\\"\\"
+  byDefaultAsIdentityEdge(
+    \\"\\"\\"The method to use when ordering \`ByDefaultAsIdentity\`.\\"\\"\\"
+    orderBy: [ByDefaultAsIdentitiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ByDefaultAsIdentitiesEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+"
+`;

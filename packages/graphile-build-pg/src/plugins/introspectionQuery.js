@@ -1,9 +1,12 @@
+// @flow
+function makeIntrospectionQuery(serverVersionNum: number): string {
+  return `\
 -- @see https://www.postgresql.org/docs/9.5/static/catalogs.html
 -- @see https://github.com/graphile/postgraphile/blob/master/resources/introspection-query.sql
 --
 -- ## Parameters
--- - `$1`: An array of strings that represent the namespaces we are introspecting.
--- - `$2`: set true to include functions/tables/etc that come from extensions
+-- - \`$1\`: An array of strings that represent the namespaces we are introspecting.
+-- - \`$2\`: set true to include functions/tables/etc that come from extensions
 with
   recursive accessible_roles(_oid) as (
     select oid _oid, pg_roles.*
@@ -66,10 +69,13 @@ with
       -- TODO: Variadic arguments.
       pro.provariadic = 0 and
       -- Filter our aggregate functions and window functions.
-      pro.proisagg = false and
-      pro.proiswindow = false and
+      ${
+        serverVersionNum >= 110000
+          ? "pro.prokind = 'f'"
+          : "pro.proisagg = false and pro.proiswindow = false"
+      } and
       -- We want to make sure the argument mode for all of our arguments is
-      -- `IN` which means `proargmodes` will be null.
+      -- \`IN\` which means \`proargmodes\` will be null.
       pro.proargmodes is null and
       -- Do not select procedures that create range types. These are utility
       -- functions that really don’t need to be exposed in an API.
@@ -77,7 +83,7 @@ with
       -- Do not expose trigger functions (type trigger has oid 2279)
       pro.prorettype <> 2279 and
       -- We don't want functions that will clash with GraphQL (treat them as private)
-      pro.proname not like E'\\_\\_%' and
+      pro.proname not like E'\\\\_\\\\_%' and
       -- We also don’t want procedures that have been defined in our namespace
       -- twice. This leads to duplicate fields in the API which throws an
       -- error. In the future we may support this case. For now though, it is
@@ -106,14 +112,14 @@ with
       nsp.nspname as "namespaceName",
       rel.reltype as "typeId",
       -- Here we determine whether or not we can use this class in a
-      -- `SELECT`’s `FROM` clause. In order to determine this we look at them
-      -- `relkind` column, if it is `i` (index) or `c` (composite), we cannot
+      -- \`SELECT\`’s \`FROM\` clause. In order to determine this we look at them
+      -- \`relkind\` column, if it is \`i\` (index) or \`c\` (composite), we cannot
       -- select this class. Otherwise we can.
       rel.relkind not in ('i', 'c') as "isSelectable",
       -- Here we are determining whether we can insert/update/delete a class.
       -- This is helpful as it lets us detect non-updatable views and then
       -- exclude them from being inserted/updated/deleted into. For more info
-      -- on how `pg_catalog.pg_relation_is_updatable` works:
+      -- on how \`pg_catalog.pg_relation_is_updatable\` works:
       --
       -- - https://www.postgresql.org/message-id/CAEZATCV2_qN9P3zbvADwME_TkYf2gR_X2cLQR4R+pqkwxGxqJg@mail.gmail.com
       -- - https://github.com/postgres/postgres/blob/2410a2543e77983dab1f63f48b2adcd23dba994e/src/backend/utils/adt/misc.c#L684
@@ -132,7 +138,7 @@ with
     where
       rel.relpersistence in ('p') and
       -- We don't want classes that will clash with GraphQL (treat them as private)
-      rel.relname not like E'\\_\\_%' and
+      rel.relname not like E'\\\\_\\\\_%' and
       rel.relkind in ('r', 'v', 'm', 'c', 'f') and
       ($2 is true or not exists(
         select 1
@@ -157,6 +163,7 @@ with
       nullif(att.atttypmod, -1) as "typeModifier",
       att.attnotnull as "isNotNull",
       att.atthasdef as "hasDefault",
+      ${serverVersionNum >= 100000 ? "att.attidentity" : "''"} as "identity",
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'SELECT')) as "aclSelectable",
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'INSERT')) as "aclInsertable",
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'UPDATE')) as "aclUpdatable"
@@ -167,14 +174,14 @@ with
       att.attrelid in (select "id" from class) and
       att.attnum > 0 and
       -- We don't want attributes that will clash with GraphQL (treat them as private)
-      att.attname not like E'\\_\\_%' and
+      att.attname not like E'\\\\_\\\\_%' and
       not att.attisdropped
     order by
       att.attrelid, att.attnum
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-type.html
   type as (
-    -- Use another `WITH` statement here, because our `WHERE` clause will need
+    -- Use another \`WITH\` statement here, because our \`WHERE\` clause will need
     -- to use it.
     with type_all as (
       select
@@ -311,3 +318,9 @@ select row_to_json(x) as object from procedure as x
 union all
 select row_to_json(x) as object from extension as x
 ;
+`;
+}
+
+module.exports = {
+  makeIntrospectionQuery,
+};

@@ -82,6 +82,7 @@ export interface PgAttribute {
   typeModifier: number;
   isNotNull: boolean;
   hasDefault: boolean;
+  identity: "" | "a" | "d";
   class: PgClass;
   type: PgType;
   namespace: PgNamespace;

@@ -223,6 +223,7 @@ export default (function PgColumnsPlugin(builder) {
               isPgBaseInput ? "base" : isPgPatch ? "update" : "create"
             )
         )
+        .filter(attr => attr.identity !== "a")
         .reduce((memo, attr) => {
           const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
@@ -248,7 +249,8 @@ export default (function PgColumnsPlugin(builder) {
                       isPgBaseInput ||
                         isPgPatch ||
                         (!attr.isNotNull && !attr.type.domainIsNotNull) ||
-                        attr.hasDefault,
+                        attr.hasDefault ||
+                        attr.identity === "d",
                       pgGetGqlInputTypeByTypeIdAndModifier(
                         attr.typeId,
                         attr.typeModifier

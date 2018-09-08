@@ -9,11 +9,11 @@ import chalk from "chalk";
 import throttle from "lodash/throttle";
 import flatMap from "lodash/flatMap";
 import { quacksLikePgPool } from "../withPgClient";
+import { makeIntrospectionQuery } from "./introspectionQuery";
 
 import { version } from "../../package.json";
 
 const debug = debugFactory("graphile-build-pg");
-const INTROSPECTION_PATH = `${__dirname}/../../res/introspection-query.sql`;
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
 // Ref: https://github.com/graphile/postgraphile/tree/master/src/postgres/introspection/object
@@ -102,6 +102,7 @@ export type PgAttribute = {
   typeModifier: number,
   isNotNull: boolean,
   hasDefault: boolean,
+  identity: "" | "a" | "d",
   class: PgClass,
   type: PgType,
   namespace: PgNamespace,
@@ -175,7 +176,14 @@ export default (async function PgIntrospectionPlugin(
     const introspectionResultsByKind = cloneResults(
       await persistentMemoizeWithKey(cacheKey, () =>
         withPgClient(pgConfig, async pgClient => {
-          const introspectionQuery = await readFile(INTROSPECTION_PATH, "utf8");
+          const versionResult = await pgClient.query(
+            "show server_version_num;"
+          );
+          const serverVersionNum = parseInt(
+            versionResult.rows[0].server_version_num,
+            10
+          );
+          const introspectionQuery = makeIntrospectionQuery(serverVersionNum);
           const { rows } = await pgClient.query(introspectionQuery, [
             schemas,
             pgIncludeExtensionResources,
