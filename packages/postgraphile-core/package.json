@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-core",
-  "version": "4.0.0-rc.10",
+  "version": "4.0.0-rc.11",
   "description": "",
   "main": "node8plus/index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@types/graphql": "^0.13.4",
-    "graphile-build": "4.0.0-rc.10",
-    "graphile-build-pg": "4.0.0-rc.10"
+    "graphile-build": "4.0.0-rc.11",
+    "graphile-build-pg": "4.0.0-rc.11"
   },
   "devDependencies": {
     "@types/node": "^10.7.1",
@@ -46,7 +46,10 @@
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
-  "files": ["node8plus", "index.js"],
+  "files": [
+    "node8plus",
+    "index.js"
+  ],
   "engines": {
     "node": ">=8.6"
   }
