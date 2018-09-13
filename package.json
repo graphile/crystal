@@ -69,7 +69,7 @@
     "@types/jest": "^16.0.4",
     "@types/lodash": "^4.14.110",
     "@types/lru-cache": "^4.1.1",
-    "@types/node": "^7.0.4",
+    "@types/node": "^10.9.4",
     "@types/parseurl": "^1.3.1",
     "@types/send": "^0.14.4",
     "connect": "^3.5.0",
@@ -95,14 +95,24 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": ["ts", "js"],
-    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/resources/jest-setup.js"
+    ],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": ["<rootDir>/src"],
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": ["build", "resources/favicon.ico"],
+  "files": [
+    "build",
+    "resources/favicon.ico"
+  ],
   "engines": {
     "node": ">=8.6"
   }
