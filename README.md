@@ -5,18 +5,19 @@
 [![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
 [![Gitter chat room](https://badges.gitter.im/graphile/postgraphile.svg)](https://gitter.im/graphile/postgraphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
-[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/benjie)
+<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support PostGraphile development on Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
 [![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
 
-_An instant, highly-performant GraphQL API for your PostgreSQL database._
+_An instant, highly-performant GraphQL API for your PostgreSQL database, extensible via a powerful plugin system._
 
 **Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)**
 
 _Note: v1-v3 of this project were named **PostGraphQL**. A v3-v4 migration guide is
 available [here](https://www.graphile.org/postgraphile/v3-migration/) and you can check
 out some of the new features
-[here](https://www.graphile.org/postgraphile/v4-new-features/). No more development is taking place on v3, but you can still access its branch [here](https://github.com/graphile/postgraphile/tree/v3)._
+[here](https://www.graphile.org/postgraphile/v4-new-features/). No more
+development is taking place on v3, but you can still access its branch
+[here](https://github.com/graphile/postgraphile/tree/v3)._
 
 ---
 
@@ -64,8 +65,8 @@ postgraphile --help
 You can also use PostGraphile as [native HTTP, Connect, Express, or Koa (experimental) middleware](https://www.graphile.org/postgraphile/usage-library/), e.g.:
 
 ```js
-import { createServer } from "http";
-import postgraphile from "postgraphile";
+import { createServer } from 'http';
+import postgraphile from 'postgraphile';
 
 createServer(postgraphile());
 ```
@@ -86,7 +87,6 @@ E.g. you might run this command (substituting the relevant variables):
 ```bash
 docker run -p 5000:5000 graphile/postgraphile --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE --schema app_public --watch
 ```
-
 
 ## Read More
 
@@ -118,10 +118,6 @@ PostGraphile features include:
 [advanced queries documentation]: https://www.graphile.org/postgraphile/custom-queries/
 [row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
 
-## Commercial Support and Consultancy Services
-
-Commercial support, consultancy and development services are available direct from the maintainer; see [Professional Services](https://www.graphile.org/support/) for more information.
-
 ## Requirements
 
 - Node v8.6+
@@ -130,21 +126,39 @@ Commercial support, consultancy and development services are available direct fr
 
 Caveats:
 
-- Support for PG10-specific features is not fully implemented yet
-- PostGraphile is not tested on Windows, if you notice any issues please file them (or send a PR!)
+- PostGraphile does not have automated tests on Windows, if you notice any
+  issues please file them (or send a PR!)
 
-## Contributing and Maintenance
+## Supporting PostGraphile
 
-Want to help testing and developing PostGraphile? Check out the [contributing document](CONTRIBUTING.md) to get started quickly!
+The fastest and easiest way you can help PostGraphile thrive is by [sponsoring
+ongoing development and maintenance](https://graphile.org/donate).
 
-The maintainer of this project is [@Benjie](https://twitter.com/benjie) - follow him on Twitter!
+Want to help testing and developing PostGraphile? Check out the [contributing
+document](CONTRIBUTING.md) to get started quickly!
+
+Commercial support, consultancy and development services are available direct
+from the maintainer; see [Professional Services](https://www.graphile.org/support/)
+for more information, or get in touch!
+
+The maintainer of this project is [@Benjie](https://twitter.com/benjie) -
+follow him on Twitter!
 
 ## Thanks
 
-Huge thanks to [the individuals who sponsor PostGraphile's development](SPONSORS.md) - their support helps me spend more time working on the project! If you want the project to advance more rapidly, please join them in supporting this project 🙏
+Huge thanks to [the individuals and companies who sponsor PostGraphile's
+development](SPONSORS.md) - their financial contributions enable more time to
+be spent on the project: from bug fixes, to code review, to new features! If
+you want to help the project advance more rapidly, please join them in
+[supporting this project](https://graphile.org/donate) 🙏
 
-A humongous, heart-felt, thank you to the original author of PostGraphile - [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into PostGraphile! He's now graduated from the project and we all wish him the best for his future ventures!
+A humongous, heart-felt, thank you to the original author of PostGraphile -
+[Caleb Meredith](https://twitter.com/calebmer) - for everything he put into
+PostGraphile! He's now graduated from the project and we all wish him the best
+for his future ventures!
 
-Thanks also to the people working on [PostgREST](https://github.com/begriffs/postgrest) which was a huge inspiration for this project!
+Thanks also to the people working on
+[PostgREST](https://github.com/begriffs/postgrest) which was a huge inspiration
+for this project!
 
 Thanks and enjoy 👍
