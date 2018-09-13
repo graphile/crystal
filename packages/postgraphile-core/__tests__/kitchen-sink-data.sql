@@ -55,6 +55,11 @@ insert into a.foreign_key (person_id, compound_key_1, compound_key_2) values
   (null, 4, 4),
   (null, 2, 1);
 
+insert into a.unique_foreign_key (compound_key_1, compound_key_2) values
+  (2, 1),
+  (4, 4),
+  (2, 5);
+
 insert into b.types values (
   12,
   50,

@@ -115,16 +115,12 @@ export default (function PgBackwardRelationPlugin(
         if (foreignKeys.some(key => omit(key, "read"))) {
           return memo;
         }
-        const singleKey = keys.length === 1 ? keys[0] : null;
-        const isUnique = !!(
-          singleKey &&
-          introspectionResultsByKind.constraint.find(
-            c =>
-              c.classId === singleKey.classId &&
-              c.keyAttributeNums.length === 1 &&
-              c.keyAttributeNums[0] === singleKey.num &&
-              (c.type === "p" || c.type === "u")
-          )
+        const isUnique = !!introspectionResultsByKind.constraint.find(
+          c =>
+            c.classId === table.id &&
+            (c.type === "p" || c.type === "u") &&
+            c.keyAttributeNums.length === keys.length &&
+            c.keyAttributeNums.every((n, i) => keys[i].num === n)
         );
 
         const isDeprecated = isUnique && legacyRelationMode === DEPRECATED;

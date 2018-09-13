@@ -1733,6 +1733,32 @@ type CompoundKey implements Node {
   personByPersonId2: Person
   personId1: Int!
   personId2: Int!
+
+  \\"\\"\\"
+  Reads a single \`UniqueForeignKey\` that is related to this \`CompoundKey\`.
+  \\"\\"\\"
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey
+
+  \\"\\"\\"Reads and enables pagination through a set of \`UniqueForeignKey\`.\\"\\"\\"
+  uniqueForeignKeysByCompoundKey1AndCompoundKey2(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): UniqueForeignKeysConnection! @deprecated(reason: \\"Please use uniqueForeignKeyByCompoundKey1AndCompoundKey2 instead\\")
 }
 
 \\"\\"\\"
@@ -7672,6 +7698,7 @@ type Query implements Node {
   ): Type
   typeById(id: Int!): Type
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
   \\"\\"\\"Reads a single \`ViewTable\` using its globally unique \`ID\`.\\"\\"\\"
   viewTable(
@@ -8599,6 +8626,44 @@ enum TypesOrderBy {
   TIMETZ_DESC
   VARCHAR_ASC
   VARCHAR_DESC
+}
+
+type UniqueForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
+
+  \\"\\"\\"
+  Reads a single \`CompoundKey\` that is related to this \`UniqueForeignKey\`.
+  \\"\\"\\"
+  compoundKeyByCompoundKey1AndCompoundKey2: CompoundKey
+}
+
+\\"\\"\\"A connection to a list of \`UniqueForeignKey\` values.\\"\\"\\"
+type UniqueForeignKeysConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`UniqueForeignKey\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [UniqueForeignKeysEdge!]!
+
+  \\"\\"\\"A list of \`UniqueForeignKey\` objects.\\"\\"\\"
+  nodes: [UniqueForeignKey]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"
+  The count of *all* \`UniqueForeignKey\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`UniqueForeignKey\` edge in the connection.\\"\\"\\"
+type UniqueForeignKeysEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`UniqueForeignKey\` at the end of the edge.\\"\\"\\"
+  node: UniqueForeignKey
 }
 
 \\"\\"\\"YOYOYO!!\\"\\"\\"

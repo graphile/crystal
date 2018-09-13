@@ -7004,6 +7004,80 @@ Object {
 }
 `;
 
+exports[`unique-foreign-keys.graphql 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeys": Object {
+      "nodes": Array [
+        Object {
+          "personId1": 1,
+          "personId2": 2,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": null,
+        },
+        Object {
+          "personId1": 2,
+          "personId2": 1,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+            "compoundKey1": 2,
+            "compoundKey2": 1,
+            "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+              "personId1": 2,
+              "personId2": 1,
+              "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+                "compoundKey1": 2,
+                "compoundKey2": 1,
+              },
+            },
+          },
+        },
+        Object {
+          "personId1": 2,
+          "personId2": 3,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": null,
+        },
+        Object {
+          "personId1": 2,
+          "personId2": 5,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+            "compoundKey1": 2,
+            "compoundKey2": 5,
+            "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+              "personId1": 2,
+              "personId2": 5,
+              "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+                "compoundKey1": 2,
+                "compoundKey2": 5,
+              },
+            },
+          },
+        },
+        Object {
+          "personId1": 4,
+          "personId2": 3,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": null,
+        },
+        Object {
+          "personId1": 4,
+          "personId2": 4,
+          "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+            "compoundKey1": 4,
+            "compoundKey2": 4,
+            "compoundKeyByCompoundKey1AndCompoundKey2": Object {
+              "personId1": 4,
+              "personId2": 4,
+              "uniqueForeignKeyByCompoundKey1AndCompoundKey2": Object {
+                "compoundKey1": 4,
+                "compoundKey2": 4,
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`view.graphql 1`] = `
 Object {
   "data": Object {

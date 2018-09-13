@@ -3055,6 +3055,7 @@ type Query implements Node {
     \\"\\"\\"
     offset: Int
   ): StaticBigIntegerConnection!
+  uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
   \\"\\"\\"Reads a single \`ViewTable\` using its globally unique \`ID\`.\\"\\"\\"
   viewTable(
@@ -3575,6 +3576,11 @@ enum TestviewsOrderBy {
   NATURAL
   TESTVIEWID_ASC
   TESTVIEWID_DESC
+}
+
+type UniqueForeignKey {
+  compoundKey1: Int
+  compoundKey2: Int
 }
 
 \\"\\"\\"All input for the \`updateDefaultValueById\` mutation.\\"\\"\\"
