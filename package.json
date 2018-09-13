@@ -2,19 +2,19 @@
   "private": true,
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-eslint": "8.2.1",
-    "babel-plugin-syntax-object-rest-spread": "6.13.0",
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "babel-preset-env": "^1.6.0",
     "concurrently": "^3.5.0",
     "eslint": "^4.0.0",
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-flowtype": "^2.35.0",
-    "eslint-plugin-graphql": "2.1.1",
+    "eslint-plugin-graphql": "^2.1.1",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-prettier": "^2.1.2",
-    "eslint_d": "5.3.1",
+    "eslint_d": "^5.3.1",
     "flow-copy-source": "^1.2.0",
-    "jest": "23.5.0",
+    "jest": "^23.5.0",
     "lerna": "^2.0.0",
     "prettier": "^1.4.4"
   },
@@ -32,13 +32,11 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-flow": "^6.23.0",
-    "flow-bin": "0.66.0",
+    "flow-bin": "^0.66.0",
     "graphql": ">=0.9 <0.14",
     "pg": ">=6.1.0 <8"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "engines": {
     "node": ">=8.6",
     "yarn": ">=1.3.2"

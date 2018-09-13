@@ -15,7 +15,9 @@
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
   "keywords": [
+    "graphile",
     "graphql",
+    "engine",
     "plugin",
     "build",
     "extension",
@@ -36,20 +38,18 @@
     "node": ">=8.6"
   },
   "devDependencies": {
-    "eslint_d": "5.3.1",
+    "eslint_d": "^5.3.1",
     "graphile-build": "4.0.0-rc.10",
     "graphile-build-pg": "4.0.0-rc.10",
-    "jest": "23.5.0",
-    "prettier": "1.14.2",
-    "ts-node": "7.0.1",
-    "tslint": "5.11.0",
-    "tslint-config-prettier": "1.15.0",
-    "typescript": "3.0.1"
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.0.1"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
-  "files": [
-    "node8plus"
-  ]
+  "files": ["node8plus"]
 }
