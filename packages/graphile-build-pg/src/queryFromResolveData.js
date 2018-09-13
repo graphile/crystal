@@ -4,6 +4,7 @@ import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
 import type { DataForType } from "graphile-build";
 import isSafeInteger from "lodash/isSafeInteger";
+import assert from "assert";
 
 const identity = _ => _ !== null && _ !== undefined;
 
@@ -56,45 +57,189 @@ export default (
     offset = 0,
     invert = false
   ) {
-    // if invert is true queryHasBefore means queryHasAfter; queryHasFirst means queryHasLast; etc
-    const sqlCommon = sql.fragment`
+    /*
+     * Strap in, 'coz this function gets hairy!
+     *
+     * The point of this function is to return SQL which will resolve to a
+     * boolean true/false depending on whether or not there is a (invert ?
+     * "previous" : "next") page.
+     *
+     * Connections have before, after, first, last and offset.
+     * - Users are forbidden from setting both first and last.
+     * - Users are forbidden from setting both offset and last.
+     *
+     * Further there are two main modes of paginating, one works by adding a
+     * where clause (this is preferred, but is not always possible, and is
+     * indicated by `canHaveCursorInWhere === true`) and the other works using
+     * standard LIMIT/OFFSET SQL pagination (and is indicated by
+     * `canHaveCursorInWhere === false`).
+     *
+     * The following diagram shows a full collection of records, #, starting at
+     * START and ending at END. The key after, before, offset, first and last
+     * variables are shown. One thing not show is that it's possible to have
+     * fewer records between before and after than requested by first or last.
+     * Another detail not clearly show is that if there is no `after` then
+     * `START` is used, similarly if there is no `before` then `END` is used.
+     *
+     *   #################################################### < collection
+     *   ^      ^<-offset->^<-first->^      ^<-last->^      ^
+     *   |      |          |         |      |        |      |
+     *   |      |          +---------+      +--------+      |
+     *   |      |          |  DATA1           DATA2  |      |
+     *   |      |          |                         |      |
+     *   |      |          |                         |      |
+     *   |      |          +-------------------------+      |
+     *   |      |                     DATA3          |      |
+     *   |    after                                before   |
+     *   |                                                  |
+     * START                                               END
+     *
+     * We want one of the three DATA blocks:
+     *
+     * - If `first` is set, then we want DATA1.
+     * - If `last` is set then we want DATA2.
+     * - If neither is set then we want DATA3.
+     *
+     * (Remember: you cannot set both `first` and `last` at the same time.)
+     *
+     * When invert === false:
+     *
+     *   Note that both DATA2 and DATA3 end at the same point, and we only care
+     *   if there's data *after* the relevant DATA block, so really we only
+     *   care if the query specified `first` (`queryHasFirst`) which makes
+     *   things complex (ending at the end of DATA1), otherwise we can use
+     *   `before` as the bound (end of DATA2/DATA3).
+     *
+     * When invert === true:
+     *
+     *   Similarly, DATA1 and DATA3 start at the same point, and we're going
+     *   backwards so we only care if there's data *before* the DATA block, so
+     *   really we just need to know if the query set `last` or not, but since
+     *   this is inverted we call it `queryHasFirst`.
+     *
+     * When `invert` is false we're calculating `hasNextPage`, when true we're
+     * calculating `hasPreviousPage`.
+     *
+     * Because of the near-symmetry of requesting hasPreviousPage vs
+     * hasNextPage we always pretend we're determining `hasNextPage`, and we
+     * just invert everything.
+     */
+
+    const sqlCommonUnbounded = sql.fragment`
       select 1
       from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
+      `;
+    /*
+     * This variable is a fragment to go into an `EXISTS(...)` call (after some tweaks).
+     *
+     * The buildWhereClause takes three arguments:
+     *
+     * - includeLowerBound (we want this for hasNextPage but not hasPreviousPage)
+     * - includeUpperBound (we want this for hasPreviousPage but not hasNextPage)
+     * - options (specifically `{addNullCase}`) - we just pass this through.
+     *
+     * So in hasNextPage mode (invert === false), this common SQL ends up
+     * representing the collection from `(after || START)` onwards with no
+     * upper bound. In hasPreviousPage mode (invert === true), it represents
+     * everything from `(before || END)` backwards, with no lower bound.
+     */
+    const sqlCommon = sql.fragment`
+      ${sqlCommonUnbounded}
       where ${queryBuilder.buildWhereClause(!invert, invert, options)}
     `;
-    if (!queryHasBefore && !queryHasFirst && (!invert || offset === 0)) {
-      // There can be no next page since there's no upper bound
-      return sql.literal(false);
-    } else if (queryHasBefore && (!invert || offset === 0)) {
-      // Simply see if there are any records after the before cursor
-      return sql.fragment`exists(
-        ${sqlCommon}
-        and not (${queryBuilder.buildWhereBoundClause(invert)})
-      )`;
-    } else if (canHaveCursorInWhere && (!invert || offset === 0)) {
-      // Query must have "first"
-      // Drop the limit, see if there are any records that aren't already in the list we've fetched
-      return sql.fragment`exists(
-        ${sqlCommon}
-        and (${queryBuilder.getSelectCursor()})::text not in (select __cursor::text from ${sqlQueryAlias})
-        ${offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`}
-      )`;
-    } else {
-      if (!invert) {
-        // Skip over the already known entries, are there any left?
+
+    /*
+     * Since the offset makes the diagram asymmetric, if offset === 0
+     * then the diagram is symmetric and things are simplified a little.
+     */
+    const isForwardOrSymmetric = !invert || offset === 0;
+
+    if (!isForwardOrSymmetric) {
+      assert(invert);
+      assert(offset > 0);
+      // We're looking for a previous page, and there's an offset, so lets just
+      // assume there's a previous page where offset is smaller.
+      return sql.literal(true);
+    } else if (canHaveCursorInWhere) {
+      assert(isForwardOrSymmetric);
+      if (!queryHasBefore && !queryHasFirst) {
+        assert(isForwardOrSymmetric);
+        // There can be no next page since there's no upper bound
+        return sql.literal(false);
+      } else if (queryHasBefore && !queryHasFirst) {
+        /*
+         * We invert the upper buildWhereBoundClause to only represent the data
+         * after `before`, then check if there's at least one record in that set.
+         *
+         * This only works if the `before` cursor can be represented in the
+         * SQL WHERE clause, otherwise we're doing limit/offset pagination
+         * which requires different logic. It also only works if there's no
+         * `first` clause, otherwise there could be a next page before the
+         * `before` clause.
+         */
         return sql.fragment`exists(
-          ${sqlCommon}
-          offset (select coalesce((select count(*) from ${sqlQueryAlias}), 0) + ${sql.value(
-          offset
-        )})
+          ${sqlCommonUnbounded}
+          where ${queryBuilder.buildWhereClause(false, false, options)}
+          and not (${queryBuilder.buildWhereBoundClause(invert)})
         )`;
       } else {
-        // Things get somewhat more complex here... Let's just assume if offset > 0 there's a previous page.
-        if (offset > 0) {
-          return sql.literal(true);
-        }
-        // And here (offset === 0 && invert) so we'd have hit an earlier case; since we haven't there must be no previous page.
-        return sql.literal(false);
+        assert(queryHasFirst);
+        // queryHasBefore could be true or false.
+        /*
+         * There's a few ways that we could determine if there's a next page.
+         *
+         * If !queryHasBefore, we could COUNT(*) the number of rows in
+         * `sqlCommon` and see if it's larger than `first`:
+         * `(select count(*) > ${first} from (${sqlCommon}) __random_table_alias__)`
+         *
+         * If !queryHasBefore, we could build a subquery table of offsetData
+         * from sqlCommon and see if it contains any rows:
+         * `EXISTS(select 1 from (${sqlCommon} OFFSET ${first}) __random_table_alias__)`.
+         *
+         * We could see if there's at least one row in sqlCommon that's not
+         * already in our chosen result set.
+         *
+         * We've chosen the latter approach here because it doesn't place a limit
+         * on queryHasBefore.
+         */
+        // Drop the `first` limit, see if there are any records that aren't
+        // already in the list we've fetched.
+        return sql.fragment`exists(
+          ${sqlCommon}
+          and (${queryBuilder.getSelectCursor()})::text not in (select __cursor::text from ${sqlQueryAlias})
+          ${
+            offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`
+          }
+        )`;
+      }
+    } else {
+      assert(!invert || offset === 0); // isForwardOrSymmetric
+      assert(!canHaveCursorInWhere);
+      // We're dealing with LIMIT/OFFSET pagination here, which means `natural`
+      // cursors, so the `queryBuilder` factors the before/after, first/last
+      // into the limit / offset.
+      const { limit } = queryBuilder.getFinalLimitAndOffset();
+
+      if (limit == null) {
+        // If paginating backwards, then offset > 0 has already been dealt
+        // with. Unbounded, so there's no next page.
+        return sql.fragment`false`;
+      } else if (invert) {
+        assert(offset === 0);
+        // Paginating backwards and there's no offset (which factors in before/after), so there's no previous page.
+        return sql.fragment`false`;
+      } else {
+        assert(!invert);
+        /*
+         * We're paginating forwards; either there's a before, there's a first,
+         * or both.
+         *
+         * We want to see if there's more than limit+offset records in sqlCommon.
+         */
+        return sql.fragment`exists(
+          ${sqlCommon}
+          offset ${sql.literal(limit + offset)}
+        )`;
       }
     }
   }

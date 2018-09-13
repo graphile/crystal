@@ -237,9 +237,17 @@ class QueryBuilder {
   offset(offsetGen: NumberGen) {
     this.checkLock("offset");
     if (this.data.offset != null) {
-      throw new Error("Must only set offset once");
+      // Add the offsets together (this should be able to recurse)
+      const previous = this.data.offset;
+      this.data.offset = context => {
+        return (
+          callIfNecessary(previous, context) +
+          callIfNecessary(offsetGen, context)
+        );
+      };
+    } else {
+      this.data.offset = offsetGen;
     }
-    this.data.offset = offsetGen;
   }
   first(first: number) {
     this.checkLock("first");
