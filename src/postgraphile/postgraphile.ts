@@ -11,6 +11,7 @@ import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 export interface PostgraphileSchemaBuilder {
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
+  options: PostGraphileOptions;
 }
 
 /**
@@ -57,6 +58,7 @@ export function getPostgraphileSchemaBuilder(
   return {
     _emitter,
     getGraphQLSchema: () => Promise.resolve(gqlSchema || gqlSchemaPromise),
+    options,
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
@@ -107,26 +109,28 @@ export default function postgraphile(
   maybeOptions?: PostGraphileOptions,
 ): HttpRequestHandler {
   let schema: string | Array<string>;
-  let options: PostGraphileOptions;
+  // These are the raw options we're passed in; getPostgraphileSchemaBuilder
+  // must process them with `pluginHook` before we can rely on them.
+  let incomingOptions: PostGraphileOptions;
 
   // If the second argument is undefined, use defaults for both `schema` and
-  // `options`.
+  // `incomingOptions`.
   if (typeof schemaOrOptions === 'undefined') {
     schema = 'public';
-    options = {};
+    incomingOptions = {};
   }
   // If the second argument is a string or array, it is the schemas so set the
   // `schema` value and try to use the third argument (or a default) for
-  // `options`.
+  // `incomingOptions`.
   else if (typeof schemaOrOptions === 'string' || Array.isArray(schemaOrOptions)) {
     schema = schemaOrOptions;
-    options = maybeOptions || {};
+    incomingOptions = maybeOptions || {};
   }
-  // Otherwise the second argument is the options so set `schema` to the
-  // default and `options` to the second argument.
+  // Otherwise the second argument is the incomingOptions so set `schema` to the
+  // default and `incomingOptions` to the second argument.
   else {
     schema = 'public';
-    options = schemaOrOptions;
+    incomingOptions = schemaOrOptions;
   }
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
@@ -145,7 +149,11 @@ export default function postgraphile(
               poolOrConfig || {},
         );
 
-  const { getGraphQLSchema, _emitter } = getPostgraphileSchemaBuilder(pgPool, schema, options);
+  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder(
+    pgPool,
+    schema,
+    incomingOptions,
+  );
   return createPostGraphileHttpRequestHandler({
     ...options,
     getGqlSchema: getGraphQLSchema,
