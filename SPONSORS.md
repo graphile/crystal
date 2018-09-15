@@ -10,10 +10,11 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 ## Leaders
 
 * Joe Dennis
-* James Allain
 * Alec Wenzowski
+* James Allain
 * MissionMode
 * DOMONDA
+* Gustin Prudner
 
 ## Supporters
 
@@ -23,3 +24,6 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Michael Tng
 * Bureau Moelijke Dingen
 * Centre for Effective Altruism
+* James Rascoe
+* Gardner Bickford
+* Michel Pelletier
