@@ -333,7 +333,9 @@ if (program['plugins']) {
 }
 
 // Kill server on exit.
-process.on('SIGINT', process.exit);
+process.on('SIGINT', () => {
+  process.exit(1);
+});
 
 // Destruct our configuration file and command line arguments, use defaults, and rename options to
 // something appropriate for JavaScript.
@@ -552,8 +554,8 @@ if (noServer) {
 } else {
   function killAllWorkers(signal = 'SIGTERM'): void {
     for (const id in cluster.workers) {
-      if (cluster.workers.hasOwnProperty(id)) {
-        cluster.workers[id].kill(signal);
+      if (cluster.workers.hasOwnProperty(id) && !!cluster.workers[id]) {
+        cluster.workers[id]!.kill(signal);
       }
     }
   }
@@ -630,7 +632,8 @@ if (noServer) {
     // Start our server by listening to a specific port and host name. Also log
     // some instructions and other interesting information.
     server.listen(port, hostname, () => {
-      const actualPort = server.address().port;
+      const address = server.address();
+      const actualPort = typeof address === 'string' ? port : address.port;
       const self = cluster.isMaster
         ? 'server'
         : `worker ${process.env.POSTGRAPHILE_WORKER_NUMBER} (pid=${process.pid})`;
