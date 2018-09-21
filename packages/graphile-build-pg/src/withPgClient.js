@@ -1,6 +1,7 @@
 // @flow
 import pg from "pg";
 import debugFactory from "debug";
+
 const debug = debugFactory("graphile-build-pg");
 
 function constructorName(obj) {
@@ -72,7 +73,9 @@ const withPgClient = async (
         pgClient.connect(err => (err ? reject(err) : resolve()))
       );
     } else {
-      throw new Error("You must provide a valid PG client configuration");
+      throw new Error(
+        "You must provide either a pg.Pool or pg.Client instance or a PostgreSQL connection string."
+      );
     }
     result = await fn(pgClient);
   } finally {
