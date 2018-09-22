@@ -8,7 +8,7 @@
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-_An instant, highly-performant GraphQL API for your PostgreSQL database, extensible via a powerful plugin system._
+_**An instant, highly-performant GraphQL API for your PostgreSQL database, extensible via a powerful plugin system.**_
 
 **Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)**
 
@@ -21,19 +21,19 @@ development is taking place on v3, but you can still access its branch
 
 ---
 
-The strongly typed GraphQL data querying language is a revolutionary new way to interact with your server. Similar to how JSON very quickly overtook XML, GraphQL will likely overtake REST. Why? Because GraphQL allows us to express our data in the exact same way we think about it.
+**GraphQL** is a powerful new way to query your servers - it's typically used as a replacement for, or companion to, RESTful API services. Introduced by Facebook in 2015, it features strong data typing, built in introspection and documentation capabilities, and solves among many other things the problems of over- and under-fetching data. It's particularly great for mobile clients where minimizing number of requests, latency, and payload size are all critically important tasks - but this awesome mobile experience makes regular webpages much smoother too.
 
-The PostgreSQL database is the self acclaimed “world’s most advanced open source database” and even after 20 years that still rings true. PostgreSQL is the most feature rich SQL database available and provides an excellent public reflection API giving its users a lot of power over their data. And despite being over 20 years old, the database still has frequent releases.
+**PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” and despite its over 20 year maturity this still rings true. New versions of PostgreSQL are released regularly, and each new major version brings incredible new features, not to mention massive performance gains. Seeing your database as just a plain CRUD store is now an archaic viewpoint, modern PostgreSQL can do so much for you: from enforcing business logic with Role-Based Access Control (RBAC) and Row-Level Security (RLS), through communicating with other systems via Foreign Data Wrappers, to real time notifications with `LISTEN`/`NOTIFY`, PostgreSQL can handle it all with ease.
 
-With PostGraphile, you can access the power of PostgreSQL through a well designed and highly performant GraphQL server. PostGraphile uses PostgreSQL reflection APIs to automatically detect primary keys, relationships, types, comments, and more providing a GraphQL server that is highly intelligent about your data.
+**PostGraphile** pairs these two incredible technologies together to help you not only build applications more rapidly, but to build faster applications! Access the power of PostgreSQL through a well designed, extensible, customisable and incredibly performant GraphQL server. PostGraphile uses PostgreSQL reflection APIs to automatically detect tables, columns, indexes, relationships, views, types, functions, comments, and more - providing a GraphQL server that is highly intelligent about your data. PostGraphile can automatically detect changes to your database (e.g. new columns or tables) and instantly rebuild and serve the updated GraphQL API - even updating GraphiQL automatically! This leads to incredible productivity gains, and helps developers multiply their impact.
 
-PostGraphile believes that a _well designed database schema should be all you need to serve well thought out APIs_. PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API then any created in house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer.
+With PostGraphile, a well designed database schema should be all you need to serve a well thought out API; and if it isn't - well, we have a powerful plugin system including many [community contributed plugins](https://www.graphile.org/postgraphile/community-plugins/)! PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API then any created in-house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer.
 
 For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
 
 ## Introduction
 
-Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a fast 7 minute introduction to using the PostGraphile project. This was using v2; we're now up to v4 which has many more bells and whistles!
+Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a walk-through of building an application with PostGraphile in under 7 minutes. This was using v2 (then called PostGraphQL); we're now up to v4 which has many more bells and whistles!
 
 [![PostGraphile at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
 
