@@ -1,9 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import debugFactory from "debug";
-import chalk from "chalk";
-
-const debugWarn = debugFactory("graphile-build-pg:warn");
 
 export default (function PgQueryProceduresPlugin(
   builder,
@@ -21,6 +17,7 @@ export default (function PgQueryProceduresPlugin(
       pgOmit: omit,
       describePgEntity,
       sqlCommentByAddingTags,
+      swallowError,
     } = build;
     const {
       scope: { isRootQuery },
@@ -96,19 +93,7 @@ export default (function PgQueryProceduresPlugin(
                 )}`
               );
             } catch (e) {
-              // eslint-disable-next-line no-console
-              console.warn(
-                chalk.bold.yellow(
-                  `Failed to add function '${proc.namespace.name}.${
-                    proc.name
-                  }'${
-                    debugWarn.enabled
-                      ? ""
-                      : `; run with 'DEBUG="graphile-build-pg:warn"' to view the error`
-                  }`
-                )
-              );
-              debugWarn(e);
+              swallowError(e);
             }
           }
           if (!proc.returnsSet || hasConnections) {

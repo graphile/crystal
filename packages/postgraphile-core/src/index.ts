@@ -231,7 +231,13 @@ const getPostGraphileBuilder = async (
         }
       });
     });
-    memoizeCache = JSON.parse(cacheString);
+    try {
+      memoizeCache = JSON.parse(cacheString);
+    } catch (e) {
+      throw new Error(
+        `Failed to parse cache file '${readCache}', perhaps it is corrupted? ${e}`
+      );
+    }
   }
   if (readCache || writeCache) {
     persistentMemoizeWithKey = (key: string, fn: () => any) => {
@@ -348,7 +354,7 @@ export const createPostGraphileSchema = async (
   });
   const schema = builder.buildSchema();
   if (writeCache) {
-    writeCache().catch(abort);
+    await writeCache().catch(abort);
   }
   return schema;
 };
