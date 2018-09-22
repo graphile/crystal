@@ -6,14 +6,19 @@ cd $(dirname $0)/..
 npm_bin=$(npm bin)
 
 export POSTGRAPHILE_ENV=development
-export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
 export BROWSER=none
 
 # Run Nodemon and watch the PostGraphile source code for changes.
 if [ "$1" = "--" ]; then
+  if [ "$DEBUG" = "" ]; then
+    echo 'You might want to:'
+    echo
+    echo '  export DEBUG="postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain"'
+  fi
   shift
   $npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts "$@" &
 else
+  export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
   $npm_bin/nodemon \
     --watch src \
     --ignore __tests__ \
