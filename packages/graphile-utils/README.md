@@ -28,7 +28,7 @@ fields and types, and it can embed raw values using the `embed` helper.
 Used to wrap a value to be included in a `gql` AST, e.g. for use in GraphQL
 directives.
 
-### `makeExtendPluginSchema`
+### `makeExtendSchemaPlugin`
 
 Enables you to add additonal types or extend existing types within your
 Graphile Engine GraphQL schema.
