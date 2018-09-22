@@ -2,11 +2,11 @@
 
 # PostGraphile
 
+<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support PostGraphile development on Patreon"><img src="https://img.shields.io/badge/donate-via%20Patreon-orange.svg" alt="Patreon donate button" /></a></span>
+[![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
-[![Gitter chat room](https://badges.gitter.im/graphile/postgraphile.svg)](https://gitter.im/graphile/postgraphile?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support PostGraphile development on Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
-[![Follow](https://img.shields.io/badge/twitter-@benjie-blue.svg)](https://twitter.com/benjie)
+[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 _An instant, highly-performant GraphQL API for your PostgreSQL database, extensible via a powerful plugin system._
 

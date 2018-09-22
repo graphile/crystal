@@ -25,7 +25,7 @@ else
     --ignore __mocks__ \
     --ignore src/postgraphile/graphiql \
     --ext js,ts \
-    --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+    --exec "$npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
 fi;
 
 # Ensure forked process is killed even if we die unexpectedly
