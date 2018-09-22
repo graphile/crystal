@@ -56,6 +56,7 @@ with
       coalesce(pro.proallargtypes, pro.proargtypes) as "argTypeIds",
       coalesce(pro.proargnames, array[]::text[]) as "argNames",
       pro.pronargdefaults as "argDefaultsNum",
+      pro.procost as "cost",
       exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable"
     from
       pg_catalog.pg_proc as pro

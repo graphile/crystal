@@ -23,6 +23,7 @@ export interface PgProc {
   argDefaultsNum: number;
   namespace: PgNamespace;
   tags: { [tag: string]: string | Array<string> };
+  cost: number;
   aclExecutable: boolean;
 }
 
