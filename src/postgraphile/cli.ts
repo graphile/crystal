@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+// tslint:disable no-console
+
+/*
+ * IMPORTANT: the './postgraphilerc' import MUST come first!
+ *
+ * Reason: enables user to apply modifications to their Node.js environment
+ * (e.g. sourcing modules that affect global state, like dotenv) before any of
+ * our other require()s occur.
+ */
+import config from './postgraphilerc';
+
 import { resolve as resolvePath } from 'path';
 import { readFileSync } from 'fs';
 import { createServer } from 'http';
@@ -15,21 +26,6 @@ import { mixed } from '../interfaces';
 
 const debugCli = debugFactory('postgraphile:cli');
 
-// tslint:disable no-console
-
-let postgraphileRCFile: string | null = null;
-try {
-  postgraphileRCFile = require.resolve(process.cwd() + '/.postgraphilerc');
-} catch (e) {
-  // No postgraphileRC; carry on
-}
-let config = {};
-if (postgraphileRCFile) {
-  config = require(postgraphileRCFile); // tslint:disable-line no-var-requires
-  if (!config.hasOwnProperty('options')) {
-    console.warn('WARNING: Your configuration file does not export any options');
-  }
-}
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null;
 
