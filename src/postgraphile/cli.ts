@@ -10,8 +10,6 @@
  */
 import config from './postgraphilerc';
 
-import { resolve as resolvePath } from 'path';
-import { readFileSync } from 'fs';
 import { createServer } from 'http';
 import chalk = require('chalk');
 import program = require('commander');
@@ -23,13 +21,12 @@ import cluster = require('cluster');
 import { makePluginHook, PostGraphilePlugin } from './pluginHook';
 import debugFactory = require('debug');
 import { mixed } from '../interfaces';
+import * as manifest from '../../package.json';
 
 const debugCli = debugFactory('postgraphile:cli');
 
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null;
-
-const manifest = JSON.parse(readFileSync(resolvePath(__dirname, '../../package.json')).toString());
 
 function extractPlugins(
   rawArgv: Array<string>,
