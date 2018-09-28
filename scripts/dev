@@ -2,10 +2,7 @@
 
 set -e
 
-echo "Preparing assets"
-scripts/make-assets
-
-echo "Running dev..."
+echo "Running dev (don't forget to 'yarn make-assets' if you've changed GraphiQL / favicon / etc)..."
 cd $(dirname $0)/..
 
 npm_bin=$(npm bin)
@@ -38,7 +35,7 @@ trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
-(sleep 1 && cd src/postgraphile/graphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null &
+(sleep 1 && cd postgraphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null &
 
 wait %1
 kill %2
