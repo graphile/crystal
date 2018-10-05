@@ -346,7 +346,7 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
     pgClient.on('notice', msg => {
-      debugNotice('NOTICE: %s', msg);
+      debugPgNotice('NOTICE: %s', msg);
     });
 
     if (debugPg.enabled || debugPgError.enabled) {
