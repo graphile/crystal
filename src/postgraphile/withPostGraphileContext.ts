@@ -97,7 +97,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   const pgClient = await pgPool.connect();
 
   // Enhance our Postgres client with debugging stuffs.
-  if ((debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) && !pgClient[$$pgClientOrigQuery]) {
+  if (
+    (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
+    !pgClient[$$pgClientOrigQuery]
+  ) {
     debugPgClient(pgClient);
   }
 
@@ -342,7 +345,7 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    pgClient.on('notice', (msg) => {
+    pgClient.on('notice', msg => {
       debugNotice('NOTICE: %s', msg);
     });
 
@@ -360,8 +363,8 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
         promiseResult.catch((error: any) => debugPgError(error));
 
         return promiseResult;
-      }
-    };
+      };
+    }
   }
 
   return pgClient;
