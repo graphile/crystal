@@ -7,6 +7,7 @@ import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
 import { mixed } from '../interfaces';
 
+const debugPgNotice = createDebugger('postgraphile:postgres:notice');
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
   o && o.length ? o : undefined;
 
@@ -96,7 +97,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   const pgClient = await pgPool.connect();
 
   // Enhance our Postgres client with debugging stuffs.
-  if ((debugPg.enabled || debugPgError.enabled) && !pgClient[$$pgClientOrigQuery]) {
+  if ((debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) && !pgClient[$$pgClientOrigQuery]) {
     debugPgClient(pgClient);
   }
 
@@ -341,19 +342,25 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    // tslint:disable-next-line only-arrow-functions
-    pgClient.query = function(...args: Array<any>): any {
-      // Debug just the query text. We don’t want to debug variables because
-      // there may be passwords in there.
-      debugPg(args[0] && args[0].text ? args[0].text : args[0]);
+    pgClient.on('notice', (msg) => {
+      debugNotice('NOTICE: %s', msg);
+    });
 
-      // tslint:disable-next-line no-invalid-this
-      const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
+    if (debugPg.enabled || debugPgError.enabled) {
+      // tslint:disable-next-line only-arrow-functions
+      pgClient.query = function(...args: Array<any>): any {
+        // Debug just the query text. We don’t want to debug variables because
+        // there may be passwords in there.
+        debugPg(args[0] && args[0].text ? args[0].text : args[0]);
 
-      // Report the error with our Postgres debugger.
-      promiseResult.catch((error: any) => debugPgError(error));
+        // tslint:disable-next-line no-invalid-this
+        const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
-      return promiseResult;
+        // Report the error with our Postgres debugger.
+        promiseResult.catch((error: any) => debugPgError(error));
+
+        return promiseResult;
+      }
     };
   }
 
