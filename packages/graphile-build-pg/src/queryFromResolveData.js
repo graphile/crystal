@@ -42,11 +42,11 @@ export default (
   const queryBuilder = new QueryBuilder();
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
 
-  for (const fn of pgQuery || []) {
-    fn(queryBuilder, resolveData);
-  }
   if (withBuilder) {
     withBuilder(queryBuilder);
+  }
+  for (const fn of pgQuery || []) {
+    fn(queryBuilder, resolveData);
   }
 
   function generateNextPrevPageSql(
