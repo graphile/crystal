@@ -24,6 +24,24 @@ export type WithPostGraphileContextFn = (
   callback: (context: mixed) => Promise<ExecutionResult>,
 ) => Promise<ExecutionResult>;
 
+const debugPg = createDebugger('postgraphile:postgres');
+const debugPgError = createDebugger('postgraphile:postgres:error');
+const debugPgNotice = createDebugger('postgraphile:postgres:notice');
+
+/**
+ * Formats an error/notice from `pg` and feeds it into a `debug` function.
+ */
+function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice) {
+  debugFn(
+    '%s%s: %s%s%s',
+    object.severity || 'ERROR',
+    object.code ? `[${object.code}]` : '',
+    object.message || object,
+    object.where ? ` | WHERE: ${object.where}` : '',
+    object.hint ? ` | HINT: ${object.hint}` : '',
+  );
+}
+
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   options: {
     pgPool: Pool;
@@ -96,7 +114,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   const pgClient = await pgPool.connect();
 
   // Enhance our Postgres client with debugging stuffs.
-  if ((debugPg.enabled || debugPgError.enabled) && !pgClient[$$pgClientOrigQuery]) {
+  if (
+    (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
+    !pgClient[$$pgClientOrigQuery]
+  ) {
     debugPgClient(pgClient);
   }
 
@@ -324,9 +345,6 @@ async function getSettingsForPgClientTransaction({
 
 const $$pgClientOrigQuery = Symbol();
 
-const debugPg = createDebugger('postgraphile:postgres');
-const debugPgError = createDebugger('postgraphile:postgres:error');
-
 /**
  * Adds debug logging funcionality to a Postgres client.
  *
@@ -341,20 +359,34 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    // tslint:disable-next-line only-arrow-functions
-    pgClient.query = function(...args: Array<any>): any {
-      // Debug just the query text. We don’t want to debug variables because
-      // there may be passwords in there.
-      debugPg(args[0] && args[0].text ? args[0].text : args[0]);
+    if (debugPgNotice.enabled) {
+      pgClient.on('notice', (msg: PgNotice) => {
+        debugPgErrorObject(debugPgNotice, msg);
+      });
+    }
 
-      // tslint:disable-next-line no-invalid-this
-      const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
+    if (debugPg.enabled || debugPgError.enabled) {
+      // tslint:disable-next-line only-arrow-functions
+      pgClient.query = function(...args: Array<any>): any {
+        // Debug just the query text. We don’t want to debug variables because
+        // there may be passwords in there.
+        debugPg(args[0] && args[0].text ? args[0].text : args[0]);
 
-      // Report the error with our Postgres debugger.
-      promiseResult.catch((error: any) => debugPgError(error));
+        // tslint:disable-next-line no-invalid-this
+        const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
-      return promiseResult;
-    };
+        // Report the error with our Postgres debugger.
+        promiseResult.catch((error: PgNotice | Error) => {
+          if (error.name && error['severity']) {
+            debugPgErrorObject(debugPgError, error as PgNotice);
+          } else {
+            debugPgError('%O', error);
+          }
+        });
+
+        return promiseResult;
+      };
+    }
   }
 
   return pgClient;
@@ -402,3 +434,28 @@ function isPgSettingValid(pgSetting: mixed): boolean {
   );
 }
 // tslint:enable no-any
+interface PgNotice extends Error {
+  name: 'notice';
+  message: string;
+  length: number;
+  severity: string;
+  code: string;
+  detail: string | void;
+  hint: string | void;
+  where: string | void;
+  schema: string | void;
+  table: string | void;
+  column: string | void;
+  constraint: string | void;
+  file: string;
+  line: string;
+  routine: string;
+  /*
+  Not sure what these are:
+
+    position: any;
+    internalPosition: any;
+    internalQuery: any;
+    dataType: any;
+  */
+}
