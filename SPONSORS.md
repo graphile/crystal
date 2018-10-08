@@ -27,3 +27,7 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * James Rascoe
 * Gardner Bickford
 * Michel Pelletier
+* Dan Lynch
+* Jimmy McBroom
+* stlbucket
+* Tim Field
