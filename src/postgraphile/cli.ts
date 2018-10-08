@@ -87,7 +87,7 @@ function addFlag(
 program
   .option(
     '--plugins <string>',
-    'a list of postgraphile plugins (not Graphile-Build plugins) to load, MUST be the first option',
+    'a list of PostGraphile server plugins (not Graphile Engine schema plugins) to load; if present, must be the _first_ option',
   )
   .option(
     '-c, --connection <string>',
@@ -164,13 +164,16 @@ pluginHook('cli:flags:add:errorHandling', addFlag);
 program
   .option(
     '--append-plugins <string>',
-    'a comma-separated list of plugins to append to the list of GraphQL schema plugins',
+    'a comma-separated list of plugins to append to the list of Graphile Engine schema plugins',
   )
   .option(
     '--prepend-plugins <string>',
-    'a comma-separated list of plugins to prepend to the list of GraphQL schema plugins',
+    'a comma-separated list of plugins to prepend to the list of Graphile Engine schema plugins',
   )
-  .option('--skip-plugins <string>', 'a comma-separated list of plugins to skip');
+  .option(
+    '--skip-plugins <string>',
+    'a comma-separated list of Graphile Engine schema plugins to skip',
+  );
 
 pluginHook('cli:flags:add:plugins', addFlag);
 
