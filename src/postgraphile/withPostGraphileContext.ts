@@ -7,7 +7,6 @@ import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
 import { mixed } from '../interfaces';
 
-const debugPgNotice = createDebugger('postgraphile:postgres:notice');
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
   o && o.length ? o : undefined;
 
@@ -24,6 +23,10 @@ export type WithPostGraphileContextFn = (
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ) => Promise<ExecutionResult>;
+
+const debugPg = createDebugger('postgraphile:postgres');
+const debugPgError = createDebugger('postgraphile:postgres:error');
+const debugPgNotice = createDebugger('postgraphile:postgres:notice');
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   options: {
@@ -328,9 +331,6 @@ async function getSettingsForPgClientTransaction({
 
 const $$pgClientOrigQuery = Symbol();
 
-const debugPg = createDebugger('postgraphile:postgres');
-const debugPgError = createDebugger('postgraphile:postgres:error');
-
 /**
  * Adds debug logging funcionality to a Postgres client.
  *
@@ -345,9 +345,11 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
-    pgClient.on('notice', msg => {
-      debugPgNotice('NOTICE: %s', msg);
-    });
+    if (debugPgNotice.enabled) {
+      pgClient.on('notice', msg => {
+        debugPgNotice('NOTICE: %s', msg);
+      });
+    }
 
     if (debugPg.enabled || debugPgError.enabled) {
       // tslint:disable-next-line only-arrow-functions
