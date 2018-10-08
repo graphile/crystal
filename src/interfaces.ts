@@ -33,7 +33,7 @@ export interface PostGraphileOptions {
   // When true, PostGraphile will update the GraphQL API whenever your database
   // schema changes. This feature requires some changes to your database in the
   // form of the
-  // [`postgraphile_watch`](https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/res/watch-fixtures.sql)
+  // [`postgraphile_watch`](https://github.com/graphile/graphile-engine/blob/master/packages/graphile-build-pg/res/watch-fixtures.sql)
   // schema; PostGraphile will try to add this itself but requires DB superuser
   // privileges to do so. If PostGraphile can't install it, you can do so
   // manually. PostGraphile will not drop the schema when it exits, to remove
@@ -93,16 +93,16 @@ export interface PostGraphileOptions {
     req: IncomingMessage,
     res: ServerResponse,
   ) => Array<GraphQLErrorExtended>);
-  // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
+  // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // after the default plugins.
   appendPlugins?: Array<Plugin>;
-  // An array of [Graphile Build](/graphile-build/plugins/) plugins to load
+  // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // before the default plugins (you probably don't want this).
   prependPlugins?: Array<Plugin>;
-  // The full array of [Graphile Build](/graphile-build/plugins/) plugins to
+  // The full array of [Graphile Engine](/graphile-build/plugins/) schema plugins to
   // use for schema generation (you almost definitely don't want this!).
   replaceAllPlugins?: Array<Plugin>;
-  // An array of [Graphile Build](/graphile-build/plugins/) plugins to skip.
+  // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to skip.
   skipPlugins?: Array<Plugin>;
   // A file path string. Reads cached values from local cache file to improve
   // startup time (you may want to do this in production).
@@ -142,7 +142,7 @@ export interface PostGraphileOptions {
   /* @middlewareOnly */
   bodySizeLimit?: string;
   // [Experimental] Enable the middleware to process multiple GraphQL queries
-  // in one request
+  // in one request.
   /* @middlewareOnly */
   enableQueryBatching?: string;
   // The secret for your JSON web tokens. This will be used to verify tokens in
@@ -186,15 +186,16 @@ export interface PostGraphileOptions {
   // A plain object specifying custom config values to set in the PostgreSQL
   // transaction (accessed via `current_setting('my.custom.setting')`) or a
   // function which will return the same (or a Promise to the same) based on
-  // the incoming web request (e.g. to extract session data)
+  // the incoming web request (e.g. to extract session data).
   /* @middlewareOnly */
   pgSettings?:
     | { [key: string]: mixed }
     | ((req: IncomingMessage) => Promise<{ [key: string]: mixed }>);
-  // Some graphile-build plugins may need additional information available on
-  // the `context` argument to the resolver - you can use this function to
-  // provide such information based on the incoming request - you can even use
-  // this to change the response [experimental], e.g. setting cookies
+  // Some Graphile Engine schema plugins may need additional information
+  // available on the `context` argument to the resolver - you can use this
+  // function to provide such information based on the incoming request - you
+  // can even use this to change the response [experimental], e.g. setting
+  // cookies.
   /* @middlewareOnly */
   additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>;
   // [experimental] Plugin hook function, enables functionality within
@@ -205,12 +206,12 @@ export interface PostGraphileOptions {
   // Should we use relay pagination, or simple collections?
   // "omit" (default) - relay connections only,
   // "only" (not recommended) - simple collections only (no Relay connections),
-  // "both" - both
+  // "both" - both.
   simpleCollections?: 'omit' | 'both' | 'only';
-  // Max query cache size in MBs of queries. Default, 50MB
+  // Max query cache size in MBs of queries. Default, 50MB.
   /* @middlewareOnly */
   queryCacheMaxSize?: number;
-  // allow arbitrary extensions for consumption by plugins
+  // Allow arbitrary extensions for consumption by plugins.
   [propName: string]: any;
 }
 

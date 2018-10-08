@@ -3345,9 +3345,9 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
-graphile-build-pg@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.0.tgz#0c09b9e1adeb24f55bf73437abb3b740f18abcc5"
+graphile-build-pg@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.0.1.tgz#b5ddf21881c593b00a7b011bc4fbd22b45cacac1"
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
@@ -6331,13 +6331,13 @@ postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.13:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.0.tgz#252cc56caec4eac32c6244e9e2a1947de5302549"
+postgraphile-core@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.0.1.tgz#96419a61fc223eb5065373a8fc889eccce50bfd1"
   dependencies:
     "@types/graphql" "^0.13.4"
     graphile-build "4.0.0"
-    graphile-build-pg "4.0.0"
+    graphile-build-pg "4.0.1"
 
 postgres-array@~1.0.0:
   version "1.0.2"
