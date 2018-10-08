@@ -28,6 +28,20 @@ const debugPg = createDebugger('postgraphile:postgres');
 const debugPgError = createDebugger('postgraphile:postgres:error');
 const debugPgNotice = createDebugger('postgraphile:postgres:notice');
 
+/**
+ * Formats an error/notice from `pg` and feeds it into a `debug` function.
+ */
+function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice) {
+  debugFn(
+    '%s%s: %s%s%s',
+    object.severity || 'ERROR',
+    object.code ? `[${object.code}]` : '',
+    object.message || object,
+    object.where ? ` | WHERE: ${object.where}` : '',
+    object.hint ? ` | HINT: ${object.hint}` : '',
+  );
+}
+
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   options: {
     pgPool: Pool;
@@ -347,14 +361,7 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
 
     if (debugPgNotice.enabled) {
       pgClient.on('notice', (msg: PgNotice) => {
-        debugPgNotice(
-          '%s%s: %s%s%s',
-          msg.severity || 'NOTICE',
-          msg.code ? `[${msg.code}]` : '',
-          msg.message || msg,
-          msg.where ? ` | WHERE: ${msg.where}` : '',
-          msg.hint ? ` | HINT: ${msg.hint}` : '',
-        );
+        debugPgErrorObject(debugPgNotice, msg);
       });
     }
 
@@ -369,7 +376,13 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
         const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
         // Report the error with our Postgres debugger.
-        promiseResult.catch((error: any) => debugPgError(error));
+        promiseResult.catch((error: PgNotice | Error) => {
+          if (error.name && error['severity']) {
+            debugPgErrorObject(debugPgError, error as PgNotice);
+          } else {
+            debugPgError('%O', error);
+          }
+        });
 
         return promiseResult;
       };
