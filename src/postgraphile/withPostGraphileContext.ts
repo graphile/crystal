@@ -346,8 +346,15 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
     pgClient[$$pgClientOrigQuery] = pgClient.query;
 
     if (debugPgNotice.enabled) {
-      pgClient.on('notice', msg => {
-        debugPgNotice('NOTICE: %s', msg);
+      pgClient.on('notice', (msg: PgNotice) => {
+        debugPgNotice(
+          '%s%s: %s%s%s',
+          msg.severity || 'NOTICE',
+          msg.code ? `[${msg.code}]` : '',
+          msg.message || msg,
+          msg.where ? ` | WHERE: ${msg.where}` : '',
+          msg.hint ? ` | HINT: ${msg.hint}` : '',
+        );
       });
     }
 
@@ -414,3 +421,28 @@ function isPgSettingValid(pgSetting: mixed): boolean {
   );
 }
 // tslint:enable no-any
+interface PgNotice extends Error {
+  name: 'notice';
+  message: string;
+  length: number;
+  severity: string;
+  code: string;
+  detail: string | void;
+  hint: string | void;
+  where: string | void;
+  schema: string | void;
+  table: string | void;
+  column: string | void;
+  constraint: string | void;
+  file: string;
+  line: string;
+  routine: string;
+  /*
+  Not sure what these are:
+
+    position: any;
+    internalPosition: any;
+    internalQuery: any;
+    dataType: any;
+  */
+}
