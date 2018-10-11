@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgraphile:
+    build: .
+    entrypoint:
+      - postgraphile
+      - -n
+      - 0.0.0.0
+      - --connection
+      - postgres://postgres:postgres@localhost:5432/db
+    ports:
+      - "5000:5000"
