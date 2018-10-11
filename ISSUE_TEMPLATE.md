@@ -2,7 +2,7 @@ I'm submitting a ... <!-- check one with "x" -->
 
 * [ ] bug report
 * [ ] feature request
-* [ ] question <!-- alternatively, ask on Gitter (https://gitter.im/graphile/postgraphile) -->
+* [ ] question <!-- alternatively, ask on Discord (http://discord.gg/graphile) -->
 
 PostGraphile version:
 
