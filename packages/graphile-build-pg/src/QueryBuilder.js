@@ -3,7 +3,7 @@ import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 
-const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
+const isDev = process.env.POSTGRAPHILE_ENV === "development";
 
 type GenContext = {
   queryBuilder: QueryBuilder,
@@ -522,49 +522,56 @@ class QueryBuilder {
       this.compiledData[type] = this.data[type];
     } else if (type === "whereBound") {
       // Handle properties separately
+      const context = getContext();
       this.compiledData[type].lower = callIfNecessaryArray(
         this.data[type].lower,
-        getContext()
+        context
       );
       this.compiledData[type].upper = callIfNecessaryArray(
         this.data[type].upper,
-        getContext()
+        context
       );
     } else if (type === "select") {
       // Assume that duplicate fields must be identical, don't output the same key multiple times
-      const seenFields = [];
+      const seenFields = {};
+      const context = getContext();
       this.compiledData[type] = this.data[type].reduce((memo, [a, b]) => {
-        if (seenFields.indexOf(b) < 0) {
-          seenFields.push(b);
-          memo.push([callIfNecessary(a, getContext()), b]);
+        // $FlowFixMe
+        if (!seenFields[b]) {
+          // $FlowFixMe
+          seenFields[b] = true;
+          memo.push([callIfNecessary(a, context), b]);
         }
         return memo;
       }, []);
     } else if (type === "orderBy") {
+      const context = getContext();
       this.compiledData[type] = this.data[type].map(([a, b]) => [
-        callIfNecessary(a, getContext()),
+        callIfNecessary(a, context),
         b,
       ]);
     } else if (type === "from") {
       if (this.data.from) {
         const f = this.data.from;
-        this.compiledData.from = [callIfNecessary(f[0], getContext()), f[1]];
+        const context = getContext();
+        this.compiledData.from = [callIfNecessary(f[0], context), f[1]];
       }
     } else if (type === "join" || type === "where") {
-      this.compiledData[type] = callIfNecessaryArray(
-        this.data[type],
-        getContext()
-      );
+      const context = getContext();
+      this.compiledData[type] = callIfNecessaryArray(this.data[type], context);
     } else if (type === "selectCursor") {
-      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
+      const context = getContext();
+      this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "cursorPrefix") {
       this.compiledData[type] = this.data[type];
     } else if (type === "orderIsUnique") {
       this.compiledData[type] = this.data[type];
     } else if (type === "limit") {
-      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
+      const context = getContext();
+      this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "offset") {
-      this.compiledData[type] = callIfNecessary(this.data[type], getContext());
+      const context = getContext();
+      this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "first") {
       this.compiledData[type] = this.data[type];
     } else if (type === "last") {
