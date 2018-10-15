@@ -143,6 +143,9 @@ export default (function PgMutationCreatePlugin(
                 {
                   name: "newNameHere",
                 }
+              )}\n\nor disable the built-in create mutation via:\n\n  ${sqlCommentByAddingTags(
+                table,
+                { omit: "create" }
               )}`,
               isMutationPayload: true,
               isPgCreatePayloadType: true,

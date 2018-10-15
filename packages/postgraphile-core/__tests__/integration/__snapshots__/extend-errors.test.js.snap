@@ -40,6 +40,10 @@ exports[`function naming clash - createPost 1`] = `
     [35mAdding table create payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via:[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m@name newNameHere[22m';[39m
+    [35m[39m
+    [35mor disable the built-in create mutation via:[39m
+    [35m[39m
+    [35m  COMMENT ON TABLE "a"."post" IS E'[1m@omit create[22m';[39m
 
   The second entity was:
 

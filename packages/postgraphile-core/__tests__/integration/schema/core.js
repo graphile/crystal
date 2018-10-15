@@ -2,7 +2,7 @@ const printSchemaOrdered = require("../../printSchemaOrdered");
 const { withPgClient } = require("../../helpers");
 const { createPostGraphileSchema } = require("../../..");
 
-exports.test = (schemas, options, setup) => () =>
+exports.test = (schemas, options, setup, finalCheck = () => {}) => () =>
   withPgClient(async client => {
     if (setup) {
       if (typeof setup === "function") {
@@ -13,4 +13,5 @@ exports.test = (schemas, options, setup) => () =>
     }
     const schema = await createPostGraphileSchema(client, schemas, options);
     expect(printSchemaOrdered(schema)).toMatchSnapshot();
+    await finalCheck();
   });
