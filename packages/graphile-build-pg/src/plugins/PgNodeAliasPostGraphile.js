@@ -7,6 +7,10 @@ export default (async function PgNodeAliasPostGraphile(builder) {
       setNodeAlias,
       inflection: { pluralize },
     } = build;
+    if (!setNodeAlias) {
+      // Node plugin must be disabled.
+      return object;
+    }
     const {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
     } = context;

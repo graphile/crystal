@@ -14,6 +14,10 @@ export default (async function PgRowNode(builder) {
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
     } = build;
+    if (!addNodeFetcherForTypeName) {
+      // Node plugin must be disabled.
+      return object;
+    }
     const {
       scope: { isPgRowType, pgIntrospection: table },
     } = context;
