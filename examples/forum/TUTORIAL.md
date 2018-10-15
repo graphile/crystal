@@ -660,7 +660,7 @@ from forum_example_private.person_account as a
 where a.email = $1;
 ```
 
-This code will select a single account from `forum_example_private.person_account` using the provided email value. The `$1` here is just another way to write the `email` argument. If we had wrote `email = email` or even `a.email = email`, Postgres would not have known which email we were referring to, so instead we just used a substitute for the `email` argument which depends on its placement in the identifer `$1`. If we succesfully find a person with that email, we store it in the `account` variable. If we do not find anything, `account` will be null. The second part of our function is:
+This code will select a single account from `forum_example_private.person_account` using the provided email value. The `$1` here is just another way to write the `email` argument. If we had wrote `email = email` or even `a.email = email`, Postgres would not have known which email we were referring to, so instead we just used a substitute for the `email` argument which depends on its placement in the identifer `$1`. If we successfully find a person with that email, we store it in the `account` variable. If we do not find anything, `account` will be null. The second part of our function is:
 
 ```plpgsql
 if account.password_hash = crypt(password, account.password_hash) then
@@ -777,7 +777,7 @@ create policy delete_post on forum_example.post for delete to forum_example_pers
 
 These policies are very similar to the ones before, except that the `insert_post` policy uses `with check` instead of `using` like our other policies. The difference between `with check` and `using` is roughly that `using` is applied _before_ any operation occurs to the table’s rows. So in the case of updating a post, one could not update a row that does not have the appropriate `author_id` in the first place. `with check` is run _after_ an operation is applied. If the `with check` fails the operation will be rejected. So in the case of an insert, Postgres sets all of the columns as specified and then compares against `with check` on the new row. You must use `with check` with `INSERT` commands because there are no rows to compare against before insertion, and you must use `using` with `DELETE` commands because a delete changes no rows only removes current ones.
 
-That’s it! We have succesfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphile we will get a well designed GraphQL API that we can use in our frontend application.
+That’s it! We have successfully creating a Postgres schema embedded with our business logic. When we use this schema with PostGraphile we will get a well designed GraphQL API that we can use in our frontend application.
 
 The final argument list for starting our PostGraphile server using the CLI would be as follows:
 
