@@ -740,6 +740,8 @@ export default function createPostGraphileHttpRequestHandler(
               !options.disableQueryLog &&
               queryDocumentAst! /* `!` is not strictly true, but stops TS complaining. */
             ) {
+              // We must reference this before it's deleted!
+              const resultStatusCode = result.statusCode;
               setTimeout(() => {
                 const prettyQuery = printGraphql(queryDocumentAst)
                   .replace(/\s+/g, ' ')
@@ -748,10 +750,21 @@ export default function createPostGraphileHttpRequestHandler(
                 const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
                 const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100;
 
-                // If we have enabled the query log for the Http handler, use that.
+                let message: string;
+                if (resultStatusCode === 401) {
+                  // Users requested that JWT errors were raised differently:
+                  //
+                  //   https://github.com/graphile/postgraphile/issues/560
+                  message = chalk.red(`401 authentication error`);
+                } else if (resultStatusCode === 403) {
+                  message = chalk.red(`403 forbidden error`);
+                } else {
+                  message = chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`);
+                }
+
                 // tslint:disable-next-line no-console
                 console.log(
-                  `${chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`)} ${
+                  `${message} ${
                     pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
                   }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
                 );
