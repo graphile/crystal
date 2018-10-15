@@ -33,6 +33,8 @@ import { createHash } from "crypto";
 
 import { version } from "../package.json";
 
+let recurseDataGeneratorsForFieldWarned = false;
+
 const isString = str => typeof str === "string";
 const isDev = ["test", "development"].indexOf(process.env.NODE_ENV) >= 0;
 const debug = debugFactory("graphile-build");
@@ -352,7 +354,25 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             fieldDataGeneratorsByFieldName[fieldName] || [];
           fieldDataGeneratorsByFieldName[fieldName].push(fn);
         };
-        const recurseDataGeneratorsForField = fieldName => {
+        const recurseDataGeneratorsForField = (
+          fieldName,
+          iKnowWhatIAmDoing
+        ) => {
+          /*
+           * Recursing data generators is not safe in general; however there
+           * are certain exceptions - for example when you know there are no
+           * "dynamic" data generator fields - e.g. where the GraphQL alias is
+           * not used at all. In PostGraphile the only case of this is the
+           * PageInfo object as none of the fields accept arguments, and they
+           * do not rely on the GraphQL query alias to store the result.
+           */
+          if (!iKnowWhatIAmDoing && !recurseDataGeneratorsForFieldWarned) {
+            recurseDataGeneratorsForFieldWarned = true;
+            // eslint-disable-next-line no-console
+            console.error(
+              "Use of `recurseDataGeneratorsForField` is NOT SAFE. e.g. `{n1: node { a: field1 }, n2: node { a: field2 } }` cannot resolve correctly."
+            );
+          }
           const fn = (parsedResolveInfoFragment, ReturnType, ...rest) => {
             const { args } = parsedResolveInfoFragment;
             const { fields } = this.simplifyParsedResolveInfoFragmentWithType(

@@ -13,6 +13,7 @@ import {
   // Union types:
   GraphQLType,
   GraphQLNamedType,
+  GraphQLOutputType,
 
   // Config:
   GraphQLEnumValueConfigMap,
@@ -35,6 +36,8 @@ import {
 import { GraphileEmbed } from "./gql";
 // tslint:disable-next-line
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
+
+const recurseDataGeneratorsWorkaroundFieldByType = new Map();
 
 export type AugmentedGraphQLFieldResolver<
   TSource,
@@ -222,7 +225,6 @@ export default function makeExtendSchemaPlugin(
               fields: (fieldsContext: {
                 Self: typeof type;
                 fieldWithHooks: any;
-                recurseDataGeneratorsForField: any;
               }) =>
                 getFields(
                   fieldsContext.Self,
@@ -507,10 +509,8 @@ function getFields<TSource>(
   resolvers: Resolvers,
   {
     fieldWithHooks,
-    recurseDataGeneratorsForField,
   }: {
     fieldWithHooks: any;
-    recurseDataGeneratorsForField: any;
   },
   build: Build
 ) {
@@ -521,10 +521,18 @@ function getFields<TSource>(
   const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
   function augmentResolver(
     resolver: AugmentedGraphQLFieldResolver<TSource, any>,
-    fieldContext: Context<TSource>
+    fieldContext: Context<TSource>,
+    type: GraphQLOutputType
   ) {
+    const namedType = build.graphql.getNamedType(type);
+    if (typeof namedType.getFields === "function") {
+      namedType.getFields(); // Ensure fields have been loaded, so workarounds are flagged
+    }
+    const recurseDataGeneratorsWorkaroundField = recurseDataGeneratorsWorkaroundFieldByType.get(
+      namedType
+    );
     const { getDataFromParsedResolveInfoFragment } = fieldContext;
-    const newResolver: GraphQLFieldResolver<TSource, any> = (
+    const newResolver: GraphQLFieldResolver<TSource, any> = async (
       parent,
       args,
       context,
@@ -553,10 +561,21 @@ function getFields<TSource>(
         const { rows } = await pgClient.query(text, values);
         return rows;
       };
-      return resolver(parent, args, context, resolveInfo, {
+      const result = await resolver(parent, args, context, resolveInfo, {
         ...fieldContext,
         selectGraphQLResultFromTable,
       });
+      if (
+        result != null &&
+        !result.data &&
+        recurseDataGeneratorsWorkaroundField
+      ) {
+        return {
+          ...result,
+          data: result[recurseDataGeneratorsWorkaroundField],
+        };
+      }
+      return result;
     };
     return newResolver;
   }
@@ -599,94 +618,113 @@ function getFields<TSource>(
           ? functionToResolveObject(resolver)
           : null;
         if (directives.recurseDataGenerators) {
-          recurseDataGeneratorsForField(fieldName);
+          if (!recurseDataGeneratorsWorkaroundFieldByType.get(Self)) {
+            recurseDataGeneratorsWorkaroundFieldByType.set(Self, fieldName);
+          }
+          // tslint:disable-next-line no-console
+          console.warn(
+            "DEPRECATION: `recurseDataGenerators` is misleading, please use `pgField` instead"
+          );
+          if (!directives.pgField) {
+            directives.pgField = directives.recurseDataGenerators;
+          }
         }
-        memo[fieldName] = fieldWithHooks(
-          fieldName,
-          (fieldContext: Context<TSource>) => {
-            const { pgIntrospection } = fieldContext.scope;
-            // @requires directive: pulls down necessary columns from table.
-            //
-            //   e.g. `@requires(columns: ["id", "name"])`
-            //
-            if (directives.requires && pgIntrospection.kind === "class") {
-              if (Array.isArray(directives.requires.columns)) {
-                const table: PgClass = pgIntrospection;
-                const attrs = table.attributes.filter(
-                  attr => directives.requires.columns.indexOf(attr.name) >= 0
-                );
-                const fieldNames = attrs.map(attr =>
-                  build.inflection.column(attr)
-                );
-                const ReturnTypes = attrs.map(
-                  attr =>
-                    build.pgGetGqlTypeByTypeIdAndModifier(
-                      attr.typeId,
-                      attr.typeModifier
-                    ) || build.graphql.GraphQLString
-                );
-                fieldContext.addDataGenerator(
-                  (parsedResolveInfoFragment: any) => ({
-                    pgQuery: (queryBuilder: QueryBuilder) => {
-                      attrs.forEach((attr, i) => {
-                        const columnFieldName = fieldNames[i];
-                        const ReturnType = ReturnTypes[i];
-                        queryBuilder.select(
-                          build.pgGetSelectValueForFieldAndTypeAndModifier(
-                            ReturnType,
-                            fieldContext,
-                            parsedResolveInfoFragment,
-                            sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
-                              attr.name
-                            )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
-                            attr.type,
-                            attr.typeModifier
-                          ),
-                          columnFieldName
-                        );
-                      });
-                    },
-                  })
-                );
-              } else {
-                throw new Error(
-                  `@requires(columns: ["...", ...]) directive called with invalid arguments`
-                );
-              }
-            }
-
-            const resolversSpec = rawResolversSpec
-              ? Object.keys(rawResolversSpec).reduce(
-                  (newResolversSpec, key) => {
-                    if (typeof rawResolversSpec[key] === "function") {
-                      newResolversSpec[key] = augmentResolver(
-                        rawResolversSpec[key],
-                        fieldContext
+        const fieldSpecGenerator = (fieldContext: Context<TSource>) => {
+          const { pgIntrospection } = fieldContext.scope;
+          // @requires directive: pulls down necessary columns from table.
+          //
+          //   e.g. `@requires(columns: ["id", "name"])`
+          //
+          if (directives.requires && pgIntrospection.kind === "class") {
+            if (Array.isArray(directives.requires.columns)) {
+              const table: PgClass = pgIntrospection;
+              const attrs = table.attributes.filter(
+                attr => directives.requires.columns.indexOf(attr.name) >= 0
+              );
+              const fieldNames = attrs.map(attr =>
+                build.inflection.column(attr)
+              );
+              const ReturnTypes = attrs.map(
+                attr =>
+                  build.pgGetGqlTypeByTypeIdAndModifier(
+                    attr.typeId,
+                    attr.typeModifier
+                  ) || build.graphql.GraphQLString
+              );
+              fieldContext.addDataGenerator(
+                (parsedResolveInfoFragment: any) => ({
+                  pgQuery: (queryBuilder: QueryBuilder) => {
+                    attrs.forEach((attr, i) => {
+                      const columnFieldName = fieldNames[i];
+                      const ReturnType = ReturnTypes[i];
+                      queryBuilder.select(
+                        build.pgGetSelectValueForFieldAndTypeAndModifier(
+                          ReturnType,
+                          fieldContext,
+                          parsedResolveInfoFragment,
+                          sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
+                            attr.name
+                          )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
+                          attr.type,
+                          attr.typeModifier
+                        ),
+                        columnFieldName
                       );
-                    }
-                    return newResolversSpec;
+                    });
                   },
-                  {}
-                )
-              : {};
-            return {
-              type,
-              args,
-              ...(deprecationReason
-                ? {
-                    deprecationReason,
-                  }
-                : null),
-              ...(description
-                ? {
-                    description,
-                  }
-                : null),
-              ...resolversSpec,
-            };
-          },
-          scope
-        );
+                })
+              );
+            } else {
+              throw new Error(
+                `@requires(columns: ["...", ...]) directive called with invalid arguments`
+              );
+            }
+          }
+
+          const resolversSpec = rawResolversSpec
+            ? Object.keys(rawResolversSpec).reduce((newResolversSpec, key) => {
+                if (typeof rawResolversSpec[key] === "function") {
+                  newResolversSpec[key] = augmentResolver(
+                    rawResolversSpec[key],
+                    fieldContext,
+                    type as GraphQLOutputType
+                  );
+                }
+                return newResolversSpec;
+              }, {})
+            : {};
+          return {
+            type,
+            args,
+            ...(deprecationReason
+              ? {
+                  deprecationReason,
+                }
+              : null),
+            ...(description
+              ? {
+                  description,
+                }
+              : null),
+            ...resolversSpec,
+          };
+        };
+        if (directives.pgField) {
+          return build.extend(memo, {
+            [fieldName]: build.pgField(
+              build,
+              fieldWithHooks,
+              fieldName,
+              fieldSpecGenerator,
+              scope,
+              false
+            ),
+          });
+        } else {
+          return build.extend(memo, {
+            [fieldName]: fieldWithHooks(fieldName, fieldSpecGenerator, scope),
+          });
+        }
       } else {
         throw new Error(
           `AST issue: expected 'FieldDefinition', instead received '${
@@ -694,7 +732,6 @@ function getFields<TSource>(
           }'`
         );
       }
-      return memo;
     }, {});
   }
   return {};

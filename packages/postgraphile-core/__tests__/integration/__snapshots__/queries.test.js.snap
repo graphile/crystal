@@ -949,6 +949,50 @@ Object {
       },
       "totalCount": 1,
     },
+    "v": Object {
+      "e1": Array [
+        Object {
+          "n1": Object {
+            "id": 1,
+            "personByAuthorId": Object {
+              "name": "Sara Smith",
+            },
+          },
+          "n2": Object {
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "personByAuthorId": Object {
+              "id": 2,
+            },
+          },
+        },
+        Object {
+          "n1": Object {
+            "id": 2,
+            "personByAuthorId": Object {
+              "name": "John Smith",
+            },
+          },
+          "n2": Object {
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "personByAuthorId": Object {
+              "id": 1,
+            },
+          },
+        },
+      ],
+      "e2": Array [
+        Object {
+          "node": Object {
+            "nodeId": "WyJwb3N0cyIsMV0=",
+          },
+        },
+        Object {
+          "node": Object {
+            "nodeId": "WyJwb3N0cyIsMl0=",
+          },
+        },
+      ],
+    },
   },
 }
 `;

@@ -38,6 +38,7 @@ export default (function PgTablesPlugin(
       getNodeIdForTypeAndIdentifiers,
       nodeIdFieldName,
       newWithHooks,
+      getSafeAliasFromResolveInfo,
       pgSql: sql,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
@@ -57,6 +58,7 @@ export default (function PgTablesPlugin(
       inflection,
       describePgEntity,
       sqlCommentByAddingTags,
+      pgField,
     } = build;
     const nullableIf = (condition, Type) =>
       condition ? Type : new GraphQLNonNull(Type);
@@ -338,14 +340,29 @@ export default (function PgTablesPlugin(
             {
               description: `A \`${tableTypeName}\` edge in the connection.`,
               name: inflection.edge(TableType.name),
-              fields: ({ fieldWithHooks, recurseDataGeneratorsForField }) => {
-                recurseDataGeneratorsForField("node");
+              fields: ({ fieldWithHooks }) => {
                 return {
                   cursor: fieldWithHooks(
                     "cursor",
                     ({ addDataGenerator }) => {
                       addDataGenerator(() => ({
                         usesCursor: [true],
+                        pgQuery: queryBuilder => {
+                          if (primaryKeys) {
+                            queryBuilder.select(
+                              sql.fragment`json_build_array(${sql.join(
+                                primaryKeys.map(
+                                  key =>
+                                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                      key.name
+                                    )}`
+                                ),
+                                ", "
+                              )})`,
+                              "__identifiers"
+                            );
+                          }
+                        },
                       }));
                       return {
                         description: "A cursor for use in pagination.",
@@ -362,16 +379,26 @@ export default (function PgTablesPlugin(
                       isCursorField: true,
                     }
                   ),
-                  node: {
-                    description: `The \`${tableTypeName}\` at the end of the edge.`,
-                    type: nullableIf(
-                      !pgForbidSetofFunctionsToReturnNull,
-                      TableType
-                    ),
-                    resolve(data) {
-                      return handleNullRow(data);
+                  node: pgField(
+                    build,
+                    fieldWithHooks,
+                    "node",
+                    {
+                      description: `The \`${tableTypeName}\` at the end of the edge.`,
+                      type: nullableIf(
+                        !pgForbidSetofFunctionsToReturnNull,
+                        TableType
+                      ),
+                      resolve(data, _args, _context, resolveInfo) {
+                        const safeAlias = getSafeAliasFromResolveInfo(
+                          resolveInfo
+                        );
+                        return handleNullRow(data[safeAlias]);
+                      },
                     },
-                  },
+                    {},
+                    false
+                  ),
                 };
               },
             },
@@ -397,34 +424,60 @@ export default (function PgTablesPlugin(
             {
               description: `A connection to a list of \`${tableTypeName}\` values.`,
               name: inflection.connection(TableType.name),
-              fields: ({ recurseDataGeneratorsForField }) => {
-                recurseDataGeneratorsForField("edges");
-                recurseDataGeneratorsForField("nodes");
-                recurseDataGeneratorsForField("pageInfo");
+              fields: ({ recurseDataGeneratorsForField, fieldWithHooks }) => {
+                recurseDataGeneratorsForField("pageInfo", true);
                 return {
-                  nodes: {
-                    description: `A list of \`${tableTypeName}\` objects.`,
-                    type: new GraphQLNonNull(
-                      new GraphQLList(
-                        nullableIf(
-                          !pgForbidSetofFunctionsToReturnNull,
-                          TableType
+                  nodes: pgField(
+                    build,
+                    fieldWithHooks,
+                    "nodes",
+                    {
+                      description: `A list of \`${tableTypeName}\` objects.`,
+                      type: new GraphQLNonNull(
+                        new GraphQLList(
+                          nullableIf(
+                            !pgForbidSetofFunctionsToReturnNull,
+                            TableType
+                          )
                         )
-                      )
-                    ),
-                    resolve(data) {
-                      return data.data.map(handleNullRow);
+                      ),
+                      resolve(data, _args, _context, resolveInfo) {
+                        const safeAlias = getSafeAliasFromResolveInfo(
+                          resolveInfo
+                        );
+                        return data.data
+                          .map(entry => entry[safeAlias])
+                          .map(handleNullRow);
+                      },
                     },
-                  },
-                  edges: {
-                    description: `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
-                    type: new GraphQLNonNull(
-                      new GraphQLList(new GraphQLNonNull(EdgeType))
-                    ),
-                    resolve(data) {
-                      return data.data;
+                    {},
+                    false
+                  ),
+                  edges: pgField(
+                    build,
+                    fieldWithHooks,
+                    "edges",
+                    {
+                      description: `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
+                      type: new GraphQLNonNull(
+                        new GraphQLList(new GraphQLNonNull(EdgeType))
+                      ),
+                      resolve(data, _args, _context, resolveInfo) {
+                        const safeAlias = getSafeAliasFromResolveInfo(
+                          resolveInfo
+                        );
+                        return data.data.map(entry => ({
+                          __cursor: entry.__cursor,
+                          ...entry[safeAlias],
+                        }));
+                      },
                     },
-                  },
+                    {},
+                    false,
+                    {
+                      hoistCursor: true,
+                    }
+                  ),
                   pageInfo: PageInfo && {
                     description: "Information to aid in pagination.",
                     type: new GraphQLNonNull(PageInfo),

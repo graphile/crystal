@@ -41,6 +41,7 @@ export default (async function PgMutationUpdateDeletePlugin(
       pgViaTemporaryTable: viaTemporaryTable,
       describePgEntity,
       sqlCommentByAddingTags,
+      pgField,
     } = build;
     const {
       scope: { isRootMutation },
@@ -203,12 +204,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                         : "updatePayloadType"
                     ](table),
                     description: `The output of our ${mode} \`${tableTypeName}\` mutation.`,
-                    fields: ({
-                      recurseDataGeneratorsForField,
-                      fieldWithHooks,
-                    }) => {
+                    fields: ({ fieldWithHooks }) => {
                       const tableName = inflection.tableFieldName(table);
-                      recurseDataGeneratorsForField(tableName);
                       // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
                       const deletedNodeIdFieldName = camelCase(
                         `deleted-${singularize(table.name)}-id`
@@ -220,13 +217,17 @@ export default (async function PgMutationUpdateDeletePlugin(
                               "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
                             type: GraphQLString,
                           },
-                          [tableName]: {
-                            description: `The \`${tableTypeName}\` that was ${mode}d by this mutation.`,
-                            type: Table,
-                            resolve(data) {
-                              return data.data;
+                          [tableName]: pgField(
+                            build,
+                            fieldWithHooks,
+                            tableName,
+                            {
+                              description: `The \`${tableTypeName}\` that was ${mode}d by this mutation.`,
+                              type: Table,
                             },
-                          },
+                            {},
+                            false
+                          ),
                         },
                         mode === "delete"
                           ? {

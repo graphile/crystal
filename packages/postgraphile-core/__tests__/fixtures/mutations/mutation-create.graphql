@@ -269,6 +269,59 @@ mutation CreateMutation($config: KeyValueHash!) {
       }
     }
   }
+  k: createPost(input: {
+    post: {
+      authorId: 1
+      headline: "super headline 2",
+      comptypes: [
+        {
+          schedule: "2008-10-24 10:17:54+02",
+          isOptimised: true
+        },
+        {
+          schedule: "2007-10-24 10:17:54+02",
+          isOptimised: false
+        },
+        {
+          schedule: "2006-10-24 10:17:54+02",
+          isOptimised: null
+        }
+      ]
+    }
+  }) {
+    post {
+      id
+      headline
+      comptypes {
+        schedule
+        isOptimised
+      }
+      personByAuthorId {
+        id
+      }
+    }
+    p2: post {
+      personByAuthorId {
+        email
+      }
+    }
+    postEdge {
+      node {
+        id
+        headline
+        comptypes {
+          schedule
+          isOptimised
+        }
+        personByAuthorId {
+          name
+        }
+      }
+    }
+    personByAuthorId {
+      createdAt
+    }
+  }
 }
 
 fragment createPersonPayload on CreatePersonPayload {

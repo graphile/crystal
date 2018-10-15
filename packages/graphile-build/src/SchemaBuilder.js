@@ -99,7 +99,7 @@ export type ContextGraphQLObjectTypeFields = {|
     fieldName: string,
     fn: DataGeneratorFunction
   ) => void,
-  recurseDataGeneratorsForField: (fieldName: string) => void,
+  recurseDataGeneratorsForField: (fieldName: string) => void, // @deprecated - DO NOT USE!
   Self: GraphQLNamedType,
   GraphQLObjectType: GraphQLObjectTypeConfig<*, *>,
   fieldWithHooks: FieldWithHooksFunction,

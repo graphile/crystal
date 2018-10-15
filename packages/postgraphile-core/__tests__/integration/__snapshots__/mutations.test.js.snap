@@ -474,6 +474,60 @@ Object {
         "id": 12,
       },
     },
+    "k": Object {
+      "p2": Object {
+        "personByAuthorId": Object {
+          "email": "john.smith@email.com",
+        },
+      },
+      "personByAuthorId": Object {
+        "createdAt": null,
+      },
+      "post": Object {
+        "comptypes": Array [
+          Object {
+            "isOptimised": true,
+            "schedule": "2008-10-24T04:17:54-04:00",
+          },
+          Object {
+            "isOptimised": false,
+            "schedule": "2007-10-24T04:17:54-04:00",
+          },
+          Object {
+            "isOptimised": null,
+            "schedule": "2006-10-24T04:17:54-04:00",
+          },
+        ],
+        "headline": "super headline 2",
+        "id": 13,
+        "personByAuthorId": Object {
+          "id": 1,
+        },
+      },
+      "postEdge": Object {
+        "node": Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": true,
+              "schedule": "2008-10-24T04:17:54-04:00",
+            },
+            Object {
+              "isOptimised": false,
+              "schedule": "2007-10-24T04:17:54-04:00",
+            },
+            Object {
+              "isOptimised": null,
+              "schedule": "2006-10-24T04:17:54-04:00",
+            },
+          ],
+          "headline": "super headline 2",
+          "id": 13,
+          "personByAuthorId": Object {
+            "name": "John Smith",
+          },
+        },
+      },
+    },
   },
 }
 `;
