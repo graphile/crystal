@@ -16,6 +16,7 @@ export default (function PgForwardRelationPlugin(builder) {
       inflection,
       pgQueryFromResolveData: queryFromResolveData,
       pgOmit: omit,
+      sqlCommentByAddingTags,
       describePgEntity,
     } = build;
     const {
@@ -172,7 +173,14 @@ export default (function PgForwardRelationPlugin(builder) {
               }
             ),
           },
-          `Adding forward relation for ${describePgEntity(constraint)}`
+          `Forward relation for ${describePgEntity(
+            constraint
+          )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+            constraint,
+            {
+              fieldName: "newNameHere",
+            }
+          )}`
         );
         return memo;
       }, {}),

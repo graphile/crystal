@@ -116,12 +116,13 @@ export const postGraphileClassicIdsInflection = inflections.newInflector({
 export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
   builder.hook("inflection", (inflection: Inflection) => {
     const previous = inflection.enumName;
-    return {
-      ...inflection,
+    // Overwrite directly so that we don't lose the 'extend' hints
+    Object.assign(inflection, {
       enumName(value: string) {
         return this.constantCase(previous.call(this, value));
       },
-    };
+    });
+    return inflection;
   });
 } as Plugin;
 
@@ -130,15 +131,16 @@ export const PostGraphileClassicIdsInflectionPlugin = function(
 ) {
   builder.hook("inflection", (inflection: Inflection) => {
     const previous = inflection._columnName;
-    return {
-      ...inflection,
+    // Overwrite directly so that we don't lose the 'extend' hints
+    Object.assign(inflection, {
       _columnName(attr: PgAttribute, options: { skipRowId?: boolean }) {
         const previousValue = previous.call(this, attr, options);
         return (options && options.skipRowId) || previousValue !== "id"
           ? previousValue
           : this.camelCase("rowId");
       },
-    };
+    });
+    return inflection;
   });
 } as Plugin;
 

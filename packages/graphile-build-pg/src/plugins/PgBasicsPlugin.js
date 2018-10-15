@@ -699,7 +699,8 @@ export default (function PgBasicsPlugin(
             `delete-${this._singularizedTableName(table)}-payload`
           );
         },
-      })
+      }),
+      "Default inflectors from PgBasicsPlugin. You can override these with `makeAddInflectorsPlugin(..., true)`."
     );
   });
 }: Plugin);
