@@ -8,7 +8,6 @@
   "version": "4.0.1",
   "command": {
     "publish": {
-      "ignore": "graphile",
       "allowBranch": "master"
     }
   }
