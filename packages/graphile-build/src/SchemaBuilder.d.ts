@@ -22,10 +22,10 @@ export interface Options {
   [str: string]: mixed;
 }
 
-export type Plugin = (
-  builder: SchemaBuilder,
-  options: Options
-) => Promise<void> | void;
+export interface Plugin {
+  (builder: SchemaBuilder, options: Options): Promise<void> | void;
+  displayName?: string;
+}
 
 export type TriggerChangeType = () => void;
 export type WatchUnwatch = (triggerChange: TriggerChangeType) => void;

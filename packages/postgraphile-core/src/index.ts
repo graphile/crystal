@@ -289,49 +289,60 @@ const getPostGraphileBuilder = async (
   const inflectionOverridePlugins = classicIds
     ? [PostGraphileInflectionPlugin, PostGraphileClassicIdsInflectionPlugin]
     : [PostGraphileInflectionPlugin];
-  return getBuilder(
-    (replaceAllPlugins
-      ? [
-          ...prependPlugins,
-          ...replaceAllPlugins,
-          ...inflectionOverridePlugins,
-          ...appendPlugins,
-        ]
-      : [
-          ...prependPlugins,
-          ...defaultPlugins,
-          ...pgDefaultPlugins,
-          ...inflectionOverridePlugins,
-          ...appendPlugins,
-        ]
-    ).filter(p => skipPlugins.indexOf(p) === -1),
-    {
-      pgConfig,
-      pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
-      pgExtendedTypes: !!dynamicJson,
-      pgColumnFilter: pgColumnFilter || (() => true),
-      pgInflection:
-        inflector ||
-        (classicIds
-          ? postGraphileClassicIdsInflection
-          : postGraphileInflection),
-      nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
-      pgJwtTypeIdentifier: jwtPgTypeIdentifier,
-      pgJwtSecret: jwtSecret,
-      pgDisableDefaultMutations: disableDefaultMutations,
-      pgViewUniqueKey: viewUniqueKey,
-      pgEnableTags: enableTags,
-      pgLegacyRelations: legacyRelations,
-      pgLegacyJsonUuid: legacyJsonUuid,
-      persistentMemoizeWithKey,
-      pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
-      pgSimpleCollections: simpleCollections,
-      pgIncludeExtensionResources: includeExtensionResources,
-      pgIgnoreRBAC: ignoreRBAC,
-      ...graphileBuildOptions,
-      ...graphqlBuildOptions, // DEPRECATED!
-    }
+  const basePluginList = replaceAllPlugins
+    ? [
+        ...prependPlugins,
+        ...replaceAllPlugins,
+        ...inflectionOverridePlugins,
+        ...appendPlugins,
+      ]
+    : [
+        ...prependPlugins,
+        ...defaultPlugins,
+        ...pgDefaultPlugins,
+        ...inflectionOverridePlugins,
+        ...appendPlugins,
+      ];
+  const invalidSkipPlugins = skipPlugins.filter(
+    pluginToSkip => basePluginList.indexOf(pluginToSkip) < 0
   );
+  if (invalidSkipPlugins.length) {
+    function getFunctionName(fn: Plugin) {
+      return fn.displayName || fn.name || String(fn);
+    }
+    throw new Error(
+      `You tried to skip plugins that would never have been loaded anyway. Perhaps you've made a mistake in your skipPlugins list, or have sourced the plugin from a duplicate plugin module - check for duplicate modules in your 'node_modules' folder. The plugins that you requested to skip were: ${invalidSkipPlugins
+        .map(getFunctionName)
+        .join(", ")}`
+    );
+  }
+  const finalPluginList = basePluginList.filter(
+    p => skipPlugins.indexOf(p) === -1
+  );
+  return getBuilder(finalPluginList, {
+    pgConfig,
+    pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
+    pgExtendedTypes: !!dynamicJson,
+    pgColumnFilter: pgColumnFilter || (() => true),
+    pgInflection:
+      inflector ||
+      (classicIds ? postGraphileClassicIdsInflection : postGraphileInflection),
+    nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
+    pgJwtTypeIdentifier: jwtPgTypeIdentifier,
+    pgJwtSecret: jwtSecret,
+    pgDisableDefaultMutations: disableDefaultMutations,
+    pgViewUniqueKey: viewUniqueKey,
+    pgEnableTags: enableTags,
+    pgLegacyRelations: legacyRelations,
+    pgLegacyJsonUuid: legacyJsonUuid,
+    persistentMemoizeWithKey,
+    pgForbidSetofFunctionsToReturnNull: !setofFunctionsContainNulls,
+    pgSimpleCollections: simpleCollections,
+    pgIncludeExtensionResources: includeExtensionResources,
+    pgIgnoreRBAC: ignoreRBAC,
+    ...graphileBuildOptions,
+    ...graphqlBuildOptions, // DEPRECATED!
+  });
 };
 
 function abort(e: Error) {
