@@ -1,9 +1,8 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import debugFactory from "debug";
+import debugSql from "./debugSql";
 
 const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
-const debugSql = debugFactory("graphile-build-pg:sql");
 
 export default (async function PgRowNode(builder) {
   builder.hook("GraphQLObjectType", (object, build, context) => {

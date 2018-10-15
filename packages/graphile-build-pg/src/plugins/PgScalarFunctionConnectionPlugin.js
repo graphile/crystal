@@ -1,5 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
+
 const base64 = str => Buffer.from(String(str)).toString("base64");
 
 export default (function PgScalarFunctionConnectionPlugin(

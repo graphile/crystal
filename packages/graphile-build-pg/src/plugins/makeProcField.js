@@ -1,11 +1,10 @@
 // @flow
-import debugFactory from "debug";
 
 import type { Build, FieldWithHooksFunction } from "graphile-build";
 import type { PgProc } from "./PgIntrospectionPlugin";
 import type { SQL } from "pg-sql2";
+import debugSql from "./debugSql";
 
-const debugSql = debugFactory("graphile-build-pg:sql");
 const firstValue = obj => {
   let firstKey;
   for (const k in obj) {

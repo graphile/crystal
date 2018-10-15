@@ -1,11 +1,9 @@
 // @flow
 
 import * as sql from "pg-sql2";
-import debugFactory from "debug";
 import type { Client } from "pg";
 import type { SQL, SQLQuery } from "pg-sql2";
-
-const debugSql = debugFactory("graphile-build-pg:sql");
+import debugSql from "./debugSql";
 
 /*
  * Originally we tried this with a CTE, but:

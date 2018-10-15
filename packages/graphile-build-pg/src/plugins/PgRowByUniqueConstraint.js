@@ -1,7 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import debugFactory from "debug";
-const debugSql = debugFactory("graphile-build-pg:sql");
+import debugSql from "./debugSql";
 
 export default (async function PgRowByUniqueConstraint(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {

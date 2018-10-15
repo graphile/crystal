@@ -1,9 +1,7 @@
 // @flow
-import debugFactory from "debug";
 
 import type { Plugin } from "graphile-build";
-
-const debugSql = debugFactory("graphile-build-pg:sql");
+import debugSql from "./debugSql";
 
 export default (async function PgAllRows(
   builder,
