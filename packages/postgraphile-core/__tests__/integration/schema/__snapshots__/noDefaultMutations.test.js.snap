@@ -253,6 +253,157 @@ input FloatRangeInput {
   start: FloatRangeBoundInput
 }
 
+\\"\\"\\"The return type of our \`funcOutComplex\` query.\\"\\"\\"
+type FuncOutComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+\\"\\"\\"A connection to a list of \`FuncOutComplexSetofRecord\` values.\\"\\"\\"
+type FuncOutComplexSetofConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`FuncOutComplexSetofRecord\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [FuncOutComplexSetofEdge!]!
+
+  \\"\\"\\"A list of \`FuncOutComplexSetofRecord\` objects.\\"\\"\\"
+  nodes: [FuncOutComplexSetofRecord!]!
+}
+
+\\"\\"\\"A \`FuncOutComplexSetofRecord\` edge in the connection.\\"\\"\\"
+type FuncOutComplexSetofEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`FuncOutComplexSetofRecord\` at the end of the edge.\\"\\"\\"
+  node: FuncOutComplexSetofRecord!
+}
+
+\\"\\"\\"The return type of our \`funcOutComplexSetof\` query.\\"\\"\\"
+type FuncOutComplexSetofRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+\\"\\"\\"The return type of our \`funcOutOutCompoundType\` query.\\"\\"\\"
+type FuncOutOutCompoundTypeRecord {
+  o1: Int
+  o2: CompoundType
+}
+
+\\"\\"\\"The return type of our \`funcOutOut\` query.\\"\\"\\"
+type FuncOutOutRecord {
+  firstOut: Int
+  secondOut: String
+}
+
+\\"\\"\\"A connection to a list of \`FuncOutOutSetofRecord\` values.\\"\\"\\"
+type FuncOutOutSetofConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`FuncOutOutSetofRecord\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [FuncOutOutSetofEdge!]!
+
+  \\"\\"\\"A list of \`FuncOutOutSetofRecord\` objects.\\"\\"\\"
+  nodes: [FuncOutOutSetofRecord!]!
+}
+
+\\"\\"\\"A \`FuncOutOutSetofRecord\` edge in the connection.\\"\\"\\"
+type FuncOutOutSetofEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`FuncOutOutSetofRecord\` at the end of the edge.\\"\\"\\"
+  node: FuncOutOutSetofRecord!
+}
+
+\\"\\"\\"The return type of our \`funcOutOutSetof\` query.\\"\\"\\"
+type FuncOutOutSetofRecord {
+  o1: Int
+  o2: String
+}
+
+\\"\\"\\"The return type of our \`funcOutOutUnnamed\` query.\\"\\"\\"
+type FuncOutOutUnnamedRecord {
+  arg1: Int
+  arg2: String
+}
+
+\\"\\"\\"A connection to a list of \`Int\` values.\\"\\"\\"
+type FuncOutSetofConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [FuncOutSetofEdge!]!
+
+  \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
+  nodes: [Int!]!
+}
+
+\\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
+type FuncOutSetofEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Int\` at the end of the edge.\\"\\"\\"
+  node: Int
+}
+
+\\"\\"\\"The return type of our \`funcOutUnnamedOutOutUnnamed\` query.\\"\\"\\"
+type FuncOutUnnamedOutOutUnnamedRecord {
+  arg1: Int
+  arg3: Int
+  o2: String
+}
+
+\\"\\"\\"A connection to a list of \`FuncReturnsTableMultiColRecord\` values.\\"\\"\\"
+type FuncReturnsTableMultiColConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`FuncReturnsTableMultiColRecord\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [FuncReturnsTableMultiColEdge!]!
+
+  \\"\\"\\"A list of \`FuncReturnsTableMultiColRecord\` objects.\\"\\"\\"
+  nodes: [FuncReturnsTableMultiColRecord!]!
+}
+
+\\"\\"\\"A \`FuncReturnsTableMultiColRecord\` edge in the connection.\\"\\"\\"
+type FuncReturnsTableMultiColEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`FuncReturnsTableMultiColRecord\` at the end of the edge.\\"\\"\\"
+  node: FuncReturnsTableMultiColRecord!
+}
+
+\\"\\"\\"The return type of our \`funcReturnsTableMultiCol\` query.\\"\\"\\"
+type FuncReturnsTableMultiColRecord {
+  col1: Int
+  col2: String
+}
+
+\\"\\"\\"A connection to a list of \`Int\` values.\\"\\"\\"
+type FuncReturnsTableOneColConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [FuncReturnsTableOneColEdge!]!
+
+  \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
+  nodes: [Int!]!
+}
+
+\\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
+type FuncReturnsTableOneColEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Int\` at the end of the edge.\\"\\"\\"
+  node: Int
+}
+
 \\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
 scalar InternetAddress
 
@@ -731,6 +882,104 @@ type Mutation {
     \\"\\"\\"
     input: LeftArmIdentityInput!
   ): LeftArmIdentityPayload
+  mutationInInout(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationInInoutInput!
+  ): MutationInInoutPayload
+  mutationInOut(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationInOutInput!
+  ): MutationInOutPayload
+  mutationOut(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutInput!
+  ): MutationOutPayload
+  mutationOutComplex(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutComplexInput!
+  ): MutationOutComplexPayload
+  mutationOutComplexSetof(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutComplexSetofInput!
+  ): MutationOutComplexSetofPayload
+  mutationOutOut(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutOutInput!
+  ): MutationOutOutPayload
+  mutationOutOutCompoundType(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutOutCompoundTypeInput!
+  ): MutationOutOutCompoundTypePayload
+  mutationOutOutSetof(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutOutSetofInput!
+  ): MutationOutOutSetofPayload
+  mutationOutOutUnnamed(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutOutUnnamedInput!
+  ): MutationOutOutUnnamedPayload
+  mutationOutSetof(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutSetofInput!
+  ): MutationOutSetofPayload
+  mutationOutTable(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutTableInput!
+  ): MutationOutTablePayload
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  mutationOutTableSetof(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutTableSetofInput!
+  ): MutationOutTableSetofPayload
+  mutationOutUnnamed(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutUnnamedInput!
+  ): MutationOutUnnamedPayload
+  mutationOutUnnamedOutOutUnnamed(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationOutUnnamedOutOutUnnamedInput!
+  ): MutationOutUnnamedOutOutUnnamedPayload
+  mutationReturnsTableMultiCol(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationReturnsTableMultiColInput!
+  ): MutationReturnsTableMultiColPayload
+  mutationReturnsTableOneCol(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: MutationReturnsTableOneColInput!
+  ): MutationReturnsTableOneColPayload
   noArgsMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -757,6 +1006,465 @@ type Mutation {
     \\"\\"\\"
     input: TypesMutationInput!
   ): TypesMutationPayload
+}
+
+\\"\\"\\"All input for the \`mutationInInout\` mutation.\\"\\"\\"
+input MutationInInoutInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  i: Int
+  ino: Int
+}
+
+\\"\\"\\"The output of our \`mutationInInout\` mutation.\\"\\"\\"
+type MutationInInoutPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  ino: Int
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationInOut\` mutation.\\"\\"\\"
+input MutationInOutInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  i: Int
+}
+
+\\"\\"\\"The output of our \`mutationInOut\` mutation.\\"\\"\\"
+type MutationInOutPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  o: Int
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationOutComplex\` mutation.\\"\\"\\"
+input MutationOutComplexInput {
+  a: Int
+  b: String
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutComplex\` mutation.\\"\\"\\"
+type MutationOutComplexPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  result: MutationOutComplexRecord
+}
+
+\\"\\"\\"The return type of our \`mutationOutComplex\` mutation.\\"\\"\\"
+type MutationOutComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+\\"\\"\\"All input for the \`mutationOutComplexSetof\` mutation.\\"\\"\\"
+input MutationOutComplexSetofInput {
+  a: Int
+  b: String
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutComplexSetof\` mutation.\\"\\"\\"
+type MutationOutComplexSetofPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  results: [MutationOutComplexSetofRecord]
+}
+
+\\"\\"\\"The return type of our \`mutationOutComplexSetof\` mutation.\\"\\"\\"
+type MutationOutComplexSetofRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+\\"\\"\\"All input for the \`mutationOut\` mutation.\\"\\"\\"
+input MutationOutInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"All input for the \`mutationOutOutCompoundType\` mutation.\\"\\"\\"
+input MutationOutOutCompoundTypeInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  i1: Int
+}
+
+\\"\\"\\"The output of our \`mutationOutOutCompoundType\` mutation.\\"\\"\\"
+type MutationOutOutCompoundTypePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  result: MutationOutOutCompoundTypeRecord
+}
+
+\\"\\"\\"The return type of our \`mutationOutOutCompoundType\` mutation.\\"\\"\\"
+type MutationOutOutCompoundTypeRecord {
+  o1: Int
+  o2: CompoundType
+}
+
+\\"\\"\\"All input for the \`mutationOutOut\` mutation.\\"\\"\\"
+input MutationOutOutInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutOut\` mutation.\\"\\"\\"
+type MutationOutOutPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  result: MutationOutOutRecord
+}
+
+\\"\\"\\"The return type of our \`mutationOutOut\` mutation.\\"\\"\\"
+type MutationOutOutRecord {
+  firstOut: Int
+  secondOut: String
+}
+
+\\"\\"\\"All input for the \`mutationOutOutSetof\` mutation.\\"\\"\\"
+input MutationOutOutSetofInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutOutSetof\` mutation.\\"\\"\\"
+type MutationOutOutSetofPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  results: [MutationOutOutSetofRecord]
+}
+
+\\"\\"\\"The return type of our \`mutationOutOutSetof\` mutation.\\"\\"\\"
+type MutationOutOutSetofRecord {
+  o1: Int
+  o2: String
+}
+
+\\"\\"\\"All input for the \`mutationOutOutUnnamed\` mutation.\\"\\"\\"
+input MutationOutOutUnnamedInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutOutUnnamed\` mutation.\\"\\"\\"
+type MutationOutOutUnnamedPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  result: MutationOutOutUnnamedRecord
+}
+
+\\"\\"\\"The return type of our \`mutationOutOutUnnamed\` mutation.\\"\\"\\"
+type MutationOutOutUnnamedRecord {
+  arg1: Int
+  arg2: String
+}
+
+\\"\\"\\"The output of our \`mutationOut\` mutation.\\"\\"\\"
+type MutationOutPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  o: Int
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationOutSetof\` mutation.\\"\\"\\"
+input MutationOutSetofInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutSetof\` mutation.\\"\\"\\"
+type MutationOutSetofPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  os: [Int]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationOutTable\` mutation.\\"\\"\\"
+input MutationOutTableInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutTable\` mutation.\\"\\"\\"
+type MutationOutTablePayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  person: Person
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationOutTableSetof\` mutation.\\"\\"\\"
+input MutationOutTableSetofInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutTableSetof\` mutation.\\"\\"\\"
+type MutationOutTableSetofPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  people: [Person]
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationOutUnnamed\` mutation.\\"\\"\\"
+input MutationOutUnnamedInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"All input for the \`mutationOutUnnamedOutOutUnnamed\` mutation.\\"\\"\\"
+input MutationOutUnnamedOutOutUnnamedInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`mutationOutUnnamedOutOutUnnamed\` mutation.\\"\\"\\"
+type MutationOutUnnamedOutOutUnnamedPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  result: MutationOutUnnamedOutOutUnnamedRecord
+}
+
+\\"\\"\\"The return type of our \`mutationOutUnnamedOutOutUnnamed\` mutation.\\"\\"\\"
+type MutationOutUnnamedOutOutUnnamedRecord {
+  arg1: Int
+  arg3: Int
+  o2: String
+}
+
+\\"\\"\\"The output of our \`mutationOutUnnamed\` mutation.\\"\\"\\"
+type MutationOutUnnamedPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  integer: Int
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`mutationReturnsTableMultiCol\` mutation.\\"\\"\\"
+input MutationReturnsTableMultiColInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  i: Int
+}
+
+\\"\\"\\"The output of our \`mutationReturnsTableMultiCol\` mutation.\\"\\"\\"
+type MutationReturnsTableMultiColPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  results: [MutationReturnsTableMultiColRecord]
+}
+
+\\"\\"\\"The return type of our \`mutationReturnsTableMultiCol\` mutation.\\"\\"\\"
+type MutationReturnsTableMultiColRecord {
+  col1: Int
+  col2: String
+}
+
+\\"\\"\\"All input for the \`mutationReturnsTableOneCol\` mutation.\\"\\"\\"
+input MutationReturnsTableOneColInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  i: Int
+}
+
+\\"\\"\\"The output of our \`mutationReturnsTableOneCol\` mutation.\\"\\"\\"
+type MutationReturnsTableOneColPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  col1S: [Int]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
 }
 
 type MyTable implements Node {
@@ -981,6 +1689,13 @@ type Person implements Node {
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+  computedComplex(a: Int, b: String): PersonComputedComplexRecord
+  computedFirstArgInout: Person
+  computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
+  computedInout(ino: String): String
+  computedInoutOut(ino: String): PersonComputedInoutOutRecord
+  computedOut: String
+  computedOutOut: PersonComputedOutOutRecord
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
@@ -1085,6 +1800,31 @@ type Person implements Node {
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection! @deprecated(reason: \\"Please use personSecretByPersonId instead\\")
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
+}
+
+\\"\\"\\"The return type of our \`computedComplex\` query.\\"\\"\\"
+type PersonComputedComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+\\"\\"\\"The return type of our \`computedFirstArgInoutOut\` query.\\"\\"\\"
+type PersonComputedFirstArgInoutOutRecord {
+  o: Int
+  person: Person
+}
+
+\\"\\"\\"The return type of our \`computedInoutOut\` query.\\"\\"\\"
+type PersonComputedInoutOutRecord {
+  ino: String
+  o: String
+}
+
+\\"\\"\\"The return type of our \`computedOutOut\` query.\\"\\"\\"
+type PersonComputedOutOutRecord {
+  o1: String
+  o2: String
 }
 
 \\"\\"\\"
@@ -1448,6 +2188,137 @@ type Query implements Node {
     offset: Int
   ): CompoundTypesConnection!
   currentUserId: Int
+  funcInInout(i: Int, ino: Int): Int
+  funcInOut(i: Int): Int
+  funcOut: Int
+  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+  funcOutComplexSetof(
+    a: Int
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+    b: String
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): FuncOutComplexSetofConnection!
+  funcOutOut: FuncOutOutRecord
+  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+  funcOutOutSetof(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): FuncOutOutSetofConnection!
+  funcOutOutUnnamed: FuncOutOutUnnamedRecord
+  funcOutSetof(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): FuncOutSetofConnection!
+  funcOutTable: Person
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  funcOutTableSetof(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): PeopleConnection!
+  funcOutUnnamed: Int
+  funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
+  funcReturnsTableMultiCol(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+    i: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): FuncReturnsTableMultiColConnection!
+  funcReturnsTableOneCol(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+    i: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): FuncReturnsTableOneColConnection!
   intSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -1529,6 +2400,7 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   returnTableWithoutGrants: CompoundKey
   tableQuery(id: Int): Post
 
@@ -1553,6 +2425,13 @@ type Query implements Node {
     offset: Int
   ): PeopleConnection!
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+}
+
+\\"\\"\\"The return type of our \`queryOutputTwoRows\` query.\\"\\"\\"
+type QueryOutputTwoRowsRecord {
+  leftArm: LeftArm
+  post: Post
+  txt: String
 }
 
 \\"\\"\\"All input for the \`tableMutation\` mutation.\\"\\"\\"

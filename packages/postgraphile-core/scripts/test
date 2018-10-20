@@ -50,3 +50,6 @@ if [ $SERVER_VERSION_NUM -ge 100000 ]; then
 else
   jest -i -t "^((?!pg10).)*$" $@
 fi;
+
+# Finally re-populate the database to aid debugging
+psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-data.sql "$TEST_DATABASE_URL"

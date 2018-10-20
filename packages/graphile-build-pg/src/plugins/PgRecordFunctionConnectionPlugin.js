@@ -3,22 +3,17 @@ import type { Plugin } from "graphile-build";
 
 const base64 = str => Buffer.from(String(str)).toString("base64");
 
-export default (function PgScalarFunctionConnectionPlugin(
+export default (function PgRecordFunctionConnectionPlugin(
   builder,
   { pgForbidSetofFunctionsToReturnNull = false }
 ) {
   builder.hook("init", (_, build) => {
     const {
       newWithHooks,
+      getSafeAliasFromResolveInfo,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       getTypeByName,
-      pgGetGqlTypeByTypeIdAndModifier,
-      graphql: {
-        GraphQLObjectType,
-        GraphQLNonNull,
-        GraphQLList,
-        GraphQLString,
-      },
+      graphql: { GraphQLObjectType, GraphQLNonNull, GraphQLList },
       inflection,
       pgOmit: omit,
       describePgEntity,
@@ -33,27 +28,28 @@ export default (function PgScalarFunctionConnectionPlugin(
       .filter(proc => !!proc.namespace)
       .filter(proc => !omit(proc, "execute"))
       .forEach(proc => {
-        const returnType =
-          introspectionResultsByKind.typeById[proc.returnTypeId];
-        const returnTypeTable =
-          introspectionResultsByKind.classById[returnType.classId];
-        if (returnTypeTable) {
-          // Just use the standard table connection from PgTablesPlugin
-          return;
-        }
-        if (returnType.id === "2249") {
-          // Defer handling to PgRecordFunctionConnectionPlugin
+        if (proc.returnTypeId !== "2249") {
+          // Does not return a record type; defer handling to
+          // PgTablesPlugin and PgScalarFunctionConnectionPlugin
           return;
         }
         // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod
         // on function arguments and return types, however maybe a later
         // version of PG will?
-        const NodeType =
-          pgGetGqlTypeByTypeIdAndModifier(returnType.id, null) || GraphQLString;
+        const NodeType = getTypeByName(
+          inflection.recordFunctionReturnType(proc)
+        );
+        if (!NodeType) {
+          throw new Error(
+            `Do not have a node type '${inflection.recordFunctionReturnType(
+              proc
+            )}' for '${proc.name}' so cannot create connection type`
+          );
+        }
         const EdgeType = newWithHooks(
           GraphQLObjectType,
           {
-            name: inflection.scalarFunctionEdge(proc),
+            name: inflection.recordFunctionEdge(proc),
             description: `A \`${NodeType.name}\` edge in the connection.`,
             fields: ({ fieldWithHooks }) => {
               return {
@@ -75,15 +71,28 @@ export default (function PgScalarFunctionConnectionPlugin(
                     isCursorField: true,
                   }
                 ),
-                node: {
-                  description: `The \`${
-                    NodeType.name
-                  }\` at the end of the edge.`,
-                  type: NodeType,
-                  resolve(data) {
-                    return data.value;
+                node: pgField(
+                  build,
+                  fieldWithHooks,
+                  "node",
+                  {
+                    description: `The \`${
+                      NodeType.name
+                    }\` at the end of the edge.`,
+                    type: nullableIf(
+                      !pgForbidSetofFunctionsToReturnNull,
+                      NodeType
+                    ),
+                    resolve(data, _args, _context, resolveInfo) {
+                      const safeAlias = getSafeAliasFromResolveInfo(
+                        resolveInfo
+                      );
+                      return data[safeAlias];
+                    },
                   },
-                },
+                  {},
+                  false
+                ),
               };
             },
           },
@@ -105,7 +114,7 @@ export default (function PgScalarFunctionConnectionPlugin(
         newWithHooks(
           GraphQLObjectType,
           {
-            name: inflection.scalarFunctionConnection(proc),
+            name: inflection.recordFunctionConnection(proc),
             description: `A connection to a list of \`${
               NodeType.name
             }\` values.`,
@@ -118,8 +127,9 @@ export default (function PgScalarFunctionConnectionPlugin(
                       nullableIf(!pgForbidSetofFunctionsToReturnNull, NodeType)
                     )
                   ),
-                  resolve(data) {
-                    return data.data.map(entry => entry.value);
+                  resolve(data, _args, _context, resolveInfo) {
+                    const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
+                    return data.data.map(entry => entry[safeAlias]);
                   },
                 }),
                 edges: pgField(
@@ -133,8 +143,14 @@ export default (function PgScalarFunctionConnectionPlugin(
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),
-                    resolve(data) {
-                      return data.data;
+                    resolve(data, _args, _context, resolveInfo) {
+                      const safeAlias = getSafeAliasFromResolveInfo(
+                        resolveInfo
+                      );
+                      return data.data.map(entry => ({
+                        __cursor: entry.__cursor,
+                        ...entry[safeAlias],
+                      }));
                     },
                   },
                   {},

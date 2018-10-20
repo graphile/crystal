@@ -472,6 +472,34 @@ export default (function PgBasicsPlugin(
         functionMutationName(proc: PgProc) {
           return this.camelCase(this._functionName(proc));
         },
+        functionMutationResultFieldName(
+          proc: PgProc,
+          gqlType,
+          plural: boolean = false,
+          outputArgNames: Array<string> = []
+        ) {
+          if (proc.tags.resultFieldName) {
+            return proc.tags.resultFieldName;
+          }
+          let name;
+          if (outputArgNames.length === 1 && outputArgNames[0] !== "") {
+            name = this.camelCase(outputArgNames[0]);
+          } else if (gqlType.name === "Int") {
+            name = "integer";
+          } else if (gqlType.name === "Float") {
+            name = "float";
+          } else if (gqlType.name === "Boolean") {
+            name = "boolean";
+          } else if (gqlType.name === "String") {
+            name = "string";
+          } else if (proc.returnTypeId === "2249") {
+            // returns a record type
+            name = "result";
+          } else {
+            name = this.camelCase(gqlType.name);
+          }
+          return plural ? this.pluralize(name) : name;
+        },
         functionQueryName(proc: PgProc) {
           return this.camelCase(this._functionName(proc));
         },
@@ -483,6 +511,13 @@ export default (function PgBasicsPlugin(
         },
         functionInputType(proc: PgProc) {
           return this.upperCamelCase(`${this._functionName(proc)}-input`);
+        },
+        functionOutputFieldName(
+          proc: PgProc,
+          outputArgName: string,
+          index: number
+        ) {
+          return this.argument(outputArgName, index);
         },
         tableType(table: PgClass) {
           return this.upperCamelCase(this._singularizedTableName(table));
@@ -667,6 +702,20 @@ export default (function PgBasicsPlugin(
         },
         edgeField(table: PgClass) {
           return this.camelCase(`${this._singularizedTableName(table)}-edge`);
+        },
+        recordFunctionReturnType(proc: PgProc) {
+          return (
+            proc.tags.resultTypeName ||
+            this.upperCamelCase(`${this._functionName(proc)}-record`)
+          );
+        },
+        recordFunctionConnection(proc: PgProc) {
+          return this.upperCamelCase(`${this._functionName(proc)}-connection`);
+        },
+        recordFunctionEdge(proc: PgProc) {
+          return this.upperCamelCase(
+            `${this.singularize(this._functionName(proc))}-edge`
+          );
         },
         scalarFunctionConnection(proc: PgProc) {
           return this.upperCamelCase(`${this._functionName(proc)}-connection`);
