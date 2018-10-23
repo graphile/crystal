@@ -78,6 +78,7 @@ export interface PostGraphileCoreOptions {
   simpleCollections?: "only" | "both" | "omit";
   includeExtensionResources?: boolean;
   ignoreRBAC?: boolean;
+  legacyFunctionsOnly?: boolean;
 }
 
 type PgConfig = Client | Pool | string;
@@ -185,6 +186,7 @@ const getPostGraphileBuilder = async (
     simpleCollections = "omit",
     includeExtensionResources = false,
     ignoreRBAC = true, // TODO: Change to 'false' in v5
+    legacyFunctionsOnly = false, // TODO: Remove in v5
   } = options;
 
   if (
@@ -340,6 +342,7 @@ const getPostGraphileBuilder = async (
     pgSimpleCollections: simpleCollections,
     pgIncludeExtensionResources: includeExtensionResources,
     pgIgnoreRBAC: ignoreRBAC,
+    pgLegacyFunctionsOnly: legacyFunctionsOnly,
     ...graphileBuildOptions,
     ...graphqlBuildOptions, // DEPRECATED!
   });

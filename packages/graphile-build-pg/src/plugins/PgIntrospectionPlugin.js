@@ -160,6 +160,7 @@ export default (async function PgIntrospectionPlugin(
     persistentMemoizeWithKey = (key, fn) => fn(),
     pgThrowOnMissingSchema = false,
     pgIncludeExtensionResources = false,
+    pgLegacyFunctionsOnly = false,
   }
 ) {
   async function introspect() {
@@ -185,7 +186,9 @@ export default (async function PgIntrospectionPlugin(
             versionResult.rows[0].server_version_num,
             10
           );
-          const introspectionQuery = makeIntrospectionQuery(serverVersionNum);
+          const introspectionQuery = makeIntrospectionQuery(serverVersionNum, {
+            pgLegacyFunctionsOnly,
+          });
           const { rows } = await pgClient.query(introspectionQuery, [
             schemas,
             pgIncludeExtensionResources,
