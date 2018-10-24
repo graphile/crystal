@@ -8,12 +8,13 @@ import type {
   PgClass,
   PgAttribute,
   PgConstraint,
+  PgEntity,
 } from "./PgIntrospectionPlugin";
 import pgField from "./pgField";
 
 import queryFromResolveData from "../queryFromResolveData";
 import addStartEndCursor from "./addStartEndCursor";
-import omit, {
+import baseOmit, {
   CREATE,
   READ,
   UPDATE,
@@ -29,6 +30,9 @@ import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
 import chalk from "chalk";
 import pickBy from "lodash/pickBy";
+import debugFactory from "debug";
+
+const warn = debugFactory("graphile-build-pg:warn");
 
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
@@ -63,10 +67,10 @@ export function preventEmptyResult<
   }, {});
 }
 
-function omitWithRBACChecks(
+const omitWithRBACChecks = omit => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
   permission: string
-) {
+) => {
   const ORDINARY_TABLE = "r";
   const VIEW = "v";
   const MATERIALIZED_VIEW = "m";
@@ -133,9 +137,44 @@ function omitWithRBACChecks(
     }
   }
   return omit(entity, permission);
-}
+};
 
-function describePgEntity(entity, includeAlias = true) {
+const omitUnindexed = omit => (
+  entity: PgProc | PgClass | PgAttribute | PgConstraint,
+  permission: string
+) => {
+  if (
+    entity.kind === "attribute" &&
+    !entity.isIndexed &&
+    (permission === "filter" || permission === "order")
+  ) {
+    return true;
+  }
+  if (
+    entity.kind === "constraint" &&
+    entity.type === "f" &&
+    !entity.isIndexed &&
+    permission === "read"
+  ) {
+    let klass = entity.class;
+    if (klass) {
+      warn(
+        "%s",
+        `We've disabled the 'read' permission for ${describePgEntity(
+          entity
+        )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix this, perform\n\n  CREATE INDEX ON ${`"${
+          klass.namespaceName
+        }"."${klass.name}"`}("${entity.keyAttributes
+          .map(a => a.name)
+          .join('", "')}");`
+      );
+    }
+    return true;
+  }
+  return omit(entity, permission);
+};
+
+function describePgEntity(entity: PgEntity, includeAlias = true) {
   const getAlias = !includeAlias
     ? () => ""
     : () => {
@@ -188,7 +227,84 @@ function describePgEntity(entity, includeAlias = true) {
     // eslint-disable-next-line no-console
     console.error(e);
   }
-  return `entity of kind '${entity.kind}' with oid '${entity.oid}'`;
+  return `entity of kind '${entity.kind}' with ${
+    typeof entity.id === "string" ? `oid '${entity.id}'` : ""
+  }`;
+}
+
+function sqlCommentByAddingTags(entity, tagsToAdd) {
+  // NOTE: this function is NOT intended to be SQL safe; it's for
+  // displaying in error messages. Nonetheless if you find issues with
+  // SQL compatibility, please send a PR or issue.
+
+  // Ref: https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-BACKSLASH-TABLE
+  const escape = str =>
+    str.replace(
+      /['\\\b\f\n\r\t]/g,
+      chr =>
+        ({
+          "\b": "\\b",
+          "\f": "\\f",
+          "\n": "\\n",
+          "\r": "\\r",
+          "\t": "\\t",
+        }[chr] || "\\" + chr)
+    );
+
+  // tagsToAdd is here twice to ensure that the keys in tagsToAdd come first, but that they also "win" any conflicts.
+  const tags = Object.assign({}, tagsToAdd, entity.tags, tagsToAdd);
+
+  const description = entity.description;
+  const tagsSql = Object.keys(tags)
+    .reduce((memo, tag) => {
+      const tagValue = tags[tag];
+      const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
+      const highlightOrNot = tag in tagsToAdd ? chalk.bold : identity;
+      valueArray.forEach(value => {
+        memo.push(
+          highlightOrNot(
+            `@${escape(escape(tag))}${
+              value === true ? "" : " " + escape(escape(value))
+            }`
+          )
+        );
+      });
+      return memo;
+    }, [])
+    .join("\\n");
+  const commentValue = `E'${tagsSql}${
+    description ? "\\n" + escape(description) : ""
+  }'`;
+  let sqlThing;
+  if (entity.kind === "class") {
+    const identifier = `"${entity.namespaceName}"."${entity.name}"`;
+    if (entity.classKind === "r") {
+      sqlThing = `TABLE ${identifier}`;
+    } else if (entity.classKind === "v") {
+      sqlThing = `VIEW ${identifier}`;
+    } else if (entity.classKind === "m") {
+      sqlThing = `MATERIALIZED VIEW ${identifier}`;
+    } else {
+      sqlThing = `PLEASE_SEND_A_PULL_REQUEST_TO_FIX_THIS ${identifier}`;
+    }
+  } else if (entity.kind === "attribute") {
+    sqlThing = `COLUMN "${entity.class.namespaceName}"."${
+      entity.class.name
+    }"."${entity.name}"`;
+  } else if (entity.kind === "procedure") {
+    sqlThing = `FUNCTION "${entity.namespaceName}"."${
+      entity.name
+    }"(...arg types go here...)`;
+  } else if (entity.kind === "constraint") {
+    // TODO: TEST!
+    sqlThing = `CONSTRAINT "${entity.name}" ON "${
+      entity.class.namespaceName
+    }"."${entity.class.name}"`;
+  } else {
+    sqlThing = `UNKNOWN_ENTITY_PLEASE_SEND_A_PULL_REQUEST`;
+  }
+
+  return `COMMENT ON ${sqlThing} IS ${commentValue};`;
 }
 
 export default (function PgBasicsPlugin(
@@ -197,9 +313,16 @@ export default (function PgBasicsPlugin(
     pgStrictFunctions = false,
     pgColumnFilter = defaultPgColumnFilter,
     pgIgnoreRBAC = false,
+    pgIgnoreIndexes = true, // TODO:v5: change this to false
   }
 ) {
-  const pgOmit = pgIgnoreRBAC ? omit : omitWithRBACChecks;
+  let pgOmit = baseOmit;
+  if (!pgIgnoreRBAC) {
+    pgOmit = omitWithRBACChecks(pgOmit);
+  }
+  if (!pgIgnoreIndexes) {
+    pgOmit = omitUnindexed(pgOmit);
+  }
   builder.hook("build", build => {
     return build.extend(build, {
       graphileBuildPgVersion: version,
@@ -214,80 +337,7 @@ export default (function PgBasicsPlugin(
       pgViaTemporaryTable: viaTemporaryTable,
       describePgEntity,
       pgField,
-      sqlCommentByAddingTags: (entity, tagsToAdd) => {
-        // NOTE: this function is NOT intended to be SQL safe; it's for
-        // displaying in error messages. Nonetheless if you find issues with
-        // SQL compatibility, please send a PR or issue.
-
-        // Ref: https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-BACKSLASH-TABLE
-        const escape = str =>
-          str.replace(
-            /['\\\b\f\n\r\t]/g,
-            chr =>
-              ({
-                "\b": "\\b",
-                "\f": "\\f",
-                "\n": "\\n",
-                "\r": "\\r",
-                "\t": "\\t",
-              }[chr] || "\\" + chr)
-          );
-
-        // tagsToAdd is here twice to ensure that the keys in tagsToAdd come first, but that they also "win" any conflicts.
-        const tags = Object.assign({}, tagsToAdd, entity.tags, tagsToAdd);
-
-        const description = entity.description;
-        const tagsSql = Object.keys(tags)
-          .reduce((memo, tag) => {
-            const tagValue = tags[tag];
-            const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
-            const highlightOrNot = tag in tagsToAdd ? chalk.bold : identity;
-            valueArray.forEach(value => {
-              memo.push(
-                highlightOrNot(
-                  `@${escape(escape(tag))}${
-                    value === true ? "" : " " + escape(escape(value))
-                  }`
-                )
-              );
-            });
-            return memo;
-          }, [])
-          .join("\\n");
-        const commentValue = `E'${tagsSql}${
-          description ? "\\n" + escape(description) : ""
-        }'`;
-        let sqlThing;
-        if (entity.kind === "class") {
-          const identifier = `"${entity.namespaceName}"."${entity.name}"`;
-          if (entity.classKind === "r") {
-            sqlThing = `TABLE ${identifier}`;
-          } else if (entity.classKind === "v") {
-            sqlThing = `VIEW ${identifier}`;
-          } else if (entity.classKind === "m") {
-            sqlThing = `MATERIALIZED VIEW ${identifier}`;
-          } else {
-            sqlThing = `PLEASE_SEND_A_PULL_REQUEST_TO_FIX_THIS ${identifier}`;
-          }
-        } else if (entity.kind === "attribute") {
-          sqlThing = `COLUMN "${entity.class.namespaceName}"."${
-            entity.class.name
-          }"."${entity.name}"`;
-        } else if (entity.kind === "procedure") {
-          sqlThing = `FUNCTION "${entity.namespaceName}"."${
-            entity.name
-          }"(...arg types go here...)`;
-        } else if (entity.kind === "constraint") {
-          // TODO: TEST!
-          sqlThing = `CONSTRAINT "${entity.name}" ON "${
-            entity.class.namespaceName
-          }"."${entity.class.name}"`;
-        } else {
-          sqlThing = `UNKNOWN_ENTITY_PLEASE_SEND_A_PULL_REQUEST`;
-        }
-
-        return `COMMENT ON ${sqlThing} IS ${commentValue};`;
-      },
+      sqlCommentByAddingTags,
     });
   });
 

@@ -27,8 +27,7 @@ export default (function PgConnectionArgCondition(builder) {
             name: inflection.conditionType(inflection.tableType(table)),
             fields: context => {
               const { fieldWithHooks } = context;
-              return introspectionResultsByKind.attribute
-                .filter(attr => attr.classId === table.id)
+              return table.attributes
                 .filter(attr => pgColumnFilter(attr, build, context))
                 .filter(attr => !omit(attr, "filter"))
                 .reduce((memo, attr) => {
@@ -68,7 +67,8 @@ export default (function PgConnectionArgCondition(builder) {
             )}`,
             pgIntrospection: table,
             isPgCondition: true,
-          }
+          },
+          true // Conditions might all be filtered
         );
       });
     return _;
@@ -82,7 +82,6 @@ export default (function PgConnectionArgCondition(builder) {
         extend,
         getTypeByName,
         pgGetGqlTypeByTypeIdAndModifier,
-        pgIntrospectionResultsByKind: introspectionResultsByKind,
         pgColumnFilter,
         inflection,
         pgOmit: omit,
@@ -112,9 +111,11 @@ export default (function PgConnectionArgCondition(builder) {
       const TableConditionType = getTypeByName(
         inflection.conditionType(TableType.name)
       );
+      if (!TableConditionType) {
+        return args;
+      }
 
-      const relevantAttributes = introspectionResultsByKind.attribute
-        .filter(attr => attr.classId === table.id)
+      const relevantAttributes = table.attributes
         .filter(attr => pgColumnFilter(attr, build, context))
         .filter(attr => !omit(attr, "filter"));
 

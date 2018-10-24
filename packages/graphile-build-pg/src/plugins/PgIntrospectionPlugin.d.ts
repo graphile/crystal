@@ -4,11 +4,12 @@ export interface PgNamespace {
   name: string;
   comment: string | void;
   description: string | void;
-  tags: { [tag: string]: string };
+  tags: { [tag: string]: true | string | Array<string> };
 }
 
 export interface PgProc {
   kind: "procedure";
+  id: string;
   name: string;
   comment: string | void;
   description: string | void;
@@ -23,7 +24,7 @@ export interface PgProc {
   argModes: Array<"i" | "o" | "b" | "v" | "t">;
   argDefaultsNum: number;
   namespace: PgNamespace;
-  tags: { [tag: string]: string | Array<string> };
+  tags: { [tag: string]: true | string | Array<string> };
   cost: number;
   aclExecutable: boolean;
 }
@@ -45,8 +46,10 @@ export interface PgClass {
   isExtensionConfigurationTable: boolean;
   namespace: PgNamespace;
   type: PgType;
-  tags: { [tag: string]: string | Array<string> };
+  tags: { [tag: string]: boolean | string | Array<string> };
   attributes: [PgAttribute];
+  constraints: [PgConstraint];
+  foreignConstraints: [PgConstraint];
   aclSelectable: boolean;
   aclInsertable: boolean;
   aclUpdatable: boolean;
@@ -70,7 +73,7 @@ export interface PgType {
   classId: string | void;
   domainBaseTypeId: string | void;
   domainTypeModifier: number | void;
-  tags: { [tag: string]: string | Array<string> };
+  tags: { [tag: string]: true | string | Array<string> };
 }
 
 export interface PgAttribute {
@@ -88,25 +91,30 @@ export interface PgAttribute {
   class: PgClass;
   type: PgType;
   namespace: PgNamespace;
-  tags: { [tag: string]: string | Array<string> };
+  tags: { [tag: string]: true | string | Array<string> };
   aclSelectable: boolean;
   aclInsertable: boolean;
   aclUpdatable: boolean;
+  isIndexed: boolean | void;
 }
 
 export interface PgConstraint {
   kind: "constraint";
+  id: string;
   name: string;
   type: string;
   classId: string;
-  class: PgClass | void;
+  class: PgClass;
   foreignClassId: string | void;
   comment: string | void;
   description: string | void;
   keyAttributeNums: Array<number>;
+  keyAttributes: Array<PgAttribute>;
   foreignKeyAttributeNums: Array<number>;
+  foreignKeyAttributes: Array<PgAttribute>;
   namespace: PgNamespace;
-  tags: { [tag: string]: string | Array<string> };
+  isIndexed: boolean | void;
+  tags: { [tag: string]: true | string | Array<string> };
 }
 
 export interface PgExtension {
@@ -119,5 +127,29 @@ export interface PgExtension {
   configurationClassIds?: Array<string>;
   comment: string | void;
   description: string | void;
-  tags: { [tag: string]: string | Array<string> };
+  tags: { [tag: string]: true | string | Array<string> };
 }
+
+export interface PgIndex {
+  kind: "index";
+  id: string;
+  name: string;
+  namespaceName: string;
+  classId: string;
+  numberOfAttributes: number;
+  isUnique: boolean;
+  isPrimary: boolean;
+  attributeNums: Array<number>;
+  description: string | void;
+  tags: { [tag: string]: true | string | Array<string> };
+}
+
+export type PgEntity =
+  | PgNamespace
+  | PgProc
+  | PgClass
+  | PgType
+  | PgAttribute
+  | PgConstraint
+  | PgExtension
+  | PgIndex;

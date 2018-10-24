@@ -31,7 +31,7 @@ with
       dsc.description as "description"
     from
       pg_catalog.pg_namespace as nsp
-      left join pg_catalog.pg_description as dsc on dsc.objoid = nsp.oid
+      left join pg_catalog.pg_description as dsc on dsc.objoid = nsp.oid and dsc.classoid = 'pg_catalog.pg_namespace'::regclass
     where
       nsp.nspname = any ($1)
     order by
@@ -45,6 +45,7 @@ with
   procedure as (
     select
       'procedure' as "kind",
+      pro.oid as "id",
       pro.proname as "name",
       dsc.description as "description",
       pro.pronamespace as "namespaceId",
@@ -65,7 +66,7 @@ with
       exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable"
     from
       pg_catalog.pg_proc as pro
-      left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid
+      left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid and dsc.classoid = 'pg_catalog.pg_proc'::regclass
       left join pg_catalog.pg_namespace as nsp on nsp.oid = pro.pronamespace
     where
       pro.pronamespace in (select "id" from namespace) and
@@ -154,7 +155,7 @@ with
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'DELETE')) as "aclDeletable"
     from
       pg_catalog.pg_class as rel
-      left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0 and dsc.classoid = (select oid from pg_catalog.pg_class where relname = 'pg_class')
+      left join pg_catalog.pg_description as dsc on dsc.objoid = rel.oid and dsc.objsubid = 0 and dsc.classoid = 'pg_catalog.pg_class'::regclass
       left join pg_catalog.pg_namespace as nsp on nsp.oid = rel.relnamespace
     where
       rel.relpersistence in ('p') and
@@ -190,7 +191,7 @@ with
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'UPDATE')) as "aclUpdatable"
     from
       pg_catalog.pg_attribute as att
-      left join pg_catalog.pg_description as dsc on dsc.objoid = att.attrelid and dsc.objsubid = att.attnum
+      left join pg_catalog.pg_description as dsc on dsc.objoid = att.attrelid and dsc.objsubid = att.attnum and dsc.classoid = 'pg_catalog.pg_class'::regclass
     where
       att.attrelid in (select "id" from class) and
       att.attnum > 0 and
@@ -252,7 +253,7 @@ with
         end as "rangeSubTypeId"
       from
         pg_catalog.pg_type as typ
-        left join pg_catalog.pg_description as dsc on dsc.objoid = typ.oid
+        left join pg_catalog.pg_description as dsc on dsc.objoid = typ.oid and dsc.classoid = 'pg_catalog.pg_type'::regclass
         left join pg_catalog.pg_namespace as nsp on nsp.oid = typ.typnamespace
     )
     select
@@ -281,6 +282,7 @@ with
   "constraint" as (
     select distinct on (con.conrelid, con.conkey, con.confrelid, con.confkey)
       'constraint' as "kind",
+      con.oid as "id",
       con.conname as "name",
       con.contype as "type",
       con.conrelid as "classId",
@@ -290,7 +292,8 @@ with
       con.confkey as "foreignKeyAttributeNums"
     from
       pg_catalog.pg_constraint as con
-      left join pg_catalog.pg_description as dsc on dsc.objoid = con.oid
+      inner join class on (con.conrelid = class.id)
+      left join pg_catalog.pg_description as dsc on dsc.objoid = con.oid and dsc.classoid = 'pg_catalog.pg_constraint'::regclass
     where
       -- Only get constraints for classes we have selected.
       con.conrelid in (select "id" from class where "namespaceId" in (select "id" from namespace)) and
@@ -321,9 +324,40 @@ with
       dsc.description as "description"
     from
       pg_catalog.pg_extension as ext
-      left join pg_catalog.pg_description as dsc on dsc.objoid = ext.oid
+      left join pg_catalog.pg_description as dsc on dsc.objoid = ext.oid and dsc.classoid = 'pg_catalog.pg_extension'::regclass
     order by
       ext.extname, ext.oid
+  ),
+  -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-index.html
+  "indexes" as (
+    select
+      'index' as "kind",
+      idx.indexrelid as "id",
+      idx_more.relname as "name",
+      nsp.nspname as "namespaceName",
+      idx.indrelid as "classId",
+      idx.indnatts as "numberOfAttributes",
+      idx.indisunique as "isUnique",
+      idx.indisprimary as "isPrimary",
+      idx.indimmediate as "isImmediate", -- enforce uniqueness immediately on insert
+      idx.indisreplident as "isReplicaIdentity",
+      idx.indisvalid as "isValid", -- if false, don't use for queries
+      idx.indkey as "attributeNums",
+      dsc.description as "description"
+    from
+      pg_catalog.pg_index as idx
+      inner join pg_catalog.pg_class idx_more on (idx.indexrelid = idx_more.oid)
+      inner join class on (idx.indrelid = class.id)
+      inner join pg_catalog.pg_namespace as nsp on (nsp.oid = idx_more.relnamespace)
+      left join pg_catalog.pg_description as dsc on dsc.objoid = idx.indexrelid and dsc.objsubid = 0 and dsc.classoid = 'pg_catalog.pg_class'::regclass
+    where
+      idx.indislive is not false and
+      idx.indisexclusion is not true and -- exclusion index
+      idx.indcheckxmin is not true and -- always valid?
+      not (string_to_array(idx.indkey::text, ' ')::int2[] @> ARRAY[0::int2]) and -- no expressions
+      idx.indpred is null -- no partial index predicate
+    order by
+      idx.indrelid, idx.indexrelid
   )
 select row_to_json(x) as object from namespace as x
 union all
@@ -338,6 +372,8 @@ union all
 select row_to_json(x) as object from procedure as x
 union all
 select row_to_json(x) as object from extension as x
+union all
+select row_to_json(x) as object from indexes as x
 ;
 `;
 }

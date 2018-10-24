@@ -29,6 +29,7 @@ export type PgNamespace = {
 
 export type PgProc = {
   kind: "procedure",
+  id: string,
   name: string,
   comment: ?string,
   description: ?string,
@@ -67,6 +68,8 @@ export type PgClass = {
   type: PgType,
   tags: { [string]: string },
   attributes: [PgAttribute],
+  constraints: [PgConstraint],
+  foreignConstraints: [PgConstraint],
   aclSelectable: boolean,
   aclInsertable: boolean,
   aclUpdatable: boolean,
@@ -112,20 +115,26 @@ export type PgAttribute = {
   aclSelectable: boolean,
   aclInsertable: boolean,
   aclUpdatable: boolean,
+  isIndexed: ?boolean,
 };
 
 export type PgConstraint = {
   kind: "constraint",
+  id: string,
   name: string,
   type: string,
   classId: string,
-  class: ?PgClass,
+  class: PgClass,
   foreignClassId: ?string,
+  foreignClass: ?PgClass,
   comment: ?string,
   description: ?string,
   keyAttributeNums: Array<number>,
+  keyAttributes: [PgAttribute],
   foreignKeyAttributeNums: Array<number>,
+  foreignKeyAttributes: [PgAttribute],
   namespace: PgNamespace,
+  isIndexed: ?boolean,
   tags: { [string]: string },
 };
 
@@ -141,6 +150,38 @@ export type PgExtension = {
   description: ?string,
   tags: { [string]: string },
 };
+
+export type PgIndex = {
+  kind: "index",
+  id: string,
+  name: string,
+  namespaceName: string,
+  classId: string,
+  numberOfAttributes: number,
+  isUnique: boolean,
+  isPrimary: boolean,
+  /*
+  Though these exist, we don't want to officially
+  support them yet.
+
+  isImmediate: boolean,
+  isReplicaIdentity: boolean,
+  isValid: boolean,
+  */
+  attributeNums: Array<number>,
+  description: ?string,
+  tags: { [string]: string },
+};
+
+export type PgEntity =
+  | PgNamespace
+  | PgProc
+  | PgClass
+  | PgType
+  | PgAttribute
+  | PgConstraint
+  | PgExtension
+  | PgIndex;
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -207,6 +248,7 @@ export default (async function PgIntrospectionPlugin(
               constraint: [],
               procedure: [],
               extension: [],
+              index: [],
             }
           );
 
@@ -219,6 +261,7 @@ export default (async function PgIntrospectionPlugin(
             "constraint",
             "procedure",
             "extension",
+            "index",
           ].forEach(kind => {
             result[kind].forEach(object => {
               // Keep a copy of the raw comment
@@ -399,6 +442,13 @@ export default (async function PgIntrospectionPlugin(
       introspectionResultsByKind.constraint,
       "class",
       "classId",
+      introspectionResultsByKind.classById
+    );
+
+    relate(
+      introspectionResultsByKind.constraint,
+      "foreignClass",
+      "foreignClassId",
       introspectionResultsByKind.classById,
       true
     );
@@ -419,10 +469,67 @@ export default (async function PgIntrospectionPlugin(
       true // Because the configuration table could be a defined in a different namespace
     );
 
+    relate(
+      introspectionResultsByKind.index,
+      "class",
+      "classId",
+      introspectionResultsByKind.classById
+    );
+
+    // Table/type columns / constraints
     introspectionResultsByKind.class.forEach(klass => {
       klass.attributes = introspectionResultsByKind.attribute.filter(
         attr => attr.classId === klass.id
       );
+      klass.constraints = introspectionResultsByKind.constraint.filter(
+        constraint => constraint.classId === klass.id
+      );
+      klass.foreignConstraints = introspectionResultsByKind.constraint.filter(
+        constraint => constraint.foreignClassId === klass.id
+      );
+    });
+
+    // Constraint attributes
+    introspectionResultsByKind.constraint.forEach(constraint => {
+      if (constraint.keyAttributeNums && constraint.class) {
+        constraint.keyAttributes = constraint.keyAttributeNums.map(nr =>
+          constraint.class.attributes.find(attr => attr.num === nr)
+        );
+      } else {
+        constraint.keyAttributes = [];
+      }
+      if (constraint.foreignKeyAttributeNums && constraint.foreignClass) {
+        constraint.foreignKeyAttributes = constraint.foreignKeyAttributeNums.map(
+          nr => constraint.foreignClass.attributes.find(attr => attr.num === nr)
+        );
+      } else {
+        constraint.foreignKeyAttributes = [];
+      }
+    });
+
+    // Detect which columns and constraints are indexed
+    introspectionResultsByKind.index.forEach(index => {
+      const columns = index.attributeNums.map(nr =>
+        index.class.attributes.find(attr => attr.num === nr)
+      );
+
+      // Indexed column (for orderBy / filter):
+      if (columns[0]) {
+        columns[0].isIndexed = true;
+      }
+
+      // Indexed constraints (for reverse relations):
+      index.class.constraints
+        .filter(constraint => constraint.type === "f")
+        .forEach(constraint => {
+          if (
+            constraint.keyAttributeNums.every(
+              (nr, idx) => index.attributeNums[idx] === nr
+            )
+          ) {
+            constraint.isIndexed = true;
+          }
+        });
     });
 
     return introspectionResultsByKind;

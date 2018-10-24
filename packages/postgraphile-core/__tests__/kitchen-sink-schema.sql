@@ -120,6 +120,7 @@ create table a.post (
   enums a.an_enum[],
   comptypes a.comptype[]
 );
+CREATE INDEX ON "a"."post"("author_id");
 
 -- This should not add a query to the schema
 create unique index uniq_post__headline_author_3 on a.post (headline) where (author_id = 3);
@@ -311,7 +312,7 @@ create function a.return_void_mutation() returns void as $$ begin return; end; $
 
 create function c.person_first_name(person c.person) returns text as $$ select split_part(person.person_full_name, ' ', 1) $$ language sql stable;
 create function c.person_friends(person c.person) returns setof c.person as $$ select friend.* from c.person as friend where friend.id in (person.id + 1, person.id + 2) $$ language sql stable;
-create function c.person_first_post(person c.person) returns a.post as $$ select * from a.post where a.post.author_id = person.id limit 1 $$ language sql stable;
+create function c.person_first_post(person c.person) returns a.post as $$ select * from a.post where a.post.author_id = person.id order by id asc limit 1 $$ language sql stable;
 create function c.compound_type_computed_field(compound_type c.compound_type) returns integer as $$ select compound_type.a + compound_type.foo_bar $$ language sql stable;
 create function a.post_headline_trimmed(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
 create function a.post_headline_trimmed_strict(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable strict;
@@ -807,3 +808,17 @@ create table d.tv_episodes (
     title       varchar(40),
     show_id     integer references d.tv_shows on delete cascade
 );
+
+/*
+
+Here's the missing indexes:
+
+CREATE INDEX ON "a"."foreign_key"("compound_key_1", "compound_key_2");
+CREATE INDEX ON "a"."foreign_key"("person_id");
+CREATE INDEX ON "a"."unique_foreign_key"("compound_key_1", "compound_key_2");
+CREATE INDEX ON "c"."compound_key"("person_id_1");
+CREATE INDEX ON "c"."compound_key"("person_id_2");
+CREATE INDEX ON "c"."left_arm"("person_id");
+CREATE INDEX ON "c"."person_secret"("person_id");
+
+*/
