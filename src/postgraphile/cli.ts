@@ -137,7 +137,11 @@ program
   )
   .option(
     '--no-ignore-rbac',
-    "[RECOMMENDED] set this to excludes fields, queries and mutations that the user isn't permitted to access; this will be the default in v5",
+    "[RECOMMENDED] set this to exclude fields, queries and mutations that the user isn't permitted to access; this will be enabled by default in v5",
+  )
+  .option(
+    '--no-ignore-indexes',
+    '[RECOMMENDED] set this to exclude filters, orderBy, and relations that would be expensive to access due to missing indexes',
   )
   .option(
     '--include-extension-resources',
@@ -291,12 +295,22 @@ pluginHook('cli:flags:add', addFlag);
 
 // Deprecated
 program
-  .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
-  .option('--secret <string>', 'DEPRECATED: Use --jwt-secret instead')
+  .option(
+    '--token <identifier>',
+    '[DEPRECATED] Use --jwt-token-identifier instead. This option will be removed in v5.',
+  )
+  .option(
+    '--secret <string>',
+    '[DEPRECATED] Use --jwt-secret instead. This option will be removed in v5.',
+  )
   .option(
     '--jwt-audiences <string>',
-    'DEPRECATED Use --jwt-verify-audience instead',
+    '[DEPRECATED] Use --jwt-verify-audience instead. This option will be removed in v5.',
     (option: string) => option.split(','),
+  )
+  .option(
+    '--legacy-functions-only',
+    '[DEPRECATED] PostGraphile 4.1.0 introduced support for PostgreSQL functions than declare parameters with IN/OUT/INOUT or declare RETURNS TABLE(...); enable this flag to ignore these types of functions. This option will be removed in v5.',
   );
 
 pluginHook('cli:flags:add:deprecated', addFlag);
@@ -390,6 +404,8 @@ const {
   legacyJsonUuid,
   disableQueryLog,
   simpleCollections,
+  legacyFunctionsOnly,
+  ignoreIndexes,
   // tslint:disable-next-line no-any
 } = { ...config['options'], ...program } as any;
 
@@ -532,6 +548,8 @@ const postgraphileOptions = pluginHook(
     enableQueryBatching,
     pluginHook,
     simpleCollections,
+    legacyFunctionsOnly,
+    ignoreIndexes,
   },
   { config, cliOptions: program },
 );
