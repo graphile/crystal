@@ -350,6 +350,18 @@ process.on('SIGINT', () => {
   process.exit(1);
 });
 
+// For `--no-*` options, `program` automatically contains the default,
+// overriding our options. We typically want the CLI to "win", but not
+// with defaults! So this code extracts those `--no-*` values and
+// re-overwrites the values if necessary.
+const configOptions = config['options'] || {};
+const overridesFromOptions = {};
+['ignoreIndexes', 'ignoreRbac', 'setofFunctionsContainNulls'].forEach(option => {
+  if (option in configOptions) {
+    overridesFromOptions[option] = configOptions[option];
+  }
+});
+
 // Destruct our configuration file and command line arguments, use defaults, and rename options to
 // something appropriate for JavaScript.
 const {
@@ -407,7 +419,7 @@ const {
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program } as any;
+} = { ...config['options'], ...program, ...overridesFromOptions } as any;
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
