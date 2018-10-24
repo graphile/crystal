@@ -7,6 +7,7 @@ import createPostGraphileHttpRequestHandler from './http/createPostGraphileHttpR
 import exportPostGraphileSchema from './schema/exportPostGraphileSchema';
 import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
+import chalk = require('chalk');
 
 export interface PostgraphileSchemaBuilder {
   _emitter: EventEmitter;
@@ -81,7 +82,7 @@ export function getPostgraphileSchemaBuilder(
       return gqlSchema;
     } catch (error) {
       // If we fail to build our schema, log the error and exit the process.
-      return handleFatalError(error);
+      return handleFatalError(error, 'building the initial schema');
     }
   }
 
@@ -90,7 +91,7 @@ export function getPostgraphileSchemaBuilder(
       await exportPostGraphileSchema(newGqlSchema, options);
     } catch (error) {
       // If we fail to export our schema, log the error and exit the process.
-      handleFatalError(error);
+      handleFatalError(error, 'exporting the schema');
     }
   }
 }
@@ -149,6 +150,19 @@ export default function postgraphile(
               poolOrConfig || {},
         );
 
+  pgPool.on('error', err => {
+    /*
+     * This handler is required so that client connection errors don't bring
+     * the server down (via `unhandledError`).
+     *
+     * `pg` will automatically terminate the client and remove it from the
+     * pool, so we don't actually need to take any action here, just ensure
+     * that the event listener is registered.
+     */
+    // tslint:disable-next-line no-console
+    console.error('PostgreSQL client generated error: ', err);
+  });
+
   const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder(
     pgPool,
     schema,
@@ -162,7 +176,12 @@ export default function postgraphile(
   });
 }
 
-function handleFatalError(error: Error): never {
+function handleFatalError(error: Error, when: string): never {
+  process.stderr.write(
+    `A fatal error occurred when ${chalk.bold(
+      when,
+    )}, so the process will now exit. Error details:\n\n`,
+  );
   process.stderr.write(`${error.stack}\n`); // console.error fails under the tests
   process.exit(1);
 

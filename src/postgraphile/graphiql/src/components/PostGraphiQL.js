@@ -97,19 +97,26 @@ class PostGraphiQL extends React.Component {
    */
   // TODO: Send the introspection query results in the server sent event?
   async updateSchema() {
-    // Fetch the schema using our introspection query and report once that has
-    // finished.
-    const { data } = await this.executeQuery({ query: introspectionQuery });
+    try {
+      // Fetch the schema using our introspection query and report once that has
+      // finished.
+      const { data } = await this.executeQuery({ query: introspectionQuery });
 
-    // Use the data we got back from GraphQL to build a client schema (a
-    // schema without resolvers).
-    const schema = buildClientSchema(data);
+      // Use the data we got back from GraphQL to build a client schema (a
+      // schema without resolvers).
+      const schema = buildClientSchema(data);
 
-    // Update our component with the new schema.
-    this.setState({ schema });
+      // Update our component with the new schema.
+      this.setState({ schema });
 
-    // Do some hacky stuff to GraphiQL.
-    this._updateGraphiQLDocExplorerNavStack(schema);
+      // Do some hacky stuff to GraphiQL.
+      this._updateGraphiQLDocExplorerNavStack(schema);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Error occurred when updating the schema:');
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
   }
 
   /**

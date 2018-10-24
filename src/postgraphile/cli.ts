@@ -540,6 +540,10 @@ if (noServer) {
   // No need for a server, let's just spin up the schema builder
   (async () => {
     const pgPool = new Pool(pgConfig);
+    pgPool.on('error', err => {
+      // tslint:disable-next-line no-console
+      console.error('PostgreSQL client generated error: ', err);
+    });
     const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions);
     await getGraphQLSchema();
     if (!watchPg) {
