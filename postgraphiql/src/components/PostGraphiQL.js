@@ -2,7 +2,12 @@ import React from 'react';
 import GraphiQL from 'graphiql';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 
-const { POSTGRAPHILE_CONFIG } = window;
+const {
+  POSTGRAPHILE_CONFIG = {
+    graphqlUrl: 'http://localhost:5000/graphql',
+    streamUrl: 'http://localhost:5000/_postgraphile/stream',
+  },
+} = window;
 
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.

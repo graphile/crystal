@@ -1,6 +1,4 @@
 /* tslint:disable:no-any */
-import { join as joinPath, resolve as resolvePath, relative as relativePath } from 'path';
-import { readFile } from 'fs';
 import {
   Source,
   parse as parseGraphql,
@@ -28,11 +26,30 @@ import httpError = require('http-errors');
 import parseUrl = require('parseurl');
 import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
-import sendFile = require('send');
 import LRU = require('lru-cache');
 import crypto = require('crypto');
 import { Pool } from 'pg';
 import { EventEmitter } from 'events';
+
+/**
+ * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
+ * client.
+ *
+ * @type {Buffer}
+ */
+import favicon from '../../assets/favicon.ico';
+
+/**
+ * The GraphiQL HTML file as a string. We need it to be a string, because we
+ * will use a regular expression to replace some variables.
+ */
+import origGraphiqlHtml from '../../assets/graphiql.html';
+
+/**
+ * When people webpack us up, e.g. for lambda, if they don't want GraphiQL then
+ * they can seriously reduce bundle size by omitting the assets.
+ */
+const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === '1';
 
 // Used by `createPostGraphileHttpRequestHandler`
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
@@ -61,36 +78,10 @@ function isEmpty(value: any): boolean {
   return true;
 }
 
-const { POSTGRAPHILE_ENV } = process.env;
+const isPostGraphileDevelopmentMode = process.env.POSTGRAPHILE_ENV === 'development';
 
 const debugGraphql = Debugger('postgraphile:graphql');
 const debugRequest = Debugger('postgraphile:request');
-
-export const graphiqlDirectory = resolvePath(__dirname, '../graphiql/public');
-
-/**
- * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
- * client.
- *
- * @type {Promise<Buffer>}
- */
-const favicon = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../../../resources/favicon.ico'), (error, data) => {
-    if (error) reject(error);
-    else resolve(data);
-  });
-});
-
-/**
- * The GraphiQL HTML file as a string. We need it to be a string, because we
- * will use a regular expression to replace some variables.
- */
-const origGraphiqlHtml: Promise<string> = new Promise((resolve, reject) => {
-  readFile(resolvePath(__dirname, '../graphiql/public/index.html'), 'utf8', (error, data) => {
-    if (error) reject(error);
-    else resolve(data);
-  });
-});
 
 /**
  * We need to be able to share the withPostGraphileContext logic between HTTP
@@ -163,6 +154,9 @@ export default function createPostGraphileHttpRequestHandler(
     throw new Error(
       'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
     );
+  }
+  if (options.graphiql && shouldOmitAssets) {
+    throw new Error('Cannot enable GraphiQL when POSTGRAPHILE_OMIT_ASSETS is set');
   }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
@@ -254,14 +248,14 @@ export default function createPostGraphileHttpRequestHandler(
     });
 
   // Takes the original GraphiQL HTML file and replaces the default config object.
-  const graphiqlHtml = origGraphiqlHtml.then(html =>
-    html.replace(
-      /window\.POSTGRAPHILE_CONFIG\s*=\s*\{[^]*\}/,
-      `window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
-        options.watchPg ? "'/_postgraphile/stream'" : 'null'
-      }}`,
-    ),
-  );
+  const graphiqlHtml = origGraphiqlHtml
+    ? origGraphiqlHtml.replace(
+        /<\/head>/,
+        `  <script>window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
+          options.watchPg ? "'/_postgraphile/stream'" : 'null'
+        }};</script>\n  </head>`,
+      )
+    : null;
 
   const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
 
@@ -366,7 +360,7 @@ export default function createPostGraphileHttpRequestHandler(
     //
     // Always enable CORS when developing PostGraphile because GraphiQL will be
     // on port 5783.
-    if (options.enableCors || POSTGRAPHILE_ENV === 'development') addCORSHeaders(res);
+    if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
 
     const { pathname = '' } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === graphqlRoute;
@@ -375,7 +369,7 @@ export default function createPostGraphileHttpRequestHandler(
     // Serve GraphiQL and Related Assets
     // ========================================================================
 
-    if (options.graphiql && !isGraphqlRoute) {
+    if (!shouldOmitAssets && options.graphiql && !isGraphqlRoute) {
       // ======================================================================
       // Favicon
       // ======================================================================
@@ -402,69 +396,7 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        res.end(await favicon);
-        return;
-      }
-
-      // ======================================================================
-      // GraphiQL `create-react-app` Assets
-      // ======================================================================
-
-      // Serve the assets for GraphiQL on a namespaced path. This will basically
-      // serve up the built GraphiQL directory.
-      if (pathname.startsWith('/_postgraphile/graphiql/')) {
-        // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-          res.end();
-          return;
-        }
-
-        // Gets the asset path (the path name with the PostGraphile prefix
-        // stripped off) and turns it into a real filesystem path
-        const assetPath = resolvePath(
-          joinPath(graphiqlDirectory, pathname.slice('/_postgraphile/graphiql/'.length)),
-        );
-
-        // Figures out the relative path for assetPath within graphiqlDirectory
-        // so we can correctly filter 'index.html' and 'asset-manifest.json'
-        const assetPathRelative = relativePath(graphiqlDirectory, assetPath);
-
-        // Block any attempts at path traversal issues
-        if (
-          assetPath.substr(0, graphiqlDirectory.length) !== graphiqlDirectory ||
-          assetPathRelative.substr(0, 2) === '..'
-        ) {
-          res.statusCode = 403;
-          res.end();
-          return;
-        }
-
-        // Don’t allow certain files generated by `create-react-app` to be
-        // inspected.
-        if (assetPathRelative === 'index.html' || assetPathRelative === 'asset-manifest.json') {
-          res.statusCode = 404;
-          res.end();
-          return;
-        }
-
-        // Sends the asset at this path. Defaults to a `statusCode` of 200.
-        res.statusCode = 200;
-        const koaCtx = (req as object)['_koaCtx'];
-        if (koaCtx) {
-          koaCtx.compress = false;
-        }
-        await new Promise((resolve, reject) => {
-          sendFile(req, assetPathRelative, {
-            index: false,
-            root: graphiqlDirectory,
-            dotfiles: 'ignore',
-          })
-            .on('end', resolve)
-            .on('error', reject)
-            .pipe(res);
-        });
+        res.end(favicon);
         return;
       }
 
@@ -490,7 +422,7 @@ export default function createPostGraphileHttpRequestHandler(
       // If this is the GraphiQL route, show GraphiQL and stop execution.
       if (pathname === graphiqlRoute) {
         // If we are developing PostGraphile, instead just redirect.
-        if (POSTGRAPHILE_ENV === 'development') {
+        if (isPostGraphileDevelopmentMode) {
           res.statusCode = 302;
           res.setHeader('Location', 'http://localhost:5783');
           res.end();
@@ -515,7 +447,7 @@ export default function createPostGraphileHttpRequestHandler(
         }
 
         // Actually renders GraphiQL.
-        res.end(await graphiqlHtml);
+        res.end(graphiqlHtml);
         return;
       }
     }
