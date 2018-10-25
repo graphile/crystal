@@ -137,7 +137,11 @@ program
   )
   .option(
     '--no-ignore-rbac',
-    "[RECOMMENDED] set this to excludes fields, queries and mutations that the user isn't permitted to access; this will be the default in v5",
+    "[RECOMMENDED] set this to exclude fields, queries and mutations that the user isn't permitted to access; this will be enabled by default in v5",
+  )
+  .option(
+    '--no-ignore-indexes',
+    '[RECOMMENDED] set this to exclude filters, orderBy, and relations that would be expensive to access due to missing indexes',
   )
   .option(
     '--include-extension-resources',
@@ -291,12 +295,22 @@ pluginHook('cli:flags:add', addFlag);
 
 // Deprecated
 program
-  .option('--token <identifier>', 'DEPRECATED: use --jwt-token-identifier instead')
-  .option('--secret <string>', 'DEPRECATED: Use --jwt-secret instead')
+  .option(
+    '--token <identifier>',
+    '[DEPRECATED] Use --jwt-token-identifier instead. This option will be removed in v5.',
+  )
+  .option(
+    '--secret <string>',
+    '[DEPRECATED] Use --jwt-secret instead. This option will be removed in v5.',
+  )
   .option(
     '--jwt-audiences <string>',
-    'DEPRECATED Use --jwt-verify-audience instead',
+    '[DEPRECATED] Use --jwt-verify-audience instead. This option will be removed in v5.',
     (option: string) => option.split(','),
+  )
+  .option(
+    '--legacy-functions-only',
+    '[DEPRECATED] PostGraphile 4.1.0 introduced support for PostgreSQL functions than declare parameters with IN/OUT/INOUT or declare RETURNS TABLE(...); enable this flag to ignore these types of functions. This option will be removed in v5.',
   );
 
 pluginHook('cli:flags:add:deprecated', addFlag);
@@ -334,6 +348,18 @@ if (program['plugins']) {
 // Kill server on exit.
 process.on('SIGINT', () => {
   process.exit(1);
+});
+
+// For `--no-*` options, `program` automatically contains the default,
+// overriding our options. We typically want the CLI to "win", but not
+// with defaults! So this code extracts those `--no-*` values and
+// re-overwrites the values if necessary.
+const configOptions = config['options'] || {};
+const overridesFromOptions = {};
+['ignoreIndexes', 'ignoreRbac', 'setofFunctionsContainNulls'].forEach(option => {
+  if (option in configOptions) {
+    overridesFromOptions[option] = configOptions[option];
+  }
 });
 
 // Destruct our configuration file and command line arguments, use defaults, and rename options to
@@ -390,8 +416,10 @@ const {
   legacyJsonUuid,
   disableQueryLog,
   simpleCollections,
+  legacyFunctionsOnly,
+  ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program } as any;
+} = { ...config['options'], ...program, ...overridesFromOptions } as any;
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
@@ -532,6 +560,8 @@ const postgraphileOptions = pluginHook(
     enableQueryBatching,
     pluginHook,
     simpleCollections,
+    legacyFunctionsOnly,
+    ignoreIndexes,
   },
   { config, cliOptions: program },
 );
@@ -540,6 +570,10 @@ if (noServer) {
   // No need for a server, let's just spin up the schema builder
   (async () => {
     const pgPool = new Pool(pgConfig);
+    pgPool.on('error', err => {
+      // tslint:disable-next-line no-console
+      console.error('PostgreSQL client generated error: ', err);
+    });
     const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions);
     await getGraphQLSchema();
     if (!watchPg) {
