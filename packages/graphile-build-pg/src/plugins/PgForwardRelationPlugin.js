@@ -29,6 +29,7 @@ export default (function PgForwardRelationPlugin(builder) {
       fieldWithHooks,
       Self,
     } = context;
+
     const table = pgIntrospectionTable || pgIntrospection;
     if (
       !(isPgRowType || isMutationPayload) ||
@@ -40,12 +41,9 @@ export default (function PgForwardRelationPlugin(builder) {
     }
     // This is a relation in which we (table) are local, and there's a foreign table
 
-    const foreignKeyConstraints = introspectionResultsByKind.constraint
-      .filter(con => con.type === "f")
-      .filter(con => con.classId === table.id);
-    const attributes = introspectionResultsByKind.attribute
-      .filter(attr => attr.classId === table.id)
-      .sort((a, b) => a.num - b.num);
+    const foreignKeyConstraints = table.constraints.filter(
+      con => con.type === "f"
+    );
 
     return extend(
       fields,
@@ -87,19 +85,10 @@ export default (function PgForwardRelationPlugin(builder) {
         if (omit(foreignTable, "read")) {
           return memo;
         }
-        const foreignSchema = introspectionResultsByKind.namespace.filter(
-          n => n.id === foreignTable.namespaceId
-        )[0];
-        const foreignAttributes = introspectionResultsByKind.attribute
-          .filter(attr => attr.classId === constraint.foreignClassId)
-          .sort((a, b) => a.num - b.num);
+        const foreignSchema = foreignTable.namespace;
 
-        const keys = constraint.keyAttributeNums.map(
-          num => attributes.filter(attr => attr.num === num)[0]
-        );
-        const foreignKeys = constraint.foreignKeyAttributeNums.map(
-          num => foreignAttributes.filter(attr => attr.num === num)[0]
-        );
+        const keys = constraint.keyAttributes;
+        const foreignKeys = constraint.foreignKeyAttributes;
         if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
           throw new Error("Could not find key columns!");
         }

@@ -82,6 +82,7 @@ export default (function PgTypesPlugin(
       inflection,
       graphql,
     } = build;
+
     const addType = build.addType.bind(build);
     const {
       GraphQLNonNull,
@@ -341,12 +342,12 @@ export default (function PgTypesPlugin(
       }
     };
     /*
-        Determined by running:
+      Determined by running:
 
-          select oid, typname, typarray, typcategory, typtype from pg_catalog.pg_type where typtype = 'b' order by oid;
+        select oid, typname, typarray, typcategory, typtype from pg_catalog.pg_type where typtype = 'b' order by oid;
 
-        We only need to add oidLookups for types that don't have the correct fallback
-      */
+      We only need to add oidLookups for types that don't have the correct fallback
+    */
     const SimpleDate = stringType("Date", "The day, does not include a time.");
     const SimpleDatetime = stringType(
       "Datetime",
@@ -831,7 +832,7 @@ export default (function PgTypesPlugin(
         gqlInputTypeByTypeIdAndModifier[typeId] = {};
       }
       if (!gqlInputTypeByTypeIdAndModifier[typeId][typeModifierKey]) {
-        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        const type = introspectionResultsByKind.typeById[typeId];
 
         if (!type) {
           throw new Error(

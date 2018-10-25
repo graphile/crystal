@@ -70,6 +70,7 @@ export type PgClass = {
   attributes: [PgAttribute],
   constraints: [PgConstraint],
   foreignConstraints: [PgConstraint],
+  primaryKeyConstraint: ?PgConstraint,
   aclSelectable: boolean,
   aclInsertable: boolean,
   aclUpdatable: boolean,
@@ -88,6 +89,8 @@ export type PgType = {
   category: string,
   domainIsNotNull: boolean,
   arrayItemTypeId: ?string,
+  arrayItemType: ?PgType,
+  arrayType: ?PgType,
   typeLength: ?number,
   isPgArray: boolean,
   classId: ?string,
@@ -315,7 +318,7 @@ export default (async function PgIntrospectionPlugin(
       }, {});
     const xByYAndZ = (arrayOfX, attrKey, attrKey2) =>
       arrayOfX.reduce((memo, x) => {
-        memo[x[attrKey]] = memo[x[attrKey]] || {};
+        if (!memo[x[attrKey]]) memo[x[attrKey]] = {};
         memo[x[attrKey]][x[attrKey2]] = x;
         return memo;
       }, {});
@@ -450,7 +453,7 @@ export default (async function PgIntrospectionPlugin(
       "foreignClass",
       "foreignClassId",
       introspectionResultsByKind.classById,
-      true
+      true // Because many constraints don't apply to foreign classes
     );
 
     relate(
@@ -476,6 +479,13 @@ export default (async function PgIntrospectionPlugin(
       introspectionResultsByKind.classById
     );
 
+    // Reverse arrayItemType -> arrayType
+    introspectionResultsByKind.type.forEach(type => {
+      if (type.arrayItemType) {
+        type.arrayItemType.arrayType = type;
+      }
+    });
+
     // Table/type columns / constraints
     introspectionResultsByKind.class.forEach(klass => {
       klass.attributes = introspectionResultsByKind.attribute.filter(
@@ -486,6 +496,9 @@ export default (async function PgIntrospectionPlugin(
       );
       klass.foreignConstraints = introspectionResultsByKind.constraint.filter(
         constraint => constraint.foreignClassId === klass.id
+      );
+      klass.primaryKeyConstraint = klass.constraints.find(
+        constraint => constraint.type === "p"
       );
     });
 

@@ -69,11 +69,11 @@ export default (function PgColumnsPlugin(builder) {
       pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
     });
   });
+
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
       pgGetGqlTypeByTypeIdAndModifier,
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       pg2gql,
       graphql: { GraphQLString, GraphQLNonNull },
@@ -88,6 +88,7 @@ export default (function PgColumnsPlugin(builder) {
       scope: { isPgRowType, isPgCompoundType, pgIntrospection: table },
       fieldWithHooks,
     } = context;
+
     if (
       !(isPgRowType || isPgCompoundType) ||
       !table ||
@@ -95,89 +96,79 @@ export default (function PgColumnsPlugin(builder) {
     ) {
       return fields;
     }
+
     return extend(
       fields,
-      introspectionResultsByKind.attribute
-        .filter(attr => attr.classId === table.id)
-        .filter(attr => pgColumnFilter(attr, build, context))
-        .filter(attr => !omit(attr, "read"))
-        .reduce((memo, attr) => {
-          /*
-            attr =
-              { kind: 'attribute',
-                classId: '6546809',
-                num: 21,
-                name: 'upstreamName',
-                description: null,
-                typeId: '6484393',
-                isNotNull: false,
-                hasDefault: false }
-            */
-          const fieldName = inflection.column(attr);
-          if (memo[fieldName]) {
-            throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on class '${
-                table.namespaceName
-              }.${table.name}'; one of them is '${attr.name}'`
-            );
-          }
-          memo = extend(
-            memo,
-            {
-              [fieldName]: fieldWithHooks(
-                fieldName,
-                fieldContext => {
-                  const { addDataGenerator } = fieldContext;
-                  const ReturnType =
-                    pgGetGqlTypeByTypeIdAndModifier(
-                      attr.typeId,
-                      attr.typeModifier
-                    ) || GraphQLString;
-                  addDataGenerator(parsedResolveInfoFragment => {
-                    return {
-                      pgQuery: queryBuilder => {
-                        queryBuilder.select(
-                          getSelectValueForFieldAndTypeAndModifier(
-                            ReturnType,
-                            fieldContext,
-                            parsedResolveInfoFragment,
-                            sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
-                              attr.name
-                            )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
-                            attr.type,
-                            attr.typeModifier
-                          ),
-                          fieldName
-                        );
-                      },
-                    };
-                  });
+      table.attributes.reduce((memo, attr) => {
+        // PERFORMANCE: These used to be .filter(...) calls
+        if (!pgColumnFilter(attr, build, context)) return memo;
+        if (omit(attr, "read")) return memo;
+
+        const fieldName = inflection.column(attr);
+        if (memo[fieldName]) {
+          throw new Error(
+            `Two columns produce the same GraphQL field name '${fieldName}' on class '${
+              table.namespaceName
+            }.${table.name}'; one of them is '${attr.name}'`
+          );
+        }
+        memo = extend(
+          memo,
+          {
+            [fieldName]: fieldWithHooks(
+              fieldName,
+              fieldContext => {
+                const { addDataGenerator } = fieldContext;
+                const ReturnType =
+                  pgGetGqlTypeByTypeIdAndModifier(
+                    attr.typeId,
+                    attr.typeModifier
+                  ) || GraphQLString;
+                addDataGenerator(parsedResolveInfoFragment => {
                   return {
-                    description: attr.description,
-                    type: nullableIf(
-                      GraphQLNonNull,
-                      !attr.isNotNull && !attr.type.domainIsNotNull,
-                      ReturnType
-                    ),
-                    resolve: (data, _args, _context, _resolveInfo) => {
-                      return pg2gql(data[fieldName], attr.type);
+                    pgQuery: queryBuilder => {
+                      queryBuilder.select(
+                        getSelectValueForFieldAndTypeAndModifier(
+                          ReturnType,
+                          fieldContext,
+                          parsedResolveInfoFragment,
+                          sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
+                            attr.name
+                          )})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
+                          attr.type,
+                          attr.typeModifier
+                        ),
+                        fieldName
+                      );
                     },
                   };
-                },
-                { pgFieldIntrospection: attr }
-              ),
-            },
-            `Adding field for ${describePgEntity(
-              attr
-            )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
-              attr,
-              {
-                name: "newNameHere",
-              }
-            )}`
-          );
-          return memo;
-        }, {}),
+                });
+                return {
+                  description: attr.description,
+                  type: nullableIf(
+                    GraphQLNonNull,
+                    !attr.isNotNull && !attr.type.domainIsNotNull,
+                    ReturnType
+                  ),
+                  resolve: (data, _args, _context, _resolveInfo) => {
+                    return pg2gql(data[fieldName], attr.type);
+                  },
+                };
+              },
+              { pgFieldIntrospection: attr }
+            ),
+          },
+          `Adding field for ${describePgEntity(
+            attr
+          )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+            attr,
+            {
+              name: "newNameHere",
+            }
+          )}`
+        );
+        return memo;
+      }, {}),
       `Adding columns to '${describePgEntity(table)}'`
     );
   });
@@ -185,7 +176,6 @@ export default (function PgColumnsPlugin(builder) {
     const {
       extend,
       pgGetGqlInputTypeByTypeIdAndModifier,
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
       graphql: { GraphQLString, GraphQLNonNull },
       pgColumnFilter,
       inflection,
@@ -213,66 +203,61 @@ export default (function PgColumnsPlugin(builder) {
     }
     return extend(
       fields,
-      introspectionResultsByKind.attribute
-        .filter(attr => attr.classId === table.id)
-        .filter(attr => pgColumnFilter(attr, build, context))
-        .filter(
-          attr =>
-            !omit(
-              attr,
-              isPgBaseInput ? "base" : isPgPatch ? "update" : "create"
-            )
-        )
-        .filter(attr => attr.identity !== "a")
-        .reduce((memo, attr) => {
-          const fieldName = inflection.column(attr);
-          if (memo[fieldName]) {
-            throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${
-                table.namespaceName
-              }.${table.name}'; one of them is '${attr.name}'`
-            );
-          }
-          memo = extend(
-            memo,
-            {
-              [fieldName]: fieldWithHooks(
-                fieldName,
-                pgAddSubfield(
-                  fieldName,
-                  attr.name,
-                  attr.type,
-                  {
-                    description: attr.description,
-                    type: nullableIf(
-                      GraphQLNonNull,
-                      isPgBaseInput ||
-                        isPgPatch ||
-                        (!attr.isNotNull && !attr.type.domainIsNotNull) ||
-                        attr.hasDefault ||
-                        attr.identity === "d",
-                      pgGetGqlInputTypeByTypeIdAndModifier(
-                        attr.typeId,
-                        attr.typeModifier
-                      ) || GraphQLString
-                    ),
-                  },
-                  attr.typeModifier
-                ),
-                { pgFieldIntrospection: attr }
-              ),
-            },
-            `Adding input object field for ${describePgEntity(
-              attr
-            )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
-              attr,
-              {
-                name: "newNameHere",
-              }
-            )}`
+      table.attributes.reduce((memo, attr) => {
+        // PERFORMANCE: These used to be .filter(...) calls
+        if (!pgColumnFilter(attr, build, context)) return memo;
+        const action = isPgBaseInput ? "base" : isPgPatch ? "update" : "create";
+        if (omit(attr, action)) return memo;
+        if (attr.identity === "a") return memo;
+
+        const fieldName = inflection.column(attr);
+        if (memo[fieldName]) {
+          throw new Error(
+            `Two columns produce the same GraphQL field name '${fieldName}' on input class '${
+              table.namespaceName
+            }.${table.name}'; one of them is '${attr.name}'`
           );
-          return memo;
-        }, {}),
+        }
+        memo = extend(
+          memo,
+          {
+            [fieldName]: fieldWithHooks(
+              fieldName,
+              pgAddSubfield(
+                fieldName,
+                attr.name,
+                attr.type,
+                {
+                  description: attr.description,
+                  type: nullableIf(
+                    GraphQLNonNull,
+                    isPgBaseInput ||
+                      isPgPatch ||
+                      (!attr.isNotNull && !attr.type.domainIsNotNull) ||
+                      attr.hasDefault ||
+                      attr.identity === "d",
+                    pgGetGqlInputTypeByTypeIdAndModifier(
+                      attr.typeId,
+                      attr.typeModifier
+                    ) || GraphQLString
+                  ),
+                },
+                attr.typeModifier
+              ),
+              { pgFieldIntrospection: attr }
+            ),
+          },
+          `Adding input object field for ${describePgEntity(
+            attr
+          )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+            attr,
+            {
+              name: "newNameHere",
+            }
+          )}`
+        );
+        return memo;
+      }, {}),
       `Adding columns to input object for ${describePgEntity(table)}`
     );
   });

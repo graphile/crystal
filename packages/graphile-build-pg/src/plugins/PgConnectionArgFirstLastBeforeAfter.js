@@ -22,6 +22,7 @@ export default (function PgConnectionArgs(builder) {
         field,
         Self,
       } = context;
+
       if (
         !(isPgFieldConnection || isPgFieldSimpleCollection) ||
         !source ||

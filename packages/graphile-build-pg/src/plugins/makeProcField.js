@@ -62,47 +62,50 @@ export default function makeProcField(
     sqlCommentByAddingTags,
     pgField,
   } = build;
+
   if (computed && isMutation) {
     throw new Error("Mutation procedure cannot be computed");
   }
   const sliceAmount = computed ? 1 : 0;
-  const argNames = proc.argTypeIds.slice(sliceAmount).reduce(
-    (prev, _, idx) =>
-      proc.argModes.length === 0 || // all args are `in`
-      proc.argModes[idx + sliceAmount] === "i" || // this arg is `in`
-      proc.argModes[idx + sliceAmount] === "b" // this arg is `inout`
-        ? [...prev, proc.argNames[idx + sliceAmount] || ""]
-        : prev,
-    []
-  );
-  const argTypes = proc.argTypeIds.slice(sliceAmount).reduce(
-    (prev, typeId, idx) =>
-      proc.argModes.length === 0 || // all args are `in`
-      proc.argModes[idx + sliceAmount] === "i" || // this arg is `in`
-      proc.argModes[idx + sliceAmount] === "b" // this arg is `inout`
-        ? [...prev, introspectionResultsByKind.typeById[typeId]]
-        : prev,
-    []
-  );
+  const argNames = proc.argTypeIds.reduce((prev, _, idx) => {
+    if (
+      idx >= sliceAmount && // Was a .slice() call
+      (proc.argModes.length === 0 || // all args are `in`
+      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "b") // this arg is `inout`
+    ) {
+      prev.push(proc.argNames[idx] || "");
+    }
+    return prev;
+  }, []);
+  const argTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+    if (
+      idx >= sliceAmount && // Was a .slice() call
+      (proc.argModes.length === 0 || // all args are `in`
+      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "b") // this arg is `inout`
+    ) {
+      prev.push(introspectionResultsByKind.typeById[typeId]);
+    }
+    return prev;
+  }, []);
   const argModesWithOutput = [
     "o", // OUT,
     "b", // INOUT
     "t", // TABLE
   ];
-  const outputArgNames = proc.argTypeIds.reduce(
-    (prev, _, idx) =>
-      argModesWithOutput.includes(proc.argModes[idx])
-        ? [...prev, proc.argNames[idx] || ""]
-        : prev,
-    []
-  );
-  const outputArgTypes = proc.argTypeIds.reduce(
-    (prev, typeId, idx) =>
-      argModesWithOutput.includes(proc.argModes[idx])
-        ? [...prev, introspectionResultsByKind.typeById[typeId]]
-        : prev,
-    []
-  );
+  const outputArgNames = proc.argTypeIds.reduce((prev, _, idx) => {
+    if (argModesWithOutput.includes(proc.argModes[idx])) {
+      prev.push(proc.argNames[idx] || "");
+    }
+    return prev;
+  }, []);
+  const outputArgTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+    if (argModesWithOutput.includes(proc.argModes[idx])) {
+      prev.push(introspectionResultsByKind.typeById[typeId]);
+    }
+    return prev;
+  }, []);
   const requiredArgCount = Math.max(0, argNames.length - proc.argDefaultsNum);
   const variantFromName = (name, _type) => {
     if (name.match(/(_p|P)atch$/)) {
@@ -555,11 +558,9 @@ export default function makeProcField(
                 if (proc.returnsSet && !forceList) {
                   // EITHER `isMutation` is true, or `ConnectionType` does not
                   // exist - either way, we're not returning a connection.
-                  return value.data
-                    .map(firstValue)
-                    .map(v => pg2gql(v, returnType));
+                  return value.data.map(v => pg2gql(firstValue(v), returnType));
                 } else if (proc.returnsSet || rawReturnType.isPgArray) {
-                  return value.map(firstValue).map(v => pg2gql(v, returnType));
+                  return value.map(v => pg2gql(firstValue(v), returnType));
                 } else {
                   return pg2gql(value, returnType);
                 }
@@ -655,11 +656,9 @@ export default function makeProcField(
                     // EITHER `isMutation` is true, or `ConnectionType` does
                     // not exist - either way, we're not returning a
                     // connection.
-                    return row.data
-                      .map(firstValue)
-                      .map(v => pg2gql(v, returnType));
+                    return row.data.map(v => pg2gql(firstValue(v), returnType));
                   } else if (proc.returnsSet || rawReturnType.isPgArray) {
-                    return rows.map(firstValue).map(v => pg2gql(v, returnType));
+                    return rows.map(v => pg2gql(firstValue(v), returnType));
                   } else {
                     return pg2gql(firstValue(row), returnType);
                   }

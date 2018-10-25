@@ -14,65 +14,68 @@ export default (function PgConnectionArgCondition(builder) {
       describePgEntity,
       sqlCommentByAddingTags,
     } = build;
-    introspectionResultsByKind.class
-      .filter(table => table.isSelectable && !omit(table, "filter"))
-      .filter(table => !!table.namespace)
-      .forEach(table => {
-        const tableTypeName = inflection.tableType(table);
-        /* const TableConditionType = */
-        newWithHooks(
-          GraphQLInputObjectType,
-          {
-            description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
-            name: inflection.conditionType(inflection.tableType(table)),
-            fields: context => {
-              const { fieldWithHooks } = context;
-              return table.attributes
-                .filter(attr => pgColumnFilter(attr, build, context))
-                .filter(attr => !omit(attr, "filter"))
-                .reduce((memo, attr) => {
-                  const fieldName = inflection.column(attr);
-                  memo = build.extend(
-                    memo,
+    introspectionResultsByKind.class.forEach(table => {
+      // PERFORMANCE: These used to be .filter(...) calls
+      if (!table.isSelectable || omit(table, "filter")) return;
+      if (!table.namespace) return;
+
+      const tableTypeName = inflection.tableType(table);
+      /* const TableConditionType = */
+      newWithHooks(
+        GraphQLInputObjectType,
+        {
+          description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
+          name: inflection.conditionType(inflection.tableType(table)),
+          fields: context => {
+            const { fieldWithHooks } = context;
+            return table.attributes.reduce((memo, attr) => {
+              // PERFORMANCE: These used to be .filter(...) calls
+              if (!pgColumnFilter(attr, build, context)) return memo;
+              if (omit(attr, "filter")) return memo;
+
+              const fieldName = inflection.column(attr);
+              memo = build.extend(
+                memo,
+                {
+                  [fieldName]: fieldWithHooks(
+                    fieldName,
                     {
-                      [fieldName]: fieldWithHooks(
-                        fieldName,
-                        {
-                          description: `Checks for equality with the object’s \`${fieldName}\` field.`,
-                          type:
-                            pgGetGqlInputTypeByTypeIdAndModifier(
-                              attr.typeId,
-                              attr.typeModifier
-                            ) || GraphQLString,
-                        },
-                        {
-                          isPgConnectionConditionInputField: true,
-                        }
-                      ),
+                      description: `Checks for equality with the object’s \`${fieldName}\` field.`,
+                      type:
+                        pgGetGqlInputTypeByTypeIdAndModifier(
+                          attr.typeId,
+                          attr.typeModifier
+                        ) || GraphQLString,
                     },
-                    `Adding condition argument for ${describePgEntity(attr)}`
-                  );
-                  return memo;
-                }, {});
-            },
+                    {
+                      isPgConnectionConditionInputField: true,
+                    }
+                  ),
+                },
+                `Adding condition argument for ${describePgEntity(attr)}`
+              );
+              return memo;
+            }, {});
           },
-          {
-            __origin: `Adding condition type for ${describePgEntity(
-              table
-            )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
-              table,
-              {
-                name: "newNameHere",
-              }
-            )}`,
-            pgIntrospection: table,
-            isPgCondition: true,
-          },
-          true // Conditions might all be filtered
-        );
-      });
+        },
+        {
+          __origin: `Adding condition type for ${describePgEntity(
+            table
+          )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+            table,
+            {
+              name: "newNameHere",
+            }
+          )}`,
+          pgIntrospection: table,
+          isPgCondition: true,
+        },
+        true // Conditions might all be filtered
+      );
+    });
     return _;
   });
+
   builder.hook(
     "GraphQLObjectType:fields:field:args",
     (args, build, context) => {
@@ -96,6 +99,7 @@ export default (function PgConnectionArgCondition(builder) {
         Self,
         field,
       } = context;
+
       const shouldAddCondition =
         isPgFieldConnection || isPgFieldSimpleCollection;
       if (
@@ -115,9 +119,9 @@ export default (function PgConnectionArgCondition(builder) {
         return args;
       }
 
-      const relevantAttributes = table.attributes
-        .filter(attr => pgColumnFilter(attr, build, context))
-        .filter(attr => !omit(attr, "filter"));
+      const relevantAttributes = table.attributes.filter(
+        attr => pgColumnFilter(attr, build, context) && !omit(attr, "filter")
+      );
 
       addArgDataGenerator(function connectionCondition({ condition }) {
         return {

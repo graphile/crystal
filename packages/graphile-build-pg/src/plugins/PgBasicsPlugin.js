@@ -158,16 +158,18 @@ const omitUnindexed = omit => (
   ) {
     let klass = entity.class;
     if (klass) {
-      warn(
-        "%s",
-        `We've disabled the 'read' permission for ${describePgEntity(
-          entity
-        )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix this, perform\n\n  CREATE INDEX ON ${`"${
-          klass.namespaceName
-        }"."${klass.name}"`}("${entity.keyAttributes
-          .map(a => a.name)
-          .join('", "')}");`
-      );
+      if (warn.enabled) {
+        warn(
+          "%s",
+          `We've disabled the 'read' permission for ${describePgEntity(
+            entity
+          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix this, perform\n\n  CREATE INDEX ON ${`"${
+            klass.namespaceName
+          }"."${klass.name}"`}("${entity.keyAttributes
+            .map(a => a.name)
+            .join('", "')}");`
+        );
+      }
     }
     return true;
   }

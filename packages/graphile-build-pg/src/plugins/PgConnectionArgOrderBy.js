@@ -13,42 +13,44 @@ export default (function PgConnectionArgOrderBy(builder) {
       sqlCommentByAddingTags,
       describePgEntity,
     } = build;
-    introspectionResultsByKind.class
-      .filter(table => table.isSelectable && !omit(table, "order"))
-      .filter(table => !!table.namespace)
-      .forEach(table => {
-        const tableTypeName = inflection.tableType(table);
-        /* const TableOrderByType = */
-        newWithHooks(
-          GraphQLEnumType,
-          {
-            name: inflection.orderByType(tableTypeName),
-            description: `Methods to use when ordering \`${tableTypeName}\`.`,
-            values: {
-              NATURAL: {
-                value: {
-                  alias: null,
-                  specs: [],
-                },
+    introspectionResultsByKind.class.forEach(table => {
+      // PERFORMANCE: These used to be .filter(...) calls
+      if (!table.isSelectable || omit(table, "order")) return;
+      if (!table.namespace) return;
+
+      const tableTypeName = inflection.tableType(table);
+      /* const TableOrderByType = */
+      newWithHooks(
+        GraphQLEnumType,
+        {
+          name: inflection.orderByType(tableTypeName),
+          description: `Methods to use when ordering \`${tableTypeName}\`.`,
+          values: {
+            NATURAL: {
+              value: {
+                alias: null,
+                specs: [],
               },
             },
           },
-          {
-            __origin: `Adding connection "orderBy" argument for ${describePgEntity(
-              table
-            )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
-              table,
-              {
-                name: "newNameHere",
-              }
-            )}`,
-            pgIntrospection: table,
-            isPgRowSortEnum: true,
-          }
-        );
-      });
+        },
+        {
+          __origin: `Adding connection "orderBy" argument for ${describePgEntity(
+            table
+          )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+            table,
+            {
+              name: "newNameHere",
+            }
+          )}`,
+          pgIntrospection: table,
+          isPgRowSortEnum: true,
+        }
+      );
+    });
     return _;
   });
+
   builder.hook(
     "GraphQLObjectType:fields:field:args",
     (args, build, context) => {
@@ -71,6 +73,7 @@ export default (function PgConnectionArgOrderBy(builder) {
         Self,
         field,
       } = context;
+
       const shouldAddOrderBy = isPgFieldConnection || isPgFieldSimpleCollection;
       if (
         !shouldAddOrderBy ||

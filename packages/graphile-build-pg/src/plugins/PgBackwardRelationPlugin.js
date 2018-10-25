@@ -47,12 +47,22 @@ export default (function PgBackwardRelationPlugin(
       return fields;
     }
     // This is a relation in which WE are foreign
-    const foreignKeyConstraints = introspectionResultsByKind.constraint
-      .filter(con => con.type === "f")
-      .filter(con => con.foreignClassId === foreignTable.id);
-    const foreignAttributes = introspectionResultsByKind.attribute
-      .filter(attr => attr.classId === foreignTable.id)
-      .sort((a, b) => a.num - b.num);
+    const foreignKeyConstraints = foreignTable.foreignConstraints.filter(
+      con => con.type === "f"
+    );
+    const foreignTableTypeName = inflection.tableType(foreignTable);
+    const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
+      foreignTable.type.id,
+      null
+    );
+    if (!gqlForeignTableType) {
+      debug(
+        `Could not determine type for foreign table with id ${
+          foreignTable.type.id
+        }`
+      );
+      return fields;
+    }
 
     return extend(
       fields,
@@ -72,21 +82,6 @@ export default (function PgBackwardRelationPlugin(
           );
           return memo;
         }
-        const foreignTable =
-          introspectionResultsByKind.classById[constraint.foreignClassId];
-        const foreignTableTypeName = inflection.tableType(foreignTable);
-        const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
-          foreignTable.type.id,
-          null
-        );
-        if (!gqlForeignTableType) {
-          debug(
-            `Could not determine type for foreign table with id ${
-              constraint.foreignClassId
-            }`
-          );
-          return memo;
-        }
         if (!table) {
           throw new Error(
             `Could not find the table that referenced us (constraint: ${
@@ -96,16 +91,8 @@ export default (function PgBackwardRelationPlugin(
         }
         const schema = table.namespace;
 
-        const attributes = introspectionResultsByKind.attribute.filter(
-          attr => attr.classId === table.id
-        );
-
-        const keys = constraint.keyAttributeNums.map(
-          num => attributes.filter(attr => attr.num === num)[0]
-        );
-        const foreignKeys = constraint.foreignKeyAttributeNums.map(
-          num => foreignAttributes.filter(attr => attr.num === num)[0]
-        );
+        const keys = constraint.keyAttributes;
+        const foreignKeys = constraint.foreignKeyAttributes;
         if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
           throw new Error("Could not find key columns!");
         }
@@ -115,9 +102,8 @@ export default (function PgBackwardRelationPlugin(
         if (foreignKeys.some(key => omit(key, "read"))) {
           return memo;
         }
-        const isUnique = !!introspectionResultsByKind.constraint.find(
+        const isUnique = !!table.constraints.find(
           c =>
-            c.classId === table.id &&
             (c.type === "p" || c.type === "u") &&
             c.keyAttributeNums.length === keys.length &&
             c.keyAttributeNums.every((n, i) => keys[i].num === n)
@@ -134,14 +120,9 @@ export default (function PgBackwardRelationPlugin(
             )
           : null;
 
-        const primaryKeyConstraint = introspectionResultsByKind.constraint
-          .filter(con => con.classId === table.id)
-          .filter(con => con.type === "p")[0];
+        const primaryKeyConstraint = table.primaryKeyConstraint;
         const primaryKeys =
-          primaryKeyConstraint &&
-          primaryKeyConstraint.keyAttributeNums.map(
-            num => attributes.filter(attr => attr.num === num)[0]
-          );
+          primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
 
         const shouldAddSingleRelation = isUnique && legacyRelationMode !== ONLY;
 

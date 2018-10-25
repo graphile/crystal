@@ -50,6 +50,7 @@ export interface PgClass {
   attributes: [PgAttribute];
   constraints: [PgConstraint];
   foreignConstraints: [PgConstraint];
+  primaryKeyConstraint: PgConstraint | void;
   aclSelectable: boolean;
   aclInsertable: boolean;
   aclUpdatable: boolean;
@@ -68,6 +69,8 @@ export interface PgType {
   category: string;
   domainIsNotNull: boolean;
   arrayItemTypeId: string | void;
+  arrayItemType: PgType | void;
+  arrayType: PgType | void;
   typeLength: number | void;
   isPgArray: boolean;
   classId: string | void;

@@ -11,7 +11,6 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
       pgGetGqlTypeByTypeIdAndModifier,
       pgSql: sql,
       graphql: { GraphQLList, GraphQLNonNull },
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
       inflection,
       pgOmit: omit,
       describePgEntity,
@@ -22,6 +21,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
       fieldWithHooks,
       Self,
     } = context;
+
     const table = pgIntrospectionTable || pgIntrospection;
     if (
       !isMutationPayload ||
@@ -33,6 +33,7 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
     ) {
       return fields;
     }
+
     const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
     const tableTypeName = TableType.name;
     const TableOrderByType = getTypeByName(
@@ -43,17 +44,9 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
       return fields;
     }
 
-    const attributes = introspectionResultsByKind.attribute.filter(
-      attr => attr.classId === table.id
-    );
-    const primaryKeyConstraint = introspectionResultsByKind.constraint
-      .filter(con => con.classId === table.id)
-      .filter(con => con.type === "p")[0];
+    const primaryKeyConstraint = table.primaryKeyConstraint;
     const primaryKeys =
-      primaryKeyConstraint &&
-      primaryKeyConstraint.keyAttributeNums.map(
-        num => attributes.filter(attr => attr.num === num)[0]
-      );
+      primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
     const canOrderBy = !omit(table, "order");
 
     const fieldName = inflection.edgeField(table);

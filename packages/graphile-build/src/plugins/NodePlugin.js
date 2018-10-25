@@ -115,6 +115,7 @@ export default (function NodePlugin(
         getNullableType,
       },
     } = build;
+    let Query;
     newWithHooks(
       GraphQLInterfaceType,
       {
@@ -122,7 +123,8 @@ export default (function NodePlugin(
         description: "An object with a globally unique `ID`.",
         resolveType: value => {
           if (value === $$isQuery) {
-            return getTypeByName("Query");
+            if (!Query) Query = getTypeByName("Query");
+            return Query;
           } else if (value[$$nodeType]) {
             return getNullableType(value[$$nodeType]);
           }

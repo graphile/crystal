@@ -60,48 +60,21 @@ export default (function PgTablesPlugin(
       sqlCommentByAddingTags,
       pgField,
     } = build;
+
     const nullableIf = (condition, Type) =>
       condition ? Type : new GraphQLNonNull(Type);
     const Cursor = getTypeByName("Cursor");
+
     introspectionResultsByKind.class.forEach(table => {
-      const tablePgType = introspectionResultsByKind.type.find(
-        type =>
-          type.type === "c" &&
-          type.category === "C" &&
-          type.namespaceId === table.namespaceId &&
-          type.classId === table.id
-      );
+      const tablePgType = table.type;
       if (!tablePgType) {
         throw new Error("Could not determine the type for this table");
       }
-      const arrayTablePgType = introspectionResultsByKind.type.find(
-        type => type.arrayItemTypeId === tablePgType.id
-      );
-      /*
-        table =
-          { kind: 'class',
-            id: '6484790',
-            name: 'bundle',
-            description: null,
-            namespaceId: '6484381',
-            typeId: '6484792',
-            isSelectable: true,
-            isInsertable: true,
-            isUpdatable: true,
-            isDeletable: true }
-        */
-      const primaryKeyConstraint = introspectionResultsByKind.constraint
-        .filter(con => con.classId === table.id)
-        .filter(con => con.type === "p")[0];
+      const arrayTablePgType = tablePgType.arrayType;
+      const primaryKeyConstraint = table.primaryKeyConstraint;
       const primaryKeys =
-        primaryKeyConstraint &&
-        primaryKeyConstraint.keyAttributeNums.map(
-          num =>
-            introspectionResultsByKind.attributeByClassIdAndNum[table.id][num]
-        );
-      const attributes = introspectionResultsByKind.attribute
-        .filter(attr => attr.classId === table.id)
-        .sort((a1, a2) => a1.num - a2.num);
+        primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
+      const attributes = table.attributes;
       const tableTypeName = inflection.tableType(table);
       const shouldHaveNodeId: boolean =
         nodeIdFieldName &&
@@ -418,6 +391,7 @@ export default (function PgTablesPlugin(
             }
           );
           const PageInfo = getTypeByName("PageInfo");
+
           /*const ConnectionType = */
           newWithHooks(
             GraphQLObjectType,
@@ -445,9 +419,9 @@ export default (function PgTablesPlugin(
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
-                        return data.data
-                          .map(entry => entry[safeAlias])
-                          .map(handleNullRow);
+                        return data.data.map(entry =>
+                          handleNullRow(entry[safeAlias])
+                        );
                       },
                     },
                     {},

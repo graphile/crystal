@@ -3,30 +3,20 @@ import type { Plugin } from "graphile-build";
 
 export default (function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook("GraphQLEnumType:values", (values, build, context) => {
-    const {
-      extend,
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
-    } = build;
+    const { extend } = build;
     const {
       scope: { isPgRowSortEnum, pgIntrospection: table },
     } = context;
+
     if (!isPgRowSortEnum || !table || table.kind !== "class") {
       return values;
     }
-    const attributes = introspectionResultsByKind.attribute.filter(
-      attr => attr.classId === table.id
-    );
-    const primaryKeyConstraint = introspectionResultsByKind.constraint
-      .filter(con => con.classId === table.id)
-      .filter(con => con.type === "p")[0];
+    const primaryKeyConstraint = table.primaryKeyConstraint;
     if (!primaryKeyConstraint) {
       return values;
     }
-    const primaryKeys =
-      primaryKeyConstraint &&
-      primaryKeyConstraint.keyAttributeNums.map(
-        num => attributes.filter(attr => attr.num === num)[0]
-      );
+    const primaryKeys = primaryKeyConstraint.keyAttributes;
+
     return extend(
       values,
       {

@@ -19,6 +19,7 @@ export default (function PgJWTPlugin(
       pgParseIdentifier: parseIdentifier,
       describePgEntity,
     } = build;
+
     if (!pgJwtTypeIdentifier) {
       return _;
     }
@@ -43,23 +44,14 @@ export default (function PgJWTPlugin(
         `Could not find JWT type '"${namespaceName}"."${typeName}"'`
       );
     }
-    const compositeType = introspectionResultsByKind.type.filter(
-      type =>
-        type.type === "c" &&
-        type.category === "C" &&
-        type.namespaceId === compositeClass.namespaceId &&
-        type.classId === compositeClass.id
-    )[0];
+    const compositeType = compositeClass.type;
     if (!compositeType) {
       throw new Error("Could not determine the type for JWT type");
     }
     if (pg2GqlMapper[compositeType.id]) {
       throw new Error("JWT type has already been overridden?");
     }
-    const attributes = introspectionResultsByKind.attribute
-      // TODO: consider adding to pgColumnFilter?
-      .filter(attr => attr.classId === compositeClass.id)
-      .sort((a1, a2) => a1.num - a2.num);
+    const attributes = compositeClass.attributes;
 
     const compositeTypeName = inflection.tableType(compositeClass);
 
@@ -112,11 +104,11 @@ export default (function PgJWTPlugin(
       pg2GqlMapper[compositeType.id] = {
         map: value => {
           if (!value) return null;
-          const values = Object.keys(value).map(k => value[k]);
-          if (values.every(v => v == null)) {
-            return null;
+          const values = Object.values(value);
+          if (values.some(v => v != null)) {
+            return value;
           }
-          return value;
+          return null;
         },
         unmap: () => {
           throw new Error(

@@ -13,6 +13,7 @@ export default (function PgConnectionTotalCount(builder) {
       fieldWithHooks,
       Self,
     } = context;
+
     if (
       !isPgRowConnectionType ||
       !table ||
@@ -22,6 +23,7 @@ export default (function PgConnectionTotalCount(builder) {
       return fields;
     }
     const tableTypeName = inflection.tableType(table);
+
     return extend(
       fields,
       {

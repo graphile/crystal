@@ -16,6 +16,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
         Self,
         field,
       } = context;
+
       if (
         !isPgFieldConnection ||
         !table ||
