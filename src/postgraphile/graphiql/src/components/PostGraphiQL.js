@@ -112,9 +112,9 @@ class PostGraphiQL extends React.Component {
       // Do some hacky stuff to GraphiQL.
       this._updateGraphiQLDocExplorerNavStack(schema);
     } catch (e) {
-      // eslint-disable-next-line no-console
+      // tslint:disable-next-line no-console
       console.error('Error occurred when updating the schema:');
-      // eslint-disable-next-line no-console
+      // tslint:disable-next-line no-console
       console.error(e);
     }
   }
