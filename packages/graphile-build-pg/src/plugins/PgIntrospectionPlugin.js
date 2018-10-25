@@ -238,22 +238,19 @@ export default (async function PgIntrospectionPlugin(
             pgIncludeExtensionResources,
           ]);
 
-          const result = rows.reduce(
-            (memo, { object }) => {
-              memo[object.kind].push(object);
-              return memo;
-            },
-            {
-              namespace: [],
-              class: [],
-              attribute: [],
-              type: [],
-              constraint: [],
-              procedure: [],
-              extension: [],
-              index: [],
-            }
-          );
+          const result = {
+            namespace: [],
+            class: [],
+            attribute: [],
+            type: [],
+            constraint: [],
+            procedure: [],
+            extension: [],
+            index: [],
+          };
+          for (const { object } of rows) {
+            result[object.kind].push(object);
+          }
 
           // Parse tags from comments
           [
@@ -289,7 +286,7 @@ export default (async function PgIntrospectionPlugin(
           });
 
           for (const k in result) {
-            result[k].map(Object.freeze);
+            result[k].forEach(Object.freeze);
           }
           return Object.freeze(result);
         })

@@ -1,8 +1,8 @@
 // @flow
 import chalk from "chalk";
 
-const aExtendedB = new WeakMap();
 const INDENT = "  ";
+const $$hints = Symbol("hints");
 
 export function indent(text: string) {
   return (
@@ -15,24 +15,17 @@ export default function extend<Obj1: *, Obj2: *>(
   extra: Obj2,
   hint?: string
 ): Obj1 & Obj2 {
-  const keysA = Object.keys(base);
-  const keysB = Object.keys(extra);
-  const hints = Object.create(null);
-  for (const key of keysA) {
-    const hintKey = `_source__${key}`;
-    if (base[hintKey]) {
-      hints[hintKey] = base[hintKey];
-    }
-  }
+  // $FlowFixMe
+  const hints = base[$$hints] || {};
 
+  const keysB = Object.keys(extra);
+  const extraHints = extra[$$hints] || {};
   for (const key of keysB) {
     const newValue = extra[key];
-    const oldValue = base[key];
-    const hintKey = `_source__${key}`;
-    const hintB = extra[hintKey] || hint;
-    if (aExtendedB.get(newValue) !== oldValue && keysA.indexOf(key) >= 0) {
+    const hintB = extraHints[key] || hint;
+    if (key in base && base[key] !== newValue) {
       // $FlowFixMe
-      const hintA: ?string = base[hintKey];
+      const hintA: ?string = hints[key];
       const firstEntityDetails = !hintA
         ? "We don't have any information about the first entity."
         : `The first entity was:\n\n${indent(chalk.magenta(hintA))}`;
@@ -45,19 +38,12 @@ export default function extend<Obj1: *, Obj2: *>(
         )}'.\n\n${indent(firstEntityDetails)}\n\n${indent(secondEntityDetails)}`
       );
     }
-    hints[hintKey] = hints[hintKey] || hintB || base[hintKey];
-  }
-  const obj = Object.assign({}, base, extra);
-  aExtendedB.set(obj, base);
-  for (const hintKey in hints) {
-    if (hints[hintKey]) {
-      Object.defineProperty(obj, hintKey, {
-        configurable: false,
-        enumerable: false,
-        value: hints[hintKey],
-        writable: false,
-      });
+    if (hintB) {
+      hints[key] = hintB;
     }
   }
-  return obj;
+  return Object.assign(base, extra, {
+    // $FlowFixMe
+    [$$hints]: hints,
+  });
 }

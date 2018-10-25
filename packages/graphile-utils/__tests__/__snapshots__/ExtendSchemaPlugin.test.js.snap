@@ -96,6 +96,15 @@ Object {
   "isRootQuery": true,
   "nullTest": null,
   "stringTest": "THIS_IS_A_STRING",
+  Symbol(hints): Object {
+    "fieldDirectives": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "fieldName": "Within context for GraphQLObjectType 'Query'",
+    "floatTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "intTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "isEchoField": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "nullTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "stringTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+  },
 }
 `;
 
@@ -159,6 +168,16 @@ Object {
   "isRootQuery": true,
   "nullTest": null,
   "stringTest": "THIS_IS_A_STRING",
+  Symbol(hints): Object {
+    "embedTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "fieldDirectives": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "fieldName": "Within context for GraphQLObjectType 'Query'",
+    "floatTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "intTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "isEchoField": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "nullTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+    "stringTest": "Extending scope for field 'echo' within context for GraphQLObjectType 'Query'",
+  },
 }
 `;
 

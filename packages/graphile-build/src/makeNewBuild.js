@@ -562,7 +562,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                   },
                   scope: extend(
                     extend(
-                      scope,
+                      { ...scope },
                       {
                         fieldName,
                       },
@@ -667,7 +667,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                   Self,
                   scope: extend(
                     extend(
-                      scope,
+                      { ...scope },
                       {
                         fieldName,
                       },
