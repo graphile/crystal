@@ -1,8 +1,8 @@
-<img width="120" height="120" title="PostGraphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/postgraphile.optimized.svg" />
+![PostGraphile Logo](https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/postgraphile.optimized.svg)
 
 # PostGraphile
 
-<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support PostGraphile development on Patreon"><img src="https://img.shields.io/badge/donate-via%20Patreon-orange.svg" alt="Patreon donate button" /></a></span>
+[![Patreon donate button](https://img.shields.io/badge/donate-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
