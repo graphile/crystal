@@ -205,6 +205,7 @@ export default (async function PgIntrospectionPlugin(
     pgThrowOnMissingSchema = false,
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
+    pgSkipInstallingWatchFixtures = false,
   }
 ) {
   async function introspect() {
@@ -593,33 +594,35 @@ export default (async function PgIntrospectionPlugin(
       );
     }
     // Install the watch fixtures.
-    const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
-    const sql = `begin; ${watchSqlInner}; commit;`;
-    try {
-      await pgClient.query(sql);
-    } catch (error) {
-      /* eslint-disable no-console */
-      console.warn(
-        `${chalk.bold.yellow(
-          "Failed to setup watch fixtures in Postgres database"
-        )} ️️⚠️`
-      );
-      console.warn(
-        chalk.yellow(
-          "This is likely because your Postgres user is not a superuser. If the"
-        )
-      );
-      console.warn(
-        chalk.yellow(
-          "fixtures already exist, the watch functionality may still work."
-        )
-      );
-      console.warn(
-        chalk.yellow("Enable DEBUG='graphile-build-pg' to see the error")
-      );
-      debug(error);
-      /* eslint-enable no-console */
-      await pgClient.query("rollback");
+    if (!pgSkipInstallingWatchFixtures) {
+      const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
+      const sql = `begin; ${watchSqlInner}; commit;`;
+      try {
+        await pgClient.query(sql);
+      } catch (error) {
+        /* eslint-disable no-console */
+        console.warn(
+          `${chalk.bold.yellow(
+            "Failed to setup watch fixtures in Postgres database"
+          )} ️️⚠️`
+        );
+        console.warn(
+          chalk.yellow(
+            "This is likely because your Postgres user is not a superuser. If the"
+          )
+        );
+        console.warn(
+          chalk.yellow(
+            "fixtures already exist, the watch functionality may still work."
+          )
+        );
+        console.warn(
+          chalk.yellow("Enable DEBUG='graphile-build-pg' to see the error")
+        );
+        debug(error);
+        /* eslint-enable no-console */
+        await pgClient.query("rollback");
+      }
     }
 
     await pgClient.query("listen postgraphile_watch");
