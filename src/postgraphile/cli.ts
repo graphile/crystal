@@ -214,6 +214,10 @@ program
     'the route to mount the GraphiQL interface on. defaults to `/graphiql`',
   )
   .option(
+    '--enhance-graphiql',
+    '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development)',
+  )
+  .option(
     '-b, --disable-graphiql',
     'disables the GraphiQL interface. overrides the GraphiQL route option',
   )
@@ -373,6 +377,7 @@ const {
   defaultRole: pgDefaultRole,
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
+  enhanceGraphiql = false,
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   jwtSecret,
@@ -532,6 +537,7 @@ const postgraphileOptions = pluginHook(
     graphqlRoute,
     graphiqlRoute,
     graphiql: !disableGraphiql,
+    enhanceGraphiql,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
     jwtAudiences,
@@ -703,7 +709,7 @@ if (noServer) {
             !disableGraphiql &&
               `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
-              )}`,
+              )}` + (enhanceGraphiql ? '' : ` (enhance with '--enhance-graphiql')`),
             `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}`,
             `Postgres schema(s):  ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`,
             `Documentation:       ${chalk.underline(

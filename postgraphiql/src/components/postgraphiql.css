@@ -1,0 +1,37 @@
+.graphiql-container.not-really {
+  display: block;
+  width: auto;
+  height: auto;
+  border-left: 1px solid rgb(0, 0, 0, 0.2);
+}
+
+.not-really .docExplorerWrap {
+  height: 100%;
+}
+
+.postgraphiql-container .graphiql-container {
+  flex-grow: 1;
+}
+
+.not-really .doc-explorer-contents {
+  margin: 0;
+  padding: 0;
+}
+.not-really textarea {
+  height: 100%;
+  width: 100%;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  overflow: auto;
+  font-size: 1rem;
+}
+
+.postgraphiql-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+}

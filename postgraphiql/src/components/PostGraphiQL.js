@@ -1,13 +1,24 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
+import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 
 const {
   POSTGRAPHILE_CONFIG = {
     graphqlUrl: 'http://localhost:5000/graphql',
     streamUrl: 'http://localhost:5000/_postgraphile/stream',
+    enhanceGraphiql: true,
   },
 } = window;
+
+const isValidJSON = json => {
+  try {
+    JSON.parse(json);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
@@ -18,6 +29,9 @@ class PostGraphiQL extends React.Component {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.
     schema: null,
+    showHeaderEditor: true, // REMOVE ME
+    headersText: '{\n"Authorization": null\n}\n',
+    headersTextValid: true,
   };
 
   componentDidMount() {
@@ -73,7 +87,19 @@ class PostGraphiQL extends React.Component {
    * Executes a GraphQL query with some extra information then the standard
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
-  async executeQuery(graphQLParams, { jwtToken } = {}) {
+  async executeQuery(graphQLParams) {
+    const { headersText } = this.state;
+    let extraHeaders;
+    try {
+      extraHeaders = JSON.parse(headersText);
+      for (const k in extraHeaders) {
+        if (extraHeaders[k] == null) {
+          delete extraHeaders[k];
+        }
+      }
+    } catch (e) {
+      // Do nothing
+    }
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: 'POST',
       headers: Object.assign(
@@ -81,11 +107,7 @@ class PostGraphiQL extends React.Component {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        jwtToken
-          ? {
-              Authorization: `Bearer ${jwtToken}`,
-            }
-          : {},
+        extraHeaders,
       ),
       credentials: 'same-origin',
       body: JSON.stringify(graphQLParams),
@@ -221,16 +243,137 @@ class PostGraphiQL extends React.Component {
     }
   }
 
+  getQueryEditor = () => {
+    return this.graphiql.getQueryEditor();
+  };
+
+  handlePrettifyQuery = () => {
+    const editor = this.getQueryEditor();
+    if (typeof window.prettier !== 'undefined' && typeof window.prettierPlugins !== 'undefined') {
+      // TODO: window.prettier.formatWithCursor
+      editor.setValue(
+        window.prettier.format(editor.getValue(), {
+          parser: 'graphql',
+          plugins: window.prettierPlugins,
+        }),
+      );
+    } else {
+      return this.graphiql.handlePrettifyQuery();
+    }
+  };
+
+  handleToggleHistory = e => {
+    this.graphiql.handleToggleHistory(e);
+  };
+
+  handlePostGraphile = () => {
+    window.open('https://graphile.org/postgraphile/', 'postgraphile');
+  };
+
+  handleDonate = () => {
+    window.open('https://graphile.org/donate', 'postgraphile');
+  };
+
+  handleToggleHeaders = () => {
+    this.setState({ showHeaderEditor: !this.state.showHeaderEditor });
+  };
+
   render() {
     const { schema } = this.state;
-    return (
-      <GraphiQL
-        ref={ref => (this.graphiql = ref)}
-        schema={schema}
-        fetcher={params => this.executeQuery(params)}
-      />
-    );
+    const sharedProps = {
+      ref: ref => {
+        this.graphiql = ref;
+      },
+      schema: schema,
+      fetcher: params => this.executeQuery(params),
+    };
+    if (!POSTGRAPHILE_CONFIG.enhanceGraphiql) {
+      return <GraphiQL {...sharedProps} />;
+    } else {
+      return (
+        <div className="postgraphiql-container">
+          <GraphiQL {...sharedProps}>
+            <GraphiQL.Logo>
+              PostGraph
+              <em>i</em>
+              QL
+            </GraphiQL.Logo>
+            <GraphiQL.Toolbar>
+              <GraphiQL.Button
+                onClick={this.handlePrettifyQuery}
+                title="Prettify Query (Shift-Ctrl-P)"
+                label="Prettify"
+              />
+              <GraphiQL.Button
+                onClick={this.handleToggleHistory}
+                title="Show History"
+                label="History"
+              />
+              <GraphiQL.Button
+                label="Headers"
+                title="Modify the headers to be sent with the requests"
+                onClick={this.handleToggleHeaders}
+              />
+              <GraphiQL.Button
+                label="PostGraphile"
+                title="Open PostGraphile documentation"
+                onClick={this.handlePostGraphile}
+              />
+              <GraphiQL.Button
+                label="Donate"
+                title="PostGraphile is supported by the community, please donate to fund ongoing development"
+                onClick={this.handleDonate}
+              />
+            </GraphiQL.Toolbar>
+          </GraphiQL>
+          <EditHeaders
+            open={this.state.showHeaderEditor}
+            value={this.state.headersText}
+            valid={this.state.headersTextValid}
+            onChange={e =>
+              this.setState({
+                headersText: e.target.value,
+                headersTextValid: isValidJSON(e.target.value),
+              })
+            }
+          >
+            <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
+              {'\u2715'}
+            </div>
+          </EditHeaders>
+        </div>
+      );
+    }
   }
+}
+
+function EditHeaders({ children, open, value, onChange, valid }) {
+  return (
+    <div
+      className="graphiql-container not-really"
+      style={{
+        display: open ? 'block' : 'none',
+        width: '300px',
+        flexBasis: '300px',
+      }}
+    >
+      <div className="docExplorerWrap">
+        <div className="doc-explorer">
+          <div className="doc-explorer-title-bar">
+            <div className="doc-explorer-title">Edit Headers</div>
+            <div className="doc-explorer-rhs">{children}</div>
+          </div>
+          <div className="doc-explorer-contents">
+            <textarea
+              value={value}
+              onChange={onChange}
+              style={valid ? {} : { backgroundColor: '#fdd' }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default PostGraphiQL;
