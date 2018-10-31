@@ -37,7 +37,7 @@ const isGraphQLNoughtPointWhatever = version[0] === '0';
 // Compatibility with GraphQL v14 vs v0.13.x
 const defaultFormatError = isGraphQLNoughtPointWhatever
   ? baseFormatError
-  : error => {
+  : (error: GraphQLError): any => {
       // TODO:v5: Remove this.
       const { extensions, ...rest } = baseFormatError(error);
       return {
