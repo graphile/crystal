@@ -144,7 +144,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       subpath,
     );
 
-  describe(name + (subpath ? ` (@${subpath})` : '') , () => {
+  describe(name + (subpath ? ` (@${subpath})` : ''), () => {
     test('will 404 for route other than that specified', async () => {
       const server1 = createServer();
       await request(server1)
