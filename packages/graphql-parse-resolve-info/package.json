@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphql-parse-resolve-info",
   "peerDependencies": {
-    "graphql": ">=0.9 <0.14"
+    "graphql": ">=0.9 <0.14 || ^14.0.2"
   },
   "devDependencies": {
     "@types/debug": "^0.0.30",
@@ -46,13 +46,10 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "@types/graphql": "^0.13.4",
+    "@types/graphql": "^14.0.3",
     "debug": ">=2 <3"
   },
-  "files": [
-    "node8plus",
-    "index.js"
-  ],
+  "files": ["node8plus", "index.js"],
   "engines": {
     "node": ">=8.6"
   }
