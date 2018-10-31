@@ -25,6 +25,7 @@
   box-sizing: border-box;
   overflow: auto;
   font-size: 1rem;
+  padding: 0.5rem;
 }
 
 .postgraphiql-container {
