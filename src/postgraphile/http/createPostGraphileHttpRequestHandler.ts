@@ -379,7 +379,7 @@ export default function createPostGraphileHttpRequestHandler(
     // on port 5783.
     if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
 
-    const { pathname = '' } = parseUrl(req) || {};
+    const { pathname = '' } = parseUrl.original(req) || {};
     const isGraphqlRoute = pathname === graphqlRoute;
 
     // ========================================================================
