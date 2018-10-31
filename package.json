@@ -44,7 +44,7 @@
     "prepack": "./scripts/build"
   },
   "dependencies": {
-    "@types/graphql": "^0.13.4",
+    "@types/graphql": "^14.0.3",
     "@types/jsonwebtoken": "<7.2.1",
     "@types/koa": "^2.0.44",
     "@types/pg": "^7.4.10",
@@ -106,23 +106,14 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": [
-      "<rootDir>/src"
-    ],
+    "testPathDirs": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "engines": {
     "node": ">=8.6"
   }
