@@ -44,7 +44,7 @@
     "prepack": "./scripts/build"
   },
   "dependencies": {
-    "@types/graphql": "^0.13.4",
+    "@types/graphql": "^14.0.3",
     "@types/jsonwebtoken": "<7.2.1",
     "@types/koa": "^2.0.44",
     "@types/pg": "^7.4.10",
@@ -54,7 +54,7 @@
     "css-loader": "1.0.0",
     "debug": "^2.3.3",
     "finalhandler": "^1.0.6",
-    "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0",
+    "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2",
     "http-errors": "^1.5.1",
     "jsonwebtoken": "^8.0.0",
     "lru-cache": ">=4 <5",
@@ -62,7 +62,7 @@
     "pg": ">=6.1.0 <8",
     "pg-connection-string": "^0.1.3",
     "pg-sql2": "^2.2.1",
-    "postgraphile-core": "4.1.0-alpha.1",
+    "postgraphile-core": "4.1.0-rc.0",
     "tslib": "^1.5.0"
   },
   "devDependencies": {
@@ -85,7 +85,6 @@
     "connect": "^3.5.0",
     "css-loader": "1.0.0",
     "express": "^4.14.0",
-    "graphiql": "^0.11.11",
     "html-webpack-inline-source-plugin": "^0.0.10",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^18.1.0",
@@ -94,9 +93,6 @@
     "nodemon": "^1.11.0",
     "pg-minify": "~0.5.3",
     "prettier": "^1.13.7",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "react-scripts": "^1.1.1",
     "source-map-support": "^0.4.6",
     "style-loader": "^0.23.0",
     "supertest": "^2.0.1",
@@ -110,23 +106,14 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": [
-      "<rootDir>/src"
-    ],
+    "testPathDirs": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "engines": {
     "node": ">=8.6"
   }

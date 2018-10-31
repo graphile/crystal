@@ -35,7 +35,7 @@ trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
-(sleep 1 && cd postgraphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null &
+(sleep 1 && cd postgraphiql && PORT=5783 node_modules/.bin/react-scripts start) > /dev/null &
 
 wait %1
 kill %2

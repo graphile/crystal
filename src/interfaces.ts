@@ -131,6 +131,9 @@ export interface PostGraphileOptions {
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
+  // Set this to `true` to add some enhancements to GraphiQL; intended for development usage only.
+  /* @middlewareOnly */
+  enhanceGraphiql?: boolean;
   // Enables some generous CORS settings for the GraphQL endpoint. There are
   // some costs associated when enabling this, if at all possible try to put
   // your API behind a reverse proxy.

@@ -13,6 +13,11 @@ async function main() {
 
   // Step 1: compile GraphiQL
   await new Promise((resolve, reject) => {
+    // Install the older version of GraphQL for GraphiQL
+    execSync('yarn', {
+      cwd: `${__dirname}/../postgraphiql`
+    });
+    // Webpack up everything
     webpack({
       mode: 'production',
       target: 'web',

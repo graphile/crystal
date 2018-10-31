@@ -46,6 +46,21 @@ import favicon from '../../assets/favicon.ico';
 import origGraphiqlHtml from '../../assets/graphiql.html';
 
 /**
+ * When writing JSON to the browser, we need to be careful that it doesn't get
+ * interpretted as HTML.
+ */
+const JS_ESCAPE_LOOKUP = {
+  '<': '\\u003c',
+  '>': '\\u003e',
+  '/': '\\u002f',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+function safeJSONStringify(obj: {}) {
+  return JSON.stringify(obj).replace(/[<>\/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
+}
+
+/**
  * When people webpack us up, e.g. for lambda, if they don't want GraphiQL then
  * they can seriously reduce bundle size by omitting the assets.
  */
@@ -251,9 +266,11 @@ export default function createPostGraphileHttpRequestHandler(
   const graphiqlHtml = origGraphiqlHtml
     ? origGraphiqlHtml.replace(
         /<\/head>/,
-        `  <script>window.POSTGRAPHILE_CONFIG={graphqlUrl:'${graphqlRoute}',streamUrl:${
-          options.watchPg ? "'/_postgraphile/stream'" : 'null'
-        }};</script>\n  </head>`,
+        `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
+          graphqlUrl: graphqlRoute,
+          streamUrl: options.watchPg ? '/_postgraphile/stream' : null,
+          enhanceGraphiql: options.enhanceGraphiql,
+        })};</script>\n  </head>`,
       )
     : null;
 
