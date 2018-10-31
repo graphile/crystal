@@ -330,12 +330,12 @@ program
 pluginHook('cli:flags:add:workarounds', addFlag);
 
 program.on('--help', () => {
-  console.log(`\
-  Get started:
+  console.log(`
+Get started:
 
-    $ postgraphile
-    $ postgraphile -c postgres://localhost/my_db
-    $ postgraphile --connection postgres://user:pass@localhost/my_db --schema my_schema --watch --dynamic-json
+  $ postgraphile
+  $ postgraphile -c postgres://localhost/my_db
+  $ postgraphile --connection postgres://user:pass@localhost/my_db --schema my_schema --watch --dynamic-json
 `);
   process.exit(0);
 });
