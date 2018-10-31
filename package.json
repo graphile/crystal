@@ -54,7 +54,7 @@
     "css-loader": "1.0.0",
     "debug": "^2.3.3",
     "finalhandler": "^1.0.6",
-    "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0",
+    "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2",
     "http-errors": "^1.5.1",
     "jsonwebtoken": "^8.0.0",
     "lru-cache": ">=4 <5",
@@ -110,23 +110,14 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "testPathDirs": [
-      "<rootDir>/src"
-    ],
+    "testPathDirs": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "engines": {
     "node": ">=8.6"
   }

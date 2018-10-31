@@ -4,7 +4,7 @@ import {
   parse as parseGraphql,
   validate as validateGraphql,
   execute as executeGraphql,
-  formatError as defaultFormatError,
+  formatError as baseFormatError,
   GraphQLError,
   GraphQLSchema,
   print as printGraphql,
@@ -30,6 +30,21 @@ import LRU = require('lru-cache');
 import crypto = require('crypto');
 import { Pool } from 'pg';
 import { EventEmitter } from 'events';
+import { version } from 'graphql/package.json'; // tslint:disable-line no-submodule-imports
+
+const isGraphQLNoughtPointWhatever = version[0] === '0';
+
+// Compatibility with GraphQL v14 vs v0.13.x
+const defaultFormatError = isGraphQLNoughtPointWhatever
+  ? baseFormatError
+  : error => {
+      // TODO:v5: Remove this.
+      const { extensions, ...rest } = baseFormatError(error);
+      return {
+        ...extensions,
+        ...rest,
+      };
+    };
 
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the

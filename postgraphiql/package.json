@@ -2,5 +2,8 @@
   "private": true,
   "name": "postgraphile-graphiql",
   "version": "1.0.0",
-  "homepage": "https://graphile.org/postgraphile/"
+  "homepage": "https://graphile.org/postgraphile/",
+  "dependencies": {
+    "graphql": "0.13.x"
+  }
 }
