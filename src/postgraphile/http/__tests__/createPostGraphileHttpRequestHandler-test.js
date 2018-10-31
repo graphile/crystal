@@ -151,8 +151,8 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .post('/x')
         .expect(404);
       if (subpath) {
-        const server1 = createServer({ graphqlRoute: '/graphql' });
-        await request(server1)
+        const server2 = createServer({ graphqlRoute: '/graphql' });
+        await request(server2)
           .post(`${subpath}/graphql`)
           .expect(404);
         const server3 = createServer({ graphqlRoute: `${subpath}/graphql` });
@@ -161,8 +161,8 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           .expect(404);
       }
 
-      const server2 = createServer({ graphqlRoute: `${subpath}/x` });
-      await request(server2)
+      const server4 = createServer({ graphqlRoute: `${subpath}/x` });
+      await request(server4)
         .post(`${subpath}/graphql`)
         .expect(404);
     });
