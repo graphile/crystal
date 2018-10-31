@@ -36,3 +36,21 @@
   overflow: hidden;
   margin: 0;
 }
+
+.postgraphile-footer {
+  height: 30px;
+  line-height: 30px;
+  overflow: hidden;
+  display: block;
+  align-items: center;
+  padding: 0 0 0 1rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.postgraphile-footer a {
+  text-decoration: none;
+  color: #3b5998;
+}
+.resultWrap {
+  width: 5rem;
+}

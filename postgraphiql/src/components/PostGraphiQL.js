@@ -29,7 +29,7 @@ class PostGraphiQL extends React.Component {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.
     schema: null,
-    showHeaderEditor: true, // REMOVE ME
+    showHeaderEditor: false,
     headersText: '{\n"Authorization": null\n}\n',
     headersTextValid: true,
   };
@@ -52,7 +52,7 @@ class PostGraphiQL extends React.Component {
             .then(() => console.log('PostGraphile: Schema updated')) // tslint:disable-line no-console
             .catch(error => console.error(error)); // tslint:disable-line no-console
         },
-        false,
+        false
       );
 
       // Add event listeners that just log things in the console.
@@ -63,13 +63,13 @@ class PostGraphiQL extends React.Component {
           console.log('PostGraphile: Listening for server sent events');
           this.updateSchema();
         },
-        false,
+        false
       );
       eventSource.addEventListener(
         'error',
         // tslint:disable-next-line no-console
         () => console.log('PostGraphile: Failed to connect to server'),
-        false,
+        false
       );
 
       // Store our event source so we can unsubscribe later.
@@ -107,7 +107,7 @@ class PostGraphiQL extends React.Component {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        extraHeaders,
+        extraHeaders
       ),
       credentials: 'same-origin',
       body: JSON.stringify(graphQLParams),
@@ -255,7 +255,7 @@ class PostGraphiQL extends React.Component {
         window.prettier.format(editor.getValue(), {
           parser: 'graphql',
           plugins: window.prettierPlugins,
-        }),
+        })
       );
     } else {
       return this.graphiql.handlePrettifyQuery();
@@ -294,9 +294,21 @@ class PostGraphiQL extends React.Component {
         <div className="postgraphiql-container">
           <GraphiQL {...sharedProps}>
             <GraphiQL.Logo>
-              PostGraph
-              <em>i</em>
-              QL
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div>
+                  <img
+                    src="https://www.graphile.org/images/postgraphile-tiny.optimized.svg"
+                    width="32"
+                    height="32"
+                    style={{ marginTop: '4px', marginRight: '0.5rem' }}
+                  />
+                </div>
+                <div>
+                  PostGraph
+                  <em>i</em>
+                  QL
+                </div>
+              </div>
             </GraphiQL.Logo>
             <GraphiQL.Toolbar>
               <GraphiQL.Button
@@ -314,17 +326,35 @@ class PostGraphiQL extends React.Component {
                 title="Modify the headers to be sent with the requests"
                 onClick={this.handleToggleHeaders}
               />
-              <GraphiQL.Button
-                label="PostGraphile"
-                title="Open PostGraphile documentation"
-                onClick={this.handlePostGraphile}
-              />
-              <GraphiQL.Button
-                label="Donate"
-                title="PostGraphile is supported by the community, please donate to fund ongoing development"
-                onClick={this.handleDonate}
-              />
             </GraphiQL.Toolbar>
+            <GraphiQL.Footer>
+              <div className="postgraphile-footer">
+                PostGraphile:{' '}
+                <a
+                  title="Open PostGraphile documentation"
+                  href="https://graphile.org/postgraphile/introduction/"
+                  target="new"
+                >
+                  Documentation
+                </a>{' '}
+                |{' '}
+                <a
+                  title="Open PostGraphile documentation"
+                  href="https://graphile.org/postgraphile/examples/"
+                  target="new"
+                >
+                  Examples
+                </a>{' '}
+                |{' '}
+                <a
+                  title="PostGraphile is supported by the community, please donate to fund ongoing development"
+                  href="https://graphile.org/donate"
+                  target="new"
+                >
+                  Support Development
+                </a>
+              </div>
+            </GraphiQL.Footer>
           </GraphiQL>
           <EditHeaders
             open={this.state.showHeaderEditor}
