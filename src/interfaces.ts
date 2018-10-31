@@ -147,7 +147,7 @@ export interface PostGraphileOptions {
   // [Experimental] Enable the middleware to process multiple GraphQL queries
   // in one request.
   /* @middlewareOnly */
-  enableQueryBatching?: string;
+  enableQueryBatching?: boolean;
   // The secret for your JSON web tokens. This will be used to verify tokens in
   // the `Authorization` header, and signing JWT tokens you return in
   // procedures.
