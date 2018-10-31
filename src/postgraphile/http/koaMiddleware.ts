@@ -29,6 +29,9 @@ export const middleware = async (
     }
   };
 
+  // In case you're using koa-mount or similar
+  ctx.req['originalUrl'] = ctx.request.originalUrl;
+
   // Execute our request handler. If an error is thrown, we don’t call
   // `next` with an error. Instead we return the promise and let `koa`
   // handle the error.

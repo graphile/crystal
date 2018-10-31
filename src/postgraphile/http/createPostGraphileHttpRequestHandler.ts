@@ -268,7 +268,7 @@ export default function createPostGraphileHttpRequestHandler(
         /<\/head>/,
         `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
           graphqlUrl: graphqlRoute,
-          streamUrl: options.watchPg ? '/_postgraphile/stream' : null,
+          streamUrl: options.watchPg ? `${graphqlRoute}/stream` : null,
           enhanceGraphiql: options.enhanceGraphiql,
         })};</script>\n  </head>`,
       )
@@ -379,7 +379,7 @@ export default function createPostGraphileHttpRequestHandler(
     // on port 5783.
     if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
 
-    const { pathname = '' } = parseUrl(req) || {};
+    const { pathname = '' } = parseUrl.original(req) || {};
     const isGraphqlRoute = pathname === graphqlRoute;
 
     // ========================================================================
@@ -422,7 +422,7 @@ export default function createPostGraphileHttpRequestHandler(
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === '/_postgraphile/stream') {
+      if (pathname === `${graphqlRoute}/stream` || pathname === '/_postgraphile/stream') {
         if (!options.watchPg || req.headers.accept !== 'text/event-stream') {
           res.statusCode = 405;
           res.end();
@@ -481,7 +481,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (options.watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', '/_postgraphile/stream');
+      res.setHeader('X-GraphQL-Event-Stream', `${graphqlRoute}/stream`);
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.

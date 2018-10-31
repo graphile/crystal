@@ -6,7 +6,7 @@ import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from
 const {
   POSTGRAPHILE_CONFIG = {
     graphqlUrl: 'http://localhost:5000/graphql',
-    streamUrl: 'http://localhost:5000/_postgraphile/stream',
+    streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
   },
 } = window;
