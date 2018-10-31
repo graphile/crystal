@@ -9,6 +9,7 @@ const express = require('express');
 const event = require('events');
 const compress = require('koa-compress');
 const koa = require('koa');
+const koaMount = require('koa-mount');
 
 const shortString = 'User_Running_These_Tests';
 // Default bodySizeLimit is 100kB
@@ -82,52 +83,94 @@ const serverCreators = new Map([
   ],
   [
     'connect',
-    handler => {
+    (handler, _options, subpath) => {
       const app = connect();
-      app.use(handler);
+      if (subpath) {
+        app.use(subpath, handler);
+      } else {
+        app.use(handler);
+      }
       return http.createServer(app);
     },
   ],
   [
     'express',
-    handler => {
+    (handler, _options, subpath) => {
       const app = express();
       app.use(handler);
+      if (subpath) {
+        app.use(subpath, handler);
+      } else {
+        app.use(handler);
+      }
       return http.createServer(app);
     },
   ],
 ]);
 
-serverCreators.set('koa', (handler, options = {}) => {
+serverCreators.set('koa', (handler, options = {}, subpath) => {
   const app = new koa();
   if (options.onPreCreate) options.onPreCreate(app);
-  app.use(handler);
+  if (subpath) {
+    app.use(koaMount(subpath, handler));
+  } else {
+    app.use(handler);
+  }
   return http.createServer(app.callback());
 });
 
+const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
+  toTest.push({ name, createServerFromHandler });
+  if (name !== 'http') {
+    toTest.push({ name, createServerFromHandler, subpath: '/path/to/mount' });
+  }
+}
+
+for (const { name, createServerFromHandler, subpath = '' } of toTest) {
   const createServer = (handlerOptions, serverOptions) =>
     createServerFromHandler(
-      createPostGraphileHttpRequestHandler(Object.assign({}, defaultOptions, handlerOptions)),
+      createPostGraphileHttpRequestHandler(
+        Object.assign(
+          {},
+          subpath
+            ? { graphqlRoute: `${subpath}/graphql`, graphiqlRoute: `${subpath}/graphiql` }
+            : null,
+          defaultOptions,
+          handlerOptions,
+        ),
+      ),
       serverOptions,
+      subpath,
     );
 
-  describe(name, () => {
+  describe(name + (subpath ? ` (@${subpath})` : '') , () => {
     test('will 404 for route other than that specified', async () => {
       const server1 = createServer();
-      const server2 = createServer({ graphqlRoute: '/x' });
       await request(server1)
         .post('/x')
         .expect(404);
+      if (subpath) {
+        const server1 = createServer({ graphqlRoute: '/graphql' });
+        await request(server1)
+          .post(`${subpath}/graphql`)
+          .expect(404);
+        const server3 = createServer({ graphqlRoute: `${subpath}/graphql` });
+        await request(server3)
+          .post(`/graphql`)
+          .expect(404);
+      }
+
+      const server2 = createServer({ graphqlRoute: `${subpath}/x` });
       await request(server2)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .expect(404);
     });
 
     test('will respond to queries on a different route', async () => {
-      const server = createServer({ graphqlRoute: '/x' });
+      const server = createServer({ graphqlRoute: `${subpath}/x` });
       await request(server)
-        .post('/x')
+        .post(`${subpath}/x`)
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -137,7 +180,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
       const server = createServer({ enableCors: true });
       await request(server)
-        .options('/graphql')
+        .options(`${subpath}/graphql`)
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
@@ -148,7 +191,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will always respond to any request with CORS headers when enabled', async () => {
       const server = createServer({ enableCors: true });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization, X-Apollo-Tracing/);
@@ -157,15 +200,15 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will not allow requests other than POST', async () => {
       const server = createServer();
       await request(server)
-        .get('/graphql')
+        .get(`${subpath}/graphql`)
         .expect(405)
         .expect('Allow', 'POST, OPTIONS');
       await request(server)
-        .delete('/graphql')
+        .delete(`${subpath}/graphql`)
         .expect(405)
         .expect('Allow', 'POST, OPTIONS');
       await request(server)
-        .put('/graphql')
+        .put(`${subpath}/graphql`)
         .expect(405)
         .expect('Allow', 'POST, OPTIONS');
     });
@@ -173,7 +216,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will run a query on a POST request with JSON data', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/json')
         .send(
           JSON.stringify({
@@ -189,7 +232,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will throw error if there's too much JSON data", async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/json')
         .send(
           JSON.stringify({
@@ -203,7 +246,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will not throw error if there's lots of JSON data and a high limit", async () => {
       const server = createServer({ bodySizeLimit: '1MB' });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/json')
         .send(
           JSON.stringify({
@@ -219,7 +262,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will run a query on a POST request with form data', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(shortString)})}`)}`)
         .expect(200)
@@ -230,7 +273,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will throw error if there's too much form data", async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(veryLongString)})}`)}`)
         .expect(413);
@@ -239,7 +282,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will not throw error if there's lots of form data and a high limit", async () => {
       const server = createServer({ bodySizeLimit: '1MB' });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(`query=${encodeURIComponent(`{greetings(name: ${JSON.stringify(veryLongString)})}`)}`)
         .expect(200)
@@ -250,7 +293,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will run a query on a POST request with GraphQL data', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/graphql')
         .send(`{greetings(name:${JSON.stringify(shortString)})}`)
         .expect(200)
@@ -261,7 +304,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will throw error if there's too much GraphQL data", async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/graphql')
         .send(`{greetings(name:${JSON.stringify(veryLongString)})}`)
         .expect(413);
@@ -270,7 +313,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test("will not throw error if there's lots of GraphQL data and a high limit", async () => {
       const server = createServer({ bodySizeLimit: '1MB' });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/graphql')
         .send(`{greetings(name:${JSON.stringify(veryLongString)})}`)
         .expect(200)
@@ -281,7 +324,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will error if query parse fails', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{' })
         .expect(400)
         .expect('Content-Type', /json/)
@@ -298,7 +341,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will error if validation fails', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{notFound}' })
         .expect(400)
         .expect('Content-Type', /json/)
@@ -315,7 +358,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will allow mutations with POST', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: 'mutation {hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -329,7 +372,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.release.mockClear();
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -345,7 +388,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.release.mockClear();
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: 'mutation{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -363,7 +406,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         pgDefaultRole: 'bob',
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{query}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -391,7 +434,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const pgDefaultRole = 'pg_default_role';
       const server = createServer({ jwtSecret, pgDefaultRole });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{query}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -419,7 +462,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const pgDefaultRole = 'pg_default_role';
       const server = createServer({ jwtSecret, pgDefaultRole });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         /*
           {
             "aud": "postgraphile",
@@ -479,7 +522,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will respect an operation name', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({
           query: 'query A { a: hello } query B { b: hello }',
           operationName: 'A',
@@ -488,7 +531,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { a: 'world' } });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({
           query: 'query A { a: hello } query B { b: hello }',
           operationName: 'B',
@@ -501,7 +544,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will use variables', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({
           query: 'query A($name: String!) { greetings(name: $name) }',
           variables: JSON.stringify({ name: 'Joe' }),
@@ -511,7 +554,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         .expect('Content-Type', /json/)
         .expect({ data: { greetings: 'Hello, Joe!' } });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .send(
           `operationName=A&query=${encodeURIComponent(
@@ -526,7 +569,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will ignore empty string variables', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}', variables: '' })
         .expect(200)
         .expect({ data: { hello: 'world' } });
@@ -535,7 +578,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will error with variables of the incorrect type', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}', variables: 2 })
         .expect(400)
         .expect({
@@ -546,7 +589,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
     test('will error with an operation name of the incorrect type', async () => {
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}', operationName: 2 })
         .expect(400)
         .expect({
@@ -560,7 +603,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       pgClient.release.mockClear();
       const server = createServer();
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -584,7 +627,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         extendedErrors: ['hint', 'detail', 'errcode'],
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -618,7 +661,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         },
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -647,7 +690,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         },
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(401, {
           errors: [
@@ -661,36 +704,39 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         });
     });
 
-    test('will serve a favicon when graphiql is enabled', async () => {
-      const server1 = createServer({ graphiql: true });
-      const server2 = createServer({ graphiql: true, route: '/graphql' });
-      await request(server1)
-        .get('/favicon.ico')
-        .expect(200)
-        .expect('Cache-Control', 'public, max-age=86400')
-        .expect('Content-Type', 'image/x-icon');
-      await request(server2)
-        .get('/favicon.ico')
-        .expect(200)
-        .expect('Cache-Control', 'public, max-age=86400')
-        .expect('Content-Type', 'image/x-icon');
-    });
+    if (!subpath) {
+      test('will serve a favicon when graphiql is enabled', async () => {
+        const server1 = createServer({ graphiql: true });
+        const server2 = createServer({ graphiql: true, route: `${subpath}/graphql` });
+        await request(server1)
+          .get('/favicon.ico')
+          .expect(200)
+          .expect('Cache-Control', 'public, max-age=86400')
+          .expect('Content-Type', 'image/x-icon');
+        await request(server2)
+          .get('/favicon.ico')
+          .expect(200)
+          .expect('Cache-Control', 'public, max-age=86400')
+          .expect('Content-Type', 'image/x-icon');
+      });
+    }
 
     test('will not serve a favicon when graphiql is disabled', async () => {
       const server1 = createServer({ graphiql: false });
-      const server2 = createServer({ graphiql: false, route: '/graphql' });
       await request(server1)
-        .get('/favicon.ico')
+        .get(`/favicon.ico`)
         .expect(404);
-      await request(server2)
-        .get('/favicon.ico')
-        .expect(404);
+      if (subpath) {
+        await request(server1)
+          .get(`${subpath}/favicon.ico`)
+          .expect(404);
+      }
     });
 
     test('will not allow if no text/event-stream headers are set', async () => {
       const server = createServer({ graphiql: true });
       await request(server)
-        .get('/_postgraphile/stream')
+        .get(`${subpath}/graphql/stream`)
         .expect(405);
     });
 
@@ -698,30 +744,30 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       const server1 = createServer();
       const server2 = createServer({ graphiql: true });
       await request(server1)
-        .get('/graphiql')
+        .get(`${subpath}/graphiql`)
         .expect(404);
       await request(server2)
-        .get('/graphiql')
+        .get(`${subpath}/graphiql`)
         .expect(200)
         .expect('Content-Type', 'text/html; charset=utf-8');
     });
 
     test('will render GraphiQL on another route if desired', async () => {
-      const server1 = createServer({ graphiqlRoute: '/x' });
-      const server2 = createServer({ graphiql: true, graphiqlRoute: '/x' });
-      const server3 = createServer({ graphiql: false, graphiqlRoute: '/x' });
+      const server1 = createServer({ graphiqlRoute: `${subpath}/x` });
+      const server2 = createServer({ graphiql: true, graphiqlRoute: `${subpath}/x` });
+      const server3 = createServer({ graphiql: false, graphiqlRoute: `${subpath}/x` });
       await request(server1)
-        .get('/x')
+        .get(`${subpath}/x`)
         .expect(404);
       await request(server2)
-        .get('/x')
+        .get(`${subpath}/x`)
         .expect(200)
         .expect('Content-Type', 'text/html; charset=utf-8');
       await request(server3)
-        .get('/x')
+        .get(`${subpath}/x`)
         .expect(404);
       await request(server3)
-        .get('/graphiql')
+        .get(`${subpath}/graphiql`)
         .expect(404);
     });
 
@@ -742,7 +788,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       };
       try {
         await request(server)
-          .post('/graphql')
+          .post(`${subpath}/graphql`)
           .send({ query: '{hello}' })
           .expect(500);
       } finally {
@@ -761,7 +807,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         },
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -791,7 +837,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
         }),
       });
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -832,7 +878,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       });
 
       await request(server)
-        .post('/graphql')
+        .post(`${subpath}/graphql`)
         .send({ query: '{hello}' })
         .expect(200)
         .expect('Content-Type', /json/)
@@ -863,7 +909,7 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
       test('koa serves & compresses graphiql route', async () => {
         const server = createKoaCompressionServer();
         await request(server)
-          .get('/graphiql')
+          .get(`${subpath}/graphiql`)
           .expect(200)
           .expect('Content-Encoding', /gzip/);
       });
