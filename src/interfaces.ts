@@ -187,9 +187,10 @@ export interface PostGraphileOptions {
   /* @middlewareOnly */
   disableQueryLog?: boolean;
   // A plain object specifying custom config values to set in the PostgreSQL
-  // transaction (accessed via `current_setting('my.custom.setting')`) or a
-  // function which will return the same (or a Promise to the same) based on
-  // the incoming web request (e.g. to extract session data).
+  // transaction (accessed via `current_setting('my.custom.setting')`) **or**
+  // an (optionally asynchronous) function which will return the same (or a
+  // Promise to the same) based on the incoming web request (e.g. to extract
+  // session data).
   /* @middlewareOnly */
   pgSettings?:
     | { [key: string]: mixed }
