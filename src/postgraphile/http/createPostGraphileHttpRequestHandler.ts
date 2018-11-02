@@ -23,7 +23,7 @@ import { Context as KoaContext } from 'koa';
 import chalk = require('chalk');
 import Debugger = require('debug'); // tslint:disable-line variable-name
 import httpError = require('http-errors');
-import parseUrl = require('parseurl');
+import parseUrlModule = require('parseurl');
 import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import LRU = require('lru-cache');
@@ -177,6 +177,7 @@ export default function createPostGraphileHttpRequestHandler(
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
   const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null;
+  const parseUrl = options.absoluteRoutes ? parseUrlModule.original : parseUrlModule;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -379,7 +380,7 @@ export default function createPostGraphileHttpRequestHandler(
     // on port 5783.
     if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
 
-    const { pathname = '' } = parseUrl.original(req) || {};
+    const { pathname = '' } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === graphqlRoute;
 
     // ========================================================================

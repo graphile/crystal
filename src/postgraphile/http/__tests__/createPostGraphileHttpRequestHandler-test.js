@@ -6,7 +6,6 @@ const http = require('http');
 const request = require('supertest');
 const connect = require('connect');
 const express = require('express');
-const event = require('events');
 const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
@@ -36,7 +35,7 @@ const gqlSchema = new GraphQLSchema({
       },
       testError: {
         type: GraphQLString,
-        resolve: (source, args, context) => {
+        resolve: () => {
           const err = new Error('test message');
           err.detail = 'test detail';
           err.hint = 'test hint';
@@ -134,7 +133,11 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         Object.assign(
           {},
           subpath
-            ? { graphqlRoute: `${subpath}/graphql`, graphiqlRoute: `${subpath}/graphiql` }
+            ? {
+                graphqlRoute: `${subpath}/graphql`,
+                graphiqlRoute: `${subpath}/graphiql`,
+                absoluteRoutes: true,
+              }
             : null,
           defaultOptions,
           handlerOptions,
@@ -176,6 +179,18 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } });
     });
+
+    if (subpath) {
+      test('will respond to queries on a different route with absoluteRoutes=false', async () => {
+        const server = createServer({ graphqlRoute: `/x`, absoluteRoutes: false });
+        await request(server)
+          .post(`${subpath}/x`)
+          .send({ query: '{hello}' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect({ data: { hello: 'world' } });
+      });
+    }
 
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
       const server = createServer({ enableCors: true });

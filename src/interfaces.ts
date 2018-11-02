@@ -128,6 +128,14 @@ export interface PostGraphileOptions {
   // `true`). Defaults to `/graphiql`.
   /* @middlewareOnly */
   graphiqlRoute?: string;
+  // Always set this to true; it's only false by default to avoid a breaking
+  // change. Tells us to use `req.originalUrl` rather than `req.url` when
+  // processing `graphqlRoute` / `graphiqlRoute` which is necessary for asset
+  // loading to work if you mount postgraphile under a path (e.g.
+  // `app.use('/path/to', postgraphile(...))`), which is not officially
+  // supported.  Will be true by default in v5.
+  /* @middlewareOnly */
+  absoluteRoutes?: boolean;
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
@@ -187,9 +195,10 @@ export interface PostGraphileOptions {
   /* @middlewareOnly */
   disableQueryLog?: boolean;
   // A plain object specifying custom config values to set in the PostgreSQL
-  // transaction (accessed via `current_setting('my.custom.setting')`) or a
-  // function which will return the same (or a Promise to the same) based on
-  // the incoming web request (e.g. to extract session data).
+  // transaction (accessed via `current_setting('my.custom.setting')`) **or**
+  // an (optionally asynchronous) function which will return the same (or a
+  // Promise to the same) based on the incoming web request (e.g. to extract
+  // session data).
   /* @middlewareOnly */
   pgSettings?:
     | { [key: string]: mixed }
