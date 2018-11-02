@@ -140,11 +140,11 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               }
             : null,
           defaultOptions,
-          handlerOptions
-        )
+          handlerOptions,
+        ),
       ),
       serverOptions,
-      subpath
+      subpath,
     );
 
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
@@ -179,6 +179,18 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'world' } });
     });
+
+    if (subpath) {
+      test('will respond to queries on a different route with absoluteRoutes=false', async () => {
+        const server = createServer({ graphqlRoute: `/x`, absoluteRoutes: false });
+        await request(server)
+          .post(`${subpath}/x`)
+          .send({ query: '{hello}' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect({ data: { hello: 'world' } });
+      });
+    }
 
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
       const server = createServer({ enableCors: true });
@@ -225,7 +237,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: shortString },
-          })
+          }),
         )
         .expect(200)
         .expect('Content-Type', /json/)
@@ -241,7 +253,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          })
+          }),
         )
         .expect(413);
     });
@@ -255,7 +267,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          })
+          }),
         )
         .expect(200)
         .expect('Content-Type', /json/)
