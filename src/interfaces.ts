@@ -128,6 +128,14 @@ export interface PostGraphileOptions {
   // `true`). Defaults to `/graphiql`.
   /* @middlewareOnly */
   graphiqlRoute?: string;
+  // Always set this to true; it's only false by default to avoid a breaking
+  // change. Tells us to use `req.originalUrl` rather than `req.url` when
+  // processing `graphqlRoute` / `graphiqlRoute` which is necessary for asset
+  // loading to work if you mount postgraphile under a path (e.g.
+  // `app.use('/path/to', postgraphile(...))`), which is not officially
+  // supported.  Will be true by default in v5.
+  /* @middlewareOnly */
+  absoluteRoutes?: boolean;
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;

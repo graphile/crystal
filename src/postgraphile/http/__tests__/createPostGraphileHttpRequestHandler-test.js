@@ -6,7 +6,6 @@ const http = require('http');
 const request = require('supertest');
 const connect = require('connect');
 const express = require('express');
-const event = require('events');
 const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
@@ -36,7 +35,7 @@ const gqlSchema = new GraphQLSchema({
       },
       testError: {
         type: GraphQLString,
-        resolve: (source, args, context) => {
+        resolve: () => {
           const err = new Error('test message');
           err.detail = 'test detail';
           err.hint = 'test hint';
@@ -134,14 +133,18 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         Object.assign(
           {},
           subpath
-            ? { graphqlRoute: `${subpath}/graphql`, graphiqlRoute: `${subpath}/graphiql` }
+            ? {
+                graphqlRoute: `${subpath}/graphql`,
+                graphiqlRoute: `${subpath}/graphiql`,
+                absoluteRoutes: true,
+              }
             : null,
           defaultOptions,
-          handlerOptions,
-        ),
+          handlerOptions
+        )
       ),
       serverOptions,
-      subpath,
+      subpath
     );
 
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
@@ -222,7 +225,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: shortString },
-          }),
+          })
         )
         .expect(200)
         .expect('Content-Type', /json/)
@@ -238,7 +241,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          }),
+          })
         )
         .expect(413);
     });
@@ -252,7 +255,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           JSON.stringify({
             query: 'query GreetingsQuery($name: String!) {greetings(name: $name)}',
             variables: { name: veryLongString },
-          }),
+          })
         )
         .expect(200)
         .expect('Content-Type', /json/)
