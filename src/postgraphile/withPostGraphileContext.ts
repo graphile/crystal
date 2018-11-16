@@ -309,6 +309,9 @@ async function getSettingsForPgClientTransaction({
       if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
         if (key === 'role') {
           role = String(pgSettings[key]);
+        } else if (key.startsWith('jwt.claims.')) {
+          // strip 'jwt.claims.' part (11 symbols)
+          jwtClaims[key.substring(11)] = String(pgSettings[key]);
         } else {
           localSettings.push([key, String(pgSettings[key])]);
         }
@@ -339,7 +342,7 @@ async function getSettingsForPgClientTransaction({
   return {
     localSettings,
     role,
-    jwtClaims: jwtToken ? jwtClaims : null,
+    jwtClaims: jwtClaims,
   };
 }
 
