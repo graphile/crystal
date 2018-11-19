@@ -182,7 +182,7 @@ comment on function forum_example.authenticate(text, text) is 'Creates a JWT tok
 create function forum_example.current_person() returns forum_example.person as $$
   select *
   from forum_example.person
-  where id = current_setting('jwt.claims.person_id', true)::integer
+  where id = nullif(current_setting('jwt.claims.person_id', true), '')::integer
 $$ language sql stable;
 
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
