@@ -10,9 +10,9 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 ## Leaders
 
 * Joe Dennis
+* MissionMode
 * Alec Wenzowski
 * James Allain
-* MissionMode
 * DOMONDA
 * Gustin Prudner
 
@@ -20,10 +20,11 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 
 * Mtpc
 * Clay Smith
-* Matt Bretl (also a major community contributor!)
 * Michael Tng
+* Matt Bretl (also a major community contributor!)
 * Bureau Moelijke Dingen
 * Centre for Effective Altruism
+* Sam Levin
 * James Rascoe
 * Gardner Bickford
 * Michel Pelletier
@@ -31,3 +32,5 @@ sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
 * Jimmy McBroom
 * stlbucket
 * Tim Field
+* Andreas
+* James Cavanaugh
