@@ -2007,6 +2007,61 @@ Object {
 }
 `;
 
+exports[`orderByNullsLast.graphql 1`] = `
+Object {
+  "data": Object {
+    "asc": Object {
+      "nodes": Array [
+        Object {
+          "col2": 1,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiw1XQ==",
+        },
+        Object {
+          "col2": 4,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwzXQ==",
+        },
+        Object {
+          "col2": 6,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwxXQ==",
+        },
+        Object {
+          "col2": null,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+        },
+        Object {
+          "col2": null,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiw0XQ==",
+        },
+      ],
+    },
+    "desc": Object {
+      "nodes": Array [
+        Object {
+          "col2": 6,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwxXQ==",
+        },
+        Object {
+          "col2": 4,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwzXQ==",
+        },
+        Object {
+          "col2": 1,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiw1XQ==",
+        },
+        Object {
+          "col2": null,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+        },
+        Object {
+          "col2": null,
+          "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiw0XQ==",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`posts.graphql 1`] = `
 Object {
   "data": Object {

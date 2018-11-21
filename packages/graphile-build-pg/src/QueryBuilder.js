@@ -66,7 +66,7 @@ class QueryBuilder {
       lower: Array<SQLGen>,
       upper: Array<SQLGen>,
     },
-    orderBy: Array<[SQLGen, boolean]>,
+    orderBy: Array<[SQLGen, boolean, boolean]>,
     orderIsUnique: boolean,
     limit: ?NumberGen,
     offset: ?NumberGen,
@@ -88,7 +88,7 @@ class QueryBuilder {
       lower: Array<SQL>,
       upper: Array<SQL>,
     },
-    orderBy: Array<[SQL, boolean]>,
+    orderBy: Array<[SQL, boolean, boolean]>,
     orderIsUnique: boolean,
     limit: ?number,
     offset: ?number,
@@ -236,9 +236,9 @@ class QueryBuilder {
   setOrderIsUnique() {
     this.data.orderIsUnique = true;
   }
-  orderBy(exprGen: SQLGen, ascending: boolean = true) {
+  orderBy(exprGen: SQLGen, ascending: boolean = true, nullsFirst: boolean) {
     this.checkLock("orderBy");
-    this.data.orderBy.push([exprGen, ascending]);
+    this.data.orderBy.push([exprGen, ascending, nullsFirst]);
   }
   limit(limitGen: NumberGen) {
     this.checkLock("limit");
@@ -473,11 +473,17 @@ class QueryBuilder {
         this.compiledData.orderBy.length
           ? sql.fragment`order by ${sql.join(
               this.compiledData.orderBy.map(
-                ([expr, ascending]) =>
+                ([expr, ascending, nullsFirst]) =>
                   sql.fragment`${expr} ${
                     Number(ascending) ^ Number(flip)
                       ? sql.fragment`ASC`
                       : sql.fragment`DESC`
+                  }${
+                    nullsFirst === true
+                      ? sql.fragment` NULLS FIRST`
+                      : nullsFirst === false
+                        ? sql.fragment` NULLS LAST`
+                        : null
                   }`
               ),
               ","
@@ -554,9 +560,10 @@ class QueryBuilder {
       }, []);
     } else if (type === "orderBy") {
       const context = getContext();
-      this.compiledData[type] = this.data[type].map(([a, b]) => [
+      this.compiledData[type] = this.data[type].map(([a, b, c]) => [
         callIfNecessary(a, context),
         b,
+        c,
       ]);
     } else if (type === "from") {
       if (this.data.from) {

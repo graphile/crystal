@@ -42,6 +42,7 @@ beforeAll(() => {
       viewUniqueKey,
       dSchema,
       simpleCollections,
+      orderByNullsLast,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
@@ -61,6 +62,11 @@ beforeAll(() => {
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         simpleCollections: "both",
       }),
+      createPostGraphileSchema(pgClient, ["a"], {
+        graphileBuildOptions: {
+          orderByNullsLast: true,
+        },
+      }),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -78,6 +84,7 @@ beforeAll(() => {
       viewUniqueKey,
       dSchema,
       simpleCollections,
+      orderByNullsLast,
       rbac,
     };
   });
@@ -119,6 +126,7 @@ beforeAll(() => {
             "simple-procedure-computed-fields.graphql":
               gqlSchemas.simpleCollections,
             "simple-procedure-query.graphql": gqlSchemas.simpleCollections,
+            "orderByNullsLast.graphql": gqlSchemas.orderByNullsLast,
           };
           let gqlSchema = schemas[fileName];
           if (!gqlSchema) {
