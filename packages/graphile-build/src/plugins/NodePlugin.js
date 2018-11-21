@@ -70,7 +70,7 @@ export default (function NodePlugin(
           getTypeAndIdentifiersFromNodeId(nodeId) {
             const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
             return {
-              Type: this.getTypeByName(nodeTypeNameByAlias[alias] || alias),
+              Type: this.getNodeType(alias),
               identifiers,
             };
           },

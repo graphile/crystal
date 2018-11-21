@@ -2,8 +2,6 @@
 import type { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
 
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
-
 export default (async function PgRowNode(builder) {
   builder.hook("GraphQLObjectType", (object, build, context) => {
     const {
@@ -78,13 +76,13 @@ export default (async function PgRowNode(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       nodeIdFieldName,
+      getTypeAndIdentifiersFromNodeId,
       extend,
       parseResolveInfo,
       pgGetGqlTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
       gql2pg,
-      getNodeType,
       graphql: { GraphQLNonNull, GraphQLID },
       inflection,
       pgQueryFromResolveData: queryFromResolveData,
@@ -143,11 +141,11 @@ export default (async function PgRowNode(builder) {
                     async resolve(parent, args, { pgClient }, resolveInfo) {
                       const nodeId = args[nodeIdFieldName];
                       try {
-                        const [alias, ...identifiers] = JSON.parse(
-                          base64Decode(nodeId)
-                        );
-                        const NodeTypeByAlias = getNodeType(alias);
-                        if (NodeTypeByAlias !== TableType) {
+                        const {
+                          Type,
+                          identifiers,
+                        } = getTypeAndIdentifiersFromNodeId(nodeId);
+                        if (Type !== TableType) {
                           throw new Error("Mismatched type");
                         }
                         if (identifiers.length !== primaryKeys.length) {

@@ -3,7 +3,6 @@ import type { Plugin } from "graphile-build";
 import debugFactory from "debug";
 
 const debug = debugFactory("graphile-build-pg");
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
 
 export default (async function PgMutationUpdateDeletePlugin(
   builder,
@@ -17,6 +16,7 @@ export default (async function PgMutationUpdateDeletePlugin(
     const {
       newWithHooks,
       getNodeIdForTypeAndIdentifiers,
+      getTypeAndIdentifiersFromNodeId,
       nodeIdFieldName,
       fieldDataGeneratorsByType,
       extend,
@@ -27,7 +27,6 @@ export default (async function PgMutationUpdateDeletePlugin(
       pgGetGqlInputTypeByTypeIdAndModifier,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgSql: sql,
-      getNodeType,
       graphql: {
         GraphQLNonNull,
         GraphQLInputObjectType,
@@ -362,11 +361,11 @@ export default (async function PgMutationUpdateDeletePlugin(
                           ) {
                             const nodeId = input[nodeIdFieldName];
                             try {
-                              const [alias, ...identifiers] = JSON.parse(
-                                base64Decode(nodeId)
-                              );
-                              const NodeTypeByAlias = getNodeType(alias);
-                              if (NodeTypeByAlias !== TableType) {
+                              const {
+                                Type,
+                                identifiers,
+                              } = getTypeAndIdentifiersFromNodeId(nodeId);
+                              if (Type !== TableType) {
                                 throw new Error("Mismatched type");
                               }
                               if (identifiers.length !== primaryKeys.length) {
