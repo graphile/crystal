@@ -330,10 +330,13 @@ export default (function PgBackwardRelationPlugin(
                           return data[safeAlias];
                         }
                       },
-                      deprecationReason: isDeprecated
-                        ? // $FlowFixMe
-                          `Please use ${singleRelationFieldName} instead`
-                        : undefined,
+                      ...(isDeprecated
+                        ? {
+                            deprecationReason:
+                              // $FlowFixMe
+                              `Please use ${singleRelationFieldName} instead`,
+                          }
+                        : null),
                     };
                   },
                   {
