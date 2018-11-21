@@ -2630,6 +2630,8 @@ type Person implements Node {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
+
+  \\"\\"\\"@deprecated This is deprecated.\\"\\"\\"
   exists(email: Email): Boolean
   firstName: String
   firstPost: Post
@@ -2835,7 +2837,10 @@ input PersonPatch {
   site: WrappedUrlInput
 }
 
-\\"\\"\\"Tracks the person's secret\\"\\"\\"
+\\"\\"\\"
+@deprecated This is deprecated.
+Tracks the person's secret
+\\"\\"\\"
 type PersonSecret implements Node {
   \\"\\"\\"
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -3140,7 +3145,7 @@ type Query implements Node {
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection
 
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  \\"\\"\\"@deprecated This is deprecated.\\"\\"\\"
   badlyBehavedFunction(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor

@@ -1803,7 +1803,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: PostWithSuffixInput!
-  ): PostWithSuffixPayload
+  ): PostWithSuffixPayload @deprecated(reason: \\"This is deprecated.\\")
   returnVoidMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

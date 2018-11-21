@@ -1699,7 +1699,7 @@ type Person implements Node {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
-  exists(email: Email): Boolean
+  exists(email: Email): Boolean @deprecated(reason: \\"This is deprecated.\\")
   firstName: String
   firstPost: Post
 
@@ -1769,7 +1769,7 @@ type Person implements Node {
   nodeId: ID!
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
-  personSecretByPersonId: PersonSecret
+  personSecretByPersonId: PersonSecret @deprecated(reason: \\"This is deprecated.\\")
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
   personSecretsByPersonId(
@@ -1798,7 +1798,7 @@ type Person implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection! @deprecated(reason: \\"Please use personSecretByPersonId instead\\")
+  ): PersonSecretsConnection! @deprecated(reason: \\"This is deprecated.\\")
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
@@ -2135,7 +2135,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection
+  ): PersonSecretsConnection @deprecated(reason: \\"This is deprecated.\\")
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   badlyBehavedFunction(
@@ -2156,7 +2156,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection! @deprecated(reason: \\"This is deprecated.\\")
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -2392,7 +2392,7 @@ type Query implements Node {
     The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
     \\"\\"\\"
     nodeId: ID!
-  ): PersonSecret
+  ): PersonSecret @deprecated(reason: \\"This is deprecated.\\")
   personSecretByPersonId(personId: Int!): PersonSecret
 
   \\"\\"\\"
