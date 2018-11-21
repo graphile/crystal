@@ -16,6 +16,7 @@ import debugFactory from "debug";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
 import LRUCache from "lru-cache";
+import semver from "semver";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
 import swallowError from "./swallowError";
 import resolveNode from "./resolveNode";
@@ -249,6 +250,15 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
 
   return {
     graphileBuildVersion: version,
+    versions: {
+      graphql: require("graphql/package.json").version,
+      "graphile-build": version,
+    },
+    hasVersion(packageName: string, range: string): boolean {
+      const packageVersion = this.versions[packageName];
+      if (!packageVersion) return false;
+      return semver.satisfies(packageVersion, range);
+    },
     graphql,
     parseResolveInfo,
     simplifyParsedResolveInfoFragmentWithType,

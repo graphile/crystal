@@ -326,6 +326,7 @@ export default (function PgBasicsPlugin(
     pgOmit = omitUnindexed(pgOmit);
   }
   builder.hook("build", build => {
+    build.versions["graphile-build-pg"] = version;
     return build.extend(build, {
       graphileBuildPgVersion: version,
       pgSql: sql,
