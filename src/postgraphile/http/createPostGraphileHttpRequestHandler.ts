@@ -491,6 +491,8 @@ export default function createPostGraphileHttpRequestHandler(
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
 
         // End early if the method is `HEAD`.
         if (req.method === 'HEAD') {
