@@ -196,6 +196,16 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       });
     }
 
+    test("infers externalUrlBase when it's not specified", async () => {
+      const server = createServer({ externalUrlBase: undefined });
+      await request(server)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } });
+    });
+
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
       const server = createServer({ enableCors: true });
       await request(server)
