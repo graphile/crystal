@@ -516,7 +516,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (options.watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${graphqlRoute}/stream`);
+      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${graphqlRoute}/stream`);
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.

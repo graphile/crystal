@@ -781,6 +781,20 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', 'text/html; charset=utf-8');
     });
 
+    test('will set X-GraphQL-Event-Stream if watch enabled', async () => {
+      const server1 = createServer();
+      const server2 = createServer({ watchPg: true });
+      const res1 = await request(server1)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' });
+      expect(res1.headers['x-graphql-event-stream']).toBeFalsy();
+      await request(server2)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('X-GraphQL-Event-Stream', `${subpath}/graphql/stream`);
+    });
+
     test('will render GraphiQL on another route if desired', async () => {
       const server1 = createServer({ graphiqlRoute: `/x` });
       const server2 = createServer({ graphiql: true, graphiqlRoute: `/x` });
