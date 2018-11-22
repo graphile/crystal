@@ -128,14 +128,18 @@ export interface PostGraphileOptions {
   // `true`). Defaults to `/graphiql`.
   /* @middlewareOnly */
   graphiqlRoute?: string;
-  // Always set this to true; it's only false by default to avoid a breaking
-  // change. Tells us to use `req.originalUrl` rather than `req.url` when
-  // processing `graphqlRoute` / `graphiqlRoute` which is necessary for asset
-  // loading to work if you mount postgraphile under a path (e.g.
-  // `app.use('/path/to', postgraphile(...))`), which is not officially
-  // supported.  Will be true by default in v5.
+  // If you are using watch mode, or have enabled GraphiQL, and you either
+  // mount PostGraphile under a path, or use PostGraphile behind some kind of
+  // proxy that puts PostGraphile under a subpath (or both!) then you must
+  // specify this setting so that PostGraphile can figure out it's external
+  // URL.
+  // (e.g. if you do `app.use('/path/to', postgraphile(...))`), which is not
+  // officially supported, then you should pass `externalUrlBase: '/path/to'`.)
+  // This setting should never end in a slash (`/`). To specify that the
+  // external URL is the expected one, either omit this setting or set it to the
+  // empty string `''`.
   /* @middlewareOnly */
-  absoluteRoutes?: boolean;
+  externalUrlBase?: string;
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
