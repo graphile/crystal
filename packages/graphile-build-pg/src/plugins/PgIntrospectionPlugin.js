@@ -172,6 +172,8 @@ export type PgIndex = {
   isValid: boolean,
   */
   attributeNums: Array<number>,
+  attributePropertiesAsc: ?Array<boolean>,
+  attributePropertiesNullsFirst: ?Array<boolean>,
   description: ?string,
   tags: { [string]: string },
 };

@@ -143,6 +143,8 @@ export interface PgIndex {
   isUnique: boolean;
   isPrimary: boolean;
   attributeNums: Array<number>;
+  attributePropertiesAsc: Array<boolean> | void;
+  attributePropertiesNullsFirst: Array<boolean> | void;
   description: string | void;
   tags: { [tag: string]: true | string | Array<string> };
 }
