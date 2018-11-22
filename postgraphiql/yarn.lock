@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@benjie/graphiql@^0.12.1-a701b68f61a315280ba3e292275757f37e004ad5", "graphiql@npm:@benjie/graphiql@0.12.1-a701b68f61a315280ba3e292275757f37e004ad5":
+  version "0.12.1-a701b68f61a315280ba3e292275757f37e004ad5"
+  resolved "https://registry.yarnpkg.com/@benjie/graphiql/-/graphiql-0.12.1-a701b68f61a315280ba3e292275757f37e004ad5.tgz#11bb6cc566b28914817bfcb9ee51764d64db1a54"
+  integrity sha512-tgc15PTrSO+KtMwr3GyJJAiO2tmdPpH5AE4Vn4bluQpLpL8oSaSnTaZ8NioMGTTRusLlehrFhNMDBbtm3YN0iQ==
+  dependencies:
+    codemirror "^5.26.0"
+    codemirror-graphql "^0.7.1"
+    markdown-it "^8.4.0"
+
 abab@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
@@ -3457,15 +3466,6 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
-
-graphiql@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/graphiql/-/graphiql-0.12.0.tgz#a035c93a6e3c18850c2f450c039747b2ea3eb953"
-  integrity sha512-OM5dpcONLK1B2prez2WVTfohQlQKe4Fwv1YwNQYQhN+fFGEW87D5v5fN2M8ZebzxbZHqP12KkHicO3sv8k30TQ==
-  dependencies:
-    codemirror "^5.26.0"
-    codemirror-graphql "^0.7.1"
-    markdown-it "^8.4.0"
 
 graphql-config@2.0.1:
   version "2.0.1"
