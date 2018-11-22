@@ -9,6 +9,34 @@ const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
 const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
 
 async function main() {
+  console.log("... Making sponsors.json");
+  const sponsorsMd = fs.readFileSync(`${__dirname}/../SPONSORS.md`, 'utf8');
+  const lines = sponsorsMd.split('\n');
+  const tiers = [];
+  let tier;
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      tier = [];
+      tiers.push(tier);
+    } else if (line.startsWith('* ')) {
+      tier.push(line.substr(2).replace(/\s?\(.*$/, ''));
+    }
+  }
+  tiers.reverse();
+  const sponsors = [];
+  for (let tier = 0; tier < tiers.length; tier++) {
+    for (const sponsor of tiers[tier]) {
+      // Higher tiers are more likely to appear
+      const repeats = (tier + 1);
+      for (let i = 0; i < repeats; i++) {
+        sponsors.push(sponsor);
+      }
+    }
+  }
+  sponsors.sort();
+  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2));
+
+
   console.log("... Building GraphiQL");
 
   // Step 1: compile GraphiQL

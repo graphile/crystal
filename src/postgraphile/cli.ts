@@ -22,6 +22,9 @@ import { makePluginHook, PostGraphilePlugin } from './pluginHook';
 import debugFactory = require('debug');
 import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
+import sponsors = require('../../sponsors.json');
+
+const sponsor = sponsors[Math.floor(sponsors.length * Math.random())];
 
 const debugCli = debugFactory('postgraphile:cli');
 
@@ -716,7 +719,9 @@ if (noServer) {
               `https://graphile.org/postgraphile/introduction/`,
             )}`,
             extractedPlugins.length === 0 &&
-              `Please support PostGraphile development: ${chalk.underline.bold.blue(
+              `Join ${chalk.bold(
+                sponsor,
+              )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
                 `https://graphile.org/donate`,
               )}`,
           ],
