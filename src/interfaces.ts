@@ -68,6 +68,12 @@ export interface PostGraphileOptions {
   // everything.
   // The default is `true`, in v5 the default will change to `false`.
   ignoreRBAC?: boolean;
+  // Set false (recommended) to exclude filters, orderBy, and relations that
+  // would be expensive to access due to missing indexes. Changing this from
+  // true to false is a breaking change, but false to true is not, so we
+  // recommend you start with it set to `false`.
+  // The default is `true`, in v5 the default may change to `false`.
+  ignoreIndexes?: boolean;
   // By default, tables and functions that come from extensions are excluded
   // from the generated GraphQL schema as general applications don't need them
   // to be exposed to the end user. You can use this flag to include them in
