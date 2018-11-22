@@ -100,6 +100,7 @@ export default class SchemaBuilder extends EventEmitter {
     hookName: "GraphQLEnumType:values:value",
     fn: Hook<GraphQLEnumValueConfig>
   ): void;
+  hook(hookName: "finalize", fn: Hook<GraphQLSchema>): void;
 
   /*
   applyHooks(

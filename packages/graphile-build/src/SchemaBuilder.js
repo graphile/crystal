@@ -162,6 +162,11 @@ class SchemaBuilder extends EventEmitter {
       // if you need to set up any global types you can do so here.
       init: [],
 
+      // 'finalize' phase is called once the schema is built; typically you
+      // shouldn't use this, but it's useful for interfacing with external
+      // libraries that mutate an already constructed schema.
+      finalize: [],
+
       // Add 'query', 'mutation' or 'subscription' types in this hook:
       GraphQLSchema: [],
 
@@ -324,13 +329,20 @@ class SchemaBuilder extends EventEmitter {
   buildSchema(): GraphQLSchema {
     if (!this._generatedSchema) {
       const build = this.createBuild();
-      this._generatedSchema = build.newWithHooks(
+      const schema = build.newWithHooks(
         GraphQLSchema,
         {},
         {
           __origin: `GraphQL built-in`,
           isSchema: true,
         }
+      );
+      this._generatedSchema = this.applyHooks(
+        build,
+        "finalize",
+        schema,
+        {},
+        "Finalising GraphQL schema"
       );
     }
     if (!this._generatedSchema) {
