@@ -20,16 +20,6 @@ module.exports = {
         trailingComma: "es5",
       },
     ],
-    "comma-dangle": [
-      2,
-      {
-        arrays: "always-multiline",
-        objects: "always-multiline",
-        imports: "always-multiline",
-        exports: "always-multiline",
-        functions: "never",
-      },
-    ],
     "no-confusing-arrow": 0,
     "no-else-return": 0,
     "no-underscore-dangle": 0,

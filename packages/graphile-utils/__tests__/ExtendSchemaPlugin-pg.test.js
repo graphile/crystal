@@ -100,7 +100,7 @@ it("allows adding a custom single field to PG schema", async () => {
     expect(data.randomUser.name).toBeTruthy();
     expect(data.randomUser.email).toBeTruthy();
   } finally {
-    pgClient.release();
+    await pgClient.release();
   }
 });
 
@@ -194,7 +194,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
             Mutation: {
               async registerUser(_query, args, context, resolveInfo) {
                 const { pgClient } = context;
-                await pgClient.query("begin");
+                await pgClient.query("SAVEPOINT graphql_mutation");
                 try {
                   const {
                     rows: [user],
@@ -218,12 +218,14 @@ it("allows adding a simple mutation field to PG schema", async () => {
                     `You're user ${user.id} - thanks for being awesome`
                   );
 
-                  await pgClient.query("commit");
+                  await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
                   return {
                     data: row,
                   };
                 } catch (e) {
-                  await pgClient.query("rollback");
+                  await pgClient.query(
+                    "ROLLBACK TO SAVEPOINT graphql_mutation"
+                  );
                   throw e;
                 }
               },
@@ -236,6 +238,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
   const printedSchema = printSchema(schema);
   expect(printedSchema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
+  await pgClient.query("begin");
   try {
     const { data, errors } = await graphql(
       schema,
@@ -282,7 +285,8 @@ it("allows adding a simple mutation field to PG schema", async () => {
     expect(data.user1.user.id).not.toEqual(data.user2.user.id);
     expect(clean(data)).toMatchSnapshot();
   } finally {
-    pgClient.release();
+    await pgClient.query("rollback");
+    await pgClient.release();
   }
 });
 
@@ -332,6 +336,6 @@ it("allows adding a field to an existing table, and requesting necessary data al
       `User 1 fetched (name: Alice) [{"number_int":1,"string_text":"hi"},{"number_int":2,"string_text":"bye"}]`
     );
   } finally {
-    pgClient.release();
+    await pgClient.release();
   }
 });

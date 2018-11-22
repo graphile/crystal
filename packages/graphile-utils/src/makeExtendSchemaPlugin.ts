@@ -1,5 +1,5 @@
 import { SchemaBuilder, Build, Context, Plugin, Options } from "graphile-build";
-import { QueryBuilder, SQL, PgClass } from "graphile-build-pg";
+import { QueryBuilder, PgClass } from "graphile-build-pg";
 import {
   // ONLY import types here, not values
   // Misc:
@@ -37,6 +37,9 @@ import { GraphileEmbed } from "./gql";
 // tslint:disable-next-line
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
+import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
+
+// TODO:v5: Remove
 const recurseDataGeneratorsWorkaroundFieldByType = new Map();
 
 export type AugmentedGraphQLFieldResolver<
@@ -496,15 +499,6 @@ function getArguments(
   return {};
 }
 
-export type SelectGraphQLResultFromTable = (
-  tableFragment: SQL,
-  builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
-) => Promise<any>;
-
-export type GraphileHelpers<TSource> = Context<TSource> & {
-  selectGraphQLResultFromTable: SelectGraphQLResultFromTable;
-};
-
 function getFields<TSource>(
   SelfGeneric: TSource,
   fields: ReadonlyArray<FieldDefinitionNode> | void,
@@ -520,7 +514,7 @@ function getFields<TSource>(
     throw new Error("getFields only supports named types");
   }
   const Self: GraphQLNamedType = SelfGeneric as any;
-  const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
+  const { pgSql: sql } = build;
   function augmentResolver(
     resolver: AugmentedGraphQLFieldResolver<TSource, any>,
     fieldContext: Context<TSource>,
@@ -533,40 +527,18 @@ function getFields<TSource>(
     const recurseDataGeneratorsWorkaroundField = recurseDataGeneratorsWorkaroundFieldByType.get(
       namedType
     );
-    const { getDataFromParsedResolveInfoFragment } = fieldContext;
     const newResolver: GraphQLFieldResolver<TSource, any> = async (
       parent,
       args,
       context,
       resolveInfo
     ) => {
-      const selectGraphQLResultFromTable: SelectGraphQLResultFromTable = async (
-        tableFragment: SQL,
-        builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
-      ) => {
-        const { pgClient } = context;
-        const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-        const PayloadType = resolveInfo.returnType;
-        const resolveData = getDataFromParsedResolveInfoFragment(
-          parsedResolveInfoFragment,
-          PayloadType
-        );
-        const tableAlias = sql.identifier(Symbol());
-        const query = pgQueryFromResolveData(
-          tableFragment,
-          tableAlias,
-          resolveData,
-          {},
-          (sqlBuilder: QueryBuilder) => builderCallback(tableAlias, sqlBuilder)
-        );
-        const { text, values } = sql.compile(query);
-        const { rows } = await pgClient.query(text, values);
-        return rows;
-      };
-      const graphileHelpers: GraphileHelpers<TSource> = {
-        ...fieldContext,
-        selectGraphQLResultFromTable,
-      };
+      const graphileHelpers: GraphileHelpers<TSource> = makeFieldHelpers(
+        build,
+        fieldContext,
+        context,
+        resolveInfo
+      );
       const result = await resolver(
         parent,
         args,

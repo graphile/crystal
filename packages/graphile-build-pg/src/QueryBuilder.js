@@ -200,7 +200,7 @@ class QueryBuilder {
       // https://github.com/graphql/graphql-js/blob/680685dd14bd52c6475305e150e5f295ead2aa7e/src/language/lexer.js#L551-L581
       //
       // so this should not cause any issues in practice.
-      if (/^(@+|[_A-Za-z])[_0-9A-Za-z]*$/.test(alias) !== true) {
+      if (/^(\$+|@+|[_A-Za-z])[_0-9A-Za-z]*$/.test(alias) !== true) {
         throw new Error(`Disallowed alias '${alias}'.`);
       }
     }
