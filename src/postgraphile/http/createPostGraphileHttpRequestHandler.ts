@@ -23,7 +23,7 @@ import { Context as KoaContext } from 'koa';
 import chalk = require('chalk');
 import Debugger = require('debug'); // tslint:disable-line variable-name
 import httpError = require('http-errors');
-import parseUrlModule = require('parseurl');
+import parseUrl = require('parseurl');
 import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import LRU = require('lru-cache');
@@ -151,6 +151,18 @@ export default function createPostGraphileHttpRequestHandler(
     pgDefaultRole,
     queryCacheMaxSize = 50 * MEGABYTE,
   } = options;
+  if (options.absoluteRoutes) {
+    throw new Error(
+      'Sorry - the `absoluteRoutes` setting has been replaced with `externalUrlBase` which solves the issue in a cleaner way. Please update your settings. Thank you for testing a PostGraphile pre-release 🙏',
+    );
+  }
+
+  // Using let because we might override it on the first request.
+  let externalUrlBase = options.externalUrlBase;
+  if (externalUrlBase && externalUrlBase.endsWith('/')) {
+    throw new Error('externalUrlBase must not end with a slash (`/`)');
+  }
+
   const pluginHook = pluginHookFromOptions(options);
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
@@ -177,7 +189,6 @@ export default function createPostGraphileHttpRequestHandler(
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
   const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null;
-  const parseUrl = options.absoluteRoutes ? parseUrlModule.original : parseUrlModule;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -263,17 +274,8 @@ export default function createPostGraphileHttpRequestHandler(
       });
     });
 
-  // Takes the original GraphiQL HTML file and replaces the default config object.
-  const graphiqlHtml = origGraphiqlHtml
-    ? origGraphiqlHtml.replace(
-        /<\/head>/,
-        `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-          graphqlUrl: graphqlRoute,
-          streamUrl: options.watchPg ? `${graphqlRoute}/stream` : null,
-          enhanceGraphiql: options.enhanceGraphiql,
-        })};</script>\n  </head>`,
-      )
-    : null;
+  // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
+  let graphiqlHtml: string | null;
 
   const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
 
@@ -350,6 +352,8 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
+  let isFirstRequest = true;
+
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
@@ -381,6 +385,36 @@ export default function createPostGraphileHttpRequestHandler(
     if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
 
     const { pathname = '' } = parseUrl(req) || {};
+
+    // Certain things depend on externalUrlBase, which we guess if the user
+    // doesn't supply it, so we calculate them on the first request.
+    if (isFirstRequest) {
+      isFirstRequest = false;
+
+      if (externalUrlBase == null) {
+        // User hasn't specified externalUrlBase; let's try and guess it
+        const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+        if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+          // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
+          // Figure out our externalUrlBase for ourselves.
+          externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
+        }
+        // Make sure we have a string, at least
+        externalUrlBase = externalUrlBase || '';
+      }
+
+      // Takes the original GraphiQL HTML file and replaces the default config object.
+      graphiqlHtml = origGraphiqlHtml
+        ? origGraphiqlHtml.replace(
+            /<\/head>/,
+            `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
+              graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
+              streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
+              enhanceGraphiql: options.enhanceGraphiql,
+            })};</script>\n  </head>`,
+          )
+        : null;
+    }
     const isGraphqlRoute = pathname === graphqlRoute;
 
     // ========================================================================
@@ -482,7 +516,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (options.watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${graphqlRoute}/stream`);
+      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${graphqlRoute}/stream`);
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.

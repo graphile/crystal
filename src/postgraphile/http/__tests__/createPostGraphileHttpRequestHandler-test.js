@@ -96,7 +96,6 @@ const serverCreators = new Map([
     'express',
     (handler, _options, subpath) => {
       const app = express();
-      app.use(handler);
       if (subpath) {
         app.use(subpath, handler);
       } else {
@@ -134,9 +133,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           {},
           subpath
             ? {
-                graphqlRoute: `${subpath}/graphql`,
-                graphiqlRoute: `${subpath}/graphiql`,
-                absoluteRoutes: true,
+                externalUrlBase: subpath,
               }
             : null,
           defaultOptions,
@@ -148,30 +145,37 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     );
 
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
-    test('will 404 for route other than that specified', async () => {
+    test('will 404 for route other than that specified 1', async () => {
       const server1 = createServer();
       await request(server1)
         .post('/x')
         .expect(404);
-      if (subpath) {
-        const server2 = createServer({ graphqlRoute: '/graphql' });
+    });
+
+    if (subpath) {
+      test('will 404 for route other than that specified 2', async () => {
+        const server2 = createServer({ graphqlRoute: `${subpath}/graphql` });
         await request(server2)
           .post(`${subpath}/graphql`)
           .expect(404);
-        const server3 = createServer({ graphqlRoute: `${subpath}/graphql` });
+      });
+      test('will 404 for route other than that specified 3', async () => {
+        const server3 = createServer({ graphqlRoute: `/graphql` });
         await request(server3)
           .post(`/graphql`)
           .expect(404);
-      }
+      });
+    }
 
-      const server4 = createServer({ graphqlRoute: `${subpath}/x` });
+    test('will 404 for route other than that specified 4', async () => {
+      const server4 = createServer({ graphqlRoute: `/x` });
       await request(server4)
         .post(`${subpath}/graphql`)
         .expect(404);
     });
 
     test('will respond to queries on a different route', async () => {
-      const server = createServer({ graphqlRoute: `${subpath}/x` });
+      const server = createServer({ graphqlRoute: `/x` });
       await request(server)
         .post(`${subpath}/x`)
         .send({ query: '{hello}' })
@@ -181,8 +185,8 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     if (subpath) {
-      test('will respond to queries on a different route with absoluteRoutes=false', async () => {
-        const server = createServer({ graphqlRoute: `/x`, absoluteRoutes: false });
+      test("will respond to queries on a different route with externalUrlBase = ''", async () => {
+        const server = createServer({ graphqlRoute: `/x`, externalUrlBase: '' });
         await request(server)
           .post(`${subpath}/x`)
           .send({ query: '{hello}' })
@@ -191,6 +195,16 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           .expect({ data: { hello: 'world' } });
       });
     }
+
+    test("infers externalUrlBase when it's not specified", async () => {
+      const server = createServer({ externalUrlBase: undefined });
+      await request(server)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({ data: { hello: 'world' } });
+    });
 
     test('will always respond with CORS to an OPTIONS request when enabled', async () => {
       const server = createServer({ enableCors: true });
@@ -767,10 +781,24 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', 'text/html; charset=utf-8');
     });
 
+    test('will set X-GraphQL-Event-Stream if watch enabled', async () => {
+      const server1 = createServer();
+      const server2 = createServer({ watchPg: true });
+      const res1 = await request(server1)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' });
+      expect(res1.headers['x-graphql-event-stream']).toBeFalsy();
+      await request(server2)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('X-GraphQL-Event-Stream', `${subpath}/graphql/stream`);
+    });
+
     test('will render GraphiQL on another route if desired', async () => {
-      const server1 = createServer({ graphiqlRoute: `${subpath}/x` });
-      const server2 = createServer({ graphiql: true, graphiqlRoute: `${subpath}/x` });
-      const server3 = createServer({ graphiql: false, graphiqlRoute: `${subpath}/x` });
+      const server1 = createServer({ graphiqlRoute: `/x` });
+      const server2 = createServer({ graphiql: true, graphiqlRoute: `/x` });
+      const server3 = createServer({ graphiql: false, graphiqlRoute: `/x` });
       await request(server1)
         .get(`${subpath}/x`)
         .expect(404);
