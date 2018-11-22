@@ -1699,7 +1699,7 @@ type Person implements Node {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
-  exists(email: Email): Boolean @deprecated(reason: \\"This is deprecated.\\")
+  exists(email: Email): Boolean @deprecated(reason: \\"This is deprecated (comment on function c.person_exists).\\")
   firstName: String
   firstPost: Post
 
@@ -1769,7 +1769,7 @@ type Person implements Node {
   nodeId: ID!
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
-  personSecretByPersonId: PersonSecret @deprecated(reason: \\"This is deprecated.\\")
+  personSecretByPersonId: PersonSecret @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
   personSecretsByPersonId(
@@ -1798,7 +1798,7 @@ type Person implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection! @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsConnection! @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
@@ -2135,7 +2135,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsConnection @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   badlyBehavedFunction(
@@ -2156,7 +2156,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection! @deprecated(reason: \\"This is deprecated.\\")
+  ): PeopleConnection! @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -2392,7 +2392,7 @@ type Query implements Node {
     The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
     \\"\\"\\"
     nodeId: ID!
-  ): PersonSecret @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecret @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
   personSecretByPersonId(personId: Int!): PersonSecret
 
   \\"\\"\\"

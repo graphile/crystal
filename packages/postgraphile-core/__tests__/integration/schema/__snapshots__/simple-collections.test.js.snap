@@ -409,13 +409,13 @@ type CreatePersonSecretPayload {
   personByPersonId: Person
 
   \\"\\"\\"The \`PersonSecret\` that was created by this mutation.\\"\\"\\"
-  personSecret: PersonSecret @deprecated(reason: \\"This is deprecated.\\")
+  personSecret: PersonSecret @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"An edge for our \`PersonSecret\`. May be used by Relay 1.\\"\\"\\"
   personSecretEdge(
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -749,7 +749,7 @@ type DeletePersonSecretPayload {
   personSecretEdge(
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -1523,7 +1523,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: CreatePersonSecretInput!
-  ): CreatePersonSecretPayload @deprecated(reason: \\"This is deprecated.\\")
+  ): CreatePersonSecretPayload @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Deletes a single \`CompoundKey\` using its globally unique id.\\"\\"\\"
   deleteCompoundKey(
@@ -1627,7 +1627,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: DeletePersonSecretInput!
-  ): DeletePersonSecretPayload @deprecated(reason: \\"This is deprecated.\\")
+  ): DeletePersonSecretPayload @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Deletes a single \`PersonSecret\` using a unique key.\\"\\"\\"
   deletePersonSecretByPersonId(
@@ -1635,7 +1635,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: DeletePersonSecretByPersonIdInput!
-  ): DeletePersonSecretPayload @deprecated(reason: \\"This is deprecated.\\")
+  ): DeletePersonSecretPayload @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
   intSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1917,7 +1917,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: UpdatePersonSecretInput!
-  ): UpdatePersonSecretPayload @deprecated(reason: \\"This is deprecated.\\")
+  ): UpdatePersonSecretPayload @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Updates a single \`PersonSecret\` using a unique key and a patch.\\"\\"\\"
   updatePersonSecretByPersonId(
@@ -1925,7 +1925,7 @@ type Mutation {
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
     input: UpdatePersonSecretByPersonIdInput!
-  ): UpdatePersonSecretPayload @deprecated(reason: \\"This is deprecated.\\")
+  ): UpdatePersonSecretPayload @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 }
 
 \\"\\"\\"All input for the \`mutationInInout\` mutation.\\"\\"\\"
@@ -2667,7 +2667,7 @@ type Person implements Node {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
-  exists(email: Email): Boolean @deprecated(reason: \\"This is deprecated.\\")
+  exists(email: Email): Boolean @deprecated(reason: \\"This is deprecated (comment on function c.person_exists).\\")
   firstName: String
   firstPost: Post
 
@@ -2746,7 +2746,7 @@ type Person implements Node {
   nodeId: ID!
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
-  personSecretByPersonId: PersonSecret @deprecated(reason: \\"This is deprecated.\\")
+  personSecretByPersonId: PersonSecret @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
   personSecretsByPersonId(
@@ -2775,7 +2775,7 @@ type Person implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection! @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsConnection! @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
 }
 
@@ -3268,7 +3268,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsConnection @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsConnection @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Reads a set of \`PersonSecret\`.\\"\\"\\"
   allPersonSecretsList(
@@ -3285,7 +3285,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!]
-  ): [PersonSecret!] @deprecated(reason: \\"This is deprecated.\\")
+  ): [PersonSecret!] @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   badlyBehavedFunction(
@@ -3306,7 +3306,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection! @deprecated(reason: \\"This is deprecated.\\")
+  ): PeopleConnection! @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   badlyBehavedFunctionList(
@@ -3315,7 +3315,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Person] @deprecated(reason: \\"This is deprecated.\\")
+  ): [Person] @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -3619,7 +3619,7 @@ type Query implements Node {
     The globally unique \`ID\` to be used in selecting a single \`PersonSecret\`.
     \\"\\"\\"
     nodeId: ID!
-  ): PersonSecret @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecret @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
   personSecretByPersonId(personId: Int!): PersonSecret
 
   \\"\\"\\"
@@ -4138,7 +4138,7 @@ type UpdatePersonSecretPayload {
   personSecretEdge(
     \\"\\"\\"The method to use when ordering \`PersonSecret\`.\\"\\"\\"
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated.\\")
+  ): PersonSecretsEdge @deprecated(reason: \\"This is deprecated (comment on table c.person_secret).\\")
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

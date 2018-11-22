@@ -54,7 +54,7 @@ create table c.person_secret (
 comment on column c.person_secret.sekrit is E'@name secret\nA secret held by the associated Person';
 comment on constraint person_secret_person_id_fkey on c.person_secret is E'@forwardDescription The `Person` this `PersonSecret` belongs to.\n@backwardDescription This `Person`''s `PersonSecret`.';
 
-comment on table c.person_secret is E'@deprecated This is deprecated.\nTracks the person''s secret';
+comment on table c.person_secret is E'@deprecated This is deprecated (comment on table c.person_secret).\nTracks the person''s secret';
 
 -- This is to test that "one-to-one" relationships also work on unique keys
 create table c.left_arm (
@@ -78,7 +78,7 @@ create function c.person_exists(person c.person, email b.email) returns boolean 
 select exists(select 1 from c.person where person.email = person_exists.email);
 $$ language sql stable;
 
-comment on function c.person_exists(person c.person, email b.email) is '@deprecated This is deprecated.';
+comment on function c.person_exists(person c.person, email b.email) is '@deprecated This is deprecated (comment on function c.person_exists).';
 
 create type a.an_enum as enum('awaiting',
   'rejected',
@@ -398,7 +398,7 @@ create function a.post_with_suffix(post a.post,suffix text) returns a.post as $$
   returning *; 
 $$ language sql volatile;
 
-comment on function a.post_with_suffix(post a.post,suffix text) is '@deprecated This is deprecated.';
+comment on function a.post_with_suffix(post a.post,suffix text) is '@deprecated This is deprecated (comment on function a.post_with_suffix).';
 
 create function a.static_big_integer() returns setof int8 as $$
   -- See https://github.com/graphile/postgraphile/issues/678#issuecomment-363659705
@@ -437,7 +437,7 @@ begin
 end;
 $$ language plpgsql stable;
 
-comment on function c.badly_behaved_function() is '@deprecated This is deprecated.';
+comment on function c.badly_behaved_function() is '@deprecated This is deprecated (comment on function c.badly_behaved_function).';
 
 create table c.my_table (
   id serial primary key,

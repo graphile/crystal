@@ -13,10 +13,11 @@ export default (function PgColumnDeprecationPlugin(builder) {
     ) {
       return field;
     }
-    return Object.assign({}, field, {
+    return {
+      ...field,
       deprecationReason: Array.isArray(pgFieldIntrospection.tags.deprecated)
         ? pgFieldIntrospection.tags.deprecated.join("\n")
         : pgFieldIntrospection.tags.deprecated,
-    });
+    };
   });
 }: Plugin);

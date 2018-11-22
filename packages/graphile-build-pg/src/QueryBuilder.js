@@ -66,7 +66,7 @@ class QueryBuilder {
       lower: Array<SQLGen>,
       upper: Array<SQLGen>,
     },
-    orderBy: Array<[SQLGen, boolean, boolean]>,
+    orderBy: Array<[SQLGen, boolean, boolean | null]>,
     orderIsUnique: boolean,
     limit: ?NumberGen,
     offset: ?NumberGen,
@@ -88,7 +88,7 @@ class QueryBuilder {
       lower: Array<SQL>,
       upper: Array<SQL>,
     },
-    orderBy: Array<[SQL, boolean, boolean]>,
+    orderBy: Array<[SQL, boolean, boolean | null]>,
     orderIsUnique: boolean,
     limit: ?number,
     offset: ?number,
@@ -236,7 +236,11 @@ class QueryBuilder {
   setOrderIsUnique() {
     this.data.orderIsUnique = true;
   }
-  orderBy(exprGen: SQLGen, ascending: boolean = true, nullsFirst: boolean) {
+  orderBy(
+    exprGen: SQLGen,
+    ascending: boolean = true,
+    nullsFirst: boolean | null
+  ) {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending, nullsFirst]);
   }

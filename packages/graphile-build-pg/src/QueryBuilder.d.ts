@@ -25,7 +25,7 @@ export default class QueryBuilder {
   public where(exprGen: SQLGen): void;
   public whereBound(exprGen: SQLGen, isLower: boolean): void;
   public setOrderIsUnique(): void;
-  public orderBy(exprGen: SQLGen, ascending: boolean, nullsFirst: boolean): void;
+  public orderBy(exprGen: SQLGen, ascending: boolean, nullsFirst: boolean | null): void;
   public limit(limitGen: NumberGen): void;
   public offset(offsetGen: NumberGen): void;
   public first(first: number): void;
@@ -45,7 +45,7 @@ export default class QueryBuilder {
   };
   public getFinalOffset(): number;
   public getFinalLimit(): number;
-  public getOrderByExpressionsAndDirections(): Array<[SQL, boolean, boolean]>;
+  public getOrderByExpressionsAndDirections(): Array<[SQL, boolean, boolean | null]>;
   public getSelectFieldsCount(): number;
   public buildSelectFields(): SQL;
   public buildSelectJson({ addNullCase }: { addNullCase?: boolean }): SQL;

@@ -2631,7 +2631,7 @@ type Person implements Node {
   createdAt: Datetime
   email: Email!
 
-  \\"\\"\\"@deprecated This is deprecated.\\"\\"\\"
+  \\"\\"\\"@deprecated This is deprecated (comment on function c.person_exists).\\"\\"\\"
   exists(email: Email): Boolean
   firstName: String
   firstPost: Post
@@ -2786,7 +2786,7 @@ input PersonPatch {
 }
 
 \\"\\"\\"
-@deprecated This is deprecated.
+@deprecated This is deprecated (comment on table c.person_secret).
 Tracks the person's secret
 \\"\\"\\"
 type PersonSecret implements Node {
@@ -3093,7 +3093,9 @@ type Query implements Node {
     orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PersonSecretsConnection
 
-  \\"\\"\\"@deprecated This is deprecated.\\"\\"\\"
+  \\"\\"\\"
+  @deprecated This is deprecated (comment on function c.badly_behaved_function).
+  \\"\\"\\"
   badlyBehavedFunction(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
