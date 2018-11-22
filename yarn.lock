@@ -2647,10 +2647,10 @@ eslint-plugin-flowtype@^2.35.0:
   dependencies:
     lodash "^4.17.10"
 
-eslint-plugin-graphql@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-graphql/-/eslint-plugin-graphql-2.1.1.tgz#dae5d597080075320ea8e98795056309ffe73a18"
-  integrity sha512-JT2paUyu3e9ZDnroSshwUMc6pKcnkfXTsZInX1+/rPotvqOLVLtdrx/cmfb7PTJwjiEAshwcpm3/XPdTpsKJPw==
+eslint-plugin-graphql@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-graphql/-/eslint-plugin-graphql-3.0.1.tgz#b75533e7ddf43f5a5c558313259bab9bd7795203"
+  integrity sha512-0VdYeu/vqygjQ5Yovi4d1+tG9gPHACcWeAqLmjCjaxsRPuVywqFjP2TK2Bv5CHedHM2J0qJgmzKimTNYpDI7Xg==
   dependencies:
     graphql-config "^2.0.1"
     lodash "^4.11.1"
@@ -3407,9 +3407,9 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4, graceful-fs@^4.1.6:
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
 
 graphql-config@^2.0.1:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/graphql-config/-/graphql-config-2.2.0.tgz#fe1529eb5b77d0bf5cb32b8bbda2f5e7db622d97"
-  integrity sha512-qBwLauRfsVUDiGXdpiQC0mJhsOXx7cJkbfevl7lFpZgiSG3Kb+6pE+9RaAhQKyBowf79U5/lbMR8GqnOTR5wsg==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/graphql-config/-/graphql-config-2.2.1.tgz#5fd0ec77ac7428ca5fb2026cf131be10151a0cb2"
+  integrity sha512-U8+1IAhw9m6WkZRRcyj8ZarK96R6lQBQ0an4lp76Ps9FyhOXENC5YQOxOFGm5CxPrX2rD0g3Je4zG5xdNJjwzQ==
   dependencies:
     graphql-import "^0.7.1"
     graphql-request "^1.5.0"
@@ -3425,10 +3425,10 @@ graphql-import@^0.7.1:
     lodash "^4.17.4"
     resolve-from "^4.0.0"
 
-graphql-iso-date@^3.2.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.5.0.tgz#55a1be0efa8d28c1453afd2eb5ce1d052189a513"
-  integrity sha512-xs+8agn0OPzbiQf91aoyiZ3xC/oq4q/iJ4q1yY7hD0mbgcYBrqnZ4R+ycBZLGdb84rON1wNfqY4BDMyQG50OOg==
+graphql-iso-date@^3.6.0:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
+  integrity sha512-AwFGIuYMJQXOEAgRlJlFL4H1ncFM8n8XmoVDTNypNOZyQ8LFDG2ppMFlsS862BSTCDcSUfHp8PD3/uJhv7t59Q==
 
 graphql-request@^1.5.0:
   version "1.8.2"
@@ -5207,7 +5207,7 @@ node-fetch-npm@^2.0.2:
 
 node-fetch@2.1.2:
   version "2.1.2"
-  resolved "http://registry.npmjs.org/node-fetch/-/node-fetch-2.1.2.tgz#ab884e8e7e57e38a944753cec706f788d1768bb5"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.1.2.tgz#ab884e8e7e57e38a944753cec706f788d1768bb5"
   integrity sha1-q4hOjn5X44qUR1POxwb3iNF2i7U=
 
 node-gyp@^3.8.0:
@@ -7288,7 +7288,7 @@ whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3:
 
 whatwg-fetch@2.0.4:
   version "2.0.4"
-  resolved "http://registry.npmjs.org/whatwg-fetch/-/whatwg-fetch-2.0.4.tgz#dde6a5df315f9d39991aa17621853d720b85566f"
+  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-2.0.4.tgz#dde6a5df315f9d39991aa17621853d720b85566f"
   integrity sha512-dcQ1GWpOD/eEQ97k66aiEVpNnapVj90/+R+SXTPYGHpYBBypfKJEQjLrvMZ7YXbKm21gXd4NcuxUTjiv1YtLng==
 
 whatwg-mimetype@^2.1.0:
