@@ -47,8 +47,10 @@ export type AugmentedGraphQLFieldResolver<
   parent: TSource,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo,
-  graphileHelpers: GraphileHelpers<TSource>
+  info: GraphQLResolveInfo & {
+    graphile: GraphileHelpers<TSource>;
+  },
+  useInfoDotGraphileInstead: GraphileHelpers<TSource>
 ) => any;
 
 export interface ObjectFieldResolver<TSource = any, TContext = any> {
@@ -561,10 +563,20 @@ function getFields<TSource>(
         const { rows } = await pgClient.query(text, values);
         return rows;
       };
-      const result = await resolver(parent, args, context, resolveInfo, {
+      const graphileHelpers: GraphileHelpers<TSource> = {
         ...fieldContext,
         selectGraphQLResultFromTable,
-      });
+      };
+      const result = await resolver(
+        parent,
+        args,
+        context,
+        {
+          ...resolveInfo,
+          graphile: graphileHelpers,
+        },
+        graphileHelpers
+      );
       if (
         result != null &&
         !result.data &&
