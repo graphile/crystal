@@ -47,8 +47,10 @@ echo "Database reset successfully ✅"
 # Now run the tests
 if [ $SERVER_VERSION_NUM -ge 100000 ]; then
   jest -i $@
-else
+elif [ $SERVER_VERSION_NUM -ge 90500 ]; then
   jest -i -t "^((?!pg10).)*$" $@
+else
+  jest -i -t "^((?!pg10|json-overflow).)*$" $@
 fi;
 
 # Finally re-populate the database to aid debugging

@@ -17,6 +17,7 @@ function readFile(filename, encoding) {
 
 const queriesDir = `${__dirname}/../fixtures/queries`;
 const queryFileNames = readdirSync(queriesDir);
+const testsToSkip = [];
 let queryResults = [];
 
 const kitchenSinkData = () =>
@@ -28,6 +29,15 @@ const dSchemaComments = () =>
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
   const gqlSchemasPromise = withPgClient(async pgClient => {
+    const {
+      rows: [{ server_version_num }],
+    } = await pgClient.query("show server_version_num;");
+    const serverVersionNum = parseInt(server_version_num, 10);
+    if (serverVersionNum < 90500) {
+      // Remove tests not supported by PG9.4
+      testsToSkip.push("json-overflow.graphql");
+    }
+
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
 
@@ -104,6 +114,10 @@ beforeAll(() => {
       // Run all of our queries in parallel.
       const results = [];
       for (const filename of queryFileNames) {
+        if (testsToSkip.indexOf(filename) >= 0) {
+          results.push(Promise.resolve());
+          continue;
+        }
         const process = async fileName => {
           // Read the query from the file system.
           const query = await readFile(
@@ -173,7 +187,14 @@ beforeAll(() => {
 });
 
 for (let i = 0; i < queryFileNames.length; i++) {
-  test(queryFileNames[i], async () => {
-    expect(await queryResults[i]).toMatchSnapshot();
+  const filename = queryFileNames[i];
+  test(filename, async () => {
+    if (testsToSkip.indexOf(filename) >= 0) {
+      // eslint-disable-next-line no-console
+      console.log(`SKIPPED '${filename}'`);
+      // Technically this will never be ran because we handle it in scripts/test
+    } else {
+      expect(await queryResults[i]).toMatchSnapshot();
+    }
   });
 }

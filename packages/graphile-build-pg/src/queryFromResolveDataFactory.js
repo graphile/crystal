@@ -1,5 +1,6 @@
 // @flow
 import QueryBuilder from "./QueryBuilder";
+import type QueryBuilderOptions from "./QueryBuilder";
 import type { RawAlias } from "./QueryBuilder";
 import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
@@ -9,7 +10,8 @@ import assert from "assert";
 
 const identity = _ => _ !== null && _ !== undefined;
 
-export default (
+// $FlowFixMe
+export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   from: SQL,
   fromAlias: ?SQL,
   resolveData: DataForType,
@@ -40,7 +42,8 @@ export default (
   const rawCursorPrefix =
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(identity);
 
-  const queryBuilder = new QueryBuilder();
+  // $FlowFixMe
+  const queryBuilder = new QueryBuilder(queryBuilderOptions);
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
 
   if (withBuilder) {
@@ -410,7 +413,7 @@ export default (
         ", "
       )} ${sqlFrom}`;
     } else {
-      return sql.fragment`${sqlWith} select ${QueryBuilder.jsonbBuildObject(
+      return sql.fragment`${sqlWith} select ${queryBuilder.jsonbBuildObject(
         fields
       )} ${sqlFrom}`;
     }

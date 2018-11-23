@@ -12,7 +12,7 @@ import type {
 } from "./PgIntrospectionPlugin";
 import pgField from "./pgField";
 
-import queryFromResolveData from "../queryFromResolveData";
+import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 import addStartEndCursor from "./addStartEndCursor";
 import baseOmit, {
   CREATE,
@@ -332,7 +332,11 @@ export default (function PgBasicsPlugin(
       pgSql: sql,
       pgStrictFunctions,
       pgColumnFilter,
-      pgQueryFromResolveData: queryFromResolveData,
+
+      // TODO:v5: remove this workaround
+      // BEWARE: this may be overridden in PgIntrospectionPlugin for PG < 9.5
+      pgQueryFromResolveData: queryFromResolveDataFactory(),
+
       pgAddStartEndCursor: addStartEndCursor,
       pgOmit,
       pgMakeProcField: makeProcField,

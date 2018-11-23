@@ -41,9 +41,22 @@ create table c.person (
   created_at timestamp default current_timestamp
 );
 
-create function c.current_user_id() returns int as $$
-  select nullif(current_setting('jwt.claims.user_id', true), '')::int;
-$$ language sql stable;
+do $_$
+begin
+if current_setting('server_version_num')::int >= 90500 then
+  -- JSONB supported
+  -- current_setting(x, true) supported
+  create function c.current_user_id() returns int as $$
+    select nullif(current_setting('jwt.claims.user_id', true), '')::int;
+  $$ language sql stable;
+else
+  execute 'alter database ' || quote_ident(current_database()) || ' set jwt.claims.user_id to ''''';
+  create function c.current_user_id() returns int as $$
+    select nullif(current_setting('jwt.claims.user_id'), '')::int;
+  $$ language sql stable;
+end if;
+end;
+$_$ language plpgsql;
 
 -- This is to test that "one-to-one" relationships work on primary keys
 create table c.person_secret (

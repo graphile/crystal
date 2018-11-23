@@ -12,6 +12,7 @@ import { quacksLikePgPool } from "../withPgClient";
 import { makeIntrospectionQuery } from "./introspectionQuery";
 
 import { version } from "../../package.json";
+import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 
 const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
@@ -218,7 +219,9 @@ export default (async function PgIntrospectionPlugin(
     const cacheKey = `PgIntrospectionPlugin-introspectionResultsByKind-v${version}`;
     const cloneResults = obj => {
       const result = Object.keys(obj).reduce((memo, k) => {
-        memo[k] = obj[k].map(v => Object.assign({}, v));
+        memo[k] = Array.isArray(obj[k])
+          ? obj[k].map(v => Object.assign({}, v))
+          : obj[k];
         return memo;
       }, {});
       return result;
@@ -242,6 +245,7 @@ export default (async function PgIntrospectionPlugin(
           ]);
 
           const result = {
+            __pgVersion: serverVersionNum,
             namespace: [],
             class: [],
             attribute: [],
@@ -288,9 +292,19 @@ export default (async function PgIntrospectionPlugin(
               extensionConfigurationClassIds.indexOf(klass.id) >= 0;
           });
 
-          for (const k in result) {
+          [
+            "namespace",
+            "class",
+            "attribute",
+            "type",
+            "constraint",
+            "procedure",
+            "extension",
+            "index",
+          ].forEach(k => {
             result[k].forEach(Object.freeze);
-          }
+          });
+
           return Object.freeze(result);
         })
       )
@@ -678,6 +692,15 @@ export default (async function PgIntrospectionPlugin(
   }, stopListening);
 
   builder.hook("build", build => {
+    if (introspectionResultsByKind.__pgVersion < 90500) {
+      // TODO:v5: remove this workaround
+      // This is a bit of a hack, but until we have plugin priorities it's the
+      // easiest way to conditionally support PG9.4.
+      // $FlowFixMe
+      build.pgQueryFromResolveData = queryFromResolveDataFactory({
+        supportsJSONB: false,
+      });
+    }
     return build.extend(build, {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
     });

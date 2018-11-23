@@ -37,20 +37,12 @@ type NumberGen = Gen<number> | number;
 type CursorValue = {};
 type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
-class QueryBuilder {
-  // Helper function
-  static jsonbBuildObject(fields: Array<[SQL, RawAlias]>) {
-    const fieldsChunks = chunk(fields, 50);
-    const chunkToJson = fieldsChunk =>
-      sql.fragment`jsonb_build_object(${sql.join(
-        fieldsChunk.map(
-          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`
-        ),
-        ", "
-      )})`;
-    return sql.join(fieldsChunks.map(chunkToJson), " || ");
-  }
+export type QueryBuilderOptions = {
+  supportsJSONB?: boolean, // Defaults to true
+};
 
+class QueryBuilder {
+  supportsJSONB: boolean;
   locks: {
     [string]: true | string,
   };
@@ -97,7 +89,10 @@ class QueryBuilder {
     cursorComparator: ?CursorComparator,
   };
 
-  constructor() {
+  constructor(options: QueryBuilderOptions = {}) {
+    this.supportsJSONB =
+      options.supportsJSONB == null ? true : !!options.supportsJSONB;
+
     this.locks = {};
     this.finalized = false;
     this.data = {
@@ -164,6 +159,32 @@ class QueryBuilder {
       this.lock("limit");
       this.lock("offset");
     });
+  }
+
+  // ----------------------------------------
+
+  // Helper function
+  jsonbBuildObject(fields: Array<[SQL, RawAlias]>) {
+    if (this.supportsJSONB) {
+      const fieldsChunks = chunk(fields, 50);
+      const chunkToJson = fieldsChunk =>
+        sql.fragment`jsonb_build_object(${sql.join(
+          fieldsChunk.map(
+            ([expr, alias]) =>
+              sql.fragment`${sql.literal(alias)}::text, ${expr}`
+          ),
+          ", "
+        )})`;
+      return sql.join(fieldsChunks.map(chunkToJson), " || ");
+    } else {
+      // PG9.4 will have issues with more than 100 parameters (50 keys)
+      return sql.fragment`json_build_object(${sql.join(
+        fields.map(
+          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`
+        ),
+        ", "
+      )})`;
+    }
   }
 
   // ----------------------------------------
@@ -388,7 +409,7 @@ class QueryBuilder {
   buildSelectJson({ addNullCase }: { addNullCase?: boolean }) {
     this.lockEverything();
     let buildObject = this.compiledData.select.length
-      ? QueryBuilder.jsonbBuildObject(this.compiledData.select)
+      ? this.jsonbBuildObject(this.compiledData.select)
       : sql.fragment`to_json(${this.getTableAlias()})`;
     if (addNullCase) {
       buildObject = sql.fragment`(case when (${this.getTableAlias()} is null) then null else ${buildObject} end)`;
