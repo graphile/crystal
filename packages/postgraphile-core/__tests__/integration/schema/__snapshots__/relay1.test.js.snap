@@ -944,7 +944,7 @@ type FuncOutSetofConnection {
   edges: [FuncOutSetofEdge!]!
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
-  nodes: [Int!]!
+  nodes: [Int]!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -997,7 +997,7 @@ type FuncReturnsTableOneColConnection {
   edges: [FuncReturnsTableOneColEdge!]!
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
-  nodes: [Int!]!
+  nodes: [Int]!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -1074,7 +1074,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
-  nodes: [Int!]!
+  nodes: [Int]!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"

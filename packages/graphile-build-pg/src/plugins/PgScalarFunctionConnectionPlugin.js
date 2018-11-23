@@ -3,10 +3,7 @@ import type { Plugin } from "graphile-build";
 
 const base64 = str => Buffer.from(String(str)).toString("base64");
 
-export default (function PgScalarFunctionConnectionPlugin(
-  builder,
-  { pgForbidSetofFunctionsToReturnNull = false }
-) {
+export default (function PgScalarFunctionConnectionPlugin(builder) {
   builder.hook("init", (_, build) => {
     const {
       newWithHooks,
@@ -26,8 +23,6 @@ export default (function PgScalarFunctionConnectionPlugin(
       pgField,
     } = build;
 
-    const nullableIf = (condition, Type) =>
-      condition ? Type : new GraphQLNonNull(Type);
     const Cursor = getTypeByName("Cursor");
     introspectionResultsByKind.procedure.forEach(proc => {
       // PERFORMANCE: These used to be .filter(...) calls
@@ -111,11 +106,7 @@ export default (function PgScalarFunctionConnectionPlugin(
             return {
               nodes: pgField(build, fieldWithHooks, "nodes", {
                 description: `A list of \`${NodeType.name}\` objects.`,
-                type: new GraphQLNonNull(
-                  new GraphQLList(
-                    nullableIf(!pgForbidSetofFunctionsToReturnNull, NodeType)
-                  )
-                ),
+                type: new GraphQLNonNull(new GraphQLList(NodeType)),
                 resolve(data) {
                   return data.data.map(entry => entry.value);
                 },

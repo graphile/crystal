@@ -2341,7 +2341,7 @@ type PostComputedIntervalSetConnection {
   edges: [PostComputedIntervalSetEdge!]!
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
-  nodes: [Interval!]!
+  nodes: [Interval]!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -3075,7 +3075,7 @@ type QueryIntervalSetConnection {
   edges: [QueryIntervalSetEdge!]!
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
-  nodes: [Interval!]!
+  nodes: [Interval]!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -3501,7 +3501,7 @@ type StaticBigIntegerConnection {
   edges: [StaticBigIntegerEdge!]!
 
   \\"\\"\\"A list of \`BigInt\` objects.\\"\\"\\"
-  nodes: [BigInt!]!
+  nodes: [BigInt]!
 }
 
 \\"\\"\\"A \`BigInt\` edge in the connection.\\"\\"\\"
