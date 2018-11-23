@@ -109,10 +109,10 @@ const serverCreators = new Map([
     'fastify',
     async (handler, _options, subpath) => {
       let server;
-      function serverFactory(handler, opts) {
+      function serverFactory(fastlyHandler, opts) {
         if (server) throw new Error('Factory called twice');
         server = http.createServer((req, res) => {
-          handler(req, res);
+          fastlyHandler(req, res);
         });
         return server;
       }
