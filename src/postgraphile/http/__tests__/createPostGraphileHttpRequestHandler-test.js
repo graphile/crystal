@@ -124,6 +124,9 @@ const serverCreators = new Map([
         app.use(handler);
       }
       await app.ready();
+      if (!server) {
+        throw new Error('Fastify server not created!');
+      }
       return server;
     },
   ],
@@ -678,7 +681,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       pgPool.connect.mockClear();
       pgClient.query.mockClear();
       pgClient.release.mockClear();
-      const server = createServer();
+      const server = await createServer();
       const res = await request(server)
         .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
