@@ -715,14 +715,17 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = createServer({
         handleErrors: errors => {
           return errors.map(error => {
-            error.extensions = {
-              exception: {
-                message: 'my custom error message',
-                hint: 'my custom error hint',
-                detail: 'my custom error detail',
+            return {
+              ...error,
+              message: 'my custom error message',
+              extensions: {
+                ...error.extensions,
+                exception: {
+                  hint: 'my custom error hint',
+                  detail: 'my custom error detail',
+                },
               },
             };
-            return error;
           });
         },
       });
