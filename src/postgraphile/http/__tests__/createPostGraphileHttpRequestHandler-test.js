@@ -648,6 +648,29 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         });
     });
 
+    test('will report standard error when extendedErrors is not enabled', async () => {
+      pgPool.connect.mockClear();
+      pgClient.query.mockClear();
+      pgClient.release.mockClear();
+      const server = createServer();
+      const res = await request(server)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({
+          data: { testError: null },
+          errors: [
+            {
+              message: 'test message',
+              locations: [{ line: 1, column: 2 }],
+              path: ['testError'],
+            },
+          ],
+        });
+      expect(JSON.parse(res.text).errors).toMatchSnapshot();
+    });
+
     test('will report an extended error when extendedErrors is enabled', async () => {
       pgPool.connect.mockClear();
       pgClient.query.mockClear();
@@ -655,7 +678,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = createServer({
         extendedErrors: ['hint', 'detail', 'errcode'],
       });
-      await request(server)
+      const res = await request(server)
         .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(200)
@@ -673,6 +696,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
             },
           ],
         });
+      expect(JSON.parse(res.text).errors).toMatchSnapshot();
     });
 
     test('will allow user to customize errors when handleErrors is set', async () => {
