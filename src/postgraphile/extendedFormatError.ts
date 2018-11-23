@@ -51,6 +51,7 @@ export function extendedFormatError(
       ? {
           // Reference: https://facebook.github.io/graphql/draft/#sec-Errors
           extensions: {
+            ...originalError.extensions,
             exception: exceptionDetails,
           },
         }

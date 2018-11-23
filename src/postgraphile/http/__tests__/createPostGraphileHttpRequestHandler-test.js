@@ -37,6 +37,7 @@ const gqlSchema = new GraphQLSchema({
         type: GraphQLString,
         resolve: () => {
           const err = new Error('test message');
+          err.extensions = { testingExtensions: true };
           err.detail = 'test detail';
           err.hint = 'test hint';
           err.code = '12345';
@@ -643,6 +644,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
             },
           ],
         });
@@ -665,6 +669,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
             },
           ],
         });
@@ -691,6 +698,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
               extensions: {
+                testingExtensions: true,
                 exception: {
                   hint: 'test hint',
                   detail: 'test detail',
@@ -742,6 +750,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
               extensions: {
+                testingExtensions: true,
                 exception: {
                   hint: 'my custom error hint',
                   detail: 'my custom error detail',
@@ -771,6 +780,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
             },
           ],
           data: { testError: null },

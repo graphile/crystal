@@ -9,6 +9,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -28,6 +29,9 @@ Array [
 exports[`connect (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -53,6 +57,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -72,6 +77,9 @@ Array [
 exports[`connect will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -97,6 +105,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -116,6 +125,9 @@ Array [
 exports[`express (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -141,6 +153,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -160,6 +173,9 @@ Array [
 exports[`express will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -185,6 +201,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -204,6 +221,9 @@ Array [
 exports[`http will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -229,6 +249,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -248,6 +269,9 @@ Array [
 exports[`koa (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
@@ -273,6 +297,7 @@ Array [
         "errcode": "12345",
         "hint": "test hint",
       },
+      "testingExtensions": true,
     },
     "hint": "test hint",
     "locations": Array [
@@ -292,6 +317,9 @@ Array [
 exports[`koa will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
     "locations": Array [
       Object {
         "column": 2,
