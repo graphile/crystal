@@ -3,6 +3,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -40,6 +47,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -77,6 +91,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -114,6 +135,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -151,6 +179,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -188,6 +223,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {
@@ -225,6 +267,13 @@ Array [
   Object {
     "detail": "test detail",
     "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+    },
     "hint": "test hint",
     "locations": Array [
       Object {

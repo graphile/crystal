@@ -238,17 +238,22 @@ export interface PostGraphileOptions {
 }
 
 export interface GraphQLFormattedErrorExtended {
-  // This is ugly, really I just want `string | void` but apparently TypeScript doesn't support that.
-  [s: string]: ReadonlyArray<SourceLocation> | ReadonlyArray<string | number> | string | void;
   message: string;
   locations: ReadonlyArray<SourceLocation> | void;
   path: ReadonlyArray<string | number> | void;
+  extensions?: {
+    [s: string]: any;
+  };
 }
 
 export type GraphQLErrorExtended = GraphQLError & {
-  hint: string;
-  detail: string;
-  code: string;
+  extensions: {
+    exception: {
+      hint: string;
+      detail: string;
+      code: string;
+    };
+  };
 };
 
 /**

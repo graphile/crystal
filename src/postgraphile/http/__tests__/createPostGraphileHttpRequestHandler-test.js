@@ -690,6 +690,15 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                exception: {
+                  hint: 'test hint',
+                  detail: 'test detail',
+                  errcode: '12345',
+                },
+              },
+
+              // TODO:v5: remove next 3 lines
               hint: 'test hint',
               detail: 'test detail',
               errcode: '12345',
@@ -706,9 +715,13 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = createServer({
         handleErrors: errors => {
           return errors.map(error => {
-            error.message = 'my custom error message';
-            error.hint = 'my custom error hint';
-            error.detail = 'my custom error detail';
+            error.extensions = {
+              exception: {
+                message: 'my custom error message',
+                hint: 'my custom error hint',
+                detail: 'my custom error detail',
+              },
+            };
             return error;
           });
         },
@@ -725,8 +738,12 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'my custom error message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
-              hint: 'my custom error hint',
-              detail: 'my custom error detail',
+              extensions: {
+                exception: {
+                  hint: 'my custom error hint',
+                  detail: 'my custom error detail',
+                },
+              },
             },
           ],
         });

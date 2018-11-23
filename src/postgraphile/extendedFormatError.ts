@@ -42,8 +42,19 @@ export function extendedFormatError(
     throw new Error('Received null or undefined error.');
   }
   const originalError = error.originalError as GraphQLErrorExtended;
+  const exceptionDetails = originalError && fields ? pickPgError(originalError, fields) : undefined;
   return {
-    ...(originalError && fields ? pickPgError(originalError, fields) : undefined),
+    // TODO:v5: remove this
+    ...exceptionDetails,
+
+    ...(exceptionDetails
+      ? {
+          // Reference: https://facebook.github.io/graphql/draft/#sec-Errors
+          extensions: {
+            exception: exceptionDetails,
+          },
+        }
+      : null),
     message: error.message,
     locations: error.locations,
     path: error.path,
