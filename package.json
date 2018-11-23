@@ -92,7 +92,7 @@
     "koa-mount": "^4.0.0",
     "nodemon": "^1.11.0",
     "pg-minify": "~0.5.3",
-    "prettier": "^1.13.7",
+    "prettier": "^1.15.2",
     "source-map-support": "^0.4.6",
     "style-loader": "^0.23.0",
     "supertest": "^2.0.1",

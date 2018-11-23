@@ -70,8 +70,8 @@ beforeAll(() => {
             fileName === 'classic-ids.graphql'
               ? gqlSchemas.classicIds
               : fileName === 'dynamic-json.graphql'
-                ? gqlSchemas.dynamicJson
-                : gqlSchemas.normal;
+              ? gqlSchemas.dynamicJson
+              : gqlSchemas.normal;
           // Return the result of our GraphQL query.
           return await graphql(gqlSchema, query, null, {
             [$$pgClient]: pgClient,

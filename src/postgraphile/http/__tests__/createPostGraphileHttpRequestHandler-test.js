@@ -37,6 +37,7 @@ const gqlSchema = new GraphQLSchema({
         type: GraphQLString,
         resolve: () => {
           const err = new Error('test message');
+          err.extensions = { testingExtensions: true };
           err.detail = 'test detail';
           err.hint = 'test hint';
           err.code = '12345';
@@ -643,19 +644,20 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
             },
           ],
         });
     });
 
-    test('will report an extended error when extendedErrors is enabled', async () => {
+    test('will report standard error when extendedErrors is not enabled', async () => {
       pgPool.connect.mockClear();
       pgClient.query.mockClear();
       pgClient.release.mockClear();
-      const server = createServer({
-        extendedErrors: ['hint', 'detail', 'errcode'],
-      });
-      await request(server)
+      const server = createServer();
+      const res = await request(server)
         .post(`${subpath}/graphql`)
         .send({ query: '{testError}' })
         .expect(200)
@@ -667,12 +669,51 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
+            },
+          ],
+        });
+      expect(JSON.parse(res.text).errors).toMatchSnapshot();
+    });
+
+    test('will report an extended error when extendedErrors is enabled', async () => {
+      pgPool.connect.mockClear();
+      pgClient.query.mockClear();
+      pgClient.release.mockClear();
+      const server = createServer({
+        extendedErrors: ['hint', 'detail', 'errcode'],
+      });
+      const res = await request(server)
+        .post(`${subpath}/graphql`)
+        .send({ query: '{testError}' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect({
+          data: { testError: null },
+          errors: [
+            {
+              message: 'test message',
+              locations: [{ line: 1, column: 2 }],
+              path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+                exception: {
+                  hint: 'test hint',
+                  detail: 'test detail',
+                  errcode: '12345',
+                },
+              },
+
+              // TODO:v5: remove next 3 lines
               hint: 'test hint',
               detail: 'test detail',
               errcode: '12345',
             },
           ],
         });
+      expect(JSON.parse(res.text).errors).toMatchSnapshot();
     });
 
     test('will allow user to customize errors when handleErrors is set', async () => {
@@ -682,10 +723,17 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = createServer({
         handleErrors: errors => {
           return errors.map(error => {
-            error.message = 'my custom error message';
-            error.hint = 'my custom error hint';
-            error.detail = 'my custom error detail';
-            return error;
+            return {
+              ...error,
+              message: 'my custom error message',
+              extensions: {
+                ...error.extensions,
+                exception: {
+                  hint: 'my custom error hint',
+                  detail: 'my custom error detail',
+                },
+              },
+            };
           });
         },
       });
@@ -701,8 +749,13 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'my custom error message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
-              hint: 'my custom error hint',
-              detail: 'my custom error detail',
+              extensions: {
+                testingExtensions: true,
+                exception: {
+                  hint: 'my custom error hint',
+                  detail: 'my custom error detail',
+                },
+              },
             },
           ],
         });
@@ -727,6 +780,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
               message: 'test message',
               locations: [{ line: 1, column: 2 }],
               path: ['testError'],
+              extensions: {
+                testingExtensions: true,
+              },
             },
           ],
           data: { testError: null },
