@@ -122,6 +122,7 @@
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
   "files": [
+    "sponsors.json",
     "build"
   ],
   "engines": {
