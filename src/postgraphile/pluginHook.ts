@@ -4,7 +4,6 @@ import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
-import { ValidationRule } from 'graphql/validation/ValidationContext';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;
@@ -29,10 +28,10 @@ export interface PostGraphilePlugin {
   'cli:greeting'?: HookFn<Array<string | void>>;
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
-  'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<ValidationRule>>;
+  'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
   'postgraphile:httpParamsList'?: HookFn<Array<object>>;
-  'postgraphile:validationRules'?: HookFn<ReadonlyArray<ValidationRule>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
+  'postgraphile:validationRules'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
 
   withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
