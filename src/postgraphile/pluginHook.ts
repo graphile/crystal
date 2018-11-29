@@ -1,14 +1,18 @@
 import { AddFlagFn } from './cli';
-import { Server } from 'http';
+import { Server, IncomingMessage } from 'http';
 import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
+import { ValidationRule } from 'graphql/validation/ValidationContext';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
 export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;
 export interface PostGraphilePlugin {
+  init?: HookFn<null>;
+
   pluginHook?: HookFn<PluginHookFn>;
+
   'cli:flags:add:standard'?: HookFn<AddFlagFn>;
   'cli:flags:add:schema'?: HookFn<AddFlagFn>;
   'cli:flags:add:errorHandling'?: HookFn<AddFlagFn>;
@@ -19,11 +23,18 @@ export interface PostGraphilePlugin {
   'cli:flags:add'?: HookFn<AddFlagFn>;
   'cli:flags:add:deprecated'?: HookFn<AddFlagFn>;
   'cli:flags:add:workarounds'?: HookFn<AddFlagFn>;
-
+  'cli:library:options'?: HookFn<{}>;
   'cli:server:middleware'?: HookFn<HttpRequestHandler>;
   'cli:server:created'?: HookFn<Server>;
+  'cli:greeting'?: HookFn<Array<string | void>>;
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
+  'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<ValidationRule>>;
+  'postgraphile:http:handler'?: HookFn<IncomingMessage>;
+  'postgraphile:httpParamsList'?: HookFn<Array<object>>;
+  'postgraphile:validationRules'?: HookFn<ReadonlyArray<ValidationRule>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
+  'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
+
   withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
 }
 type HookName = keyof PostGraphilePlugin;
