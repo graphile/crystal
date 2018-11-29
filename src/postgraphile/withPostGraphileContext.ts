@@ -16,7 +16,7 @@ export type WithPostGraphileContextFn = (
     jwtToken?: string;
     jwtSecret?: string;
     jwtAudiences?: Array<string>;
-    jwtRole: Array<string>;
+    jwtRole?: Array<string>;
     jwtVerifyOptions?: jwt.VerifyOptions;
     pgDefaultRole?: string;
     pgSettings?: { [key: string]: mixed };
