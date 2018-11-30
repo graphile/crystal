@@ -1,11 +1,10 @@
 import {
   GraphQLSchema,
-  GraphQLObjectType,
+  GraphQLSchemaConfig,
+  GraphQLObjectTypeConfig,
   GraphQLInterfaceType,
-  GraphQLInputObjectType,
-  GraphQLEnumType,
-  GraphQLOutputType,
-  GraphQLFieldResolver,
+  GraphQLInputObjectTypeConfig,
+  GraphQLEnumTypeConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
   GraphQLFieldConfig,
@@ -61,8 +60,11 @@ export default class SchemaBuilder extends EventEmitter {
   hook(hookName: "build", fn: Hook<Build>): void;
   hook(hookName: "inflection", fn: Hook<Inflection>): void;
   hook(hookName: "init", fn: Hook<InitObject>): void;
-  hook(hookName: "GraphQLSchema", fn: Hook<GraphQLSchema>): void;
-  hook(hookName: "GraphQLObjectType", fn: Hook<GraphQLObjectType>): void;
+  hook(hookName: "GraphQLSchema", fn: Hook<GraphQLSchemaConfig>): void;
+  hook<TSource, TContext>(
+    hookName: "GraphQLObjectType",
+    fn: Hook<GraphQLObjectTypeConfig<TSource, TContext>>
+  ): void;
   hook(
     hookName: "GraphQLObjectType:interfaces",
     fn: Hook<Array<GraphQLInterfaceType>>
@@ -81,7 +83,7 @@ export default class SchemaBuilder extends EventEmitter {
   ): void;
   hook(
     hookName: "GraphQLInputObjectType",
-    fn: Hook<GraphQLInputObjectType>
+    fn: Hook<GraphQLInputObjectTypeConfig>
   ): void;
   hook(
     hookName: "GraphQLInputObjectType:fields",
@@ -91,7 +93,7 @@ export default class SchemaBuilder extends EventEmitter {
     hookName: "GraphQLInputObjectType:fields:field",
     fn: Hook<GraphQLInputFieldConfig>
   ): void;
-  hook(hookName: "GraphQLEnumType", fn: Hook<GraphQLEnumType>): void;
+  hook(hookName: "GraphQLEnumType", fn: Hook<GraphQLEnumTypeConfig>): void;
   hook(
     hookName: "GraphQLEnumType:values",
     fn: Hook<GraphQLEnumValueConfigMap>
