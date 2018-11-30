@@ -22,6 +22,14 @@ With PostGraphile, a well designed database schema should serve the basis for a 
 
 For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
 
+## PostGraphile is _donationware_
+
+A huge amount of work goes into producing and maintaining this powerful and
+professional software. We give you incredible freedom in how you use it
+thanks to the liberal MIT license; please **give back** by sponsoring ongoing
+maintenance and development via [Patreon](https://patreon.com/benjie), or get
+a [support contract](https://graphile.org/support/).
+
 ## Introduction
 
 Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at GraphQL Summit for a walk-through of building an application with PostGraphile in under 7 minutes. This was using v2 (then called PostGraphQL); we're now up to v4 which has many more bells and whistles!
