@@ -6,6 +6,7 @@ import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
 import { mixed } from '../interfaces';
+import { formatSQLForDebugging } from 'postgraphile-core';
 
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
   o && o.length ? o : undefined;
@@ -370,7 +371,7 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
       pgClient.query = function(...args: Array<any>): any {
         // Debug just the query text. We don’t want to debug variables because
         // there may be passwords in there.
-        debugPg(args[0] && args[0].text ? args[0].text : args[0]);
+        debugPg('%s', formatSQLForDebugging(args[0] && args[0].text ? args[0].text : args[0]));
 
         // tslint:disable-next-line no-invalid-this
         const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
