@@ -37,9 +37,15 @@ beforeAll(() => {
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
     const serverVersionNum = await getServerVersionNum(pgClient);
-    const [gqlSchema, dSchema, pg10Schema] = await Promise.all([
+    const [
+      gqlSchema,
+      dSchema,
+      inheritenceSchema,
+      pg10Schema,
+    ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["d"]),
+      createPostGraphileSchema(pgClient, ["inheritence"]),
       serverVersionNum >= 100000
         ? createPostGraphileSchema(pgClient, ["pg10"])
         : null,
@@ -52,6 +58,7 @@ beforeAll(() => {
     return {
       gqlSchema,
       dSchema,
+      inheritenceSchema,
       pg10Schema,
       rbacSchema,
     };
@@ -65,7 +72,13 @@ beforeAll(() => {
   mutationResults = mutationFileNames.map(async fileName => {
     // Wait for the schema to resolve. We need the schema to be introspected
     // before we can do anything else!
-    let { gqlSchema, dSchema, pg10Schema, rbacSchema } = await gqlSchemaPromise;
+    let {
+      gqlSchema,
+      dSchema,
+      inheritenceSchema,
+      pg10Schema,
+      rbacSchema,
+    } = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async pgClient => {
       // Read the mutation from the file system.
@@ -80,6 +93,8 @@ beforeAll(() => {
       let schemaToUse;
       if (fileName.startsWith("d.")) {
         schemaToUse = dSchema;
+      } else if (fileName.startsWith("inheritence.")) {
+        schemaToUse = inheritenceSchema;
       } else if (fileName.startsWith("pg10.")) {
         const serverVersionNum = await getServerVersionNum(pgClient);
         if (serverVersionNum < 100000) {

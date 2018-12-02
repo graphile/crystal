@@ -60,6 +60,30 @@ Object {
 }
 `;
 
+exports[`inheritence.createUserFile.graphql 1`] = `
+Object {
+  "data": Object {
+    "createUser": Object {
+      "user": Object {
+        "id": 1,
+        "name": "Bobby Tables",
+        "nodeId": "WyJ1c2VycyIsMV0=",
+      },
+    },
+    "createUserFile": Object {
+      "userFile": Object {
+        "filename": "foo.txt",
+        "id": 1,
+        "userByUserId": Object {
+          "id": 1,
+          "name": "Bobby Tables",
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`mutation-create.graphql 1`] = `
 Object {
   "data": Object {

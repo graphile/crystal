@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d cascade;
+drop schema if exists a, b, c, d, inheritence cascade;
 drop extension if exists hstore;
 
 create schema a;
@@ -841,3 +841,20 @@ CREATE INDEX ON "c"."left_arm"("person_id");
 CREATE INDEX ON "c"."person_secret"("person_id");
 
 */
+
+
+create schema inheritence;
+
+create table inheritence.user (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+create table inheritence.file (
+  id SERIAL PRIMARY KEY,
+  filename TEXT NOT NULL
+);
+
+create table inheritence.user_file (
+  user_id INTEGER NOT NULL REFERENCES inheritence.user(id)
+) inherits (inheritence.file);
