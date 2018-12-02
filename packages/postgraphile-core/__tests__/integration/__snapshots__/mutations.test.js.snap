@@ -188,7 +188,7 @@ Object {
         },
       },
       "c": Object {
-        "cursor": "WyJpZF9hc2MiLFs5MDAwLDkwMDBdXQ==",
+        "cursor": "WyJpZF9hc2MiLFs5MDAwXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -203,7 +203,7 @@ Object {
         },
       },
       "e": Object {
-        "cursor": "WyJlbWFpbF9hc2MiLFsiam9obm55LmJveS5zbWl0aEBlbWFpbC5jb20iLDkwMDBdXQ==",
+        "cursor": "WyJlbWFpbF9hc2MiLFsiam9obm55LmJveS5zbWl0aEBlbWFpbC5jb20iXV0=",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -266,7 +266,7 @@ Object {
         },
       },
       "c": Object {
-        "cursor": "WyJpZF9hc2MiLFsyMCwyMF1d",
+        "cursor": "WyJpZF9hc2MiLFsyMF1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -281,7 +281,7 @@ Object {
         },
       },
       "e": Object {
-        "cursor": "WyJlbWFpbF9hc2MiLFsiYmVzdC5wYWxAZW1haWwuY29tIiwyMF1d",
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYmVzdC5wYWxAZW1haWwuY29tIl1d",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -382,7 +382,7 @@ Object {
         },
       },
       "c": Object {
-        "cursor": "WyJpZF9hc2MiLFsxOTk4LDE5OThdXQ==",
+        "cursor": "WyJpZF9hc2MiLFsxOTk4XV0=",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
@@ -397,7 +397,7 @@ Object {
         },
       },
       "e": Object {
-        "cursor": "WyJlbWFpbF9hc2MiLFsiYnVkZC5kZWV5LnRoZS5zZWNvbmRAZW1haWwuY29tIiwxOTk4XV0=",
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYnVkZC5kZWV5LnRoZS5zZWNvbmRAZW1haWwuY29tIl1d",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",

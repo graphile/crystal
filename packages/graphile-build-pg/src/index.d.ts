@@ -19,6 +19,8 @@ export {
   PgExtension,
 };
 
+export function formatSQLForDebugging(sql: string): string;
+
 export function parseIdentifier(
   typeIdentifier: string
 ): {

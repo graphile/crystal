@@ -165,7 +165,7 @@ class QueryBuilder {
 
   // Helper function
   jsonbBuildObject(fields: Array<[SQL, RawAlias]>) {
-    if (this.supportsJSONB) {
+    if (this.supportsJSONB && fields.length > 50) {
       const fieldsChunks = chunk(fields, 50);
       const chunkToJson = fieldsChunk =>
         sql.fragment`jsonb_build_object(${sql.join(
@@ -175,7 +175,10 @@ class QueryBuilder {
           ),
           ", "
         )})`;
-      return sql.join(fieldsChunks.map(chunkToJson), " || ");
+      return sql.fragment`(${sql.join(
+        fieldsChunks.map(chunkToJson),
+        " || "
+      )})::json`;
     } else {
       // PG9.4 will have issues with more than 100 parameters (50 keys)
       return sql.fragment`json_build_object(${sql.join(

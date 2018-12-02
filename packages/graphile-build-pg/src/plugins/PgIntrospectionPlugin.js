@@ -120,6 +120,7 @@ export type PgAttribute = {
   aclInsertable: boolean,
   aclUpdatable: boolean,
   isIndexed: ?boolean,
+  isUnique: ?boolean,
 };
 
 export type PgConstraint = {
@@ -543,6 +544,10 @@ export default (async function PgIntrospectionPlugin(
       // Indexed column (for orderBy / filter):
       if (columns[0]) {
         columns[0].isIndexed = true;
+      }
+
+      if (columns[0] && columns.length === 1 && index.isUnique) {
+        columns[0].isUnique = true;
       }
 
       // Indexed constraints (for reverse relations):

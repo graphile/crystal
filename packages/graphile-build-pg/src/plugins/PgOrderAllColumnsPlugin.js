@@ -23,6 +23,7 @@ export default (function PgOrderAllColumnsPlugin(builder) {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!pgColumnFilter(attr, build, context)) return memo;
         if (omit(attr, "order")) return memo;
+        const unique = attr.isUnique;
 
         const ascFieldName = inflection.orderByColumnEnum(attr, true);
         const descFieldName = inflection.orderByColumnEnum(attr, false);
@@ -33,6 +34,7 @@ export default (function PgOrderAllColumnsPlugin(builder) {
               value: {
                 alias: ascFieldName.toLowerCase(),
                 specs: [[attr.name, true]],
+                unique,
               },
             },
           },

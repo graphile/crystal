@@ -1,12 +1,7 @@
 import debugFactory from "debug";
 import chalk from "chalk";
 
-const rawDebugSql = debugFactory("graphile-build-pg:sql");
-
-function debugSql(sql) {
-  if (!rawDebugSql.enabled) {
-    return;
-  }
+export function formatSQLForDebugging(sql) {
   let colourIndex = 0;
   let allowedColours = [
     chalk.red,
@@ -68,7 +63,16 @@ function debugSql(sql) {
     .replace(/\(\s*(\([A-Za-z0-9_."' =]{1,50}\))\s*\)/g, "($1)")
     .replace(/\n\s*and \(TRUE\)/g, chalk.gray(" and (TRUE)"));
   const colouredSql = tidySql.replace(/__local_[0-9]+__/g, colourize);
-  rawDebugSql("%s", "\n" + colouredSql);
+  return colouredSql;
+}
+
+const rawDebugSql = debugFactory("graphile-build-pg:sql");
+
+function debugSql(sql) {
+  if (!rawDebugSql.enabled) {
+    return;
+  }
+  rawDebugSql("%s", "\n" + formatSQLForDebugging(sql));
 }
 Object.assign(debugSql, rawDebugSql);
 

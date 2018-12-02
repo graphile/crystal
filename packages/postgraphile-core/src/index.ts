@@ -17,6 +17,7 @@ import {
   inflections,
   Inflector,
   PgAttribute,
+  formatSQLForDebugging,
 } from "graphile-build-pg";
 import { Pool, Client } from "pg";
 
@@ -28,6 +29,7 @@ export {
   SchemaListener,
   Inflection,
   Options,
+  formatSQLForDebugging,
 };
 
 export type mixed = {} | string | number | boolean | undefined | null;

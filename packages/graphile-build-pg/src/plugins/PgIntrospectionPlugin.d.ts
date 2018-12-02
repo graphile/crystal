@@ -99,6 +99,7 @@ export interface PgAttribute {
   aclInsertable: boolean;
   aclUpdatable: boolean;
   isIndexed: boolean | void;
+  isUnique: boolean | void;
 }
 
 export interface PgConstraint {
