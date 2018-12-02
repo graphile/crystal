@@ -3816,7 +3816,7 @@ type IntSetQueryConnection {
   edges: [IntSetQueryEdge!]!
 
   \"\"\"A list of \`Int\` objects.\"\"\"
-  nodes: [Int!]!
+  nodes: [Int]!
 }
 
 \"\"\"A \`Int\` edge in the connection.\"\"\"
