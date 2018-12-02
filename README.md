@@ -8,28 +8,25 @@
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-_**An instant, highly-performant GraphQL API for your PostgreSQL database, extensible via a powerful plugin system.**_
+_**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL database. Highly customisable and extensible thanks to incredibly powerful plugin system.**_ _Formerly "PostGraphQL"._
 
-**Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)**
+## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
-_Note: v1-v3 of this project were named **PostGraphQL**. A v3-v4 migration guide is
-available [here](https://www.graphile.org/postgraphile/v3-migration/) and you can check
-out some of the new features
-[here](https://www.graphile.org/postgraphile/v4-new-features/). No more
-development is taking place on v3, but you can still access its branch
-[here](https://github.com/graphile/postgraphile/tree/v3)._
+**GraphQL** is a new way of communicating with your server. It eliminates the problems of over- and under-fetching, incorporates strong data types, has built-in introspection, documentation and deprecation capabilities, and is implemented in many programming languages. This all leads to gloriously low-latency user experiences, better developer experiences, and much increased productivity. Because of all this, GraphQL is typically used as a replacement for (or companion to) RESTful API services.
 
----
+**PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” with each new release bring more amazing features and performance gains. Thinking of your database as a plain CRUD store is now an archaic viewpoint as modern PostgreSQL can do so much for you &mdash; from authorization with Row-Level Security (RLS, introduced in PG9.5), through Foreign Data Wrappers (FDW), to real time notifications with `LISTEN`/`NOTIFY`.
 
-**GraphQL** is a powerful new way to query your servers - it's typically used as a replacement for, or companion to, RESTful API services. Introduced by Facebook in 2015, it features strong data typing, built in introspection and documentation capabilities, and solves among many other things the problems of over- and under-fetching data. It's particularly great for mobile clients where minimizing number of requests, latency, and payload size are all critically important tasks - but this awesome mobile experience makes regular webpages much smoother too.
+**PostGraphile** pairs these two incredible technologies together, helping you not only build applications more rapidly, but to build lightning-fast applications. PostGraphile allows you to access the power of PostgreSQL through a well designed, extensible, customisable and incredibly performant GraphQL server. It automatically detects tables, columns, indexes, relationships, views, types, functions, comments, and more - providing a GraphQL server that is highly intelligent about your data, and that automatically updates itself without restarting when you change your database schema.
 
-**PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” and despite its over 20 year maturity this still rings true. New versions of PostgreSQL are released regularly, and each new major version brings incredible new features, not to mention massive performance gains. Seeing your database as just a plain CRUD store is now an archaic viewpoint, modern PostgreSQL can do so much for you: from enforcing business logic with Role-Based Access Control (RBAC) and Row-Level Security (RLS), through communicating with other systems via Foreign Data Wrappers, to real time notifications with `LISTEN`/`NOTIFY`, PostgreSQL can handle it all with ease.
+With PostGraphile, a well designed database schema should serve the basis for a well thought out API. PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API then any created in-house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer. Once you need to expand beyond this, we have a powerful plugin system including many [community contributed plugins](https://www.graphile.org/postgraphile/community-plugins/). For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
 
-**PostGraphile** pairs these two incredible technologies together to help you not only build applications more rapidly, but to build faster applications! Access the power of PostgreSQL through a well designed, extensible, customisable and incredibly performant GraphQL server. PostGraphile uses PostgreSQL reflection APIs to automatically detect tables, columns, indexes, relationships, views, types, functions, comments, and more - providing a GraphQL server that is highly intelligent about your data. PostGraphile can automatically detect changes to your database (e.g. new columns or tables) and instantly rebuild and serve the updated GraphQL API - even updating GraphiQL automatically! This leads to incredible productivity gains, and helps developers multiply their impact.
+## PostGraphile is _donationware_
 
-With PostGraphile, a well designed database schema should be all you need to serve a well thought out API; and if it isn't - well, we have a powerful plugin system including many [community contributed plugins](https://www.graphile.org/postgraphile/community-plugins/)! PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API then any created in-house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer.
-
-For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
+A huge amount of work goes into producing and maintaining this powerful and
+professional software. We give you incredible freedom in how you use it
+thanks to the liberal MIT license; please **give back** by sponsoring ongoing
+maintenance and development via [Patreon](https://patreon.com/benjie), or get
+a [support contract](https://graphile.org/support/).
 
 ## Introduction
 
@@ -37,18 +34,19 @@ Watch a talk by the original author [Caleb](https://twitter.com/calebmer) at Gra
 
 [![PostGraphile at GraphQL Summit](https://img.youtube.com/vi/b3pwlCDy6vY/0.jpg)](https://www.youtube.com/watch?v=b3pwlCDy6vY)
 
+Hear from the current maintainer [Benjie](https://twitter.com/benjie) at GraphQL Finland about the benefits of Database-Driven GraphQL Development:
+
+[![Database Driven GraphQL Development at GraphQL Finland](https://img.youtube.com/vi/XDOrhTXd4pE/0.jpg)](https://www.youtube.com/watch?v=XDOrhTXd4pE)
+
 ## Usage
 
 **Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)**
 
-You can use PostGraphile via the CLI, as a middleware, or just use the GraphQL schema directly. Make sure to check out the **[forum example][]** and especially **[step by step tutorial][]** for a demo of a PostGraphile compliant schema and authentication.
-
-[forum example]: https://github.com/graphile/postgraphile/tree/master/examples/forum
-[step by step tutorial]: https://github.com/graphile/postgraphile/blob/master/examples/forum/TUTORIAL.md
+You can use PostGraphile via the CLI, as a Node.js middleware, or use the GraphQL schema directly. Make sure to check out the **[full usage instructions](https://graphile.org/postgraphile/usage/)** on the documentation website. We also have a [PostgreSQL schema design guide](http://graphile.meh/postgraphile/postgresql-schema-design/) you can follow to build a fully functional PostGraphile API.
 
 ### CLI
 
-Install using npm:
+To get started you can install PostGraphile globally:
 
 ```bash
 npm install -g postgraphile
@@ -60,9 +58,20 @@ npm install -g postgraphile
 postgraphile --help
 ```
 
+When you're ready to use PostGraphile for your own project, you're advised to install it locally with `yarn`, and run it with `npx`:
+
+```bash
+yarn add postgraphile
+npx postgraphile --help
+```
+
 ### Middleware
 
 You can also use PostGraphile as [native HTTP, Connect, Express, or Koa (experimental) middleware](https://www.graphile.org/postgraphile/usage-library/), e.g.:
+
+```bash
+yarn add postgraphile
+```
 
 ```js
 import { createServer } from 'http';
@@ -120,8 +129,10 @@ PostGraphile features include:
 
 ## Requirements
 
+[Full requirements are on the website](https://www.graphile.org/postgraphile/requirements/), but a basic summary is:
+
 - Node v8.6+
-- PostgreSQL 9.6+ (currently works with 9.4+)
+- PostgreSQL 9.6+ (officially; but currently works with 9.4+)
 - Linux, macOS or Windows
 
 Caveats:
