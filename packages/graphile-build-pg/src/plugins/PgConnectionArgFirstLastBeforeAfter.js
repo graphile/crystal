@@ -70,8 +70,14 @@ export default (function PgConnectionArgs(builder) {
             }
 
             function addCursorConstraint(cursor, isAfter) {
-              const cursorValues = JSON.parse(base64Decode(cursor));
-              return queryBuilder.addCursorCondition(cursorValues, isAfter);
+              try {
+                const cursorValues = JSON.parse(base64Decode(cursor));
+                return queryBuilder.addCursorCondition(cursorValues, isAfter);
+              } catch (e) {
+                throw new Error(
+                  "Invalid cursor, please enter a cursor from a previous request, or null."
+                );
+              }
             }
           },
         };

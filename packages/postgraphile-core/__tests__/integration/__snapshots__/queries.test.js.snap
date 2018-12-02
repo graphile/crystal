@@ -997,6 +997,19 @@ Object {
 }
 `;
 
+exports[`connections-blankcursor.graphql 1`] = `
+Object {
+  "data": Object {
+    "blankCursor": null,
+    "invalidCursor": null,
+  },
+  "errors": Array [
+    [GraphQLError: Invalid cursor, please enter a cursor from a previous request, or null.],
+    [GraphQLError: Invalid cursor, please enter a cursor from a previous request, or null.],
+  ],
+}
+`;
+
 exports[`connections-totalCount.graphql 1`] = `
 Object {
   "data": Object {
