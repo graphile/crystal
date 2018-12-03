@@ -1,6 +1,6 @@
 {
   "name": "graphile",
-  "version": "4.1.0-rc.3",
+  "version": "4.1.0-rc.4",
   "scripts": {
     "watch": "sleep 1000000000",
     "test": "true",
