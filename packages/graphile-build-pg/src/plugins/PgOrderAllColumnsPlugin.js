@@ -54,6 +54,7 @@ export default (function PgOrderAllColumnsPlugin(builder) {
               value: {
                 alias: descFieldName.toLowerCase(),
                 specs: [[attr.name, false]],
+                unique,
               },
             },
           },

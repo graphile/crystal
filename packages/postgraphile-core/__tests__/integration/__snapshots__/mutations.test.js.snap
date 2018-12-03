@@ -220,7 +220,7 @@ Object {
       },
       "clientMutationId": null,
       "d": Object {
-        "cursor": "WyJpZF9kZXNjIixbOTAwMCw5MDAwXV0=",
+        "cursor": "WyJpZF9kZXNjIixbOTAwMF1d",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -234,7 +234,7 @@ Object {
         },
       },
       "f": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIixbImpvaG5ueS5ib3kuc21pdGhAZW1haWwuY29tIiw5MDAwXV0=",
+        "cursor": "WyJlbWFpbF9kZXNjIixbImpvaG5ueS5ib3kuc21pdGhAZW1haWwuY29tIl1d",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -248,7 +248,7 @@ Object {
         },
       },
       "h": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJqb2hubnkuYm95LnNtaXRoQGVtYWlsLmNvbSIsOTAwMCw5MDAwXV0=",
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJqb2hubnkuYm95LnNtaXRoQGVtYWlsLmNvbSIsOTAwMF1d",
         "node": Object {
           "name": "John Smith Jr.",
           "nodeId": "WyJwZW9wbGUiLDkwMDBd",
@@ -298,7 +298,7 @@ Object {
       },
       "clientMutationId": "hello",
       "d": Object {
-        "cursor": "WyJpZF9kZXNjIixbMjAsMjBdXQ==",
+        "cursor": "WyJpZF9kZXNjIixbMjBdXQ==",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -312,7 +312,7 @@ Object {
         },
       },
       "f": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIixbImJlc3QucGFsQGVtYWlsLmNvbSIsMjBdXQ==",
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJlc3QucGFsQGVtYWlsLmNvbSJdXQ==",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -326,7 +326,7 @@ Object {
         },
       },
       "h": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJiZXN0LnBhbEBlbWFpbC5jb20iLDIwLDIwXV0=",
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJiZXN0LnBhbEBlbWFpbC5jb20iLDIwXV0=",
         "node": Object {
           "name": "Best Pal",
           "nodeId": "WyJwZW9wbGUiLDIwXQ==",
@@ -414,7 +414,7 @@ Object {
       },
       "clientMutationId": null,
       "d": Object {
-        "cursor": "WyJpZF9kZXNjIixbMTk5OCwxOTk4XV0=",
+        "cursor": "WyJpZF9kZXNjIixbMTk5OF1d",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
@@ -428,7 +428,7 @@ Object {
         },
       },
       "f": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIixbImJ1ZGQuZGVleS50aGUuc2Vjb25kQGVtYWlsLmNvbSIsMTk5OF1d",
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJ1ZGQuZGVleS50aGUuc2Vjb25kQGVtYWlsLmNvbSJdXQ==",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
@@ -442,7 +442,7 @@ Object {
         },
       },
       "h": Object {
-        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJidWRkLmRlZXkudGhlLnNlY29uZEBlbWFpbC5jb20iLDE5OTgsMTk5OF1d",
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJidWRkLmRlZXkudGhlLnNlY29uZEBlbWFpbC5jb20iLDE5OThdXQ==",
         "node": Object {
           "name": "Budd Deey",
           "nodeId": "WyJwZW9wbGUiLDE5OThd",
