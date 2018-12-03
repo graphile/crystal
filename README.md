@@ -24,7 +24,7 @@ With PostGraphile, a well designed database schema should serve the basis for a 
 
 A huge amount of work goes into producing and maintaining this powerful and
 professional software. We give you incredible freedom in how you use it
-thanks to the liberal MIT license; please **give back** by sponsoring ongoing
+thanks to the permissive MIT license; please **give back** by sponsoring ongoing
 maintenance and development via [Patreon](https://patreon.com/benjie), or get
 a [support contract](https://graphile.org/support/).
 
