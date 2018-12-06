@@ -5,7 +5,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "4.1.0-rc.4",
+  "version": "4.1.0",
   "command": {
     "publish": {
       "allowBranch": "master"
