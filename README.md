@@ -2,7 +2,7 @@
 
 # PostGraphile
 
-[![Patreon donate button](https://img.shields.io/badge/donate-via%20Patreon-orange.svg)](https://patreon.com/benjie)
+[![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
 ![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
@@ -20,13 +20,14 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 With PostGraphile, a well designed database schema should serve the basis for a well thought out API. PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API then any created in-house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer. Once you need to expand beyond this, we have a powerful plugin system including many [community contributed plugins](https://www.graphile.org/postgraphile/community-plugins/). For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
 
-## PostGraphile is _donationware_
+## Crowd-funded open-source software
 
-A huge amount of work goes into producing and maintaining this powerful and
-professional software. We give you incredible freedom in how you use it
-thanks to the permissive MIT license; please **give back** by sponsoring ongoing
-maintenance and development via [Patreon](https://patreon.com/benjie), or get
-a [support contract](https://graphile.org/support/).
+In exchange for the incredible freedom we give in how this software can be
+used (thanks to the permissive MIT license) we ask the individuals and
+businesses that use it to sponsor ongoing maintenance and development. A huge
+amount of work goes into producing and maintaining this powerful and
+professional software, please give back [via
+sponsorship](https://graphile.org/sponsor/).
 
 ## Introduction
 
@@ -143,7 +144,7 @@ Caveats:
 ## Supporting PostGraphile
 
 The fastest and easiest way you can help PostGraphile thrive is by [sponsoring
-ongoing development and maintenance](https://graphile.org/donate).
+ongoing development and maintenance](https://graphile.org/sponsor/).
 
 Want to help testing and developing PostGraphile? Check out the [contributing
 document](CONTRIBUTING.md) to get started quickly!
@@ -161,7 +162,7 @@ Huge thanks to [the individuals and companies who sponsor PostGraphile's
 development](SPONSORS.md) - their financial contributions enable more time to
 be spent on the project: from bug fixes, to code review, to new features! If
 you want to help the project advance more rapidly, please join them in
-[supporting this project](https://graphile.org/donate) 🙏
+[supporting this project](https://graphile.org/sponsor/) 🙏
 
 A humongous, heart-felt, thank you to the original author of PostGraphile -
 [Caleb Meredith](https://twitter.com/calebmer) - for everything he put into

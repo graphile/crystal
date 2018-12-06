@@ -722,7 +722,7 @@ if (noServer) {
               `Join ${chalk.bold(
                 sponsor,
               )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
-                `https://graphile.org/donate`,
+                `https://graphile.org/sponsor/`,
               )}`,
           ],
           {

@@ -266,14 +266,6 @@ class PostGraphiQL extends React.Component {
     this.graphiql.handleToggleHistory(e);
   };
 
-  handlePostGraphile = () => {
-    window.open('https://graphile.org/postgraphile/', 'postgraphile');
-  };
-
-  handleDonate = () => {
-    window.open('https://graphile.org/donate', 'postgraphile');
-  };
-
   handleToggleHeaders = () => {
     this.setState({ showHeaderEditor: !this.state.showHeaderEditor });
   };
@@ -347,11 +339,11 @@ class PostGraphiQL extends React.Component {
                 </a>{' '}
                 |{' '}
                 <a
-                  title="PostGraphile is supported by the community, please donate to fund ongoing development"
-                  href="https://graphile.org/donate"
+                  title="PostGraphile is supported by the community, please sponsor ongoing development"
+                  href="https://graphile.org/sponsor/"
                   target="new"
                 >
-                  Support Development
+                  Sponsor Development
                 </a>
               </div>
             </GraphiQL.Footer>
