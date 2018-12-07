@@ -22,6 +22,10 @@ if [ "$1" = "--" ]; then
 else
   export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
   $npm_bin/nodemon \
+    --watch ../packages/postgraphile-core/node8plus \
+    --watch ../packages/graphile-build-pg/node8plus \
+    --watch ../packages/graphile-build/node8plus \
+    --watch ../packages/graphile-uitls/node8plus \
     --watch src \
     --ignore __tests__ \
     --ignore __mocks__ \

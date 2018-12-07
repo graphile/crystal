@@ -6,43 +6,66 @@ enables developers to build powerful applications in much less time then would
 previously have been taken. This document aims to help you get started
 contributing to the project.
 
-As PostGraphile may be a piece of critical infrastructure in your app, it is
-only fair to run the project as [OPEN Open Source](http://openopensource.org/).
-If you contribute meaningful work to the PostGraphile project you will be made
-a collaborator which allows you to create new branches and approve pull
-requests.
+## Development environment
 
-To get started hacking on the codebase, make sure Postgres is listening on
-`localhost:5432`, go to the project folder and then run the following to
-install all dependencies and PostGraphile schemas into your default database:
+Since PostGraphile is mostly powered by Graphile Engine the best way to
+develop it is to do it in the context of a Graphile Engine build so that you
+may dig into the depths if you need to.
+
+To get started:
 
 ```bash
-yarn # or "npm install" if you prefer
-scripts/run-kitchen-sink-sql [-h <hostname> -U <user>] # add optional args to psql
-scripts/dev
+npm install -g yarn # Use the latest yarn
+
+# Clone and setup Graphile Engine
+git clone git@github.com:graphile/graphile-engine.git
+cd graphile-engine
+yarn
+
+# Clone and setup PostGraphile *inside* of graphile-engine
+git clone git@github.com:graphile/postgraphile.git
+cd postgraphile
+yarn
+# Remove our dependencies that are instead served by the local Graphile Engine
+./rmlocal.sh
 ```
 
-The first script will install all dependencies of PostGraphile project. The
-second script will add the kitchen sink SQL schemas (named `a`, `b`, and `c`)
-to your default Postgres database at `localhost:5432`. The third script will
-start PostGraphile in watch mode and open GraphiQL in your default browser.
-Whenever you change the PostGraphile source code, the `scripts/dev` command
-will restart the PostGraphile server. To manually restart the server type in
-`rs` and hit enter while `scripts/dev` is running.
+Make sure you read the instructions on developing Graphile Engine, in
+particular remember to run `yarn watch` in the `graphile-engine` folder to
+keep transpiling the module sources.
 
-If you want to use a different database (e.g. after `createdb postgraphile`),
-you can do so by passing the database URL to these commands, like this:
+## Running development PostGraphile
+
+Next make sure Postgres is listening on `localhost:5432`, change into the
+`postgraphile` folder, then you can run the `scripts/dev`:
 
 ```bash
-scripts/run-kitchen-sink-sql postgres://localhost:5432/postgraphile
-scripts/dev -c postgres://localhost:5432/postgraphile
+scripts/dev -- -c my_db -s my_schema --watch --enhance-graphiql
 ```
 
-To start PostGraphile with arguments besides the defaults, just add them to
-`scripts/dev` like so:
+The `--` makes scripts/dev act more like a regular build - i.e. exiting on
+the `-X` commands or when an error occurs.
+
+Run the above **without** the `--` may be preferable in many cases - this
+uses `nodemon` so that then whenever you change the PostGraphile source code,
+the `scripts/dev` command will restart the PostGraphile server. To manually
+restart the server type in `rs` and hit enter while `scripts/dev` is running.
+
+## Updating
+
+When updating, from the `graphile-engine` folder:
 
 ```bash
-scripts/dev --schema forum_example --secret keyboard_kitten
+# Pull changes, install updates
+git pull --rebase
+yarn
+
+# Pull changes, install updates for postgraphile too
+cd postgraphile
+git pull --rebase
+yarn
+# Re-delete the modules that we want served by graphile-engine instead
+./rmlocal.sh
 ```
 
 ## Tests
@@ -56,7 +79,7 @@ running on `localhost:5432`. To do so run the following:
 createdb postgraphile_test
 ```
 
-To run the full test suite run:
+To run the PostGraphile test suite run:
 
 ```bash
 scripts/test
@@ -73,6 +96,10 @@ Now, only the tests in the files you have changed will be run. There are some
 slow tests in the PostGraphile suite so hopefully this should make your
 development time faster. Once you are in watch mode, Jest will present you with
 some options you can use to better configure your testing experience.
+
+If you change Graphile Engine, don't forget to run the Graphile Engine tests.
+These require a `TEST_DATABASE_URL` envvar to be set, the database pointed to
+by this will be overwritten. For historical reasons, Benjie uses `pggql_test`.
 
 ### Snapshots
 
@@ -95,13 +122,13 @@ test builds and enforce lint rules:
 
 The instance of GraphiQL used by PostGraphile is a
 [`create-react-app`](https://github.com/facebookincubator/create-react-app)
-located in `src/postgraphile/graphiql`. When developing PostGraphile (running
+located in `postgraphiql`. When developing PostGraphile (running
 `scripts/dev` only), GraphiQL will run on a different port to take advantage of
 the `create-react-app` developer experience.
 
 When we build PostGraphile before publishing (with `scripts/build`), GraphiQL
-is built into a few JS, CSS, and HTML files then served by the PostGraphile
-middleware people import into their projects.
+is built into a resources served by the PostGraphile middleware people import
+into their projects.
 
 ## Commit messages
 
@@ -126,27 +153,27 @@ will be written to summarize the changes.
 
 You must use one of the following types:
 
-* `chore`
-* `docs`
-* `feat`
-* `fix`
-* `refactor`
-* `style`
-* `test`
+- `chore`
+- `docs`
+- `feat`
+- `fix`
+- `refactor`
+- `style`
+- `test`
 
 Common scopes are as follows. You are not required to use any of the following
 scopes and may instead invent your own. These are just a few that get commonly
 used.
 
-* `*`
-* `postgraphile`
-* `graphql`
-* `interface`
-* `postgres`
-* `package`
-* `scripts`
-* `examples`
-* `ci`
+- `*`
+- `postgraphile`
+- `graphql`
+- `interface`
+- `postgres`
+- `package`
+- `scripts`
+- `examples`
+- `ci`
 
 ## Resources
 
@@ -154,4 +181,4 @@ Here are some resources that will help you learn more about Postgres and
 GraphQL so that you may understand more of what is going on inside
 PostGraphile.
 
-* [The Anatomy of a GraphQL Query.](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747) This article provides the vocabulary you need to talk about a GraphQL query technically.
+- [The Anatomy of a GraphQL Query.](https://dev-blog.apollodata.com/the-anatomy-of-a-graphql-query-6dffa9e9e747) This article provides the vocabulary you need to talk about a GraphQL query technically.
