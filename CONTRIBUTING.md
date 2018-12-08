@@ -8,109 +8,248 @@ contributing to the project.
 
 ## Development environment
 
+First of all, our development environment is focussed around Unix tools. If
+you are on Windows, you may need to use something like Docker or a VM to help
+you develop.
+
 Since PostGraphile is mostly powered by Graphile Engine the best way to
 develop it is to do it in the context of a Graphile Engine build so that you
 may dig into the depths if you need to.
 
-To get started:
+We use yarn workspaces, so it's very important that you use the `yarn`
+package manager rather an npm whilst developing PostGraphile.
+
+```
+npm install -g yarn
+```
+
+Before we start, check that you're running up to date versions of the relevant
+tools, you should be running at least:
+
+```
+$ node --version
+v10.13.0
+$ yarn --version
+1.12.1
+$ git --version
+git version 2.18.0
+$ watchman --version # optional
+4.9.0
+```
+
+(If you don't have `watchman` that's fine, but it helps when watching large
+numbers of files. On Mac you can install it using homebrew:
+`brew install watchman`)
+
+To get started, we're going to check out `graphile-engine`, and then we're
+going to check out `postgraphile` _inside of_ `graphile-engine`. With a few
+tweaks this will enable `postgraphile` to use the development version of the
+modules in `graphile-engine` without needing to perform `yarn link` etc.
+
+It should be safe to copy and paste these commands into your terminal (one at
+a time), but if you're using zsh you may want to run this first so that comments are ignored:
+
+```
+set -k
+```
+
+Okay, here's the setup:
 
 ```bash
-npm install -g yarn # Use the latest yarn
+# Clone graphile-engine:
+git clone git@github.com:graphile/graphile-engine.git graphile-engine
 
-# Clone and setup Graphile Engine
-git clone git@github.com:graphile/graphile-engine.git
+# Clone postgraphile _inside of_ graphile-engine:
+git clone git@github.com:graphile/postgraphile.git graphile-engine/postgraphile
+
+########################################
+
+# Initial setup for graphile-engine
 cd graphile-engine
-yarn
 
-# Clone and setup PostGraphile *inside* of graphile-engine
-git clone git@github.com:graphile/postgraphile.git
-cd postgraphile
+# Install deps:
 yarn
-# Remove our dependencies that are instead served by the local Graphile Engine
+# Monorepo stuff:
+yarn lerna bootstrap
+# Run initial build:
+yarn prepack:all
+
+########################################
+
+# Initial setup for postgraphile
+cd postgraphile
+
+# Install deps:
+yarn
+# Remove deps that should be served by the parent graphile-engine:
 ./rmlocal.sh
+# Builds GraphiQL, images, etc so they can be require()d:
+yarn make-assets
 ```
 
-Make sure you read the instructions on developing Graphile Engine, in
-particular remember to run `yarn watch` in the `graphile-engine` folder to
-keep transpiling the module sources.
+## Developing
 
-## Running development PostGraphile
+### Graphile Engine
 
-Next make sure Postgres is listening on `localhost:5432`, change into the
-`postgraphile` folder, then you can run the `scripts/dev`:
+Graphile Engine is built in a mixture of TypeScript and Flow (we're slowly
+migrating to TypeScript); which means it has a compile step. For developer
+productivity we don't incur this compilation cost every time we run the
+development version of PostGraphile, instead we require the compiled code in
+most places. This means that we must watch the source code for changes so
+that when we run the compiled code it's not out of date. To do this, in the
+root of graphile-engine, run `yarn watch`:
+
+```
+yarn watch
+```
+
+This will compile everything, and then monitor for changes and compile just
+the changed files. Every time a file is compiled it will be listed in the
+output - **be careful to check for errors**!
+
+You should leave this watch process running, so open another terminal to do
+further work.
+
+### PostGraphile
+
+First, change into the postgraphile directory (`graphile-engine/postgraphile/`).
+
+To run PostGraphile in development, you can use the `scripts/dev` command.
+This command emulates the `postgraphile` command, and it has two modes. If
+you want the `scripts/dev` command to exit when `postgraphile` would, add two
+hyphens, e.g.
 
 ```bash
-scripts/dev -- -c my_db -s my_schema --watch --enhance-graphiql
+# Will run once and exit on error or `-X` option
+scripts/dev -- -c postgres://localhost/my_db -s my_schema --watch --enhance-graphiql
 ```
 
-The `--` makes scripts/dev act more like a regular build - i.e. exiting on
+The `--` makes `scripts/dev` act more like a regular build - i.e. exiting on
 the `-X` commands or when an error occurs.
 
-Run the above **without** the `--` may be preferable in many cases - this
-uses `nodemon` so that then whenever you change the PostGraphile source code,
-the `scripts/dev` command will restart the PostGraphile server. To manually
-restart the server type in `rs` and hit enter while `scripts/dev` is running.
-
-## Updating
-
-When updating, from the `graphile-engine` folder:
+If, however, you want `scripts/dev` to automatically restart whenever you
+change the PostGraphile or Graphile Engine source code, run it without the
+`--`. To manually restart the server type in `rs` and hit enter while
+`scripts/dev` is running.
 
 ```bash
-# Pull changes, install updates
-git pull --rebase
-yarn
-
-# Pull changes, install updates for postgraphile too
-cd postgraphile
-git pull --rebase
-yarn
-# Re-delete the modules that we want served by graphile-engine instead
-./rmlocal.sh
+# Will monitor the source for changes and restart automatically
+scripts/dev -c postgres://localhost/my_db -s my_schema --watch --enhance-graphiql
 ```
+
+## Updating or changing branches
+
+Due to this peculiar setup, when you want to update or switch branches,
+you have to do an extra couple steps than you might expect.
+
+### Graphile Engine
+
+(In the `graphile-engine` folder.)
+
+Thanks to yarn workspaces, updating the `graphile-engine` folder
+is straightforward:
+
+```bash
+git pull --rebase # or checkout a branch, or whatever
+yarn # update deps
+```
+
+If you're running `yarn watch` in the `graphile-engine` folder then it's
+probably a good idea to restart it incase any of the dependencies have
+changed.
+
+### PostGraphile
+
+(In the `graphile-engine/postgraphile` folder.)
+
+```
+git pull --rebase # or checkout a branch, or whatever
+yarn # update deps
+./rmlocal.sh # Remove deps that should be served by the parent graphile-engine
+```
+
+The `./rmlocal.sh` script is the one you must remember to run again -
+otherwise yarn will restore the release versions of `postgraphile-core`,
+`graphile-build-pg` and `graphile-build`, thus your local changes won't be represented.
 
 ## Tests
 
 PostGraphile uses [Jest](http://facebook.github.io/jest/) for testing to take
-advantage of Jest’s snapshot feature. To run PostGraphile tests you will need
-to first create the `postgraphile_test` database in your Postgres instance
-running on `localhost:5432`. To do so run the following:
+advantage of Jest’s snapshot feature. We test against a local database, so
+make sure PostgreSQL is running on `localhost:5432`.
+
+### Graphile Engine
+
+Graphile Engine uses a user-configurable test database. For historic reasons,
+Benjie calls it `pggql_test` (this is from before Graphile Engine had a
+name!), so we'll use that name here:
+
+```
+createdb pggql_test
+```
+
+We must then export a `TEST_DATABASE_URL` environment variable so the tests
+know where to install. **WARNING**: this database will be overwritten!
+
+```
+export TEST_DATABASE_URL="postgres://localhost/pggql_test"
+```
+
+Then you can run the tests with
+
+```
+yarn test
+```
+
+This takes a while; I'd advise that you focus on the integration tests in
+`postgraphile-core` in most cases; and since we're using jest you can pass a
+filter such as `queries` to only run tests with a file name that contains the
+word `queries`:
+
+```
+cd packages/postgraphile-core
+yarn test queries
+```
+
+### PostGraphile
+
+To run PostGraphile tests you will need to first create the
+`postgraphile_test` database:
 
 ```bash
 createdb postgraphile_test
 ```
 
-To run the PostGraphile test suite run:
+Then run the test suite with:
 
 ```bash
-scripts/test
+yarn test
 ```
 
 When developing PostGraphile, we recommend using the Jest watch mode feature.
 So instead you would run tests like so:
 
 ```bash
-scripts/test --watch
+yarn test --watch
 ```
+
+(If you get an error about too many open files, consider installing
+`watchman` as mentioned above.)
 
 Now, only the tests in the files you have changed will be run. There are some
 slow tests in the PostGraphile suite so hopefully this should make your
 development time faster. Once you are in watch mode, Jest will present you with
 some options you can use to better configure your testing experience.
 
-If you change Graphile Engine, don't forget to run the Graphile Engine tests.
-These require a `TEST_DATABASE_URL` envvar to be set, the database pointed to
-by this will be overwritten. For historical reasons, Benjie uses `pggql_test`.
-
 ### Snapshots
 
-PostGraphile makes use of the Jest snapshot feature. Even when you change small
-things in PostGraphile the snapshot tests are likely to fail. This is OK, the
-snapshot tests are expected to fail. To make the snapshot tests pass again, run
-`scripts/test --watch` and then press `u` once the initial tests have run. Or
-run `scripts/test --updateSnapshot`. This will rerun the tests and change the
-snapshot files in the repository. Commit the changes to the snapshots and the
-changed snapshots will be reviewed along with the rest of your changes in the
-PR review process.
+We make use of the Jest snapshot feature. Even when you change small things
+the snapshot tests are likely to fail, this is expected. To update the
+snapshots so that the tests pass again, you can press `u` if you're running
+in watch mode, or you can run `yarn test -u`. You should carefully review the
+changes to the snapshots to ensure they're what you intended. Commit the
+changes to the snapshots and the changed snapshots will be reviewed along
+with the rest of your changes in the PR review process.
 
 ### Linting
 
@@ -123,12 +262,14 @@ test builds and enforce lint rules:
 The instance of GraphiQL used by PostGraphile is a
 [`create-react-app`](https://github.com/facebookincubator/create-react-app)
 located in `postgraphiql`. When developing PostGraphile (running
-`scripts/dev` only), GraphiQL will run on a different port to take advantage of
-the `create-react-app` developer experience.
+`scripts/dev` only), GraphiQL will run on a different port to take advantage
+of the `create-react-app` developer experience.
 
-When we build PostGraphile before publishing (with `scripts/build`), GraphiQL
-is built into a resources served by the PostGraphile middleware people import
-into their projects.
+Note that `postgraphiql` has it's own `package.json` and `yarn.lock` because
+it depends on a specific version of GraphQL which is different from the wide
+range supported by PostGraphile/Graphile Engine. When we build PostGraphile
+before publishing (with `scripts/build`), GraphiQL is built into a resources
+served by the PostGraphile middleware people import into their projects.
 
 ## Commit messages
 

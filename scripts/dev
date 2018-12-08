@@ -25,7 +25,7 @@ else
     --watch ../packages/postgraphile-core/node8plus \
     --watch ../packages/graphile-build-pg/node8plus \
     --watch ../packages/graphile-build/node8plus \
-    --watch ../packages/graphile-uitls/node8plus \
+    --watch ../packages/graphile-utils/node8plus \
     --watch src \
     --ignore __tests__ \
     --ignore __mocks__ \
