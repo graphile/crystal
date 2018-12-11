@@ -16,22 +16,25 @@ sponsor](https://graphile.org/sponsor/).
 - James Allain
 - DOMONDA
 - Gustin Prudner
+- Matthew Mullens
 
 ## Supporters
 
 - Mtpc
 - Clay Smith
-- Michael Tng
 - Matt Bretl (also a major community contributor!)
+- Michael Tng
 - Bureau Moelijke Dingen
 - Centre for Effective Altruism
 - Sam Levin
-- James Rascoe
 - Gardner Bickford
+- James Rascoe
 - Michel Pelletier
-- Dan Lynch
-- Jimmy McBroom
 - stlbucket
-- Tim Field
+- Jimmy McBroom
+- Dan Lynch
 - Andreas
 - James Cavanaugh
+- Tim Field
+- Amédée d'Aboville
+- Antwaan Harrison
