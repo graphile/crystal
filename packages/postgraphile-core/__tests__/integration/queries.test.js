@@ -53,6 +53,7 @@ beforeAll(() => {
       dSchema,
       simpleCollections,
       orderByNullsLast,
+      smartCommentRelations,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
@@ -77,6 +78,7 @@ beforeAll(() => {
           orderByNullsLast: true,
         },
       }),
+      createPostGraphileSchema(pgClient, ["smart_comment_relations"], {}),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -96,6 +98,7 @@ beforeAll(() => {
       simpleCollections,
       orderByNullsLast,
       rbac,
+      smartCommentRelations,
     };
   });
 
@@ -148,6 +151,8 @@ beforeAll(() => {
               gqlSchema = gqlSchemas.dSchema;
             } else if (fileName.startsWith("rbac.")) {
               gqlSchema = gqlSchemas.rbac;
+            } else if (fileName.startsWith("smart_comment_relations.")) {
+              gqlSchema = gqlSchemas.smartCommentRelations;
             } else {
               gqlSchema = gqlSchemas.normal;
             }
@@ -167,7 +172,7 @@ beforeAll(() => {
             });
             if (result.errors) {
               // eslint-disable-next-line no-console
-              console.log(result.errors.map(e => e.originalError));
+              console.log(result.errors.map(e => e.originalError || e));
             }
             return result;
           } finally {

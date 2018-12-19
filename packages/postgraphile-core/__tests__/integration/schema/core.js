@@ -13,5 +13,5 @@ exports.test = (schemas, options, setup, finalCheck = () => {}) => () =>
     }
     const schema = await createPostGraphileSchema(client, schemas, options);
     expect(printSchemaOrdered(schema)).toMatchSnapshot();
-    await finalCheck();
+    await finalCheck(schema);
   });

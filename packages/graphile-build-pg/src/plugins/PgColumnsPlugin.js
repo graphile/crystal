@@ -147,7 +147,9 @@ export default (function PgColumnsPlugin(builder) {
                   description: attr.description,
                   type: nullableIf(
                     GraphQLNonNull,
-                    !attr.isNotNull && !attr.type.domainIsNotNull,
+                    !attr.isNotNull &&
+                      !attr.type.domainIsNotNull &&
+                      !attr.tags.notNull,
                     ReturnType
                   ),
                   resolve: (data, _args, _context, _resolveInfo) => {
@@ -233,7 +235,9 @@ export default (function PgColumnsPlugin(builder) {
                     GraphQLNonNull,
                     isPgBaseInput ||
                       isPgPatch ||
-                      (!attr.isNotNull && !attr.type.domainIsNotNull) ||
+                      (!attr.isNotNull &&
+                        !attr.type.domainIsNotNull &&
+                        !attr.tags.notNull) ||
                       attr.hasDefault ||
                       attr.identity === "d",
                     pgGetGqlInputTypeByTypeIdAndModifier(

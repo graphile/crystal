@@ -64,6 +64,13 @@ export default (async function PgAllRows(
         const uniqueIdAttribute = viewUniqueKey
           ? attributes.find(attr => attr.name === viewUniqueKey)
           : undefined;
+        if (isView && table.tags.uniqueKey && !uniqueIdAttribute) {
+          throw new Error(
+            `Could not find the named unique key '${
+              table.tags.uniqueKey
+            }' on view '${table.namespaceName}.${table.name}'`
+          );
+        }
         if (!ConnectionType) {
           throw new Error(
             `Could not find GraphQL connection type for table '${table.name}'`

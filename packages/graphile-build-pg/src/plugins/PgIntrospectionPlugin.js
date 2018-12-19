@@ -199,6 +199,230 @@ function readFile(filename, encoding) {
   });
 }
 
+const removeQuotes = str => {
+  const trimmed = str.trim();
+  if (trimmed[0] === '"') {
+    if (trimmed[trimmed.length - 1] !== '"') {
+      throw new Error(
+        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`
+      );
+    }
+    return trimmed.substr(1, trimmed.length - 2);
+  } else {
+    // PostgreSQL lower-cases unquoted columns, so we should too.
+    return trimmed.toLowerCase();
+  }
+};
+
+const parseSqlColumn = (str, array = false) => {
+  if (!str) {
+    throw new Error(`Cannot parse '${str}'`);
+  }
+  const parts = array ? str.split(",") : [str];
+  const parsedParts = parts.map(removeQuotes);
+  return array ? parsedParts : parsedParts[0];
+};
+
+function parseConstraintSpec(rawSpec) {
+  const [spec, ...tagComponents] = rawSpec.split(/\|/);
+  const parsed = parseTags(tagComponents.join("\n"));
+  return {
+    spec,
+    tags: parsed.tags,
+    description: parsed.text,
+  };
+}
+
+function smartCommentConstraints(introspectionResults) {
+  const attributesByNames = (tbl, cols, debugStr) => {
+    const attributes = introspectionResults.attribute
+      .filter(a => a.classId === tbl.id)
+      .sort((a, b) => a.num - b.num);
+    if (!cols) {
+      const pk = introspectionResults.constraint.find(
+        c => c.classId == tbl.id && c.type === "p"
+      );
+      if (pk) {
+        return pk.keyAttributeNums.map(n => attributes.find(a => a.num === n));
+      } else {
+        throw new Error(
+          `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${
+            tbl.id
+          }) and no PK found (${debugStr}).`
+        );
+      }
+    }
+    return cols.map(colName => {
+      const attr = attributes.find(a => a.name === colName);
+      if (!attr) {
+        throw new Error(
+          `Could not find attribute '${colName}' in '${tbl.namespaceName}.${
+            tbl.name
+          }'`
+        );
+      }
+      return attr;
+    });
+  };
+
+  // First: primary keys
+  introspectionResults.class.forEach(klass => {
+    const namespace = introspectionResults.namespace.find(
+      n => n.id === klass.namespaceId
+    );
+    if (!namespace) {
+      return;
+    }
+    if (klass.tags.primaryKey) {
+      if (typeof klass.tags.primaryKey !== "string") {
+        throw new Error(
+          `@primaryKey configuration of '${klass.namespaceName}.${
+            klass.name
+          }' is invalid; please specify just once "@primaryKey col1,col2"`
+        );
+      }
+      const { spec: pkSpec, tags, description } = parseConstraintSpec(
+        klass.tags.primaryKey
+      );
+      // $FlowFixMe
+      const columns: string[] = parseSqlColumn(pkSpec, true);
+      const attributes = attributesByNames(
+        klass,
+        columns,
+        `@primaryKey ${klass.tags.primaryKey}`
+      );
+      attributes.forEach(attr => {
+        attr.tags.notNull = true;
+      });
+      const keyAttributeNums = attributes.map(a => a.num);
+      // Now we need to fake a constraint for this:
+      const fakeConstraint = {
+        kind: "constraint",
+        isFake: true,
+        id: Math.random(),
+        name: `FAKE_${klass.namespaceName}_${klass.name}_primaryKey`,
+        type: "p", // primary key
+        classId: klass.id,
+        foreignClassId: null,
+        comment: null,
+        description,
+        keyAttributeNums,
+        foreignKeyAttributeNums: null,
+        tags,
+      };
+      introspectionResults.constraint.push(fakeConstraint);
+    }
+  });
+  // Now primary keys are in place, we can apply foreign keys
+  introspectionResults.class.forEach(klass => {
+    const namespace = introspectionResults.namespace.find(
+      n => n.id === klass.namespaceId
+    );
+    if (!namespace) {
+      return;
+    }
+    if (klass.tags.foreignKey) {
+      const foreignKeys =
+        typeof klass.tags.foreignKey === "string"
+          ? [klass.tags.foreignKey]
+          : klass.tags.foreignKey;
+      if (!Array.isArray(foreignKeys)) {
+        throw new Error(
+          `Invalid foreign key smart comment specified on '${
+            klass.namespaceName
+          }.${klass.name}'`
+        );
+      }
+      foreignKeys.forEach((fkSpecRaw, index) => {
+        if (typeof fkSpecRaw !== "string") {
+          throw new Error(
+            `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${
+              klass.name
+            }'`
+          );
+        }
+        const { spec: fkSpec, tags, description } = parseConstraintSpec(
+          fkSpecRaw
+        );
+        const matches = fkSpec.match(
+          /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i
+        );
+        if (!matches) {
+          throw new Error(
+            `Invalid foreignKey syntax for '${klass.namespaceName}.${
+              klass.name
+            }'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${fkSpecRaw}'`
+          );
+        }
+        const [
+          ,
+          rawColumns,
+          rawSchemaOrTable,
+          rawTableOnly,
+          rawForeignColumns,
+        ] = matches;
+        const rawSchema = rawTableOnly
+          ? rawSchemaOrTable
+          : `"${klass.namespaceName}"`;
+        const rawTable = rawTableOnly || rawSchemaOrTable;
+        // $FlowFixMe
+        const columns: string[] = parseSqlColumn(rawColumns, true);
+        // $FlowFixMe
+        const foreignSchema: string = parseSqlColumn(rawSchema);
+        // $FlowFixMe
+        const foreignTable: string = parseSqlColumn(rawTable);
+        // $FlowFixMe
+        const foreignColumns: string[] = rawForeignColumns
+          ? parseSqlColumn(rawForeignColumns, true)
+          : null;
+
+        const foreignKlass = introspectionResults.class.find(
+          k => k.name === foreignTable && k.namespaceName === foreignSchema
+        );
+        if (!foreignKlass) {
+          throw new Error(
+            `@foreignKey smart comment referenced non-existant table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`
+          );
+        }
+        const foreignNamespace = introspectionResults.namespace.find(
+          n => n.id === foreignKlass.namespaceId
+        );
+        if (!foreignNamespace) {
+          return;
+        }
+
+        const keyAttributeNums = attributesByNames(
+          klass,
+          columns,
+          `@foreignKey ${fkSpecRaw}`
+        ).map(a => a.num);
+        const foreignKeyAttributeNums = attributesByNames(
+          foreignKlass,
+          foreignColumns,
+          `@foreignKey ${fkSpecRaw}`
+        ).map(a => a.num);
+
+        // Now we need to fake a constraint for this:
+        const fakeConstraint = {
+          kind: "constraint",
+          isFake: true,
+          id: Math.random(),
+          name: `FAKE_${klass.namespaceName}_${klass.name}_foreignKey_${index}`,
+          type: "f", // foreign key
+          classId: klass.id,
+          foreignClassId: foreignKlass.id,
+          comment: null,
+          description,
+          keyAttributeNums,
+          foreignKeyAttributeNums,
+          tags,
+        };
+        introspectionResults.constraint.push(fakeConstraint);
+      });
+    }
+  });
+}
+
 export default (async function PgIntrospectionPlugin(
   builder,
   {
@@ -210,8 +434,14 @@ export default (async function PgIntrospectionPlugin(
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
     pgSkipInstallingWatchFixtures = false,
+    pgAugmentIntrospectionResults,
   }
 ) {
+  const augment = introspectionResults => {
+    [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(
+      fn => (fn ? fn(introspectionResults) : null)
+    );
+  };
   async function introspect() {
     // Perform introspection
     if (!Array.isArray(schemas)) {
@@ -395,6 +625,8 @@ export default (async function PgIntrospectionPlugin(
         }
       });
     };
+
+    augment(introspectionResultsByKind);
 
     relate(
       introspectionResultsByKind.class,

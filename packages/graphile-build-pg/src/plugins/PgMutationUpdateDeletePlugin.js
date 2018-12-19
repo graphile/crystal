@@ -543,6 +543,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                       {
                         isPgNodeMutation: false,
                         pgFieldIntrospection: table,
+                        pgFieldConstraint: constraint,
                         [mode === "update"
                           ? "isPgUpdateMutationField"
                           : "isPgDeleteMutationField"]: true,

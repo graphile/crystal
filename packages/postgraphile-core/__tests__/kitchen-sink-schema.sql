@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations cascade;
 drop extension if exists hstore;
 
 create schema a;
@@ -858,3 +858,94 @@ create table inheritence.file (
 create table inheritence.user_file (
   user_id INTEGER NOT NULL REFERENCES inheritence.user(id)
 ) inherits (inheritence.file);
+
+
+
+
+create schema smart_comment_relations;
+
+create table smart_comment_relations.streets (
+  id serial primary key,
+  name text not null
+);
+
+create table smart_comment_relations.properties (
+  id serial primary key,
+  street_id int not null references smart_comment_relations.streets on delete cascade,
+  name_or_number text not null
+);
+
+create table smart_comment_relations.street_property (
+  str_id int not null references smart_comment_relations.streets on delete cascade,
+  prop_id int not null references smart_comment_relations.properties on delete cascade,
+  current_owner text,
+  primary key (str_id, prop_id)
+);
+
+create table smart_comment_relations.buildings (
+  id serial primary key,
+  property_id int not null references smart_comment_relations.properties on delete cascade,
+  name text not null,
+  floors int not null default 1,
+  is_primary boolean not null default true
+);
+
+comment on table smart_comment_relations.buildings is E'@foreignKey (name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet';
+
+-- Only one primary building
+create unique index on smart_comment_relations.buildings (property_id) where is_primary is true;
+
+create view smart_comment_relations.houses as (
+  select 
+    buildings.name as building_name,
+    properties.name_or_number as property_name_or_number,
+    streets.name as street_name,
+    streets.id as street_id,
+    buildings.id as building_id,
+    properties.id as property_id,
+    buildings.floors
+  from smart_comment_relations.properties
+  inner join smart_comment_relations.streets
+  on (properties.street_id = streets.id)
+  left join smart_comment_relations.buildings
+  on (buildings.property_id = properties.id and buildings.is_primary is true)
+);
+comment on view smart_comment_relations.houses is E'@primaryKey street_id,property_id
+@foreignKey (street_id) references smart_comment_relations.streets
+@foreignKey (building_id) references smart_comment_relations.buildings (id)
+@foreignKey (property_id) references properties
+@foreignKey (street_id, property_id) references street_property (str_id, prop_id)
+';
+
+comment on column smart_comment_relations.houses.property_name_or_number is E'@notNull';
+comment on column smart_comment_relations.houses.street_name is E'@notNull';
+
+create table smart_comment_relations.post (
+  id text primary key
+);
+comment on table smart_comment_relations.post is E'@name post_table
+@omit';
+
+create table smart_comment_relations.offer (
+  id serial primary key,
+  post_id text references smart_comment_relations.post(id) not null
+);
+comment on table smart_comment_relations.offer is E'@name offer_table
+@omit';
+
+create view smart_comment_relations.post_view as
+  SELECT 
+    post.id
+    FROM smart_comment_relations.post post;
+comment on view smart_comment_relations.post_view is E'@name posts
+@primaryKey id';
+
+create view smart_comment_relations.offer_view as
+  SELECT
+    offer.id,
+    offer.post_id
+
+    FROM smart_comment_relations.offer offer;
+comment on view smart_comment_relations.offer_view is E'@name offers
+@primaryKey id
+@foreignKey (post_id) references post_view (id)';

@@ -144,3 +144,30 @@ update d.person set
   col_no_anything = col_no_anything || id::text;
 
 alter sequence d.person_id_seq restart with 10;
+
+
+-- Begin data for smart_comment_relations
+
+
+insert into smart_comment_relations.streets (id, name) values
+  (1, 'My Street'),
+  (2, 'Our Street'),
+  (3, 'Dunroamin');
+
+insert into smart_comment_relations.properties (id, street_id, name_or_number) values
+  (1, 1, 'My House'),
+  (2, 1, '10'),
+  (3, 2, 'The middle'),
+  (4, 3, 'Your house');
+
+insert into smart_comment_relations.street_property (str_id, prop_id, current_owner) values
+  (1, 1, 'Me'),
+  (2, 3, 'Us'),
+  (3, 4, 'You');
+
+insert into smart_comment_relations.buildings (id, property_id, name, floors, is_primary) values
+  (1, 3, 'Our House', 3, true),
+  (2, 3, 'Dunroamin', 1, false),
+  (3, 3, 'Our shed', 1, false),
+  (4, 1, 'Home sweet home', 2, true),
+  (5, 4, 'The Tower', 200, true);

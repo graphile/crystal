@@ -7302,6 +7302,332 @@ Object {
 }
 `;
 
+exports[`smart_comment_relations.houses.graphql 1`] = `
+Object {
+  "data": Object {
+    "allHouses": Object {
+      "nodes": Array [
+        Object {
+          "buildingByBuildingId": Object {
+            "floors": 2,
+            "id": 4,
+            "isPrimary": true,
+            "name": "Home sweet home",
+            "namedAfterStreet": null,
+            "nodeId": "WyJidWlsZGluZ3MiLDRd",
+            "propertyByPropertyId": Object {
+              "id": 1,
+              "nameOrNumber": "My House",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiwxXQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [],
+                },
+                "id": 1,
+                "name": "My Street",
+                "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+              },
+              "streetId": 1,
+            },
+          },
+          "buildingId": 4,
+          "buildingName": "Home sweet home",
+          "nodeId": "WyJob3VzZXMiLDEsMV0=",
+          "propertyByPropertyId": Object {
+            "id": 1,
+            "nameOrNumber": "My House",
+            "nodeId": "WyJwcm9wZXJ0aWVzIiwxXQ==",
+            "streetByStreetId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [],
+              },
+              "id": 1,
+              "name": "My Street",
+              "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+            },
+            "streetId": 1,
+          },
+          "propertyId": 1,
+          "propertyNameOrNumber": "My House",
+          "streetByStreetId": Object {
+            "buildingsNamedAfterStreet": Object {
+              "nodes": Array [],
+            },
+            "id": 1,
+            "name": "My Street",
+            "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+          },
+          "streetId": 1,
+          "streetName": "My Street",
+          "streetPropertyByStreetIdAndPropertyId": Object {
+            "currentOwner": "Me",
+            "propId": 1,
+            "propertyByPropId": Object {
+              "id": 1,
+              "nameOrNumber": "My House",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiwxXQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [],
+                },
+                "id": 1,
+                "name": "My Street",
+                "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+              },
+              "streetId": 1,
+            },
+            "strId": 1,
+            "streetByStrId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [],
+              },
+              "id": 1,
+              "name": "My Street",
+              "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+            },
+          },
+        },
+        Object {
+          "buildingByBuildingId": null,
+          "buildingId": null,
+          "buildingName": null,
+          "nodeId": "WyJob3VzZXMiLDEsMl0=",
+          "propertyByPropertyId": Object {
+            "id": 2,
+            "nameOrNumber": "10",
+            "nodeId": "WyJwcm9wZXJ0aWVzIiwyXQ==",
+            "streetByStreetId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [],
+              },
+              "id": 1,
+              "name": "My Street",
+              "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+            },
+            "streetId": 1,
+          },
+          "propertyId": 2,
+          "propertyNameOrNumber": "10",
+          "streetByStreetId": Object {
+            "buildingsNamedAfterStreet": Object {
+              "nodes": Array [],
+            },
+            "id": 1,
+            "name": "My Street",
+            "nodeId": "WyJzdHJlZXRzIiwxXQ==",
+          },
+          "streetId": 1,
+          "streetName": "My Street",
+          "streetPropertyByStreetIdAndPropertyId": null,
+        },
+        Object {
+          "buildingByBuildingId": Object {
+            "floors": 3,
+            "id": 1,
+            "isPrimary": true,
+            "name": "Our House",
+            "namedAfterStreet": null,
+            "nodeId": "WyJidWlsZGluZ3MiLDFd",
+            "propertyByPropertyId": Object {
+              "id": 3,
+              "nameOrNumber": "The middle",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiwzXQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [],
+                },
+                "id": 2,
+                "name": "Our Street",
+                "nodeId": "WyJzdHJlZXRzIiwyXQ==",
+              },
+              "streetId": 2,
+            },
+          },
+          "buildingId": 1,
+          "buildingName": "Our House",
+          "nodeId": "WyJob3VzZXMiLDIsM10=",
+          "propertyByPropertyId": Object {
+            "id": 3,
+            "nameOrNumber": "The middle",
+            "nodeId": "WyJwcm9wZXJ0aWVzIiwzXQ==",
+            "streetByStreetId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [],
+              },
+              "id": 2,
+              "name": "Our Street",
+              "nodeId": "WyJzdHJlZXRzIiwyXQ==",
+            },
+            "streetId": 2,
+          },
+          "propertyId": 3,
+          "propertyNameOrNumber": "The middle",
+          "streetByStreetId": Object {
+            "buildingsNamedAfterStreet": Object {
+              "nodes": Array [],
+            },
+            "id": 2,
+            "name": "Our Street",
+            "nodeId": "WyJzdHJlZXRzIiwyXQ==",
+          },
+          "streetId": 2,
+          "streetName": "Our Street",
+          "streetPropertyByStreetIdAndPropertyId": Object {
+            "currentOwner": "Us",
+            "propId": 3,
+            "propertyByPropId": Object {
+              "id": 3,
+              "nameOrNumber": "The middle",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiwzXQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [],
+                },
+                "id": 2,
+                "name": "Our Street",
+                "nodeId": "WyJzdHJlZXRzIiwyXQ==",
+              },
+              "streetId": 2,
+            },
+            "strId": 2,
+            "streetByStrId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [],
+              },
+              "id": 2,
+              "name": "Our Street",
+              "nodeId": "WyJzdHJlZXRzIiwyXQ==",
+            },
+          },
+        },
+        Object {
+          "buildingByBuildingId": Object {
+            "floors": 200,
+            "id": 5,
+            "isPrimary": true,
+            "name": "The Tower",
+            "namedAfterStreet": null,
+            "nodeId": "WyJidWlsZGluZ3MiLDVd",
+            "propertyByPropertyId": Object {
+              "id": 4,
+              "nameOrNumber": "Your house",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiw0XQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [
+                    Object {
+                      "id": 2,
+                      "name": "Dunroamin",
+                      "nodeId": "WyJidWlsZGluZ3MiLDJd",
+                    },
+                  ],
+                },
+                "id": 3,
+                "name": "Dunroamin",
+                "nodeId": "WyJzdHJlZXRzIiwzXQ==",
+              },
+              "streetId": 3,
+            },
+          },
+          "buildingId": 5,
+          "buildingName": "The Tower",
+          "nodeId": "WyJob3VzZXMiLDMsNF0=",
+          "propertyByPropertyId": Object {
+            "id": 4,
+            "nameOrNumber": "Your house",
+            "nodeId": "WyJwcm9wZXJ0aWVzIiw0XQ==",
+            "streetByStreetId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [
+                  Object {
+                    "id": 2,
+                    "name": "Dunroamin",
+                    "nodeId": "WyJidWlsZGluZ3MiLDJd",
+                  },
+                ],
+              },
+              "id": 3,
+              "name": "Dunroamin",
+              "nodeId": "WyJzdHJlZXRzIiwzXQ==",
+            },
+            "streetId": 3,
+          },
+          "propertyId": 4,
+          "propertyNameOrNumber": "Your house",
+          "streetByStreetId": Object {
+            "buildingsNamedAfterStreet": Object {
+              "nodes": Array [
+                Object {
+                  "id": 2,
+                  "name": "Dunroamin",
+                  "nodeId": "WyJidWlsZGluZ3MiLDJd",
+                },
+              ],
+            },
+            "id": 3,
+            "name": "Dunroamin",
+            "nodeId": "WyJzdHJlZXRzIiwzXQ==",
+          },
+          "streetId": 3,
+          "streetName": "Dunroamin",
+          "streetPropertyByStreetIdAndPropertyId": Object {
+            "currentOwner": "You",
+            "propId": 4,
+            "propertyByPropId": Object {
+              "id": 4,
+              "nameOrNumber": "Your house",
+              "nodeId": "WyJwcm9wZXJ0aWVzIiw0XQ==",
+              "streetByStreetId": Object {
+                "buildingsNamedAfterStreet": Object {
+                  "nodes": Array [
+                    Object {
+                      "id": 2,
+                      "name": "Dunroamin",
+                      "nodeId": "WyJidWlsZGluZ3MiLDJd",
+                    },
+                  ],
+                },
+                "id": 3,
+                "name": "Dunroamin",
+                "nodeId": "WyJzdHJlZXRzIiwzXQ==",
+              },
+              "streetId": 3,
+            },
+            "strId": 3,
+            "streetByStrId": Object {
+              "buildingsNamedAfterStreet": Object {
+                "nodes": Array [
+                  Object {
+                    "id": 2,
+                    "name": "Dunroamin",
+                    "nodeId": "WyJidWlsZGluZ3MiLDJd",
+                  },
+                ],
+              },
+              "id": 3,
+              "name": "Dunroamin",
+              "nodeId": "WyJzdHJlZXRzIiwzXQ==",
+            },
+          },
+        },
+      ],
+    },
+    "brothersGotADateToKeep": Object {
+      "cantHangAround": "Our House",
+      "in": "The middle",
+      "of": "Our Street",
+      "z": "WyJob3VzZXMiLDIsM10=",
+    },
+    "nothingEverSlowsHerDown": Object {
+      "andAMessIsNotAllowed": "Our House",
+      "in": "The middle",
+      "of": "Our Street",
+      "z": "WyJob3VzZXMiLDIsM10=",
+    },
+  },
+}
+`;
+
 exports[`types.graphql 1`] = `
 Object {
   "data": Object {
