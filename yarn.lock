@@ -3299,10 +3299,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
 
-graphile-build-pg@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.1.0.tgz#036745514fb86d3f90c83d5566f9ea53c4b6f066"
-  integrity sha512-mmUWar1lBdHPZRwquRMdjY87IXE5OPe3dJpd0uiSwhVuZDWBuP5Do7mkgve+gPxCOWyvQ1zILlCW9pxNM7MCUQ==
+graphile-build-pg@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.2.0.tgz#4c8b279b94bcafb0bfc21b32f542660bf32f53b1"
+  integrity sha512-UApYkNb0aIkT/6MjInXniH3eTH4H2I9sR0biaulwBAXLukqpB/ttxWrzWbbGZF4dWZ0+uRjZNNyrK5OGdsHHtg==
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
@@ -5741,14 +5741,14 @@ postcss@^6.0.1, postcss@^6.0.23:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.1.0.tgz#9872a6b4211533cc4d93774534aacbdacce79200"
-  integrity sha512-s8CJ5dTCwJd/VIhplAbpWr0Q835MbkRE9Tu0mtnhATqZLDjtGorBROI56qBSJ+OcanRafqzpk+xFZgRwKkQUMw==
+postgraphile-core@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.2.0.tgz#ee5d42f04629ce1225665fedb78f491b1f8491f0"
+  integrity sha512-9SJKV+/0jINUUPQPN3TtoSEG4tI47DOZEY9Qg4sq6Yxnf5/Yr9OFImLUj8c6wxfvq5/+7Ajqny1OGnS1fnwg1Q==
   dependencies:
     "@types/graphql" "^14.0.3"
     graphile-build "4.1.0"
-    graphile-build-pg "4.1.0"
+    graphile-build-pg "4.2.0"
 
 postgres-array@~1.0.0:
   version "1.0.2"
