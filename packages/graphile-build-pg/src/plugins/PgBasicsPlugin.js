@@ -30,9 +30,6 @@ import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
 import chalk from "chalk";
 import pickBy from "lodash/pickBy";
-import debugFactory from "debug";
-
-const warn = debugFactory("graphile-build-pg:warn");
 
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
@@ -158,12 +155,15 @@ const omitUnindexed = omit => (
   ) {
     let klass = entity.class;
     if (klass) {
-      if (warn.enabled) {
-        warn(
+      if (!entity._omitUnindexedReadWarningGiven) {
+        // $FlowFixMe
+        entity._omitUnindexedReadWarningGiven = true;
+        // eslint-disable-next-line no-console
+        console.log(
           "%s",
-          `We've disabled the 'read' permission for ${describePgEntity(
+          `Disabled 'read' permission for ${describePgEntity(
             entity
-          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix this, perform\n\n  CREATE INDEX ON ${`"${
+          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${
             klass.namespaceName
           }"."${klass.name}"`}("${entity.keyAttributes
             .map(a => a.name)
