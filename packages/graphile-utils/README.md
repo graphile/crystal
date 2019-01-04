@@ -11,7 +11,7 @@ utilising Graphile Engine, such as the one produced by
 [PostGraphile](https://graphile.org/postgraphile).
 
 Documentation is currently available
-[here](https://graphile.org/postgraphile/extending/#the-easy-way-graphile-utils).
+[here](https://graphile.org/postgraphile/extending/).
 
 PRs to improve documentation are always welcome!
 
@@ -29,6 +29,8 @@ Used to wrap a value to be included in a `gql` AST, e.g. for use in GraphQL
 directives.
 
 ### `makeExtendSchemaPlugin`
+
+Docs: https://www.graphile.org/postgraphile/make-extend-schema-plugin/
 
 Enables you to add additonal types or extend existing types within your
 Graphile Engine GraphQL schema.
@@ -83,25 +85,29 @@ makeExtendSchemaPlugin(build => ({
 
 ### `makeAddInflectorsPlugin`
 
+Docs: https://www.graphile.org/postgraphile/make-add-inflectors-plugin/
+
 If you don't like the default naming conventions that come with a Graphile
 Engine GraphQL schema then it's easy for you to override them using the
 inflector.
 
-For example, if you want '\*Patch' types to instead be called '\*ChangeSet'
-you could make a plugin such as this one:
+### `makeChangeNullabilityPlugin`
 
-```js
-const { makeAddInflectorsPlugin } = require("graphile-utils");
+Docs: https://www.graphile.org/postgraphile/make-change-nullability-plugin/
 
-module.exports = makeAddInflectorsPlugin({
-  patchType(typeName: string) {
-    return this.upperCamelCase(`${typeName}-change-set`);
-  },
-});
-```
+Use this plugin to override the nullability of fields in your GraphQL schema.
 
-The default Graphile Engine inflectors (`pluralize`, `singularize`,
-`upperCamelCase`, `camelCase` and `constantCase`) can be found
-[here](https://github.com/graphile/graphile-engine/blob/6b0cb9e4e91050c98f1a9c62b73e3613a6c78f09/packages/graphile-build/src/makeNewBuild.js#L811-L815).
+### `makeProcessSchemaPlugin`
 
-The additional inflectors used in PostGraphile can be found [here](https://github.com/graphile/graphile-engine/blob/6b0cb9e4e91050c98f1a9c62b73e3613a6c78f09/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js#L296-L699).
+Docs: https://www.graphile.org/postgraphile/make-process-schema-plugin/
+
+Enables you to process the schema after it's built, e.g. print it to a file,
+augment it with a third party library (e.g. graphql-shield), etc.
+
+### `makeWrapResolversPlugin`
+
+Docs: https://www.graphile.org/postgraphile/make-wrap-resolvers-plugin/
+
+Enables you to wrap the field resolvers in the generated GraphQL API,
+allowing you to take an action before or after the resolver, or even modify
+the resolver result.

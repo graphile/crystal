@@ -1,5 +1,10 @@
-import { SchemaBuilder, Options, Plugin } from "graphile-build";
-import { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
+import { SchemaBuilder, Options, Plugin, Context, Build } from "graphile-build";
+import {
+  GraphQLFieldResolver,
+  GraphQLResolveInfo,
+  GraphQLFieldConfig,
+  GraphQLObjectType,
+} from "graphql";
 import {
   makeFieldHelpers,
   requireChildColumn,
@@ -36,11 +41,47 @@ interface ResolverWrapperRules {
 
 type ResolverWrapperRulesGenerator = (options: Options) => ResolverWrapperRules;
 
+type ResolverWrapperFilter<T> = (
+  context: Context<GraphQLObjectType>,
+  build: Build,
+  field: GraphQLFieldConfig<any, any>,
+  options: Options
+) => T | null;
+
+type ResolverWrapperFilterRule<T> = (
+  match: T
+) => ResolverWrapperRule | ResolverWrapperFn;
+
 export default function makeWrapResolversPlugin(
   rulesOrGenerator: ResolverWrapperRules | ResolverWrapperRulesGenerator
+): Plugin;
+export default function makeWrapResolversPlugin<T>(
+  filter: ResolverWrapperFilter<T>,
+  rule: ResolverWrapperFilterRule<T>
+): Plugin;
+export default function makeWrapResolversPlugin<T>(
+  rulesOrGeneratorOrFilter:
+    | ResolverWrapperRules
+    | ResolverWrapperRulesGenerator
+    | ResolverWrapperFilter<T>,
+  rule?: ResolverWrapperFilterRule<T>
 ): Plugin {
+  if (rule && typeof rule !== "function") {
+    throw new Error(
+      "Invalid call signature for makeWrapResolversPlugin, expected second argument to be a function"
+    );
+  }
   return (builder: SchemaBuilder, options: Options) => {
-    const rules: ResolverWrapperRules =
+    // Disambiguate first argument
+    const rulesOrGenerator:
+      | ResolverWrapperRules
+      | ResolverWrapperRulesGenerator
+      | null = rule ? null : (rulesOrGeneratorOrFilter as any);
+    const filter: ResolverWrapperFilter<T> | null = rule
+      ? (rulesOrGeneratorOrFilter as any)
+      : null;
+
+    const rules: ResolverWrapperRules | null =
       typeof rulesOrGenerator === "function"
         ? rulesOrGenerator(options)
         : rulesOrGenerator;
@@ -49,11 +90,31 @@ export default function makeWrapResolversPlugin(
         Self,
         scope: { fieldName },
       } = context;
-      const typeRules = rules[Self.name];
-      if (!typeRules) {
-        return field;
+      let resolveWrapperOrSpec;
+      if (filter) {
+        const filterResult: any = filter(context, build, field, options);
+        if (!filterResult) {
+          if (filterResult !== null) {
+            // tslint:disable-next-line no-console
+            console.error(
+              `Filter should return either a truthy value, or 'null', instead received: '${filterResult}'`
+            );
+          }
+          return field;
+        }
+        resolveWrapperOrSpec = rule!(filterResult);
+      } else if (rules) {
+        const typeRules = rules[Self.name];
+        if (!typeRules) {
+          return field;
+        }
+        resolveWrapperOrSpec = typeRules[fieldName];
+      } else {
+        // Should not happen
+        throw new Error(
+          "Bad call signature for function makeWrapResolversPlugin"
+        );
       }
-      const resolveWrapperOrSpec = typeRules[fieldName];
       if (!resolveWrapperOrSpec) {
         return field;
       }
