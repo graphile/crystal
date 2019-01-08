@@ -22,19 +22,17 @@ sponsor](https://graphile.org/sponsor/).
 
 - Mtpc
 - Clay Smith
-- Matt Bretl (also a major community contributor!)
 - Michael Tng
-- Bureau Moelijke Dingen
-- Centre for Effective Altruism
+- Matt Bretl (also a major community contributor!)
+- BMD Studio
 - Sam Levin
+- stlbucket
 - Gardner Bickford
 - James Rascoe
 - Michel Pelletier
-- stlbucket
 - Jimmy McBroom
 - Dan Lynch
-- Andreas
 - James Cavanaugh
 - Tim Field
-- Amédée d'Aboville
 - Antwaan Harrison
+- Chris Watland
