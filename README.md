@@ -43,7 +43,7 @@ Hear from the current maintainer [Benjie](https://twitter.com/benjie) at GraphQL
 
 **Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)**
 
-You can use PostGraphile via the CLI, as a Node.js middleware, or use the GraphQL schema directly. Make sure to check out the **[full usage instructions](https://graphile.org/postgraphile/usage/)** on the documentation website. We also have a [PostgreSQL schema design guide](http://graphile.meh/postgraphile/postgresql-schema-design/) you can follow to build a fully functional PostGraphile API.
+You can use PostGraphile via the CLI, as a Node.js middleware, or use the GraphQL schema directly. Make sure to check out the **[full usage instructions](https://graphile.org/postgraphile/usage/)** on the documentation website. We also have a [PostgreSQL schema design guide](https://www.graphile.org/postgraphile/postgresql-schema-design/) you can follow to build a fully functional PostGraphile API.
 
 ### CLI
 
