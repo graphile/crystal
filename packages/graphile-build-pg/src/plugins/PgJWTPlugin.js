@@ -14,6 +14,7 @@ export default (function PgJWTPlugin(
       pgRegisterGqlTypeByTypeId,
       pg2GqlMapper,
       pgTweaksByTypeId,
+      pgTweakFragmentForTypeAndModifier,
       graphql: { GraphQLScalarType },
       inflection,
       pgParseIdentifier: parseIdentifier,
@@ -118,7 +119,20 @@ export default (function PgJWTPlugin(
       };
 
       pgTweaksByTypeId[compositeType.id] = fragment =>
-        sql.fragment`to_json(${fragment})`;
+        sql.fragment`json_build_object(${sql.join(
+          compositeClass.attributes.map(
+            attr =>
+              sql.fragment`${sql.literal(
+                attr.name
+              )}::text, ${pgTweakFragmentForTypeAndModifier(
+                sql.fragment`(${fragment}).${sql.identifier(attr.name)}`,
+                attr.type,
+                attr.typeModifier,
+                {}
+              )}`
+          ),
+          ", "
+        )})`;
     });
     return _;
   });

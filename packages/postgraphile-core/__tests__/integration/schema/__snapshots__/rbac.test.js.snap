@@ -1543,8 +1543,8 @@ type AuthenticateFailPayload {
 \\"\\"\\"All input for the \`authenticate\` mutation.\\"\\"\\"
 input AuthenticateInput {
   a: Int
-  b: Int
-  c: Int
+  b: BigFloat
+  c: BigInt
 
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1556,8 +1556,8 @@ input AuthenticateInput {
 \\"\\"\\"All input for the \`authenticateMany\` mutation.\\"\\"\\"
 input AuthenticateManyInput {
   a: Int
-  b: Int
-  c: Int
+  b: BigFloat
+  c: BigInt
 
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1599,8 +1599,8 @@ type AuthenticatePayload {
 \\"\\"\\"All input for the \`authenticatePayload\` mutation.\\"\\"\\"
 input AuthenticatePayloadInput {
   a: Int
-  b: Int
-  c: Int
+  b: BigFloat
+  c: BigInt
 
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -4535,8 +4535,8 @@ type JsonIdentityMutationPayload {
 
 type JwtToken {
   a: Int
-  b: Int
-  c: Int
+  b: BigFloat
+  c: BigInt
   exp: Int
   role: String
 }

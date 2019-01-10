@@ -475,7 +475,10 @@ export default function makeProcField(
                             : null),
                         },
                         {},
-                        false
+                        false,
+                        {
+                          pgType: returnType,
+                        }
                       ),
                       // Result
                     }

@@ -12,6 +12,7 @@ export default function pgField(
     pgQueryFromResolveData: queryFromResolveData,
     getSafeAliasFromAlias,
     getSafeAliasFromResolveInfo,
+    pgTweakFragmentForTypeAndModifier,
   } = build;
   return fieldWithHooks(
     fieldName,
@@ -26,6 +27,13 @@ export default function pgField(
       const isListType =
         nullableType !== namedType &&
         nullableType.constructor === build.graphql.GraphQLList;
+      const isLeafType = build.graphql.isLeafType(FieldType);
+      if (isLeafType && !options.pgType) {
+        // eslint-disable-next-line no-console
+        throw new Error(
+          "pgField call omits options.pgType for a leaf type; certain tweaks may not be applied!"
+        );
+      }
       const {
         getDataFromParsedResolveInfoFragment,
         addDataGenerator,
@@ -52,7 +60,14 @@ export default function pgField(
                   : sql.identifier(Symbol());
               const query = queryFromResolveData(
                 whereFrom ? whereFrom(queryBuilder) : sql.identifier(Symbol()),
-                tableAlias,
+                isLeafType && options.pgType
+                  ? pgTweakFragmentForTypeAndModifier(
+                      tableAlias,
+                      options.pgType,
+                      options.pgTypeModifier,
+                      {}
+                    )
+                  : tableAlias,
                 resolveData,
                 whereFrom === false
                   ? { onlyJsonField: true }

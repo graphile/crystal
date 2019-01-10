@@ -363,12 +363,12 @@ create type b.jwt_token as (
   role text,
   exp integer,
   a integer,
-  b integer,
-  c integer
+  b numeric,
+  c bigint
 );
 
-create function b.authenticate(a integer, b integer, c integer) returns b.jwt_token as $$ select ('yay', extract(epoch from '2037-07-12'::timestamp), a, b, c)::b.jwt_token $$ language sql;
-create function b.authenticate_many(a integer, b integer, c integer) returns b.jwt_token[] as $$ select array[('foo', 1, a, b, c)::b.jwt_token, ('bar', 2, a + 1, b + 1, c + 1)::b.jwt_token, ('baz', 3, a + 2, b + 2, c + 2)::b.jwt_token] $$ language sql;
+create function b.authenticate(a integer, b numeric, c bigint) returns b.jwt_token as $$ select ('yay', extract(epoch from '2037-07-12'::timestamp), a, b, c)::b.jwt_token $$ language sql;
+create function b.authenticate_many(a integer, b numeric, c bigint) returns b.jwt_token[] as $$ select array[('foo', 1, a, b, c)::b.jwt_token, ('bar', 2, a + 1, b + 1, c + 1)::b.jwt_token, ('baz', 3, a + 2, b + 2, c + 2)::b.jwt_token] $$ language sql;
 create function b.authenticate_fail() returns b.jwt_token as $$ select null::b.jwt_token $$ language sql;
 
 create type b.auth_payload as (
@@ -377,7 +377,7 @@ create type b.auth_payload as (
   admin bool
 );
 
-create function b.authenticate_payload(a integer, b integer, c integer) returns b.auth_payload as $$ select (('yay', extract(epoch from '2037-07-12'::timestamp), a, b, c)::b.jwt_token, 1, true)::b.auth_payload $$ language sql;
+create function b.authenticate_payload(a integer, b numeric, c bigint) returns b.auth_payload as $$ select (('yay', extract(epoch from '2037-07-12'::timestamp), a, b, c)::b.jwt_token, 1, true)::b.auth_payload $$ language sql;
 
 create table a.similar_table_1 (
   id serial primary key,
