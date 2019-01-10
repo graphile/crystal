@@ -1,4 +1,12 @@
 // @flow
+/*
+ * IMPORTANT: when editing this file, ensure all operators (e.g. `@>`) are
+ * specified in the correct namespace (e.g. `operator(pg_catalog.@>)`). It looks
+ * weird, but it prevents clashes with extensions or user code that may
+ * overload operators, e.g. extension `intarray` overloads `@>`.
+ *
+ * NOTE: I'm not doing this with `=` because that way lies madness.
+ */
 function makeIntrospectionQuery(
   serverVersionNum: number,
   options: { pgLegacyFunctionsOnly?: boolean } = {}
@@ -88,29 +96,39 @@ with
       -- \`IN\` which means \`proargmodes\` will be null.
       pro.proargmodes is null and
       -- Do not select procedures that return \`RECORD\` (oid 2249).
-      pro.prorettype <> 2249 and`
+      pro.prorettype operator(pg_catalog.<>) 2249 and`
           : `\
       -- We want to make sure the argument modes for all of our arguments are
       -- \`IN\`, \`OUT\`, \`INOUT\`, or \`TABLE\` (not \`VARIADIC\`).
-      (pro.proargmodes is null or pro.proargmodes <@ array['i','o','b','t']::"char"[]) and
+      (pro.proargmodes is null or pro.proargmodes operator(pg_catalog.<@) array['i','o','b','t']::"char"[]) and
       -- Do not select procedures that return \`RECORD\` (oid 2249) unless they
       -- have \`OUT\`, \`INOUT\`, or \`TABLE\` arguments to define the return type.
-      (pro.prorettype <> 2249 or pro.proargmodes && array['o','b','t']::"char"[]) and
+      (pro.prorettype operator(pg_catalog.<>) 2249 or pro.proargmodes && array['o','b','t']::"char"[]) and
       -- Do not select procedures that have \`RECORD\` arguments.
-      (pro.proallargtypes is null or not (pro.proallargtypes @> array[2249::oid])) and`
+      (pro.proallargtypes is null or not (pro.proallargtypes operator(pg_catalog.@>) array[2249::oid])) and`
       }
       -- Do not select procedures that create range types. These are utility
       -- functions that really don’t need to be exposed in an API.
-      pro.proname not in (select typ.typname from pg_catalog.pg_type as typ where typ.typtype = 'r' and typ.typnamespace = pro.pronamespace) and
+      pro.proname not in (
+        select typ.typname
+        from pg_catalog.pg_type as typ
+        where typ.typtype = 'r'
+        and typ.typnamespace = pro.pronamespace
+      ) and
       -- Do not expose trigger functions (type trigger has oid 2279)
-      pro.prorettype <> 2279 and
+      pro.prorettype operator(pg_catalog.<>) 2279 and
       -- We don't want functions that will clash with GraphQL (treat them as private)
       pro.proname not like E'\\\\_\\\\_%' and
       -- We also don’t want procedures that have been defined in our namespace
       -- twice. This leads to duplicate fields in the API which throws an
       -- error. In the future we may support this case. For now though, it is
       -- too complex.
-      (select count(pro2.*) from pg_catalog.pg_proc as pro2 where pro2.pronamespace = pro.pronamespace and pro2.proname = pro.proname) = 1 and
+      (
+        select count(pro2.*)
+        from pg_catalog.pg_proc as pro2
+        where pro2.pronamespace = pro.pronamespace
+        and pro2.proname = pro.proname
+      ) = 1 and
       ($2 is true or not exists(
         select 1
         from pg_catalog.pg_depend
@@ -146,9 +164,9 @@ with
       -- - https://www.postgresql.org/message-id/CAEZATCV2_qN9P3zbvADwME_TkYf2gR_X2cLQR4R+pqkwxGxqJg@mail.gmail.com
       -- - https://github.com/postgres/postgres/blob/2410a2543e77983dab1f63f48b2adcd23dba994e/src/backend/utils/adt/misc.c#L684
       -- - https://github.com/postgres/postgres/blob/3aff33aa687e47d52f453892498b30ac98a296af/src/backend/rewrite/rewriteHandler.c#L2351
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00010000') = B'00010000' as "isInsertable",
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00001000') = B'00001000' as "isUpdatable",
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) & B'00000100') = B'00000100' as "isDeletable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00010000') = B'00010000' as "isInsertable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00001000') = B'00001000' as "isUpdatable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00000100') = B'00000100' as "isDeletable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'SELECT')) as "aclSelectable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'INSERT')) as "aclInsertable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'UPDATE')) as "aclUpdatable",
@@ -367,7 +385,7 @@ with
       idx.indislive is not false and
       idx.indisexclusion is not true and -- exclusion index
       idx.indcheckxmin is not true and -- always valid?
-      not (string_to_array(idx.indkey::text, ' ')::int2[] @> ARRAY[0::int2]) and -- no expressions
+      not (string_to_array(idx.indkey::text, ' ')::int2[] operator(pg_catalog.@>) ARRAY[0::int2]) and -- no expressions
       idx.indpred is null -- no partial index predicate
     order by
       idx.indrelid, idx.indexrelid

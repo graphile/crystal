@@ -223,10 +223,10 @@ class SchemaBuilder extends EventEmitter {
     if (!this.hooks[hookName]) {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
-    if (this._currentPluginName && !fn.displayName) {
+    if (this._currentPluginName) {
       fn.displayName = `${
         this._currentPluginName
-      }/${hookName}/${fn.displayName || fn.name || "anonymous"}`;
+      }/${hookName}/${fn.displayName || fn.name || "unnamed"}`;
     }
     this.hooks[hookName].push(fn);
   }
