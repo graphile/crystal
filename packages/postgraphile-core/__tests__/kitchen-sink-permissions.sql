@@ -25,3 +25,7 @@ grant select(id, headline, body, author_id) on a.post to postgraphile_test_visit
 
 -- DO NOT GRANT ANYTHING ON c.compound_key!
 grant execute on function c.return_table_without_grants() to postgraphile_test_visitor;
+
+
+-- SJE bug; do not grant other permissions on POST
+grant execute on function a.post_with_suffix(a.post, text) to postgraphile_test_visitor;

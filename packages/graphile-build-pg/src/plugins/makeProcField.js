@@ -4,6 +4,7 @@ import type { Build, FieldWithHooksFunction } from "graphile-build";
 import type { PgProc } from "./PgIntrospectionPlugin";
 import type { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
+import chalk from "chalk";
 
 const firstValue = obj => {
   let firstKey;
@@ -129,16 +130,21 @@ export default function makeProcField(
     const Type = pgGetGqlInputTypeByTypeIdAndModifier(type.id, variant);
     if (!Type) {
       const hint = type.class
-        ? `; you might want to use smart comments, e.g. 'COMMENT ON FUNCTION "${
-            proc.namespace.name
-          }"."${proc.name}"(${argTypes
-            .map(t => `"${t.namespaceName}"."${t.name}"`)
-            .join(", ")}) IS E'@arg${idx}variant base';"`
+        ? `; this might be because no INSERT column privileges are granted on ${describePgEntity(
+            type.class
+          )}. You can use smart comments to tell PostGraphile to instead use the "${chalk.bold.green(
+            "base"
+          )}" input type which includes all columns:\n\n  ${sqlCommentByAddingTags(
+            proc,
+            {
+              [`arg${idx}variant`]: "base",
+            }
+          )}\n`
         : "";
       throw new Error(
         `Could not determine type for argument ${idx} ('${
           argNames[idx]
-        }') of function '${proc.name}'${hint}`
+        }') of function ${describePgEntity(proc)}${hint}`
       );
     }
     if (idx >= notNullArgCount) {

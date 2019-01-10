@@ -261,7 +261,7 @@ function sqlCommentByAddingTags(entity, tagsToAdd) {
     .reduce((memo, tag) => {
       const tagValue = tags[tag];
       const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
-      const highlightOrNot = tag in tagsToAdd ? chalk.bold : identity;
+      const highlightOrNot = tag in tagsToAdd ? chalk.bold.green : identity;
       valueArray.forEach(value => {
         memo.push(
           highlightOrNot(

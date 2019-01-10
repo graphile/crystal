@@ -15,18 +15,18 @@ export default function swallowError(e: Error): void {
       e && typeof e.toString === "function"
         ? String(e)
             .replace(/\n.*/g, "")
-            .substr(0, 160)
+            .substr(0, 320)
             .trim()
         : null;
     if (errorSnippet) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error (see: http://graphile.org/postgraphile/debugging )\n> ${errorSnippet}…`
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error (see: https://graphile.org/postgraphile/debugging )\n> ${errorSnippet}…`
       );
     } else {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: http://graphile.org/postgraphile/debugging )`
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: https://graphile.org/postgraphile/debugging )`
       );
     }
     debugWarn(e);
