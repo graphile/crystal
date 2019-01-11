@@ -21,11 +21,12 @@ export default (async function MutationPlugin(builder) {
       newWithHooks,
       extend,
       graphql: { GraphQLObjectType },
+      inflection,
     } = build;
     const Mutation = newWithHooks(
       GraphQLObjectType,
       {
-        name: "Mutation",
+        name: inflection.mutation(),
         description:
           "The root mutation type which contains root level fields which mutate data.",
       },

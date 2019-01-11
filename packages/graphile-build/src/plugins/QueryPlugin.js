@@ -23,13 +23,14 @@ export default (async function QueryPlugin(builder) {
       newWithHooks,
       extend,
       graphql: { GraphQLObjectType, GraphQLNonNull },
+      inflection,
     } = build;
     const queryType = newWithHooks(
       GraphQLObjectType,
       {
         description:
           "The root query type which gives access points into the data universe.",
-        name: "Query",
+        name: inflection.query(),
         isTypeOf: (value, _context, info) =>
           info.parentType == null || value === $$isQuery,
         fields: ({ Self }) => ({

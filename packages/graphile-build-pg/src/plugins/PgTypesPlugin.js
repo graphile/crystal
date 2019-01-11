@@ -174,7 +174,7 @@ export default (function PgTypesPlugin(
       };
     };
     const GQLInterval = new GraphQLObjectType({
-      name: "Interval",
+      name: inflection.pgIntervalType(),
       description:
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
@@ -182,7 +182,7 @@ export default (function PgTypesPlugin(
     addType(GQLInterval, "graphile-build-pg built-in");
 
     const GQLIntervalInput = new GraphQLInputObjectType({
-      name: "IntervalInput",
+      name: inflection.pgIntervalInputType(),
       description:
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
@@ -346,7 +346,7 @@ export default (function PgTypesPlugin(
 
     // 'point' in PostgreSQL is a 16-byte type that's comprised of two 8-byte floats.
     const Point = new GraphQLObjectType({
-      name: "Point",
+      name: inflection.pgPointType(),
       fields: {
         x: {
           type: new GraphQLNonNull(GraphQLFloat),
@@ -357,7 +357,7 @@ export default (function PgTypesPlugin(
       },
     });
     const PointInput = new GraphQLInputObjectType({
-      name: "PointInput",
+      name: inflection.pgPointInputType(),
       fields: {
         x: {
           type: new GraphQLNonNull(GraphQLFloat),

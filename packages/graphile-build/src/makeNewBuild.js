@@ -843,6 +843,13 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       upperCamelCase,
       camelCase,
       constantCase,
+
+      // Core type names
+      query: () => "Query",
+      mutation: () => "Mutation",
+      subscription: () => "Subscription",
+      node: () => "Node",
+      pageInfo: () => "PageInfo",
     },
     swallowError,
     // resolveNode: EXPERIMENTAL, API might change!

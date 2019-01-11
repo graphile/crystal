@@ -14,8 +14,6 @@ import {
 import { GraphQLSchema } from "graphql";
 import {
   defaultPlugins as pgDefaultPlugins,
-  inflections,
-  Inflector,
   PgAttribute,
   formatSQLForDebugging,
 } from "graphile-build-pg";
@@ -33,6 +31,17 @@ export {
 };
 
 export type mixed = {} | string | number | boolean | undefined | null;
+
+function errorProxy(message: string) {
+  return new Proxy(
+    {},
+    {
+      get: () => {
+        throw new Error(message);
+      },
+    }
+  );
+}
 
 const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
   if (!Array.isArray(arr)) {
@@ -63,7 +72,6 @@ export interface PostGraphileCoreOptions {
   skipPlugins?: Array<Plugin>;
   jwtPgTypeIdentifier?: string;
   jwtSecret?: string;
-  inflector?: Inflector; // NO LONGER SUPPORTED!
   pgColumnFilter?: <TSource>(
     attr: mixed,
     build: Build,
@@ -89,30 +97,26 @@ type PgConfig = Client | Pool | string;
 /*
  * BELOW HERE IS DEPRECATED!!
  */
-export { inflections };
 
-export const postGraphileBaseOverrides = {
-  enumName(value: string) {
-    return inflections.defaultUtils.constantCase(
-      inflections.defaultInflection.enumName(value)
-    );
-  },
-};
-
-export const postGraphileClassicIdsOverrides = {
-  column(name: string, _table: string, _schema?: string) {
-    return name === "id" ? "rowId" : inflections.defaultUtils.camelCase(name);
-  },
-};
-
-export const postGraphileInflection = inflections.newInflector(
-  postGraphileBaseOverrides
+export const inflections = errorProxy(
+  "`inflections` was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
 );
 
-export const postGraphileClassicIdsInflection = inflections.newInflector({
-  ...postGraphileBaseOverrides,
-  ...postGraphileClassicIdsOverrides,
-});
+export const postGraphileBaseOverrides = errorProxy(
+  "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+);
+
+export const postGraphileClassicIdsOverrides = errorProxy(
+  "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+);
+
+export const postGraphileInflection = errorProxy(
+  "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+);
+
+export const postGraphileClassicIdsInflection = errorProxy(
+  "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+);
 /*
  * ABOVE HERE IS DEPRECATED.
  */
@@ -163,6 +167,12 @@ const getPostGraphileBuilder = async (
   schemas: string | Array<string>,
   options: PostGraphileCoreOptions = {}
 ) => {
+  // @ts-ignore
+  if (options.inflector) {
+    throw new Error(
+      "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+    );
+  }
   const {
     dynamicJson,
     classicIds,
@@ -176,7 +186,6 @@ const getPostGraphileBuilder = async (
     disableDefaultMutations,
     graphileBuildOptions,
     graphqlBuildOptions, // DEPRECATED!
-    inflector, // NO LONGER SUPPORTED!
     pgColumnFilter,
     viewUniqueKey,
     enableTags = true,
@@ -287,11 +296,6 @@ const getPostGraphileBuilder = async (
   ensureValidPlugins("prependPlugins", prependPlugins);
   ensureValidPlugins("appendPlugins", appendPlugins);
   ensureValidPlugins("skipPlugins", skipPlugins);
-  if (inflector) {
-    throw new Error(
-      "Custom inflector arguments are no longer supported, please use the inflector plugin API instead"
-    );
-  }
   const inflectionOverridePlugins = classicIds
     ? [PostGraphileInflectionPlugin, PostGraphileClassicIdsInflectionPlugin]
     : [PostGraphileInflectionPlugin];
@@ -330,9 +334,9 @@ const getPostGraphileBuilder = async (
     pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
     pgExtendedTypes: !!dynamicJson,
     pgColumnFilter: pgColumnFilter || (() => true),
-    pgInflection:
-      inflector ||
-      (classicIds ? postGraphileClassicIdsInflection : postGraphileInflection),
+    pgInflection: errorProxy(
+      "The PostGraphile options `pgInflection` key was deprecated in v4.0.0-beta.7; instead please use `build.inflection` (and note that the call signatures are now simpler): https://www.graphile.org/postgraphile/inflection/"
+    ),
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
     pgJwtTypeIdentifier: jwtPgTypeIdentifier,
     pgJwtSecret: jwtSecret,

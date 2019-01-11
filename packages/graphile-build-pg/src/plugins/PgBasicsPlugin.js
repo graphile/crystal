@@ -352,6 +352,12 @@ export default (function PgBasicsPlugin(
     return build.extend(
       inflection,
       preventEmptyResult({
+        // Postgres type names
+        pgIntervalType: () => "Interval",
+        pgIntervalInputType: () => "IntervalInput",
+        pgPointType: () => "Point",
+        pgPointInputType: () => "PointInput",
+
         // These helpers are passed GraphQL type names as strings
         conditionType(typeName: string) {
           return this.upperCamelCase(`${typeName}-condition`);
@@ -746,6 +752,9 @@ export default (function PgBasicsPlugin(
         },
         deleteNode(table: PgClass) {
           return this.camelCase(`delete-${this._singularizedTableName(table)}`);
+        },
+        deletedNodeId(table: PgClass) {
+          return this.camelCase(`deleted-${this.singularize(table.name)}-id`);
         },
         updateNodeInputType(table: PgClass) {
           return this.upperCamelCase(

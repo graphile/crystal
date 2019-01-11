@@ -21,11 +21,12 @@ export default (async function SubscriptionPlugin(builder) {
       newWithHooks,
       extend,
       graphql: { GraphQLObjectType },
+      inflection,
     } = build;
     const Subscription = newWithHooks(
       GraphQLObjectType,
       {
-        name: "Subscription",
+        name: inflection.subscription(),
         description:
           "The root subscription type which contains root level fields which mutate data.",
       },

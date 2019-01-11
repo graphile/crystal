@@ -33,13 +33,14 @@ export default (function StandardTypesPlugin(builder) {
     const {
       newWithHooks,
       graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
+      inflection,
     } = build;
     // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
     /* const PageInfo = */
     newWithHooks(
       GraphQLObjectType,
       {
-        name: "PageInfo",
+        name: inflection.pageInfo(),
         description: "Information about pagination in a connection.",
         fields: ({ fieldWithHooks }) => ({
           hasNextPage: fieldWithHooks(

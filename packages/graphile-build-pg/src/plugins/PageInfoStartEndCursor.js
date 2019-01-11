@@ -3,9 +3,9 @@ import type { Plugin } from "graphile-build";
 
 export default (function PageInfoStartEndCursor(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
-    const { extend, getTypeByName } = build;
+    const { extend, getTypeByName, inflection } = build;
     const { Self, fieldWithHooks } = context;
-    if (Self.name !== "PageInfo") {
+    if (Self.name !== inflection.pageInfo()) {
       return fields;
     }
     const Cursor = getTypeByName("Cursor");

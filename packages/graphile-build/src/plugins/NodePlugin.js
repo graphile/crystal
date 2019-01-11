@@ -114,16 +114,17 @@ export default (function NodePlugin(
         GraphQLInterfaceType,
         getNullableType,
       },
+      inflection,
     } = build;
     let Query;
     newWithHooks(
       GraphQLInterfaceType,
       {
-        name: "Node",
+        name: inflection.node(),
         description: "An object with a globally unique `ID`.",
         resolveType: value => {
           if (value === $$isQuery) {
-            if (!Query) Query = getTypeByName("Query");
+            if (!Query) Query = getTypeByName(inflection.query());
             return Query;
           } else if (value[$$nodeType]) {
             return getNullableType(value[$$nodeType]);
@@ -149,14 +150,14 @@ export default (function NodePlugin(
     build,
     context
   ) {
-    const { getTypeByName } = build;
+    const { getTypeByName, inflection } = build;
     const {
       scope: { isRootQuery },
     } = context;
     if (!isRootQuery) {
       return interfaces;
     }
-    const Type = getTypeByName("Node");
+    const Type = getTypeByName(inflection.node());
     if (Type) {
       return [...interfaces, Type];
     } else {
@@ -182,6 +183,7 @@ export default (function NodePlugin(
         getTypeByName,
         extend,
         graphql: { GraphQLNonNull, GraphQLID },
+        inflection,
       } = build;
       return extend(
         fields,
@@ -198,7 +200,7 @@ export default (function NodePlugin(
             "node",
             ({ getDataFromParsedResolveInfoFragment }) => ({
               description: "Fetches an object given its globally unique `ID`.",
-              type: getTypeByName("Node"),
+              type: getTypeByName(inflection.node()),
               args: {
                 [nodeIdFieldName]: {
                   description: "The globally unique `ID`.",
