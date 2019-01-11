@@ -1,6 +1,5 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import { types as pgTypes } from "pg";
 
 import makeGraphQLJSONTypes from "../GraphQLJSON";
 
@@ -25,44 +24,6 @@ function parseInterval(str) {
   }
   return result;
 }
-
-const pgRangeParser = {
-  parse(str) {
-    const parts = str.split(",");
-    if (parts.length !== 2) {
-      throw new Error("Invalid daterange");
-    }
-
-    return {
-      start:
-        parts[0].length > 1
-          ? {
-              inclusive: parts[0][0] === "[",
-              value: parts[0].slice(1),
-            }
-          : null,
-      end:
-        parts[1].length > 1
-          ? {
-              inclusive: parts[1][parts[1].length - 1] === "]",
-              value: parts[1].slice(0, -1),
-            }
-          : null,
-    };
-  },
-
-  serialize({ start, end }) {
-    const inclusivity = {
-      true: "[]",
-      false: "()",
-    };
-
-    return [
-      start ? inclusivity[start.inclusive][0] + start.value : "[",
-      end ? end.value + inclusivity[end.inclusive][1] : "]",
-    ].join(",");
-  },
-};
 
 export default (function PgTypesPlugin(
   builder,
@@ -660,32 +621,34 @@ export default (function PgTypesPlugin(
         }
         gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = Range;
         gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] = RangeInput;
+        if (pgTweaksByTypeIdAndModifer[type.id] === undefined) {
+          pgTweaksByTypeIdAndModifer[type.id] = {};
+        }
+        pgTweaksByTypeIdAndModifer[type.id][
+          typeModifierKey
+        ] = fragment => sql.fragment`case
+          when (${fragment}) is null then null else json_build_object(
+            'start', case
+              when lower(${fragment}) is null then null
+              else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
+                sql.fragment`lower(${fragment})`,
+                subtype,
+                typeModifier,
+                {}
+              )}, 'inclusive', lower_inc(${fragment}))
+            end,
+            'end', case
+              when upper(${fragment}) is null then null
+              else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
+                sql.fragment`upper(${fragment})`,
+                subtype,
+                typeModifier,
+                {}
+              )}, 'inclusive', upper_inc(${fragment}))
+            end
+        ) end`;
         pg2GqlMapper[type.id] = {
-          map: pgRange => {
-            const parsed = pgRangeParser.parse(pgRange);
-            // Since the value we will get from `parsed.(start|end).value` is a
-            // string but our code will expect it to be the value after `pg`
-            // parsed it, we pass through to `pg-types` for parsing.
-            const pgParse =
-              rawTypes.indexOf(parseInt(subtype.id, 10)) >= 0
-                ? identity
-                : pgTypes.getTypeParser(subtype.id);
-            const { start, end } = parsed;
-            return {
-              start: start
-                ? {
-                    value: pg2gql(pgParse(start.value), subtype),
-                    inclusive: start.inclusive,
-                  }
-                : null,
-              end: end
-                ? {
-                    value: pg2gql(pgParse(end.value), subtype),
-                    inclusive: end.inclusive,
-                  }
-                : null,
-            };
-          },
+          map: identity,
           unmap: ({ start, end }) => {
             // Ref: https://www.postgresql.org/docs/9.6/static/rangetypes.html#RANGETYPES-CONSTRUCT
             const lower =

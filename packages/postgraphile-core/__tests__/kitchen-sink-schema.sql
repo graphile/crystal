@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -411,7 +411,7 @@ create view a.testview as
 create function a.post_with_suffix(post a.post,suffix text) returns a.post as $$
   insert into a.post(id,headline,body,author_id,enums,comptypes) values
   (post.id,post.headline || suffix,post.body,post.author_id,post.enums,post.comptypes)
-  returning *; 
+  returning *;
 $$ language sql volatile;
 
 comment on function a.post_with_suffix(post a.post,suffix text) is '@deprecated This is deprecated (comment on function a.post_with_suffix).';
@@ -899,7 +899,7 @@ comment on table smart_comment_relations.buildings is E'@foreignKey (name) refer
 create unique index on smart_comment_relations.buildings (property_id) where is_primary is true;
 
 create view smart_comment_relations.houses as (
-  select 
+  select
     buildings.name as building_name,
     properties.name_or_number as property_name_or_number,
     streets.name as street_name,
@@ -937,7 +937,7 @@ comment on table smart_comment_relations.offer is E'@name offer_table
 @omit';
 
 create view smart_comment_relations.post_view as
-  SELECT 
+  SELECT
     post.id
     FROM smart_comment_relations.post post;
 comment on view smart_comment_relations.post_view is E'@name posts
@@ -952,3 +952,12 @@ create view smart_comment_relations.offer_view as
 comment on view smart_comment_relations.offer_view is E'@name offers
 @primaryKey id
 @foreignKey (post_id) references post_view (id)';
+
+create schema ranges;
+create table ranges.range_test (
+  id serial primary key,
+  num numrange default null,
+  int8 int8range default null,
+  ts tsrange default null,
+  tstz tstzrange default null
+);
