@@ -30,7 +30,6 @@ test('will use a connected client from the pool, the default schema, and options
   createPostGraphileHttpRequestHandler.mockClear();
   const pgPool = new Pool();
   const options = Symbol('options');
-  const pgClient = { release: jest.fn() };
   await postgraphile(pgPool, options);
   expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, ['public'], options]]);
 });
@@ -82,4 +81,10 @@ test('will watch Postgres schemas when `watchPg` is true', async () => {
 test('will not error if jwtSecret is provided without jwtPgTypeIdentifier', async () => {
   const pgPool = new Pool();
   expect(() => postgraphile(pgPool, [], { jwtSecret: 'test' })).not.toThrow();
+});
+
+test('will throw on undefined positional arguments', async () => {
+  const pgPool = new Pool();
+  expect(() => postgraphile(pgPool, undefined)).toThrow();
+  expect(() => postgraphile(undefined, 'public')).toThrow();
 });

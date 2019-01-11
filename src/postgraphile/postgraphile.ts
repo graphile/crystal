@@ -114,41 +114,36 @@ export default function postgraphile(
   // must process them with `pluginHook` before we can rely on them.
   let incomingOptions: PostGraphileOptions;
 
-  // If the second argument is undefined, use defaults for both `schema` and
-  // `incomingOptions`.
-  if (typeof schemaOrOptions === 'undefined') {
-    schema = 'public';
-    incomingOptions = {};
-  }
   // If the second argument is a string or array, it is the schemas so set the
   // `schema` value and try to use the third argument (or a default) for
   // `incomingOptions`.
-  else if (typeof schemaOrOptions === 'string' || Array.isArray(schemaOrOptions)) {
+  if (typeof schemaOrOptions === 'string' || Array.isArray(schemaOrOptions)) {
     schema = schemaOrOptions;
     incomingOptions = maybeOptions || {};
   }
-  // Otherwise the second argument is the incomingOptions so set `schema` to the
+  // If the second argument is the incomingOptions so set `schema` to the
   // default and `incomingOptions` to the second argument.
-  else {
+  else if (typeof schemaOrOptions !== 'undefined') {
     schema = 'public';
     incomingOptions = schemaOrOptions;
+  }
+  // Otherwise the second argument is undefined, use defaults for both `schema` and
+  // `incomingOptions`.
+  else {
+    if (arguments.length > 1) {
+      throw new Error('The second argument to postgraphile was `undefined`... did you mean to set a schema?');
+    }
+    schema = 'public';
+    incomingOptions = {};
+  }
+
+  if (typeof poolOrConfig === 'undefined' && arguments.length > 1) {
+    throw new Error('The first argument to postgraphile was `undefined`... did you mean to set pool options?');
   }
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const pgPool: Pool =
-    // If it is already a `Pool`, just use it.
-    poolOrConfig instanceof Pool || quacksLikePgPool(poolOrConfig)
-      ? (poolOrConfig as Pool)
-      : new Pool(
-          typeof poolOrConfig === 'string'
-            ? // Otherwise if it is a string, let us parse it to get a config to
-              // create a `Pool`.
-              parsePgConnectionString(poolOrConfig)
-            : // Finally, it must just be a config itself. If it is undefined, we
-              // will just use an empty config and let the defaults take over.
-              poolOrConfig || {},
-        );
+  const pgPool = toPgPool(poolOrConfig);
 
   pgPool.on('error', err => {
     /*
@@ -202,7 +197,27 @@ function constructorName(obj: mixed): string | null {
 }
 
 // tslint:disable-next-line no-any
-function quacksLikePgPool(pgConfig: any): boolean {
+function toPgPool(poolOrConfig: any): Pool {
+  if (quacksLikePgPool(poolOrConfig)) {
+    // If it is already a `Pool`, just use it.
+    return poolOrConfig;
+  }
+
+  return new Pool(
+    typeof poolOrConfig === 'string'
+      ? // Otherwise if it is a string, let us parse it to get a config to
+        // create a `Pool`.
+        parsePgConnectionString(poolOrConfig)
+      : // Finally, it must just be a config itself. If it is undefined, we
+        // will just use an empty config and let the defaults take over.
+        poolOrConfig || {},
+  );
+}
+
+// tslint:disable-next-line no-any
+function quacksLikePgPool(pgConfig: any): pgConfig is Pool {
+  if (pgConfig instanceof Pool) return true;
+
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== 'object') return false;
   if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool')
