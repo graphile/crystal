@@ -5494,6 +5494,8 @@ enum PeopleOrderBy {
   ABOUT_DESC
   ALIASES_ASC
   ALIASES_DESC
+  COMPUTED_OUT_ASC
+  COMPUTED_OUT_DESC
   CONFIG_ASC
   CONFIG_DESC
   CREATED_AT_ASC
@@ -5580,7 +5582,7 @@ type Person implements N {
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
   computedInout(ino: String): String
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
-  computedOut: String
+  computedOut: String!
   computedOutOut: PersonComputedOutOutRecord
   config: KeyValueHash
   createdAt: Datetime
@@ -5637,6 +5639,9 @@ type Person implements N {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): PeopleConnection!
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
@@ -5780,6 +5785,9 @@ input PersonCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`aliases\` field.\\"\\"\\"
   aliases: [String]
+
+  \\"\\"\\"Checks for equality with the object’s \`computedOut\` field.\\"\\"\\"
+  computedOut: String
 
   \\"\\"\\"Checks for equality with the object’s \`config\` field.\\"\\"\\"
   config: KeyValueHash
@@ -7240,6 +7248,11 @@ type Q implements N {
     \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
     before: Cursor
 
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+
     \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
     first: Int
 
@@ -7251,6 +7264,9 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): PeopleConnection!
 
   \\"\\"\\"Reads a single \`Type\` using its globally unique \`ID\`.\\"\\"\\"

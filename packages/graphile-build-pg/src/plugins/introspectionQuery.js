@@ -69,6 +69,7 @@ with
       coalesce(pro.proallargtypes, pro.proargtypes) as "argTypeIds",
       coalesce(pro.proargmodes, array[]::text[]) as "argModes",
       coalesce(pro.proargnames, array[]::text[]) as "argNames",
+      pro.pronargs as "inputArgsCount",
       pro.pronargdefaults as "argDefaultsNum",
       pro.procost as "cost",
       exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable"

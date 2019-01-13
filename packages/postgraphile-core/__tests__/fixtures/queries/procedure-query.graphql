@@ -20,6 +20,8 @@ query {
   compoundTypeArrayQuery(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {seconds: 12, minutes: 3, hours: 2}, fooBar: 8 }) { a b c d e f f g { hours minutes seconds } fooBar }
   tableQuery(id: 5) { nodeId id headline authorId }
   tableSetQuery { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQuery_sorted: tableSetQuery(orderBy: NAME_ASC) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQuery_condition: tableSetQuery(condition: {name: "Budd Deey"}) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   tableSetQueryWithOffset: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", after: "WyJuYXR1cmFsIiwzXQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   tableSetQueryWithOffset2: tableSetQuery(after: "WyJuYXR1cmFsIiwzXQ==", before: "WyJuYXR1cmFsIiw1XQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   tableSetQueryWithOffset3: tableSetQuery(before: "WyJuYXR1cmFsIiw1XQ==", last: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }

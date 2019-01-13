@@ -67,23 +67,38 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
         scope: {
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgFieldIntrospection: table,
+          pgFieldIntrospection,
+          pgFieldIntrospectionTable,
         },
         addArgDataGenerator,
         Self,
         field,
       } = context;
 
-      const shouldAddOrderBy = isPgFieldConnection || isPgFieldSimpleCollection;
+      if (!isPgFieldConnection && !isPgFieldSimpleCollection) {
+        return args;
+      }
+
+      const proc =
+        pgFieldIntrospection.kind === "procedure" ? pgFieldIntrospection : null;
+      const table =
+        pgFieldIntrospection.kind === "class"
+          ? pgFieldIntrospection
+          : proc
+            ? pgFieldIntrospectionTable
+            : null;
       if (
-        !shouldAddOrderBy ||
         !table ||
-        table.kind !== "class" ||
         !table.namespace ||
         !table.isSelectable ||
         omit(table, "order")
       ) {
         return args;
+      }
+      if (proc) {
+        if (!proc.tags.sortable) {
+          return args;
+        }
       }
       const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
       const tableTypeName = TableType.name;
@@ -126,7 +141,9 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
                     ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                         col
                       )}`
-                    : col;
+                    : typeof col === "function"
+                      ? col(queryBuilder)
+                      : col;
                   // If the enum specifies null ordering, use that
                   // Otherwise, use the orderByNullsLast option if present
                   const nullsFirst =

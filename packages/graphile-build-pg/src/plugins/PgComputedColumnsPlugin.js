@@ -1,5 +1,41 @@
 // @flow
-import type { Plugin } from "graphile-build";
+import type { Plugin, Build } from "graphile-build";
+import type { PgClass, PgProc } from "./PgIntrospectionPlugin";
+
+// This interface is not official yet, don't rely on it.
+export const getComputedColumnDetails = (
+  build: Build,
+  table: PgClass,
+  proc: PgProc
+) => {
+  if (!proc.isStable) return null;
+  if (proc.namespaceId !== table.namespaceId) return null;
+  if (!proc.name.startsWith(`${table.name}_`)) return null;
+  if (proc.argTypeIds.length < 1) return null;
+  if (proc.argTypeIds[0] !== table.type.id) return null;
+
+  const argTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+    if (
+      proc.argModes.length === 0 || // all args are `in`
+      proc.argModes[idx] === "i" || // this arg is `in`
+      proc.argModes[idx] === "b" // this arg is `inout`
+    ) {
+      prev.push(build.pgIntrospectionResultsByKind.typeById[typeId]);
+    }
+    return prev;
+  }, []);
+  if (
+    argTypes
+      .slice(1)
+      .some(type => type.type === "c" && type.class && type.class.isSelectable)
+  ) {
+    // Accepts two input tables? Skip.
+    return null;
+  }
+
+  const pseudoColumnName = proc.name.substr(table.name.length + 1);
+  return { argTypes, pseudoColumnName };
+};
 
 export default (function PgComputedColumnsPlugin(
   builder,
@@ -48,36 +84,14 @@ export default (function PgComputedColumnsPlugin(
     return extend(
       fields,
       introspectionResultsByKind.procedure.reduce((memo, proc) => {
-        // PERFORMANCE: These used to be .filter(...) calls
-        if (!proc.isStable) return memo;
-        if (proc.namespaceId !== table.namespaceId) return memo;
-        if (!proc.name.startsWith(`${table.name}_`)) return memo;
-        if (proc.argTypeIds.length < 1) return memo;
-        if (proc.argTypeIds[0] !== tableType.id) return memo;
         if (omit(proc, "execute")) return memo;
-
-        const argTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
-          if (
-            proc.argModes.length === 0 || // all args are `in`
-            proc.argModes[idx] === "i" || // this arg is `in`
-            proc.argModes[idx] === "b" // this arg is `inout`
-          ) {
-            prev.push(introspectionResultsByKind.typeById[typeId]);
-          }
-          return prev;
-        }, []);
-        if (
-          argTypes
-            .slice(1)
-            .some(
-              type => type.type === "c" && type.class && type.class.isSelectable
-            )
-        ) {
-          // Accepts two input tables? Skip.
-          return memo;
-        }
-
-        const pseudoColumnName = proc.name.substr(table.name.length + 1);
+        const computedColumnDetails = getComputedColumnDetails(
+          build,
+          table,
+          proc
+        );
+        if (!computedColumnDetails) return memo;
+        const { pseudoColumnName } = computedColumnDetails;
         function makeField(forceList) {
           const fieldName = forceList
             ? inflection.computedColumnList(pseudoColumnName, proc, table)

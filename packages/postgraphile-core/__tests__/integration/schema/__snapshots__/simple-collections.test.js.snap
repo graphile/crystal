@@ -2542,6 +2542,8 @@ enum PeopleOrderBy {
   ABOUT_DESC
   ALIASES_ASC
   ALIASES_DESC
+  COMPUTED_OUT_ASC
+  COMPUTED_OUT_DESC
   CONFIG_ASC
   CONFIG_DESC
   CREATED_AT_ASC
@@ -2662,7 +2664,7 @@ type Person implements Node {
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
   computedInout(ino: String): String
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
-  computedOut: String
+  computedOut: String!
   computedOutOut: PersonComputedOutOutRecord
   config: KeyValueHash
   createdAt: Datetime
@@ -2690,6 +2692,9 @@ type Person implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): PeopleConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
@@ -2699,6 +2704,9 @@ type Person implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): [Person]
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
@@ -2813,6 +2821,9 @@ input PersonCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`aliases\` field.\\"\\"\\"
   aliases: [String]
+
+  \\"\\"\\"Checks for equality with the object’s \`computedOut\` field.\\"\\"\\"
+  computedOut: String
 
   \\"\\"\\"Checks for equality with the object’s \`config\` field.\\"\\"\\"
   config: KeyValueHash
@@ -3639,6 +3650,11 @@ type Query implements Node {
     \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
     before: Cursor
 
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+
     \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
     first: Int
 
@@ -3650,15 +3666,26 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): PeopleConnection!
 
   \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   tableSetQueryList(
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+
     \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
     first: Int
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!]
   ): [Person]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }

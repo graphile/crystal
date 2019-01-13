@@ -1010,6 +1010,84 @@ Object {
 }
 `;
 
+exports[`connections-condition-computed-column.graphql 1`] = `
+Object {
+  "data": Object {
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "id": 3,
+          "name": "Budd Deey",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`connections-order-computed-column.graphql 1`] = `
+Object {
+  "data": Object {
+    "asc": Object {
+      "nodes": Array [
+        Object {
+          "id": 3,
+          "name": "Budd Deey",
+        },
+        Object {
+          "id": 5,
+          "name": "Joe Tucker",
+        },
+        Object {
+          "id": 1,
+          "name": "John Smith",
+        },
+        Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "id": 2,
+          "name": "Sara Smith",
+        },
+        Object {
+          "id": 6,
+          "name": "Twenty Seventwo",
+        },
+      ],
+    },
+    "desc": Object {
+      "nodes": Array [
+        Object {
+          "id": 6,
+          "name": "Twenty Seventwo",
+        },
+        Object {
+          "id": 2,
+          "name": "Sara Smith",
+        },
+        Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "id": 1,
+          "name": "John Smith",
+        },
+        Object {
+          "id": 5,
+          "name": "Joe Tucker",
+        },
+        Object {
+          "id": 3,
+          "name": "Budd Deey",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`connections-totalCount.graphql 1`] = `
 Object {
   "data": Object {
@@ -4835,6 +4913,68 @@ Object {
         "hasNextPage": false,
         "hasPreviousPage": false,
         "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQuery_condition": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwxXQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQuery_sorted": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsM10=",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNV0=",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsMV0=",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNF0=",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsMl0=",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNl0=",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2FzYyIsNl0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2FzYyIsM10=",
       },
     },
     "typesQuery": false,

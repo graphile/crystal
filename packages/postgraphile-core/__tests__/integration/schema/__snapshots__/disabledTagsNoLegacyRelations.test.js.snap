@@ -2625,6 +2625,12 @@ type Person implements Node {
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
   computedInout(ino: String): String
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
+
+  \\"\\"\\"
+  @notNull
+  @sortable
+  @filterable
+  \\"\\"\\"
   computedOut: String
   computedOutOut: PersonComputedOutOutRecord
   config: KeyValueHash
@@ -2636,7 +2642,7 @@ type Person implements Node {
   firstName: String
   firstPost: Post
 
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  \\"\\"\\"@sortable\\"\\"\\"
   friends(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
@@ -3362,7 +3368,10 @@ type Query implements Node {
   returnTableWithoutGrants: CompoundKey
   tableQuery(id: Int): Post
 
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  \\"\\"\\"
+  @sortable
+  @filterable
+  \\"\\"\\"
   tableSetQuery(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor

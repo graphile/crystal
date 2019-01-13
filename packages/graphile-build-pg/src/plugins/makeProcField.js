@@ -1,4 +1,6 @@
 // @flow
+const nullableIf = (GraphQLNonNull, condition, Type) =>
+  condition ? Type : new GraphQLNonNull(Type);
 
 import type { Build, FieldWithHooksFunction } from "graphile-build";
 import type { PgProc } from "./PgIntrospectionPlugin";
@@ -557,7 +559,7 @@ export default function makeProcField(
                 TableType.name
               }\`.`
             : null,
-        type: ReturnType,
+        type: nullableIf(GraphQLNonNull, !proc.tags.notNull, ReturnType),
         args: args,
         resolve: computed
           ? (data, _args, _context, resolveInfo) => {

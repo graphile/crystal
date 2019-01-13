@@ -93,7 +93,8 @@ export default (function PgConnectionArgCondition(builder) {
         scope: {
           isPgFieldConnection,
           isPgFieldSimpleCollection,
-          pgFieldIntrospection: table,
+          pgFieldIntrospection,
+          pgFieldIntrospectionTable,
         },
         addArgDataGenerator,
         Self,
@@ -102,8 +103,17 @@ export default (function PgConnectionArgCondition(builder) {
 
       const shouldAddCondition =
         isPgFieldConnection || isPgFieldSimpleCollection;
+      if (!shouldAddCondition) return args;
+
+      const proc =
+        pgFieldIntrospection.kind === "procedure" ? pgFieldIntrospection : null;
+      const table =
+        pgFieldIntrospection.kind === "class"
+          ? pgFieldIntrospection
+          : proc
+            ? pgFieldIntrospectionTable
+            : null;
       if (
-        !shouldAddCondition ||
         !table ||
         table.kind !== "class" ||
         !table.namespace ||
@@ -111,6 +121,12 @@ export default (function PgConnectionArgCondition(builder) {
       ) {
         return args;
       }
+      if (proc) {
+        if (!proc.tags.filterable) {
+          return args;
+        }
+      }
+
       const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
       const TableConditionType = getTypeByName(
         inflection.conditionType(TableType.name)

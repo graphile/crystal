@@ -8,6 +8,7 @@ import PgConnectionArgFirstLastBeforeAfter from "./plugins/PgConnectionArgFirstL
 import PgConnectionArgOrderBy from "./plugins/PgConnectionArgOrderBy";
 import PgConnectionArgOrderByDefaultValue from "./plugins/PgConnectionArgOrderByDefaultValue";
 import PgConnectionArgCondition from "./plugins/PgConnectionArgCondition";
+import PgConditionComputedColumnPlugin from "./plugins/PgConditionComputedColumnPlugin";
 import PgAllRows from "./plugins/PgAllRows";
 import PgColumnsPlugin from "./plugins/PgColumnsPlugin";
 import PgColumnDeprecationPlugin from "./plugins/PgColumnDeprecationPlugin";
@@ -17,6 +18,7 @@ import PgRowByUniqueConstraint from "./plugins/PgRowByUniqueConstraint";
 import PgComputedColumnsPlugin from "./plugins/PgComputedColumnsPlugin";
 import PgQueryProceduresPlugin from "./plugins/PgQueryProceduresPlugin";
 import PgOrderAllColumnsPlugin from "./plugins/PgOrderAllColumnsPlugin";
+import PgOrderComputedColumnsPlugin from "./plugins/PgOrderComputedColumnsPlugin";
 import PgOrderByPrimaryKeyPlugin from "./plugins/PgOrderByPrimaryKeyPlugin";
 import PgRowNode from "./plugins/PgRowNode";
 import PgNodeAliasPostGraphile from "./plugins/PgNodeAliasPostGraphile";
@@ -48,6 +50,7 @@ export const defaultPlugins = [
   PgConnectionArgOrderBy,
   PgConnectionArgOrderByDefaultValue,
   PgConnectionArgCondition,
+  PgConditionComputedColumnPlugin,
   PgAllRows,
   PgColumnsPlugin,
   PgColumnDeprecationPlugin,
@@ -57,6 +60,7 @@ export const defaultPlugins = [
   PgComputedColumnsPlugin,
   PgQueryProceduresPlugin,
   PgOrderAllColumnsPlugin,
+  PgOrderComputedColumnsPlugin,
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
   PgNodeAliasPostGraphile,
@@ -83,6 +87,7 @@ export {
   PgConnectionArgOrderBy,
   PgConnectionArgOrderByDefaultValue,
   PgConnectionArgCondition,
+  PgConditionComputedColumnPlugin,
   PgAllRows,
   PgColumnsPlugin,
   PgColumnDeprecationPlugin,
@@ -92,6 +97,7 @@ export {
   PgComputedColumnsPlugin,
   PgQueryProceduresPlugin,
   PgOrderAllColumnsPlugin,
+  PgOrderComputedColumnsPlugin,
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
   PgNodeAliasPostGraphile,

@@ -423,13 +423,25 @@ export default (function PgBasicsPlugin(
         argument(name: ?string, index: number) {
           return this.camelCase(name || `arg${index}`);
         },
+        orderByEnum(columnName, ascending) {
+          return this.constantCase(
+            `${columnName}_${ascending ? "asc" : "desc"}`
+          );
+        },
         orderByColumnEnum(attr: PgAttribute, ascending: boolean) {
           const columnName = this._columnName(attr, {
             skipRowId: true, // Because we messed up 😔
           });
-          return this.constantCase(
-            `${columnName}_${ascending ? "asc" : "desc"}`
-          );
+          return this.orderByEnum(columnName, ascending);
+        },
+        orderByComputedColumnEnum(
+          pseudoColumnName: string,
+          proc: PgProc,
+          table: PgClass,
+          ascending: boolean
+        ) {
+          const columnName = this.computedColumn(pseudoColumnName, proc, table);
+          return this.orderByEnum(columnName, ascending);
         },
         domainType(type: PgType) {
           return this.upperCamelCase(this._typeName(type));

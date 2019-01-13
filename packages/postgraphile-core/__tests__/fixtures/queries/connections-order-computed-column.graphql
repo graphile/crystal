@@ -1,0 +1,14 @@
+query {
+  asc: allPeople(orderBy: [COMPUTED_OUT_ASC]) {
+    nodes {
+      id
+      name
+    }
+  }
+  desc: allPeople(orderBy: [COMPUTED_OUT_DESC]) {
+    nodes {
+      id
+      name
+    }
+  }
+}
