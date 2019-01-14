@@ -137,7 +137,7 @@ export default function postgraphile(
     incomingOptions = {};
   }
 
-  if (typeof poolOrConfig === 'undefined' && arguments.length > 1) {
+  if (typeof poolOrConfig === 'undefined' && arguments.length >= 1) {
     throw new Error('The first argument to postgraphile was `undefined`... did you mean to set pool options?');
   }
 
