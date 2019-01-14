@@ -85,6 +85,11 @@ test('will not error if jwtSecret is provided without jwtPgTypeIdentifier', asyn
 
 test('will throw on undefined positional arguments', async () => {
   const pgPool = new Pool();
+
+  expect(() => postgraphile(null)).not.toThrow();
+  expect(() => postgraphile(pgPool, null)).not.toThrow();
+  expect(() => postgraphile(null, 'public')).not.toThrow();
+
   expect(() => postgraphile(undefined)).toThrow();
   expect(() => postgraphile(pgPool, undefined)).toThrow();
   expect(() => postgraphile(undefined, 'public')).toThrow();
