@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -757,6 +757,7 @@ returns varchar as $$
   select n.first_name || ' ' || n.last_name;
 $$ language sql stable;
 
+create index full_name_idx on d.person ((first_name || ' ' || last_name));
 
 create table d.post (
   id serial primary key,
@@ -847,7 +848,6 @@ CREATE INDEX ON "c"."left_arm"("person_id");
 CREATE INDEX ON "c"."person_secret"("person_id");
 
 */
-
 
 create schema inheritence;
 
@@ -964,3 +964,15 @@ create table ranges.range_test (
   ts tsrange default null,
   tstz tstzrange default null
 );
+
+create schema index_expressions;
+
+create table index_expressions.employee (
+  id serial primary key,
+  first_name text not null,
+  last_name text not null
+);
+
+create unique index employee_name on index_expressions.employee ((first_name || ' ' || last_name));
+create index employee_lower_name on index_expressions.employee (lower(first_name));
+create index employee_first_name_idx on index_expressions.employee (first_name);

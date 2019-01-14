@@ -164,6 +164,7 @@ export type PgIndex = {
   namespaceName: string,
   classId: string,
   numberOfAttributes: number,
+  indexType: string,
   isUnique: boolean,
   isPrimary: boolean,
   /*

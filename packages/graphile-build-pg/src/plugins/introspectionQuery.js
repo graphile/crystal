@@ -362,6 +362,7 @@ with
       idx.indisreplident as "isReplicaIdentity",
       idx.indisvalid as "isValid", -- if false, don't use for queries
       idx.indkey as "attributeNums",
+      am.amname as "indexType",
       ${
         serverVersionNum >= 90600
           ? `\
@@ -381,12 +382,12 @@ with
       inner join pg_catalog.pg_class idx_more on (idx.indexrelid = idx_more.oid)
       inner join class on (idx.indrelid = class.id)
       inner join pg_catalog.pg_namespace as nsp on (nsp.oid = idx_more.relnamespace)
+      inner join pg_catalog.pg_am as am on (am.oid = idx_more.relam)
       left join pg_catalog.pg_description as dsc on dsc.objoid = idx.indexrelid and dsc.objsubid = 0 and dsc.classoid = 'pg_catalog.pg_class'::regclass
     where
       idx.indislive is not false and
       idx.indisexclusion is not true and -- exclusion index
       idx.indcheckxmin is not true and -- always valid?
-      not (string_to_array(idx.indkey::text, ' ')::int2[] operator(pg_catalog.@>) ARRAY[0::int2]) and -- no expressions
       idx.indpred is null -- no partial index predicate
     order by
       idx.indrelid, idx.indexrelid
