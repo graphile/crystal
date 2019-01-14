@@ -131,14 +131,18 @@ export default function postgraphile(
   // `incomingOptions`.
   else {
     if (arguments.length > 1) {
-      throw new Error('The second argument to postgraphile was `undefined`... did you mean to set a schema?');
+      throw new Error(
+        'The second argument to postgraphile was `undefined`... did you mean to set a schema?',
+      );
     }
     schema = 'public';
     incomingOptions = {};
   }
 
   if (typeof poolOrConfig === 'undefined' && arguments.length >= 1) {
-    throw new Error('The first argument to postgraphile was `undefined`... did you mean to set pool options?');
+    throw new Error(
+      'The first argument to postgraphile was `undefined`... did you mean to set pool options?',
+    );
   }
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
