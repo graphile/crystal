@@ -123,9 +123,9 @@ export default function postgraphile(
   }
   // If the second argument is the incomingOptions so set `schema` to the
   // default and `incomingOptions` to the second argument.
-  else if (typeof schemaOrOptions !== 'undefined') {
+  else if (typeof schemaOrOptions === 'object') {
     schema = 'public';
-    incomingOptions = schemaOrOptions || {};
+    incomingOptions = schemaOrOptions || maybeOptions || {};
   }
   // Otherwise the second argument is undefined, use defaults for both `schema` and
   // `incomingOptions`.
