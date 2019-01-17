@@ -20,7 +20,7 @@ test('will use a connected client from the pool, the schemas, and options to cre
   createPostGraphileHttpRequestHandler.mockClear();
   const pgPool = new Pool();
   const schemas = [Symbol('schemas')];
-  const options = Symbol('options');
+  const options = { $options: Symbol('options') };
   await postgraphile(pgPool, schemas, options);
   expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, schemas, options]]);
 });
@@ -29,8 +29,7 @@ test('will use a connected client from the pool, the default schema, and options
   createPostGraphileSchema.mockClear();
   createPostGraphileHttpRequestHandler.mockClear();
   const pgPool = new Pool();
-  const options = Symbol('options');
-  const pgClient = { release: jest.fn() };
+  const options = { $options: Symbol('options') };
   await postgraphile(pgPool, options);
   expect(createPostGraphileSchema.mock.calls).toEqual([[pgPool, ['public'], options]]);
 });
@@ -82,4 +81,25 @@ test('will watch Postgres schemas when `watchPg` is true', async () => {
 test('will not error if jwtSecret is provided without jwtPgTypeIdentifier', async () => {
   const pgPool = new Pool();
   expect(() => postgraphile(pgPool, [], { jwtSecret: 'test' })).not.toThrow();
+});
+
+test('will throw on undefined positional arguments', async () => {
+  const pgPool = new Pool();
+  const options = { $options: Symbol('options') };
+
+  createPostGraphileSchema.mockClear();
+  expect(() => postgraphile(pgPool, null, options)).not.toThrow();
+  expect(() => postgraphile(pgPool, options)).not.toThrow();
+  expect(createPostGraphileSchema.mock.calls).toEqual([
+    [pgPool, ['public'], options],
+    [pgPool, ['public'], options],
+  ]);
+
+  expect(() => postgraphile(null)).not.toThrow();
+  expect(() => postgraphile(pgPool, null)).not.toThrow();
+  expect(() => postgraphile(null, 'public')).not.toThrow();
+
+  expect(() => postgraphile(undefined)).toThrow();
+  expect(() => postgraphile(pgPool, undefined)).toThrow();
+  expect(() => postgraphile(undefined, 'public')).toThrow();
 });
