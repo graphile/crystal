@@ -121,20 +121,20 @@ export default function postgraphile(
     schema = schemaOrOptions;
     incomingOptions = maybeOptions || {};
   }
-  // If the second argument is the incomingOptions so set `schema` to the
-  // default and `incomingOptions` to the second argument.
+  // If the second argument is null or an object then use default `schema`
+  // and set incomingOptions to second or third argument (or default).
   else if (typeof schemaOrOptions === 'object') {
     schema = 'public';
     incomingOptions = schemaOrOptions || maybeOptions || {};
   }
-  // Otherwise the second argument is undefined, use defaults for both `schema` and
-  // `incomingOptions`.
+  // Otherwise if the second argument is present it's invalid: throw an error.
+  else if (arguments.length > 1) {
+    throw new Error(
+      'The second argument to postgraphile was invalid... did you mean to set a schema?',
+    );
+  }
+  // No schema or options specified, use defaults.
   else {
-    if (arguments.length > 1) {
-      throw new Error(
-        'The second argument to postgraphile was `undefined`... did you mean to set a schema?',
-      );
-    }
     schema = 'public';
     incomingOptions = {};
   }
