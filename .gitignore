@@ -9,3 +9,4 @@ package-lock.json
 /assets/graphiql.html
 /src/assets/favicon.ico.ts
 /src/assets/graphiql.html.ts
+.vscode
