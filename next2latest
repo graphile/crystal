@@ -1,0 +1,14 @@
+#!/bin/bash
+echo "Enter OTP code:"
+read otp
+export NPM_CONFIG_OTP=$otp
+function next2latest {
+  V=$(npm info $1 dist-tags.next | xargs)
+  npm dist-tags add $1@$V latest
+}
+next2latest graphql-parse-resolve-info
+next2latest graphile-build
+next2latest graphile-build-pg
+next2latest postgraphile-core
+next2latest graphile-utils
+next2latest postgraphile
