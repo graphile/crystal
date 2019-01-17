@@ -3,3 +3,4 @@ node_modules
 /pg-omit-archived/
 /pg-simplify-inflector/
 /operation-hooks/
+/.vscode
