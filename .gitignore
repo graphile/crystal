@@ -1,1 +1,5 @@
 node_modules
+/postgraphile/
+/pg-omit-archived/
+/pg-simplify-inflector/
+/operation-hooks/
