@@ -43,7 +43,7 @@ import favicon from '../../assets/favicon.ico';
  * The GraphiQL HTML file as a string. We need it to be a string, because we
  * will use a regular expression to replace some variables.
  */
-import origGraphiqlHtml from '../../assets/graphiql.html';
+import baseGraphiqlHtml from '../../assets/graphiql.html';
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
@@ -164,6 +164,8 @@ export default function createPostGraphileHttpRequestHandler(
   }
 
   const pluginHook = pluginHookFromOptions(options);
+
+  const origGraphiqlHtml = pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options });
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
     throw new Error(

@@ -44,6 +44,7 @@ export interface PostGraphilePlugin {
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
   'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
+  'postgraphile:graphiql:html'?: HookFn<string>;
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
   'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
   'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
