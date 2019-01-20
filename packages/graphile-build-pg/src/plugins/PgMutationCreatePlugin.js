@@ -106,7 +106,8 @@ export default (function PgMutationCreatePlugin(
               }
             )}`,
             isPgCreateInputType: true,
-            pgInflection: table,
+            pgInflection: table, // TODO:v5: remove - TYPO!
+            pgIntrospection: table,
           }
         );
         const PayloadType = newWithHooks(

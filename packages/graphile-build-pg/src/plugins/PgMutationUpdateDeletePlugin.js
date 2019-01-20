@@ -326,7 +326,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                     isPgUpdateNodeInputType: mode === "update",
                     isPgDeleteInputType: mode === "delete",
                     isPgDeleteNodeInputType: mode === "delete",
-                    pgInflection: table,
+                    pgInflection: table, // TODO:v5: remove - TYPO!
+                    pgIntrospection: table,
                     isMutationInput: true,
                   }
                 );
@@ -482,7 +483,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                     isPgUpdateByKeysInputType: mode === "update",
                     isPgDeleteInputType: mode === "delete",
                     isPgDeleteByKeysInputType: mode === "delete",
-                    pgInflection: table,
+                    pgInflection: table, // TODO:v5: remove - TYPO!
+                    pgIntrospection: table,
                     pgKeys: keys,
                     isMutationInput: true,
                   }
