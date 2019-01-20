@@ -6,7 +6,22 @@ import { version } from '../../package.json';
 import * as graphql from 'graphql';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
-export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;
+export type PluginHookFn = <TArgument, TContext = {}>(
+  hookName: string,
+  argument: TArgument,
+  context?: TContext,
+) => T;
+
+export interface PostGraphileHTTPResult {
+  statusCode?: number;
+  result?: object;
+  errors?: Array<object>;
+  meta?: object;
+}
+export interface PostGraphileHTTPEnd {
+  statusCode?: number;
+  result: object | Array<object>;
+}
 export interface PostGraphilePlugin {
   init?: HookFn<null>;
 
@@ -30,6 +45,8 @@ export interface PostGraphilePlugin {
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
   'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
+  'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
+  'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
   'postgraphile:httpParamsList'?: HookFn<Array<object>>;
   'postgraphile:validationRules'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;

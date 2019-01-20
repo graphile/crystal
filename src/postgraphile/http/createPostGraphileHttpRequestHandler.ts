@@ -325,7 +325,7 @@ export default function createPostGraphileHttpRequestHandler(
       return result;
     } else {
       const source = new Source(queryString, 'GraphQL Http Request');
-      let queryDocumentAst;
+      let queryDocumentAst: DocumentNode | void;
 
       // Catch an errors while parsing so that we can set the `statusCode` to
       // 400. Otherwise we don’t need to parse this way.
@@ -721,6 +721,11 @@ export default function createPostGraphileHttpRequestHandler(
             if (!isEmpty(meta)) {
               result.meta = meta;
             }
+            result = pluginHook('postgraphile:http:result', result, {
+              options,
+              returnArray,
+              queryDocumentAst: queryDocumentAst!,
+            });
             // Log the query. If this debugger isn’t enabled, don’t run it.
             if (
               !options.disableQueryLog &&
@@ -783,8 +788,23 @@ export default function createPostGraphileHttpRequestHandler(
       }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      const { statusCode, result } = pluginHook(
+        'postgraphile:http:end',
+        {
+          statusCode: res.statusCode,
+          result: returnArray ? results : results[0]!,
+        },
+        {
+          options,
+          returnArray,
+          res,
+        },
+      );
 
-      res.end(JSON.stringify(returnArray ? results : results[0]!));
+      if (statusCode) {
+        res.statusCode = statusCode;
+      }
+      res.end(JSON.stringify(result));
 
       if (debugRequest.enabled)
         debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
