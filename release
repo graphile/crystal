@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
-lerna bootstrap
-lerna run --concurrency 1 test
+npx lerna bootstrap
+npx lerna run --concurrency 1 test
 
 echo "Enter OTP code:"
 read otp
 export NPM_CONFIG_OTP=$otp
-lerna publish --exact --npm-client=npm --npm-tag=${1:-next}
+npx lerna publish --exact --npm-client=npm --npm-tag=${1:-next}
