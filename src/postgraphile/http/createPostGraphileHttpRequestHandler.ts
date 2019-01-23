@@ -727,6 +727,7 @@ export default function createPostGraphileHttpRequestHandler(
               options,
               returnArray,
               queryDocumentAst: queryDocumentAst!,
+              req,
             });
             // Log the query. If this debugger isn’t enabled, don’t run it.
             if (
@@ -799,6 +800,7 @@ export default function createPostGraphileHttpRequestHandler(
         {
           options,
           returnArray,
+          req,
           res,
         },
       );
