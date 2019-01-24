@@ -5,7 +5,7 @@ export default (function PageInfoStartEndCursor(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const { extend, getTypeByName, inflection } = build;
     const { Self, fieldWithHooks } = context;
-    if (Self.name !== inflection.pageInfo()) {
+    if (Self.name !== inflection.builtin("PageInfo")) {
       return fields;
     }
     const Cursor = getTypeByName("Cursor");

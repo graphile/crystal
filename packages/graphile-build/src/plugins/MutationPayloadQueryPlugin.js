@@ -18,7 +18,7 @@ export default (function MutationPayloadQueryPlugin(builder) {
       if (!isMutationPayload) {
         return fields;
       }
-      const Query = getTypeByName(inflection.query());
+      const Query = getTypeByName(inflection.builtin("Query"));
       return extend(
         fields,
         {

@@ -316,6 +316,7 @@ export default (function PgBasicsPlugin(
     pgColumnFilter = defaultPgColumnFilter,
     pgIgnoreRBAC = false,
     pgIgnoreIndexes = true, // TODO:v5: change this to false
+    pgLegacyJsonUuid = false, // TODO:v5: remove this
   }
 ) {
   let pgOmit = baseOmit;
@@ -349,15 +350,17 @@ export default (function PgBasicsPlugin(
   });
 
   builder.hook("inflection", (inflection, build) => {
+    // TODO:v5: move this to postgraphile-core
+    const oldBuiltin = inflection.builtin;
+    inflection.builtin = function(name) {
+      if (pgLegacyJsonUuid && name === "JSON") return "Json";
+      if (pgLegacyJsonUuid && name === "UUID") return "Uuid";
+      return oldBuiltin.call(this, name);
+    };
+
     return build.extend(
       inflection,
       preventEmptyResult({
-        // Postgres type names
-        pgIntervalType: () => "Interval",
-        pgIntervalInputType: () => "IntervalInput",
-        pgPointType: () => "Point",
-        pgPointInputType: () => "PointInput",
-
         // These helpers are passed GraphQL type names as strings
         conditionType(typeName: string) {
           return this.upperCamelCase(`${typeName}-condition`);

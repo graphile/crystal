@@ -6,19 +6,24 @@ test(
   core.test(["a", "b", "c"], {
     appendPlugins: [
       makeAddInflectorsPlugin(
-        {
-          query: () => "Q",
-          mutation: () => "M",
-          subscription: () => "S",
-          node: () => "N",
-          pageInfo: () => "PI",
+        ({ builtin, inputType }) => ({
+          builtin(name) {
+            if (name === "Query") return "Q";
+            if (name === "Mutation") return "M";
+            if (name === "Subscription") return "S";
+            if (name === "Node") return "N";
+            if (name === "PageInfo") return "PI";
 
-          // Postgres type names
-          pgIntervalType: () => "I",
-          pgIntervalInputType: () => "II",
-          pgPointType: () => "P",
-          pgPointInputType: () => "PP",
-        },
+            if (name === "Interval") return "I";
+            if (name === "Point") return "P";
+            return builtin.call(this, name);
+          },
+          inputType(name) {
+            if (name === "I") return "II";
+            if (name === "P") return "PP";
+            return inputType.call(this, name);
+          },
+        }),
         true
       ),
     ],

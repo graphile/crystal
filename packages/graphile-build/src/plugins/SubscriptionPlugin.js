@@ -26,7 +26,7 @@ export default (async function SubscriptionPlugin(builder) {
     const Subscription = newWithHooks(
       GraphQLObjectType,
       {
-        name: inflection.subscription(),
+        name: inflection.builtin("Subscription"),
         description:
           "The root subscription type which contains root level fields which mutate data.",
       },

@@ -40,7 +40,7 @@ export default (function StandardTypesPlugin(builder) {
     newWithHooks(
       GraphQLObjectType,
       {
-        name: inflection.pageInfo(),
+        name: inflection.builtin("PageInfo"),
         description: "Information about pagination in a connection.",
         fields: ({ fieldWithHooks }) => ({
           hasNextPage: fieldWithHooks(

@@ -26,7 +26,7 @@ export default (async function MutationPlugin(builder) {
     const Mutation = newWithHooks(
       GraphQLObjectType,
       {
-        name: inflection.mutation(),
+        name: inflection.builtin("Mutation"),
         description:
           "The root mutation type which contains root level fields which mutate data.",
       },

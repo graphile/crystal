@@ -844,12 +844,37 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       camelCase,
       constantCase,
 
-      // Core type names
-      query: () => "Query",
-      mutation: () => "Mutation",
-      subscription: () => "Subscription",
-      node: () => "Node",
-      pageInfo: () => "PageInfo",
+      // Built-in names (allows you to override these in the output schema)
+      builtin: name => {
+        /*
+         * e.g.:
+         *
+         * graphile-build:
+         *
+         * - Query
+         * - Mutation
+         * - Subscription
+         * - Node
+         * - PageInfo
+         *
+         * graphile-build-pg:
+         *
+         * - Interval
+         * - BigInt
+         * - BigFloat
+         * - BitString
+         * - Point
+         * - Date
+         * - Datetime
+         * - Time
+         * - JSON
+         * - UUID
+         * - InternetAddress
+         *
+         * Other plugins may add their own builtins too; try and avoid conflicts!
+         */
+        return name;
+      },
     },
     swallowError,
     // resolveNode: EXPERIMENTAL, API might change!

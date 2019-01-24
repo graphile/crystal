@@ -108,7 +108,7 @@ export default (function PgTablesPlugin(
               name: tableTypeName,
               interfaces: () => {
                 if (shouldHaveNodeId) {
-                  return [getTypeByName(inflection.node())];
+                  return [getTypeByName(inflection.builtin("Node"))];
                 } else {
                   return [];
                 }
@@ -390,7 +390,7 @@ export default (function PgTablesPlugin(
               pgIntrospection: table,
             }
           );
-          const PageInfo = getTypeByName(inflection.pageInfo());
+          const PageInfo = getTypeByName(inflection.builtin("PageInfo"));
 
           /*const ConnectionType = */
           newWithHooks(

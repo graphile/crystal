@@ -30,7 +30,7 @@ export default (async function QueryPlugin(builder) {
       {
         description:
           "The root query type which gives access points into the data universe.",
-        name: inflection.query(),
+        name: inflection.builtin("Query"),
         isTypeOf: (value, _context, info) =>
           info.parentType == null || value === $$isQuery,
         fields: ({ Self }) => ({

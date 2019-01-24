@@ -1,13 +1,24 @@
-import { Plugin } from "graphile-build";
+import { Plugin, Options, Build } from "graphile-build";
+
+interface Inflectors {
+  [str: string]: ((...args: Array<any>) => any);
+}
+type InflectorsGenerator = (
+  inflection: Inflectors,
+  build: Build,
+  options: Options
+) => Inflectors;
 
 export default function makeAddInflectorsPlugin(
-  additionalInflectors: {
-    [str: string]: ((...args: Array<any>) => any);
-  },
+  additionalInflectorsOrGenerator: Inflectors | InflectorsGenerator,
   replace = false
 ): Plugin {
-  return builder => {
+  return (builder, options) => {
     builder.hook("inflection", (inflection, build) => {
+      const additionalInflectors =
+        typeof additionalInflectorsOrGenerator === "function"
+          ? additionalInflectorsOrGenerator(inflection, build, options)
+          : additionalInflectorsOrGenerator;
       if (replace) {
         // Overwrite directly so that we don't lose the 'extend' hints
         Object.assign(inflection, additionalInflectors);

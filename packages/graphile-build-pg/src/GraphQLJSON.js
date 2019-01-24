@@ -27,7 +27,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-export default function makeGraphQLJSONTypes(graphql) {
+export default function makeGraphQLJSONType(graphql, name) {
   const { GraphQLScalarType, Kind } = graphql;
 
   function identity(value) {
@@ -63,27 +63,14 @@ export default function makeGraphQLJSONTypes(graphql) {
     }
   }
 
-  const GraphQLJSON = new GraphQLScalarType({
-    name: "JSON",
+  return new GraphQLScalarType({
+    name,
     description:
-      "The `JSON` scalar type represents JSON values as specified by " +
+      `The \`${name}\` scalar type represents JSON values as specified by ` +
       "[ECMA-404](http://www.ecma-international.org/" +
       "publications/files/ECMA-ST/ECMA-404.pdf).",
     serialize: identity,
     parseValue: identity,
     parseLiteral,
   });
-
-  const GraphQLJson = new GraphQLScalarType({
-    name: "Json",
-    description:
-      "The `Json` scalar type represents JSON values as specified by " +
-      "[ECMA-404](http://www.ecma-international.org/" +
-      "publications/files/ECMA-ST/ECMA-404.pdf).",
-    serialize: identity,
-    parseValue: identity,
-    parseLiteral,
-  });
-
-  return { GraphQLJSON, GraphQLJson };
 }

@@ -1,7 +1,7 @@
 // @flow
 import type { Plugin } from "graphile-build";
 
-import makeGraphQLJSONTypes from "../GraphQLJSON";
+import makeGraphQLJSONType from "../GraphQLJSON";
 
 import rawParseInterval from "postgres-interval";
 import LRU from "lru-cache";
@@ -29,7 +29,6 @@ export default (function PgTypesPlugin(
   builder,
   {
     pgExtendedTypes = true,
-    pgLegacyJsonUuid = false,
     // Adding hstore support is technically a breaking change; this allows people to opt out easily:
     pgSkipHstore = false,
   }
@@ -174,7 +173,7 @@ export default (function PgTypesPlugin(
       };
     };
     const GQLInterval = new GraphQLObjectType({
-      name: inflection.pgIntervalType(),
+      name: inflection.builtin("Interval"),
       description:
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
@@ -182,7 +181,7 @@ export default (function PgTypesPlugin(
     addType(GQLInterval, "graphile-build-pg built-in");
 
     const GQLIntervalInput = new GraphQLInputObjectType({
-      name: inflection.pgIntervalInputType(),
+      name: inflection.inputType(inflection.builtin("Interval")),
       description:
         "An interval of time that has passed where the smallest distinct unit is a second.",
       fields: makeIntervalFields(),
@@ -204,11 +203,11 @@ export default (function PgTypesPlugin(
       });
 
     const BigFloat = stringType(
-      "BigFloat",
+      inflection.builtin("BigFloat"),
       "A floating point number that requires more precision than IEEE 754 binary 64"
     );
     const BitString = stringType(
-      "BitString",
+      inflection.builtin("BitString"),
       "A string representing a series of binary bits"
     );
     addType(BigFloat, "graphile-build-pg built-in");
@@ -309,35 +308,34 @@ export default (function PgTypesPlugin(
 
       We only need to add oidLookups for types that don't have the correct fallback
     */
-    const SimpleDate = stringType("Date", "The day, does not include a time.");
+    const SimpleDate = stringType(
+      inflection.builtin("Date"),
+      "The day, does not include a time."
+    );
     const SimpleDatetime = stringType(
-      "Datetime",
+      inflection.builtin("Datetime"),
       "A point in time as described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone."
     );
     const SimpleTime = stringType(
-      "Time",
+      inflection.builtin("Time"),
       "The exact time of day, does not include the date. May or may not have a timezone offset."
     );
     const SimpleJSON = stringType(
-      pgLegacyJsonUuid ? "Json" : "JSON",
+      inflection.builtin("JSON"),
       "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf)."
     );
     const SimpleUUID = stringType(
-      pgLegacyJsonUuid ? "Uuid" : "UUID",
+      inflection.builtin("UUID"),
       "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
     );
     const InetType = stringType(
-      "InternetAddress",
+      inflection.builtin("InternetAddress"),
       "An IPv4 or IPv6 host address, and optionally its subnet."
     );
 
-    const { GraphQLJSON, GraphQLJson } = makeGraphQLJSONTypes(graphql);
-
     // pgExtendedTypes might change what types we use for things
     const JSONType = pgExtendedTypes
-      ? pgLegacyJsonUuid
-        ? GraphQLJson
-        : GraphQLJSON
+      ? makeGraphQLJSONType(graphql, inflection.builtin("JSON"))
       : SimpleJSON;
     const UUIDType = SimpleUUID; // GraphQLUUID
     const DateType = SimpleDate; // GraphQLDate
@@ -346,7 +344,7 @@ export default (function PgTypesPlugin(
 
     // 'point' in PostgreSQL is a 16-byte type that's comprised of two 8-byte floats.
     const Point = new GraphQLObjectType({
-      name: inflection.pgPointType(),
+      name: inflection.builtin("Point"),
       fields: {
         x: {
           type: new GraphQLNonNull(GraphQLFloat),
@@ -357,7 +355,7 @@ export default (function PgTypesPlugin(
       },
     });
     const PointInput = new GraphQLInputObjectType({
-      name: inflection.pgPointInputType(),
+      name: inflection.inputType(inflection.builtin("Point")),
       fields: {
         x: {
           type: new GraphQLNonNull(GraphQLFloat),
@@ -377,7 +375,7 @@ export default (function PgTypesPlugin(
 
     const oidLookup = {
       "20": stringType(
-        "BigInt",
+        inflection.builtin("BigInt"),
         "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
       ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
       "21": GraphQLInt, // int2
@@ -970,7 +968,6 @@ export default (function PgTypesPlugin(
     // better validation; but you could just as easily use JSON directly if you
     // wanted to.
     const GraphQLHStoreType = makeGraphQLHstoreType(graphql, hstoreTypeName);
-    // const GraphQLHStoreType = build.getTypeByName(pgLegacyJsonUuid ? "Json" : "JSON");
 
     // Now register the hstore type with the type system for both output and input.
     pgRegisterGqlTypeByTypeId(hstoreType.id, () => GraphQLHStoreType);

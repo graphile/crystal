@@ -120,11 +120,11 @@ export default (function NodePlugin(
     newWithHooks(
       GraphQLInterfaceType,
       {
-        name: inflection.node(),
+        name: inflection.builtin("Node"),
         description: "An object with a globally unique `ID`.",
         resolveType: value => {
           if (value === $$isQuery) {
-            if (!Query) Query = getTypeByName(inflection.query());
+            if (!Query) Query = getTypeByName(inflection.builtin("Query"));
             return Query;
           } else if (value[$$nodeType]) {
             return getNullableType(value[$$nodeType]);
@@ -157,7 +157,7 @@ export default (function NodePlugin(
     if (!isRootQuery) {
       return interfaces;
     }
-    const Type = getTypeByName(inflection.node());
+    const Type = getTypeByName(inflection.builtin("Node"));
     if (Type) {
       return [...interfaces, Type];
     } else {
@@ -200,7 +200,7 @@ export default (function NodePlugin(
             "node",
             ({ getDataFromParsedResolveInfoFragment }) => ({
               description: "Fetches an object given its globally unique `ID`.",
-              type: getTypeByName(inflection.node()),
+              type: getTypeByName(inflection.builtin("Node")),
               args: {
                 [nodeIdFieldName]: {
                   description: "The globally unique `ID`.",
