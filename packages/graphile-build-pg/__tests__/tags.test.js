@@ -46,4 +46,11 @@ test("tags are extracted correctly", () => {
   ).toEqual({
     jsonField: ["date timestamp", "name text", "episode enum ONE=1 TWO=2"],
   });
+  expect(
+    parseTags(
+      `@jsonField date timestamp\r\n@jsonField name text\n@jsonField episode enum ONE=1 TWO=2\r\nBaz`
+    ).tags
+  ).toEqual({
+    jsonField: ["date timestamp", "name text", "episode enum ONE=1 TWO=2"],
+  });
 });

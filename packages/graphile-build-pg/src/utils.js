@@ -1,6 +1,6 @@
 // @flow
 export const parseTags = (str: string) => {
-  return str.split(`\n`).reduce(
+  return str.split(/\r?\n/).reduce(
     (prev, curr) => {
       if (prev.text !== "") {
         return Object.assign({}, prev, {
