@@ -728,6 +728,8 @@ export default function createPostGraphileHttpRequestHandler(
               returnArray,
               queryDocumentAst: queryDocumentAst!,
               req,
+              // We don't pass `res` here because this is for just a single
+              // result; if you need that, use postgraphile:http:end.
             });
             // Log the query. If this debugger isn’t enabled, don’t run it.
             if (

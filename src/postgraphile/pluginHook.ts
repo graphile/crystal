@@ -107,18 +107,25 @@ function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   };
 }
 
+function shouldMemoizeHook(hookName: HookName) {
+  return hookName === 'withPostGraphileContext';
+}
+
 function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): HookFn<T> {
-  return memoizeHook<T>(
-    plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
-      if (typeof plugin[hookName] === 'function') {
-        return (argument: T, context: {}) => {
-          return plugin[hookName](previousHook(argument, context), context);
-        };
-      } else {
-        return previousHook;
-      }
-    }, identityHook),
-  );
+  const combinedHook = plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
+    if (typeof plugin[hookName] === 'function') {
+      return (argument: T, context: {}) => {
+        return plugin[hookName](previousHook(argument, context), context);
+      };
+    } else {
+      return previousHook;
+    }
+  }, identityHook);
+  if (shouldMemoizeHook(hookName)) {
+    return memoizeHook<T>(combinedHook);
+  } else {
+    return combinedHook;
+  }
 }
 
 export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn {
