@@ -24,6 +24,11 @@ import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
 
+// tslint:disable-next-line no-any
+function isString(str: any): str is string {
+  return typeof str === 'string';
+}
+
 const sponsor = sponsors[Math.floor(sponsors.length * Math.random())];
 
 const debugCli = debugFactory('postgraphile:cli');
@@ -703,7 +708,7 @@ if (noServer) {
               pgPort !== 5432 ? `:${pgConfig.port || 5432}` : ''
             }${pgDatabase ? `/${pgDatabase}` : ''}`;
 
-        const information = pluginHook(
+        const information: Array<string> = pluginHook(
           'cli:greeting',
           [
             `GraphQL API:         ${chalk.underline.bold.blue(
@@ -718,12 +723,13 @@ if (noServer) {
             `Documentation:       ${chalk.underline(
               `https://graphile.org/postgraphile/introduction/`,
             )}`,
-            extractedPlugins.length === 0 &&
-              `Join ${chalk.bold(
-                sponsor,
-              )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
-                `https://graphile.org/sponsor/`,
-              )}`,
+            extractedPlugins.length === 0
+              ? `Join ${chalk.bold(
+                  sponsor,
+                )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
+                  `https://graphile.org/sponsor/`,
+                )}`
+              : null,
           ],
           {
             options: postgraphileOptions,
@@ -731,7 +737,7 @@ if (noServer) {
             port: actualPort,
             chalk,
           },
-        ).filter(Boolean);
+        ).filter(isString);
         console.log(information.map(msg => `  ‣ ${msg}`).join('\n'));
 
         console.log('');

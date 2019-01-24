@@ -6,7 +6,22 @@ import { version } from '../../package.json';
 import * as graphql from 'graphql';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
-export type PluginHookFn = <T>(hookName: string, argument: T, context?: {}) => T;
+export type PluginHookFn = <TArgument, TContext = {}>(
+  hookName: string,
+  argument: TArgument,
+  context?: TContext,
+) => TArgument;
+
+export interface PostGraphileHTTPResult {
+  statusCode?: number;
+  result?: object;
+  errors?: Array<object>;
+  meta?: object;
+}
+export interface PostGraphileHTTPEnd {
+  statusCode?: number;
+  result: object | Array<object>;
+}
 export interface PostGraphilePlugin {
   init?: HookFn<null>;
 
@@ -25,11 +40,14 @@ export interface PostGraphilePlugin {
   'cli:library:options'?: HookFn<{}>;
   'cli:server:middleware'?: HookFn<HttpRequestHandler>;
   'cli:server:created'?: HookFn<Server>;
-  'cli:greeting'?: HookFn<Array<string | void>>;
+  'cli:greeting'?: HookFn<Array<string | null | void>>;
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
   'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
+  'postgraphile:graphiql:html'?: HookFn<string>;
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
+  'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
+  'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
   'postgraphile:httpParamsList'?: HookFn<Array<object>>;
   'postgraphile:validationRules'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
@@ -89,18 +107,25 @@ function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   };
 }
 
+function shouldMemoizeHook(hookName: HookName) {
+  return hookName === 'withPostGraphileContext';
+}
+
 function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): HookFn<T> {
-  return memoizeHook<T>(
-    plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
-      if (typeof plugin[hookName] === 'function') {
-        return (argument: T, context: {}) => {
-          return plugin[hookName](previousHook(argument, context), context);
-        };
-      } else {
-        return previousHook;
-      }
-    }, identityHook),
-  );
+  const combinedHook = plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
+    if (typeof plugin[hookName] === 'function') {
+      return (argument: T, context: {}) => {
+        return plugin[hookName](previousHook(argument, context), context);
+      };
+    } else {
+      return previousHook;
+    }
+  }, identityHook);
+  if (shouldMemoizeHook(hookName)) {
+    return memoizeHook<T>(combinedHook);
+  } else {
+    return combinedHook;
+  }
 }
 
 export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn {
