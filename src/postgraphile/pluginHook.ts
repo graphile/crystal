@@ -10,7 +10,7 @@ export type PluginHookFn = <TArgument, TContext = {}>(
   hookName: string,
   argument: TArgument,
   context?: TContext,
-) => T;
+) => TArgument;
 
 export interface PostGraphileHTTPResult {
   statusCode?: number;
@@ -40,7 +40,7 @@ export interface PostGraphilePlugin {
   'cli:library:options'?: HookFn<{}>;
   'cli:server:middleware'?: HookFn<HttpRequestHandler>;
   'cli:server:created'?: HookFn<Server>;
-  'cli:greeting'?: HookFn<Array<string | void>>;
+  'cli:greeting'?: HookFn<Array<string | null | void>>;
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
   'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
