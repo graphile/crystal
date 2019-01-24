@@ -141,9 +141,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
                     ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                         col
                       )}`
-                    : typeof col === "function"
-                      ? col(queryBuilder)
-                      : col;
+                    : col;
                   // If the enum specifies null ordering, use that
                   // Otherwise, use the orderByNullsLast option if present
                   const nullsFirst =

@@ -81,7 +81,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
 
         const unique = !!proc.tags.isUnique;
 
-        const functionCall = queryBuilder =>
+        const functionCall = ({ queryBuilder }) =>
           sql.fragment`(${sql.identifier(
             proc.namespaceName,
             proc.name
