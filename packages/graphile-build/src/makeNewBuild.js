@@ -48,7 +48,7 @@ const debug = debugFactory("graphile-build");
  * produce half a million hashes per second on my machine, the LRU only gives
  * us a 10x speedup!
  */
-const hashCache = LRUCache(100000);
+const hashCache = new LRUCache(100000);
 
 /*
  * This function must never return a string longer than 56 characters.
