@@ -1,0 +1,383 @@
+exports[`connect (@/path/to/mount) will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`connect (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`connect will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`connect will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`express (@/path/to/mount) will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`express (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`express will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`express will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`http will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`http will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`koa (@/path/to/mount) will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`koa (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`koa will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`koa will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;

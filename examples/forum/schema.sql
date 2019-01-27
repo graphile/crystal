@@ -182,7 +182,7 @@ comment on function forum_example.authenticate(text, text) is 'Creates a JWT tok
 create function forum_example.current_person() returns forum_example.person as $$
   select *
   from forum_example.person
-  where id = current_setting('jwt.claims.person_id')::integer
+  where id = nullif(current_setting('jwt.claims.person_id', true), '')::integer
 $$ language sql stable;
 
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
@@ -215,19 +215,19 @@ create policy select_post on forum_example.post for select
   using (true);
 
 create policy update_person on forum_example.person for update to forum_example_person
-  using (id = current_setting('jwt.claims.person_id')::integer);
+  using (id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy delete_person on forum_example.person for delete to forum_example_person
-  using (id = current_setting('jwt.claims.person_id')::integer);
+  using (id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy insert_post on forum_example.post for insert to forum_example_person
-  with check (author_id = current_setting('jwt.claims.person_id')::integer);
+  with check (author_id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy update_post on forum_example.post for update to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id', true)::integer);
 
 create policy delete_post on forum_example.post for delete to forum_example_person
-  using (author_id = current_setting('jwt.claims.person_id')::integer);
+  using (author_id = current_setting('jwt.claims.person_id', true)::integer);
 
 
 commit;

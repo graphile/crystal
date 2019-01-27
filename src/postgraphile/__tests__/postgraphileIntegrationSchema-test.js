@@ -1,16 +1,16 @@
 // TODO: There may be some excessive waste, if we could somehow filter what
 // these guys see, that would be great 👍
 
-jest.unmock('postgraphile-core')
+jest.unmock('postgraphile-core');
 
-import printSchemaOrdered from '../../__tests__/utils/printSchemaOrdered'
-import withPgClient from '../../__tests__/utils/withPgClient'
-import { createPostGraphileSchema } from '..'
+import printSchemaOrdered from '../../__tests__/utils/printSchemaOrdered';
+import withPgClient from '../../__tests__/utils/withPgClient';
+import { createPostGraphileSchema } from '..';
 
 // This test suite can be flaky. Increase it’s timeout.
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-let testResults
+let testResults;
 
 const testFixtures = [
   {
@@ -19,8 +19,7 @@ const testFixtures = [
   },
   {
     name: 'prints a schema with Relay 1 style ids',
-    createSchema: client =>
-      createPostGraphileSchema(client, 'c', { classicIds: true }),
+    createSchema: client => createPostGraphileSchema(client, 'c', { classicIds: true }),
   },
   {
     name: 'prints a schema with a JWT generating mutation',
@@ -43,18 +42,18 @@ const testFixtures = [
         legacyJsonUuid: true,
       }),
   },
-]
+];
 
 beforeAll(() => {
   testResults = testFixtures.map(testFixture =>
     withPgClient(async client => {
-      return await testFixture.createSchema(client)
+      return await testFixture.createSchema(client);
     })(),
-  )
-})
+  );
+});
 
 for (let i = 0; i < testFixtures.length; i++) {
   test(testFixtures[i].name, async () => {
-    expect(printSchemaOrdered(await testResults[i])).toMatchSnapshot()
-  })
+    expect(printSchemaOrdered(await testResults[i])).toMatchSnapshot();
+  });
 }

@@ -1,25 +1,37 @@
 #!/bin/bash
 
 set -e
+
+echo "Running dev (don't forget to 'yarn make-assets' if you've changed GraphiQL / favicon / etc)..."
 cd $(dirname $0)/..
 
 npm_bin=$(npm bin)
 
 export POSTGRAPHILE_ENV=development
-export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
+export BROWSER=none
 
 # Run Nodemon and watch the PostGraphile source code for changes.
 if [ "$1" = "--" ]; then
+  if [ "$DEBUG" = "" ]; then
+    echo 'You might want to:'
+    echo
+    echo '  export DEBUG="postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain"'
+  fi
   shift
-  $npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* &
+  $npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts "$@" &
 else
+  export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
   $npm_bin/nodemon \
+    --watch ../packages/postgraphile-core/node8plus \
+    --watch ../packages/graphile-build-pg/node8plus \
+    --watch ../packages/graphile-build/node8plus \
+    --watch ../packages/graphile-utils/node8plus \
     --watch src \
     --ignore __tests__ \
     --ignore __mocks__ \
     --ignore src/postgraphile/graphiql \
     --ext js,ts \
-    --exec "$npm_bin/ts-node --ignore node_modules --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+    --exec "$npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
 fi;
 
 # Ensure forked process is killed even if we die unexpectedly
@@ -27,7 +39,7 @@ trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill
 
 # Run `react-scripts` in the GraphiQL directory as well parallel, but pipe the
 # output to `/dev/null`.
-(sleep 1 && cd src/postgraphile/graphiql && PORT=5783 $npm_bin/react-scripts start) > /dev/null &
+(sleep 1 && cd postgraphiql && PORT=5783 node_modules/.bin/react-scripts start) > /dev/null &
 
 wait %1
 kill %2

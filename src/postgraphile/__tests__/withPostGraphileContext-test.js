@@ -1,9 +1,9 @@
 // tslint:disable no-empty
 
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext'
-import withPostGraphileContext from '../withPostGraphileContext'
+import { $$pgClient } from '../../postgres/inventory/pgClientFromContext';
+import withPostGraphileContext from '../withPostGraphileContext';
 
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 /**
  * Expects an Http error. Passes if there is an error of the correct form,
@@ -12,91 +12,83 @@ const jwt = require('jsonwebtoken')
 function expectHttpError(promise, statusCode, message) {
   return promise.then(
     () => {
-      throw new Error('Expected a Http error.')
+      throw new Error('Expected a Http error.');
     },
     error => {
-      expect(error.statusCode).toBe(statusCode)
-      expect(error.message).toBe(message)
+      expect(error.statusCode).toBe(statusCode);
+      expect(error.message).toBe(message);
     },
-  )
+  );
 }
 
 test('will be a noop for no token, secret, or default role', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  await withPostGraphileContext({ pgPool }, () => {})
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await withPostGraphileContext({ pgPool }, () => {});
+  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']]);
+});
 
 test('will pass in a context object with the client', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext({ pgPool }, client => {
-    expect(client[$$pgClient]).toBe(pgClient)
-  })
-})
+    expect(client[$$pgClient]).toBe(pgClient);
+  });
+});
 
 test('will record queries run inside the transaction', async () => {
-  const query1 = Symbol()
-  const query2 = Symbol()
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const query1 = Symbol();
+  const query2 = Symbol();
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext({ pgPool }, client => {
-    client[$$pgClient].query(query1)
-    client[$$pgClient].query(query2)
-  })
-  expect(pgClient.query.mock.calls).toEqual([
-    ['begin'],
-    [query1],
-    [query2],
-    ['commit'],
-  ])
-})
+    client[$$pgClient].query(query1);
+    client[$$pgClient].query(query2);
+  });
+  expect(pgClient.query.mock.calls).toEqual([['begin'], [query1], [query2], ['commit']]);
+});
 
 test('will return the value from the callback', async () => {
-  const value = Symbol()
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  expect(await withPostGraphileContext({ pgPool }, () => value)).toBe(value)
-})
+  const value = Symbol();
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  expect(await withPostGraphileContext({ pgPool }, () => value)).toBe(value);
+});
 
 test('will return the asynchronous value from the callback', async () => {
-  const value = Symbol()
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  expect(
-    await withPostGraphileContext({ pgPool }, () => Promise.resolve(value)),
-  ).toBe(value)
-})
+  const value = Symbol();
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  expect(await withPostGraphileContext({ pgPool }, () => Promise.resolve(value))).toBe(value);
+});
 
 test('will throw an error if there was a `jwtToken`, but no `jwtSecret`', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: 'asd' }, () => {}),
     403,
     'Not allowed to provide a JWT token.',
-  )
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
 
 test('will throw an error for a malformed `jwtToken`', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
-    withPostGraphileContext(
-      { pgPool, jwtToken: 'asd', jwtSecret: 'secret' },
-      () => {},
-    ),
+    withPostGraphileContext({ pgPool, jwtToken: 'asd', jwtSecret: 'secret' }, () => {}),
     403,
     'jwt malformed',
-  )
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
 
 test('will throw an error if the JWT token was signed with the wrong signature', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -110,13 +102,14 @@ test('will throw an error if the JWT token was signed with the wrong signature',
     ),
     403,
     'invalid signature',
-  )
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
 
 test('will throw an error if the JWT token does not have an audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -130,13 +123,14 @@ test('will throw an error if the JWT token does not have an audience', async () 
     ),
     403,
     'jwt audience invalid. expected: postgraphile',
-  )
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
 
 test('will throw an error if the JWT token does not have an appropriate audience', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -150,13 +144,14 @@ test('will throw an error if the JWT token does not have an appropriate audience
     ),
     403,
     'jwt audience invalid. expected: postgraphile',
-  )
-  expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-})
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
 
 test('will succeed with all the correct things', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -166,7 +161,7 @@ test('will succeed with all the correct things', async () => {
       jwtSecret: 'secret',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -176,12 +171,12 @@ test('will succeed with all the correct things', async () => {
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('will add extra claims as available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -191,7 +186,7 @@ test('will add extra claims as available', async () => {
       jwtSecret: 'secret',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -202,21 +197,49 @@ test('will add extra claims as available', async () => {
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
+
+test('will include JWT claims as jwtClaims in context callback', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { jwtClaims } = await withPostGraphileContext(
+    {
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphile', a: 1, b: 2, c: 3 }, 'secret', {
+        noTimestamp: true,
+      }),
+      jwtSecret: 'secret',
+    },
+    context => context,
+  );
+  expect(jwtClaims).toEqual({ aud: 'postgraphile', a: 1, b: 2, c: 3 });
+});
+
+test('jwtClaims should be null if there is no JWT token', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { jwtClaims } = await withPostGraphileContext(
+    {
+      pgPool,
+    },
+    context => context,
+  );
+  expect(jwtClaims).toBeNull();
+});
 
 test('will add extra settings as available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -230,13 +253,12 @@ test('will add extra settings as available', async () => {
       },
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
       {
-        text:
-          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
+        text: 'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)',
         values: [
           'foo.bar',
           'test1',
@@ -248,16 +270,16 @@ test('will add extra settings as available', async () => {
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('undefined and null extra settings are ignored while 0 is converted to a string', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
-      jwtToken: jwt.sign({ aud: 'postgraphile' }, 'secret', {
+      jwtToken: jwt.sign({ aud: 'postgraphile', true: true, false: false }, 'secret', {
         noTimestamp: true,
       }),
       jwtSecret: 'secret',
@@ -267,16 +289,18 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
         'some.setting.not.defined': undefined,
         'some.setting.zero': 0,
         'number.setting': 42,
+        'boolean.true': true,
+        'boolean.false': false,
       },
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
       {
         text:
-          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)',
+          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)',
         values: [
           'foo.bar',
           'test1',
@@ -284,19 +308,27 @@ test('undefined and null extra settings are ignored while 0 is converted to a st
           '0',
           'number.setting',
           '42',
+          'boolean.true',
+          'true',
+          'boolean.false',
+          'false',
           'jwt.claims.aud',
           'postgraphile',
+          'jwt.claims.true',
+          'true',
+          'jwt.claims.false',
+          'false',
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('extra pgSettings that are objects throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  let message
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  let message;
   try {
     await withPostGraphileContext(
       {
@@ -310,19 +342,19 @@ test('extra pgSettings that are objects throw an error', async () => {
         },
       },
       () => {},
-    )
+    );
   } catch (error) {
-    message = error.message
+    message = error.message;
   }
   expect(message).toBe(
-    'Error converting pgSetting: object needs to be of type string or number.',
-  )
-})
+    'Error converting pgSetting: object needs to be of type string, number or boolean.',
+  );
+});
 
 test('extra pgSettings that are symbols throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  let message
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  let message;
   try {
     await withPostGraphileContext(
       {
@@ -336,44 +368,18 @@ test('extra pgSettings that are symbols throw an error', async () => {
         },
       },
       () => {},
-    )
+    );
   } catch (error) {
-    message = error.message
+    message = error.message;
   }
   expect(message).toBe(
-    'Error converting pgSetting: symbol needs to be of type string or number.',
-  )
-})
-
-test('extra pgSettings that are booleans throw an error', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
-  let message
-  try {
-    await withPostGraphileContext(
-      {
-        pgPool,
-        jwtToken: jwt.sign({ aud: 'postgraphile' }, 'secret', {
-          noTimestamp: true,
-        }),
-        jwtSecret: 'secret',
-        pgSettings: {
-          'some.boolean': true,
-        },
-      },
-      () => {},
-    )
-  } catch (error) {
-    message = error.message
-  }
-  expect(message).toBe(
-    'Error converting pgSetting: boolean needs to be of type string or number.',
-  )
-})
+    'Error converting pgSetting: symbol needs to be of type string, number or boolean.',
+  );
+});
 
 test('will set the default role if available', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -381,7 +387,7 @@ test('will set the default role if available', async () => {
       pgDefaultRole: 'test_default_role',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -391,12 +397,12 @@ test('will set the default role if available', async () => {
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('will set the default role if no other role was provided in the JWT', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -407,7 +413,7 @@ test('will set the default role if no other role was provided in the JWT', async
       pgDefaultRole: 'test_default_role',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -420,33 +426,35 @@ test('will set the default role if no other role was provided in the JWT', async
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('will set a role provided in the JWT', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
       jwtToken: jwt.sign(
         { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
         'secret',
-        { noTimestamp: true },
+        {
+          noTimestamp: true,
+        },
       ),
       jwtSecret: 'secret',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -459,36 +467,38 @@ test('will set a role provided in the JWT', async () => {
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
           'jwt.claims.role',
           'test_jwt_role',
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('will set a role provided in the JWT superceding the default role', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
       jwtToken: jwt.sign(
         { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
         'secret',
-        { noTimestamp: true },
+        {
+          noTimestamp: true,
+        },
       ),
       jwtSecret: 'secret',
       pgDefaultRole: 'test_default_role',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -501,23 +511,23 @@ test('will set a role provided in the JWT superceding the default role', async (
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
           'jwt.claims.role',
           'test_jwt_role',
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 test('will set a role provided in the JWT', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -536,7 +546,7 @@ test('will set a role provided in the JWT', async () => {
       jwtRole: ['some', 'other', 'path'],
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -549,23 +559,76 @@ test('will set a role provided in the JWT', async () => {
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
           'jwt.claims.some',
-          { other: { path: 'test_deep_role' } },
+          JSON.stringify({ other: { path: 'test_deep_role' } }),
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
+
+test('if same settings are set by pgSettings and JWT, JWT will "win", except for the "role" because of legacy', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await withPostGraphileContext(
+    {
+      pgPool,
+      jwtToken: jwt.sign(
+        { aud: 'postgraphile', a: 1, b: 2, c: 3, role: 'test_jwt_role' },
+        'secret',
+        {
+          noTimestamp: true,
+        },
+      ),
+      jwtSecret: 'secret',
+      pgSettings: {
+        'jwt.claims.a': 99,
+        'jwt.claims.b': 98,
+        'jwt.claims.c': 97,
+        'jwt.claims.d': 96,
+        role: 'ugh_legacy_override',
+        'jwt.claims.role': 'some_other_role_again',
+      },
+    },
+    () => {},
+  );
+  expect(pgClient.query.mock.calls).toEqual([
+    ['begin'],
+    [
+      {
+        text:
+          'select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)',
+        values: [
+          'jwt.claims.d',
+          '96',
+          'role',
+          'ugh_legacy_override',
+          'jwt.claims.aud',
+          'postgraphile',
+          'jwt.claims.a',
+          '1',
+          'jwt.claims.b',
+          '2',
+          'jwt.claims.c',
+          '3',
+          'jwt.claims.role',
+          'test_jwt_role',
+        ],
+      },
+    ],
+    ['commit'],
+  ]);
+});
 
 test('will set a role provided in the JWT superceding the default role', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() }
-  const pgPool = { connect: jest.fn(() => pgClient) }
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
   await withPostGraphileContext(
     {
       pgPool,
@@ -585,7 +648,7 @@ test('will set a role provided in the JWT superceding the default role', async (
       pgDefaultRole: 'test_default_role',
     },
     () => {},
-  )
+  );
   expect(pgClient.query.mock.calls).toEqual([
     ['begin'],
     [
@@ -598,27 +661,27 @@ test('will set a role provided in the JWT superceding the default role', async (
           'jwt.claims.aud',
           'postgraphile',
           'jwt.claims.a',
-          1,
+          '1',
           'jwt.claims.b',
-          2,
+          '2',
           'jwt.claims.c',
-          3,
+          '3',
           'jwt.claims.some',
-          { other: { path: 'test_deep_role' } },
+          JSON.stringify({ other: { path: 'test_deep_role' } }),
         ],
       },
     ],
     ['commit'],
-  ])
-})
+  ]);
+});
 
 describe('jwtVerifyOptions', () => {
-  let pgClient
-  let pgPool
+  let pgClient;
+  let pgPool;
   beforeEach(() => {
-    pgClient = { query: jest.fn(), release: jest.fn() }
-    pgPool = { connect: jest.fn(() => pgClient) }
-  })
+    pgClient = { query: jest.fn(), release: jest.fn() };
+    pgPool = { connect: jest.fn(() => pgClient) };
+  });
 
   test('will throw an error if jwtAudiences and jwtVerifyOptions.audience are both provided', async () => {
     await expectHttpError(
@@ -633,10 +696,30 @@ describe('jwtVerifyOptions', () => {
         () => {},
       ),
       403,
-      'Provide either \'jwtAudiences\' or \'jwtVerifyOptions.audience\' but not both',
-    )
-    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-  })
+      "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
+
+  test('will throw an error if jwtAudiences is provided and jwtVerifyOptions.audience = undefined', async () => {
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtAudiences: ['some-other-audience'],
+          jwtToken: jwt.sign({ aud: 'postgrest' }, 'secret'),
+          jwtSecret: 'secret',
+          jwtVerifyOptions: { audience: undefined },
+        },
+        () => {},
+      ),
+      403,
+      "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
 
   test('will succeed with both jwtAudiences and jwtVerifyOptions if jwtVerifyOptions does not have an audience field', async () => {
     await withPostGraphileContext(
@@ -651,23 +734,115 @@ describe('jwtVerifyOptions', () => {
         jwtVerifyOptions: { subject: 'my-subject' },
       },
       () => {},
-    )
+    );
     expect(pgClient.query.mock.calls).toEqual([
       ['begin'],
       [
         {
           text: 'select set_config($1, $2, true), set_config($3, $4, true)',
-          values: [
-            'jwt.claims.aud',
-            'my-audience',
-            'jwt.claims.sub',
-            'my-subject',
-          ],
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
         },
       ],
       ['commit'],
-    ])
-  })
+    ]);
+  });
+
+  test('will succeed with audience check disabled via null', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: null },
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will succeed with audience check disabled via empty array', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: [] },
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will succeed with audience check disabled via empty string', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'my-audience' }, 'secret', {
+          noTimestamp: true,
+          subject: 'my-subject',
+        }),
+        jwtSecret: 'secret',
+        jwtVerifyOptions: { subject: 'my-subject', audience: '' },
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true), set_config($3, $4, true)',
+          values: ['jwt.claims.aud', 'my-audience', 'jwt.claims.sub', 'my-subject'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will throw error if audience does not match', async () => {
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtAudiences: ['my-audience'],
+          jwtToken: jwt.sign({ aud: 'incorrect-audience' }, 'secret', {
+            noTimestamp: true,
+            subject: 'my-subject',
+          }),
+          jwtSecret: 'secret',
+          jwtVerifyOptions: { subject: 'my-subject' },
+        },
+        () => {},
+      ),
+      403,
+      'jwt audience invalid. expected: my-audience',
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
 
   test('will throw an error if the JWT token does not have an appropriate audience', async () => {
     await expectHttpError(
@@ -682,9 +857,10 @@ describe('jwtVerifyOptions', () => {
       ),
       403,
       'jwt audience invalid. expected: another-audience',
-    )
-    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-  })
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
 
   test('will throw an error from a mismatched subject', async () => {
     await expectHttpError(
@@ -700,9 +876,10 @@ describe('jwtVerifyOptions', () => {
       ),
       403,
       'jwt subject invalid. expected: orangutan',
-    )
-    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-  })
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
 
   test('will throw an error from an issuer array that does not match iss', async () => {
     await expectHttpError(
@@ -710,21 +887,19 @@ describe('jwtVerifyOptions', () => {
         {
           pgPool,
           jwtSecret: 'secret',
-          jwtToken: jwt.sign(
-            { aud: 'postgraphile', iss: 'alpha:nasa' },
-            'secret',
-          ),
+          jwtToken: jwt.sign({ aud: 'postgraphile', iss: 'alpha:nasa' }, 'secret'),
           jwtVerifyOptions: { issuer: ['alpha:aliens', 'alpha:ufo'] },
         },
         () => {},
       ),
       403,
       'jwt issuer invalid. expected: alpha:aliens,alpha:ufo',
-    )
-    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-  })
+    );
+    // Never set up the transaction due to error
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
 
-  test('will default to an audience of [\'postgraphile\'] if no audience params are provided', async () => {
+  test("will default to an audience of ['postgraphile'] if no audience params are provided", async () => {
     await expectHttpError(
       withPostGraphileContext(
         {
@@ -736,7 +911,8 @@ describe('jwtVerifyOptions', () => {
       ),
       403,
       'jwt audience invalid. expected: postgraphile',
-    )
-    expect(pgClient.query.mock.calls).toEqual([['begin'], ['commit']])
-  })
-})
+    );
+    // No need for transaction since there's no settings
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
+});

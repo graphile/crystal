@@ -1,17 +1,38 @@
 # Sponsors
 
-These people and companies help accelerate the advancement of this project by
-sponsoring my work, e.g. via [Patreon](https://www.patreon.com/benjie).
+These individuals and companies give back to PostGraphile by sponsoring its
+ongoing development. Find out [how you can become a
+sponsor](https://graphile.org/sponsor/).
+
+## Featured
+
+- Chad Furman
 
 ## Leaders
 
-* Chad Furman
-* Diwank Tomer
-* Joe Dennis
-* James Allain
+- Joe Dennis
+- MissionMode
+- Alec Wenzowski
+- James Allain
+- DOMONDA
+- Gustin Prudner
+- Matthew Mullens
 
 ## Supporters
 
-* Mtpc
-* Evgeniy Foucault
-* Alec Wenzowski
+- Mtpc
+- Clay Smith
+- Michael Tng
+- Matt Bretl (also a major community contributor!)
+- BMD Studio
+- Sam Levin
+- stlbucket
+- Gardner Bickford
+- James Rascoe
+- Michel Pelletier
+- Jimmy McBroom
+- Dan Lynch
+- James Cavanaugh
+- Tim Field
+- Antwaan Harrison
+- Chris Watland
