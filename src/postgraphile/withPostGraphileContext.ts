@@ -161,10 +161,13 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   } finally {
     // Cleanup our Postgres client by ending the transaction and releasing
     // the client back to the pool. Always do this even if the query fails.
-    if (needTransaction) {
-      await pgClient.query('commit');
+    try {
+      if (needTransaction) {
+        await pgClient.query('commit');
+      }
+    } finally {
+      pgClient.release();
     }
-    pgClient.release();
   }
 };
 
