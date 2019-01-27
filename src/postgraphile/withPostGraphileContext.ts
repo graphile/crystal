@@ -156,7 +156,6 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     return await callback({
       [$$pgClient]: pgClient,
       pgRole,
-
       jwtClaims,
     });
   } finally {
