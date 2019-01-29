@@ -5,9 +5,22 @@
   "homepage": "https://graphile.org/postgraphile/",
   "dependencies": {
     "graphiql": "npm:@benjie/graphiql@0.12.1-a701b68f61a315280ba3e292275757f37e004ad5",
-    "graphql": "0.13.x",
+    "graphiql-explorer": "^0.3.6",
+    "graphql": "14.0.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-scripts": "^2.1.3"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "prettier": {
+    "printWidth": 100,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

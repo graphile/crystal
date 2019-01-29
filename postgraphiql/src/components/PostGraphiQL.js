@@ -1,5 +1,7 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
+import GraphiQLExplorer from 'graphiql-explorer';
+import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 
@@ -21,18 +23,68 @@ const isValidJSON = json => {
 };
 
 /**
+ * The GraphiQL Explorer sidebar.
+ */
+class ExplorerWrapper extends React.PureComponent {
+  state = {
+    query: '',
+  };
+  componentDidMount() {
+    const graphiql = this.props.graphiql;
+    // Extract query from the graphiql ref
+    if (graphiql) {
+      this.setState({ query: graphiql.state.query });
+    }
+    // Set onEditQuery in the parent so that we can be notified of query changes
+    this.props.setOnEditQuery(query => this.setState({ query }));
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.graphiql && this.props.graphiql) {
+      // Extract query from the graphiql ref
+      this.setState({ query: this.props.graphiql.state.query });
+    }
+  }
+
+  _onEditQuery = query => {
+    const graphiql = this.props.graphiql;
+    if (graphiql) {
+      graphiql.handleEditQuery(query);
+    }
+  };
+  render() {
+    return (
+      <GraphiQLExplorer
+        schema={this.props.schema}
+        query={this.state.query}
+        onEdit={this._onEditQuery}
+        explorerIsOpen={this.props.explorerIsOpen}
+        onToggleExplorer={this.props.onToggleExplorer}
+      />
+    );
+  }
+}
+
+/**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
  * Including a JWT setter and live schema udpate capabilities.
  */
-class PostGraphiQL extends React.Component {
-  state = {
-    // Our GraphQL schema which GraphiQL will use to do its intelligence
-    // stuffs.
-    schema: null,
-    showHeaderEditor: false,
-    headersText: '{\n"Authorization": null\n}\n',
-    headersTextValid: true,
-  };
+class PostGraphiQL extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    // Use same storage as GraphiQL to save explorer visibility state
+    this._storage = new StorageAPI();
+
+    this.state = {
+      // Our GraphQL schema which GraphiQL will use to do its intelligence
+      // stuffs.
+      schema: null,
+      showHeaderEditor: false,
+      headersText: '{\n"Authorization": null\n}\n',
+      headersTextValid: true,
+      explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
+    };
+  }
 
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
@@ -270,10 +322,21 @@ class PostGraphiQL extends React.Component {
     this.setState({ showHeaderEditor: !this.state.showHeaderEditor });
   };
 
+  handleToggleExplorer = () => {
+    this.setState({ explorerIsOpen: !this.state.explorerIsOpen }, () =>
+      this._storage.set(
+        'explorerIsOpen',
+        // stringify so that storage API will store the state (it deletes key if value is false)
+        JSON.stringify(this.state.explorerIsOpen)
+      )
+    );
+  };
+
   render() {
     const { schema } = this.state;
     const sharedProps = {
       ref: ref => {
+        this.setState({ graphiql: ref });
         this.graphiql = ref;
       },
       schema: schema,
@@ -283,8 +346,15 @@ class PostGraphiQL extends React.Component {
       return <GraphiQL {...sharedProps} />;
     } else {
       return (
-        <div className="postgraphiql-container">
-          <GraphiQL {...sharedProps}>
+        <div className="postgraphiql-container graphiql-container">
+          <ExplorerWrapper
+            schema={schema}
+            graphiql={this.state.graphiql}
+            setOnEditQuery={onEditQuery => this.setState({ onEditQuery })}
+            explorerIsOpen={this.state.explorerIsOpen}
+            onToggleExplorer={this.handleToggleExplorer}
+          />
+          <GraphiQL onEditQuery={this.state.onEditQuery} {...sharedProps}>
             <GraphiQL.Logo>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div>
@@ -317,6 +387,11 @@ class PostGraphiQL extends React.Component {
                 label="Headers"
                 title="Modify the headers to be sent with the requests"
                 onClick={this.handleToggleHeaders}
+              />
+              <GraphiQL.Button
+                label="Explorer"
+                title="Construct a query with the GraphiQL explorer"
+                onClick={this.handleToggleExplorer}
               />
             </GraphiQL.Toolbar>
             <GraphiQL.Footer>
