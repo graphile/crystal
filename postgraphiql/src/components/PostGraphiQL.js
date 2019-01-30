@@ -70,21 +70,18 @@ class ExplorerWrapper extends React.PureComponent {
  * Including a JWT setter and live schema udpate capabilities.
  */
 class PostGraphiQL extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    // Use same storage as GraphiQL to save explorer visibility state
-    this._storage = new StorageAPI();
+  // Use same storage as GraphiQL to save explorer visibility state
+  _storage = new StorageAPI();
 
-    this.state = {
-      // Our GraphQL schema which GraphiQL will use to do its intelligence
-      // stuffs.
-      schema: null,
-      showHeaderEditor: false,
-      headersText: '{\n"Authorization": null\n}\n',
-      headersTextValid: true,
-      explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
-    };
-  }
+  state = {
+    // Our GraphQL schema which GraphiQL will use to do its intelligence
+    // stuffs.
+    schema: null,
+    showHeaderEditor: false,
+    headersText: '{\n"Authorization": null\n}\n',
+    headersTextValid: true,
+    explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
+  };
 
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
