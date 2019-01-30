@@ -6,7 +6,7 @@
   "dependencies": {
     "graphiql": "npm:@benjie/graphiql@0.12.1-a701b68f61a315280ba3e292275757f37e004ad5",
     "graphiql-explorer": "^0.3.6",
-    "graphql": "14.0.2",
+    "graphql": "^14.0.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-scripts": "^2.1.3"
