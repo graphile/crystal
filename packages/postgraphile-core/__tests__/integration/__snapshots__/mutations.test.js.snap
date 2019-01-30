@@ -703,9 +703,9 @@ Object {
     },
   },
   "errors": Array [
-    [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+    [GraphQLError: No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.],
     [GraphQLError: Nope.],
-    [GraphQLError: No values were deleted in collection 'posts' because no values were found.],
+    [GraphQLError: No values were deleted in collection 'posts' because no values you can delete were found matching these criteria.],
   ],
 }
 `;

@@ -163,7 +163,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                 throw new Error(
                   `No values were ${mode}d in collection '${inflection.pluralize(
                     inflection._singularizedTableName(table)
-                  )}' because no values were found.`
+                  )}' because no values you can ${mode} were found matching these criteria.`
                 );
               }
               return {
