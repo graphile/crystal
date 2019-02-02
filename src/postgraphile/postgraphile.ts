@@ -190,13 +190,13 @@ function handleFatalError(error: Error, when: string): never {
   return null as never;
 }
 
-function constructorName(obj: mixed): string | null {
+function hasPoolConstructor(obj: mixed): boolean {
   return (
     (obj &&
       typeof obj.constructor === 'function' &&
-      obj.constructor.name &&
-      String(obj.constructor.name)) ||
-    null
+      obj.constructor === (Pool as any).super_
+    ) ||
+    false
   );
 }
 
@@ -220,12 +220,11 @@ function toPgPool(poolOrConfig: any): Pool {
 
 // tslint:disable-next-line no-any
 function quacksLikePgPool(pgConfig: any): pgConfig is Pool {
-  if (pgConfig instanceof Pool) return true;
+  if ((pgConfig instanceof Pool) || (pgConfig instanceof EventEmitter)) return true;
 
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== 'object') return false;
-  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool')
-    return false;
+  if (!hasPoolConstructor(pgConfig)) return false;
   if (!pgConfig['Client']) return false;
   if (!pgConfig['options']) return false;
   if (typeof pgConfig['connect'] !== 'function') return false;
