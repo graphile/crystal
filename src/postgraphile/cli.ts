@@ -381,6 +381,7 @@ const overridesFromOptions = {};
 const {
   demo: isDemo = false,
   connection: pgConnectionString,
+  subscriptions,
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -557,6 +558,7 @@ const postgraphileOptions = pluginHook(
     jwtRole,
     jwtVerifyOptions,
     pgDefaultRole,
+    subscriptions,
     watchPg,
     showErrorStack,
     extendedErrors,

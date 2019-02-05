@@ -404,6 +404,7 @@ export default function createPostGraphileHttpRequestHandler(
               graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
               streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
               enhanceGraphiql: options.enhanceGraphiql,
+              subscriptions: !!options.subscriptions,
             })};</script>\n  </head>`,
           )
         : null;

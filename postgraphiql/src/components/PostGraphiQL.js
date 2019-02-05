@@ -1,15 +1,24 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
+import { parse } from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
+
+const isSubscription = ({ query }) =>
+  parse(query).definitions.some(
+    definition =>
+      definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+  );
 
 const {
   POSTGRAPHILE_CONFIG = {
     graphqlUrl: 'http://localhost:5000/graphql',
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
+    subscriptions: true,
   },
 } = window;
 
@@ -83,6 +92,14 @@ class PostGraphiQL extends React.PureComponent {
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
   };
 
+  subscriptionsClient = POSTGRAPHILE_CONFIG.subscriptions
+    ? new SubscriptionClient(POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws'), {
+        reconnect: true,
+      })
+    : null;
+
+  activeSubscriptionUnsubscribe = null;
+
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
     this.updateSchema().catch(error => console.error(error)); // tslint:disable-line no-console
@@ -136,7 +153,7 @@ class PostGraphiQL extends React.PureComponent {
    * Executes a GraphQL query with some extra information then the standard
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
-  async executeQuery(graphQLParams) {
+  executeQuery(graphQLParams) {
     const { headersText } = this.state;
     let extraHeaders;
     try {
@@ -149,22 +166,34 @@ class PostGraphiQL extends React.PureComponent {
     } catch (e) {
       // Do nothing
     }
-    const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
-      method: 'POST',
-      headers: Object.assign(
-        {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+    if (this.activeSubscriptionUnsubscribe !== null) {
+      this.activeSubscriptionUnsubscribe();
+    }
+    if (isSubscription(graphQLParams) && this.subscriptionsClient) {
+      return {
+        subscribe: observer => {
+          observer.next('Waiting for subscription to yield data…');
+
+          const { unsubscribe } = this.subscriptionsClient
+            .request(graphQLParams)
+            .subscribe(observer);
+          this.activeSubscriptionUnsubscribe = unsubscribe;
         },
-        extraHeaders
-      ),
-      credentials: 'same-origin',
-      body: JSON.stringify(graphQLParams),
-    });
-
-    const result = await response.json();
-
-    return result;
+      };
+    } else {
+      return fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
+        method: 'POST',
+        headers: Object.assign(
+          {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          extraHeaders
+        ),
+        credentials: 'same-origin',
+        body: JSON.stringify(graphQLParams),
+      }).then(response => response.json());
+    }
   }
 
   /**
