@@ -23,6 +23,7 @@ import debugFactory = require('debug');
 import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
+import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
 
 // tslint:disable-next-line no-any
 function isString(str: any): str is string {
@@ -102,6 +103,10 @@ program
     '-s, --schema <string>',
     'a Postgres schema to be introspected. Use commas to define multiple schemas',
     (option: string) => option.split(','),
+  )
+  .option(
+    '-S, --subscriptions',
+    '[EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
   )
   .option(
     '-w, --watch',
@@ -668,6 +673,10 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
+    if (postgraphileOptions.subscriptions) {
+      enhanceHttpServerWithSubscriptions(server, middleware);
+    }
+
     pluginHook('cli:server:created', server, {
       options: postgraphileOptions,
       middleware,
@@ -713,12 +722,14 @@ if (noServer) {
           [
             `GraphQL API:         ${chalk.underline.bold.blue(
               `http://${hostname}:${actualPort}${graphqlRoute}`,
-            )}`,
+            )}` + (postgraphileOptions.subscriptions ? ' (subscriptions enabled)' : ''),
             !disableGraphiql &&
               `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
               )}` + (enhanceGraphiql ? '' : ` (enhance with '--enhance-graphiql')`),
-            `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}`,
+            `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
+              postgraphileOptions.watchPg ? ' (watching)' : ''
+            }`,
             `Postgres schema(s):  ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`,
             `Documentation:       ${chalk.underline(
               `https://graphile.org/postgraphile/introduction/`,

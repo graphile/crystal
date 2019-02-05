@@ -15,7 +15,7 @@ import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, PostGraphileOptions, mixed } from '../../interfaces';
+import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import { Context as KoaContext } from 'koa';
@@ -28,8 +28,6 @@ import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import LRU = require('lru-cache');
 import crypto = require('crypto');
-import { Pool } from 'pg';
-import { EventEmitter } from 'events';
 
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
@@ -44,6 +42,7 @@ import favicon from '../../assets/favicon.ico';
  * will use a regular expression to replace some variables.
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
+import { enhanceHttpServerWithSubscriptions } from './subscriptions';
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
@@ -67,14 +66,6 @@ function safeJSONStringify(obj: {}) {
 const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === '1';
 
 // Used by `createPostGraphileHttpRequestHandler`
-export interface CreateRequestHandlerOptions extends PostGraphileOptions {
-  // The actual GraphQL schema we will use.
-  getGqlSchema: () => Promise<GraphQLSchema>;
-  // A Postgres client pool we use to connect Postgres clients.
-  pgPool: Pool;
-  _emitter: EventEmitter;
-}
-
 const calculateQueryHash = (queryString: string): string =>
   crypto
     .createHash('sha1')
@@ -416,6 +407,20 @@ export default function createPostGraphileHttpRequestHandler(
             })};</script>\n  </head>`,
           )
         : null;
+
+      if (options.subscriptions) {
+        const server = req && req.connection && req.connection['server'];
+        if (!server) {
+          // tslint:disable-next-line no-console
+          console.warn(
+            "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
+          );
+        } else {
+          // Relying on this means that a normal request must come in before an
+          // upgrade attempt. It's better to call it manually.
+          enhanceHttpServerWithSubscriptions(server, middleware);
+        }
+      }
     }
     const isGraphqlRoute = pathname === graphqlRoute;
 
@@ -860,6 +865,8 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.formatError = formatError;
   middleware.pgPool = pgPool;
   middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes;
+  middleware.handleErrors = handleErrors;
+  middleware.options = options;
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,
