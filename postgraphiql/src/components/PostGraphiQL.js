@@ -74,6 +74,13 @@ class ExplorerWrapper extends React.PureComponent {
   }
 }
 
+const l = window.location;
+const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
+  ? POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws')
+  : `ws${l.protocol === 'https:' ? 's' : ''}://${l.hostname}${
+      l.port !== 80 && l.port !== 443 ? ':' + l.port : ''
+    }${POSTGRAPHILE_CONFIG.graphqlUrl}`;
+
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
  * Including a JWT setter and live schema udpate capabilities.
@@ -93,7 +100,7 @@ class PostGraphiQL extends React.PureComponent {
   };
 
   subscriptionsClient = POSTGRAPHILE_CONFIG.subscriptions
-    ? new SubscriptionClient(POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws'), {
+    ? new SubscriptionClient(websocketUrl, {
         reconnect: true,
       })
     : null;
