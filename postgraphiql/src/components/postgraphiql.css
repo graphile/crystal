@@ -54,3 +54,7 @@
 .resultWrap {
   width: 5rem;
 }
+
+.postgraphiql-container .toolbar {
+  align-items: center;
+}
