@@ -250,17 +250,22 @@ class PostGraphiQL extends React.PureComponent {
         subscribe: observer => {
           observer.next('Waiting for subscription to yield data…');
 
-          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(
-            observer,
-            err => {
-              this.setState({ activeSubscription: false });
-              observer.next(`[ERROR: ${err.message}]`);
-            },
-            () => {
-              this.setState({ activeSubscription: false });
-              observer.next('[ENDED]');
+          // Hack because GraphiQL logs `[object Object]` otherwise
+          const oldError = observer.error;
+          observer.error = function(error) {
+            let stack;
+            try {
+              stack = JSON.stringify(error, null, 2);
+            } catch (e) {
+              stack = error.message || error;
             }
-          );
+            oldError.call(this, {
+              stack,
+              ...error,
+            });
+          };
+
+          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = subscription;
           return subscription;
