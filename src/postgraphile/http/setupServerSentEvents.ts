@@ -1,7 +1,7 @@
 /* tslint:disable:no-any */
 import { PassThrough } from 'stream';
 import { IncomingMessage, ServerResponse } from 'http';
-import { CreateRequestHandlerOptions } from './createPostGraphileHttpRequestHandler';
+import { CreateRequestHandlerOptions } from '../../interfaces';
 
 export default function setupServerSentEvents(
   req: IncomingMessage,
