@@ -192,7 +192,14 @@ export async function enhanceHttpServerWithSubscriptions(
           return response;
         };
         params.formatResponse = formatResponse;
-        return params;
+        return options.pluginHook
+          ? options.pluginHook('postgraphile:ws:onOperation', params, {
+              message,
+              params,
+              socket,
+              options,
+            })
+          : params;
       },
       onOperationComplete(socket: WebSocket, opId: string) {
         releaseContextByOpId(socket, opId);

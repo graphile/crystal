@@ -4,6 +4,7 @@ import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
+import { ExecutionParams } from 'subscriptions-transport-ws';
 
 export type HookFn<T> = (arg: T, context: {}) => T;
 export type PluginHookFn = <TArgument, TContext = {}>(
@@ -51,6 +52,7 @@ export interface PostGraphilePlugin {
   'postgraphile:httpParamsList'?: HookFn<Array<object>>;
   'postgraphile:validationRules'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
+  'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
 
   withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
 }
