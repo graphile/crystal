@@ -471,6 +471,19 @@ class PostGraphiQL extends React.PureComponent {
         reconnecting: '😓',
         reconnected: '😅',
       }[socketStatus] || '😐';
+    const color =
+      {
+        connected: 'green',
+        reconnected: 'green',
+        connecting: 'amber',
+        reconnecting: 'amber',
+        disconnected: 'red',
+      }[socketStatus] || 'gray';
+    const svg = (
+      <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>
+        <circle fill={color} cx="50" cy="50" r="45" />
+      </svg>
+    );
     return (
       <>
         {error ? (
@@ -490,7 +503,7 @@ class PostGraphiQL extends React.PureComponent {
           onClick={this.cancelSubscription}
         >
           <span aria-label={socketStatus} role="img">
-            {icon}
+            {svg || icon}
           </span>
         </div>
       </>
