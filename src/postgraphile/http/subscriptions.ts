@@ -1,6 +1,6 @@
 import { Server, ServerResponse } from 'http';
 import { HttpRequestHandler, mixed } from '../../interfaces';
-import { execute, subscribe, ExecutionResult } from 'graphql';
+import { subscribe, ExecutionResult } from 'graphql';
 import { RequestHandler, Request, Response } from 'express';
 import * as WebSocket from 'ws';
 import { parse } from 'url';
@@ -145,7 +145,9 @@ export async function enhanceHttpServerWithSubscriptions(
   SubscriptionServer.create(
     {
       schema,
-      execute,
+      execute: () => {
+        throw new Error('Only subscriptions are allowed over websocket transport');
+      },
       subscribe,
       onConnect(
         connectionParams: object,
