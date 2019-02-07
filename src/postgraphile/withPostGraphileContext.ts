@@ -1,6 +1,6 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
 import { ExecutionResult, DocumentNode, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
@@ -21,6 +21,7 @@ export type WithPostGraphileContextFn = (
     jwtVerifyOptions?: jwt.VerifyOptions;
     pgDefaultRole?: string;
     pgSettings?: { [key: string]: mixed };
+    singleStatement?: boolean;
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ) => Promise<ExecutionResult>;
@@ -56,6 +57,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     queryDocumentAst?: DocumentNode;
     operationName?: string;
     pgForceTransaction?: boolean;
+    singleStatement?: boolean;
   },
   callback: (context: mixed) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
@@ -71,6 +73,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     queryDocumentAst,
     operationName,
     pgForceTransaction,
+    singleStatement,
   } = options;
 
   let operation: OperationDefinitionNode | void;
@@ -103,71 +106,123 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgSettings,
   });
 
+  const sqlSettings: Array<sql.SQLQuery> = [];
+  if (localSettings.length > 0) {
+    // Later settings should win, so we're going to loop backwards and not
+    // add settings for keys we've already seen.
+    const seenKeys: Array<string> = [];
+    // TODO:perf: looping backwards is slow
+    for (let i = localSettings.length - 1; i >= 0; i--) {
+      const [key, value] = localSettings[i];
+      if (seenKeys.indexOf(key) < 0) {
+        seenKeys.push(key);
+        // Make sure that the third config is always `true` so that we are only
+        // ever setting variables on the transaction.
+        // Also, we're using `unshift` to undo the reverse-looping we're doing
+        sqlSettings.unshift(sql.fragment`set_config(${sql.value(key)}, ${sql.value(value)}, true)`);
+      }
+    }
+  }
+
+  const sqlSettingsQuery =
+    sqlSettings.length > 0 ? sql.compile(sql.query`select ${sql.join(sqlSettings, ', ')}`) : null;
+
   // If we can avoid transactions, we get greater performance.
   const needTransaction =
     pgForceTransaction ||
-    localSettings.length > 0 ||
+    !!sqlSettingsQuery ||
     (operationType !== 'query' && operationType !== 'subscription');
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
+  async function withAuthenticatedPgClient<T>(
+    fn: (pgClient: PoolClient) => Promise<T>,
+  ): Promise<T> {
+    // Connect a new Postgres client
+    const pgClient = await pgPool.connect();
 
-  // Connect a new Postgres client
-  const pgClient = await pgPool.connect();
-
-  // Enhance our Postgres client with debugging stuffs.
-  if (
-    (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
-    !pgClient[$$pgClientOrigQuery]
-  ) {
-    debugPgClient(pgClient);
-  }
-
-  // Begin our transaction, if necessary.
-  if (needTransaction) {
-    await pgClient.query('begin');
-  }
-
-  try {
-    // If there is at least one local setting, load it into the database.
-    if (needTransaction && localSettings.length !== 0) {
-      // Later settings should win, so we're going to loop backwards and not
-      // add settings for keys we've already seen.
-      const seenKeys: Array<string> = [];
-
-      const sqlSettings: Array<sql.SQLQuery> = [];
-      for (let i = localSettings.length - 1; i >= 0; i--) {
-        const [key, value] = localSettings[i];
-        if (seenKeys.indexOf(key) < 0) {
-          seenKeys.push(key);
-          // Make sure that the third config is always `true` so that we are only
-          // ever setting variables on the transaction.
-          // Also, we're using `unshift` to undo the reverse-looping we're doing
-          sqlSettings.unshift(
-            sql.fragment`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
-          );
-        }
-      }
-
-      const query = sql.compile(sql.query`select ${sql.join(sqlSettings, ', ')}`);
-
-      await pgClient.query(query);
+    // Enhance our Postgres client with debugging stuffs.
+    if (
+      (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
+      !pgClient[$$pgClientOrigQuery]
+    ) {
+      debugPgClient(pgClient);
     }
 
-    return await callback({
-      [$$pgClient]: pgClient,
+    // Begin our transaction, if necessary.
+    if (needTransaction) {
+      await pgClient.query('begin');
+    }
+
+    try {
+      // If there is at least one local setting, load it into the database.
+      if (sqlSettingsQuery) {
+        await pgClient.query(sqlSettingsQuery);
+      }
+
+      // Use the client, wait for it to be finished with, then go to 'finally'
+      return await fn(pgClient);
+    } finally {
+      // Cleanup our Postgres client by ending the transaction and releasing
+      // the client back to the pool. Always do this even if the query fails.
+      try {
+        if (needTransaction) {
+          await pgClient.query('commit');
+        }
+      } finally {
+        pgClient.release();
+      }
+    }
+  }
+  if (singleStatement) {
+    // TODO:v5: remove this workaround
+    /*
+     * This is a workaround for subscriptions; the GraphQL context is allocated
+     * for the entire duration of the subscription, however hogging a pgClient
+     * for more than a few milliseconds (let alone hours!) is a no-no. So we
+     * fake a PG client that will set up the transaction each time `query` is
+     * called. It's a very thin/dumb wrapper, so it supports nothing but
+     * `query`.
+     */
+    const fakePgClient = {
+      query(
+        textOrQueryOptions?: string | QueryConfig,
+        values?: mixed,
+        cb?: void,
+      ): Promise<QueryResult> {
+        if (!textOrQueryOptions) {
+          throw new Error('Incompatible call to singleStatement - no statement passed?');
+        } else if (typeof textOrQueryOptions === 'object') {
+          if (values || cb) {
+            throw new Error('Incompatible call to singleStatement - expected no callback');
+          }
+        } else if (typeof textOrQueryOptions !== 'string') {
+          throw new Error('Incompatible call to singleStatement - bad query');
+        } else if (values && !Array.isArray(values)) {
+          throw new Error('Incompatible call to singleStatement - bad values');
+        } else if (cb) {
+          throw new Error('Incompatible call to singleStatement - expected to return promise');
+        }
+        // Generate an authenticated client on the fly
+        return withAuthenticatedPgClient(pgClient =>
+          // @ts-ignore
+          pgClient.query(textOrQueryOptions, values),
+        );
+      },
+    };
+
+    return callback({
+      [$$pgClient]: fakePgClient,
       pgRole,
       jwtClaims,
     });
-  } finally {
-    // Cleanup our Postgres client by ending the transaction and releasing
-    // the client back to the pool. Always do this even if the query fails.
-    try {
-      if (needTransaction) {
-        await pgClient.query('commit');
-      }
-    } finally {
-      pgClient.release();
-    }
+  } else {
+    return withAuthenticatedPgClient(pgClient =>
+      callback({
+        [$$pgClient]: pgClient,
+        pgRole,
+        jwtClaims,
+      }),
+    );
   }
 };
 

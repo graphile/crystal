@@ -1,15 +1,24 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
+import { parse } from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
+
+const isSubscription = ({ query }) =>
+  parse(query).definitions.some(
+    definition =>
+      definition.kind === 'OperationDefinition' && definition.operation === 'subscription',
+  );
 
 const {
   POSTGRAPHILE_CONFIG = {
     graphqlUrl: 'http://localhost:5000/graphql',
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
+    subscriptions: true,
   },
 } = window;
 
@@ -65,6 +74,13 @@ class ExplorerWrapper extends React.PureComponent {
   }
 }
 
+const l = window.location;
+const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
+  ? POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws')
+  : `ws${l.protocol === 'https:' ? 's' : ''}://${l.hostname}${
+      l.port !== 80 && l.port !== 443 ? ':' + l.port : ''
+    }${POSTGRAPHILE_CONFIG.graphqlUrl}`;
+
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
  * Including a JWT setter and live schema udpate capabilities.
@@ -81,11 +97,60 @@ class PostGraphiQL extends React.PureComponent {
     headersText: '{\n"Authorization": null\n}\n',
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
+    haveActiveSubscription: false,
+    socketStatus:
+      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
   };
+
+  subscriptionsClient =
+    POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
+      ? new SubscriptionClient(websocketUrl, {
+          reconnect: true,
+          connectionParams: () => this.getHeaders() || {},
+        })
+      : null;
+
+  activeSubscription = null;
 
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
-    this.updateSchema().catch(error => console.error(error)); // tslint:disable-line no-console
+    this.updateSchema();
+
+    if (this.subscriptionsClient) {
+      const unlisten1 = this.subscriptionsClient.on('connected', () => {
+        this.setState({ socketStatus: 'connected', error: null });
+      });
+      const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
+        this.setState({ socketStatus: 'disconnected' });
+      });
+      const unlisten3 = this.subscriptionsClient.on('connecting', () => {
+        this.setState({ socketStatus: 'connecting' });
+      });
+      const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
+        this.setState({ socketStatus: 'reconnected', error: null });
+        setTimeout(() => {
+          this.setState(state =>
+            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
+          );
+        }, 5000);
+      });
+      const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
+        this.setState({ socketStatus: 'reconnecting' });
+      });
+      const unlisten6 = this.subscriptionsClient.on('error', error => {
+        // tslint:disable-next-line no-console
+        console.error('Client connection error', error);
+        this.setState({ error: new Error('Subscriptions client connection error') });
+      });
+      this.unlistenSubscriptionsClient = () => {
+        unlisten1();
+        unlisten2();
+        unlisten3();
+        unlisten4();
+        unlisten5();
+        unlisten6();
+      };
+    }
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -97,11 +162,9 @@ class PostGraphiQL extends React.PureComponent {
       eventSource.addEventListener(
         'change',
         () => {
-          this.updateSchema()
-            .then(() => console.log('PostGraphile: Schema updated')) // tslint:disable-line no-console
-            .catch(error => console.error(error)); // tslint:disable-line no-console
+          this.updateSchema();
         },
-        false
+        false,
       );
 
       // Add event listeners that just log things in the console.
@@ -110,15 +173,19 @@ class PostGraphiQL extends React.PureComponent {
         () => {
           // tslint:disable-next-line no-console
           console.log('PostGraphile: Listening for server sent events');
+          this.setState({ error: null });
           this.updateSchema();
         },
-        false
+        false,
       );
       eventSource.addEventListener(
         'error',
-        // tslint:disable-next-line no-console
-        () => console.log('PostGraphile: Failed to connect to server'),
-        false
+        error => {
+          // tslint:disable-next-line no-console
+          console.error('PostGraphile: Failed to connect to event stream', error);
+          this.setState({ error: new Error('Failed to connect to event stream') });
+        },
+        false,
       );
 
       // Store our event source so we can unsubscribe later.
@@ -127,16 +194,25 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   componentWillUnmount() {
+    if (this.unlistenSubscriptionsClient) this.unlistenSubscriptionsClient();
     // Close out our event source so we get no more events.
     this._eventSource.close();
     this._eventSource = null;
   }
 
+  cancelSubscription = () => {
+    if (this.activeSubscription !== null) {
+      this.activeSubscription.unsubscribe();
+      this.setState({
+        haveActiveSubscription: false,
+      });
+    }
+  };
+
   /**
-   * Executes a GraphQL query with some extra information then the standard
-   * parameters. Namely a JWT which may be added as an `Authorization` header.
+   * Get the user editable headers as an object
    */
-  async executeQuery(graphQLParams) {
+  getHeaders() {
     const { headersText } = this.state;
     let extraHeaders;
     try {
@@ -149,6 +225,15 @@ class PostGraphiQL extends React.PureComponent {
     } catch (e) {
       // Do nothing
     }
+    return extraHeaders;
+  }
+
+  /**
+   * Executes a GraphQL query with some extra information then the standard
+   * parameters. Namely a JWT which may be added as an `Authorization` header.
+   */
+  async executeQuery(graphQLParams) {
+    const extraHeaders = this.getHeaders();
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: 'POST',
       headers: Object.assign(
@@ -156,7 +241,7 @@ class PostGraphiQL extends React.PureComponent {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        extraHeaders
+        extraHeaders,
       ),
       credentials: 'same-origin',
       body: JSON.stringify(graphQLParams),
@@ -166,6 +251,42 @@ class PostGraphiQL extends React.PureComponent {
 
     return result;
   }
+
+  /**
+   * Routes the request either to the subscriptionClient or to executeQuery.
+   */
+  fetcher = graphQLParams => {
+    this.cancelSubscription();
+    if (isSubscription(graphQLParams) && this.subscriptionsClient) {
+      return {
+        subscribe: observer => {
+          observer.next('Waiting for subscription to yield data…');
+
+          // Hack because GraphiQL logs `[object Object]` on error otherwise
+          const oldError = observer.error;
+          observer.error = function(error) {
+            let stack;
+            try {
+              stack = JSON.stringify(error, null, 2);
+            } catch (e) {
+              stack = error.message || error;
+            }
+            oldError.call(this, {
+              stack,
+              ...error,
+            });
+          };
+
+          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
+          this.setState({ haveActiveSubscription: true });
+          this.activeSubscription = subscription;
+          return subscription;
+        },
+      };
+    } else {
+      return this.executeQuery(graphQLParams);
+    }
+  };
 
   /**
    * When we recieve an event signaling a change for the schema, we must rerun
@@ -187,11 +308,16 @@ class PostGraphiQL extends React.PureComponent {
 
       // Do some hacky stuff to GraphiQL.
       this._updateGraphiQLDocExplorerNavStack(schema);
-    } catch (e) {
+
+      // tslint:disable-next-line no-console
+      console.log('PostGraphile: Schema updated');
+      this.setState({ error: null });
+    } catch (error) {
       // tslint:disable-next-line no-console
       console.error('Error occurred when updating the schema:');
       // tslint:disable-next-line no-console
-      console.error(e);
+      console.error(error);
+      this.setState({ error });
     }
   }
 
@@ -304,7 +430,7 @@ class PostGraphiQL extends React.PureComponent {
         window.prettier.format(editor.getValue(), {
           parser: 'graphql',
           plugins: window.prettierPlugins,
-        })
+        }),
       );
     } else {
       return this.graphiql.handlePrettifyQuery();
@@ -324,10 +450,77 @@ class PostGraphiQL extends React.PureComponent {
       this._storage.set(
         'explorerIsOpen',
         // stringify so that storage API will store the state (it deletes key if value is false)
-        JSON.stringify(this.state.explorerIsOpen)
-      )
+        JSON.stringify(this.state.explorerIsOpen),
+      ),
     );
   };
+
+  renderSocketStatus() {
+    const { socketStatus, error } = this.state;
+    if (socketStatus === null) {
+      return null;
+    }
+    const icon =
+      {
+        connecting: '🤔',
+        reconnecting: '😓',
+        connected: '😀',
+        reconnected: '😅',
+        disconnected: '☹️',
+      }[socketStatus] || '😐';
+    const tick = (
+      <path fill="transparent" stroke="white" d="M30,50 L45,65 L70,30" strokeWidth="8" />
+    );
+    const cross = (
+      <path fill="transparent" stroke="white" d="M30,30 L70,70 M30,70 L70,30" strokeWidth="8" />
+    );
+    const decoration =
+      {
+        connecting: null,
+        reconnecting: null,
+        connected: tick,
+        reconnected: tick,
+        disconnected: cross,
+      }[socketStatus] || null;
+    const color =
+      {
+        connected: 'green',
+        reconnected: 'green',
+        connecting: 'orange',
+        reconnecting: 'orange',
+        disconnected: 'red',
+      }[socketStatus] || 'gray';
+    const svg = (
+      <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>
+        <circle fill={color} cx="50" cy="50" r="45" />
+        {decoration}
+      </svg>
+    );
+    return (
+      <>
+        {error ? (
+          <div
+            style={{ fontSize: '1.5em', marginRight: '0.25em' }}
+            title={error.message || `Error occurred: ${error}`}
+            onClick={() => this.setState({ error: null })}
+          >
+            <span aria-label="ERROR" role="img">
+              {'⚠️'}
+            </span>
+          </div>
+        ) : null}
+        <div
+          style={{ fontSize: '1.5em', marginRight: '0.25em' }}
+          title={'Websocket status: ' + socketStatus}
+          onClick={this.cancelSubscription}
+        >
+          <span aria-label={socketStatus} role="img">
+            {svg || icon}
+          </span>
+        </div>
+      </>
+    );
+  }
 
   render() {
     const { schema } = this.state;
@@ -337,7 +530,7 @@ class PostGraphiQL extends React.PureComponent {
         this.graphiql = ref;
       },
       schema: schema,
-      fetcher: params => this.executeQuery(params),
+      fetcher: this.fetcher,
     };
     if (!POSTGRAPHILE_CONFIG.enhanceGraphiql) {
       return <GraphiQL {...sharedProps} />;
@@ -370,6 +563,7 @@ class PostGraphiQL extends React.PureComponent {
               </div>
             </GraphiQL.Logo>
             <GraphiQL.Toolbar>
+              {this.renderSocketStatus()}
               <GraphiQL.Button
                 onClick={this.handlePrettifyQuery}
                 title="Prettify Query (Shift-Ctrl-P)"
@@ -425,10 +619,18 @@ class PostGraphiQL extends React.PureComponent {
             value={this.state.headersText}
             valid={this.state.headersTextValid}
             onChange={e =>
-              this.setState({
-                headersText: e.target.value,
-                headersTextValid: isValidJSON(e.target.value),
-              })
+              this.setState(
+                {
+                  headersText: e.target.value,
+                  headersTextValid: isValidJSON(e.target.value),
+                },
+                () => {
+                  if (this.state.headersTextValid && this.subscriptionsClient) {
+                    // Reconnect to websocket with new headers
+                    this.subscriptionsClient.close(false, true);
+                  }
+                },
+              )
             }
           >
             <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
