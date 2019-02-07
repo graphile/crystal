@@ -225,6 +225,7 @@ class PostGraphiQL extends React.PureComponent {
     } catch (e) {
       // Do nothing
     }
+    return extraHeaders;
   }
 
   /**
