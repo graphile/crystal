@@ -3,7 +3,6 @@ import { HttpRequestHandler, mixed } from '../../interfaces';
 import { subscribe, ExecutionResult } from 'graphql';
 import { RequestHandler, Request, Response } from 'express';
 import * as WebSocket from 'ws';
-import { parse } from 'url';
 import { SubscriptionServer, ConnectionContext } from 'subscriptions-transport-ws';
 import parseUrl = require('parseurl');
 
