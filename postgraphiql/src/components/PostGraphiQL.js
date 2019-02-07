@@ -456,29 +456,44 @@ class PostGraphiQL extends React.PureComponent {
   };
 
   renderSocketStatus() {
-    const { haveActiveSubscription, socketStatus, error } = this.state;
+    const { socketStatus, error } = this.state;
     if (socketStatus === null) {
       return null;
     }
     const icon =
       {
         connecting: '🤔',
-        connected: '😀',
-        disconnected: '☹️',
         reconnecting: '😓',
+        connected: '😀',
         reconnected: '😅',
+        disconnected: '☹️',
       }[socketStatus] || '😐';
+    const tick = (
+      <path fill="transparent" stroke="white" d="M30,50 L45,65 L70,30" strokeWidth="8" />
+    );
+    const cross = (
+      <path fill="transparent" stroke="white" d="M30,30 L70,70 M30,70 L70,30" strokeWidth="8" />
+    );
+    const decoration =
+      {
+        connecting: null,
+        reconnecting: null,
+        connected: tick,
+        reconnected: tick,
+        disconnected: cross,
+      }[socketStatus] || null;
     const color =
       {
         connected: 'green',
         reconnected: 'green',
-        connecting: 'amber',
-        reconnecting: 'amber',
+        connecting: 'orange',
+        reconnecting: 'orange',
         disconnected: 'red',
       }[socketStatus] || 'gray';
     const svg = (
       <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>
         <circle fill={color} cx="50" cy="50" r="45" />
+        {decoration}
       </svg>
     );
     return (
