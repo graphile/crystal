@@ -10,7 +10,7 @@ import { SubscriptionClient } from 'subscriptions-transport-ws';
 const isSubscription = ({ query }) =>
   parse(query).definitions.some(
     definition =>
-      definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+      definition.kind === 'OperationDefinition' && definition.operation === 'subscription',
   );
 
 const {
@@ -114,11 +114,7 @@ class PostGraphiQL extends React.PureComponent {
 
   componentDidMount() {
     // Update the schema for the first time. Log an error if we fail.
-    this.updateSchema().catch(error => {
-      // tslint:disable-next-line no-console
-      console.error(error);
-      this.setState({ error });
-    });
+    this.updateSchema();
 
     if (this.subscriptionsClient) {
       const unlisten1 = this.subscriptionsClient.on('connected', () => {
@@ -133,8 +129,8 @@ class PostGraphiQL extends React.PureComponent {
       const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
         this.setState({ socketStatus: 'reconnected', error: null });
         setTimeout(() => {
-          this.setState(
-            state => (state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {})
+          this.setState(state =>
+            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
           );
         }, 5000);
       });
@@ -143,7 +139,7 @@ class PostGraphiQL extends React.PureComponent {
       });
       const unlisten6 = this.subscriptionsClient.on('error', error => {
         // tslint:disable-next-line no-console
-        console.error(error);
+        console.error('Client connection error', error);
         this.setState({ error: new Error('Subscriptions client connection error') });
       });
       this.unlistenSubscriptionsClient = () => {
@@ -166,19 +162,9 @@ class PostGraphiQL extends React.PureComponent {
       eventSource.addEventListener(
         'change',
         () => {
-          this.updateSchema()
-            .then(() => {
-              // tslint:disable-next-line no-console
-              console.log('PostGraphile: Schema updated');
-              this.setState({ error: null });
-            })
-            .catch(error => {
-              // tslint:disable-next-line no-console
-              console.error(error);
-              this.setState({ error });
-            });
+          this.updateSchema();
         },
-        false
+        false,
       );
 
       // Add event listeners that just log things in the console.
@@ -187,18 +173,19 @@ class PostGraphiQL extends React.PureComponent {
         () => {
           // tslint:disable-next-line no-console
           console.log('PostGraphile: Listening for server sent events');
+          this.setState({ error: null });
           this.updateSchema();
         },
-        false
+        false,
       );
       eventSource.addEventListener(
         'error',
         error => {
           // tslint:disable-next-line no-console
-          console.error('PostGraphile: Failed to connect to server');
-          this.setState({ error: new Error('Failed to connect to server') });
+          console.error('PostGraphile: Failed to connect to event stream');
+          this.setState({ error: new Error('Failed to connect to event stream') });
         },
-        false
+        false,
       );
 
       // Store our event source so we can unsubscribe later.
@@ -241,6 +228,30 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   /**
+   * Executes a GraphQL query with some extra information then the standard
+   * parameters. Namely a JWT which may be added as an `Authorization` header.
+   */
+  async executeQuery(graphQLParams) {
+    const extraHeaders = this.getHeaders();
+    const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
+      method: 'POST',
+      headers: Object.assign(
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        extraHeaders,
+      ),
+      credentials: 'same-origin',
+      body: JSON.stringify(graphQLParams),
+    });
+
+    const result = await response.json();
+
+    return result;
+  }
+
+  /**
    * Routes the request either to the subscriptionClient or to executeQuery.
    */
   fetcher = graphQLParams => {
@@ -250,7 +261,7 @@ class PostGraphiQL extends React.PureComponent {
         subscribe: observer => {
           observer.next('Waiting for subscription to yield data…');
 
-          // Hack because GraphiQL logs `[object Object]` otherwise
+          // Hack because GraphiQL logs `[object Object]` on error otherwise
           const oldError = observer.error;
           observer.error = function(error) {
             let stack;
@@ -277,26 +288,6 @@ class PostGraphiQL extends React.PureComponent {
   };
 
   /**
-   * Executes a GraphQL query with some extra information then the standard
-   * parameters. Namely a JWT which may be added as an `Authorization` header.
-   */
-  executeQuery(graphQLParams) {
-    const extraHeaders = this.getHeaders();
-    return fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
-      method: 'POST',
-      headers: Object.assign(
-        {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        extraHeaders
-      ),
-      credentials: 'same-origin',
-      body: JSON.stringify(graphQLParams),
-    }).then(response => response.json());
-  }
-
-  /**
    * When we recieve an event signaling a change for the schema, we must rerun
    * our introspection query and notify the user of the results.
    */
@@ -316,11 +307,16 @@ class PostGraphiQL extends React.PureComponent {
 
       // Do some hacky stuff to GraphiQL.
       this._updateGraphiQLDocExplorerNavStack(schema);
-    } catch (e) {
+
+      // tslint:disable-next-line no-console
+      console.log('PostGraphile: Schema updated');
+      this.setState({ error: null });
+    } catch (error) {
       // tslint:disable-next-line no-console
       console.error('Error occurred when updating the schema:');
       // tslint:disable-next-line no-console
-      console.error(e);
+      console.error(error);
+      this.setState({ error });
     }
   }
 
@@ -433,7 +429,7 @@ class PostGraphiQL extends React.PureComponent {
         window.prettier.format(editor.getValue(), {
           parser: 'graphql',
           plugins: window.prettierPlugins,
-        })
+        }),
       );
     } else {
       return this.graphiql.handlePrettifyQuery();
@@ -453,8 +449,8 @@ class PostGraphiQL extends React.PureComponent {
       this._storage.set(
         'explorerIsOpen',
         // stringify so that storage API will store the state (it deletes key if value is false)
-        JSON.stringify(this.state.explorerIsOpen)
-      )
+        JSON.stringify(this.state.explorerIsOpen),
+      ),
     );
   };
 
@@ -617,7 +613,7 @@ class PostGraphiQL extends React.PureComponent {
                     // Reconnect to websocket with new headers
                     this.subscriptionsClient.close(false, true);
                   }
-                }
+                },
               )
             }
           >
