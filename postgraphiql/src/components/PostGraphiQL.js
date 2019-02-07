@@ -182,7 +182,7 @@ class PostGraphiQL extends React.PureComponent {
         'error',
         error => {
           // tslint:disable-next-line no-console
-          console.error('PostGraphile: Failed to connect to event stream');
+          console.error('PostGraphile: Failed to connect to event stream', error);
           this.setState({ error: new Error('Failed to connect to event stream') });
         },
         false,
