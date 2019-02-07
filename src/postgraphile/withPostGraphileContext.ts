@@ -423,27 +423,37 @@ function debugPgClient(pgClient: PoolClient): PoolClient {
         debugPgErrorObject(debugPgNotice, msg);
       });
     }
+    const logError = (error: PgNotice | Error) => {
+      if (error.name && error['severity']) {
+        debugPgErrorObject(debugPgError, error as PgNotice);
+      } else {
+        debugPgError('%O', error);
+      }
+    };
 
     if (debugPg.enabled || debugPgError.enabled) {
       // tslint:disable-next-line only-arrow-functions
       pgClient.query = function(...args: Array<any>): any {
-        // Debug just the query text. We don’t want to debug variables because
-        // there may be passwords in there.
-        debugPg('%s', formatSQLForDebugging(args[0] && args[0].text ? args[0].text : args[0]));
+        const [a, b, c] = args;
+        // If we understand it (and it uses the promises API), log it out
+        if (
+          (typeof a === 'string' && !c && (!b || Array.isArray(b))) ||
+          (typeof a === 'object' && !b && !c)
+        ) {
+          // Debug just the query text. We don’t want to debug variables because
+          // there may be passwords in there.
+          debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
 
-        // tslint:disable-next-line no-invalid-this
-        const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
+          const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
-        // Report the error with our Postgres debugger.
-        promiseResult.catch((error: PgNotice | Error) => {
-          if (error.name && error['severity']) {
-            debugPgErrorObject(debugPgError, error as PgNotice);
-          } else {
-            debugPgError('%O', error);
-          }
-        });
+          // Report the error with our Postgres debugger.
+          promiseResult.catch(logError);
 
-        return promiseResult;
+          return promiseResult;
+        } else {
+          // We don't understand it (e.g. `pgPool.query`), just let it happen.
+          return pgClient[$$pgClientOrigQuery].apply(this, args);
+        }
       };
     }
   }
