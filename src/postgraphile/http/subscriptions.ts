@@ -5,6 +5,7 @@ import { RequestHandler, Request, Response } from 'express';
 import * as WebSocket from 'ws';
 import { parse } from 'url';
 import { SubscriptionServer, ConnectionContext } from 'subscriptions-transport-ws';
+import parseUrl = require('parseurl');
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -18,7 +19,7 @@ function lowerCaseKeys(obj: object): object {
   }, {});
 }
 
-function deferred<T>(): Deferred<T> {
+function deferred<T = void>(): Deferred<T> {
   let resolve: (input?: T | PromiseLike<T> | undefined) => void;
   let reject: (error: Error) => void;
   const promise = new Promise<T>((_resolve, _reject) => {
@@ -52,22 +53,23 @@ export async function enhanceHttpServerWithSubscriptions(
 
   const schema = await getGraphQLSchema();
 
-  const contextKeepalivePromisesByOpId = {};
+  const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> | null } = {};
 
   const contextKey = (ws: WebSocket, opId: string) => ws['postgraphileId'] + '|' + opId;
 
-  const releaseContextByOpId = (ws: WebSocket, opId: string) => {
-    const promise = contextKeepalivePromisesByOpId[contextKey(ws, opId)];
+  const releaseContextForSocketAndOpId = (ws: WebSocket, opId: string) => {
+    const promise = keepalivePromisesByContextKey[contextKey(ws, opId)];
     if (promise) {
       promise.resolve();
+      keepalivePromisesByContextKey[contextKey(ws, opId)] = null;
     }
   };
 
-  const addContextForOpId = (context: mixed, ws: WebSocket, opId: string) => {
-    releaseContextByOpId(ws, opId);
+  const addContextForSocketAndOpId = (context: mixed, ws: WebSocket, opId: string) => {
+    releaseContextForSocketAndOpId(ws, opId);
     const promise = deferred();
     promise['context'] = context;
-    contextKeepalivePromisesByOpId[contextKey(ws, opId)] = promise;
+    keepalivePromisesByContextKey[contextKey(ws, opId)] = promise;
     return promise;
   };
 
@@ -77,6 +79,7 @@ export async function enhanceHttpServerWithSubscriptions(
     res: Response,
   ) => {
     for (const middleware of middlewares) {
+      // TODO: add Koa support
       await new Promise((resolve, reject) => {
         middleware(req, res, err => (err ? reject(err) : resolve()));
       });
@@ -96,16 +99,17 @@ export async function enhanceHttpServerWithSubscriptions(
     }
     if (!dummyRes) {
       dummyRes = new ServerResponse(req);
-      dummyRes.writeHead = (statusCode: number, statusMessage: never, headers: never) => {
-        if (statusMessage || headers) {
-          throw new Error(
-            'Passing more than the statusCode to writeHead is not supported with websockets currently',
-          );
-        }
+      dummyRes.writeHead = (statusCode: number, _statusMessage: never, headers: never) => {
         if (statusCode && statusCode > 200) {
           // tslint:disable-next-line no-console
           console.error(
             `Something used 'writeHead' to write a '${statusCode}' error for websockets - check the middleware you're passing!`,
+          );
+          socket.close();
+        } else if (headers) {
+          // tslint:disable-next-line no-console
+          console.error(
+            "Passing headers to 'writeHead' is not supported with websockets currently - check the middleware you're passing",
           );
           socket.close();
         }
@@ -121,7 +125,7 @@ export async function enhanceHttpServerWithSubscriptions(
       reqResFromSocket(socket)
         .then(({ req, res }) =>
           withPostGraphileContextFromReqRes(req, res, { singleStatement: true }, context => {
-            const promise = addContextForOpId(context, socket, opId);
+            const promise = addContextForSocketAndOpId(context, socket, opId);
             resolve(promise['context']);
             return promise;
           }),
@@ -132,10 +136,13 @@ export async function enhanceHttpServerWithSubscriptions(
 
   const wss = new WebSocket.Server({ noServer: true });
 
+  let socketId = 0;
+
   websocketServer.on('upgrade', (req, socket, head) => {
-    const url = req.originalUrl || req.url;
-    const path = parse(url).pathname;
-    if (path === graphqlRoute) {
+    // TODO: this will not support mounting postgraphile at a subpath right now...
+    const { pathname = '' } = parseUrl(req) || {};
+    const isGraphqlRoute = pathname === graphqlRoute;
+    if (isGraphqlRoute) {
       wss.handleUpgrade(req, socket, head, ws => {
         wss.emit('connection', ws, req);
       });
@@ -155,22 +162,28 @@ export async function enhanceHttpServerWithSubscriptions(
         connectionContext: ConnectionContext,
       ) {
         const { socket, request } = connectionContext;
+        socket['postgraphileId'] = ++socketId;
         if (!request) {
           throw new Error('No request!');
         }
+        const normalizedConnectionParams = lowerCaseKeys(connectionParams);
         request['connectionParams'] = connectionParams;
-        const normalizedConnectionParams = Object.keys(connectionParams).reduce((memo, key) => {
-          memo[key.toLowerCase()] = connectionParams[key];
-          return memo;
-        }, {});
         request['normalizedConnectionParams'] = normalizedConnectionParams;
         socket['__postgraphileReq'] = request;
         if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
+          /*
+           * Enable JWT support through connectionParams.
+           *
+           * For other headers you'll need to do this yourself for security
+           * reasons (e.g. we don't want to allow overriding of Origin /
+           * Referer / etc)
+           */
           request.headers.authorization = String(normalizedConnectionParams['authorization']);
         }
 
         socket['postgraphileHeaders'] = {
-          ...lowerCaseKeys(connectionParams),
+          ...normalizedConnectionParams,
+          // The original headers must win (for security)
           ...request.headers,
         };
       },
@@ -202,7 +215,7 @@ export async function enhanceHttpServerWithSubscriptions(
           : params;
       },
       onOperationComplete(socket: WebSocket, opId: string) {
-        releaseContextByOpId(socket, opId);
+        releaseContextForSocketAndOpId(socket, opId);
       },
     },
     wss,
