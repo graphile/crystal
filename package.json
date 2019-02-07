@@ -37,7 +37,7 @@
     "dev": "./scripts/dev",
     "lint": "./scripts/lint",
     "make-assets": "./scripts/make-assets",
-    "prettier": "prettier 'src/**/*.[tj]s'",
+    "prettier": "prettier 'src/**/*.[tj]s' 'postgraphiql/src/**/*.[tj]s'",
     "prettier:fix": "yarn prettier --write",
     "prettier:check": "yarn prettier --list-different",
     "test": "./scripts/test",
