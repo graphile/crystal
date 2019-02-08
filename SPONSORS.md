@@ -23,6 +23,7 @@ sponsor](https://graphile.org/sponsor/).
 
 - Mtpc
 - Michael Tng
+- Clay Smith
 - Matt Bretl (also a major community contributor!)
 - BMD Studio
 - Sam Levin
@@ -33,6 +34,7 @@ sponsor](https://graphile.org/sponsor/).
 - Dan Lynch
 - Gardner Bickford
 - James Cavanaugh
+- Tim Field
 - Antwaan Harrison
 - Chris Watland
 - Simon Elliott
