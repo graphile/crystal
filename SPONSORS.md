@@ -17,22 +17,23 @@ sponsor](https://graphile.org/sponsor/).
 - DOMONDA
 - Gustin Prudner
 - Matthew Mullens
+- Daniel Einspanjer
 
 ## Supporters
 
 - Mtpc
-- Clay Smith
 - Michael Tng
 - Matt Bretl (also a major community contributor!)
 - BMD Studio
 - Sam Levin
 - stlbucket
-- Gardner Bickford
 - James Rascoe
 - Michel Pelletier
 - Jimmy McBroom
 - Dan Lynch
+- Gardner Bickford
 - James Cavanaugh
-- Tim Field
 - Antwaan Harrison
-- Chris Watland
+- Chris Watlant
+- Simon Elliott
+- Mark Lipscombe
