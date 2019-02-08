@@ -34,6 +34,6 @@ sponsor](https://graphile.org/sponsor/).
 - Gardner Bickford
 - James Cavanaugh
 - Antwaan Harrison
-- Chris Watlant
+- Chris Watland
 - Simon Elliott
 - Mark Lipscombe
