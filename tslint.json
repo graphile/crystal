@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "tslint:latest",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:latest", "tslint-config-prettier"],
   "rules": {
     "curly": false,
     "no-any": true,
@@ -12,33 +9,16 @@
     "max-file-line-count": false,
     "no-default-export": false,
     "object-literal-sort-keys": false,
-    "array-type": [
-      true,
-      "generic"
-    ],
-    "interface-name": [
-      true,
-      "never-prefix"
-    ],
+    "array-type": [true, "generic"],
+    "interface-name": [true, "never-prefix"],
     "ordered-imports": false,
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
-    ],
-    "no-implicit-dependencies": [
-      true,
-      "dev"
-    ],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+    "no-implicit-dependencies": [true, "dev", "peer"],
     "no-string-literal": false
   },
   "jsRules": {
     "no-reference": true,
-    "only-arrow-functions": [
-      true,
-      "allow-declarations"
-    ],
+    "only-arrow-functions": [true, "allow-declarations"],
     "prefer-for-of": true,
     "ban": false,
     "curly": false,
@@ -47,14 +27,7 @@
     "no-arg": true,
     "no-bitwise": true,
     "no-conditional-assignment": true,
-    "no-console": [
-      true,
-      "log",
-      "error",
-      "warn",
-      "info",
-      "trace"
-    ],
+    "no-console": [true, "log", "error", "warn", "info", "trace"],
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-variable": true,
@@ -71,10 +44,7 @@
     "radix": true,
     "restrict-plus-operands": false,
     "switch-default": true,
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
+    "triple-equals": [true, "allow-null-check"],
     "use-isnan": true,
     "cyclomatic-complexity": false,
     "eofline": true,
@@ -91,11 +61,6 @@
     "object-literal-shorthand": true,
     "one-variable-per-declaration": true,
     "ordered-imports": false,
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
-    ]
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
   }
 }
