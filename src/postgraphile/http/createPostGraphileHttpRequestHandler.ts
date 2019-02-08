@@ -744,7 +744,7 @@ export default function createPostGraphileHttpRequestHandler(
             ) {
               // We must reference this before it's deleted!
               const resultStatusCode = result.statusCode;
-              setTimeout(() => {
+              setImmediate(() => {
                 const prettyQuery = printGraphql(queryDocumentAst)
                   .replace(/\s+/g, ' ')
                   .trim();
@@ -770,7 +770,7 @@ export default function createPostGraphileHttpRequestHandler(
                     pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
                   }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
                 );
-              }, 0);
+              });
             }
             if (debugRequest.enabled) debugRequest('GraphQL query has been executed.');
           }
