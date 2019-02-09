@@ -100,6 +100,10 @@ program
     "the PostgreSQL database name or connection string. If omitted, inferred from environmental variables (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples: 'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=1'",
   )
   .option(
+    '-C, --owner-connection <string>',
+    'as `--connection`, but for a privileged user (e.g. for setting up watch fixtures, logical decoding, etc); defaults to the value from `--connection`',
+  )
+  .option(
     '-s, --schema <string>',
     'a Postgres schema to be introspected. Use commas to define multiple schemas',
     (option: string) => option.split(','),
@@ -381,6 +385,7 @@ const overridesFromOptions = {};
 const {
   demo: isDemo = false,
   connection: pgConnectionString,
+  ownerConnection,
   subscriptions,
   watch: watchPg,
   schema: dbSchema,
@@ -452,6 +457,8 @@ const noServer = !yesServer;
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
 // schema is what we want.
 const schemas: Array<string> = dbSchema || (isDemo ? ['forum_example'] : ['public']);
+
+const ownerConnectionString = ownerConnection || pgConnectionString || process.env.DATABASE_URL;
 
 // Create our Postgres config.
 const pgConfig: PoolConfig = {
@@ -580,6 +587,7 @@ const postgraphileOptions = pluginHook(
     simpleCollections,
     legacyFunctionsOnly,
     ignoreIndexes,
+    ownerConnectionString,
   },
   { config, cliOptions: program },
 );

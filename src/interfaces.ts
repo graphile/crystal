@@ -43,6 +43,8 @@ export interface PostGraphileOptions {
   //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
+  // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
+  ownerConnectionString?: string;
   // [EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
   /* @middlewareOnly */
   subscriptions?: boolean;

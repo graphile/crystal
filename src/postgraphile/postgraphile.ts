@@ -168,6 +168,7 @@ export default function postgraphile(
     incomingOptions,
   );
   return createPostGraphileHttpRequestHandler({
+    ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
     ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
