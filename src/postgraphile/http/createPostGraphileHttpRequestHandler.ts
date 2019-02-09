@@ -403,7 +403,10 @@ export default function createPostGraphileHttpRequestHandler(
             `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
               graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
               streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
-              enhanceGraphiql: options.enhanceGraphiql,
+              enhanceGraphiql:
+                options.enhanceGraphiql === false
+                  ? false
+                  : !!options.enhanceGraphiql || options.subscriptions || options.live,
               subscriptions: !!options.subscriptions,
             })};</script>\n  </head>`,
           )

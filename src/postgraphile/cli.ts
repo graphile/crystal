@@ -236,7 +236,7 @@ program
   )
   .option(
     '--enhance-graphiql',
-    '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development)',
+    '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development; automatically enables with `subscriptions` and `live`)',
   )
   .option(
     '-b, --disable-graphiql',
@@ -563,7 +563,7 @@ const postgraphileOptions = pluginHook(
     graphqlRoute,
     graphiqlRoute,
     graphiql: !disableGraphiql,
-    enhanceGraphiql,
+    enhanceGraphiql: enhanceGraphiql ? true : undefined,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
     jwtAudiences,
