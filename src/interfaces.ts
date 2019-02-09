@@ -46,8 +46,9 @@ export interface PostGraphileOptions {
   // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
   ownerConnectionString?: string;
   // [EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
-  /* @middlewareOnly */
   subscriptions?: boolean;
+  // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
+  live?: boolean;
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
   pgDefaultRole?: string;

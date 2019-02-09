@@ -113,6 +113,10 @@ program
     '[EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
   )
   .option(
+    '-L, --live',
+    '[EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change). Implies --subscriptions',
+  )
+  .option(
     '-w, --watch',
     'automatically updates your GraphQL schema when your database schema changes (NOTE: requires DB superuser to install `postgraphile_watch` schema)',
   )
@@ -387,6 +391,7 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
+  live,
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -565,7 +570,8 @@ const postgraphileOptions = pluginHook(
     jwtRole,
     jwtVerifyOptions,
     pgDefaultRole,
-    subscriptions,
+    subscriptions: subscriptions || live,
+    live,
     watchPg,
     showErrorStack,
     extendedErrors,
@@ -732,7 +738,10 @@ if (noServer) {
           [
             `GraphQL API:         ${chalk.underline.bold.blue(
               `http://${hostname}:${actualPort}${graphqlRoute}`,
-            )}` + (postgraphileOptions.subscriptions ? ' (subscriptions enabled)' : ''),
+            )}` +
+              (postgraphileOptions.subscriptions
+                ? ` (${postgraphileOptions.live ? 'live ' : ''}subscriptions enabled)`
+                : ''),
             !disableGraphiql &&
               `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
