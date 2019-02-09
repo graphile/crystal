@@ -5,6 +5,7 @@ import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
 import { Plugin } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
+import { EventEmitter } from 'events';
 
 /**
  * A narrower type than `any` that won’t swallow errors from assumptions about
@@ -42,6 +43,9 @@ export interface PostGraphileOptions {
   //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
+  // [EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
+  /* @middlewareOnly */
+  subscriptions?: boolean;
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
   pgDefaultRole?: string;
@@ -95,7 +99,7 @@ export interface PostGraphileOptions {
   // effect.
   /* @middlewareOnly */
   handleErrors?: ((
-    errors: Array<GraphQLError>,
+    errors: ReadonlyArray<GraphQLError>,
     req: IncomingMessage,
     res: ServerResponse,
   ) => Array<GraphQLErrorExtended>);
@@ -237,6 +241,14 @@ export interface PostGraphileOptions {
   [propName: string]: any;
 }
 
+export interface CreateRequestHandlerOptions extends PostGraphileOptions {
+  // The actual GraphQL schema we will use.
+  getGqlSchema: () => Promise<GraphQLSchema>;
+  // A Postgres client pool we use to connect Postgres clients.
+  pgPool: Pool;
+  _emitter: EventEmitter;
+}
+
 export interface GraphQLFormattedErrorExtended {
   message: string;
   locations: ReadonlyArray<SourceLocation> | void;
@@ -271,4 +283,10 @@ export interface HttpRequestHandler {
     moreOptions: any,
     fn: (ctx: mixed) => any,
   ) => Promise<any>;
+  options: CreateRequestHandlerOptions;
+  handleErrors: ((
+    errors: ReadonlyArray<GraphQLError>,
+    req: IncomingMessage,
+    res: ServerResponse,
+  ) => Array<GraphQLErrorExtended>);
 }
