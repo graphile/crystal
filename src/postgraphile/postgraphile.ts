@@ -192,6 +192,7 @@ function handleFatalError(error: Error, when: string): never {
 
 function hasPoolConstructor(obj: mixed): boolean {
   return (
+    // tslint:disable-next-line no-any
     (obj && typeof obj.constructor === 'function' && obj.constructor === (Pool as any).super_) ||
     false
   );
