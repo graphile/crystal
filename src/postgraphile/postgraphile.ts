@@ -25,6 +25,10 @@ export function getPostgraphileSchemaBuilder(
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions,
 ): PostgraphileSchemaBuilder {
+  if (incomingOptions.live && incomingOptions.subscriptions == null) {
+    // live implies subscriptions
+    incomingOptions.subscriptions = true;
+  }
   const pluginHook = pluginHookFromOptions(incomingOptions);
   const options = pluginHook('postgraphile:options', incomingOptions, {
     pgPool,
