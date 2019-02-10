@@ -745,7 +745,12 @@ if (noServer) {
             !disableGraphiql &&
               `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
-              )}` + (enhanceGraphiql ? '' : ` (enhance with '--enhance-graphiql')`),
+              )}` +
+                (postgraphileOptions.enhanceGraphiql ||
+                postgraphileOptions.live ||
+                postgraphileOptions.subscriptions
+                  ? ''
+                  : ` (enhance with '--enhance-graphiql')`),
             `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
               postgraphileOptions.watchPg ? ' (watching)' : ''
             }`,
