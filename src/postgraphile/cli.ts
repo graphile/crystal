@@ -25,6 +25,8 @@ import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
 import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
 
+const isDev = process.env.POSTGRAPHILE_ENV === 'development';
+
 // tslint:disable-next-line no-any
 function isString(str: any): str is string {
   return typeof str === 'string';
@@ -704,7 +706,9 @@ if (noServer) {
       const address = server.address();
       const actualPort = typeof address === 'string' ? port : address.port;
       const self = cluster.isMaster
-        ? 'server'
+        ? isDev
+          ? `server (pid=${process.pid})`
+          : 'server'
         : `worker ${process.env.POSTGRAPHILE_WORKER_NUMBER} (pid=${process.pid})`;
       const versionString = `v${manifest.version}`;
       if (cluster.isMaster || process.env.POSTGRAPHILE_WORKER_NUMBER === '1') {
