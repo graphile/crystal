@@ -195,6 +195,14 @@ function handleFatalError(error: Error, when: string): never {
   return null as never;
 }
 
+function hasPoolConstructor(obj: mixed): boolean {
+  return (
+    // tslint:disable-next-line no-any
+    (obj && typeof obj.constructor === 'function' && obj.constructor === (Pool as any).super_) ||
+    false
+  );
+}
+
 function constructorName(obj: mixed): string | null {
   return (
     (obj &&
@@ -226,6 +234,7 @@ function toPgPool(poolOrConfig: any): Pool {
 // tslint:disable-next-line no-any
 function quacksLikePgPool(pgConfig: any): pgConfig is Pool {
   if (pgConfig instanceof Pool) return true;
+  if (hasPoolConstructor(pgConfig)) return true;
 
   // A diagnosis of exclusion
   if (!pgConfig || typeof pgConfig !== 'object') return false;
