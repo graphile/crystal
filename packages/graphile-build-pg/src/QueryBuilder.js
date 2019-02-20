@@ -3,6 +3,10 @@ import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import chunk from "lodash/chunk";
+import type { PgClass } from "./plugins/PgIntrospectionPlugin";
+
+// eslint-disable-next-line flowtype/no-weak-types
+type GraphQLContext = any;
 
 const isDev = process.env.POSTGRAPHILE_ENV === "development";
 
@@ -42,11 +46,14 @@ export type QueryBuilderOptions = {
 };
 
 class QueryBuilder {
+  parentQueryBuilder: QueryBuilder | void;
+  context: GraphQLContext;
   supportsJSONB: boolean;
   locks: {
     [string]: true | string,
   };
   finalized: boolean;
+  selectedIdentifiers: boolean;
   data: {
     cursorPrefix: Array<string>,
     select: Array<[SQLGen, RawAlias]>,
@@ -65,9 +72,13 @@ class QueryBuilder {
     first: ?number,
     last: ?number,
     beforeLock: {
-      [string]: Array<() => void>,
+      [string]: Array<() => void> | null,
     },
     cursorComparator: ?CursorComparator,
+    liveConditions: Array<
+      // eslint-disable-next-line flowtype/no-weak-types
+      [(data: {}) => (record: any) => boolean, { [key: string]: SQL } | void]
+    >,
   };
   compiledData: {
     cursorPrefix: Array<string>,
@@ -89,12 +100,14 @@ class QueryBuilder {
     cursorComparator: ?CursorComparator,
   };
 
-  constructor(options: QueryBuilderOptions = {}) {
+  constructor(options: QueryBuilderOptions = {}, context: GraphQLContext = {}) {
+    this.context = context || {};
     this.supportsJSONB =
       options.supportsJSONB == null ? true : !!options.supportsJSONB;
 
     this.locks = {};
     this.finalized = false;
+    this.selectedIdentifiers = false;
     this.data = {
       // TODO: refactor `cursorPrefix`, it shouldn't be here (or should at least have getters/setters)
       cursorPrefix: ["natural"],
@@ -115,6 +128,7 @@ class QueryBuilder {
       last: null,
       beforeLock: {},
       cursorComparator: null,
+      liveConditions: [],
     };
     this.compiledData = {
       cursorPrefix: ["natural"],
@@ -194,9 +208,83 @@ class QueryBuilder {
 
   beforeLock(field: string, fn: () => void) {
     this.checkLock(field);
-    this.data.beforeLock[field] = this.data.beforeLock[field] || [];
+    if (!this.data.beforeLock[field]) {
+      this.data.beforeLock[field] = [];
+    }
+    // $FlowFixMe
     this.data.beforeLock[field].push(fn);
   }
+
+  makeLiveCollection(
+    table: PgClass,
+    // eslint-disable-next-line flowtype/no-weak-types
+    cb?: (checker: (data: any) => (record: any) => boolean) => void
+  ) {
+    if (!this.context.liveCollection) return;
+    if (!this.context.liveConditions) return;
+    /* the actual condition doesn't matter hugely, 'select' should work */
+    const liveConditions = this.data.liveConditions;
+    const checkerGenerator = data => {
+      // Compute this once.
+      const checkers = liveConditions.map(([checkerGenerator]) =>
+        checkerGenerator(data)
+      );
+      return record => checkers.every(checker => checker(record));
+    };
+    if (this.parentQueryBuilder) {
+      if (cb) {
+        throw new Error(
+          "Either use parentQueryBuilder or pass callback, not both."
+        );
+      }
+      this.parentQueryBuilder.beforeLock("select", () => {
+        const id = this.context.liveConditions.push(checkerGenerator) - 1;
+        // BEWARE: it's easy to override others' conditions, and that will cause issues. Be sensible.
+        const allRequirements = this.data.liveConditions.reduce(
+          (memo, [_checkerGenerator, requirements]) =>
+            requirements ? Object.assign(memo, requirements) : memo,
+          {}
+        );
+        // $FlowFixMe
+        this.parentQueryBuilder.select(
+          sql.fragment`json_build_object(
+          '__id', ${sql.value(id)}::int
+          ${sql.join(
+            Object.keys(allRequirements).map(
+              key =>
+                sql.fragment`, ${sql.literal(key)}::text, ${
+                  allRequirements[key]
+                }`
+            ),
+
+            ", "
+          )}
+          )`,
+          "__live"
+        );
+      });
+    } else if (cb) {
+      cb(checkerGenerator);
+    } else {
+      throw new Error(
+        "makeLiveCollection was called without parentQueryBuilder and without callback"
+      );
+    }
+  }
+
+  addLiveCondition(
+    // eslint-disable-next-line flowtype/no-weak-types
+    checkerGenerator: (data: {}) => (record: any) => boolean,
+    requirements?: { [key: string]: SQL }
+  ) {
+    if (requirements && !this.parentQueryBuilder) {
+      throw new Error(
+        "There's no parentQueryBuilder, so there cannot be requirements"
+      );
+    }
+    this.data.liveConditions.push([checkerGenerator, requirements]);
+  }
+
   setCursorComparator(fn: CursorComparator) {
     this.checkLock("cursorComparator");
     this.data.cursorComparator = fn;
@@ -229,6 +317,23 @@ class QueryBuilder {
       }
     }
     this.data.select.push([exprGen, alias]);
+  }
+  selectIdentifiers(table: PgClass) {
+    if (this.selectedIdentifiers) return;
+    const primaryKey = table.primaryKeyConstraint;
+    if (!primaryKey) return;
+    const primaryKeys = primaryKey.keyAttributes;
+    this.select(
+      sql.fragment`json_build_array(${sql.join(
+        primaryKeys.map(
+          key =>
+            sql.fragment`${this.getTableAlias()}.${sql.identifier(key.name)}`
+        ),
+        ", "
+      )})`,
+      "__identifiers"
+    );
+    this.selectedIdentifiers = true;
   }
   selectCursor(exprGen: SQLGen) {
     this.checkLock("selectCursor");
@@ -554,11 +659,15 @@ class QueryBuilder {
       queryBuilder: this,
     });
     const beforeLocks = this.data.beforeLock[type];
-    this.data.beforeLock[type] = [];
-    for (const fn of beforeLocks || []) {
-      fn();
+    if (beforeLocks && beforeLocks.length) {
+      this.data.beforeLock[type] = null;
+      for (const fn of beforeLocks) {
+        fn();
+      }
     }
-    this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
+    if (type !== "select") {
+      this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
+    }
     if (type === "cursorComparator") {
       // It's meant to be a function
       this.compiledData[type] = this.data[type];
@@ -574,18 +683,38 @@ class QueryBuilder {
         context
       );
     } else if (type === "select") {
-      // Assume that duplicate fields must be identical, don't output the same key multiple times
+      /*
+       * NOTICE: locking select can cause additional selects to be added, so the
+       * length of this.data[type] may increase during the operation. This is
+       * why we handle this.locks[type] separately.
+       */
+
+      // Assume that duplicate fields must be identical, don't output the same
+      // key multiple times
       const seenFields = {};
       const context = getContext();
-      this.compiledData[type] = this.data[type].reduce((memo, [a, b]) => {
+      const data = [];
+      const selects = this.data[type];
+
+      // DELIBERATE slow loop, see NOTICE above
+      for (let i = 0; i < selects.length; i++) {
+        const [valueOrGenerator, columnName] = selects[i];
         // $FlowFixMe
-        if (!seenFields[b]) {
+        if (!seenFields[columnName]) {
           // $FlowFixMe
-          seenFields[b] = true;
-          memo.push([callIfNecessary(a, context), b]);
+          seenFields[columnName] = true;
+          data.push([callIfNecessary(valueOrGenerator, context), columnName]);
+          const newBeforeLocks = this.data.beforeLock[type];
+          if (newBeforeLocks && newBeforeLocks.length) {
+            this.data.beforeLock[type] = null;
+            for (const fn of newBeforeLocks) {
+              fn();
+            }
+          }
         }
-        return memo;
-      }, []);
+      }
+      this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
+      this.compiledData[type] = data;
     } else if (type === "orderBy") {
       const context = getContext();
       this.compiledData[type] = this.data[type].map(([a, b, c]) => [

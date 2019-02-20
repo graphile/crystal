@@ -30,6 +30,7 @@ import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
 import chalk from "chalk";
 import pickBy from "lodash/pickBy";
+import PgLiveProvider from "../PgLiveProvider";
 
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
@@ -328,6 +329,7 @@ export default (function PgBasicsPlugin(
   }
   builder.hook("build", build => {
     build.versions["graphile-build-pg"] = version;
+    build.liveCoordinator.registerProvider(new PgLiveProvider());
     return build.extend(build, {
       graphileBuildPgVersion: version,
       pgSql: sql,

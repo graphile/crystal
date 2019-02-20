@@ -4,7 +4,7 @@ import debugFactory from "debug";
 
 const debug = debugFactory("graphile-build-pg");
 
-export default (function PgForwardRelationPlugin(builder) {
+export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -128,6 +128,15 @@ export default (function PgForwardRelationPlugin(builder) {
                           { asJson: true },
                           innerQueryBuilder => {
                             innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                            if (subscriptions && table.primaryKeyConstraint) {
+                              queryBuilder.selectIdentifiers(table);
+                            }
+                            if (
+                              subscriptions &&
+                              foreignTable.primaryKeyConstraint
+                            ) {
+                              innerQueryBuilder.selectIdentifiers(foreignTable);
+                            }
                             keys.forEach((key, i) => {
                               innerQueryBuilder.where(
                                 sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
@@ -137,7 +146,8 @@ export default (function PgForwardRelationPlugin(builder) {
                                 )}`
                               );
                             });
-                          }
+                          },
+                          queryBuilder.context
                         );
                         return sql.fragment`(${query})`;
                       }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -149,10 +159,18 @@ export default (function PgForwardRelationPlugin(builder) {
                     constraint.tags.forwardDescription ||
                     `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
                   type: gqlForeignTableType, // Nullable since RLS may forbid fetching
-                  resolve: (rawData, _args, _context, resolveInfo) => {
+                  resolve: (rawData, _args, resolveContext, resolveInfo) => {
                     const data = isMutationPayload ? rawData.data : rawData;
                     const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
-                    return data[safeAlias];
+                    const record = data[safeAlias];
+                    if (record && resolveContext.liveRecord) {
+                      resolveContext.liveRecord(
+                        "pg",
+                        foreignTable,
+                        record.__identifiers
+                      );
+                    }
+                    return record;
                   },
                 };
               },

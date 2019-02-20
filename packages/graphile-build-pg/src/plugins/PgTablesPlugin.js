@@ -120,18 +120,7 @@ export default (function PgTablesPlugin(
                   addDataGeneratorForField(nodeIdFieldName, () => {
                     return {
                       pgQuery: queryBuilder => {
-                        queryBuilder.select(
-                          sql.fragment`json_build_array(${sql.join(
-                            primaryKeys.map(
-                              key =>
-                                sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                  key.name
-                                )}`
-                            ),
-                            ", "
-                          )})`,
-                          "__identifiers"
-                        );
+                        queryBuilder.selectIdentifiers(table);
                       },
                     };
                   });
@@ -322,18 +311,7 @@ export default (function PgTablesPlugin(
                         usesCursor: [true],
                         pgQuery: queryBuilder => {
                           if (primaryKeys) {
-                            queryBuilder.select(
-                              sql.fragment`json_build_array(${sql.join(
-                                primaryKeys.map(
-                                  key =>
-                                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                      key.name
-                                    )}`
-                                ),
-                                ", "
-                              )})`,
-                              "__identifiers"
-                            );
+                            queryBuilder.selectIdentifiers(table);
                           }
                         },
                       }));
@@ -362,11 +340,24 @@ export default (function PgTablesPlugin(
                         !pgForbidSetofFunctionsToReturnNull,
                         TableType
                       ),
-                      resolve(data, _args, _context, resolveInfo) {
+                      resolve(data, _args, resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
-                        return handleNullRow(data[safeAlias]);
+                        const record = handleNullRow(data[safeAlias]);
+                        if (
+                          record &&
+                          primaryKeys &&
+                          resolveContext.liveRecord &&
+                          data.__identifiers
+                        ) {
+                          resolveContext.liveRecord(
+                            "pg",
+                            table,
+                            data.__identifiers
+                          );
+                        }
+                        return record;
                       },
                     },
                     {},
@@ -415,13 +406,27 @@ export default (function PgTablesPlugin(
                           )
                         )
                       ),
-                      resolve(data, _args, _context, resolveInfo) {
+                      resolve(data, _args, resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
-                        return data.data.map(entry =>
-                          handleNullRow(entry[safeAlias])
-                        );
+                        return data.data.map(entry => {
+                          const record = handleNullRow(entry[safeAlias]);
+                          if (
+                            record &&
+                            resolveContext.liveRecord &&
+                            primaryKeys &&
+                            entry.__identifiers
+                          ) {
+                            resolveContext.liveRecord(
+                              "pg",
+                              table,
+                              entry.__identifiers
+                            );
+                          }
+
+                          return record;
+                        });
                       },
                     },
                     {},
@@ -441,7 +446,7 @@ export default (function PgTablesPlugin(
                           resolveInfo
                         );
                         return data.data.map(entry => ({
-                          __cursor: entry.__cursor,
+                          ...entry,
                           ...entry[safeAlias],
                         }));
                       },

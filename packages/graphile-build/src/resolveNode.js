@@ -34,7 +34,8 @@ export default async function resolveNode(
       context,
       parsedResolveInfoFragment,
       resolveInfo.returnType,
-      resolveData
+      resolveData,
+      resolveInfo
     );
     Object.defineProperty(node, $$nodeType, {
       enumerable: false,

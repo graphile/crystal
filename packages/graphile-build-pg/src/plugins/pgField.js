@@ -79,7 +79,8 @@ export default function pgField(
                       parsedResolveInfoFragment,
                     });
                   }
-                }
+                },
+                queryBuilder.context
               );
               return sql.fragment`(${query})`;
             }, safeAlias);

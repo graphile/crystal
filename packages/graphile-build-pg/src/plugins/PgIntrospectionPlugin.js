@@ -1,6 +1,6 @@
 // @flow
 import type { Plugin } from "graphile-build";
-import withPgClient from "../withPgClient";
+import withPgClient, { quacksLikePgPool } from "../withPgClient";
 import { parseTags } from "../utils";
 import { readFile as rawReadFile } from "fs";
 import pg from "pg";
@@ -8,7 +8,6 @@ import debugFactory from "debug";
 import chalk from "chalk";
 import throttle from "lodash/throttle";
 import flatMap from "lodash/flatMap";
-import { quacksLikePgPool } from "../withPgClient";
 import { makeIntrospectionQuery } from "./introspectionQuery";
 
 import { version } from "../../package.json";
@@ -437,6 +436,7 @@ export default (async function PgIntrospectionPlugin(
     pgLegacyFunctionsOnly = false,
     pgSkipInstallingWatchFixtures = false,
     pgAugmentIntrospectionResults,
+    pgOwnerConnectionString,
   }
 ) {
   const augment = introspectionResults => {
@@ -461,7 +461,7 @@ export default (async function PgIntrospectionPlugin(
     };
     const introspectionResultsByKind = cloneResults(
       await persistentMemoizeWithKey(cacheKey, () =>
-        withPgClient(pgConfig, async pgClient => {
+        withPgClient(pgOwnerConnectionString || pgConfig, async pgClient => {
           const versionResult = await pgClient.query(
             "show server_version_num;"
           );

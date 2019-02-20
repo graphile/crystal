@@ -55,25 +55,35 @@ beforeAll(() => {
       orderByNullsLast,
       smartCommentRelations,
     ] = await Promise.all([
-      createPostGraphileSchema(pgClient, ["a", "b", "c"]),
-      createPostGraphileSchema(pgClient, ["a", "b", "c"], { classicIds: true }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
+      }),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
+        classicIds: true,
+      }),
+      createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
         dynamicJson: true,
         setofFunctionsContainNulls: null,
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
         pgColumnFilter: attr => attr.name !== "headline",
         setofFunctionsContainNulls: false,
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
         viewUniqueKey: "testviewid",
         setofFunctionsContainNulls: true,
       }),
       createPostGraphileSchema(pgClient, ["d"], {}),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
+        subscriptions: true,
         simpleCollections: "both",
       }),
       createPostGraphileSchema(pgClient, ["a"], {
+        subscriptions: true,
         graphileBuildOptions: {
           orderByNullsLast: true,
         },

@@ -147,12 +147,18 @@ export default (function PgConnectionArgCondition(builder) {
                 const fieldName = inflection.column(attr);
                 const val = condition[fieldName];
                 if (val != null) {
+                  queryBuilder.addLiveCondition(() => record =>
+                    record[attr.name] === val
+                  );
                   queryBuilder.where(
                     sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                       attr.name
                     )} = ${gql2pg(val, attr.type, attr.typeModifier)}`
                   );
                 } else if (val === null) {
+                  queryBuilder.addLiveCondition(() => record =>
+                    record[attr.name] == null
+                  );
                   queryBuilder.where(
                     sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
                       attr.name

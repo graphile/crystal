@@ -20,6 +20,7 @@ import semver from "semver";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
 import swallowError from "./swallowError";
 import resolveNode from "./resolveNode";
+import { LiveCoordinator } from "./Live";
 
 import type SchemaBuilder, {
   Build,
@@ -249,6 +250,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
   const fieldArgDataGeneratorsByFieldNameByType = new Map();
 
   return {
+    options: builder.options,
     graphileBuildVersion: version,
     versions: {
       graphql: require("graphql/package.json").version,
@@ -883,5 +885,6 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       currentHookName: null,
       currentHookEvent: null,
     },
+    liveCoordinator: new LiveCoordinator(),
   };
 }

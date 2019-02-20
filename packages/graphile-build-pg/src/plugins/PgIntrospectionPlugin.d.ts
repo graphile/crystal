@@ -111,6 +111,7 @@ export interface PgConstraint {
   classId: string;
   class: PgClass;
   foreignClassId: string | void;
+  foreignClass: PgClass | void;
   comment: string | void;
   description: string | void;
   keyAttributeNums: Array<number>;

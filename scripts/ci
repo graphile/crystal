@@ -14,9 +14,11 @@ npm run flow:check
 
 echo "[4/4]: Testing Project"
 for I in packages/*/; do
-  cd $I
-  npm run test
-  cd -
+  if [[ "$PGVERSION" != "9.4" || ( "$I" != "packages/lds/" && "$I" != "packages/subscriptions-lds/" ) ]]; then
+    cd $I
+    npm run test
+    cd -
+  fi;
 done
 
 echo ""

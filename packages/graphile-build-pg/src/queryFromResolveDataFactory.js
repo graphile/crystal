@@ -8,6 +8,9 @@ import type { DataForType } from "graphile-build";
 import isSafeInteger from "lodash/isSafeInteger";
 import assert from "assert";
 
+// eslint-disable-next-line flowtype/no-weak-types
+type GraphQLContext = any;
+
 const identity = _ => _ !== null && _ !== undefined;
 
 // $FlowFixMe
@@ -23,7 +26,9 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     addNullCase?: boolean,
     onlyJsonField?: boolean,
   },
-  withBuilder?: (builder: QueryBuilder) => void
+  // TODO:v5: context is not optional
+  withBuilder?: ((builder: QueryBuilder) => void) | null | void,
+  context?: GraphQLContext = {}
 ) => {
   const {
     pgQuery,
@@ -43,7 +48,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(identity);
 
   // $FlowFixMe
-  const queryBuilder = new QueryBuilder(queryBuilderOptions);
+  const queryBuilder = new QueryBuilder(queryBuilderOptions, context);
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
 
   if (withBuilder) {

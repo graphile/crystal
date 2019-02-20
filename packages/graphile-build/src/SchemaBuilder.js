@@ -122,6 +122,7 @@ export type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
 export type SchemaListener = (newSchema: GraphQLSchema) => void;
 
 class SchemaBuilder extends EventEmitter {
+  options: Options;
   watchers: Array<WatchUnwatch>;
   unwatchers: Array<WatchUnwatch>;
   triggerChange: ?TriggerChangeType;
@@ -136,8 +137,13 @@ class SchemaBuilder extends EventEmitter {
   _busy: boolean;
   _watching: boolean;
 
-  constructor() {
+  constructor(options: Options) {
     super();
+
+    this.options = options;
+    if (!options) {
+      throw new Error("Please pass options to SchemaBuilder");
+    }
 
     this._busy = false;
     this._watching = false;

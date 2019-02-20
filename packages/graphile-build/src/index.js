@@ -11,6 +11,7 @@ import {
   SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
+  AddQueriesToSubscriptionsPlugin,
 } from "./plugins";
 import resolveNode from "./resolveNode";
 import type { GraphQLSchema } from "graphql";
@@ -42,11 +43,13 @@ export type {
   SchemaListener,
 } from "./SchemaBuilder";
 
+export { LiveSource, LiveProvider, LiveMonitor, LiveCoordinator } from "./Live";
+
 export const getBuilder = async (
   plugins: Array<Plugin>,
   options: Options = {}
 ): Promise<SchemaBuilder> => {
-  const builder = new SchemaBuilder();
+  const builder = new SchemaBuilder(options);
   for (let i = 0, l = plugins.length; i < l; i++) {
     const plugin = plugins[i];
     if (typeof plugin !== "function") {
@@ -80,6 +83,7 @@ export const defaultPlugins: Array<Plugin> = [
   SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
+  AddQueriesToSubscriptionsPlugin,
 ];
 
 export {
@@ -91,6 +95,7 @@ export {
   SubscriptionPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
+  AddQueriesToSubscriptionsPlugin,
   // resolveNode: EXPERIMENTAL, API might change!
   resolveNode,
 };

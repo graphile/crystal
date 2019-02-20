@@ -21,6 +21,7 @@ import SchemaBuilder, {
 } from "./SchemaBuilder";
 
 export * from "./SchemaBuilder";
+export * from "./Live";
 export { SchemaBuilder };
 
 export const getBuilder: (

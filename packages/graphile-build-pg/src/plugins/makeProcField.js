@@ -64,6 +64,7 @@ export default function makeProcField(
     describePgEntity,
     sqlCommentByAddingTags,
     pgField,
+    options: { subscriptions = false },
   } = build;
 
   if (computed && isMutation) {
@@ -345,7 +346,8 @@ export default function makeProcField(
         ReturnType,
         sqlMutationQuery,
         functionAlias,
-        parentQueryBuilder
+        parentQueryBuilder,
+        resolveContext
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment,
@@ -394,8 +396,15 @@ export default function makeProcField(
                   "value"
                 );
               }
+            } else if (
+              subscriptions &&
+              returnTypeTable &&
+              returnTypeTable.primaryKeyConstraint
+            ) {
+              innerQueryBuilder.selectIdentifiers(returnTypeTable);
             }
-          }
+          },
+          parentQueryBuilder ? parentQueryBuilder.context : resolveContext
         );
         return query;
       }
@@ -566,6 +575,7 @@ export default function makeProcField(
               const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
               const value = data[safeAlias];
               if (returnFirstValueAsValue) {
+                // Is not table like; is not record like.
                 if (proc.returnsSet && !forceList) {
                   // EITHER `isMutation` is true, or `ConnectionType` does not
                   // exist - either way, we're not returning a connection.
@@ -588,7 +598,8 @@ export default function makeProcField(
                 }
               }
             }
-          : async (data, args, { pgClient }, resolveInfo) => {
+          : async (data, args, resolveContext, resolveInfo) => {
+              const { pgClient, liveRecord } = resolveContext;
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
               const functionAlias = sql.identifier(Symbol());
               const sqlMutationQuery = makeMutationCall(
@@ -604,7 +615,8 @@ export default function makeProcField(
                   resolveInfo.returnType,
                   functionAlias,
                   functionAlias,
-                  null
+                  null,
+                  resolveContext
                 );
                 const intermediateIdentifier = sql.identifier(Symbol());
                 const isVoid = returnType.id === "2278";
@@ -652,7 +664,8 @@ export default function makeProcField(
                   resolveInfo.returnType,
                   sqlMutationQuery,
                   functionAlias,
-                  null
+                  null,
+                  resolveContext
                 );
                 const { text, values } = sql.compile(query);
                 if (debugSql.enabled) debugSql(text);
@@ -676,13 +689,50 @@ export default function makeProcField(
                 } else {
                   if (proc.returnsSet && !isMutation && !forceList) {
                     // Connection
+                    const data = row.data
+                      ? row.data.map(scalarAwarePg2gql)
+                      : null;
+                    if (
+                      subscriptions &&
+                      isTableLike &&
+                      data &&
+                      returnTypeTable &&
+                      liveRecord
+                    ) {
+                      data.forEach(
+                        row =>
+                          row &&
+                          liveRecord("pg", returnTypeTable, row.__identifiers)
+                      );
+                    }
                     return addStartEndCursor({
                       ...row,
-                      data: row.data ? row.data.map(scalarAwarePg2gql) : null,
+                      data,
                     });
                   } else if (proc.returnsSet || rawReturnType.isPgArray) {
+                    if (
+                      subscriptions &&
+                      isTableLike &&
+                      returnTypeTable &&
+                      liveRecord
+                    ) {
+                      rows.forEach(
+                        row =>
+                          row &&
+                          liveRecord("pg", returnTypeTable, row.__identifiers)
+                      );
+                    }
                     return rows.map(row => pg2gql(row, returnType));
                   } else {
+                    if (
+                      subscriptions &&
+                      isTableLike &&
+                      row &&
+                      returnTypeTable &&
+                      liveRecord
+                    ) {
+                      liveRecord("pg", returnTypeTable, row.__identifiers);
+                    }
                     return pg2gql(row, returnType);
                   }
                 }

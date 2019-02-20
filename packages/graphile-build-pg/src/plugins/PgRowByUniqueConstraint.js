@@ -2,7 +2,10 @@
 import type { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
 
-export default (async function PgRowByUniqueConstraint(builder) {
+export default (async function PgRowByUniqueConstraint(
+  builder,
+  { subscriptions }
+) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -82,7 +85,8 @@ export default (async function PgRowByUniqueConstraint(builder) {
                     };
                     return memo;
                   }, {}),
-                  async resolve(parent, args, { pgClient }, resolveInfo) {
+                  async resolve(parent, args, resolveContext, resolveInfo) {
+                    const { pgClient, liveRecord } = resolveContext;
                     const parsedResolveInfoFragment = parseResolveInfo(
                       resolveInfo
                     );
@@ -96,6 +100,9 @@ export default (async function PgRowByUniqueConstraint(builder) {
                       resolveData,
                       {},
                       queryBuilder => {
+                        if (subscriptions && table.primaryKeyConstraint) {
+                          queryBuilder.selectIdentifiers(table);
+                        }
                         keys.forEach(key => {
                           queryBuilder.where(
                             sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
@@ -107,13 +114,17 @@ export default (async function PgRowByUniqueConstraint(builder) {
                             )}`
                           );
                         });
-                      }
+                      },
+                      resolveContext
                     );
                     const { text, values } = sql.compile(query);
                     if (debugSql.enabled) debugSql(text);
                     const {
                       rows: [row],
                     } = await pgClient.query(text, values);
+                    if (subscriptions && liveRecord && row) {
+                      liveRecord("pg", table, row.__identifiers);
+                    }
                     return row;
                   },
                 };

@@ -11,7 +11,7 @@ const ONLY = 2;
 
 export default (function PgBackwardRelationPlugin(
   builder,
-  { pgLegacyRelations, pgSimpleCollections }
+  { pgLegacyRelations, pgSimpleCollections, subscriptions }
 ) {
   const hasConnections = pgSimpleCollections !== "only";
   const hasSimpleCollections =
@@ -166,6 +166,9 @@ export default (function PgBackwardRelationPlugin(
                             },
                             innerQueryBuilder => {
                               innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                              if (subscriptions && table.primaryKeyConstraint) {
+                                innerQueryBuilder.selectIdentifiers(table);
+                              }
                               keys.forEach((key, i) => {
                                 innerQueryBuilder.where(
                                   sql.fragment`${tableAlias}.${sql.identifier(
@@ -175,7 +178,8 @@ export default (function PgBackwardRelationPlugin(
                                   )}`
                                 );
                               });
-                            }
+                            },
+                            queryBuilder.context
                           );
                           return sql.fragment`(${query})`;
                         }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -188,11 +192,19 @@ export default (function PgBackwardRelationPlugin(
                       `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
                     type: gqlTableType,
                     args: {},
-                    resolve: (data, _args, _context, resolveInfo) => {
+                    resolve: (data, _args, resolveContext, resolveInfo) => {
                       const safeAlias = getSafeAliasFromResolveInfo(
                         resolveInfo
                       );
-                      return data[safeAlias];
+                      const record = data[safeAlias];
+                      if (record && resolveContext.liveRecord) {
+                        resolveContext.liveRecord(
+                          "pg",
+                          table,
+                          record.__identifiers
+                        );
+                      }
+                      return record;
                     },
                   };
                 },
@@ -262,7 +274,32 @@ export default (function PgBackwardRelationPlugin(
                               },
                               innerQueryBuilder => {
                                 innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                                if (subscriptions) {
+                                  innerQueryBuilder.makeLiveCollection(table);
+                                  innerQueryBuilder.addLiveCondition(
+                                    data => record => {
+                                      return keys.every(
+                                        key =>
+                                          record[key.name] === data[key.name]
+                                      );
+                                    },
+                                    keys.reduce((memo, key, i) => {
+                                      memo[
+                                        key.name
+                                      ] = sql.fragment`${foreignTableAlias}.${sql.identifier(
+                                        foreignKeys[i].name
+                                      )}`;
+                                      return memo;
+                                    }, {})
+                                  );
+                                }
                                 if (primaryKeys) {
+                                  if (
+                                    subscriptions &&
+                                    table.primaryKeyConstraint
+                                  ) {
+                                    innerQueryBuilder.selectIdentifiers(table);
+                                  }
                                   innerQueryBuilder.beforeLock(
                                     "orderBy",
                                     () => {
@@ -296,7 +333,8 @@ export default (function PgBackwardRelationPlugin(
                                     )}`
                                   );
                                 });
-                              }
+                              },
+                              queryBuilder.context
                             );
                             return sql.fragment`(${query})`;
                           }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -320,14 +358,37 @@ export default (function PgBackwardRelationPlugin(
                             new GraphQLList(new GraphQLNonNull(TableType))
                           ),
                       args: {},
-                      resolve: (data, _args, _context, resolveInfo) => {
+                      resolve: (data, _args, resolveContext, resolveInfo) => {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
+                        if (
+                          subscriptions &&
+                          resolveContext.liveCollection &&
+                          data.__live
+                        ) {
+                          const { __id, ...rest } = data.__live;
+                          const condition = resolveContext.liveConditions[__id];
+                          const checker = condition(rest);
+
+                          resolveContext.liveCollection("pg", table, checker);
+                        }
                         if (isConnection) {
                           return addStartEndCursor(data[safeAlias]);
                         } else {
-                          return data[safeAlias];
+                          const records = data[safeAlias];
+                          if (resolveContext.liveRecord) {
+                            records.forEach(
+                              r =>
+                                r &&
+                                resolveContext.liveRecord(
+                                  "pg",
+                                  table,
+                                  r.__identifiers
+                                )
+                            );
+                          }
+                          return records;
                         }
                       },
                       ...(isDeprecated

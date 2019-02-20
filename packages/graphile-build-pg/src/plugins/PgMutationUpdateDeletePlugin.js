@@ -79,7 +79,8 @@ export default (async function PgMutationUpdateDeletePlugin(
               PayloadType,
               input,
               condition,
-              context
+              context,
+              resolveContext
             ) {
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
               const resolveData = getDataFromParsedResolveInfoFragment(
@@ -141,7 +142,9 @@ export default (async function PgMutationUpdateDeletePlugin(
                 modifiedRowAlias,
                 modifiedRowAlias,
                 resolveData,
-                {}
+                {},
+                null,
+                resolveContext
               );
               let row;
               try {
@@ -355,9 +358,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                           async resolve(
                             parent,
                             { input },
-                            { pgClient },
+                            resolveContext,
                             resolveInfo
                           ) {
+                            const { pgClient } = resolveContext;
                             const nodeId = input[nodeIdFieldName];
                             try {
                               const {
@@ -390,7 +394,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                                   ),
                                   ") and ("
                                 )})`,
-                                context
+                                context,
+                                resolveContext
                               );
                             } catch (e) {
                               debug(e);
@@ -513,9 +518,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                           async resolve(
                             parent,
                             { input },
-                            { pgClient },
+                            resolveContext,
                             resolveInfo
                           ) {
+                            const { pgClient } = resolveContext;
                             return commonCodeRenameMe(
                               pgClient,
                               resolveInfo,
@@ -535,7 +541,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                                 ),
                                 ") and ("
                               )})`,
-                              context
+                              context,
+                              resolveContext
                             );
                           },
                         };

@@ -6,9 +6,13 @@ node_js:
 
 addons:
   postgresql: "9.4"
+  apt:
+    packages:
+      - postgresql-server-dev-9.4
 
 env:
   TEST_DATABASE_URL: postgres://localhost:5432/travis
+  PGVERSION: 9.4
 
 cache:
   directories:
@@ -20,6 +24,13 @@ install:
   - yarn
   - lerna bootstrap
 
+before_script:
+  - psql -c "ALTER USER travis WITH PASSWORD 'travis';"
+  - sudo bash -c "echo -e 'wal_level = logical\nmax_replication_slots = 10\nmax_wal_senders = 10' >> /etc/postgresql/$PGVERSION/main/postgresql.conf"
+  - sudo service postgresql restart
+  - git clone https://github.com/eulerto/wal2json.git
+  - sudo bash -c "cd wal2json && USE_PGXS=1 make && USE_PGXS=1 make install"
+
 script:
   - scripts/ci
 
@@ -30,11 +41,12 @@ matrix:
           packages:
             - postgresql-10
             - postgresql-client-10
+            - postgresql-server-dev-10
         postgresql: 10
       env:
         - PGPORT=5433
         - TEST_DATABASE_URL=postgres://travis:travis@localhost:5433/travis
+        - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5433/lds_test
+        - PGVERSION=10
       sudo: false
       dist: trusty
-      before_script:
-        - psql -c "ALTER USER travis WITH PASSWORD 'travis';"
