@@ -2,7 +2,7 @@
 set -e
 cd packages;
 # Do not run this in parallel; build order matters due to TypeScript.
-for PACKAGE in graphile graphile-build graphile-build-pg graphql-parse-resolve-info graphile-utils postgraphile-core lds subscriptions-lds; do
+for PACKAGE in graphile graphile-build graphile-build-pg graphql-parse-resolve-info graphile-utils postgraphile-core lds subscriptions-lds pg-pubsub; do
   cd $PACKAGE;
   npm run prepack;
   cd -;

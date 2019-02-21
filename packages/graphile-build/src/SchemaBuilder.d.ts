@@ -18,7 +18,7 @@ import { EventEmitter } from "events";
 type mixed = {} | string | number | boolean | undefined | null;
 
 export interface Options {
-  [str: string]: mixed;
+  [str: string]: any;
 }
 
 export interface Plugin {

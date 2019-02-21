@@ -1,20 +1,11 @@
 {
-  "extends": [
-    "tslint:latest",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:latest", "tslint-config-prettier"],
   "rules": {
     "object-literal-sort-keys": false,
     "only-arrow-functions": false,
     "ordered-imports": false,
-    "array-type": [
-      true,
-      "generic"
-    ],
-    "interface-name": [
-      true,
-      "never-prefix"
-    ],
+    "array-type": [true, "generic"],
+    "interface-name": [true, "never-prefix"],
     "variable-name": [
       true,
       "ban-keywords",
@@ -22,9 +13,8 @@
       "allow-leading-underscore",
       "allow-pascal-case"
     ],
-    "no-implicit-dependencies": [
-      true,
-      "dev"
-    ]
+    "no-implicit-dependencies": [true, "dev"],
+    "no-empty": [false],
+    "no-string-literal": [false]
   }
 }

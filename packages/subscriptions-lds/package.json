@@ -6,6 +6,7 @@
   "scripts": {
     "db:init": "dropdb --if-exists lds_test && createdb lds_test && psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f __tests__/schema.sql lds_test",
     "test": "npm run db:init && jest -i",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
     "prepack": "tsc",
     "watch": "tsc --watch"
   },
