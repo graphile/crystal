@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "4.3.2-beta.0",
+  "version": "4.4.0-alpha.0",
   "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -39,8 +39,8 @@
   },
   "devDependencies": {
     "eslint_d": "^5.3.1",
-    "graphile-build": "4.3.2-beta.0",
-    "graphile-build-pg": "4.3.2-beta.0",
+    "graphile-build": "4.4.0-alpha.0",
+    "graphile-build-pg": "4.4.0-alpha.0",
     "jest": "^23.5.0",
     "prettier": "^1.14.2",
     "ts-node": "^7.0.1",
