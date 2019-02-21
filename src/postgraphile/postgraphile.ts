@@ -163,7 +163,7 @@ export default function postgraphile(
      * that the event listener is registered.
      */
     // tslint:disable-next-line no-console
-    console.error('PostgreSQL client generated error: ', err);
+    console.error('PostgreSQL client generated error: ', err.message);
   });
 
   const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder(

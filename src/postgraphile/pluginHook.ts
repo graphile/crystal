@@ -6,7 +6,8 @@ import { version } from '../../package.json';
 import * as graphql from 'graphql';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 
-export type HookFn<T> = (arg: T, context: {}) => T;
+// tslint:disable-next-line no-any
+export type HookFn<TArg, TContext = any> = (arg: TArg, context: TContext) => TArg;
 export type PluginHookFn = <TArgument, TContext = {}>(
   hookName: string,
   argument: TArgument,
@@ -38,7 +39,8 @@ export interface PostGraphilePlugin {
   'cli:flags:add'?: HookFn<AddFlagFn>;
   'cli:flags:add:deprecated'?: HookFn<AddFlagFn>;
   'cli:flags:add:workarounds'?: HookFn<AddFlagFn>;
-  'cli:library:options'?: HookFn<{}>;
+  // tslint:disable-next-line no-any
+  'cli:library:options'?: HookFn<PostGraphileOptions, { config: any; cliOptions: any }>;
   'cli:server:middleware'?: HookFn<HttpRequestHandler>;
   'cli:server:created'?: HookFn<Server>;
   'cli:greeting'?: HookFn<Array<string | null | void>>;

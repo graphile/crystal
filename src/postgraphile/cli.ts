@@ -606,7 +606,7 @@ if (noServer) {
     const pgPool = new Pool(pgConfig);
     pgPool.on('error', err => {
       // tslint:disable-next-line no-console
-      console.error('PostgreSQL client generated error: ', err);
+      console.error('PostgreSQL client generated error: ', err.message);
     });
     const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions);
     await getGraphQLSchema();
