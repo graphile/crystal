@@ -25,6 +25,10 @@ export function getPostgraphileSchemaBuilder(
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions,
 ): PostgraphileSchemaBuilder {
+  if (incomingOptions.live && incomingOptions.subscriptions == null) {
+    // live implies subscriptions
+    incomingOptions.subscriptions = true;
+  }
   const pluginHook = pluginHookFromOptions(incomingOptions);
   const options = pluginHook('postgraphile:options', incomingOptions, {
     pgPool,
@@ -159,7 +163,7 @@ export default function postgraphile(
      * that the event listener is registered.
      */
     // tslint:disable-next-line no-console
-    console.error('PostgreSQL client generated error: ', err);
+    console.error('PostgreSQL client generated error: ', err.message);
   });
 
   const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder(
@@ -168,6 +172,7 @@ export default function postgraphile(
     incomingOptions,
   );
   return createPostGraphileHttpRequestHandler({
+    ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
     ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,

@@ -43,9 +43,12 @@ export interface PostGraphileOptions {
   //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
+  // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
+  ownerConnectionString?: string;
   // [EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
-  /* @middlewareOnly */
   subscriptions?: boolean;
+  // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
+  live?: boolean;
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
   pgDefaultRole?: string;
@@ -153,7 +156,7 @@ export interface PostGraphileOptions {
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
-  // Set this to `true` to add some enhancements to GraphiQL; intended for development usage only.
+  // Set this to `true` to add some enhancements to GraphiQL; intended for development usage only (automatically enables with `subscriptions` and `live`).
   /* @middlewareOnly */
   enhanceGraphiql?: boolean;
   // Enables some generous CORS settings for the GraphQL endpoint. There are

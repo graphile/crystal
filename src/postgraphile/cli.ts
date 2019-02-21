@@ -25,6 +25,8 @@ import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
 import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
 
+const isDev = process.env.POSTGRAPHILE_ENV === 'development';
+
 // tslint:disable-next-line no-any
 function isString(str: any): str is string {
   return typeof str === 'string';
@@ -100,6 +102,10 @@ program
     "the PostgreSQL database name or connection string. If omitted, inferred from environmental variables (see https://www.postgresql.org/docs/current/static/libpq-envars.html). Examples: 'db', 'postgres:///db', 'postgres://user:password@domain:port/db?ssl=1'",
   )
   .option(
+    '-C, --owner-connection <string>',
+    'as `--connection`, but for a privileged user (e.g. for setting up watch fixtures, logical decoding, etc); defaults to the value from `--connection`',
+  )
+  .option(
     '-s, --schema <string>',
     'a Postgres schema to be introspected. Use commas to define multiple schemas',
     (option: string) => option.split(','),
@@ -107,6 +113,10 @@ program
   .option(
     '-S, --subscriptions',
     '[EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
+  )
+  .option(
+    '-L, --live',
+    '[EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change). Implies --subscriptions',
   )
   .option(
     '-w, --watch',
@@ -228,7 +238,7 @@ program
   )
   .option(
     '--enhance-graphiql',
-    '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development)',
+    '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development; automatically enables with `subscriptions` and `live`)',
   )
   .option(
     '-b, --disable-graphiql',
@@ -381,7 +391,9 @@ const overridesFromOptions = {};
 const {
   demo: isDemo = false,
   connection: pgConnectionString,
+  ownerConnection,
   subscriptions,
+  live,
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -452,6 +464,8 @@ const noServer = !yesServer;
 // mode, we want to use the `forum_example` schema. Otherwise the `public`
 // schema is what we want.
 const schemas: Array<string> = dbSchema || (isDemo ? ['forum_example'] : ['public']);
+
+const ownerConnectionString = ownerConnection || pgConnectionString || process.env.DATABASE_URL;
 
 // Create our Postgres config.
 const pgConfig: PoolConfig = {
@@ -551,14 +565,15 @@ const postgraphileOptions = pluginHook(
     graphqlRoute,
     graphiqlRoute,
     graphiql: !disableGraphiql,
-    enhanceGraphiql,
+    enhanceGraphiql: enhanceGraphiql ? true : undefined,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
     jwtAudiences,
     jwtRole,
     jwtVerifyOptions,
     pgDefaultRole,
-    subscriptions,
+    subscriptions: subscriptions || live,
+    live,
     watchPg,
     showErrorStack,
     extendedErrors,
@@ -580,6 +595,7 @@ const postgraphileOptions = pluginHook(
     simpleCollections,
     legacyFunctionsOnly,
     ignoreIndexes,
+    ownerConnectionString,
   },
   { config, cliOptions: program },
 );
@@ -590,7 +606,7 @@ if (noServer) {
     const pgPool = new Pool(pgConfig);
     pgPool.on('error', err => {
       // tslint:disable-next-line no-console
-      console.error('PostgreSQL client generated error: ', err);
+      console.error('PostgreSQL client generated error: ', err.message);
     });
     const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions);
     await getGraphQLSchema();
@@ -690,7 +706,9 @@ if (noServer) {
       const address = server.address();
       const actualPort = typeof address === 'string' ? port : address.port;
       const self = cluster.isMaster
-        ? 'server'
+        ? isDev
+          ? `server (pid=${process.pid})`
+          : 'server'
         : `worker ${process.env.POSTGRAPHILE_WORKER_NUMBER} (pid=${process.pid})`;
       const versionString = `v${manifest.version}`;
       if (cluster.isMaster || process.env.POSTGRAPHILE_WORKER_NUMBER === '1') {
@@ -724,11 +742,19 @@ if (noServer) {
           [
             `GraphQL API:         ${chalk.underline.bold.blue(
               `http://${hostname}:${actualPort}${graphqlRoute}`,
-            )}` + (postgraphileOptions.subscriptions ? ' (subscriptions enabled)' : ''),
+            )}` +
+              (postgraphileOptions.subscriptions
+                ? ` (${postgraphileOptions.live ? 'live ' : ''}subscriptions enabled)`
+                : ''),
             !disableGraphiql &&
               `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
-              )}` + (enhanceGraphiql ? '' : ` (enhance with '--enhance-graphiql')`),
+              )}` +
+                (postgraphileOptions.enhanceGraphiql ||
+                postgraphileOptions.live ||
+                postgraphileOptions.subscriptions
+                  ? ''
+                  : ` (enhance with '--enhance-graphiql')`),
             `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
               postgraphileOptions.watchPg ? ' (watching)' : ''
             }`,

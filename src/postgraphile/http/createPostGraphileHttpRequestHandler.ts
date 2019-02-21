@@ -403,7 +403,10 @@ export default function createPostGraphileHttpRequestHandler(
             `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
               graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
               streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
-              enhanceGraphiql: options.enhanceGraphiql,
+              enhanceGraphiql:
+                options.enhanceGraphiql === false
+                  ? false
+                  : !!options.enhanceGraphiql || options.subscriptions || options.live,
               subscriptions: !!options.subscriptions,
             })};</script>\n  </head>`,
           )
@@ -744,7 +747,7 @@ export default function createPostGraphileHttpRequestHandler(
             ) {
               // We must reference this before it's deleted!
               const resultStatusCode = result.statusCode;
-              setTimeout(() => {
+              setImmediate(() => {
                 const prettyQuery = printGraphql(queryDocumentAst)
                   .replace(/\s+/g, ' ')
                   .trim();
@@ -770,7 +773,7 @@ export default function createPostGraphileHttpRequestHandler(
                     pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
                   }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
                 );
-              }, 0);
+              });
             }
             if (debugRequest.enabled) debugRequest('GraphQL query has been executed.');
           }

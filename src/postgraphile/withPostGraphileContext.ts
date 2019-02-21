@@ -11,7 +11,12 @@ import { formatSQLForDebugging } from 'postgraphile-core';
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
   o && o.length ? o : undefined;
 
-export type WithPostGraphileContextFn = (
+interface PostGraphileContext {
+  [$$pgClient]: PoolClient;
+  [key: string]: PoolClient | mixed;
+}
+
+export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
   options: {
     pgPool: Pool;
     jwtToken?: string;
@@ -23,8 +28,8 @@ export type WithPostGraphileContextFn = (
     pgSettings?: { [key: string]: mixed };
     singleStatement?: boolean;
   },
-  callback: (context: mixed) => Promise<ExecutionResult>,
-) => Promise<ExecutionResult>;
+  callback: (context: PostGraphileContext) => Promise<TResult>,
+) => Promise<TResult>;
 
 const debugPg = createDebugger('postgraphile:postgres');
 const debugPgError = createDebugger('postgraphile:postgres:error');
@@ -59,7 +64,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgForceTransaction?: boolean;
     singleStatement?: boolean;
   },
-  callback: (context: mixed) => Promise<ExecutionResult>,
+  callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const {
     pgPool,
@@ -183,10 +188,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
      * called. It's a very thin/dumb wrapper, so it supports nothing but
      * `query`.
      */
-    const fakePgClient = {
+    const fakePgClient: PoolClient = {
       query(
         textOrQueryOptions?: string | QueryConfig,
-        values?: mixed,
+        values?: Array<any>, // tslint:disable-line no-any
         cb?: void,
       ): Promise<QueryResult> {
         if (!textOrQueryOptions) {
@@ -203,12 +208,9 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
           throw new Error('Incompatible call to singleStatement - expected to return promise');
         }
         // Generate an authenticated client on the fly
-        return withAuthenticatedPgClient(pgClient =>
-          // @ts-ignore
-          pgClient.query(textOrQueryOptions, values),
-        );
+        return withAuthenticatedPgClient(pgClient => pgClient.query(textOrQueryOptions, values));
       },
-    };
+    } as any; // tslint:disable-line no-any
 
     return callback({
       [$$pgClient]: fakePgClient,
@@ -262,7 +264,7 @@ const withPostGraphileContext: WithPostGraphileContextFn = async (
     pgDefaultRole?: string;
     pgSettings?: { [key: string]: mixed };
   },
-  callback: (context: mixed) => Promise<ExecutionResult>,
+  callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const pluginHook = pluginHookFromOptions(options);
   const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
