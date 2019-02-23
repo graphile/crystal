@@ -737,6 +737,7 @@ export default function createPostGraphileHttpRequestHandler(
               returnArray,
               queryDocumentAst: queryDocumentAst!,
               req,
+              pgRole,
               // We don't pass `res` here because this is for just a single
               // result; if you need that, use postgraphile:http:end.
             });
@@ -747,13 +748,13 @@ export default function createPostGraphileHttpRequestHandler(
             ) {
               // We must reference this before it's deleted!
               const resultStatusCode = result.statusCode;
+              const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
               setImmediate(() => {
                 const prettyQuery = printGraphql(queryDocumentAst)
                   .replace(/\s+/g, ' ')
                   .trim();
                 const errorCount = (result.errors || []).length;
-                const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
-                const ms = Math.round((timeDiff[0] * 1e9 + timeDiff[1]) * 10e-7 * 100) / 100;
+                const ms = timeDiff[0] * 1e3 + timeDiff[1] * 1e-6;
 
                 let message: string;
                 if (resultStatusCode === 401) {
@@ -771,7 +772,7 @@ export default function createPostGraphileHttpRequestHandler(
                 console.log(
                   `${message} ${
                     pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
-                  }in ${chalk.grey(`${ms}ms`)} :: ${prettyQuery}`,
+                  }in ${chalk.grey(`${ms.toFixed(2)}ms`)} :: ${prettyQuery}`,
                 );
               });
             }
