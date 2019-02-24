@@ -236,7 +236,8 @@ export default (function PgColumnsPlugin(builder) {
                     isPgBaseInput ||
                       isPgPatch ||
                       (!attr.isNotNull &&
-                        !attr.type.domainIsNotNull &&
+                        (!attr.type.domainIsNotNull ||
+                          attr.type.domainHasDefault) &&
                         !attr.tags.notNull) ||
                       attr.hasDefault ||
                       attr.identity === "d",

@@ -3008,7 +3008,7 @@ input Issue756Condition {
 \\"\\"\\"An input for mutations affecting \`Issue756\`\\"\\"\\"
 input Issue756Input {
   id: Int
-  ts: NotNullTimestamp!
+  ts: NotNullTimestamp
 }
 
 \\"\\"\\"All input for the \`issue756Mutation\` mutation.\\"\\"\\"
