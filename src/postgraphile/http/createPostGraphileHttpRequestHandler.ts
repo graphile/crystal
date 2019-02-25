@@ -919,12 +919,7 @@ function addCORSHeaders(res: ServerResponse): void {
       'Content-Length',
     ].join(', '),
   );
-  res.setHeader(
-    'Access-Control-Expose-Headers',
-    [
-      'X-GraphQL-Event-Stream'
-    ].join(', ')
-  );
+  res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));
 }
 
 function createBadAuthorizationHeaderError(): httpError.HttpError {
