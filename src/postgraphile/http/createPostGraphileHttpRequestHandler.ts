@@ -923,7 +923,7 @@ function addCORSHeaders(res: ServerResponse): void {
     'Access-Control-Expose-Headers',
     [
       'X-GraphQL-Event-Stream'
-    ]
+    ].join(', ')
   );
 }
 
