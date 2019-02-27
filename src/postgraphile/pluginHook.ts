@@ -46,13 +46,13 @@ export interface PostGraphilePlugin {
   'cli:greeting'?: HookFn<Array<string | null | void>>;
 
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
-  'postgraphile:validationRules:static'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>;
+  'postgraphile:validationRules:static'?: HookFn<typeof graphql.specifiedRules>;
   'postgraphile:graphiql:html'?: HookFn<string>;
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
   'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
   'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
   'postgraphile:httpParamsList'?: HookFn<Array<object>>;
-  'postgraphile:validationRules'?: HookFn<ReadonlyArray<typeof graphql.specifiedRules>>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
+  'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
 
