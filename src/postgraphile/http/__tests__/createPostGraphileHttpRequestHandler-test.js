@@ -3,6 +3,8 @@ import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
 import request from './supertest';
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const http = require('http');
 const http2 = require('http2');
 const connect = require('connect');
@@ -11,6 +13,7 @@ const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
 const fastify = require('fastify');
+const EventEmitter = require('events');
 
 const shortString = 'User_Running_These_Tests';
 // Default bodySizeLimit is 100kB
@@ -180,11 +183,12 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
 }
 
 for (const { name, createServerFromHandler, subpath = '' } of toTest) {
-  const createServer = (handlerOptions, serverOptions) =>
-    createServerFromHandler(
+  const createServer = async (handlerOptions, serverOptions) => {
+    const _emitter = new EventEmitter();
+    const server = await createServerFromHandler(
       createPostGraphileHttpRequestHandler(
         Object.assign(
-          {},
+          { _emitter },
           subpath
             ? {
                 externalUrlBase: subpath,
@@ -197,6 +201,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       serverOptions,
       subpath,
     );
+    server._emitter = _emitter;
+    return server;
+  };
 
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
     test('will 404 for route other than that specified 1', async () => {
@@ -879,6 +886,22 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       await request(server)
         .get(`${subpath}/graphql/stream`)
         .expect(405);
+    });
+
+    test('will return an event-stream', async () => {
+      const server = await createServer({ graphiql: true, watchPg: true });
+      const promise = request(server)
+        .get(`${subpath}/graphql/stream`)
+        .set('Accept', 'text/event-stream')
+        .expect(200)
+        .expect('event: open\n\nevent: change\ndata: schema\n\n')
+        .then(res => res); // Trick superagent into finishing
+      await sleep(200);
+      server._emitter.emit('schemas:changed');
+      await sleep(100);
+      server._emitter.emit('test:close');
+
+      return await promise;
     });
 
     test('will render GraphiQL if enabled', async () => {

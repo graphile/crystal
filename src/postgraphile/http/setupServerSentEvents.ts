@@ -60,4 +60,5 @@ export default function setupServerSentEvents(
   req.on('close', cleanup);
   req.on('finish', cleanup);
   req.on('error', cleanup);
+  _emitter.on('test:close', cleanup);
 }
