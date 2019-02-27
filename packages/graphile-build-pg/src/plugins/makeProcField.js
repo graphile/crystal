@@ -601,6 +601,7 @@ export default function makeProcField(
           : async (data, args, resolveContext, resolveInfo) => {
               const { pgClient, liveRecord } = resolveContext;
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+              parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
               const functionAlias = sql.identifier(Symbol());
               const sqlMutationQuery = makeMutationCall(
                 parsedResolveInfoFragment,

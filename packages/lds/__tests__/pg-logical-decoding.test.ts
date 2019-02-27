@@ -62,7 +62,7 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]
   );
-  expect(finalPgRows.length).toEqual(0);
+  expect(finalPgRows).toHaveLength(0);
 });
 
 test("notified on insert", () =>

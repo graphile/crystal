@@ -92,6 +92,7 @@ export default (async function PgAllRows(
                   const parsedResolveInfoFragment = parseResolveInfo(
                     resolveInfo
                   );
+                  parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                   const resolveData = getDataFromParsedResolveInfoFragment(
                     parsedResolveInfoFragment,
                     resolveInfo.returnType

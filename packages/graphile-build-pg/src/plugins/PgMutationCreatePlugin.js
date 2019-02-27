@@ -177,11 +177,13 @@ export default (function PgMutationCreatePlugin(
                       type: new GraphQLNonNull(InputType),
                     },
                   },
-                  async resolve(data, { input }, resolveContext, resolveInfo) {
+                  async resolve(data, args, resolveContext, resolveInfo) {
+                    const { input } = args;
                     const { pgClient } = resolveContext;
                     const parsedResolveInfoFragment = parseResolveInfo(
                       resolveInfo
                     );
+                    parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                     const resolveData = getDataFromParsedResolveInfoFragment(
                       parsedResolveInfoFragment,
                       PayloadType

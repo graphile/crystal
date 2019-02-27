@@ -77,12 +77,14 @@ export default (async function PgMutationUpdateDeletePlugin(
               resolveInfo,
               getDataFromParsedResolveInfoFragment,
               PayloadType,
-              input,
+              args,
               condition,
               context,
               resolveContext
             ) {
+              const { input } = args;
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+              parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
               const resolveData = getDataFromParsedResolveInfoFragment(
                 parsedResolveInfoFragment,
                 PayloadType
@@ -357,10 +359,11 @@ export default (async function PgMutationUpdateDeletePlugin(
                           },
                           async resolve(
                             parent,
-                            { input },
+                            args,
                             resolveContext,
                             resolveInfo
                           ) {
+                            const { input } = args;
                             const { pgClient } = resolveContext;
                             const nodeId = input[nodeIdFieldName];
                             try {
@@ -380,7 +383,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                                 resolveInfo,
                                 getDataFromParsedResolveInfoFragment,
                                 PayloadType,
-                                input,
+                                args,
                                 sql.fragment`(${sql.join(
                                   primaryKeys.map(
                                     (key, idx) =>
@@ -517,17 +520,18 @@ export default (async function PgMutationUpdateDeletePlugin(
                           },
                           async resolve(
                             parent,
-                            { input },
+                            args,
                             resolveContext,
                             resolveInfo
                           ) {
+                            const { input } = args;
                             const { pgClient } = resolveContext;
                             return commonCodeRenameMe(
                               pgClient,
                               resolveInfo,
                               getDataFromParsedResolveInfoFragment,
                               PayloadType,
-                              input,
+                              args,
                               sql.fragment`(${sql.join(
                                 keys.map(
                                   key =>
