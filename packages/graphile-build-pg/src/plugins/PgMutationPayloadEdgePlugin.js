@@ -74,6 +74,9 @@ export default (function PgMutationPayloadEdgePlugin(builder) {
                 }
               : {},
             resolve(data, { orderBy: rawOrderBy }, _context, resolveInfo) {
+              if (!data.data) {
+                return null;
+              }
               const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
               const edge = data.data[safeAlias];
               if (!edge) {

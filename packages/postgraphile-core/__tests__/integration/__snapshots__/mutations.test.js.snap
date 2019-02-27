@@ -1508,6 +1508,11 @@ Object {
         },
       },
     },
+    "tableMutationReturningNull": Object {
+      "personByAuthorId": null,
+      "post": null,
+      "postEdge": null,
+    },
     "tableSetMutation": Object {
       "people": Array [
         Object {

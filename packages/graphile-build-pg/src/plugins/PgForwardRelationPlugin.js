@@ -161,6 +161,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                   type: gqlForeignTableType, // Nullable since RLS may forbid fetching
                   resolve: (rawData, _args, resolveContext, resolveInfo) => {
                     const data = isMutationPayload ? rawData.data : rawData;
+                    if (!data) return null;
                     const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
                     const record = data[safeAlias];
                     if (record && resolveContext.liveRecord) {

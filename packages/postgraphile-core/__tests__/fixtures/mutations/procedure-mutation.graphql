@@ -20,6 +20,7 @@ mutation {
   compoundTypeSetMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: FOO_BAR, f: _EMPTY_, g: {hours: 5}, fooBar: 8 } }) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
   compoundTypeArrayMutation(input: { object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: FOO_BAR, f: _EMPTY_, g: { hours: 5}, fooBar: 8 } }) { compoundTypes { a b c d e f g { seconds minutes hours } fooBar } }
   tableMutation(input: { id: 5 }) { post { nodeId id headline authorId } personByAuthorId { id name } postEdge { cursor node { id headline } } }
+  tableMutationReturningNull: tableMutation(input: { id: -1 }) { post { nodeId id headline authorId } personByAuthorId { id name } postEdge { cursor node { id headline } } }
   tableSetMutation(input: {}) { people { name } }
   intSetMutation(input: { x: 5, z: 6 }) { integers }
   noArgsMutation(input: { clientMutationId: "x" }) { clientMutationId integer }
