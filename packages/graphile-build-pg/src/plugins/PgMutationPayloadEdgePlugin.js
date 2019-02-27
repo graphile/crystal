@@ -2,7 +2,14 @@
 import type { Plugin } from "graphile-build";
 import isString from "lodash/isString";
 
-export default (function PgMutationPayloadEdgePlugin(builder) {
+export default (function PgMutationPayloadEdgePlugin(
+  builder,
+  { pgSimpleCollections, disableIssue397Fix }
+) {
+  const hasConnections = pgSimpleCollections !== "only";
+  if (!hasConnections && !disableIssue397Fix) {
+    return null;
+  }
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
