@@ -1,5 +1,4 @@
 import { Pool, PoolConfig } from 'pg';
-import { parse as parsePgConnectionString } from 'pg-connection-string';
 import { GraphQLSchema } from 'graphql';
 import { EventEmitter } from 'events';
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core';
@@ -8,6 +7,16 @@ import exportPostGraphileSchema from './schema/exportPostGraphileSchema';
 import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 import chalk = require('chalk');
+
+// tslint:disable-next-line no-any
+function isPlainObject(obj: any) {
+  if (!obj || typeof obj !== 'object' || String(obj) !== '[object Object]') return false;
+  const proto = Object.getPrototypeOf(obj);
+  if (proto === null || proto === Object.prototype) {
+    return true;
+  }
+  return false;
+}
 
 export interface PostgraphileSchemaBuilder {
   _emitter: EventEmitter;
@@ -220,15 +229,18 @@ function toPgPool(poolOrConfig: any): Pool {
     return poolOrConfig;
   }
 
-  return new Pool(
-    typeof poolOrConfig === 'string'
-      ? // Otherwise if it is a string, let us parse it to get a config to
-        // create a `Pool`.
-        parsePgConnectionString(poolOrConfig)
-      : // Finally, it must just be a config itself. If it is undefined, we
-        // will just use an empty config and let the defaults take over.
-        poolOrConfig || {},
-  );
+  if (typeof poolOrConfig === 'string') {
+    // If it is a string, let us parse it to get a config to create a `Pool`.
+    return new Pool({ connectionString: poolOrConfig });
+  } else if (!poolOrConfig) {
+    // Use an empty config and let the defaults take over.
+    return new Pool({});
+  } else if (isPlainObject(poolOrConfig)) {
+    // The user handed over a configuration object, pass it through
+    return new Pool(poolOrConfig);
+  } else {
+    throw new Error('Invalid connection string / Pool ');
+  }
 }
 
 // tslint:disable-next-line no-any
