@@ -52,6 +52,12 @@ class Test extends Request {
         );
       return promise.then(cb, ecb);
     };
+    ['get', 'post', 'put', 'delete', 'options'].forEach(method => {
+      const old = this[method];
+      this[method] = function(...args) {
+        return old.apply(this, args).http2(app._http2);
+      };
+    });
   }
   /**
    * Returns a URL, extracted from a server.

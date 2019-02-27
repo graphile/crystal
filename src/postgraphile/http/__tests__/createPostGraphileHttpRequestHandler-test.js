@@ -1,17 +1,10 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
-import baseRequest from './supertest';
-
-const request = app => {
-  const ret = baseRequest(app);
-  if (app._http2) {
-    return ret.http2(true);
-  }
-  return ret;
-};
+import request from './supertest';
 
 const http = require('http');
+const http2 = require('http2');
 const connect = require('connect');
 const express = require('express');
 const compress = require('koa-compress');
@@ -151,12 +144,37 @@ const serverCreators = new Map([
       return http.createServer(app.callback());
     },
   ],
+  [
+    'fastify-http2',
+    async (handler, _options, subpath) => {
+      let server;
+      function serverFactory(fastlyHandler, opts) {
+        if (server) throw new Error('Factory called twice');
+        server = http2.createServer((req, res) => {
+          fastlyHandler(req, res);
+        });
+        return server;
+      }
+      const app = fastify({ serverFactory, http2: true });
+      if (subpath) {
+        throw new Error('Fastify does not support subpath at this time');
+      } else {
+        app.use(handler);
+      }
+      await app.ready();
+      if (!server) {
+        throw new Error('Fastify server not created!');
+      }
+      server._http2 = true;
+      return server;
+    },
+  ],
 ]);
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   toTest.push({ name, createServerFromHandler });
-  if (name !== 'http' && name !== 'fastify') {
+  if (name !== 'http' && name !== 'fastify' && name !== 'fastify-http2') {
     toTest.push({ name, createServerFromHandler, subpath: '/path/to/mount' });
   }
 }
@@ -1021,12 +1039,14 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'foo' } });
       expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1);
-      expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(
-        http.IncomingMessage,
-      );
-      expect(additionalGraphQLContextFromRequest.mock.calls[0][1]).toBeInstanceOf(
-        http.ServerResponse,
-      );
+      const [req, res] = additionalGraphQLContextFromRequest.mock.calls[0];
+      if (req.httpVersionMajor > 1) {
+        expect(req).toBeInstanceOf(http2.Http2ServerRequest);
+        expect(res).toBeInstanceOf(http2.Http2ServerResponse);
+      } else {
+        expect(req).toBeInstanceOf(http.IncomingMessage);
+        expect(res).toBeInstanceOf(http.ServerResponse);
+      }
     });
 
     if (name === 'koa') {
