@@ -75,7 +75,7 @@ const calculateQueryHash = (queryString: string): string =>
 // Fast way of checking if an object is empty,
 // faster than `Object.keys(value).length === 0`
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-function isEmpty(value: any): boolean {
+export function isEmpty(value: any): boolean {
   for (const key in value) {
     if (hasOwnProperty.call(value, key)) {
       return false;
@@ -274,7 +274,6 @@ export default function createPostGraphileHttpRequestHandler(
 
   const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
     options,
-    httpError,
   });
 
   // Typically clients use static queries, so we can cache the parse and

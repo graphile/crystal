@@ -1,10 +1,20 @@
 import { Server, ServerResponse } from 'http';
 import { HttpRequestHandler, mixed } from '../../interfaces';
-import { subscribe, ExecutionResult } from 'graphql';
+import {
+  subscribe,
+  ExecutionResult,
+  specifiedRules,
+  validate,
+  GraphQLError,
+  parse,
+  DocumentNode,
+} from 'graphql';
 import { RequestHandler, Request, Response } from 'express';
 import * as WebSocket from 'ws';
-import { SubscriptionServer, ConnectionContext } from 'subscriptions-transport-ws';
+import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
 import parseUrl = require('parseurl');
+import { pluginHookFromOptions } from '../pluginHook';
+import { isEmpty } from './createPostGraphileHttpRequestHandler';
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -48,6 +58,7 @@ export async function enhanceHttpServerWithSubscriptions(
     withPostGraphileContextFromReqRes,
     handleErrors,
   } = postgraphileMiddleware;
+  const pluginHook = pluginHookFromOptions(options);
   const graphqlRoute = options.graphqlRoute || '/graphql';
 
   const schema = await getGraphQLSchema();
@@ -147,10 +158,14 @@ export async function enhanceHttpServerWithSubscriptions(
       });
     }
   });
+  const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
+    options,
+  });
 
   SubscriptionServer.create(
     {
       schema,
+      validationRules: staticValidationRules,
       execute: () => {
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
@@ -187,7 +202,7 @@ export async function enhanceHttpServerWithSubscriptions(
         };
       },
       // tslint:disable-next-line no-any
-      async onOperation(message: any, params: any, socket: WebSocket) {
+      async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
         const opId = message.id;
         const context = await getContext(socket, opId);
 
@@ -197,14 +212,19 @@ export async function enhanceHttpServerWithSubscriptions(
         Object.assign(params.context, context);
 
         const { req, res } = await reqResFromSocket(socket);
+        const meta = {};
         const formatResponse = (response: ExecutionResult) => {
           if (response.errors) {
             response.errors = handleErrors(response.errors, req, res);
           }
+          if (!isEmpty(meta)) {
+            response['meta'] = meta;
+          }
+
           return response;
         };
         params.formatResponse = formatResponse;
-        return options.pluginHook
+        const hookedParams = options.pluginHook
           ? options.pluginHook('postgraphile:ws:onOperation', params, {
               message,
               params,
@@ -212,6 +232,39 @@ export async function enhanceHttpServerWithSubscriptions(
               options,
             })
           : params;
+        const finalParams: typeof hookedParams & { query: DocumentNode } = {
+          ...hookedParams,
+          query:
+            typeof hookedParams.query !== 'string' ? hookedParams.query : parse(hookedParams.query),
+        };
+
+        // You are strongly encouraged to use
+        // `postgraphile:validationRules:static` if possible - you should
+        // only use this one if you need access to variables.
+        const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
+          options,
+          req,
+          res,
+          variables: params.variables,
+          operationName: params.operationName,
+          meta,
+        });
+        if (moreValidationRules.length) {
+          const validationErrors: ReadonlyArray<GraphQLError> = validate(
+            params.schema,
+            finalParams.query,
+            moreValidationRules,
+          );
+          if (validationErrors.length) {
+            const error = new Error(
+              'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
+            );
+            error['errors'] = validationErrors;
+            throw error;
+          }
+        }
+
+        return finalParams;
       },
       onOperationComplete(socket: WebSocket, opId: string) {
         releaseContextForSocketAndOpId(socket, opId);
