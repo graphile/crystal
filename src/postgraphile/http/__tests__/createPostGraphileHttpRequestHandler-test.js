@@ -1,9 +1,9 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
+import request from './supertest';
 
 const http = require('http');
-const request = require('supertest');
 const connect = require('connect');
 const express = require('express');
 const compress = require('koa-compress');
