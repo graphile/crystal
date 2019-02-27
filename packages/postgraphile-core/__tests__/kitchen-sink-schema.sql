@@ -256,6 +256,7 @@ create table b.types (
   "time" time not null,
   "timetz" timetz not null,
   "interval" interval not null,
+  "interval_array" interval[] not null,
   "money" money not null,
   "compound_type" c.compound_type not null,
   "nested_compound_type" b.nested_compound_type not null,

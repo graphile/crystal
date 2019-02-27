@@ -980,6 +980,7 @@ type Type implements Node {
   enumArray: [Color]!
   id: Int!
   interval: Interval!
+  intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
   money: Float!
@@ -1047,6 +1048,9 @@ input TypeCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`interval\` field.\\"\\"\\"
   interval: IntervalInput
+
+  \\"\\"\\"Checks for equality with the object’s \`intervalArray\` field.\\"\\"\\"
+  intervalArray: [IntervalInput]
 
   \\"\\"\\"Checks for equality with the object’s \`json\` field.\\"\\"\\"
   json: JSON
@@ -1120,6 +1124,7 @@ input TypeInput {
   enumArray: [Color]!
   id: Int
   interval: IntervalInput!
+  intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
   money: Float!
@@ -1157,6 +1162,7 @@ input TypePatch {
   enumArray: [Color]
   id: Int
   interval: IntervalInput
+  intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
   money: Float
@@ -1229,6 +1235,8 @@ enum TypesOrderBy {
   ENUM_DESC
   ID_ASC
   ID_DESC
+  INTERVAL_ARRAY_ASC
+  INTERVAL_ARRAY_DESC
   INTERVAL_ASC
   INTERVAL_DESC
   JSON_ASC

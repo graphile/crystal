@@ -31,6 +31,7 @@ export default (function PgTypesPlugin(
     pgExtendedTypes = true,
     // Adding hstore support is technically a breaking change; this allows people to opt out easily:
     pgSkipHstore = false,
+    disableIssue390Fix = false,
   }
 ) {
   // XXX: most of this should be in an "init" hook, not a "build" hook
@@ -246,22 +247,6 @@ export default (function PgTypesPlugin(
         "790": tweakToNumericText,
       }
     );
-
-    const categoryLookup = {
-      B: () => GraphQLBoolean,
-
-      // Numbers may be too large for GraphQL/JS to handle, so stringify by
-      // default.
-      N: type => {
-        pgTweaksByTypeId[type.id] = tweakToText;
-        return BigFloat;
-      },
-
-      A: (type, typeModifier) =>
-        new GraphQLList(
-          getGqlTypeByTypeIdAndModifier(type.arrayItemTypeId, typeModifier)
-        ),
-    };
 
     const pgTweakFragmentForTypeAndModifier = (
       fragment,
@@ -698,15 +683,47 @@ export default (function PgTypesPlugin(
         }
       }
 
-      // Fall back to categories
-      if (!gqlTypeByTypeIdAndModifier[type.id][typeModifierKey]) {
-        const gen = categoryLookup[type.category];
-        if (gen) {
-          gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = gen(
-            type,
+      // Arrays
+      if (
+        !gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] &&
+        type.category === "A"
+      ) {
+        const arrayEntryOutputType = getGqlTypeByTypeIdAndModifier(
+          type.arrayItemTypeId,
+          typeModifier
+        );
+        gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = new GraphQLList(
+          arrayEntryOutputType
+        );
+        if (!disableIssue390Fix) {
+          const arrayEntryInputType = getGqlInputTypeByTypeIdAndModifier(
+            type.arrayItemTypeId,
             typeModifier
           );
+          if (arrayEntryInputType) {
+            gqlInputTypeByTypeIdAndModifier[type.id][
+              typeModifierKey
+            ] = new GraphQLList(arrayEntryInputType);
+          }
         }
+      }
+
+      // Booleans
+      if (
+        !gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] &&
+        type.category === "B"
+      ) {
+        gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = GraphQLBoolean;
+      }
+
+      // Numbers may be too large for GraphQL/JS to handle, so stringify by
+      // default.
+      if (
+        !gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] &&
+        type.category === "N"
+      ) {
+        pgTweaksByTypeId[type.id] = tweakToText;
+        gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = BigFloat;
       }
 
       // Nothing else worked; pass through as string!
