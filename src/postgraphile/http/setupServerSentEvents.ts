@@ -19,7 +19,11 @@ export default function setupServerSentEvents(
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+  if (req.httpVersionMajor >= 2) {
+    // NOOP
+  } else {
+    res.setHeader('Connection', 'keep-alive');
+  }
   const koaCtx = (req as object)['_koaCtx'];
   const isKoa = !!koaCtx;
   const stream = isKoa ? new PassThrough() : null;
