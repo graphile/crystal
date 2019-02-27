@@ -25,6 +25,7 @@ const Request: any = request.Request;
 class Test extends Request {
   constructor(app: any, method: any, path: any, host?: any) {
     super(method.toUpperCase(), path);
+    this._enableHttp2 = app._http2;
     this.redirects(0);
     this.buffer();
     this.app = app;
@@ -43,21 +44,16 @@ class Test extends Request {
           this,
           () => donePromise,
           e => {
-            if (this.expectedStatus >= 400) {
+            if (this.expectedStatus >= 400 && e.status === this.expectedStatus) {
               return donePromise;
             } else {
+              console.error(e);
               return Promise.reject(e);
             }
           },
         );
       return promise.then(cb, ecb);
     };
-    ['get', 'post', 'put', 'delete', 'options'].forEach(method => {
-      const old = this[method];
-      this[method] = function(...args) {
-        return old.apply(this, args).http2(app._http2);
-      };
-    });
   }
   /**
    * Returns a URL, extracted from a server.

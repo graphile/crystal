@@ -150,7 +150,7 @@ const serverCreators = new Map([
       let server;
       function serverFactory(fastlyHandler, opts) {
         if (server) throw new Error('Factory called twice');
-        server = http2.createServer((req, res) => {
+        server = http2.createServer({}, (req, res) => {
           fastlyHandler(req, res);
         });
         return server;
