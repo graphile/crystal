@@ -258,6 +258,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = await createServer({ enableCors: true });
       await request(server)
         .post(`${subpath}/graphql`)
+        .expect(400)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization, X-Apollo-Tracing/)

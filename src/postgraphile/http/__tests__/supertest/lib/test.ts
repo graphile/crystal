@@ -37,9 +37,20 @@ class Test extends Request {
       this.completeCallback = resolve;
     });
     let promise;
-    this.then = cb => {
-      if (!promise) promise = oldThen.call(this, () => donePromise, () => donePromise);
-      return promise.then(cb);
+    this.then = (cb, ecb) => {
+      if (!promise)
+        promise = oldThen.call(
+          this,
+          () => donePromise,
+          e => {
+            if (this.expectedStatus >= 400) {
+              return donePromise;
+            } else {
+              return Promise.reject(e);
+            }
+          },
+        );
+      return promise.then(cb, ecb);
     };
   }
   /**
@@ -89,6 +100,7 @@ class Test extends Request {
 
     // status
     if (typeof a === 'number') {
+      this.expectedStatus = a;
       this._asserts.push(this._assertStatus.bind(this, a));
       // body
       if (typeof b !== 'function' && arguments.length > 1) {
