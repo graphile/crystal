@@ -130,18 +130,20 @@ const serverCreators = new Map([
       return server;
     },
   ],
+  [
+    'koa',
+    (handler, options = {}, subpath) => {
+      const app = new koa();
+      if (options.onPreCreate) options.onPreCreate(app);
+      if (subpath) {
+        app.use(koaMount(subpath, handler));
+      } else {
+        app.use(handler);
+      }
+      return http.createServer(app.callback());
+    },
+  ],
 ]);
-
-serverCreators.set('koa', (handler, options = {}, subpath) => {
-  const app = new koa();
-  if (options.onPreCreate) options.onPreCreate(app);
-  if (subpath) {
-    app.use(koaMount(subpath, handler));
-  } else {
-    app.use(handler);
-  }
-  return http.createServer(app.callback());
-});
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
