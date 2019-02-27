@@ -6,7 +6,7 @@ export default (function PgConnectionTotalCount(builder) {
     const {
       extend,
       inflection,
-      graphql: { GraphQLInt },
+      graphql: { GraphQLInt, GraphQLNonNull },
     } = build;
     const {
       scope: { isPgRowConnectionType, pgIntrospection: table },
@@ -37,7 +37,10 @@ export default (function PgConnectionTotalCount(builder) {
             });
             return {
               description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
+              resolve(parent) {
+                return parent.totalCount || 0;
+              },
             };
           },
           {

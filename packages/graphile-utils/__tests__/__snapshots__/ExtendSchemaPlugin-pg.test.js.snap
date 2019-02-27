@@ -151,7 +151,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`User\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`User\` edge in the connection.\\"\\"\\"
@@ -335,7 +335,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`User\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`User\` edge in the connection.\\"\\"\\"
@@ -519,7 +519,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`User\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`User\` edge in the connection.\\"\\"\\"
@@ -724,7 +724,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`User\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`User\` edge in the connection.\\"\\"\\"

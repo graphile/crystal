@@ -68,7 +68,7 @@ type BarsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Bar\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Bar\` edge in the connection.\\"\\"\\"
@@ -365,7 +365,7 @@ type FoosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Foo\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Foo\` edge in the connection.\\"\\"\\"
@@ -803,7 +803,7 @@ type BarsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Bar\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Bar\` edge in the connection.\\"\\"\\"
@@ -1100,7 +1100,7 @@ type FoosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Foo\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Foo\` edge in the connection.\\"\\"\\"

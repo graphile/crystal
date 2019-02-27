@@ -17,7 +17,7 @@ type AlwaysAsIdentitiesConnection {
   \\"\\"\\"
   The count of *all* \`AlwaysAsIdentity\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`AlwaysAsIdentity\` edge in the connection.\\"\\"\\"
@@ -90,7 +90,7 @@ type ByDefaultAsIdentitiesConnection {
   \\"\\"\\"
   The count of *all* \`ByDefaultAsIdentity\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`ByDefaultAsIdentity\` edge in the connection.\\"\\"\\"

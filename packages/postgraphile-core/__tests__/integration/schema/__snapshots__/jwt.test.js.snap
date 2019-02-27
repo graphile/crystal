@@ -1197,7 +1197,7 @@ type TypesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Type\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Type\` edge in the connection.\\"\\"\\"
@@ -1330,7 +1330,7 @@ type UpdatableViewsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`UpdatableView\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`UpdatableView\` edge in the connection.\\"\\"\\"

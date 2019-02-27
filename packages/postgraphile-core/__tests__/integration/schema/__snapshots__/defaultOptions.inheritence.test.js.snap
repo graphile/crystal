@@ -257,7 +257,7 @@ type FilesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`File\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`File\` edge in the connection.\\"\\"\\"
@@ -726,7 +726,7 @@ type UserFilesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`UserFile\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`UserFile\` edge in the connection.\\"\\"\\"
@@ -777,7 +777,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`User\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`User\` edge in the connection.\\"\\"\\"

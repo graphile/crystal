@@ -604,7 +604,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -993,7 +993,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -1178,7 +1178,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -1525,7 +1525,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -1622,7 +1622,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -1704,7 +1704,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -1815,7 +1815,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"
@@ -2797,7 +2797,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -3186,7 +3186,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -3370,7 +3370,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -3717,7 +3717,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -3814,7 +3814,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -3896,7 +3896,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -4008,7 +4008,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"
@@ -4990,7 +4990,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -5379,7 +5379,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -5564,7 +5564,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -5911,7 +5911,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -6008,7 +6008,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -6084,7 +6084,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -6188,7 +6188,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"
@@ -7168,7 +7168,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -7557,7 +7557,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -7742,7 +7742,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -8089,7 +8089,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -8186,7 +8186,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -8268,7 +8268,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -8378,7 +8378,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"
@@ -9360,7 +9360,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -9749,7 +9749,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -9934,7 +9934,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -10281,7 +10281,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -10378,7 +10378,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -10460,7 +10460,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -10569,7 +10569,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"
@@ -11551,7 +11551,7 @@ type FilmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Film\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Film\` edge in the connection.\\"\\"\\"
@@ -11940,7 +11940,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -12125,7 +12125,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -12472,7 +12472,7 @@ type RenamedTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`RenamedTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`RenamedTable\` edge in the connection.\\"\\"\\"
@@ -12569,7 +12569,7 @@ type StudiosConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Studio\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Studio\` edge in the connection.\\"\\"\\"
@@ -12651,7 +12651,7 @@ type TvEpisodesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvEpisode\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvEpisode\` edge in the connection.\\"\\"\\"
@@ -12762,7 +12762,7 @@ type TvShowsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`TvShow\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`TvShow\` edge in the connection.\\"\\"\\"

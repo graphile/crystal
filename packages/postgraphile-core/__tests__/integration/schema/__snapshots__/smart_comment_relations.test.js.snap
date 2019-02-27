@@ -104,7 +104,7 @@ type BuildingsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Building\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Building\` edge in the connection.\\"\\"\\"
@@ -737,7 +737,7 @@ type HousesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`House\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`House\` edge in the connection.\\"\\"\\"
@@ -1077,7 +1077,7 @@ type OffersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Offer\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Offer\` edge in the connection.\\"\\"\\"
@@ -1187,7 +1187,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -1222,7 +1222,7 @@ type PropertiesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Property\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Property\` edge in the connection.\\"\\"\\"
@@ -1818,7 +1818,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"
   The count of *all* \`StreetProperty\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`StreetProperty\` edge in the connection.\\"\\"\\"
@@ -1937,7 +1937,7 @@ type StreetsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Street\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Street\` edge in the connection.\\"\\"\\"
@@ -2427,7 +2427,7 @@ type BuildingsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Building\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Building\` edge in the connection.\\"\\"\\"
@@ -3054,7 +3054,7 @@ type HousesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`House\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`House\` edge in the connection.\\"\\"\\"
@@ -3391,7 +3391,7 @@ type OffersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Offer\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Offer\` edge in the connection.\\"\\"\\"
@@ -3472,7 +3472,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -3507,7 +3507,7 @@ type PropertiesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Property\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Property\` edge in the connection.\\"\\"\\"
@@ -4103,7 +4103,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"
   The count of *all* \`StreetProperty\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`StreetProperty\` edge in the connection.\\"\\"\\"
@@ -4222,7 +4222,7 @@ type StreetsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Street\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Street\` edge in the connection.\\"\\"\\"
@@ -4709,7 +4709,7 @@ type BuildingsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Building\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Building\` edge in the connection.\\"\\"\\"
@@ -5342,7 +5342,7 @@ type HousesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`House\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`House\` edge in the connection.\\"\\"\\"
@@ -5682,7 +5682,7 @@ type OffersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Offer\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Offer\` edge in the connection.\\"\\"\\"
@@ -5792,7 +5792,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -5827,7 +5827,7 @@ type PropertiesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Property\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Property\` edge in the connection.\\"\\"\\"
@@ -6423,7 +6423,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"
   The count of *all* \`StreetProperty\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`StreetProperty\` edge in the connection.\\"\\"\\"
@@ -6542,7 +6542,7 @@ type StreetsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Street\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Street\` edge in the connection.\\"\\"\\"
@@ -7032,7 +7032,7 @@ type BuildingsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Building\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Building\` edge in the connection.\\"\\"\\"
@@ -7617,7 +7617,7 @@ type HousesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`House\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`House\` edge in the connection.\\"\\"\\"
@@ -7925,7 +7925,7 @@ type OffersConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Offer\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Offer\` edge in the connection.\\"\\"\\"
@@ -8023,7 +8023,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -8056,7 +8056,7 @@ type PropertiesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Property\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Property\` edge in the connection.\\"\\"\\"
@@ -8645,7 +8645,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"
   The count of *all* \`StreetProperty\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`StreetProperty\` edge in the connection.\\"\\"\\"
@@ -8764,7 +8764,7 @@ type StreetsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Street\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Street\` edge in the connection.\\"\\"\\"

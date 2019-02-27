@@ -97,7 +97,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`CompoundKey\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`CompoundKey\` edge in the connection.\\"\\"\\"
@@ -149,7 +149,7 @@ type CompoundTypesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`CompoundType\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`CompoundType\` edge in the connection.\\"\\"\\"
@@ -883,7 +883,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`EdgeCase\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`EdgeCase\` edge in the connection.\\"\\"\\"
@@ -1248,7 +1248,7 @@ type Issue756SConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Issue756\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Issue756\` edge in the connection.\\"\\"\\"
@@ -1519,7 +1519,7 @@ type LeftArmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`LeftArm\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`LeftArm\` edge in the connection.\\"\\"\\"
@@ -2558,7 +2558,7 @@ type MyTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
@@ -2680,7 +2680,7 @@ type NullTestRecordsConnection {
   \\"\\"\\"
   The count of *all* \`NullTestRecord\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`NullTestRecord\` edge in the connection.\\"\\"\\"
@@ -2736,7 +2736,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -3108,7 +3108,7 @@ type PersonSecretsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`PersonSecret\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`PersonSecret\` edge in the connection.\\"\\"\\"

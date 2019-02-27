@@ -486,7 +486,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`CompoundKey\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`CompoundKey\` edge in the connection.\\"\\"\\"
@@ -600,7 +600,7 @@ type CompoundTypesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`CompoundType\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`CompoundType\` edge in the connection.\\"\\"\\"
@@ -1571,7 +1571,7 @@ type DefaultValuesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`DefaultValue\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`DefaultValue\` edge in the connection.\\"\\"\\"
@@ -2323,7 +2323,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`EdgeCase\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`EdgeCase\` edge in the connection.\\"\\"\\"
@@ -2429,7 +2429,7 @@ type ForeignKeysConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`ForeignKey\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`ForeignKey\` edge in the connection.\\"\\"\\"
@@ -2669,7 +2669,7 @@ type InputsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Input\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Input\` edge in the connection.\\"\\"\\"
@@ -2869,7 +2869,7 @@ type Issue756SConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Issue756\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Issue756\` edge in the connection.\\"\\"\\"
@@ -3144,7 +3144,7 @@ type LeftArmsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`LeftArm\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`LeftArm\` edge in the connection.\\"\\"\\"
@@ -4738,7 +4738,7 @@ type MyTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`MyTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`MyTable\` edge in the connection.\\"\\"\\"
@@ -4827,7 +4827,7 @@ type NonUpdatableViewsConnection {
   \\"\\"\\"
   The count of *all* \`NonUpdatableView\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`NonUpdatableView\` edge in the connection.\\"\\"\\"
@@ -4891,7 +4891,7 @@ type NoPrimaryKeysConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`NoPrimaryKey\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`NoPrimaryKey\` edge in the connection.\\"\\"\\"
@@ -4975,7 +4975,7 @@ type NullTestRecordsConnection {
   \\"\\"\\"
   The count of *all* \`NullTestRecord\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`NullTestRecord\` edge in the connection.\\"\\"\\"
@@ -5044,7 +5044,7 @@ type PatchesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Patch\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Patch\` edge in the connection.\\"\\"\\"
@@ -5091,7 +5091,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -5511,7 +5511,7 @@ type PersonSecretsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`PersonSecret\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`PersonSecret\` edge in the connection.\\"\\"\\"
@@ -5694,7 +5694,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Post\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Post\` edge in the connection.\\"\\"\\"
@@ -6868,7 +6868,7 @@ type ReservedInputRecordsConnection {
   \\"\\"\\"
   The count of *all* \`ReservedInputRecord\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`ReservedInputRecord\` edge in the connection.\\"\\"\\"
@@ -6940,7 +6940,7 @@ type ReservedPatchRecordsConnection {
   \\"\\"\\"
   The count of *all* \`ReservedPatchRecord\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`ReservedPatchRecord\` edge in the connection.\\"\\"\\"
@@ -6975,7 +6975,7 @@ type ReservedsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Reserved\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Reserved\` edge in the connection.\\"\\"\\"
@@ -7076,7 +7076,7 @@ type SimilarTable1SConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`SimilarTable1\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`SimilarTable1\` edge in the connection.\\"\\"\\"
@@ -7160,7 +7160,7 @@ type SimilarTable2SConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`SimilarTable2\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`SimilarTable2\` edge in the connection.\\"\\"\\"
@@ -7313,7 +7313,7 @@ type TestviewsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Testview\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Testview\` edge in the connection.\\"\\"\\"
@@ -7567,7 +7567,7 @@ type TypesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Type\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Type\` edge in the connection.\\"\\"\\"
@@ -7708,7 +7708,7 @@ type UniqueForeignKeysConnection {
   \\"\\"\\"
   The count of *all* \`UniqueForeignKey\` you could get from the connection.
   \\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`UniqueForeignKey\` edge in the connection.\\"\\"\\"
@@ -7770,7 +7770,7 @@ type UpdatableViewsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`UpdatableView\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`UpdatableView\` edge in the connection.\\"\\"\\"
@@ -8623,7 +8623,7 @@ type ViewTablesConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`ViewTable\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`ViewTable\` edge in the connection.\\"\\"\\"
