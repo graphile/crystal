@@ -4,3 +4,4 @@ node_modules
 /pg-simplify-inflector/
 /operation-hooks/
 /.vscode
+*.tgz

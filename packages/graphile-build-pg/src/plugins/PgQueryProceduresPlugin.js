@@ -5,10 +5,6 @@ export default (function PgQueryProceduresPlugin(
   builder,
   { pgSimpleCollections }
 ) {
-  const hasConnections = pgSimpleCollections !== "only";
-  const hasSimpleCollections =
-    pgSimpleCollections === "only" || pgSimpleCollections === "both";
-
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -93,6 +89,11 @@ export default (function PgQueryProceduresPlugin(
             swallowError(e);
           }
         }
+        const simpleCollections =
+          proc.tags.simpleCollections || pgSimpleCollections;
+        const hasConnections = simpleCollections !== "only";
+        const hasSimpleCollections =
+          simpleCollections === "only" || simpleCollections === "both";
         if (!proc.returnsSet || hasConnections) {
           makeField(false);
         }

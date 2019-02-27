@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -985,3 +985,21 @@ create table index_expressions.employee (
 create unique index employee_name on index_expressions.employee ((first_name || ' ' || last_name));
 create index employee_lower_name on index_expressions.employee (lower(first_name));
 create index employee_first_name_idx on index_expressions.employee (first_name);
+
+
+create schema simple_collections;
+
+create table simple_collections.people (
+  id serial primary key,
+  name text
+);
+
+create table simple_collections.pets (
+  id serial primary key,
+  owner_id int not null references simple_collections.people,
+  name text
+);
+
+create function simple_collections.people_odd_pets(p simple_collections.people) returns setof simple_collections.pets as $$
+  select * from simple_collections.pets where owner_id = p.id and id % 2 = 1;
+$$ language sql stable;

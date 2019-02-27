@@ -6,10 +6,6 @@ export default (function PgMutationPayloadEdgePlugin(
   builder,
   { pgSimpleCollections, disableIssue397Fix }
 ) {
-  const hasConnections = pgSimpleCollections !== "only";
-  if (!hasConnections && !disableIssue397Fix) {
-    return null;
-  }
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -38,6 +34,12 @@ export default (function PgMutationPayloadEdgePlugin(
       !table.isSelectable ||
       (omit(table, "all") && omit(table, "many"))
     ) {
+      return fields;
+    }
+    const simpleCollections =
+      table.tags.simpleCollections || pgSimpleCollections;
+    const hasConnections = simpleCollections !== "only";
+    if (!hasConnections && !disableIssue397Fix) {
       return fields;
     }
 

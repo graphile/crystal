@@ -7,9 +7,6 @@ export default (async function PgAllRows(
   builder,
   { pgViewUniqueKey, pgSimpleCollections, subscriptions }
 ) {
-  const hasConnections = pgSimpleCollections !== "only";
-  const hasSimpleCollections =
-    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       parseResolveInfo,
@@ -198,6 +195,11 @@ export default (async function PgAllRows(
             }
           );
         }
+        const simpleCollections =
+          table.tags.simpleCollections || pgSimpleCollections;
+        const hasConnections = simpleCollections !== "only";
+        const hasSimpleCollections =
+          simpleCollections === "only" || simpleCollections === "both";
         if (TableType && ConnectionType && hasConnections) {
           makeField(true);
         }

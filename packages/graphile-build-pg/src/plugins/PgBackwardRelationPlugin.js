@@ -13,9 +13,6 @@ export default (function PgBackwardRelationPlugin(
   builder,
   { pgLegacyRelations, pgSimpleCollections, subscriptions }
 ) {
-  const hasConnections = pgSimpleCollections !== "only";
-  const hasSimpleCollections =
-    pgSimpleCollections === "only" || pgSimpleCollections === "both";
   const legacyRelationMode =
     {
       only: ONLY,
@@ -424,6 +421,13 @@ export default (function PgBackwardRelationPlugin(
             );
           }
         }
+        const simpleCollections =
+          constraint.tags.simpleCollections ||
+          table.tags.simpleCollections ||
+          pgSimpleCollections;
+        const hasConnections = simpleCollections !== "only";
+        const hasSimpleCollections =
+          simpleCollections === "only" || simpleCollections === "both";
         if (hasConnections) {
           makeFields(true);
         }
