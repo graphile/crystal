@@ -1,7 +1,15 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
-import request from './supertest';
+import baseRequest from './supertest';
+
+const request = app => {
+  const ret = baseRequest(app);
+  if (app._http2) {
+    return ret.http2(true);
+  }
+  return ret;
+};
 
 const http = require('http');
 const connect = require('connect');
