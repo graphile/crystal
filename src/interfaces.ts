@@ -1,5 +1,5 @@
 /* tslint:disable:no-any */
-import { GraphQLError, GraphQLSchema, SourceLocation } from 'graphql';
+import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
@@ -292,4 +292,24 @@ export interface HttpRequestHandler {
     req: IncomingMessage,
     res: ServerResponse,
   ) => Array<GraphQLErrorExtended>);
+}
+
+/**
+ * Options passed to the `withPostGraphileContext` function
+ */
+export interface WithPostGraphileContextOptions {
+  pgPool: Pool;
+  jwtToken?: string;
+  jwtSecret?: string;
+  jwtAudiences?: Array<string>;
+  jwtRole: Array<string>;
+  jwtVerifyOptions?: jwt.VerifyOptions;
+  pgDefaultRole?: string;
+  pgSettings?: { [key: string]: mixed };
+  queryDocumentAst?: DocumentNode;
+  operationName?: string;
+  pgForceTransaction?: boolean;
+  singleStatement?: boolean;
+  // tslint:disable-next-line no-any
+  variables?: any;
 }

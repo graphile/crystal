@@ -1,11 +1,11 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
-import { ExecutionResult, DocumentNode, OperationDefinitionNode, Kind } from 'graphql';
+import { PoolClient, QueryConfig, QueryResult } from 'pg';
+import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
-import { mixed } from '../interfaces';
+import { mixed, WithPostGraphileContextOptions } from '../interfaces';
 import { formatSQLForDebugging } from 'postgraphile-core';
 
 const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
@@ -17,17 +17,7 @@ interface PostGraphileContext {
 }
 
 export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
-  options: {
-    pgPool: Pool;
-    jwtToken?: string;
-    jwtSecret?: string;
-    jwtAudiences?: Array<string>;
-    jwtRole?: Array<string>;
-    jwtVerifyOptions?: jwt.VerifyOptions;
-    pgDefaultRole?: string;
-    pgSettings?: { [key: string]: mixed };
-    singleStatement?: boolean;
-  },
+  options: WithPostGraphileContextOptions,
   callback: (context: PostGraphileContext) => Promise<TResult>,
 ) => Promise<TResult>;
 
@@ -50,20 +40,7 @@ function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice)
 }
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
-  options: {
-    pgPool: Pool;
-    jwtToken?: string;
-    jwtSecret?: string;
-    jwtAudiences?: Array<string>;
-    jwtRole: Array<string>;
-    jwtVerifyOptions?: jwt.VerifyOptions;
-    pgDefaultRole?: string;
-    pgSettings?: { [key: string]: mixed };
-    queryDocumentAst?: DocumentNode;
-    operationName?: string;
-    pgForceTransaction?: boolean;
-    singleStatement?: boolean;
-  },
+  options: WithPostGraphileContextOptions,
   callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const {
@@ -254,16 +231,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
  * ```
  */
 const withPostGraphileContext: WithPostGraphileContextFn = async (
-  options: {
-    pgPool: Pool;
-    jwtToken?: string;
-    jwtSecret?: string;
-    jwtAudiences?: Array<string>;
-    jwtRole: Array<string>;
-    jwtVerifyOptions?: jwt.VerifyOptions;
-    pgDefaultRole?: string;
-    pgSettings?: { [key: string]: mixed };
-  },
+  options: WithPostGraphileContextOptions,
   callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const pluginHook = pluginHookFromOptions(options);
