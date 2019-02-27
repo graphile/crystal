@@ -220,7 +220,7 @@ export class LiveMonitor {
 
 /*
  * There is one coordinator for each build of the GraphQL schema, it tracks the providers
- * and gives a handy `subscribe` method that can be used for live subscriptions (assuming
+ * and gives a handy `subscribe` method that can be used for live queries (assuming
  * that the `resolve` is provided the same as in a Query).
  */
 export class LiveCoordinator {

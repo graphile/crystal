@@ -13,6 +13,7 @@ const AddQueriesToSubscriptionsPlugin: Plugin = function(
     const { extend, getTypeByName, inflection } = build;
     const {
       scope: { isRootSubscription },
+      fieldWithHooks,
     } = context;
     if (!isRootSubscription) {
       return fields;
@@ -24,38 +25,45 @@ const AddQueriesToSubscriptionsPlugin: Plugin = function(
       (memo, queryFieldName) => {
         const queryField = queryFields[queryFieldName];
         const oldResolve = queryField.resolve;
-        memo[queryFieldName] = {
-          description: (queryField.description || "") + " (live)",
-          type: queryField.type,
-          args: (queryField.args || []).reduce((newArgs, arg) => {
-            const { name, description, type, defaultValue } = arg;
-            newArgs[name] = {
-              description,
-              type,
-              defaultValue,
-            };
-            return newArgs;
-          }, {}),
-          ...(oldResolve
-            ? {
-                resolve: async (...args) => {
-                  try {
-                    return await oldResolve(...args);
-                  } catch (e) {
-                    const context = args[2];
-                    if (typeof context.liveAbort === "function") {
-                      context.liveAbort(e);
+        memo[queryFieldName] = fieldWithHooks(
+          inflection.live(queryFieldName),
+          {
+            description: (queryField.description || "") + " (live)",
+            type: queryField.type,
+            args: (queryField.args || []).reduce((newArgs, arg) => {
+              const { name, description, type, defaultValue } = arg;
+              newArgs[name] = {
+                description,
+                type,
+                defaultValue,
+              };
+              return newArgs;
+            }, {}),
+            ...(oldResolve
+              ? {
+                  resolve: async (...args) => {
+                    try {
+                      return await oldResolve(...args);
+                    } catch (e) {
+                      const context = args[2];
+                      if (typeof context.liveAbort === "function") {
+                        context.liveAbort(e);
+                      }
+                      throw e;
                     }
-                    throw e;
-                  }
-                },
-              }
-            : null),
-          subscribe: build.liveCoordinator.subscribe,
-          deprecationReason: queryField.isDeprecated
-            ? queryField.deprecationReason
-            : undefined,
-        };
+                  },
+                }
+              : null),
+            subscribe: build.liveCoordinator.subscribe,
+            deprecationReason: queryField.isDeprecated
+              ? queryField.deprecationReason
+              : undefined,
+          },
+          {
+            isLiveField: true,
+            originalField: queryField,
+          }
+        );
         return memo;
       },
       {}

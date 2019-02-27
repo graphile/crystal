@@ -303,7 +303,7 @@ const PgLDSSourcePlugin: Plugin = async function(
     });
   } catch (e) {
     console.error(
-      "Could not Initiate PgLDSSourcePlugin, continuing without LDS live subscriptions. Error:",
+      "Could not Initiate PgLDSSourcePlugin, continuing without LDS live queries. Error:",
       e.message
     );
     return;

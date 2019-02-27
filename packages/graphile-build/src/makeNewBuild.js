@@ -877,6 +877,9 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
          */
         return name;
       },
+
+      // When converting a query field to a subscription (live query) field, this allows you to rename it
+      live: name => name,
     },
     swallowError,
     // resolveNode: EXPERIMENTAL, API might change!
