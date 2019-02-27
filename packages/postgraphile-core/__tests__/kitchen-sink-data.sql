@@ -98,7 +98,8 @@ insert into b.types values (
 insert into c.edge_case values
   (default, 20, 1),
   (true, null, 2),
-  (false, -512, 3);
+  (false, -512, 3),
+  (default, null, 4);
 
 insert into a.similar_table_1 (id, col1, col2, col3) values
   (1, null, 6, 3),
@@ -128,6 +129,13 @@ insert into c.my_table(id, json_data) values
   (3, '{"stringField":"notTest"}');
 
 alter sequence c.my_table_id_seq restart with 10;
+
+insert into c.null_test_record (id, nullable_text, nullable_int, non_null_text) values
+  (1, 'Hello', 99, 'World'),
+  (2, null, 98, 'Ninety eight'),
+  (3, null, null, 'Ninety seven'),
+  (4, 'Hey', null, 'Ninety six'),
+  (5, 'Hey', 95, 'Ninety five');
 
 -- Begin tests for smart comments
 

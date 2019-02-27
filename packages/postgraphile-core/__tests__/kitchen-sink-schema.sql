@@ -470,6 +470,14 @@ create table c.issue756 (
   id serial primary key,
   ts c.not_null_timestamp
 );
+
+create table c.null_test_record (
+  id serial primary key,
+  nullable_text text,
+  nullable_int int,
+  non_null_text text not null
+);
+
 create function c.issue756_mutation() returns c.issue756 as $$
 begin
   return null;

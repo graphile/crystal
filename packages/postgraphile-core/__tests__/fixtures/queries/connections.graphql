@@ -41,6 +41,7 @@ query {
       }
     }
   }
+  nullTest1: allNullTestRecords { nodes { nullableText nullableInt } }
 }
 
 fragment personConnection on PeopleConnection {

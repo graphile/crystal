@@ -727,6 +727,30 @@ Object {
       },
       "totalCount": 6,
     },
+    "nullTest1": Object {
+      "nodes": Array [
+        Object {
+          "nullableInt": 99,
+          "nullableText": "Hello",
+        },
+        Object {
+          "nullableInt": 98,
+          "nullableText": null,
+        },
+        Object {
+          "nullableInt": null,
+          "nullableText": null,
+        },
+        Object {
+          "nullableInt": null,
+          "nullableText": "Hey",
+        },
+        Object {
+          "nullableInt": 95,
+          "nullableText": "Hey",
+        },
+      ],
+    },
     "o": Object {
       "nodes": Array [
         Object {
@@ -2629,6 +2653,11 @@ Object {
           "computed": "hello world",
           "notNullHasDefault": false,
           "wontCastEasy": -512,
+        },
+        Object {
+          "computed": "hello world",
+          "notNullHasDefault": false,
+          "wontCastEasy": null,
         },
       ],
     },

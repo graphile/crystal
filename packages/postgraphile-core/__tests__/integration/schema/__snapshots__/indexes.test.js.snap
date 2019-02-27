@@ -1433,6 +1433,41 @@ type CreateNoPrimaryKeyPayload {
   query: Query
 }
 
+\\"\\"\\"All input for the create \`NullTestRecord\` mutation.\\"\\"\\"
+input CreateNullTestRecordInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NullTestRecord\` to be created by this mutation.\\"\\"\\"
+  nullTestRecord: NullTestRecordInput!
+}
+
+\\"\\"\\"The output of our create \`NullTestRecord\` mutation.\\"\\"\\"
+type CreateNullTestRecordPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NullTestRecord\` that was created by this mutation.\\"\\"\\"
+  nullTestRecord: NullTestRecord
+
+  \\"\\"\\"An edge for our \`NullTestRecord\`. May be used by Relay 1.\\"\\"\\"
+  nullTestRecordEdge(
+    \\"\\"\\"The method to use when ordering \`NullTestRecord\`.\\"\\"\\"
+    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
 \\"\\"\\"All input for the create \`Patch\` mutation.\\"\\"\\"
 input CreatePatchInput {
   \\"\\"\\"
@@ -2348,6 +2383,54 @@ type DeleteNoPrimaryKeyPayload {
     \\"\\"\\"The method to use when ordering \`NoPrimaryKey\`.\\"\\"\\"
     orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
   ): NoPrimaryKeysEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteNullTestRecordById\` mutation.\\"\\"\\"
+input DeleteNullTestRecordByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteNullTestRecord\` mutation.\\"\\"\\"
+input DeleteNullTestRecordInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NullTestRecord\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`NullTestRecord\` mutation.\\"\\"\\"
+type DeleteNullTestRecordPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedNullTestRecordId: ID
+
+  \\"\\"\\"The \`NullTestRecord\` that was deleted by this mutation.\\"\\"\\"
+  nullTestRecord: NullTestRecord
+
+  \\"\\"\\"An edge for our \`NullTestRecord\`. May be used by Relay 1.\\"\\"\\"
+  nullTestRecordEdge(
+    \\"\\"\\"The method to use when ordering \`NullTestRecord\`.\\"\\"\\"
+    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4010,6 +4093,14 @@ type Mutation {
     input: CreateNoPrimaryKeyInput!
   ): CreateNoPrimaryKeyPayload
 
+  \\"\\"\\"Creates a single \`NullTestRecord\`.\\"\\"\\"
+  createNullTestRecord(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateNullTestRecordInput!
+  ): CreateNullTestRecordPayload
+
   \\"\\"\\"Creates a single \`Patch\`.\\"\\"\\"
   createPatch(
     \\"\\"\\"
@@ -4225,6 +4316,22 @@ type Mutation {
     \\"\\"\\"
     input: DeleteNoPrimaryKeyByIdInput!
   ): DeleteNoPrimaryKeyPayload
+
+  \\"\\"\\"Deletes a single \`NullTestRecord\` using its globally unique id.\\"\\"\\"
+  deleteNullTestRecord(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNullTestRecordInput!
+  ): DeleteNullTestRecordPayload
+
+  \\"\\"\\"Deletes a single \`NullTestRecord\` using a unique key.\\"\\"\\"
+  deleteNullTestRecordById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNullTestRecordByIdInput!
+  ): DeleteNullTestRecordPayload
 
   \\"\\"\\"Deletes a single \`Patch\` using its globally unique id.\\"\\"\\"
   deletePatch(
@@ -4773,6 +4880,24 @@ type Mutation {
     \\"\\"\\"
     input: UpdateNoPrimaryKeyByIdInput!
   ): UpdateNoPrimaryKeyPayload
+
+  \\"\\"\\"
+  Updates a single \`NullTestRecord\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateNullTestRecord(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNullTestRecordInput!
+  ): UpdateNullTestRecordPayload
+
+  \\"\\"\\"Updates a single \`NullTestRecord\` using a unique key and a patch.\\"\\"\\"
+  updateNullTestRecordById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNullTestRecordByIdInput!
+  ): UpdateNullTestRecordPayload
 
   \\"\\"\\"Updates a single \`Patch\` using its globally unique id and a patch.\\"\\"\\"
   updatePatch(
@@ -5745,6 +5870,82 @@ scalar NotNullTimestamp
 
 scalar NotNullUrl
 
+type NullTestRecord implements Node {
+  id: Int!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  nonNullText: String!
+  nullableInt: Int
+  nullableText: String
+}
+
+\\"\\"\\"
+A condition to be used against \`NullTestRecord\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input NullTestRecordCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+}
+
+\\"\\"\\"An input for mutations affecting \`NullTestRecord\`\\"\\"\\"
+input NullTestRecordInput {
+  id: Int
+  nonNullText: String!
+  nullableInt: Int
+  nullableText: String
+}
+
+\\"\\"\\"
+Represents an update to a \`NullTestRecord\`. Fields that are set will be updated.
+\\"\\"\\"
+input NullTestRecordPatch {
+  id: Int
+  nonNullText: String
+  nullableInt: Int
+  nullableText: String
+}
+
+\\"\\"\\"A connection to a list of \`NullTestRecord\` values.\\"\\"\\"
+type NullTestRecordsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`NullTestRecord\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [NullTestRecordsEdge!]!
+
+  \\"\\"\\"A list of \`NullTestRecord\` objects.\\"\\"\\"
+  nodes: [NullTestRecord]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"
+  The count of *all* \`NullTestRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`NullTestRecord\` edge in the connection.\\"\\"\\"
+type NullTestRecordsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`NullTestRecord\` at the end of the edge.\\"\\"\\"
+  node: NullTestRecord
+}
+
+\\"\\"\\"Methods to use when ordering \`NullTestRecord\`.\\"\\"\\"
+enum NullTestRecordsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"Information about pagination in a connection.\\"\\"\\"
 type PageInfo {
   \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
@@ -6694,6 +6895,35 @@ type Query implements Node {
     orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
   ): NonUpdatableViewsConnection
 
+  \\"\\"\\"Reads and enables pagination through a set of \`NullTestRecord\`.\\"\\"\\"
+  allNullTestRecords(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NullTestRecordCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`NullTestRecord\`.\\"\\"\\"
+    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`Patch\`.\\"\\"\\"
   allPatches(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -7320,6 +7550,15 @@ type Query implements Node {
   The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
   \\"\\"\\"
   nodeId: ID!
+
+  \\"\\"\\"Reads a single \`NullTestRecord\` using its globally unique \`ID\`.\\"\\"\\"
+  nullTestRecord(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`NullTestRecord\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): NullTestRecord
+  nullTestRecordById(id: Int!): NullTestRecord
   optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
   optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
   optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
@@ -8707,6 +8946,63 @@ type UpdateNoPrimaryKeyPayload {
     \\"\\"\\"The method to use when ordering \`NoPrimaryKey\`.\\"\\"\\"
     orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
   ): NoPrimaryKeysEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateNullTestRecordById\` mutation.\\"\\"\\"
+input UpdateNullTestRecordByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NullTestRecord\` being updated.
+  \\"\\"\\"
+  nullTestRecordPatch: NullTestRecordPatch!
+}
+
+\\"\\"\\"All input for the \`updateNullTestRecord\` mutation.\\"\\"\\"
+input UpdateNullTestRecordInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NullTestRecord\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NullTestRecord\` being updated.
+  \\"\\"\\"
+  nullTestRecordPatch: NullTestRecordPatch!
+}
+
+\\"\\"\\"The output of our update \`NullTestRecord\` mutation.\\"\\"\\"
+type UpdateNullTestRecordPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NullTestRecord\` that was updated by this mutation.\\"\\"\\"
+  nullTestRecord: NullTestRecord
+
+  \\"\\"\\"An edge for our \`NullTestRecord\`. May be used by Relay 1.\\"\\"\\"
+  nullTestRecordEdge(
+    \\"\\"\\"The method to use when ordering \`NullTestRecord\`.\\"\\"\\"
+    orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NullTestRecordsEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

@@ -91,7 +91,7 @@ export default (async function PgAllRows(
                   : new GraphQLList(new GraphQLNonNull(TableType)),
                 args: {},
                 async resolve(parent, args, resolveContext, resolveInfo) {
-                  const { pgClient, liveRecord } = resolveContext;
+                  const { pgClient } = resolveContext;
                   const parsedResolveInfoFragment = parseResolveInfo(
                     resolveInfo
                   );
@@ -117,7 +117,7 @@ export default (async function PgAllRows(
                         );
                       }
                       if (primaryKeys) {
-                        if (subscriptions && liveRecord) {
+                        if (subscriptions) {
                           queryBuilder.selectIdentifiers(table);
                         }
                         queryBuilder.beforeLock("orderBy", () => {
