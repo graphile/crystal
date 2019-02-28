@@ -1,10 +1,4 @@
-import {
-  postgraphile,
-  createPostGraphileSchema,
-  watchPostGraphileSchema,
-  withPostGraphileContext,
-} from './postgraphile';
-import { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
+export * from './interfaces';
 
 export {
   Plugin,
@@ -25,15 +19,15 @@ export {
   createPostGraphileSchema,
   watchPostGraphileSchema,
   withPostGraphileContext,
-  makePluginHook,
-  PostGraphilePlugin,
+  enhanceHttpServerWithSubscriptions,
   // Backwards compatability
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,
   watchPostGraphileSchema as watchPostGraphQLSchema,
   withPostGraphileContext as withPostGraphQLContext,
-};
+} from './postgraphile';
 
-export * from './interfaces';
+export { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
 
+import { postgraphile } from './postgraphile';
 export default postgraphile;
