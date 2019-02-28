@@ -260,7 +260,7 @@ export async function enhanceHttpServerWithSubscriptions(
               'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
             );
             error['errors'] = validationErrors;
-            throw error;
+            return Promise.reject(error);
           }
         }
 
