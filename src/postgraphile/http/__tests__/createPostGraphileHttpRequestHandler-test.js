@@ -13,6 +13,7 @@ const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
 const fastify = require('fastify');
+// tslint:disable-next-line variable-name
 const EventEmitter = require('events');
 
 const shortString = 'User_Running_These_Tests';
