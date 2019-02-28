@@ -99,7 +99,7 @@
     "prettier": "^1.15.2",
     "source-map-support": "^0.4.6",
     "style-loader": "^0.23.0",
-    "supertest": "^2.0.1",
+    "superagent": "^4.1.0",
     "ts-node": "^2.0.0",
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.14.0",
@@ -112,7 +112,8 @@
     },
     "moduleFileExtensions": [
       "ts",
-      "js"
+      "js",
+      "json"
     ],
     "setupFiles": [
       "<rootDir>/resources/jest-setup.js"

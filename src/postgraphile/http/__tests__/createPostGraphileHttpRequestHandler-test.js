@@ -1,15 +1,20 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
+import request from './supertest';
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const http = require('http');
-const request = require('supertest');
+const http2 = require('http2');
 const connect = require('connect');
 const express = require('express');
 const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
 const fastify = require('fastify');
+// tslint:disable-next-line variable-name
+const EventEmitter = require('events');
 
 const shortString = 'User_Running_These_Tests';
 // Default bodySizeLimit is 100kB
@@ -130,33 +135,61 @@ const serverCreators = new Map([
       return server;
     },
   ],
+  [
+    'koa',
+    (handler, options = {}, subpath) => {
+      const app = new koa();
+      if (options.onPreCreate) options.onPreCreate(app);
+      if (subpath) {
+        app.use(koaMount(subpath, handler));
+      } else {
+        app.use(handler);
+      }
+      return http.createServer(app.callback());
+    },
+  ],
+  [
+    'fastify-http2',
+    async (handler, _options, subpath) => {
+      let server;
+      function serverFactory(fastlyHandler, opts) {
+        if (server) throw new Error('Factory called twice');
+        server = http2.createServer({}, (req, res) => {
+          fastlyHandler(req, res);
+        });
+        return server;
+      }
+      const app = fastify({ serverFactory, http2: true });
+      if (subpath) {
+        throw new Error('Fastify does not support subpath at this time');
+      } else {
+        app.use(handler);
+      }
+      await app.ready();
+      if (!server) {
+        throw new Error('Fastify server not created!');
+      }
+      server._http2 = true;
+      return server;
+    },
+  ],
 ]);
-
-serverCreators.set('koa', (handler, options = {}, subpath) => {
-  const app = new koa();
-  if (options.onPreCreate) options.onPreCreate(app);
-  if (subpath) {
-    app.use(koaMount(subpath, handler));
-  } else {
-    app.use(handler);
-  }
-  return http.createServer(app.callback());
-});
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   toTest.push({ name, createServerFromHandler });
-  if (name !== 'http' && name !== 'fastify') {
+  if (name !== 'http' && name !== 'fastify' && name !== 'fastify-http2') {
     toTest.push({ name, createServerFromHandler, subpath: '/path/to/mount' });
   }
 }
 
 for (const { name, createServerFromHandler, subpath = '' } of toTest) {
-  const createServer = (handlerOptions, serverOptions) =>
-    createServerFromHandler(
+  const createServer = async (handlerOptions, serverOptions) => {
+    const _emitter = new EventEmitter();
+    const server = await createServerFromHandler(
       createPostGraphileHttpRequestHandler(
         Object.assign(
-          {},
+          { _emitter },
           subpath
             ? {
                 externalUrlBase: subpath,
@@ -169,6 +202,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       serverOptions,
       subpath,
     );
+    server._emitter = _emitter;
+    return server;
+  };
 
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
     test('will 404 for route other than that specified 1', async () => {
@@ -248,6 +284,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       const server = await createServer({ enableCors: true });
       await request(server)
         .post(`${subpath}/graphql`)
+        .expect(400)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Access-Control-Allow-Methods', 'HEAD, GET, POST')
         .expect('Access-Control-Allow-Headers', /Accept, Authorization, X-Apollo-Tracing/)
@@ -852,6 +889,22 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect(405);
     });
 
+    test('will return an event-stream', async () => {
+      const server = await createServer({ graphiql: true, watchPg: true });
+      const promise = request(server)
+        .get(`${subpath}/graphql/stream`)
+        .set('Accept', 'text/event-stream')
+        .expect(200)
+        .expect('event: open\n\nevent: change\ndata: schema\n\n')
+        .then(res => res); // Trick superagent into finishing
+      await sleep(200);
+      server._emitter.emit('schemas:changed');
+      await sleep(100);
+      server._emitter.emit('test:close');
+
+      return await promise;
+    });
+
     test('will render GraphiQL if enabled', async () => {
       const server1 = await createServer();
       const server2 = await createServer({ graphiql: true });
@@ -1010,12 +1063,14 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Content-Type', /json/)
         .expect({ data: { hello: 'foo' } });
       expect(additionalGraphQLContextFromRequest).toHaveBeenCalledTimes(1);
-      expect(additionalGraphQLContextFromRequest.mock.calls[0][0]).toBeInstanceOf(
-        http.IncomingMessage,
-      );
-      expect(additionalGraphQLContextFromRequest.mock.calls[0][1]).toBeInstanceOf(
-        http.ServerResponse,
-      );
+      const [req, res] = additionalGraphQLContextFromRequest.mock.calls[0];
+      if (req.httpVersionMajor > 1) {
+        expect(req).toBeInstanceOf(http2.Http2ServerRequest);
+        expect(res).toBeInstanceOf(http2.Http2ServerResponse);
+      } else {
+        expect(req).toBeInstanceOf(http.IncomingMessage);
+        expect(res).toBeInstanceOf(http.ServerResponse);
+      }
     });
 
     if (name === 'koa') {
