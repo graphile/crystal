@@ -68,7 +68,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`CompoundKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`CompoundKey\` edge in the connection.\"\"\"
@@ -371,7 +371,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`EdgeCase\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`EdgeCase\` edge in the connection.\"\"\"
@@ -703,7 +703,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Person\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Person\` edge in the connection.\"\"\"
@@ -2239,7 +2239,7 @@ type TypesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Type\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Type\` edge in the connection.\"\"\"
@@ -2360,7 +2360,7 @@ type UpdatableViewsConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`UpdatableView\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`UpdatableView\` edge in the connection.\"\"\"
@@ -2807,7 +2807,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`CompoundKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`CompoundKey\` edge in the connection.\"\"\"
@@ -3611,7 +3611,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`EdgeCase\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`EdgeCase\` edge in the connection.\"\"\"
@@ -3704,7 +3704,7 @@ type ForeignKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`ForeignKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`ForeignKey\` edge in the connection.\"\"\"
@@ -4457,7 +4457,7 @@ type NonUpdatableViewsConnection {
   \"\"\"
   The count of *all* \`NonUpdatableView\` you could get from the connection.
   \"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`NonUpdatableView\` edge in the connection.\"\"\"
@@ -4505,7 +4505,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Person\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Person\` edge in the connection.\"\"\"
@@ -4798,7 +4798,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Post\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Post\` edge in the connection.\"\"\"
@@ -5329,7 +5329,7 @@ type SimilarTable1SConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`SimilarTable1\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`SimilarTable1\` edge in the connection.\"\"\"
@@ -5418,7 +5418,7 @@ type SimilarTable2SConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`SimilarTable2\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`SimilarTable2\` edge in the connection.\"\"\"
@@ -5707,7 +5707,7 @@ type TypesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Type\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Type\` edge in the connection.\"\"\"
@@ -5860,7 +5860,7 @@ type UpdatableViewsConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`UpdatableView\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`UpdatableView\` edge in the connection.\"\"\"
@@ -6619,7 +6619,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`CompoundKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`CompoundKey\` edge in the connection.\"\"\"
@@ -7423,7 +7423,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`EdgeCase\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`EdgeCase\` edge in the connection.\"\"\"
@@ -7516,7 +7516,7 @@ type ForeignKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`ForeignKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`ForeignKey\` edge in the connection.\"\"\"
@@ -8269,7 +8269,7 @@ type NonUpdatableViewsConnection {
   \"\"\"
   The count of *all* \`NonUpdatableView\` you could get from the connection.
   \"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`NonUpdatableView\` edge in the connection.\"\"\"
@@ -8317,7 +8317,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Person\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Person\` edge in the connection.\"\"\"
@@ -8610,7 +8610,7 @@ type PostsConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Post\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Post\` edge in the connection.\"\"\"
@@ -9141,7 +9141,7 @@ type SimilarTable1SConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`SimilarTable1\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`SimilarTable1\` edge in the connection.\"\"\"
@@ -9230,7 +9230,7 @@ type SimilarTable2SConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`SimilarTable2\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`SimilarTable2\` edge in the connection.\"\"\"
@@ -9519,7 +9519,7 @@ type TypesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Type\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Type\` edge in the connection.\"\"\"
@@ -9672,7 +9672,7 @@ type UpdatableViewsConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`UpdatableView\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`UpdatableView\` edge in the connection.\"\"\"
@@ -10127,7 +10127,7 @@ type CompoundKeysConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`CompoundKey\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`CompoundKey\` edge in the connection.\"\"\"
@@ -10197,7 +10197,7 @@ type EdgeCasesConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`EdgeCase\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`EdgeCase\` edge in the connection.\"\"\"
@@ -10424,7 +10424,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \"\"\"The count of *all* \`Person\` you could get from the connection.\"\"\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \"\"\"A \`Person\` edge in the connection.\"\"\"
