@@ -706,7 +706,7 @@ export default function createPostGraphileHttpRequestHandler(
                   pgRole = graphqlContext.pgRole;
                   return executeGraphql(
                     gqlSchema,
-                    queryDocumentAst,
+                    queryDocumentAst!,
                     null,
                     graphqlContext,
                     params.variables,
