@@ -461,7 +461,7 @@ export default (async function PgIntrospectionPlugin(
     };
     const introspectionResultsByKind = cloneResults(
       await persistentMemoizeWithKey(cacheKey, () =>
-        withPgClient(pgOwnerConnectionString || pgConfig, async pgClient => {
+        withPgClient(pgConfig, async pgClient => {
           const versionResult = await pgClient.query(
             "show server_version_num;"
           );
@@ -853,7 +853,9 @@ export default (async function PgIntrospectionPlugin(
       const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
       const sql = `begin; ${watchSqlInner}; commit;`;
       try {
-        await pgClient.query(sql);
+        await withPgClient(pgOwnerConnectionString || pgConfig, pgClient =>
+          pgClient.query(sql)
+        );
       } catch (error) {
         /* eslint-disable no-console */
         console.warn(
