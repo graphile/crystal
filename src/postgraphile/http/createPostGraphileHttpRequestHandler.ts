@@ -614,7 +614,7 @@ export default function createPostGraphileHttpRequestHandler(
       });
       results = await Promise.all(
         paramsList.map(async (params: any) => {
-          let queryDocumentAst: DocumentNode;
+          let queryDocumentAst: DocumentNode | null = null;
           let result: any;
           const meta = {};
           try {
@@ -680,6 +680,8 @@ export default function createPostGraphileHttpRequestHandler(
             // send the errors to the client with a `400` code.
             if (validationErrors.length > 0) {
               result = { errors: validationErrors, statusCode: 400 };
+            } else if (!queryDocumentAst) {
+              throw new Error('Could not process query');
             } else {
               if (debugRequest.enabled) debugRequest('GraphQL query is validated.');
 
@@ -704,7 +706,7 @@ export default function createPostGraphileHttpRequestHandler(
                   pgRole = graphqlContext.pgRole;
                   return executeGraphql(
                     gqlSchema,
-                    queryDocumentAst,
+                    queryDocumentAst!,
                     null,
                     graphqlContext,
                     params.variables,
@@ -734,17 +736,14 @@ export default function createPostGraphileHttpRequestHandler(
             result = pluginHook('postgraphile:http:result', result, {
               options,
               returnArray,
-              queryDocumentAst: queryDocumentAst!,
+              queryDocumentAst,
               req,
               pgRole,
               // We don't pass `res` here because this is for just a single
               // result; if you need that, use postgraphile:http:end.
             });
             // Log the query. If this debugger isn’t enabled, don’t run it.
-            if (
-              !options.disableQueryLog &&
-              queryDocumentAst! /* `!` is not strictly true, but stops TS complaining. */
-            ) {
+            if (!options.disableQueryLog && queryDocumentAst) {
               // We must reference this before it's deleted!
               const resultStatusCode = result.statusCode;
               const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
