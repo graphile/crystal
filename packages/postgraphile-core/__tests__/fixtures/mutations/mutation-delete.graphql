@@ -3,7 +3,7 @@ mutation {
   b: deletePost(input: { nodeId: "WyJwb3N0cyIsMl0=", clientMutationId: "hello" }) { ...deletePostPayload }
   c: deletePost(input: { nodeId: "WyJwb3N0cyIsMjAwMF0=" }) { ...deletePostPayload }
   d: deletePost(input: { nodeId: "WyJwb3N0cyIsM10=", clientMutationId: "world" }) { ...deletePostPayload }
-  d2: deleteTypeById(input: { id: 12, clientMutationId: "throw error" }) { clientMutationId deletedTypeId }
+  d2: deleteTypeById(input: { id: 11, clientMutationId: "throw error" }) { clientMutationId deletedTypeId }
   e: deletePostById(input: { id: 6 }) { ...deletePostPayload }
   f: deletePostById(input: { id: 9, clientMutationId: "hello" }) { ...deletePostPayload }
   g: deletePostById(input: { id: 2000 }) { ...deletePostPayload }

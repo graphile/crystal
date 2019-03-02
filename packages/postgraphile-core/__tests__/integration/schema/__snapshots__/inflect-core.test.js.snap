@@ -1399,6 +1399,12 @@ type CreateTypePayload {
   \\"\\"\\"
   clientMutationId: String
 
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
+
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
@@ -2483,6 +2489,12 @@ type DeleteTypePayload {
   \\"\\"\\"
   clientMutationId: String
   deletedTypeId: ID
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4276,6 +4288,26 @@ type M {
     \\"\\"\\"
     input: TableSetMutationInput!
   ): TableSetMutationPayload
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typeFunctionConnectionMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionConnectionMutationInput!
+  ): TypeFunctionConnectionMutationPayload
+  typeFunctionListMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionListMutationInput!
+  ): TypeFunctionListMutationPayload
+  typeFunctionMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionMutationInput!
+  ): TypeFunctionMutationPayload
   typesMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -5965,6 +5997,29 @@ type Person implements N {
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection!
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
+  typeFunction(id: Int): Type
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typeFunctionConnection(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): TypesConnection!
+  typeFunctionList: [Type]
 }
 
 \\"\\"\\"The return type of our \`computedComplex\` query.\\"\\"\\"
@@ -6200,6 +6255,67 @@ type Post implements N {
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`Post\`.\\"\\"\\"
   personByAuthorId: Person
+
+  \\"\\"\\"Reads a single \`Type\` that is related to this \`Post\`.\\"\\"\\"
+  typeById: Type
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typesById(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: TypeCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesConnection! @deprecated(reason: \\"Please use typeById instead\\")
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typesBySmallint(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: TypeCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesConnection!
 }
 
 \\"\\"\\"A connection to a list of \`I\` values.\\"\\"\\"
@@ -7529,6 +7645,29 @@ type Q implements N {
     nodeId: ID!
   ): Type
   typeById(id: Int!): Type
+  typeFunction(id: Int): Type
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typeFunctionConnection(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): TypesConnection!
+  typeFunctionList: [Type]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
@@ -8160,6 +8299,12 @@ type Type implements N {
   numeric: BigFloat!
   numrange: BigFloatRange!
   point: P!
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -8270,6 +8415,115 @@ input TypeCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`varchar\` field.\\"\\"\\"
   varchar: String
+}
+
+\\"\\"\\"All input for the \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+input TypeFunctionConnectionMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+type TypeFunctionConnectionMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Q
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+  types: [Type]
+}
+
+\\"\\"\\"All input for the \`typeFunctionListMutation\` mutation.\\"\\"\\"
+input TypeFunctionListMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`typeFunctionListMutation\` mutation.\\"\\"\\"
+type TypeFunctionListMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Q
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+  types: [Type]
+}
+
+\\"\\"\\"All input for the \`typeFunctionMutation\` mutation.\\"\\"\\"
+input TypeFunctionMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int
+}
+
+\\"\\"\\"The output of our \`typeFunctionMutation\` mutation.\\"\\"\\"
+type TypeFunctionMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Q
+  type: Type
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
 }
 
 \\"\\"\\"An input for mutations affecting \`Type\`\\"\\"\\"
@@ -9629,6 +9883,12 @@ type UpdateTypePayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

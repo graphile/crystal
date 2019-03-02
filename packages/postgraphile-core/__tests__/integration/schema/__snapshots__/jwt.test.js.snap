@@ -811,6 +811,26 @@ type Mutation {
     input: Mult4Input!
   ): Mult4Payload
 
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typeFunctionConnectionMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionConnectionMutationInput!
+  ): TypeFunctionConnectionMutationPayload
+  typeFunctionListMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionListMutationInput!
+  ): TypeFunctionListMutationPayload
+  typeFunctionMutation(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: TypeFunctionMutationInput!
+  ): TypeFunctionMutationPayload
+
   \\"\\"\\"Updates a single \`Type\` using its globally unique id and a patch.\\"\\"\\"
   updateType(
     \\"\\"\\"
@@ -959,6 +979,29 @@ type Query implements Node {
     nodeId: ID!
   ): Type
   typeById(id: Int!): Type
+  typeFunction(id: Int): Type
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typeFunctionConnection(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+  ): TypesConnection!
+  typeFunctionList: [Type]
 }
 
 \\"\\"\\"
@@ -1107,6 +1150,97 @@ input TypeCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`varchar\` field.\\"\\"\\"
   varchar: String
+}
+
+\\"\\"\\"All input for the \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+input TypeFunctionConnectionMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+type TypeFunctionConnectionMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+  types: [Type]
+}
+
+\\"\\"\\"All input for the \`typeFunctionListMutation\` mutation.\\"\\"\\"
+input TypeFunctionListMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our \`typeFunctionListMutation\` mutation.\\"\\"\\"
+type TypeFunctionListMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
+  types: [Type]
+}
+
+\\"\\"\\"All input for the \`typeFunctionMutation\` mutation.\\"\\"\\"
+input TypeFunctionMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int
+}
+
+\\"\\"\\"The output of our \`typeFunctionMutation\` mutation.\\"\\"\\"
+type TypeFunctionMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+  type: Type
+
+  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  typeEdge(
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesEdge
 }
 
 \\"\\"\\"An input for mutations affecting \`Type\`\\"\\"\\"

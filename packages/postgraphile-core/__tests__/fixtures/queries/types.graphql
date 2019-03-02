@@ -1,11 +1,48 @@
 query {
   allTypes {
-    nodes {
+    ...typesConnection
+  }
+  allTypesList {
+    ...type
+  }
+  typeById(id: 11) {
+    ...type
+  }
+  type(nodeId: "WyJ0eXBlcyIsMTFd") {
+    ...type
+  }
+  node(nodeId: "WyJ0eXBlcyIsMTFd") {
+    ...type
+  }
+  typeFunction(id: 11) {
+    ...type
+  }
+  typeFunctionList {
+    ...type
+  }
+  typeFunctionConnection {
+    ...typesConnection
+  }
+  personById(id: 1) {
+    typeFunction(id: 11) {
       ...type
     }
+    typeFunctionList {
+      ...type
+    }
+    typeFunctionConnection {
+      ...typesConnection
+    }
   }
-  typeById(id: 12) {
-    ...type
+  postById(id: 11) {
+    id
+    headline
+    typeById {
+      ...type
+    }
+    typesBySmallint {
+      ...typesConnection
+    }
   }
 }
 
@@ -31,30 +68,92 @@ fragment type on Type {
   json
   jsonb
   nullableRange {
-    start { value inclusive }
-    end { value inclusive }
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
   }
   numrange {
-    start { value inclusive }
-    end { value inclusive }
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
   }
   anIntRange {
-    start { value inclusive }
-    end { value inclusive }
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
   }
   money
-  compoundType { ...compoundType }
+  compoundType {
+    ...compoundType
+  }
   nestedCompoundType {
-    a { ...compoundType }
-    b { ...compoundType }
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
     bazBuz
   }
-  nullableCompoundType { ...compoundType }
+  nullableCompoundType {
+    ...compoundType
+  }
   nullableNestedCompoundType {
-    a { ...compoundType }
-    b { ...compoundType }
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
     bazBuz
   }
-  point { x y }
-  nullablePoint { x y }
+  point {
+    x
+    y
+  }
+  nullablePoint {
+    x
+    y
+  }
+  postBySmallint {
+    id
+    headline
+  }
+  postById {
+    id
+    headline
+  }
+}
+
+fragment typesConnection on TypesConnection {
+  nodes {
+    ...type
+  }
+  edges {
+    node {
+      ...type
+    }
+  }
+  totalCount
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
 }

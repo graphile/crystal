@@ -1,5 +1,5 @@
 mutation {
-  deleteTypeById(input: { id: 12 }) {
+  deleteTypeById(input: { id: 11 }) {
     clientMutationId
     deletedTypeId
     type {

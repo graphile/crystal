@@ -153,6 +153,7 @@ beforeAll(() => {
             "simple-procedure-computed-fields.graphql":
               gqlSchemas.simpleCollections,
             "simple-procedure-query.graphql": gqlSchemas.simpleCollections,
+            "types.graphql": gqlSchemas.simpleCollections,
             "orderByNullsLast.graphql": gqlSchemas.orderByNullsLast,
           };
           let gqlSchema = schemas[fileName];

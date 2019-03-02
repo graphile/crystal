@@ -266,6 +266,8 @@ create table b.types (
   "nullablePoint" point
 );
 
+comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';
+
 create function b.throw_error() returns trigger as $$
 begin
   raise exception 'Nope.';
@@ -361,6 +363,17 @@ create function a.mutation_compound_type_array(object c.compound_type) returns c
 create function a.mutation_text_array() returns text[] as $$ select ARRAY['str1','str2','str3']; $$ language sql volatile;
 create function a.mutation_interval_array() returns interval[] as $$ select ARRAY[interval '12 seconds', interval '3 hours', interval '34567 seconds']; $$ language sql volatile;
 create function a.mutation_interval_set() returns setof interval as $$ begin return next interval '12 seconds'; return next interval '3 hours'; return next interval '34567 seconds'; end; $$ language plpgsql volatile;
+
+-- Procs returning `type` record (to test JSON encoding)
+create function b.type_function(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql stable;
+create function b.type_function_list() returns b.types[] as $$ select array_agg(types) from b.types $$ language sql stable;
+create function b.type_function_connection() returns setof b.types as $$ select * from b.types $$ language sql stable;
+create function c.person_type_function(p c.person, id int) returns b.types as $$ select * from b.types where types.id = $2; $$ language sql stable;
+create function c.person_type_function_list(p c.person) returns b.types[] as $$ select array_agg(types) from b.types $$ language sql stable;
+create function c.person_type_function_connection(p c.person) returns setof b.types as $$ select * from b.types $$ language sql stable;
+create function b.type_function_mutation(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql;
+create function b.type_function_list_mutation() returns b.types[] as $$ select array_agg(types) from b.types $$ language sql;
+create function b.type_function_connection_mutation() returns setof b.types as $$ select * from b.types $$ language sql;
 
 create type b.jwt_token as (
   role text,
@@ -573,7 +586,7 @@ create function c.person_computed_complex (person c.person, in a int, in b text,
     b.types.compound_type as y,
     person as z
   from c.person
-    inner join b.types on c.person.id = (b.types.id - 11)
+    inner join b.types on c.person.id = (b.types.id - 10)
   limit 1;
 $$ language sql stable;
 
@@ -603,7 +616,7 @@ create function c.func_out_complex(in a int, in b text, out x int, out y c.compo
     b.types.compound_type as y,
     person as z
   from c.person
-    inner join b.types on c.person.id = (b.types.id - 11)
+    inner join b.types on c.person.id = (b.types.id - 10)
   limit 1;
 $$ language sql stable;
 
@@ -613,7 +626,7 @@ create function c.func_out_complex_setof(in a int, in b text, out x int, out y c
     b.types.compound_type as y,
     person as z
   from c.person
-    inner join b.types on c.person.id = (b.types.id - 11)
+    inner join b.types on c.person.id = (b.types.id - 10)
   limit 1;
 $$ language sql stable;
 
@@ -647,7 +660,7 @@ create function c.mutation_out_complex(in a int, in b text, out x int, out y c.c
     b.types.compound_type as y,
     person as z
   from c.person
-    inner join b.types on c.person.id = (b.types.id - 11)
+    inner join b.types on c.person.id = (b.types.id - 10)
   limit 1;
 $$ language sql volatile;
 
@@ -657,7 +670,7 @@ create function c.mutation_out_complex_setof(in a int, in b text, out x int, out
     b.types.compound_type as y,
     person as z
   from c.person
-    inner join b.types on c.person.id = (b.types.id - 11)
+    inner join b.types on c.person.id = (b.types.id - 10)
   limit 1;
 $$ language sql volatile;
 
