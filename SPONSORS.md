@@ -12,29 +12,27 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - MissionMode
+- DOMONDA
 - Alec Wenzowski
 - James Allain
-- DOMONDA
+- Stagency
 - Gustin Prudner
-- Matthew Mullens
 - Daniel Einspanjer
+- NodeSource
+- Nigel Taylor
 
 ## Supporters
 
-- Mtpc
 - Michael Tng
-- Clay Smith
 - Matt Bretl (also a major community contributor!)
 - BMD Studio
 - Sam Levin
 - stlbucket
-- James Rascoe
 - Michel Pelletier
-- Jimmy McBroom
 - Dan Lynch
-- Gardner Bickford
+- James Rascoe
+- Jimmy McBroom
 - James Cavanaugh
-- Tim Field
 - Antwaan Harrison
 - Chris Watland
 - Simon Elliott
