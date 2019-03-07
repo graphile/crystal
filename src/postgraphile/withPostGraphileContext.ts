@@ -283,9 +283,15 @@ async function getSettingsForPgClientTransaction({
     // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
     // as a 403 error because the token is not trustworthy.
     try {
-      // If a JWT token was defined, but a secret was not provided to the server
-      // throw a 403 error.
-      if (typeof jwtSecret !== 'string') throw new Error('Not allowed to provide a JWT token.');
+      // If a JWT token was defined, but a secret was not provided to the server or
+      // secret had unsupported type, throw a 403 error.
+      if (!Buffer.isBuffer(jwtSecret) && typeof jwtSecret !== 'string') {
+        // tslint:disable-next-line no-console
+        console.error(
+          'ERROR: `jwtToken` was provided, but `jwtSecret` was not set to a string or buffer - rejecting request.',
+        );
+        throw new Error('Not allowed to provide a JWT token.');
+      }
 
       if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
         throw new Error(

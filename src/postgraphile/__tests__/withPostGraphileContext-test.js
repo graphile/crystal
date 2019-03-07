@@ -74,6 +74,18 @@ test('will throw an error if there was a `jwtToken`, but no `jwtSecret`', async 
   expect(pgClient.query.mock.calls).toEqual([]);
 });
 
+test('will throw an error if there was a `jwtToken`, but `jwtSecret` had unsupported format', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  await expectHttpError(
+    withPostGraphileContext({ pgPool, jwtToken: 'asd', jwtSecret: true }, () => {}),
+    403,
+    'Not allowed to provide a JWT token.',
+  );
+  // Never set up the transaction due to error
+  expect(pgClient.query.mock.calls).toEqual([]);
+});
+
 test('will throw an error for a malformed `jwtToken`', async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
@@ -159,6 +171,32 @@ test('will succeed with all the correct things', async () => {
         noTimestamp: true,
       }),
       jwtSecret: 'secret',
+    },
+    () => {},
+  );
+  expect(pgClient.query.mock.calls).toEqual([
+    ['begin'],
+    [
+      {
+        text: 'select set_config($1, $2, true)',
+        values: ['jwt.claims.aud', 'postgraphile'],
+      },
+    ],
+    ['commit'],
+  ]);
+});
+
+test('will succeed with jwt and buffer as secret ', async () => {
+  const pgClient = { query: jest.fn(), release: jest.fn() };
+  const pgPool = { connect: jest.fn(() => pgClient) };
+  const bufferSecret = Buffer.from('secret', 'utf8');
+  await withPostGraphileContext(
+    {
+      pgPool,
+      jwtToken: jwt.sign({ aud: 'postgraphile' }, bufferSecret, {
+        noTimestamp: true,
+      }),
+      jwtSecret: bufferSecret,
     },
     () => {},
   );
