@@ -3655,6 +3655,35 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4, graceful-fs@^4.1.6:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
 
+graphile-build-pg@4.4.0-beta.0:
+  version "4.4.0-beta.0"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.4.0-beta.0.tgz#612195dc1f9fa1c7a6a2472fafdd2308591b862a"
+  integrity sha512-q0fa76TnhHDICQ/QfkOwzYKDJ1N6PZJpYYfWE/U4ELwsceEpON6VbDYVvfjEuDDrnajK2ptpTpDG/0uJlZ3Hxw==
+  dependencies:
+    chalk "^2.1.0"
+    debug ">=2 <3"
+    graphile-build "4.4.0-beta.0"
+    graphql-iso-date "^3.6.0"
+    jsonwebtoken "^8.1.1"
+    lodash ">=4 <5"
+    lru-cache ">=4 <5"
+    pg-sql2 "2.2.1"
+    postgres-interval "^1.1.1"
+
+graphile-build@4.4.0-beta.0:
+  version "4.4.0-beta.0"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.4.0-beta.0.tgz#a9e427f649f6d06b71d281a71833921b239f125b"
+  integrity sha512-xu2ukicKbP3BaVndpZkMJKFcx03iweDFgvgRiu2jzBnzsvPizjw2IUUNRVVDWRn3wqcq8rTHuMG9AZb0u8Q2aA==
+  dependencies:
+    "@types/graphql" "^14.0.3"
+    chalk "^2.1.0"
+    debug ">=2 <3"
+    graphql-parse-resolve-info "4.1.0"
+    lodash ">=4 <5"
+    lru-cache "^5.0.0"
+    pluralize "^7.0.0"
+    semver "^5.6.0"
+
 graphql-config@^2.0.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/graphql-config/-/graphql-config-2.2.1.tgz#5fd0ec77ac7428ca5fb2026cf131be10151a0cb2"
@@ -6231,6 +6260,15 @@ posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
+
+postgraphile-core@4.4.0-beta.0:
+  version "4.4.0-beta.0"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.4.0-beta.0.tgz#2a73fc62761700282030d831f0f0a5472e243a93"
+  integrity sha512-s9sckwMLY+yci3mOq/64n8FAJtOYRFRTB+9CUzCMYR7FuItymKng3KenYr2uz4DxMWrgn0A5JqYLHj8livUnlA==
+  dependencies:
+    "@types/graphql" "^14.0.3"
+    graphile-build "4.4.0-beta.0"
+    graphile-build-pg "4.4.0-beta.0"
 
 postgraphile@^4.4.0-beta.0:
   version "4.4.0-beta.0"
