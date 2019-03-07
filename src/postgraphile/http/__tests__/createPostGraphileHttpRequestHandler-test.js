@@ -1,3 +1,4 @@
+/* tslint:disable no-console */
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';

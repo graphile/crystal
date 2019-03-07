@@ -77,7 +77,7 @@
     "@types/chalk": "^0.4.30",
     "@types/commander": ">=2.3.30 <2.12.0",
     "@types/debug": "^0.0.29",
-    "@types/finalhandler": "^0.0.32",
+    "@types/finalhandler": "^0.0.33",
     "@types/http-errors": "^1.6.1",
     "@types/jest": "^16.0.4",
     "@types/lru-cache": "^4.1.1",
