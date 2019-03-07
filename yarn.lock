@@ -747,10 +747,10 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
-"@types/finalhandler@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@types/finalhandler/-/finalhandler-0.0.32.tgz#85b56721e6a34028690e436ae3a2cd32df2f4d0a"
-  integrity sha512-Sf92UgZt4ApdAAUG1Q/2wdFSiPUNKZUD7s1X0xR48LPVhV6KnzCs5VJTF68xIuDlr0t5U6Mg+Npf/CZ5J56i7A==
+"@types/finalhandler@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@types/finalhandler/-/finalhandler-0.0.33.tgz#517a6d6159072b3c2a8da40b3876cf10167b8380"
+  integrity sha512-nV2BixeE7zsjupfRymHLzmBaiXVKVtLELNJhD+MA3EWxSc9Gm68NhpY+quigOlkOpUoDTu8hZWs58yRFgUM5gw==
   dependencies:
     "@types/node" "*"
 
