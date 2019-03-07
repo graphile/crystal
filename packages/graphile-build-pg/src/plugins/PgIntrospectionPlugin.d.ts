@@ -28,6 +28,7 @@ export interface PgProc {
   tags: { [tag: string]: true | string | Array<string> };
   cost: number;
   aclExecutable: boolean;
+  language: string;
 }
 
 export interface PgClass {
@@ -56,6 +57,7 @@ export interface PgClass {
   aclInsertable: boolean;
   aclUpdatable: boolean;
   aclDeletable: boolean;
+  canUseAsterisk: boolean;
 }
 
 export interface PgType {
@@ -101,6 +103,7 @@ export interface PgAttribute {
   aclUpdatable: boolean;
   isIndexed: boolean | void;
   isUnique: boolean | void;
+  columnLevelSelectGrant: boolean;
 }
 
 export interface PgConstraint {

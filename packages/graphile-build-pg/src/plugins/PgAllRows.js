@@ -103,6 +103,7 @@ export default (async function PgAllRows(
                     undefined,
                     resolveData,
                     {
+                      useAsterisk: table.canUseAsterisk,
                       withPaginationAsFields: isConnection,
                     },
                     queryBuilder => {

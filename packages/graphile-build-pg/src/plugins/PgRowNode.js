@@ -48,7 +48,9 @@ export default (async function PgRowNode(builder, { subscriptions }) {
           sqlFullTableName,
           undefined,
           resolveData,
-          {},
+          {
+            useAsterisk: false, // Because it's only a single relation, no need
+          },
           queryBuilder => {
             if (subscriptions && table.primaryKeyConstraint) {
               queryBuilder.selectIdentifiers(table);
@@ -173,7 +175,9 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                           sqlFullTableName,
                           undefined,
                           resolveData,
-                          {},
+                          {
+                            useAsterisk: false, // Because it's only a single relation, no need
+                          },
                           queryBuilder => {
                             if (subscriptions && table.primaryKeyConstraint) {
                               queryBuilder.selectIdentifiers(table);

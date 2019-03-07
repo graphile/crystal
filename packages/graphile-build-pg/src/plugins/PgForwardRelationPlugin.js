@@ -125,7 +125,10 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                           sql.identifier(foreignSchema.name, foreignTable.name),
                           foreignTableAlias,
                           resolveData,
-                          { asJson: true },
+                          {
+                            useAsterisk: false, // Because it's only a single relation, no need
+                            asJson: true,
+                          },
                           innerQueryBuilder => {
                             innerQueryBuilder.parentQueryBuilder = queryBuilder;
                             if (subscriptions && table.primaryKeyConstraint) {

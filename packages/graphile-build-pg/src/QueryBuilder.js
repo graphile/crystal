@@ -575,6 +575,7 @@ class QueryBuilder {
       asJsonAggregate?: boolean,
       onlyJsonField?: boolean,
       addNullCase?: boolean,
+      useAsterisk?: boolean,
     } = {}
   ) {
     const {
@@ -582,6 +583,7 @@ class QueryBuilder {
       asJsonAggregate = false,
       onlyJsonField = false,
       addNullCase = false,
+      useAsterisk = false,
     } = options;
 
     this.lockEverything();
@@ -595,7 +597,7 @@ class QueryBuilder {
         : this.buildSelectFields();
 
     let fragment = sql.fragment`
-      select ${fields}
+      select ${useAsterisk ? sql.fragment`${this.getTableAlias()}.*` : fields}
       ${this.compiledData.from &&
         sql.fragment`from ${
           this.compiledData.from[0]
@@ -636,6 +638,9 @@ class QueryBuilder {
         from ${sql.identifier(flipAlias)}
         order by (row_number() over (partition by 1)) desc
         `;
+    }
+    if (useAsterisk) {
+      fragment = sql.fragment`select ${fields} from (${fragment}) ${this.getTableAlias()}`;
     }
     if (asJsonAggregate) {
       const aggAlias = Symbol();

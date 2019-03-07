@@ -358,6 +358,11 @@ export default function makeProcField(
           functionAlias,
           resolveData,
           {
+            useAsterisk:
+              !isMutation &&
+              (isTableLike || isRecordLike) &&
+              (forceList || proc.returnsSet || rawReturnType.isPgArray) && // only bother with lists
+              proc.language !== "sql", // sql functions can be inlined, so GRANTs still apply
             withPagination: !forceList && !isMutation && proc.returnsSet,
             withPaginationAsFields:
               !forceList && !isMutation && proc.returnsSet && !computed,

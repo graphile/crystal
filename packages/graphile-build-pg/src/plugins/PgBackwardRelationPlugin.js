@@ -157,6 +157,7 @@ export default (function PgBackwardRelationPlugin(
                             tableAlias,
                             resolveData,
                             {
+                              useAsterisk: false, // Because it's only a single relation, no need
                               asJson: true,
                               addNullCase: true,
                               withPagination: false,
@@ -265,6 +266,7 @@ export default (function PgBackwardRelationPlugin(
                               tableAlias,
                               resolveData,
                               {
+                                useAsterisk: table.canUseAsterisk,
                                 withPagination: isConnection,
                                 withPaginationAsFields: false,
                                 asJsonAggregate: !isConnection,

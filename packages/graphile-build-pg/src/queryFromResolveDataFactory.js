@@ -25,6 +25,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     asJsonAggregate?: boolean,
     addNullCase?: boolean,
     onlyJsonField?: boolean,
+    useAsterisk?: boolean,
   },
   // TODO:v5: context is not optional
   withBuilder?: ((builder: QueryBuilder) => void) | null | void,

@@ -72,7 +72,8 @@ with
       pro.pronargs as "inputArgsCount",
       pro.pronargdefaults as "argDefaultsNum",
       pro.procost as "cost",
-      exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable"
+      exists(select 1 from accessible_roles where has_function_privilege(accessible_roles.oid, pro.oid, 'EXECUTE')) as "aclExecutable",
+      (select lanname from pg_catalog.pg_language where pg_language.oid = pro.prolang) as "language"
     from
       pg_catalog.pg_proc as pro
       left join pg_catalog.pg_description as dsc on dsc.objoid = pro.oid and dsc.classoid = 'pg_catalog.pg_proc'::regclass
@@ -207,7 +208,9 @@ with
       ${serverVersionNum >= 100000 ? "att.attidentity" : "''"} as "identity",
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'SELECT')) as "aclSelectable",
       exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'INSERT')) as "aclInsertable",
-      exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'UPDATE')) as "aclUpdatable"
+      exists(select 1 from accessible_roles where has_column_privilege(accessible_roles.oid, att.attrelid, att.attname, 'UPDATE')) as "aclUpdatable",
+      -- https://git.postgresql.org/gitweb/?p=postgresql.git;a=commit;h=c62dd80cdf149e2792b13c13777a539f5abb0370
+      att.attacl is not null and exists(select 1 from aclexplode(att.attacl) aclitem where aclitem.privilege_type = 'SELECT' and grantee in (select oid from accessible_roles)) as "columnLevelSelectGrant"
     from
       pg_catalog.pg_attribute as att
       left join pg_catalog.pg_description as dsc on dsc.objoid = att.attrelid and dsc.objsubid = att.attnum and dsc.classoid = 'pg_catalog.pg_class'::regclass

@@ -48,6 +48,7 @@ export type PgProc = {
   tags: { [string]: string },
   cost: number,
   aclExecutable: boolean,
+  language: string,
 };
 
 export type PgClass = {
@@ -76,6 +77,7 @@ export type PgClass = {
   aclInsertable: boolean,
   aclUpdatable: boolean,
   aclDeletable: boolean,
+  canUseAsterisk: boolean,
 };
 
 export type PgType = {
@@ -121,6 +123,7 @@ export type PgAttribute = {
   aclUpdatable: boolean,
   isIndexed: ?boolean,
   isUnique: ?boolean,
+  columnLevelSelectGrant: boolean,
 };
 
 export type PgConstraint = {
@@ -739,6 +742,9 @@ export default (async function PgIntrospectionPlugin(
     introspectionResultsByKind.class.forEach(klass => {
       klass.attributes = introspectionResultsByKind.attribute.filter(
         attr => attr.classId === klass.id
+      );
+      klass.canUseAsterisk = !klass.attributes.some(
+        attr => attr.columnLevelSelectGrant
       );
       klass.constraints = introspectionResultsByKind.constraint.filter(
         constraint => constraint.classId === klass.id

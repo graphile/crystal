@@ -99,7 +99,9 @@ export default (async function PgRowByUniqueConstraint(
                       sqlFullTableName,
                       undefined,
                       resolveData,
-                      {},
+                      {
+                        useAsterisk: false, // Because it's only a single relation, no need
+                      },
                       queryBuilder => {
                         if (subscriptions && table.primaryKeyConstraint) {
                           queryBuilder.selectIdentifiers(table);
