@@ -815,6 +815,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         }
       }
 
+      this.scopeByType.set(Self, scope);
       if (finalSpec.name) {
         this.addType(
           Self,
@@ -889,5 +890,6 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       currentHookEvent: null,
     },
     liveCoordinator: new LiveCoordinator(),
+    scopeByType: new Map(),
   };
 }

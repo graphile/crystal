@@ -20,14 +20,27 @@ export function makeFieldHelpers<TSource>(
   resolveInfo: GraphQLResolveInfo
 ) {
   const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
-  const { getDataFromParsedResolveInfoFragment } = fieldContext;
+  const { getDataFromParsedResolveInfoFragment, scope } = fieldContext;
+  const { pgFieldIntrospection, isPgFieldConnection } = scope;
+
+  const isConnection = !!isPgFieldConnection;
+
+  const table =
+    pgFieldIntrospection && pgFieldIntrospection.kind === "class"
+      ? pgFieldIntrospection
+      : null;
+  const primaryKeyConstraint = table && table.primaryKeyConstraint;
+  const primaryKeys =
+    primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
+
   const selectGraphQLResultFromTable: SelectGraphQLResultFromTable = async (
     tableFragment: SQL,
-    builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
+    builderCallback?: (alias: SQL, sqlBuilder: QueryBuilder) => void
   ) => {
     const { pgClient } = context;
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
     const PayloadType = resolveInfo.returnType;
+
     const resolveData = getDataFromParsedResolveInfoFragment(
       parsedResolveInfoFragment,
       PayloadType
@@ -37,12 +50,26 @@ export function makeFieldHelpers<TSource>(
       tableFragment,
       tableAlias,
       resolveData,
-      {},
-      (sqlBuilder: QueryBuilder) => builderCallback(tableAlias, sqlBuilder)
+      {
+        withPaginationAsFields: isConnection,
+      },
+      (sqlBuilder: QueryBuilder) => {
+        if (primaryKeys && build.options.subscriptions && table) {
+          sqlBuilder.selectIdentifiers(table);
+        }
+
+        if (typeof builderCallback === "function") {
+          builderCallback(tableAlias, sqlBuilder);
+        }
+      }
     );
     const { text, values } = sql.compile(query);
     const { rows } = await pgClient.query(text, values);
-    return rows;
+    if (isConnection) {
+      return build.pgAddStartEndCursor(rows[0]);
+    } else {
+      return rows;
+    }
   };
 
   const graphileHelpers: GraphileHelpers<TSource> = {

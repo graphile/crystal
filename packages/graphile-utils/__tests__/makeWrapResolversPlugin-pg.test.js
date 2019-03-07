@@ -19,7 +19,7 @@ afterAll(() => {
 });
 
 const makeSchemaWithPlugins = plugins =>
-  createPostGraphileSchema(pgPool, ["a"], {
+  createPostGraphileSchema(pgPool, ["graphile_utils"], {
     appendPlugins: plugins,
   });
 

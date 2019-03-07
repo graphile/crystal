@@ -515,6 +515,7 @@ function getFields<TSource>(
   },
   build: Build
 ) {
+  const scopeByType = build.scopeByType || new Map();
   if (!build.graphql.isNamedType(SelfGeneric)) {
     throw new Error("getFields only supports named types");
   }
@@ -525,13 +526,16 @@ function getFields<TSource>(
     fieldContext: Context<TSource>,
     type: GraphQLOutputType
   ) {
-    const namedType = build.graphql.getNamedType(type);
-    if (typeof namedType.getFields === "function") {
-      namedType.getFields(); // Ensure fields have been loaded, so workarounds are flagged
-    }
-    const recurseDataGeneratorsWorkaroundField = recurseDataGeneratorsWorkaroundFieldByType.get(
-      namedType
-    );
+    let got = false;
+    let val: any;
+    const getRecurseDataGeneratorsWorkaroundField = () => {
+      if (!got) {
+        got = true;
+        const namedType = build.graphql.getNamedType(type);
+        val = recurseDataGeneratorsWorkaroundFieldByType.get(namedType);
+      }
+      return val;
+    };
     const newResolver: GraphQLFieldResolver<TSource, any> = async (
       parent,
       args,
@@ -554,6 +558,7 @@ function getFields<TSource>(
         },
         graphileHelpers
       );
+      const recurseDataGeneratorsWorkaroundField = getRecurseDataGeneratorsWorkaroundField();
       if (
         result != null &&
         !result.data &&
@@ -575,8 +580,23 @@ function getFields<TSource>(
         const fieldName = getName(field.name);
         const args = getArguments(field.arguments, build);
         const type = getType(field.type, build);
+        const nullableType = build.graphql.getNullableType(type);
+        const namedType = build.graphql.getNamedType(type);
+        const typeScope = scopeByType.get(namedType) || {};
         const directives = getDirectives(field.directives);
-        const scope = {
+        const scope: any = {
+          ...(typeScope.pgIntrospection &&
+          typeScope.pgIntrospection.kind === "class"
+            ? {
+                pgFieldIntrospection: typeScope.pgIntrospection,
+              }
+            : null),
+          ...(typeScope.isPgRowConnectionType && typeScope.pgIntrospection
+            ? {
+                isPgFieldConnection: true,
+                pgFieldIntrospection: typeScope.pgIntrospection,
+              }
+            : null),
           fieldDirectives: directives,
           ...(directives.scope || {}),
         };
@@ -590,6 +610,48 @@ function getFields<TSource>(
           typeof functionOrResolveObject === "function"
             ? { resolve: functionOrResolveObject }
             : functionOrResolveObject;
+        const isConnection = !!scope.isPgFieldConnection;
+        const isListType =
+          nullableType !== namedType &&
+          nullableType.constructor === build.graphql.GraphQLList;
+        const table: PgClass | null =
+          scope.pgFieldIntrospection &&
+          scope.pgFieldIntrospection.kind === "class"
+            ? scope.pgFieldIntrospection
+            : null;
+
+        const generateImplicitResolverIfPossible = () => {
+          if (directives.pgQuery && table) {
+            return (
+              data: any,
+              _args: any,
+              resolveContext: any,
+              resolveInfo: any
+            ) => {
+              const safeAlias = build.getSafeAliasFromResolveInfo(resolveInfo);
+              if (isConnection) {
+                return build.pgAddStartEndCursor(data[safeAlias]);
+              } else if (isListType) {
+                const records = data[safeAlias];
+                if (table && resolveContext.liveRecord) {
+                  records.forEach(
+                    (r: any) =>
+                      r &&
+                      resolveContext.liveRecord("pg", table, r.__identifiers)
+                  );
+                }
+                return records;
+              } else {
+                const record = data[safeAlias];
+                if (record && resolveContext.liveRecord && table) {
+                  resolveContext.liveRecord("pg", table, record.__identifiers);
+                }
+                return record;
+              }
+            };
+          }
+          return null;
+        };
         /*
          * We accept a resolver function directly, or an object which can
          * define 'resolve', 'subscribe' and other relevant methods.
@@ -602,7 +664,7 @@ function getFields<TSource>(
           (typeof possibleResolver === "object" ||
             typeof possibleResolver === "function")
             ? possibleResolver
-            : null;
+            : generateImplicitResolverIfPossible();
         const rawResolversSpec = resolver
           ? functionToResolveObject(resolver)
           : null;
@@ -625,8 +687,9 @@ function getFields<TSource>(
           //   e.g. `@requires(columns: ["id", "name"])`
           //
           if (directives.requires && pgIntrospection.kind === "class") {
+            // tslint:disable-next-line no-shadowed-variable
+            const table: PgClass = pgIntrospection;
             if (Array.isArray(directives.requires.columns)) {
-              const table: PgClass = pgIntrospection;
               const attrs = table.attributes.filter(
                 attr => directives.requires.columns.indexOf(attr.name) >= 0
               );
@@ -668,6 +731,53 @@ function getFields<TSource>(
                 `@requires(columns: ["...", ...]) directive called with invalid arguments`
               );
             }
+          }
+          if (directives.pgQuery && table && pgIntrospection === table) {
+            fieldContext.addDataGenerator((parsedResolveInfoFragment: any) => {
+              return {
+                pgQuery: (queryBuilder: QueryBuilder) => {
+                  queryBuilder.select(() => {
+                    const resolveData = fieldContext.getDataFromParsedResolveInfoFragment(
+                      parsedResolveInfoFragment,
+                      namedType
+                    );
+                    const tableAlias = sql.identifier(Symbol());
+                    const query = build.pgQueryFromResolveData(
+                      directives.pgQuery.source,
+                      tableAlias,
+                      resolveData,
+                      {
+                        withPagination: isConnection,
+                        withPaginationAsFields: false,
+                        asJsonAggregate: isListType && !isConnection,
+                        asJson: !isConnection,
+                        addNullCase: !isConnection,
+                      },
+                      (innerQueryBuilder: QueryBuilder) => {
+                        innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                        if (
+                          build.options.subscriptions &&
+                          table.primaryKeyConstraint
+                        ) {
+                          innerQueryBuilder.selectIdentifiers(table);
+                        }
+                        if (
+                          typeof directives.pgQuery.withQueryBuilder ===
+                          "function"
+                        ) {
+                          directives.pgQuery.withQueryBuilder(
+                            innerQueryBuilder,
+                            parsedResolveInfoFragment.args
+                          );
+                        }
+                      },
+                      queryBuilder.context
+                    );
+                    return sql.fragment`(${query})`;
+                  }, build.getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
+                },
+              };
+            });
           }
 
           const resolversSpec = rawResolversSpec

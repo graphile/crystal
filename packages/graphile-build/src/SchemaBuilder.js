@@ -75,6 +75,7 @@ export type Build = {|
     currentHookName: ?string,
     currentHookEvent: ?string,
   },
+  scopeByType: Map<GraphQLType, Scope>,
 |};
 
 export type BuildExtensionQuery = {|
