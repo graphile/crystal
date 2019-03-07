@@ -101,11 +101,11 @@ export interface PostGraphileOptions {
   // `showErrorStack` and `extendedError` may have no
   // effect.
   /* @middlewareOnly */
-  handleErrors?: ((
+  handleErrors?: (
     errors: ReadonlyArray<GraphQLError>,
     req: IncomingMessage,
     res: ServerResponse,
-  ) => Array<GraphQLErrorExtended>);
+  ) => Array<GraphQLErrorExtended>;
   // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // after the default plugins.
   appendPlugins?: Array<Plugin>;
@@ -287,11 +287,11 @@ export interface HttpRequestHandler {
     fn: (ctx: mixed) => any,
   ) => Promise<any>;
   options: CreateRequestHandlerOptions;
-  handleErrors: ((
+  handleErrors: (
     errors: ReadonlyArray<GraphQLError>,
     req: IncomingMessage,
     res: ServerResponse,
-  ) => Array<GraphQLErrorExtended>);
+  ) => Array<GraphQLErrorExtended>;
 }
 
 /**
