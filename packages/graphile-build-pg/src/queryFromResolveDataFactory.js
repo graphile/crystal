@@ -33,8 +33,8 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
 ) => {
   const {
     pgQuery,
+    pgAggregateQuery,
     pgCursorPrefix: reallyRawCursorPrefix,
-    pgCalculateTotalCount,
     calculateHasNextPage,
     calculateHasPreviousPage,
     usesCursor: explicitlyUsesCursor,
@@ -386,11 +386,6 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
           true
         );
 
-    const totalCount = sql.fragment`(
-      select count(*)
-      from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
-      where ${queryBuilder.buildWhereClause(false, false, options)}
-    )`;
     const sqlWith = haveFields
       ? sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`
       : sql.fragment``;
@@ -408,8 +403,30 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
         fields.push([hasPreviousPage, "hasPreviousPage"]);
       }
     }
-    if (pgCalculateTotalCount) {
-      fields.push([totalCount, "totalCount"]);
+    if (pgAggregateQuery && pgAggregateQuery.length) {
+      const aggregateQueryBuilder = new QueryBuilder(
+        queryBuilderOptions,
+        context
+      );
+      aggregateQueryBuilder.from(
+        queryBuilder.getTableExpression(),
+        queryBuilder.getTableAlias()
+      );
+
+      for (const fn of pgAggregateQuery) {
+        fn(aggregateQueryBuilder);
+      }
+      const aggregateJsonBuildObject = aggregateQueryBuilder.build({
+        onlyJsonField: true,
+      });
+      const aggregatesSql = sql.fragment`
+      (
+        select ${aggregateJsonBuildObject}
+        from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
+        where ${queryBuilder.buildWhereClause(false, false, options)}
+      )
+      `;
+      fields.push([aggregatesSql, "aggregates"]);
     }
     if (options.withPaginationAsFields) {
       return sql.fragment`${sqlWith} select ${sql.join(

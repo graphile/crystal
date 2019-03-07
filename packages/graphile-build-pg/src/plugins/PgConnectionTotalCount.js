@@ -7,6 +7,7 @@ export default (function PgConnectionTotalCount(builder) {
       extend,
       inflection,
       graphql: { GraphQLInt, GraphQLNonNull },
+      pgSql: sql,
     } = build;
     const {
       scope: { isPgRowConnectionType, pgIntrospection: table },
@@ -32,14 +33,19 @@ export default (function PgConnectionTotalCount(builder) {
           ({ addDataGenerator }) => {
             addDataGenerator(() => {
               return {
-                pgCalculateTotalCount: true,
+                pgAggregateQuery: aggregateQueryBuilder => {
+                  aggregateQueryBuilder.select(
+                    sql.fragment`count(*)`,
+                    "totalCount"
+                  );
+                },
               };
             });
             return {
               description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
               type: new GraphQLNonNull(GraphQLInt),
               resolve(parent) {
-                return parent.totalCount || 0;
+                return (parent.aggregates && parent.aggregates.totalCount) || 0;
               },
             };
           },
