@@ -3232,14 +3232,14 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
   integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
 
-graphile-build-pg@4.4.0-beta.2:
-  version "4.4.0-beta.2"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.4.0-beta.2.tgz#3617b199fc17074b46334cbadf685f8c8d2003b1"
-  integrity sha512-b0578LqKzEmkwdOrxnrenh0hjmvO4eQ59ws0XB5SWHvT6U0tfiQmQhtur0D2cEO0c8Lht3BlmZaduGFR+tgpGg==
+graphile-build-pg@4.4.0-beta.3:
+  version "4.4.0-beta.3"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.4.0-beta.3.tgz#e827cb368e47d09cbf0343e5e1b6fe017ebd33a2"
+  integrity sha512-RWMxO7s7ax/fUeolCQu5fA1a6kI4oY1PX3+C2v8toNZF4L/XJ1VmZZqfJY+nxeX0ibRnzQjZFtRyY3TbT6kZLg==
   dependencies:
     chalk "^2.1.0"
     debug ">=2 <3"
-    graphile-build "4.4.0-beta.2"
+    graphile-build "4.4.0-beta.3"
     graphql-iso-date "^3.6.0"
     jsonwebtoken "^8.1.1"
     lodash ">=4 <5"
@@ -3247,10 +3247,10 @@ graphile-build-pg@4.4.0-beta.2:
     pg-sql2 "2.2.1"
     postgres-interval "^1.1.1"
 
-graphile-build@4.4.0-beta.2:
-  version "4.4.0-beta.2"
-  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.4.0-beta.2.tgz#e131a891fbc2e3ea4c133b5ff41c61eaddb2b536"
-  integrity sha512-aB2xAcLEjT97SUpwCcQFXgJMa97JIJN6ie2JIKyKSLXgj5fe8vtFu95YEWN/nJcTHKnX5lRwSVYMDBg+BE+BYw==
+graphile-build@4.4.0-beta.3:
+  version "4.4.0-beta.3"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.4.0-beta.3.tgz#cdf7eff46bd164aa44d1be7054c0e9920198d4ac"
+  integrity sha512-2uIeye9SgNZ08Yz8M8QGzmZACLL/eKlUF5L5nZGLpS7kQvnGL/y1fxU9c5UHsFnZnBLP9rdOvX+kRyj21eQUUQ==
   dependencies:
     "@types/graphql" "^14.0.3"
     chalk "^2.1.0"
@@ -5684,14 +5684,14 @@ postcss@^6.0.1, postcss@^6.0.23:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
-postgraphile-core@4.4.0-beta.2:
-  version "4.4.0-beta.2"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.4.0-beta.2.tgz#e95c8cb60b1deaf2b3a8dc83e8e2323d7a575aff"
-  integrity sha512-sugYOoT7BpxPhLE96nauluQvduhLQbTVPfqdh1EaH9XdVj77bAIovZRjj+HyQx6Erma9+BU27znOx01KDPITDw==
+postgraphile-core@4.4.0-beta.3:
+  version "4.4.0-beta.3"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.4.0-beta.3.tgz#30e04b40bc16c5b5232e76c458489eb694644df0"
+  integrity sha512-GOOlleKfIH9VP27Ck2QQweKQkLcFKbDCvOXd4zr/A3aR9gGFZYL/dXAlkXILaRXIWaGffXqPd+z44XiVbImJFw==
   dependencies:
     "@types/graphql" "^14.0.3"
-    graphile-build "4.4.0-beta.2"
-    graphile-build-pg "4.4.0-beta.2"
+    graphile-build "4.4.0-beta.3"
+    graphile-build-pg "4.4.0-beta.3"
 
 postgres-array@~2.0.0:
   version "2.0.0"
