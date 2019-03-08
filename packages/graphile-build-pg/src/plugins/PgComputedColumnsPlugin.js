@@ -41,94 +41,98 @@ export default (function PgComputedColumnsPlugin(
   builder,
   { pgSimpleCollections }
 ) {
-  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
-    const {
-      scope: {
-        isPgRowType,
-        isPgCompoundType,
-        isInputType,
-        pgIntrospection: table,
-      },
-      fieldWithHooks,
-      Self,
-    } = context;
+  builder.hook(
+    "GraphQLObjectType:fields",
+    (fields, build, context) => {
+      const {
+        scope: {
+          isPgRowType,
+          isPgCompoundType,
+          isInputType,
+          pgIntrospection: table,
+        },
+        fieldWithHooks,
+        Self,
+      } = context;
 
-    if (
-      isInputType ||
-      !(isPgRowType || isPgCompoundType) ||
-      !table ||
-      table.kind !== "class" ||
-      !table.namespace
-    ) {
-      return fields;
-    }
+      if (
+        isInputType ||
+        !(isPgRowType || isPgCompoundType) ||
+        !table ||
+        table.kind !== "class" ||
+        !table.namespace
+      ) {
+        return fields;
+      }
 
-    const {
-      extend,
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
-      inflection,
-      pgOmit: omit,
-      pgMakeProcField: makeProcField,
-      swallowError,
-      describePgEntity,
-      sqlCommentByAddingTags,
-    } = build;
-    const tableType = table.type;
-    if (!tableType) {
-      throw new Error("Could not determine the type for this table");
-    }
-    return extend(
-      fields,
-      introspectionResultsByKind.procedure.reduce((memo, proc) => {
-        if (omit(proc, "execute")) return memo;
-        const computedColumnDetails = getComputedColumnDetails(
-          build,
-          table,
-          proc
-        );
-        if (!computedColumnDetails) return memo;
-        const { pseudoColumnName } = computedColumnDetails;
-        function makeField(forceList) {
-          const fieldName = forceList
-            ? inflection.computedColumnList(pseudoColumnName, proc, table)
-            : inflection.computedColumn(pseudoColumnName, proc, table);
-          try {
-            memo = extend(
-              memo,
-              {
-                [fieldName]: makeProcField(fieldName, proc, build, {
-                  fieldWithHooks,
-                  computed: true,
-                  forceList,
-                }),
-              },
-              `Adding computed column for ${describePgEntity(
-                proc
-              )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
-                proc,
+      const {
+        extend,
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
+        inflection,
+        pgOmit: omit,
+        pgMakeProcField: makeProcField,
+        swallowError,
+        describePgEntity,
+        sqlCommentByAddingTags,
+      } = build;
+      const tableType = table.type;
+      if (!tableType) {
+        throw new Error("Could not determine the type for this table");
+      }
+      return extend(
+        fields,
+        introspectionResultsByKind.procedure.reduce((memo, proc) => {
+          if (omit(proc, "execute")) return memo;
+          const computedColumnDetails = getComputedColumnDetails(
+            build,
+            table,
+            proc
+          );
+          if (!computedColumnDetails) return memo;
+          const { pseudoColumnName } = computedColumnDetails;
+          function makeField(forceList) {
+            const fieldName = forceList
+              ? inflection.computedColumnList(pseudoColumnName, proc, table)
+              : inflection.computedColumn(pseudoColumnName, proc, table);
+            try {
+              memo = extend(
+                memo,
                 {
-                  fieldName: "newNameHere",
-                }
-              )}`
-            );
-          } catch (e) {
-            swallowError(e);
+                  [fieldName]: makeProcField(fieldName, proc, build, {
+                    fieldWithHooks,
+                    computed: true,
+                    forceList,
+                  }),
+                },
+                `Adding computed column for ${describePgEntity(
+                  proc
+                )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                  proc,
+                  {
+                    fieldName: "newNameHere",
+                  }
+                )}`
+              );
+            } catch (e) {
+              swallowError(e);
+            }
           }
-        }
-        const simpleCollections =
-          proc.tags.simpleCollections || pgSimpleCollections;
-        const hasConnections = simpleCollections !== "only";
-        const hasSimpleCollections =
-          simpleCollections === "only" || simpleCollections === "both";
-        if (!proc.returnsSet || hasConnections) {
-          makeField(false);
-        }
-        if (proc.returnsSet && hasSimpleCollections) {
-          makeField(true);
-        }
-        return memo;
-      }, {}),
-      `Adding computed column to '${Self.name}'`
-    );
-  });
+          const simpleCollections =
+            proc.tags.simpleCollections || pgSimpleCollections;
+          const hasConnections = simpleCollections !== "only";
+          const hasSimpleCollections =
+            simpleCollections === "only" || simpleCollections === "both";
+          if (!proc.returnsSet || hasConnections) {
+            makeField(false);
+          }
+          if (proc.returnsSet && hasSimpleCollections) {
+            makeField(true);
+          }
+          return memo;
+        }, {}),
+        `Adding computed column to '${Self.name}'`
+      );
+    },
+    ["PgComputedColumns"]
+  );
 }: Plugin);

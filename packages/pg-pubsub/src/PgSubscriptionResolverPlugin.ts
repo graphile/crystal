@@ -91,7 +91,8 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
               },
             }),
       });
-    }
+    },
+    ["PgSubscriptionResolver"]
   );
 };
 

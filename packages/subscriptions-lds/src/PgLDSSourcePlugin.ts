@@ -297,10 +297,14 @@ const PgLDSSourcePlugin: Plugin = async function(
       // @ts-ignore
       connectionString: pgOwnerConnectionString as string,
     });
-    builder.hook("build", build => {
-      build.liveCoordinator.registerSource("pg", source);
-      return build;
-    });
+    builder.hook(
+      "build",
+      build => {
+        build.liveCoordinator.registerSource("pg", source);
+        return build;
+      },
+      ["PgLDSSource"]
+    );
   } catch (e) {
     console.error(
       "Could not Initiate PgLDSSourcePlugin, continuing without LDS live queries. Error:",

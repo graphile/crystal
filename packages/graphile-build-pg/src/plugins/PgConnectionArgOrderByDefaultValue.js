@@ -51,6 +51,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
           }'`
         ),
       });
-    }
+    },
+    ["PgConnectionArgOrderByDefaultValue"]
   );
 }: Plugin);

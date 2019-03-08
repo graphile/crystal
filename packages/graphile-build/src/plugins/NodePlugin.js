@@ -96,74 +96,83 @@ export default (function NodePlugin(
         },
         `Adding 'Node' interface support to the Build`
       );
-    }
+    },
+    ["Node"]
   );
 
-  builder.hook("init", function defineNodeInterfaceType(
-    _: {},
-    build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |}
-  ) {
-    const {
-      $$isQuery,
-      $$nodeType,
-      getTypeByName,
-      newWithHooks,
-      graphql: {
-        GraphQLNonNull,
-        GraphQLID,
-        GraphQLInterfaceType,
-        getNullableType,
-      },
-      inflection,
-    } = build;
-    let Query;
-    newWithHooks(
-      GraphQLInterfaceType,
-      {
-        name: inflection.builtin("Node"),
-        description: "An object with a globally unique `ID`.",
-        resolveType: value => {
-          if (value === $$isQuery) {
-            if (!Query) Query = getTypeByName(inflection.builtin("Query"));
-            return Query;
-          } else if (value[$$nodeType]) {
-            return getNullableType(value[$$nodeType]);
-          }
+  builder.hook(
+    "init",
+    function defineNodeInterfaceType(
+      _: {},
+      build: {| ...Build, ...BuildExtensionQuery, ...BuildExtensionNode |}
+    ) {
+      const {
+        $$isQuery,
+        $$nodeType,
+        getTypeByName,
+        newWithHooks,
+        graphql: {
+          GraphQLNonNull,
+          GraphQLID,
+          GraphQLInterfaceType,
+          getNullableType,
         },
-        fields: {
-          [nodeIdFieldName]: {
-            description:
-              "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
-            type: new GraphQLNonNull(GraphQLID),
+        inflection,
+      } = build;
+      let Query;
+      newWithHooks(
+        GraphQLInterfaceType,
+        {
+          name: inflection.builtin("Node"),
+          description: "An object with a globally unique `ID`.",
+          resolveType: value => {
+            if (value === $$isQuery) {
+              if (!Query) Query = getTypeByName(inflection.builtin("Query"));
+              return Query;
+            } else if (value[$$nodeType]) {
+              return getNullableType(value[$$nodeType]);
+            }
+          },
+          fields: {
+            [nodeIdFieldName]: {
+              description:
+                "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+              type: new GraphQLNonNull(GraphQLID),
+            },
           },
         },
-      },
-      {
-        __origin: `graphile-build built-in (NodePlugin); you can omit this plugin if you like, but you'll lose compatibility with Relay`,
-      }
-    );
-    return _;
-  });
+        {
+          __origin: `graphile-build built-in (NodePlugin); you can omit this plugin if you like, but you'll lose compatibility with Relay`,
+        }
+      );
+      return _;
+    },
+    ["Node"]
+  );
 
-  builder.hook("GraphQLObjectType:interfaces", function addNodeIdToQuery(
-    interfaces: Array<GraphQLInterfaceType>,
-    build,
-    context
-  ) {
-    const { getTypeByName, inflection } = build;
-    const {
-      scope: { isRootQuery },
-    } = context;
-    if (!isRootQuery) {
-      return interfaces;
-    }
-    const Type = getTypeByName(inflection.builtin("Node"));
-    if (Type) {
-      return [...interfaces, Type];
-    } else {
-      return interfaces;
-    }
-  });
+  builder.hook(
+    "GraphQLObjectType:interfaces",
+    function addNodeIdToQuery(
+      interfaces: Array<GraphQLInterfaceType>,
+      build,
+      context
+    ) {
+      const { getTypeByName, inflection } = build;
+      const {
+        scope: { isRootQuery },
+      } = context;
+      if (!isRootQuery) {
+        return interfaces;
+      }
+      const Type = getTypeByName(inflection.builtin("Node"));
+      if (Type) {
+        return [...interfaces, Type];
+      } else {
+        return interfaces;
+      }
+    },
+    ["Node"]
+  );
 
   builder.hook(
     "GraphQLObjectType:fields",
@@ -226,6 +235,7 @@ export default (function NodePlugin(
         },
         `Adding Relay Global Object Identification support to the root Query via 'node' and '${nodeIdFieldName}' fields`
       );
-    }
+    },
+    ["Node"]
   );
 }: Plugin);

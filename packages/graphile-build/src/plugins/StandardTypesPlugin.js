@@ -27,59 +27,66 @@ export default (function StandardTypesPlugin(builder) {
       );
       build.addType(Cursor, "graphile-build built-in");
       return build;
-    }
+    },
+    ["StandardTypes"]
   );
-  builder.hook("init", (_: {}, build) => {
-    const {
-      newWithHooks,
-      graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
-      inflection,
-    } = build;
-    // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
-    /* const PageInfo = */
-    newWithHooks(
-      GraphQLObjectType,
-      {
-        name: inflection.builtin("PageInfo"),
-        description: "Information about pagination in a connection.",
-        fields: ({ fieldWithHooks }) => ({
-          hasNextPage: fieldWithHooks(
-            "hasNextPage",
-            ({ addDataGenerator }) => {
-              addDataGenerator(() => {
+  builder.hook(
+    "init",
+    (_: {}, build) => {
+      const {
+        newWithHooks,
+        graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
+        inflection,
+      } = build;
+      // https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo
+      /* const PageInfo = */
+      newWithHooks(
+        GraphQLObjectType,
+        {
+          name: inflection.builtin("PageInfo"),
+          description: "Information about pagination in a connection.",
+          fields: ({ fieldWithHooks }) => ({
+            hasNextPage: fieldWithHooks(
+              "hasNextPage",
+              ({ addDataGenerator }) => {
+                addDataGenerator(() => {
+                  return {
+                    calculateHasNextPage: true,
+                  };
+                });
                 return {
-                  calculateHasNextPage: true,
+                  description:
+                    "When paginating forwards, are there more items?",
+                  type: new GraphQLNonNull(GraphQLBoolean),
                 };
-              });
-              return {
-                description: "When paginating forwards, are there more items?",
-                type: new GraphQLNonNull(GraphQLBoolean),
-              };
-            },
-            { isPageInfoHasNextPageField: true }
-          ),
-          hasPreviousPage: fieldWithHooks(
-            "hasPreviousPage",
-            ({ addDataGenerator }) => {
-              addDataGenerator(() => {
+              },
+              { isPageInfoHasNextPageField: true }
+            ),
+            hasPreviousPage: fieldWithHooks(
+              "hasPreviousPage",
+              ({ addDataGenerator }) => {
+                addDataGenerator(() => {
+                  return {
+                    calculateHasPreviousPage: true,
+                  };
+                });
                 return {
-                  calculateHasPreviousPage: true,
+                  description:
+                    "When paginating backwards, are there more items?",
+                  type: new GraphQLNonNull(GraphQLBoolean),
                 };
-              });
-              return {
-                description: "When paginating backwards, are there more items?",
-                type: new GraphQLNonNull(GraphQLBoolean),
-              };
-            },
-            { isPageInfoHasPreviousPageField: true }
-          ),
-        }),
-      },
-      {
-        __origin: `graphile-build built-in`,
-        isPageInfo: true,
-      }
-    );
-    return _;
-  });
+              },
+              { isPageInfoHasPreviousPageField: true }
+            ),
+          }),
+        },
+        {
+          __origin: `graphile-build built-in`,
+          isPageInfo: true,
+        }
+      );
+      return _;
+    },
+    ["StandardTypes", "PageInfo"]
+  );
 }: Plugin);

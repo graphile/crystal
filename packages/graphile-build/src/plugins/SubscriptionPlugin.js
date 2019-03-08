@@ -16,36 +16,42 @@ function isValidSubscription(Subscription) {
 }
 
 export default (async function SubscriptionPlugin(builder) {
-  builder.hook("GraphQLSchema", (schema: {}, build) => {
-    const {
-      newWithHooks,
-      extend,
-      graphql: { GraphQLObjectType },
-      inflection,
-    } = build;
-    const Subscription = newWithHooks(
-      GraphQLObjectType,
-      {
-        name: inflection.builtin("Subscription"),
-        description:
-          "The root subscription type which contains root level fields which mutate data.",
-      },
-      {
-        __origin: `graphile-build built-in (root subscription type)`,
-        isRootSubscription: true,
-      },
-      true
-    );
-    if (isValidSubscription(Subscription)) {
-      return extend(
-        schema,
+  builder.hook(
+    "GraphQLSchema",
+    (schema: {}, build) => {
+      const {
+        newWithHooks,
+        extend,
+        graphql: { GraphQLObjectType },
+        inflection,
+      } = build;
+      const Subscription = newWithHooks(
+        GraphQLObjectType,
         {
-          subscription: Subscription,
+          name: inflection.builtin("Subscription"),
+          description:
+            "The root subscription type which contains root level fields which mutate data.",
         },
-        "Adding subscription type to schema"
+        {
+          __origin: `graphile-build built-in (root subscription type)`,
+          isRootSubscription: true,
+        },
+        true
       );
-    } else {
-      return schema;
-    }
-  });
+      if (isValidSubscription(Subscription)) {
+        return extend(
+          schema,
+          {
+            subscription: Subscription,
+          },
+          "Adding subscription type to schema"
+        );
+      } else {
+        return schema;
+      }
+    },
+    ["Subscription"],
+    [],
+    ["Query"]
+  );
 }: Plugin);

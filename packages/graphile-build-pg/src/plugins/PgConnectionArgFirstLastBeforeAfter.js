@@ -127,6 +127,7 @@ export default (function PgConnectionArgs(builder) {
               Self.name
             }'`
       );
-    }
+    },
+    ["PgConnectionArgFirstLastBeforeAfter"]
   );
 }: Plugin);

@@ -27,7 +27,8 @@ export default (function ClientMutationIdDescriptionPlugin(
         },
         `Tweaking '${field.name || ""}' field in '${Self.name}'`
       );
-    }
+    },
+    ["ClientMutationIdDescription"]
   );
 
   builder.hook(
@@ -53,7 +54,8 @@ export default (function ClientMutationIdDescriptionPlugin(
         },
         `Tweaking '${field.name || ""}' field in '${Self.name}'`
       );
-    }
+    },
+    ["ClientMutationIdDescription"]
   );
 
   builder.hook(
@@ -80,6 +82,7 @@ export default (function ClientMutationIdDescriptionPlugin(
           }' field in '${Self.name}'`
         ),
       });
-    }
+    },
+    ["ClientMutationIdDescription"]
   );
 }: Plugin);

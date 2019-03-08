@@ -23,6 +23,7 @@ export default (function SwallowErrorsPlugin(
       } else {
         return build;
       }
-    }
+    },
+    ["SwallowErrors"]
   );
 }: Plugin);

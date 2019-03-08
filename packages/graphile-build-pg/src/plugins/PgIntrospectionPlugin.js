@@ -938,18 +938,24 @@ export default (async function PgIntrospectionPlugin(
     introspectionResultsByKind = await introspect();
   }, stopListening);
 
-  builder.hook("build", build => {
-    if (introspectionResultsByKind.__pgVersion < 90500) {
-      // TODO:v5: remove this workaround
-      // This is a bit of a hack, but until we have plugin priorities it's the
-      // easiest way to conditionally support PG9.4.
-      // $FlowFixMe
-      build.pgQueryFromResolveData = queryFromResolveDataFactory({
-        supportsJSONB: false,
+  builder.hook(
+    "build",
+    build => {
+      if (introspectionResultsByKind.__pgVersion < 90500) {
+        // TODO:v5: remove this workaround
+        // This is a bit of a hack, but until we have plugin priorities it's the
+        // easiest way to conditionally support PG9.4.
+        // $FlowFixMe
+        build.pgQueryFromResolveData = queryFromResolveDataFactory({
+          supportsJSONB: false,
+        });
+      }
+      return build.extend(build, {
+        pgIntrospectionResultsByKind: introspectionResultsByKind,
       });
-    }
-    return build.extend(build, {
-      pgIntrospectionResultsByKind: introspectionResultsByKind,
-    });
-  });
+    },
+    ["PgIntrospection"],
+    [],
+    ["PgBasics"]
+  );
 }: Plugin);

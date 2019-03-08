@@ -45,60 +45,64 @@ function getCompatibleComputedColumns(build, table) {
 }
 
 export default (function PgConditionComputedColumnPlugin(builder) {
-  builder.hook("GraphQLInputObjectType:fields", (fields, build, context) => {
-    const {
-      extend,
-      pgGetGqlInputTypeByTypeIdAndModifier,
-      inflection,
-      describePgEntity,
-    } = build;
-    const {
-      scope: { isPgCondition, pgIntrospection: table },
-      fieldWithHooks,
-    } = context;
-    if (!isPgCondition || !table || table.kind !== "class") {
-      return fields;
-    }
-    const compatibleComputedColumns = getCompatibleComputedColumns(
-      build,
-      table
-    );
-    return extend(
-      fields,
-      compatibleComputedColumns.reduce((memo, { proc, pseudoColumnName }) => {
-        const fieldName = inflection.computedColumn(
-          pseudoColumnName,
-          proc,
-          table
-        );
-        const Type = pgGetGqlInputTypeByTypeIdAndModifier(
-          proc.returnTypeId,
-          null
-        );
-        if (!Type) return memo;
-        memo = build.extend(
-          memo,
-          {
-            [fieldName]: fieldWithHooks(
-              fieldName,
-              {
-                description: `Checks for equality with the object’s \`${fieldName}\` field.`,
-                type: Type,
-              },
-              {
-                isPgConnectionConditionInputField: true,
-                pgFieldIntrospection: proc,
-              }
-            ),
-          },
-          `Adding computed column condition argument for ${describePgEntity(
-            proc
-          )}`
-        );
-        return memo;
-      }, {})
-    );
-  });
+  builder.hook(
+    "GraphQLInputObjectType:fields",
+    (fields, build, context) => {
+      const {
+        extend,
+        pgGetGqlInputTypeByTypeIdAndModifier,
+        inflection,
+        describePgEntity,
+      } = build;
+      const {
+        scope: { isPgCondition, pgIntrospection: table },
+        fieldWithHooks,
+      } = context;
+      if (!isPgCondition || !table || table.kind !== "class") {
+        return fields;
+      }
+      const compatibleComputedColumns = getCompatibleComputedColumns(
+        build,
+        table
+      );
+      return extend(
+        fields,
+        compatibleComputedColumns.reduce((memo, { proc, pseudoColumnName }) => {
+          const fieldName = inflection.computedColumn(
+            pseudoColumnName,
+            proc,
+            table
+          );
+          const Type = pgGetGqlInputTypeByTypeIdAndModifier(
+            proc.returnTypeId,
+            null
+          );
+          if (!Type) return memo;
+          memo = build.extend(
+            memo,
+            {
+              [fieldName]: fieldWithHooks(
+                fieldName,
+                {
+                  description: `Checks for equality with the object’s \`${fieldName}\` field.`,
+                  type: Type,
+                },
+                {
+                  isPgConnectionConditionInputField: true,
+                  pgFieldIntrospection: proc,
+                }
+              ),
+            },
+            `Adding computed column condition argument for ${describePgEntity(
+              proc
+            )}`
+          );
+          return memo;
+        }, {})
+      );
+    },
+    ["PgConditionComputedColumn"]
+  );
 
   builder.hook(
     "GraphQLObjectType:fields:field:args",
@@ -201,6 +205,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       });
 
       return args;
-    }
+    },
+    ["PgConditionComputedColumn"]
   );
 }: Plugin);
