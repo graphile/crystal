@@ -131,6 +131,7 @@ export interface PgExtension {
   id: string;
   name: string;
   namespaceId: string;
+  namespaceName: string;
   relocatable: boolean;
   version: string;
   configurationClassIds?: Array<string>;

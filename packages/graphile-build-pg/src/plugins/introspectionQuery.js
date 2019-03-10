@@ -341,6 +341,7 @@ with
       ext.oid as "id",
       ext.extname as "name",
       ext.extnamespace as "namespaceId",
+      nsp.nspname as "namespaceName",
       ext.extrelocatable as "relocatable",
       ext.extversion as "version",
       ext.extconfig as "configurationClassIds",
@@ -348,6 +349,7 @@ with
     from
       pg_catalog.pg_extension as ext
       left join pg_catalog.pg_description as dsc on dsc.objoid = ext.oid and dsc.classoid = 'pg_catalog.pg_extension'::regclass
+      left join pg_catalog.pg_namespace as nsp on nsp.oid = ext.extnamespace
     order by
       ext.extname, ext.oid
   ),
