@@ -256,10 +256,14 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       graphql: require("graphql/package.json").version,
       "graphile-build": version,
     },
-    hasVersion(packageName: string, range: string): boolean {
+    hasVersion(
+      packageName: string,
+      range: string,
+      options?: { includePrerelease?: boolean } = { includePrerelease: true }
+    ): boolean {
       const packageVersion = this.versions[packageName];
       if (!packageVersion) return false;
-      return semver.satisfies(packageVersion, range);
+      return semver.satisfies(packageVersion, range, options);
     },
     graphql,
     parseResolveInfo,
