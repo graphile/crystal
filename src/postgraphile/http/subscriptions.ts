@@ -47,6 +47,9 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions(
   websocketServer: Server,
   postgraphileMiddleware: HttpRequestHandler,
+  subscriptionServerOptions?: {
+    keepAlive?: number
+  }
 ) {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
@@ -269,6 +272,22 @@ export async function enhanceHttpServerWithSubscriptions(
       onOperationComplete(socket: WebSocket, opId: string) {
         releaseContextForSocketAndOpId(socket, opId);
       },
+
+      /*
+       * Heroku times out after 55s:
+       *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+       *
+       * The subscriptions-transport-ws client times out by default 30s after last keepalive:
+       *   https://github.com/apollographql/subscriptions-transport-ws/blob/52758bfba6190169a28078ecbafd2e457a2ff7a8/src/defaults.ts#L1
+       *
+       * GraphQL Playground times out after 20s:
+       *   https://github.com/prisma/graphql-playground/blob/fa91e1b6d0488e6b5563d8b472682fe728ee0431/packages/graphql-playground-react/src/state/sessions/fetchingSagas.ts#L81
+       *
+       * Pick a number under these ceilings.
+       */
+      keepAlive: 15000,
+
+      ...subscriptionServerOptions
     },
     wss,
   );
