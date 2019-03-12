@@ -48,8 +48,8 @@ export async function enhanceHttpServerWithSubscriptions(
   websocketServer: Server,
   postgraphileMiddleware: HttpRequestHandler,
   subscriptionServerOptions?: {
-    keepAlive?: number
-  }
+    keepAlive?: number;
+  },
 ) {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
@@ -287,7 +287,7 @@ export async function enhanceHttpServerWithSubscriptions(
        */
       keepAlive: 15000,
 
-      ...subscriptionServerOptions
+      ...subscriptionServerOptions,
     },
     wss,
   );
