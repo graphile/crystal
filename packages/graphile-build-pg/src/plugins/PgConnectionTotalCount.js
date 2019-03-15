@@ -37,7 +37,7 @@ export default (function PgConnectionTotalCount(builder) {
                 return {
                   pgAggregateQuery: aggregateQueryBuilder => {
                     aggregateQueryBuilder.select(
-                      sql.fragment`count(*)`,
+                      sql.fragment`count(1)`,
                       "totalCount"
                     );
                   },
