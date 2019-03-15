@@ -173,7 +173,7 @@ export default class PgLogicalDecoding extends EventEmitter {
     await this.trackSelf(client);
     try {
       const { rows } = await client.query({
-        text: `SELECT lsn, data FROM pg_catalog.pg_logical_slot_get_changes($1, $2, $3, 'add-tables', $4::text, 'format-version', '1')`,
+        text: `SELECT lsn, data FROM pg_catalog.pg_logical_slot_get_changes($1, $2, $3, 'add-tables', $4::text)`,
         values: [this.slotName, uptoLsn, uptoNchanges, this.tablePattern],
         rowMode: "array",
       });
