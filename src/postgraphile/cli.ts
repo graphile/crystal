@@ -379,12 +379,33 @@ process.on('SIGINT', () => {
 // with defaults! So this code extracts those `--no-*` values and
 // re-overwrites the values if necessary.
 const configOptions = config['options'] || {};
-const overridesFromOptions = {};
-['ignoreIndexes', 'ignoreRbac', 'setofFunctionsContainNulls'].forEach(option => {
-  if (option in configOptions) {
-    overridesFromOptions[option] = configOptions[option];
+const booleanDefaults = {
+  setofFunctionsContainNulls: true,
+  dynamicJson: false,
+  classicIds: false,
+  disableDefaultMutations: false,
+  ignoreRbac: true,
+  ignoreIndexes: true,
+  includeExtensionResources: false,
+  showErrorStack: false,
+  enhanceGraphiql: false,
+  disableGraphiql: false,
+  cors: false,
+  enableQueryBatching: false,
+  disableQueryLog: false,
+  jwtVerifyIgnoreExpiration: false,
+  jwtVerifyIgnoreNotBefore: false,
+  // TODO!
+};
+function getConfigOverrides(cli, config) {
+  const newObj = {};
+  for (const key of booleanDefaults) {
+    if (key in config && key in cli && cli[key] === booleanDefaults[key]) {
+      newObj[key] = config[key];
+    }
   }
-});
+  return newObj;
+}
 
 // Destruct our configuration file and command line arguments, use defaults, and rename options to
 // something appropriate for JavaScript.
@@ -447,7 +468,11 @@ const {
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program, ...overridesFromOptions } as any;
+} = {
+  ...config['options'],
+  ...removeDefaults(program),
+  ...getDefaultOverrides(program, config['options']),
+} as any;
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
