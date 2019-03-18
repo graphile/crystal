@@ -17,9 +17,23 @@ create table graphile_utils.users (
   created_at timestamptz not null default now()
 );
 
+create table graphile_utils.pets (
+  id serial primary key,
+  user_id int not null, -- DELIBERATELY NO REFERENCE: references graphile_utils.users,
+  name text not null,
+  type text not null
+);
+create index on graphile_utils.pets(user_id);
+
 comment on column graphile_utils.users.slightly_more_complex_column is E'@name renamedComplexColumn';
 
 insert into graphile_utils.users (name, email, bio) values
   ('Alice', 'alice@example.com', null),
   ('Bob', 'bob@example.com', 'I''m a thought leader!'),
   ('Caroline', 'caroline@example.com', 'Saving the world, one disease at a time');
+
+insert into graphile_utils.pets (user_id, type, name) values
+  (2, 'cat', 'Felix'),
+  (2, 'dog', 'Fido'),
+  (3, 'goldfish', 'Goldie'),
+  (3, 'goldfish', 'Spot');

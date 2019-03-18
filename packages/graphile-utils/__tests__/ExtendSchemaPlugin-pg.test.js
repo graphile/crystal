@@ -513,11 +513,11 @@ it("allows adding a custom connection to a nested type", async () => {
         return {
           typeDefs: gql`
             extend type User {
-              myCustomConnection: UsersConnection @pgQuery(
-                source: ${embed(sql.fragment`graphile_utils.users`)}
+              pets: PetsConnection @pgQuery(
+                source: ${embed(sql.fragment`graphile_utils.pets`)}
                 withQueryBuilder: ${embed(queryBuilder => {
                   queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.id < 3`
+                    sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`
                   );
                 })}
               )
@@ -535,25 +535,39 @@ it("allows adding a custom connection to a nested type", async () => {
       schema,
       `
         query {
-          user: userById(id: 1) {
-            id
-            name
-            myCustomConnection(first: 1, offset: 1) {
-              edges {
-                cursor
-                node {
-                  bio
+          allUsers {
+            nodes {
+              id
+              name
+              p1: pets(first: 1, offset: 1) {
+                nodes {
+                  name
+                }
+                totalCount
+                pageInfo {
+                  hasNextPage
+                  hasPreviousPage
+                  startCursor
+                  endCursor
                 }
               }
-              nodes {
-                name
-              }
-              totalCount
-              pageInfo {
-                hasNextPage
-                hasPreviousPage
-                startCursor
-                endCursor
+              p2: pets(first: 2) {
+                edges {
+                  cursor
+                  node {
+                    type
+                  }
+                }
+                nodes {
+                  name
+                }
+                totalCount
+                pageInfo {
+                  hasNextPage
+                  hasPreviousPage
+                  startCursor
+                  endCursor
+                }
               }
             }
           }
@@ -565,21 +579,20 @@ it("allows adding a custom connection to a nested type", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
-    expect(data.user).toBeTruthy();
-    expect(data.user.myCustomConnection).toBeTruthy();
-    expect(data.user.myCustomConnection.edges.length).toEqual(1);
-    expect(data.user.myCustomConnection.nodes.length).toEqual(1);
-    expect(data.user.myCustomConnection.edges[0].cursor).toBeTruthy();
-    expect(data.user.myCustomConnection.edges[0].node).toBeTruthy();
-    expect(data.user.myCustomConnection.edges[0].node.bio).not.toBe(undefined);
-    expect(data.user.myCustomConnection.nodes[0]).toBeTruthy();
-    expect(data.user.myCustomConnection.nodes[0].name).toBeTruthy();
-    expect(data.user.myCustomConnection.totalCount).toEqual(2);
-    expect(data.user.myCustomConnection.pageInfo).toBeTruthy();
-    expect(data.user.myCustomConnection.pageInfo.hasNextPage).toBe(false);
-    expect(data.user.myCustomConnection.pageInfo.hasPreviousPage).toBe(true);
-    expect(data.user.myCustomConnection.pageInfo.startCursor).toBeTruthy();
-    expect(data.user.myCustomConnection.pageInfo.endCursor).toBeTruthy();
+    expect(data.allUsers).toBeTruthy();
+    expect(data.allUsers.nodes).toHaveLength(3);
+    const [alice, bob, caroline] = data.allUsers.nodes;
+    expect(alice.p2).toBeTruthy();
+    expect(alice.p2.nodes).toHaveLength(0);
+    expect(alice.p2.totalCount).toEqual(0);
+    expect(bob.p2).toBeTruthy();
+    expect(bob.p2.nodes).toHaveLength(2);
+    expect(bob.p2.totalCount).toEqual(2);
+    expect(caroline.p2).toBeTruthy();
+    expect(caroline.p2.nodes).toHaveLength(2);
+    expect(caroline.p2.totalCount).toEqual(2);
+    expect(caroline.p2.nodes.map(n => n.name)).toEqual(["Goldie", "Spot"]);
+    expect(data).toMatchSnapshot();
   } finally {
     pgClient.release();
   }

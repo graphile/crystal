@@ -732,7 +732,7 @@ function getFields<TSource>(
               );
             }
           }
-          if (directives.pgQuery && table && pgIntrospection === table) {
+          if (directives.pgQuery && table) {
             fieldContext.addDataGenerator((parsedResolveInfoFragment: any) => {
               return {
                 pgQuery: (queryBuilder: QueryBuilder) => {

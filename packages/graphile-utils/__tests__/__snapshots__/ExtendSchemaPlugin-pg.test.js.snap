@@ -44,6 +44,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -62,6 +131,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -91,7 +189,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -254,6 +359,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -272,6 +446,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -301,7 +504,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -321,7 +531,7 @@ type User implements Node {
   bio: String
   renamedComplexColumn: [Complex]
   createdAt: Datetime!
-  myCustomConnection(
+  pets(
     \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
     first: Int
 
@@ -340,14 +550,14 @@ type User implements Node {
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
 
-    \\"\\"\\"The method to use when ordering \`User\`.\\"\\"\\"
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
 
     \\"\\"\\"
     A condition to be used in determining which values should be returned by the collection.
     \\"\\"\\"
-    condition: UserCondition
-  ): UsersConnection
+    condition: PetCondition
+  ): PetsConnection
 }
 
 \\"\\"\\"
@@ -420,6 +630,138 @@ enum UsersOrderBy {
 "
 `;
 
+exports[`allows adding a custom connection to a nested type 2`] = `
+Object {
+  "allUsers": Object {
+    "nodes": Array [
+      Object {
+        "id": 1,
+        "name": "Alice",
+        "p1": Object {
+          "nodes": Array [],
+          "pageInfo": Object {
+            "endCursor": null,
+            "hasNextPage": false,
+            "hasPreviousPage": true,
+            "startCursor": null,
+          },
+          "totalCount": 0,
+        },
+        "p2": Object {
+          "edges": Array [],
+          "nodes": Array [],
+          "pageInfo": Object {
+            "endCursor": null,
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": null,
+          },
+          "totalCount": 0,
+        },
+      },
+      Object {
+        "id": 2,
+        "name": "Bob",
+        "p1": Object {
+          "nodes": Array [
+            Object {
+              "name": "Fido",
+            },
+          ],
+          "pageInfo": Object {
+            "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+            "hasNextPage": false,
+            "hasPreviousPage": true,
+            "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          },
+          "totalCount": 2,
+        },
+        "p2": Object {
+          "edges": Array [
+            Object {
+              "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+              "node": Object {
+                "type": "cat",
+              },
+            },
+            Object {
+              "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+              "node": Object {
+                "type": "dog",
+              },
+            },
+          ],
+          "nodes": Array [
+            Object {
+              "name": "Felix",
+            },
+            Object {
+              "name": "Fido",
+            },
+          ],
+          "pageInfo": Object {
+            "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          },
+          "totalCount": 2,
+        },
+      },
+      Object {
+        "id": 3,
+        "name": "Caroline",
+        "p1": Object {
+          "nodes": Array [
+            Object {
+              "name": "Spot",
+            },
+          ],
+          "pageInfo": Object {
+            "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+            "hasNextPage": false,
+            "hasPreviousPage": true,
+            "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          },
+          "totalCount": 2,
+        },
+        "p2": Object {
+          "edges": Array [
+            Object {
+              "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+              "node": Object {
+                "type": "goldfish",
+              },
+            },
+            Object {
+              "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+              "node": Object {
+                "type": "goldfish",
+              },
+            },
+          ],
+          "nodes": Array [
+            Object {
+              "name": "Goldie",
+            },
+            Object {
+              "name": "Spot",
+            },
+          ],
+          "pageInfo": Object {
+            "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          },
+          "totalCount": 2,
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`allows adding a custom connection without requiring directives 1`] = `
 "type Complex {
   numberInt: Int
@@ -464,6 +806,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -482,6 +893,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -511,7 +951,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -674,6 +1121,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -692,6 +1208,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -721,7 +1266,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -858,6 +1410,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -876,6 +1497,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -905,7 +1555,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -1042,6 +1699,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -1060,6 +1786,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -1089,7 +1844,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -1226,6 +1988,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -1244,6 +2075,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -1273,7 +2133,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -1422,6 +2289,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -1440,6 +2376,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -1469,7 +2434,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
@@ -1638,6 +2610,75 @@ type PageInfo {
   endCursor: Cursor
 }
 
+type Pet implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PetCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`userId\` field.\\"\\"\\"
+  userId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`type\` field.\\"\\"\\"
+  type: String
+}
+
+\\"\\"\\"A connection to a list of \`Pet\` values.\\"\\"\\"
+type PetsConnection {
+  \\"\\"\\"A list of \`Pet\` objects.\\"\\"\\"
+  nodes: [Pet]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PetsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Pet\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Pet\` edge in the connection.\\"\\"\\"
+type PetsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Pet\` at the end of the edge.\\"\\"\\"
+  node: Pet
+}
+
+\\"\\"\\"Methods to use when ordering \`Pet\`.\\"\\"\\"
+enum PetsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"
@@ -1656,6 +2697,35 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
     nodeId: ID!
   ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
+  allPets(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Pet\`.\\"\\"\\"
+    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PetCondition
+  ): PetsConnection
 
   \\"\\"\\"Reads and enables pagination through a set of \`User\`.\\"\\"\\"
   allUsers(
@@ -1685,7 +2755,14 @@ type Query implements Node {
     \\"\\"\\"
     condition: UserCondition
   ): UsersConnection
+  petById(id: Int!): Pet
   userById(id: Int!): User
+
+  \\"\\"\\"Reads a single \`Pet\` using its globally unique \`ID\`.\\"\\"\\"
+  pet(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Pet\`.\\"\\"\\"
+    nodeId: ID!
+  ): Pet
 
   \\"\\"\\"Reads a single \`User\` using its globally unique \`ID\`.\\"\\"\\"
   user(
