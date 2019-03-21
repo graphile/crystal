@@ -19,7 +19,7 @@ import {
   PgAttribute,
   formatSQLForDebugging,
 } from "graphile-build-pg";
-import { Pool, Client } from "pg";
+import { Pool, PoolClient } from "pg";
 
 export {
   Plugin,
@@ -87,7 +87,7 @@ export interface PostGraphileCoreOptions {
   ownerConnectionString?: string;
 }
 
-type PgConfig = Client | Pool | string;
+type PgConfig = Pool | PoolClient | string;
 
 /*
  * BELOW HERE IS DEPRECATED!!
