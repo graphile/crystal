@@ -13,7 +13,7 @@ export default (function SwallowErrorsPlugin(
         // compatibility, `swallowError` still exists on `makeNewBuild`; and
         // thus this plugin is really `dontSwallowErrors`.
         // $FlowFixMe
-        return Object.assign({}, build, {
+        return Object.assign(build, {
           swallowError(e) {
             // $FlowFixMe
             e.recoverable = true;

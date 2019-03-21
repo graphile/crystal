@@ -335,7 +335,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       if (!Type) {
         throw new Error("No type specified!");
       }
-      if (!this.newWithHooks || !Object.isFrozen(this)) {
+      if (!this.newWithHooks) {
         throw new Error(
           "Please do not generate the schema during the build building phase, use 'init' instead"
         );

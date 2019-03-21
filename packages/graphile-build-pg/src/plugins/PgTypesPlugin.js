@@ -46,7 +46,19 @@ export default (function PgTypesPlugin(
         graphql,
       } = build;
 
-      const addType = build.addType.bind(build);
+      /*
+       * Note these do not do `foo.bind(build)` because they want to reference
+       * the *latest* value of foo (i.e. after all the build hooks run) rather
+       * than the current value of foo in this current hook.
+       *
+       * Also don't use this in your own code, only construct types *after* the
+       * build hook has completed (i.e. 'init' or later).
+       *
+       * TODO:v5: move this to the 'init' hook.
+       */
+      const newWithHooks = (...args) => build.newWithHooks(...args);
+      const addType = (...args) => build.addType(...args);
+
       const {
         GraphQLNonNull,
         GraphQLString,
@@ -175,20 +187,32 @@ export default (function PgTypesPlugin(
           },
         };
       };
-      const GQLInterval = new GraphQLObjectType({
-        name: inflection.builtin("Interval"),
-        description:
-          "An interval of time that has passed where the smallest distinct unit is a second.",
-        fields: makeIntervalFields(),
-      });
+      const GQLInterval = newWithHooks(
+        GraphQLObjectType,
+        {
+          name: inflection.builtin("Interval"),
+          description:
+            "An interval of time that has passed where the smallest distinct unit is a second.",
+          fields: makeIntervalFields(),
+        },
+        {
+          isIntervalType: true,
+        }
+      );
       addType(GQLInterval, "graphile-build-pg built-in");
 
-      const GQLIntervalInput = new GraphQLInputObjectType({
-        name: inflection.inputType(inflection.builtin("Interval")),
-        description:
-          "An interval of time that has passed where the smallest distinct unit is a second.",
-        fields: makeIntervalFields(),
-      });
+      const GQLIntervalInput = newWithHooks(
+        GraphQLInputObjectType,
+        {
+          name: inflection.inputType(inflection.builtin("Interval")),
+          description:
+            "An interval of time that has passed where the smallest distinct unit is a second.",
+          fields: makeIntervalFields(),
+        },
+        {
+          isIntervalInputType: true,
+        }
+      );
       addType(GQLIntervalInput, "graphile-build-pg built-in");
 
       const stringType = (name, description) =>
@@ -330,28 +354,40 @@ export default (function PgTypesPlugin(
       const TimeType = SimpleTime; // GraphQLTime
 
       // 'point' in PostgreSQL is a 16-byte type that's comprised of two 8-byte floats.
-      const Point = new GraphQLObjectType({
-        name: inflection.builtin("Point"),
-        fields: {
-          x: {
-            type: new GraphQLNonNull(GraphQLFloat),
-          },
-          y: {
-            type: new GraphQLNonNull(GraphQLFloat),
-          },
-        },
-      });
-      const PointInput = new GraphQLInputObjectType({
-        name: inflection.inputType(inflection.builtin("Point")),
-        fields: {
-          x: {
-            type: new GraphQLNonNull(GraphQLFloat),
-          },
-          y: {
-            type: new GraphQLNonNull(GraphQLFloat),
+      const Point = newWithHooks(
+        GraphQLObjectType,
+        {
+          name: inflection.builtin("Point"),
+          fields: {
+            x: {
+              type: new GraphQLNonNull(GraphQLFloat),
+            },
+            y: {
+              type: new GraphQLNonNull(GraphQLFloat),
+            },
           },
         },
-      });
+        {
+          isPointType: true,
+        }
+      );
+      const PointInput = newWithHooks(
+        GraphQLInputObjectType,
+        {
+          name: inflection.inputType(inflection.builtin("Point")),
+          fields: {
+            x: {
+              type: new GraphQLNonNull(GraphQLFloat),
+            },
+            y: {
+              type: new GraphQLNonNull(GraphQLFloat),
+            },
+          },
+        },
+        {
+          isPointInputType: true,
+        }
+      );
 
       // Other plugins might want to use JSON
       addType(JSONType, "graphile-build-pg built-in");
@@ -516,18 +552,23 @@ export default (function PgTypesPlugin(
           !gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] &&
           type.type === "e"
         ) {
-          gqlTypeByTypeIdAndModifier[type.id][
-            typeModifierKey
-          ] = new GraphQLEnumType({
-            name: inflection.enumType(type),
-            description: type.description,
-            values: type.enumVariants.reduce((memo, value) => {
-              memo[inflection.enumName(value)] = {
-                value: value,
-              };
-              return memo;
-            }, {}),
-          });
+          gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = newWithHooks(
+            GraphQLEnumType,
+            {
+              name: inflection.enumType(type),
+              description: type.description,
+              values: type.enumVariants.reduce((memo, value) => {
+                memo[inflection.enumName(value)] = {
+                  value: value,
+                };
+                return memo;
+              }, {}),
+            },
+            {
+              pgIntrospection: type,
+              isPgEnumType: true,
+            }
+          );
         }
         // Ranges
         if (
@@ -546,66 +587,102 @@ export default (function PgTypesPlugin(
           let Range = getTypeByName(inflection.rangeType(gqlRangeSubType.name));
           let RangeInput;
           if (!Range) {
-            const RangeBound = new GraphQLObjectType({
-              name: inflection.rangeBoundType(gqlRangeSubType.name),
-              description:
-                "The value at one end of a range. A range can either include this value, or not.",
-              fields: {
-                value: {
-                  description: "The value at one end of our range.",
-                  type: new GraphQLNonNull(gqlRangeSubType),
-                },
-                inclusive: {
-                  description:
-                    "Whether or not the value of this bound is included in the range.",
-                  type: new GraphQLNonNull(GraphQLBoolean),
-                },
-              },
-            });
-            const RangeBoundInput = new GraphQLInputObjectType({
-              name: inflection.inputType(RangeBound.name),
-              description:
-                "The value at one end of a range. A range can either include this value, or not.",
-              fields: {
-                value: {
-                  description: "The value at one end of our range.",
-                  type: new GraphQLNonNull(gqlRangeSubType),
-                },
-                inclusive: {
-                  description:
-                    "Whether or not the value of this bound is included in the range.",
-                  type: new GraphQLNonNull(GraphQLBoolean),
+            const RangeBound = newWithHooks(
+              GraphQLObjectType,
+              {
+                name: inflection.rangeBoundType(gqlRangeSubType.name),
+                description:
+                  "The value at one end of a range. A range can either include this value, or not.",
+                fields: {
+                  value: {
+                    description: "The value at one end of our range.",
+                    type: new GraphQLNonNull(gqlRangeSubType),
+                  },
+                  inclusive: {
+                    description:
+                      "Whether or not the value of this bound is included in the range.",
+                    type: new GraphQLNonNull(GraphQLBoolean),
+                  },
                 },
               },
-            });
-            Range = new GraphQLObjectType({
-              name: inflection.rangeType(gqlRangeSubType.name),
-              description: `A range of \`${gqlRangeSubType.name}\`.`,
-              fields: {
-                start: {
-                  description: "The starting bound of our range.",
-                  type: RangeBound,
-                },
-                end: {
-                  description: "The ending bound of our range.",
-                  type: RangeBound,
-                },
-              },
-            });
-            RangeInput = new GraphQLInputObjectType({
-              name: inflection.inputType(Range.name),
-              description: `A range of \`${gqlRangeSubType.name}\`.`,
-              fields: {
-                start: {
-                  description: "The starting bound of our range.",
-                  type: RangeBoundInput,
-                },
-                end: {
-                  description: "The ending bound of our range.",
-                  type: RangeBoundInput,
+              {
+                isPgRangeBoundType: true,
+                pgIntrospection: type,
+                pgSubtypeIntrospection: subtype,
+                pgTypeModifier: typeModifier,
+              }
+            );
+            const RangeBoundInput = newWithHooks(
+              GraphQLInputObjectType,
+              {
+                name: inflection.inputType(RangeBound.name),
+                description:
+                  "The value at one end of a range. A range can either include this value, or not.",
+                fields: {
+                  value: {
+                    description: "The value at one end of our range.",
+                    type: new GraphQLNonNull(gqlRangeSubType),
+                  },
+                  inclusive: {
+                    description:
+                      "Whether or not the value of this bound is included in the range.",
+                    type: new GraphQLNonNull(GraphQLBoolean),
+                  },
                 },
               },
-            });
+              {
+                isPgRangeBoundInputType: true,
+                pgIntrospection: type,
+                pgSubtypeIntrospection: subtype,
+                pgTypeModifier: typeModifier,
+              }
+            );
+            Range = newWithHooks(
+              GraphQLObjectType,
+              {
+                name: inflection.rangeType(gqlRangeSubType.name),
+                description: `A range of \`${gqlRangeSubType.name}\`.`,
+                fields: {
+                  start: {
+                    description: "The starting bound of our range.",
+                    type: RangeBound,
+                  },
+                  end: {
+                    description: "The ending bound of our range.",
+                    type: RangeBound,
+                  },
+                },
+              },
+              {
+                isPgRangeType: true,
+                pgIntrospection: type,
+                pgSubtypeIntrospection: subtype,
+                pgTypeModifier: typeModifier,
+              }
+            );
+            RangeInput = newWithHooks(
+              GraphQLInputObjectType,
+              {
+                name: inflection.inputType(Range.name),
+                description: `A range of \`${gqlRangeSubType.name}\`.`,
+                fields: {
+                  start: {
+                    description: "The starting bound of our range.",
+                    type: RangeBoundInput,
+                  },
+                  end: {
+                    description: "The ending bound of our range.",
+                    type: RangeBoundInput,
+                  },
+                },
+              },
+              {
+                isPgRangeInputType: true,
+                pgIntrospection: type,
+                pgSubtypeIntrospection: subtype,
+                pgTypeModifier: typeModifier,
+              }
+            );
             addType(Range, "graphile-build-pg built-in");
             addType(RangeInput, "graphile-build-pg built-in");
           } else {

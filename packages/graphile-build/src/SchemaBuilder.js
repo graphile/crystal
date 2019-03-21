@@ -380,7 +380,27 @@ class SchemaBuilder extends EventEmitter {
           const previousHookEvent = build.status.currentHookEvent;
           build.status.currentHookName = hookDisplayName;
           build.status.currentHookEvent = hookName;
+          const oldObj = newObj;
           newObj = hook(newObj, build, context);
+          if (hookName === "build") {
+            /*
+             * Unlike all the other hooks, the `build` hook must always use the
+             * same `build` object - never returning a new object for fear of
+             * causing issues to other build hooks that reference the old
+             * object and don't get the new additions.
+             */
+            if (newObj !== oldObj) {
+              // TODO:v5: forbid this
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Build hook '${hookDisplayName}' returned a new object; please use 'return build.extend(build, {...})' instead.`
+              );
+              // Copy everything from newObj back to oldObj
+              Object.assign(oldObj, newObj);
+              // Go back to the old objectect
+              newObj = oldObj;
+            }
+          }
           build.status.currentHookName = previousHookName;
           build.status.currentHookEvent = previousHookEvent;
 
