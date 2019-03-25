@@ -302,6 +302,7 @@ export default (function PgBackwardRelationPlugin(
                                   if (primaryKeys) {
                                     if (
                                       subscriptions &&
+                                      !isConnection &&
                                       table.primaryKeyConstraint
                                     ) {
                                       innerQueryBuilder.selectIdentifiers(
@@ -388,7 +389,7 @@ export default (function PgBackwardRelationPlugin(
                             return addStartEndCursor(data[safeAlias]);
                           } else {
                             const records = data[safeAlias];
-                            if (resolveContext.liveRecord) {
+                            if (subscriptions && resolveContext.liveRecord) {
                               records.forEach(
                                 r =>
                                   r &&

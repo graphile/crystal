@@ -121,7 +121,7 @@ export default (async function PgAllRows(
                           );
                         }
                         if (primaryKeys) {
-                          if (subscriptions) {
+                          if (subscriptions && !isConnection) {
                             queryBuilder.selectIdentifiers(table);
                           }
                           queryBuilder.beforeLock("orderBy", () => {
@@ -179,7 +179,12 @@ export default (async function PgAllRows(
                       } = result;
                       return addStartEndCursor(row);
                     } else {
-                      if (primaryKeys && resolveContext.liveRecord) {
+                      if (
+                        subscriptions &&
+                        !isConnection &&
+                        primaryKeys &&
+                        resolveContext.liveRecord
+                      ) {
                         result.rows.forEach(
                           row =>
                             row &&

@@ -21,7 +21,7 @@ const hasNonNullKey = row => {
 
 export default (function PgTablesPlugin(
   builder,
-  { pgForbidSetofFunctionsToReturnNull = false }
+  { pgForbidSetofFunctionsToReturnNull = false, subscriptions = false }
 ) {
   const handleNullRow = pgForbidSetofFunctionsToReturnNull
     ? (row, _identifiers) => row
@@ -378,7 +378,14 @@ export default (function PgTablesPlugin(
                         },
                       },
                       {},
-                      false
+                      false,
+                      {
+                        withQueryBuilder: queryBuilder => {
+                          if (subscriptions) {
+                            queryBuilder.selectIdentifiers(table);
+                          }
+                        },
+                      }
                     ),
                   };
                 },
@@ -450,7 +457,14 @@ export default (function PgTablesPlugin(
                         },
                       },
                       {},
-                      false
+                      false,
+                      {
+                        withQueryBuilder: queryBuilder => {
+                          if (subscriptions) {
+                            queryBuilder.selectIdentifiers(table);
+                          }
+                        },
+                      }
                     ),
                     edges: pgField(
                       build,

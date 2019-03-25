@@ -54,7 +54,12 @@ export function makeFieldHelpers<TSource>(
         withPaginationAsFields: isConnection,
       },
       (sqlBuilder: QueryBuilder) => {
-        if (primaryKeys && build.options.subscriptions && table) {
+        if (
+          !isConnection &&
+          primaryKeys &&
+          build.options.subscriptions &&
+          table
+        ) {
           sqlBuilder.selectIdentifiers(table);
         }
 
@@ -68,6 +73,17 @@ export function makeFieldHelpers<TSource>(
     if (isConnection) {
       return build.pgAddStartEndCursor(rows[0]);
     } else {
+      if (
+        build.options.subscriptions &&
+        !isConnection &&
+        primaryKeys &&
+        context.liveRecord
+      ) {
+        rows.forEach(
+          (row: any) =>
+            row && context.liveRecord("pg", table, row.__identifiers)
+        );
+      }
       return rows;
     }
   };
