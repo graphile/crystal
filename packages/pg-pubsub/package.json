@@ -1,6 +1,6 @@
 {
   "name": "@graphile/pg-pubsub",
-  "version": "4.4.0-beta.7",
+  "version": "4.4.0-beta.8",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL's LISTEN/NOTIFY",
   "main": "dist/index.js",
   "scripts": {
