@@ -28,6 +28,7 @@ In this tutorial we will walk through the Postgres schema design for a forum app
   - [JSON Web Tokens](#json-web-tokens)
   - [Logging In](#logging-in)
   - [Using the Authorized User](#using-the-authorized-user)
+  - [Updating Passwords](#updating-passwords)
   - [Grants](#grants)
   - [Row Level Security](#row-level-security)
 - [Conclusion](#conclusion)
@@ -632,51 +633,36 @@ create function forum_example.authenticate(
   email text,
   password text
 ) returns forum_example.jwt_token as $$
-declare
-  account forum_example_private.person_account;
-begin
-  select a.* into account
-  from forum_example_private.person_account as a
-  where a.email = $1;
-
-  if account.password_hash = crypt(password, account.password_hash) then
-    return ('forum_example_person', account.person_id)::forum_example.jwt_token;
-  else
-    return null;
-  end if;
-end;
-$$ language plpgsql strict security definer;
+  select ('forum_example_person', person_id)::forum_example.jwt_token
+    from forum_example_private.person_account
+    where 
+      person_account.email = $1 
+      and person_account.password_hash = crypt($2, person_account.password_hash);
+$$ language sql strict security definer;
 
 comment on function forum_example.authenticate(text, text) is 'Creates a JWT token that will securely identify a person and give them certain permissions.';
 ```
 
 This function will return null if the user failed to authenticate, and a JWT token if the user succeeds. Returning null could mean that the password was incorrect, a user with their email doesn’t exist, or the client forgot to pass `email` and/or `password` arguments. It is then up to the client to raise an error when encountering `null`. If a user with the provided email _does_ exist, and the provided password checks out with `password_hash` in `forum_example_private.person_account` then we return an instance of `forum_example.jwt_token` which will then be converted into an actual JWT by PostGraphile.
 
-There are two main parts to our function body. The first is:
+The function body is a single statement: 
 
-```plpgsql
-select a.* into account
-from forum_example_private.person_account as a
-where a.email = $1;
+```SQL
+  select ('forum_example_person', account.person_id)::forum_example.jwt_token
+    from forum_example_private.person_account
+    where 
+      account.email = $1 
+      and account.password_hash = crypt($2, account.password_hash);
 ```
 
-This code will select a single account from `forum_example_private.person_account` using the provided email value. The `$1` here is just another way to write the `email` argument. If we had wrote `email = email` or even `a.email = email`, Postgres would not have known which email we were referring to, so instead we just used a substitute for the `email` argument which depends on its placement in the identifer `$1`. If we successfully find a person with that email, we store it in the `account` variable. If we do not find anything, `account` will be null. The second part of our function is:
-
-```plpgsql
-if account.password_hash = crypt(password, account.password_hash) then
-  return ('forum_example_person', account.person_id)::forum_example.jwt_token;
-else
-  return null;
-end if;
-```
-
-This is an if/else statement that checks to see if the plaintext `password` argument we were provided matches the password hash that was stored in our `forum_example_private.person_account`’s `password_hash` table. If there is a match, then we return a JWT token. Otherwise we return null. The password match check is done in the code `account.password_hash = crypt(password, account.password_hash)`. To better understand how this works, read the documentation for `pgcrypto` on [password hashing functions](https://www.postgresql.org/docs/9.6/static/pgcrypto.html#AEN178870).
+This code will select a single account from `forum_example_private.person_account` using the provided email value. The `$1` here is just another way to write the `email` argument. If we had written `email = email` or even `a.email = email`, Postgres would not have known which email we were referring to, so instead we just used a substitute for the `email` argument which depends on its placement in the identifer `$1`. If Postgres does not successfully find a person with that email, then no records will be available for the select and the function will return null.   If it does find a matching email, it will proceed to check if the password also matches.  To do this, Postgress will check to see if the plaintext `password` argument we were provided matches the password hash that was stored in our `forum_example_private.person_account`’s `password_hash` table. If there is a match, then we return a JWT token. Otherwise we return null as previously described. The password match check is done in the code `account.password_hash = crypt($2, account.password_hash)`. To better understand how this works, read the documentation for `pgcrypto` on [password hashing functions](https://www.postgresql.org/docs/9.6/static/pgcrypto.html#AEN178870).
 
 In order to construct a `forum_example.jwt_token` we use the Postgres [composite value input](https://www.postgresql.org/docs/9.6/static/rowtypes.html#AEN8046) syntax which looks like: `('forum_example_person', account.person_id)`. Then we cast that composite value with `::forum_example.jwt_token`. The order in which the values go is the order in which they were originally defined. Since we defined `role` first and `person_id` second, this JWT will have a `role` of `forum_example_person` and a `person_id` of `account.person_id`.
 
 > **Warning:** Be careful about logging around this function too.
 
 Now that we know how to get JWTs for our users, let’s use the JWTs.
+
 
 ### Using the Authorized User
 
@@ -693,6 +679,33 @@ comment on function forum_example.current_person() is 'Gets the person who was i
 ```
 
 This is a simple function that we can use in PostGraphile or our database to get the person who is currently executing the query — by means of the token in the request header. The one new concept here is `current_setting('jwt.claims.person_id', true)::integer`. As we discussed before, PostGraphile will serialize your JWT to the database in the form of transaction local settings. Using the `current_setting` function is how we access those settings. Also note that we cast the value to an integer with `::integer`. This is because the Postgres `current_setting` function will always return a string, if you need another data type, you will likely need to cast to that data type.
+
+### Updating Passwords
+
+Now that we can identify the current user, we might want to use that information to make functions that are relevant only to the current user, such as returning a set of data only relevant to that user or, as our title suggests, changing the current user's password.
+
+```sql
+create function forum_example.change_password(current_password text, new_password text) 
+returns boolean as $$
+declare
+  current_person forum_example.person;
+begin
+  current_person := forum_example.current_person();
+  if exists (select 1 from forum_example_private.person_account where person_account.person_id = current_person.id and person_account.password_hash = crypt($1, person_account.password_hash)) 
+  then
+    update forum_example_private.person_account set password_hash = crypt($2, gen_salt('bf')) where person_account.person_id = current_person.id; 
+    return true;
+  else 
+    return false;
+  end if;
+end;
+$$ language plpgsql strict security definer;
+```
+
+This function will return a boolean that is true if the password has been successfully updated and false if the password was not updated.
+We use the function `current_person` to get the id of the person who owns the JWT token sent with the request.
+Then we check if there is a record matching the id and password of this current person, roughly equivalent to authenticating them again.
+If there is a matching record, we update the `password_hash` for the account to match the new password, and if there is no matching record, we return false to indicate the password update failed.
 
 Now, let’s use the JWT to define permissions.
 
@@ -716,6 +729,7 @@ grant execute on function forum_example.person_latest_post(forum_example.person)
 grant execute on function forum_example.search_posts(text) to forum_example_anonymous, forum_example_person;
 grant execute on function forum_example.authenticate(text, text) to forum_example_anonymous, forum_example_person;
 grant execute on function forum_example.current_person() to forum_example_anonymous, forum_example_person;
+grant execute on function forum_example.change_password(text, text) to forum_example_person;
 
 grant execute on function forum_example.register_person(text, text, text, text) to forum_example_anonymous;
 ```

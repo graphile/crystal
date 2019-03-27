@@ -162,30 +162,38 @@ create function forum_example.authenticate(
   email text,
   password text
 ) returns forum_example.jwt_token as $$
-declare
-  account forum_example_private.person_account;
-begin
-  select a.* into account
-  from forum_example_private.person_account as a
-  where a.email = $1;
-
-  if account.password_hash = crypt(password, account.password_hash) then
-    return ('forum_example_person', account.person_id)::forum_example.jwt_token;
-  else
-    return null;
-  end if;
-end;
-$$ language plpgsql strict security definer;
+  select ('forum_example_person', person_id)::forum_example.jwt_token
+    from forum_example_private.person_account
+    where 
+      person_account.email = $1 
+      and person_account.password_hash = crypt($2, person_account.password_hash);
+$$ language sql strict security definer;
 
 comment on function forum_example.authenticate(text, text) is 'Creates a JWT token that will securely identify a person and give them certain permissions.';
 
 create function forum_example.current_person() returns forum_example.person as $$
   select *
   from forum_example.person
-  where id = nullif(current_setting('jwt.claims.person_id', true), '')::integer
+  where id = current_setting('jwt.claims.person_id', true)::integer
 $$ language sql stable;
 
 comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
+
+create function forum_example.change_password(current_password text, new_password text) 
+returns boolean as $$
+declare
+  current_person forum_example.person;
+begin
+  current_person := forum_example.current_person();
+  if exists (select 1 from forum_example_private.person_account where person_account.person_id = current_person.id and person_account.password_hash = crypt($1, person_account.password_hash)) 
+  then
+    update forum_example_private.person_account set password_hash = crypt($2, gen_salt('bf')) where person_account.person_id = current_person.id; 
+    return true;
+  else 
+    return false;
+  end if;
+end;
+$$ language plpgsql strict security definer;
 
 grant usage on schema forum_example to forum_example_anonymous, forum_example_person;
 
@@ -202,6 +210,7 @@ grant execute on function forum_example.person_latest_post(forum_example.person)
 grant execute on function forum_example.search_posts(text) to forum_example_anonymous, forum_example_person;
 grant execute on function forum_example.authenticate(text, text) to forum_example_anonymous, forum_example_person;
 grant execute on function forum_example.current_person() to forum_example_anonymous, forum_example_person;
+grant execute on function forum_example.change_password(text, text) to forum_example_person;
 
 grant execute on function forum_example.register_person(text, text, text, text) to forum_example_anonymous;
 
