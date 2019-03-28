@@ -32,7 +32,7 @@ ${schemaMarkdownFile
     if (isInsideMarkdownSQLCode) {
       // If this line closes our SQL, do not include this line, but do
       // change our state.
-      if (line === '```') {
+      if (line.trim() === '```') {
         isInsideMarkdownSQLCode = false
         return `${sql}\n`
       }
@@ -42,7 +42,7 @@ ${schemaMarkdownFile
     // code so far.
     else {
       // If this line opens a block of SQL, change our state.
-      if (line === '```sql')
+      if (line.trim() === '```sql')
         isInsideMarkdownSQLCode = true
 
       return sql
