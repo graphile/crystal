@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "homepage": "https://graphile.org/postgraphile/",
   "dependencies": {
-    "graphiql": "npm:@benjie/graphiql@0.12.1-a701b68f61a315280ba3e292275757f37e004ad5",
+    "graphiql": "0.13.0",
     "graphiql-explorer": "^0.3.6",
     "graphql": "^14.0.2",
     "react": "^16.8.1",
