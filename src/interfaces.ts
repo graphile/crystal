@@ -302,7 +302,7 @@ export interface WithPostGraphileContextOptions {
   jwtToken?: string;
   jwtSecret?: string;
   jwtAudiences?: Array<string>;
-  jwtRole: Array<string>;
+  jwtRole?: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;
   pgDefaultRole?: string;
   pgSettings?: { [key: string]: mixed };
