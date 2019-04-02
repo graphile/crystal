@@ -11,13 +11,13 @@ sponsor](https://graphile.org/sponsor/).
 ## Leaders
 
 - Joe Dennis
-- MissionMode
 - DOMONDA
 - Alec Wenzowski
 - James Allain
 - Stagency
 - Gustin Prudner
 - Daniel Einspanjer
+- 8th Light
 - NodeSource
 - Nigel Taylor
 
@@ -25,15 +25,18 @@ sponsor](https://graphile.org/sponsor/).
 
 - Michael Tng
 - Matt Bretl (also a major community contributor!)
-- BMD Studio
 - Sam Levin
+- BMD Studio
 - stlbucket
 - Michel Pelletier
 - Dan Lynch
 - James Rascoe
 - Jimmy McBroom
 - James Cavanaugh
-- Antwaan Harrison
 - Chris Watland
+- Antwaan Harrison
 - Simon Elliott
 - Mark Lipscombe
+- Frank
+- Mark Rapoza
+- innovation.rocks
