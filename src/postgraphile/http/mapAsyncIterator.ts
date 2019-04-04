@@ -21,30 +21,30 @@ export default function mapAsyncIterator<T, U>(
   iterable: AsyncIterable<T>,
   callback: (val: T) => PromiseOrValue<U>,
   rejectCallback?: (val: any) => PromiseOrValue<U>,
-): AsyncGenerator<U, void, void> {
+) {
   const iterator = getAsyncIterator(iterable);
-  let $return;
-  let abruptClose;
+  let $return: any;
+  let abruptClose: any;
   // $FlowFixMe(>=0.68.0)
   if (typeof iterator.return === 'function') {
     $return = iterator.return;
-    abruptClose = error => {
+    abruptClose = (error: any) => {
       const rethrow = () => Promise.reject(error);
       return $return.call(iterator).then(rethrow, rethrow);
     };
   }
 
-  function mapResult(result) {
+  function mapResult(result: any) {
     return result.done
       ? result
       : asyncMapValue(result.value, callback).then(iteratorResult, abruptClose);
   }
 
-  let mapReject;
+  let mapReject: any;
   if (rejectCallback) {
     // Capture rejectCallback to ensure it cannot be null.
     const reject = rejectCallback;
-    mapReject = error => asyncMapValue(error, reject).then(iteratorResult, abruptClose);
+    mapReject = (error: any) => asyncMapValue(error, reject).then(iteratorResult, abruptClose);
   }
 
   /* TODO: Flow doesn't support symbols as keys:
@@ -58,7 +58,7 @@ export default function mapAsyncIterator<T, U>(
         ? $return.call(iterator).then(mapResult, mapReject)
         : Promise.resolve({ value: undefined, done: true });
     },
-    throw(error) {
+    throw(error: any) {
       // $FlowFixMe(>=0.68.0)
       if (typeof iterator.throw === 'function') {
         return iterator.throw(error).then(mapResult, mapReject);
@@ -75,6 +75,6 @@ function asyncMapValue<T, U>(value: T, callback: (val: T) => PromiseOrValue<U>):
   return new Promise(resolve => resolve(callback(value)));
 }
 
-function iteratorResult<T>(value: T): IteratorResult<T, void> {
+function iteratorResult<T>(value: T) {
   return { value, done: false };
 }
