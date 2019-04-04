@@ -81,6 +81,7 @@ export default class QueryBuilder {
     asJsonAggregate?: boolean;
     onlyJsonField?: boolean;
     addNullCase?: boolean;
+    useAsterisk?: boolean;
   }): SQL;
 
   // ----------------------------------------
