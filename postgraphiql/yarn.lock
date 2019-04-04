@@ -4270,10 +4270,10 @@ graphiql-explorer@^0.3.6:
   resolved "https://registry.yarnpkg.com/graphiql-explorer/-/graphiql-explorer-0.3.6.tgz#4696815ba81e63d6bdaf9962427038db44cec0d7"
   integrity sha512-jTPtwxPaZUjZ6zlFIfbdpLTnPj80/FUFBC9Ij19DUIZ3OfL4E+27dMF5UdYLP+7vpqZixCcT4bP611XZlvYIxg==
 
-"graphiql@npm:@benjie/graphiql@0.12.1-a701b68f61a315280ba3e292275757f37e004ad5":
-  version "0.12.1-a701b68f61a315280ba3e292275757f37e004ad5"
-  resolved "https://registry.yarnpkg.com/@benjie/graphiql/-/graphiql-0.12.1-a701b68f61a315280ba3e292275757f37e004ad5.tgz#11bb6cc566b28914817bfcb9ee51764d64db1a54"
-  integrity sha512-tgc15PTrSO+KtMwr3GyJJAiO2tmdPpH5AE4Vn4bluQpLpL8oSaSnTaZ8NioMGTTRusLlehrFhNMDBbtm3YN0iQ==
+"graphiql@npm:@benjie/graphiql@0.13.1-benjie.0":
+  version "0.13.1-benjie.0"
+  resolved "https://registry.yarnpkg.com/@benjie/graphiql/-/graphiql-0.13.1-benjie.0.tgz#4967bbbbb0d5f64ee41616e07e9f5adac3dce418"
+  integrity sha512-tjMOpubpkKBZY6/uGApPTsHav5gwxLFmVnJL+tzaaDi0G+O+LfbERbU8Stwix4OInAcwZ4qnSR+PGVzmKWSCHw==
   dependencies:
     codemirror "^5.26.0"
     codemirror-graphql "^0.7.1"
