@@ -84,8 +84,30 @@ function liveSubscribeImpl(
   // the GraphQL specification. The `execute` function provides the
   // "ExecuteSubscriptionEvent" algorithm, as it is nearly identical to the
   // "ExecuteQuery" algorithm, for which `execute` is also used.
-  const mapSourceToResponse = (payload: any) =>
-    execute(schema, document, payload, contextValue, variableValues, operationName, fieldResolver);
+  const mapSourceToResponse = async (payload: any) => {
+    /*
+     * GRAPHILE FORK
+     *
+     * We need to tell Graphile Engine when the execution has completed
+     * (because we cannot detect this from inside the GraphQL execution) so
+     * that it can clean up old listeners; we do this with the `finally` block.
+     */
+    try {
+      return await execute(
+        schema,
+        document,
+        payload,
+        contextValue,
+        variableValues,
+        operationName,
+        fieldResolver,
+      );
+    } finally {
+      if (payload && typeof payload.release === 'function') {
+        payload.release();
+      }
+    }
+  };
 
   // Resolve the Source Stream, then map every source value to a
   // ExecutionResult value as described above.
