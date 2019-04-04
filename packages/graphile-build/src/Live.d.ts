@@ -65,10 +65,7 @@ export class LiveCoordinator {
 
   registerSource(namespace: string, source: LiveSource): void;
 
-  getMonitorAndContext(): {
-    monitor: LiveMonitor;
-    context: any;
-  };
+  getMonitor(): LiveMonitor;
 
   subscribe(
     _parent: any,

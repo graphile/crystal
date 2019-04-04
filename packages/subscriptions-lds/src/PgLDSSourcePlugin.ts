@@ -190,8 +190,13 @@ export class LDSLiveSource {
       done = true;
       const i = this.subscriptions[topic].indexOf(entry);
       this.subscriptions[topic].splice(i, 1);
-      if (this.ws && this.subscriptions[topic].length === 0) {
-        this.ws.send("UNSUB " + topic);
+      if (this.subscriptions[topic].length === 0) {
+        // Solve potential memory leak
+        delete this.subscriptions[topic];
+
+        if (this.ws) {
+          this.ws.send("UNSUB " + topic);
+        }
       }
     };
   }

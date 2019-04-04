@@ -66,22 +66,25 @@ export function makeFieldHelpers<TSource>(
         if (typeof builderCallback === "function") {
           builderCallback(tableAlias, sqlBuilder);
         }
-      }
+      },
+      context,
+      resolveInfo.rootValue
     );
     const { text, values } = sql.compile(query);
     const { rows } = await pgClient.query(text, values);
     if (isConnection) {
       return build.pgAddStartEndCursor(rows[0]);
     } else {
+      const liveRecord =
+        resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
       if (
         build.options.subscriptions &&
         !isConnection &&
         primaryKeys &&
-        context.liveRecord
+        liveRecord
       ) {
         rows.forEach(
-          (row: any) =>
-            row && context.liveRecord("pg", table, row.__identifiers)
+          (row: any) => row && liveRecord("pg", table, row.__identifiers)
         );
       }
       return rows;

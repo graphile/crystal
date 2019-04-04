@@ -40,9 +40,14 @@ export default (async function PgRowNode(builder, { subscriptions }) {
           resolveContext,
           parsedResolveInfoFragment,
           ReturnType,
-          resolveData
+          resolveData,
+          resolveInfo
         ) => {
-          const { pgClient, liveRecord } = resolveContext;
+          const { pgClient } = resolveContext;
+          const liveRecord =
+            resolveInfo &&
+            resolveInfo.rootValue &&
+            resolveInfo.rootValue.liveRecord;
           if (identifiers.length !== primaryKeys.length) {
             throw new Error("Invalid ID");
           }
@@ -69,7 +74,8 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                 );
               });
             },
-            resolveContext
+            resolveContext,
+            resolveInfo && resolveInfo.rootValue
           );
           const { text, values } = sql.compile(query);
           if (debugSql.enabled) debugSql(text);
@@ -158,7 +164,10 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                         },
                       },
                       async resolve(parent, args, resolveContext, resolveInfo) {
-                        const { pgClient, liveRecord } = resolveContext;
+                        const { pgClient } = resolveContext;
+                        const liveRecord =
+                          resolveInfo.rootValue &&
+                          resolveInfo.rootValue.liveRecord;
                         const nodeId = args[nodeIdFieldName];
                         try {
                           const {
@@ -203,7 +212,8 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                                 );
                               });
                             },
-                            resolveContext
+                            resolveContext,
+                            resolveInfo.rootValue
                           );
                           const { text, values } = sql.compile(query);
                           if (debugSql.enabled) debugSql(text);

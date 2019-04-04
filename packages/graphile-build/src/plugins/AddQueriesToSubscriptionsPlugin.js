@@ -49,9 +49,12 @@ const AddQueriesToSubscriptionsPlugin: Plugin = function(
                       try {
                         return await oldResolve(...args);
                       } catch (e) {
-                        const context = args[2];
-                        if (typeof context.liveAbort === "function") {
-                          context.liveAbort(e);
+                        const info = args[3];
+                        if (
+                          info.rootValue &&
+                          typeof info.rootValue.liveAbort === "function"
+                        ) {
+                          info.rootValue.liveAbort(e);
                         }
                         throw e;
                       }

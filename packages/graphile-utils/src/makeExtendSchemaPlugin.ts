@@ -625,26 +625,26 @@ function getFields<TSource>(
             return (
               data: any,
               _args: any,
-              resolveContext: any,
+              _resolveContext: any,
               resolveInfo: any
             ) => {
               const safeAlias = build.getSafeAliasFromResolveInfo(resolveInfo);
+              const liveRecord =
+                resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
               if (isConnection) {
                 return build.pgAddStartEndCursor(data[safeAlias]);
               } else if (isListType) {
                 const records = data[safeAlias];
-                if (table && resolveContext.liveRecord) {
+                if (table && liveRecord) {
                   records.forEach(
-                    (r: any) =>
-                      r &&
-                      resolveContext.liveRecord("pg", table, r.__identifiers)
+                    (r: any) => r && liveRecord("pg", table, r.__identifiers)
                   );
                 }
                 return records;
               } else {
                 const record = data[safeAlias];
-                if (record && resolveContext.liveRecord && table) {
-                  resolveContext.liveRecord("pg", table, record.__identifiers);
+                if (record && liveRecord && table) {
+                  liveRecord("pg", table, record.__identifiers);
                 }
                 return record;
               }
@@ -771,7 +771,8 @@ function getFields<TSource>(
                           );
                         }
                       },
-                      queryBuilder.context
+                      queryBuilder.context,
+                      queryBuilder.rootValue
                     );
                     return sql.fragment`(${query})`;
                   }, build.getSafeAliasFromAlias(parsedResolveInfoFragment.alias));

@@ -162,7 +162,8 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                                 );
                               });
                             },
-                            queryBuilder.context
+                            queryBuilder.context,
+                            queryBuilder.rootValue
                           );
                           return sql.fragment`(${query})`;
                         }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -181,12 +182,11 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                         resolveInfo
                       );
                       const record = data[safeAlias];
-                      if (record && resolveContext.liveRecord) {
-                        resolveContext.liveRecord(
-                          "pg",
-                          foreignTable,
-                          record.__identifiers
-                        );
+                      const liveRecord =
+                        resolveInfo.rootValue &&
+                        resolveInfo.rootValue.liveRecord;
+                      if (record && liveRecord) {
+                        liveRecord("pg", foreignTable, record.__identifiers);
                       }
                       return record;
                     },

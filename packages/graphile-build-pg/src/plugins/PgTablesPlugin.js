@@ -362,17 +362,16 @@ export default (function PgTablesPlugin(
                             data[safeAlias],
                             data.__identifiers
                           );
+                          const liveRecord =
+                            resolveInfo.rootValue &&
+                            resolveInfo.rootValue.liveRecord;
                           if (
                             record &&
                             primaryKeys &&
-                            resolveContext.liveRecord &&
+                            liveRecord &&
                             data.__identifiers
                           ) {
-                            resolveContext.liveRecord(
-                              "pg",
-                              table,
-                              data.__identifiers
-                            );
+                            liveRecord("pg", table, data.__identifiers);
                           }
                           return record;
                         },
@@ -434,21 +433,24 @@ export default (function PgTablesPlugin(
                           const safeAlias = getSafeAliasFromResolveInfo(
                             resolveInfo
                           );
+                          const liveRecord =
+                            resolveInfo.rootValue &&
+                            resolveInfo.rootValue.liveRecord;
                           return data.data.map(entry => {
                             const record = handleNullRow(
                               entry[safeAlias],
-                              entry.__identifiers
+                              entry[safeAlias].__identifiers
                             );
                             if (
                               record &&
-                              resolveContext.liveRecord &&
+                              liveRecord &&
                               primaryKeys &&
-                              entry.__identifiers
+                              entry[safeAlias].__identifiers
                             ) {
-                              resolveContext.liveRecord(
+                              liveRecord(
                                 "pg",
                                 table,
-                                entry.__identifiers
+                                entry[safeAlias].__identifiers
                               );
                             }
 

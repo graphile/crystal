@@ -197,7 +197,8 @@ export default (function PgMutationCreatePlugin(
                         resolveData,
                         {},
                         null,
-                        resolveContext
+                        resolveContext,
+                        resolveInfo.rootValue
                       );
                       const sqlColumns = [];
                       const sqlValues = [];

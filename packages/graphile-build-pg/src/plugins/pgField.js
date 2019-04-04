@@ -80,7 +80,8 @@ export default function pgField(
                     });
                   }
                 },
-                queryBuilder.context
+                queryBuilder.context,
+                queryBuilder.rootValue
               );
               return sql.fragment`(${query})`;
             }, safeAlias);

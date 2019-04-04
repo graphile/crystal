@@ -48,6 +48,7 @@ export type QueryBuilderOptions = {
 class QueryBuilder {
   parentQueryBuilder: QueryBuilder | void;
   context: GraphQLContext;
+  rootValue: any; // eslint-disable-line flowtype/no-weak-types
   supportsJSONB: boolean;
   locks: {
     [string]: true | string,
@@ -100,10 +101,18 @@ class QueryBuilder {
     cursorComparator: ?CursorComparator,
   };
 
-  constructor(options: QueryBuilderOptions = {}, context: GraphQLContext = {}) {
+  constructor(
+    options: QueryBuilderOptions = {},
+    context: GraphQLContext = {},
+    rootValue?: any // eslint-disable-line flowtype/no-weak-types
+  ) {
     this.context = context || {};
+    this.rootValue = rootValue;
     this.supportsJSONB =
-      options.supportsJSONB == null ? true : !!options.supportsJSONB;
+      typeof options.supportsJSONB === "undefined" ||
+      options.supportsJSONB === null
+        ? true
+        : !!options.supportsJSONB;
 
     this.locks = {};
     this.finalized = false;
@@ -220,9 +229,8 @@ class QueryBuilder {
     // eslint-disable-next-line flowtype/no-weak-types
     cb?: (checker: (data: any) => (record: any) => boolean) => void
   ) {
-    if (!this.context.liveCollection) return;
-    if (!this.context.liveConditions) return;
     /* the actual condition doesn't matter hugely, 'select' should work */
+    if (!this.rootValue || !this.rootValue.liveConditions) return;
     const liveConditions = this.data.liveConditions;
     const checkerGenerator = data => {
       // Compute this once.
@@ -238,7 +246,7 @@ class QueryBuilder {
         );
       }
       this.parentQueryBuilder.beforeLock("select", () => {
-        const id = this.context.liveConditions.push(checkerGenerator) - 1;
+        const id = this.rootValue.liveConditions.push(checkerGenerator) - 1;
         // BEWARE: it's easy to override others' conditions, and that will cause issues. Be sensible.
         const allRequirements = this.data.liveConditions.reduce(
           (memo, [_checkerGenerator, requirements]) =>

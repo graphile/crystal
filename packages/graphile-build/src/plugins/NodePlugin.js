@@ -8,7 +8,11 @@ import type {
 } from "../SchemaBuilder";
 import resolveNode from "../resolveNode";
 import type { ResolveTree } from "graphql-parse-resolve-info";
-import type { GraphQLType, GraphQLInterfaceType } from "graphql";
+import type {
+  GraphQLType,
+  GraphQLInterfaceType,
+  GraphQLResolveInfo,
+} from "graphql";
 import type { BuildExtensionQuery } from "./QueryPlugin";
 
 const base64 = str => Buffer.from(String(str)).toString("base64");
@@ -20,7 +24,8 @@ export type NodeFetcher = (
   context: mixed,
   parsedResolveInfoFragment: ResolveTree,
   type: GraphQLType,
-  resolveData: DataForType
+  resolveData: DataForType,
+  resolveInfo: GraphQLResolveInfo
 ) => {};
 
 export type BuildExtensionNode = {|

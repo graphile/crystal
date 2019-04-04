@@ -184,7 +184,8 @@ export default (function PgBackwardRelationPlugin(
                                   );
                                 });
                               },
-                              queryBuilder.context
+                              queryBuilder.context,
+                              queryBuilder.rootValue
                             );
                             return sql.fragment`(${query})`;
                           }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -202,12 +203,11 @@ export default (function PgBackwardRelationPlugin(
                           resolveInfo
                         );
                         const record = data[safeAlias];
-                        if (record && resolveContext.liveRecord) {
-                          resolveContext.liveRecord(
-                            "pg",
-                            table,
-                            record.__identifiers
-                          );
+                        const liveRecord =
+                          resolveInfo.rootValue &&
+                          resolveInfo.rootValue.liveRecord;
+                        if (record && liveRecord) {
+                          liveRecord("pg", table, record.__identifiers);
                         }
                         return record;
                       },
@@ -345,7 +345,8 @@ export default (function PgBackwardRelationPlugin(
                                     );
                                   });
                                 },
-                                queryBuilder.context
+                                queryBuilder.context,
+                                queryBuilder.resolveInfo
                               );
                               return sql.fragment`(${query})`;
                             }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -373,31 +374,35 @@ export default (function PgBackwardRelationPlugin(
                           const safeAlias = getSafeAliasFromResolveInfo(
                             resolveInfo
                           );
+                          const liveCollection =
+                            resolveInfo.rootValue &&
+                            resolveInfo.rootValue.liveCollection;
+                          const liveConditions =
+                            resolveInfo.rootValue &&
+                            resolveInfo.rootValue.liveConditions;
                           if (
                             subscriptions &&
-                            resolveContext.liveCollection &&
+                            liveCollection &&
+                            liveConditions &&
                             data.__live
                           ) {
                             const { __id, ...rest } = data.__live;
-                            const condition =
-                              resolveContext.liveConditions[__id];
+                            const condition = liveConditions[__id];
                             const checker = condition(rest);
 
-                            resolveContext.liveCollection("pg", table, checker);
+                            liveCollection("pg", table, checker);
                           }
                           if (isConnection) {
                             return addStartEndCursor(data[safeAlias]);
                           } else {
                             const records = data[safeAlias];
-                            if (subscriptions && resolveContext.liveRecord) {
+                            const liveRecord =
+                              resolveInfo.rootValue &&
+                              resolveInfo.rootValue.liveRecord;
+                            if (subscriptions && liveRecord) {
                               records.forEach(
                                 r =>
-                                  r &&
-                                  resolveContext.liveRecord(
-                                    "pg",
-                                    table,
-                                    r.__identifiers
-                                  )
+                                  r && liveRecord("pg", table, r.__identifiers)
                               );
                             }
                             return records;

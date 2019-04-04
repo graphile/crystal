@@ -29,7 +29,8 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   },
   // TODO:v5: context is not optional
   withBuilder?: ((builder: QueryBuilder) => void) | null | void,
-  context?: GraphQLContext = {}
+  context?: GraphQLContext = {},
+  rootValue?: any // eslint-disable-line flowtype/no-weak-types
 ) => {
   const {
     pgQuery,
@@ -49,7 +50,12 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     reallyRawCursorPrefix && reallyRawCursorPrefix.filter(identity);
 
   // $FlowFixMe
-  const queryBuilder = new QueryBuilder(queryBuilderOptions, context);
+  const queryBuilder = new QueryBuilder(
+    // $FlowFixMe
+    queryBuilderOptions,
+    context,
+    rootValue
+  );
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
 
   if (withBuilder) {
@@ -405,8 +411,10 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     }
     if (pgAggregateQuery && pgAggregateQuery.length) {
       const aggregateQueryBuilder = new QueryBuilder(
+        // $FlowFixMe
         queryBuilderOptions,
-        context
+        context,
+        rootValue
       );
       aggregateQueryBuilder.from(
         queryBuilder.getTableExpression(),

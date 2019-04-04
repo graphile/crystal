@@ -158,19 +158,19 @@ export default (async function PgAllRows(
                           });
                         }
                       },
-                      resolveContext
+                      resolveContext,
+                      resolveInfo.rootValue
                     );
                     const { text, values } = sql.compile(query);
                     if (debugSql.enabled) debugSql(text);
                     const result = await pgClient.query(text, values);
 
-                    if (
-                      subscriptions &&
-                      resolveContext.liveCollection &&
-                      checkerGenerator
-                    ) {
+                    const liveCollection =
+                      resolveInfo.rootValue &&
+                      resolveInfo.rootValue.liveCollection;
+                    if (subscriptions && liveCollection && checkerGenerator) {
                       const checker = checkerGenerator();
-                      resolveContext.liveCollection("pg", table, checker);
+                      liveCollection("pg", table, checker);
                     }
 
                     if (isConnection) {
@@ -179,20 +179,18 @@ export default (async function PgAllRows(
                       } = result;
                       return addStartEndCursor(row);
                     } else {
+                      const liveRecord =
+                        resolveInfo.rootValue &&
+                        resolveInfo.rootValue.liveRecord;
                       if (
                         subscriptions &&
                         !isConnection &&
                         primaryKeys &&
-                        resolveContext.liveRecord
+                        liveRecord
                       ) {
                         result.rows.forEach(
                           row =>
-                            row &&
-                            resolveContext.liveRecord(
-                              "pg",
-                              table,
-                              row.__identifiers
-                            )
+                            row && liveRecord("pg", table, row.__identifiers)
                         );
                       }
                       return result.rows;

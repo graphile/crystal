@@ -91,7 +91,10 @@ export default (async function PgRowByUniqueConstraint(
                       return memo;
                     }, {}),
                     async resolve(parent, args, resolveContext, resolveInfo) {
-                      const { pgClient, liveRecord } = resolveContext;
+                      const { pgClient } = resolveContext;
+                      const liveRecord =
+                        resolveInfo.rootValue &&
+                        resolveInfo.rootValue.liveRecord;
                       const parsedResolveInfoFragment = parseResolveInfo(
                         resolveInfo
                       );
@@ -123,7 +126,8 @@ export default (async function PgRowByUniqueConstraint(
                             );
                           });
                         },
-                        resolveContext
+                        resolveContext,
+                        resolveInfo.rootValue
                       );
                       const { text, values } = sql.compile(query);
                       if (debugSql.enabled) debugSql(text);

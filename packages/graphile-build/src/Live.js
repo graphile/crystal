@@ -73,16 +73,25 @@ export class LiveProvider {
 export class LiveMonitor {
   released: boolean;
   providers: { [namespace: string]: LiveProvider };
-  subscriptionReleasers: (() => void)[];
-  changeCallback: (() => void) | null;
-  liveConditions: Array<PredicateGenerator>;
+  subscriptionReleasersByCounter: {
+    [counter: string]: (() => void)[],
+  };
+  liveConditionsByCounter: { [counter: string]: Array<PredicateGenerator> };
+  changeCallback: ((arg: any) => void) | null;
+  changeCounter: number;
+  extraRootValue: any;
 
-  constructor(providers: { [namespace: string]: LiveProvider }) {
+  constructor(
+    providers: { [namespace: string]: LiveProvider },
+    extraRootValue: any
+  ) {
+    this.extraRootValue = extraRootValue;
     this.released = false;
     this.providers = providers;
-    this.subscriptionReleasers = [];
+    this.subscriptionReleasersByCounter = {};
     this.changeCallback = null;
-    this.liveConditions = [];
+    this.changeCounter = 0;
+    this.liveConditionsByCounter = {};
     if (!this.handleChange) {
       throw new Error("This is just to make flow happy");
     }
@@ -97,14 +106,30 @@ export class LiveMonitor {
     this.onChange = this.onChange.bind(this);
   }
 
-  reset() {
-    // clear monitoring
-    for (const releaser of this.subscriptionReleasers) {
-      releaser();
+  resetBefore(currentCounter: number) {
+    // Clear out of date subscriptionReleasers
+    {
+      const oldCounters = Object.keys(
+        this.subscriptionReleasersByCounter
+      ).filter(n => parseInt(n, 10) < currentCounter);
+      for (const oldCounter of oldCounters) {
+        for (const releaser of this.subscriptionReleasersByCounter[
+          oldCounter
+        ]) {
+          releaser();
+        }
+        delete this.subscriptionReleasersByCounter[oldCounter];
+      }
     }
-    this.subscriptionReleasers = [];
-    // Delete everything from liveConditions, we'll be getting fresh conditions soon enough
-    this.liveConditions.splice(0, this.liveCollection.length);
+    // Clear out of date liveConditions
+    {
+      const oldCounters = Object.keys(this.liveConditionsByCounter).filter(
+        n => parseInt(n, 10) < currentCounter
+      );
+      for (const oldCounter of oldCounters) {
+        delete this.liveConditionsByCounter[oldCounter];
+      }
+    }
   }
 
   release() {
@@ -112,7 +137,7 @@ export class LiveMonitor {
       this.handleChange.cancel();
     }
     this.handleChange = null;
-    this.reset();
+    this.resetBefore(Infinity);
     this.providers = {};
     this.released = true;
   }
@@ -120,11 +145,32 @@ export class LiveMonitor {
   // Tell Flow that we're okay with overwriting this
   handleChange: (() => void) | null;
   handleChange() {
+    // This function is throttled to MONITOR_THROTTLE_DURATION (see constructor)
     if (this.changeCallback) {
       // Convince Flow this won't suddenly become null
       const cb = this.changeCallback;
-      this.reset();
-      cb();
+      const counter = this.changeCounter++;
+      /*
+       * In live queries we need to know when the current result set has
+       * finished being calculated so that we know we've received all the
+       * liveRecord / liveCollection calls and can release the out of date
+       * ones. To achieve this, we use a custom `subscribe` function which
+       * calls `rootValue.release()` once the result set has been calculated.
+       */
+      this.subscriptionReleasersByCounter[String(counter)] = [];
+      this.liveConditionsByCounter[String(counter)] = [];
+      const changeRootValue = {
+        ...this.extraRootValue,
+        counter,
+        liveCollection: this.liveCollection.bind(this, counter),
+        liveRecord: this.liveRecord.bind(this, counter),
+        liveConditions: this.liveConditionsByCounter[String(counter)],
+        release: () => {
+          // Despite it's name, this means that the execution has complete, which means we're actually releasing everything *before* this.
+          this.resetBefore(counter);
+        },
+      };
+      cb(changeRootValue);
     } else {
       // eslint-disable-next-line no-console
       console.warn("Change occurred, but no-one was listening");
@@ -154,6 +200,7 @@ export class LiveMonitor {
   }
 
   liveCollection(
+    counter: number,
     namespace: string,
     collectionIdentifier: any,
     predicate: (record: any) => boolean = () => true
@@ -176,12 +223,13 @@ export class LiveMonitor {
         predicate
       );
       if (releaser) {
-        this.subscriptionReleasers.push(releaser);
+        this.subscriptionReleasersByCounter[String(counter)].push(releaser);
       }
     }
   }
 
   liveRecord(
+    counter: number,
     namespace: string,
     collectionIdentifier: any,
     recordIdentifier: any
@@ -212,7 +260,7 @@ export class LiveMonitor {
         recordIdentifier
       );
       if (releaser) {
-        this.subscriptionReleasers.push(releaser);
+        this.subscriptionReleasersByCounter[String(counter)].push(releaser);
       }
     }
   }
@@ -250,16 +298,8 @@ export class LiveCoordinator {
     this.providers[namespace].registerSource(source);
   }
 
-  getMonitorAndContext() {
-    const monitor = new LiveMonitor(this.providers);
-    return {
-      monitor,
-      context: {
-        liveCollection: monitor.liveCollection.bind(monitor),
-        liveRecord: monitor.liveRecord.bind(monitor),
-        liveConditions: monitor.liveConditions,
-      },
-    };
+  getMonitor(extraRootValue: any) {
+    return new LiveMonitor(this.providers, extraRootValue);
   }
 
   // Tell Flow that we're okay with overwriting this
@@ -269,13 +309,18 @@ export class LiveCoordinator {
     context: any,
     _info: GraphQLResolveInfo
   ) => any;
-  subscribe(_parent: any, _args: any, context: any, _info: GraphQLResolveInfo) {
-    const { monitor, context: additionalContext } = this.getMonitorAndContext();
-    Object.assign(context, additionalContext);
+  subscribe(
+    _parent: any,
+    _args: any,
+    _context: any,
+    _info: GraphQLResolveInfo
+  ) {
+    const monitor = this.getMonitor({
+      liveAbort: e => {
+        if (iterator) iterator.throw(e);
+      },
+    });
     const iterator = makeAsyncIteratorFromMonitor(monitor);
-    context.liveAbort = e => {
-      iterator.throw(e);
-    };
     return iterator;
   }
 }

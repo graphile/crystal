@@ -347,7 +347,8 @@ export default function makeProcField(
         sqlMutationQuery,
         functionAlias,
         parentQueryBuilder,
-        resolveContext
+        resolveContext,
+        resolveInfo
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment,
@@ -410,7 +411,10 @@ export default function makeProcField(
               innerQueryBuilder.selectIdentifiers(returnTypeTable);
             }
           },
-          parentQueryBuilder ? parentQueryBuilder.context : resolveContext
+          parentQueryBuilder ? parentQueryBuilder.context : resolveContext,
+          parentQueryBuilder
+            ? parentQueryBuilder.rootValue
+            : resolveInfo && resolveInfo.rootValue
         );
         return query;
       }
@@ -578,7 +582,8 @@ export default function makeProcField(
         args: args,
         resolve: computed
           ? (data, _args, resolveContext, resolveInfo) => {
-              const { liveRecord } = resolveContext;
+              const liveRecord =
+                resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
               const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
               const value = data[safeAlias];
               if (returnFirstValueAsValue) {
@@ -628,7 +633,9 @@ export default function makeProcField(
               }
             }
           : async (data, args, resolveContext, resolveInfo) => {
-              const { pgClient, liveRecord } = resolveContext;
+              const { pgClient } = resolveContext;
+              const liveRecord =
+                resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
               const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
               parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
               const functionAlias = sql.identifier(Symbol());
@@ -646,7 +653,8 @@ export default function makeProcField(
                   functionAlias,
                   functionAlias,
                   null,
-                  resolveContext
+                  resolveContext,
+                  resolveInfo
                 );
                 const intermediateIdentifier = sql.identifier(Symbol());
                 const isVoid = returnType.id === "2278";
@@ -695,7 +703,8 @@ export default function makeProcField(
                   sqlMutationQuery,
                   functionAlias,
                   null,
-                  resolveContext
+                  resolveContext,
+                  resolveInfo
                 );
                 const { text, values } = sql.compile(query);
                 if (debugSql.enabled) debugSql(text);

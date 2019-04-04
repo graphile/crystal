@@ -71,15 +71,8 @@ test("works", async () => {
   const dummyProvider = new DummyProvider();
   lc.registerProvider(dummyProvider);
   lc.registerSource("dummy", dummySource);
-  const { monitor, context } = lc.getMonitorAndContext();
+  const monitor = lc.getMonitor();
   const asyncIterator = makeAsyncIteratorFromMonitor(monitor);
-  expect(Object.keys(context)).toMatchInlineSnapshot(`
-Array [
-  "liveCollection",
-  "liveRecord",
-  "liveConditions",
-]
-`);
   const collection = Symbol("collection");
   const record = Symbol("record");
 
@@ -87,18 +80,36 @@ Array [
   {
     const { value, done } = await asyncIterator.next();
     expect(done).toBeFalsy();
-    expect(value).toMatchInlineSnapshot(`undefined`);
+    expect(value.counter).toMatchInlineSnapshot(`0`);
+    expect(Object.keys(value)).toMatchInlineSnapshot(`
+Array [
+  "counter",
+  "liveCollection",
+  "liveRecord",
+  "liveConditions",
+  "release",
+]
+`);
   }
 
   // Now we register a listener
-  monitor.liveRecord("dummy", collection, record);
+  monitor.liveRecord(0, "dummy", collection, record);
   // And trigger an update to it
   dummySource.triggerRecord(collection, record);
   // Which should mean we trigger again
   {
     const { value, done } = await asyncIterator.next();
     expect(done).toBeFalsy();
-    expect(value).toMatchInlineSnapshot(`undefined`);
+    expect(value.counter).toMatchInlineSnapshot(`1`);
+    expect(Object.keys(value)).toMatchInlineSnapshot(`
+Array [
+  "counter",
+  "liveCollection",
+  "liveRecord",
+  "liveConditions",
+  "release",
+]
+`);
   }
 
   // Now we should have reset again (because we triggered), so if we trigger
@@ -110,6 +121,6 @@ Array [
   {
     const { value, done } = await asyncIterator.next();
     expect(done).toBeTruthy();
-    expect(value).toMatchInlineSnapshot(`undefined`);
+    expect(value).toBe(undefined);
   }
 });

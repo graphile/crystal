@@ -1,6 +1,8 @@
 import PgLogicalDecoding from "../src/pg-logical-decoding";
 import { tryDropSlot, DATABASE_URL, query, withLdAndClient } from "./helpers";
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 test("opens and closes cleanly", async () => {
   const ld = new PgLogicalDecoding(DATABASE_URL, {
     temporary: true,
@@ -58,6 +60,8 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
   );
   expect(initialPgRows.length).toEqual(1);
   await ld.close();
+  // Give half a second to clean up the slot
+  await sleep(500);
   const { rows: finalPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]

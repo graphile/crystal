@@ -21,6 +21,7 @@ export type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 export default class QueryBuilder {
   public parentQueryBuilder: QueryBuilder | void;
   public context: GraphQLContext;
+  public rootValue: any;
   public beforeLock(field: string, fn: () => void): void;
   public makeLiveCollection(
     table: PgClass,

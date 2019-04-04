@@ -152,7 +152,8 @@ export default (async function PgMutationUpdateDeletePlugin(
                   resolveData,
                   {},
                   null,
-                  resolveContext
+                  resolveContext,
+                  resolveInfo.rootValue
                 );
                 let row;
                 try {
