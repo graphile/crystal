@@ -1,7 +1,7 @@
 import { Server, ServerResponse } from 'http';
 import { HttpRequestHandler, mixed } from '../../interfaces';
 import {
-  subscribe,
+  subscribe as graphqlSubscribe,
   ExecutionResult,
   specifiedRules,
   validate,
@@ -15,6 +15,7 @@ import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscrip
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
+import liveSubscribe from './liveSubscribe';
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -172,7 +173,7 @@ export async function enhanceHttpServerWithSubscriptions(
       execute: () => {
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
-      subscribe,
+      subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
         connectionParams: object,
         _socket: WebSocket,
