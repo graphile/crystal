@@ -57,7 +57,7 @@ export interface PostGraphileOptions {
   // JSON input and output, saving the need to parse / stringify JSON manually.
   dynamicJson?: boolean;
   // If none of your `RETURNS SETOF compound_type` functions mix NULLs with the
-  // results then you may set this true to reduce the nullables in the GraphQL
+  // results then you may set this false to reduce the nullables in the GraphQL
   // schema.
   setofFunctionsContainNulls?: boolean;
   // Enables classic ids for Relay support. Instead of using the field name
