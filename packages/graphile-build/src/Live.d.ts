@@ -5,6 +5,9 @@ import { GraphQLResolveInfo } from "graphql";
 type SubscriptionReleaser = () => void;
 type SubscriptionCallback = () => void;
 
+type Predicate = (record: any) => boolean;
+type PredicateGenerator = (data: any) => Predicate;
+
 export abstract class LiveSource {
   abstract subscribeCollection(
     _callback: SubscriptionCallback,
@@ -37,21 +40,27 @@ export abstract class LiveProvider {
 
 export class LiveMonitor {
   providers: { [namespace: string]: LiveProvider };
-  subscriptionReleasers: (() => void)[];
+  subscriptionReleasersByCounter: {
+    [counter: string]: (() => void)[],
+  };
+  liveConditionsByCounter: { [counter: string]: Array<PredicateGenerator> };
+  changeCounter: number;
 
-  constructor(providers: { [namespace: string]: LiveProvider });
+  constructor(providers: { [namespace: string]: LiveProvider }, extraRootValue: any);
 
-  reset(): void;
+  resetBefore(currentCounter: number): void;
   release(): void;
   handleChange(): void;
   onChange(callback: () => void): void;
   liveCollection(
+    counter: number,
     namespace: string,
     collectionIdentifier: any,
     predicate?: (record: any) => boolean
   ): void;
 
   liveRecord(
+    counter: number,
     namespace: string,
     collectionIdentifier: any,
     recordIdentifier: any

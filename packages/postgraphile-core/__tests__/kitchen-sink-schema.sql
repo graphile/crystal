@@ -703,7 +703,7 @@ create function c.mutation_out_table(out c.person) as $$
 $$ language sql volatile;
 
 create function c.mutation_out_table_setof(out c.person) returns setof c.person as $$
-  select * from c.person;
+  select * from c.person order by id;
 $$ language sql volatile;
 
 create function c.mutation_out_unnamed(out int) as $$
