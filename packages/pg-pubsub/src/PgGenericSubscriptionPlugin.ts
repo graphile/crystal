@@ -1,11 +1,16 @@
 import debugFactory from "debug";
 import { Plugin } from "graphile-build";
 import { GraphQLFieldConfig } from "graphql";
+import { PubSub } from "graphql-subscriptions";
 
 const debug = debugFactory("pg-pubsub");
 const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
 
 const nodeIdFromDbNode = (dbNode: any) => base64(JSON.stringify(dbNode));
+
+function isPubSub(pubsub: any): pubsub is PubSub {
+  return !!pubsub;
+}
 
 const PgGenericSubscriptionPlugin: Plugin = function(
   builder,
@@ -15,7 +20,7 @@ const PgGenericSubscriptionPlugin: Plugin = function(
     pgSubscriptionAuthorizationFunction,
   }
 ) {
-  if (!pubsub) {
+  if (!isPubSub(pubsub)) {
     debug("Subscriptions disabled - no pubsub provided");
     return;
   }
@@ -163,6 +168,9 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                 unsubscribeTopic = _unsubscribeTopic;
               }
               const asyncIterator = pubsub.asyncIterator(topic);
+              if (!asyncIterator) {
+                return asyncIterator;
+              }
               if (unsubscribeTopic) {
                 // Subscribe to event revoking subscription
                 const unsubscribeIterator = pubsub.asyncIterator(
@@ -173,8 +181,12 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                     "Unsubscribe triggered on channel %s",
                     unsubscribeTopic
                   );
-                  asyncIterator.return();
-                  unsubscribeIterator.return();
+                  if (asyncIterator.return) {
+                    asyncIterator.return();
+                  }
+                  if (unsubscribeIterator.return) {
+                    unsubscribeIterator.return();
+                  }
                 });
               }
               return asyncIterator;

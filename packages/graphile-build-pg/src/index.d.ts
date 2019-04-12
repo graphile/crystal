@@ -86,4 +86,16 @@ export type Inflector = any;
 
 import QueryBuilder from "./QueryBuilder";
 export { QueryBuilder };
-export * from "./QueryBuilder";
+export {
+  sql,
+  SQL,
+  GraphQLContext,
+  GenContext,
+  Gen,
+  RawAlias,
+  SQLAlias,
+  SQLGen,
+  NumberGen,
+  CursorValue,
+  CursorComparator,
+} from "./QueryBuilder";

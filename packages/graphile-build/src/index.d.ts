@@ -20,8 +20,27 @@ import SchemaBuilder, {
   DataForType,
 } from "./SchemaBuilder";
 
-export * from "./SchemaBuilder";
-export * from "./Live";
+export {
+  mixed,
+  Options,
+  Plugin,
+  TriggerChangeType,
+  WatchUnwatch,
+  SchemaListener,
+  DataForType,
+  InitObject,
+  Build,
+  Inflection,
+  Scope,
+  Context,
+  Hook,
+} from "./SchemaBuilder";
+export {
+  LiveSource,
+  LiveProvider,
+  LiveMonitor,
+  LiveCoordinator,
+} from "./Live";
 export { SchemaBuilder };
 
 export const getBuilder: (
