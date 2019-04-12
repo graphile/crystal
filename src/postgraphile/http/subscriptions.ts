@@ -1,5 +1,5 @@
-import { Server, ServerResponse } from 'http';
-import { HttpRequestHandler, mixed } from '../../interfaces';
+import { Server, IncomingMessage, ServerResponse } from 'http';
+import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
   ExecutionResult,
@@ -9,7 +9,6 @@ import {
   parse,
   DocumentNode,
 } from 'graphql';
-import { RequestHandler, Request, Response } from 'express';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
 import parseUrl = require('parseurl');
@@ -88,9 +87,9 @@ export async function enhanceHttpServerWithSubscriptions(
   };
 
   const applyMiddleware = async (
-    middlewares: Array<RequestHandler> = [],
-    req: Request,
-    res: Response,
+    middlewares: Array<Middleware> = [],
+    req: IncomingMessage,
+    res: ServerResponse,
   ) => {
     for (const middleware of middlewares) {
       // TODO: add Koa support
@@ -128,7 +127,7 @@ export async function enhanceHttpServerWithSubscriptions(
           socket.close();
         }
       };
-      await applyMiddleware(options.websocketMiddlewares || options.middlewares, req, dummyRes);
+      await applyMiddleware(options.websocketMiddlewares, req, dummyRes);
       socket['__postgraphileRes'] = dummyRes;
     }
     return { req, res: dummyRes };

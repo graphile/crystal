@@ -59,7 +59,7 @@ export function getPostgraphileSchemaBuilder(
   // Creates the Postgres schemas array.
   const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema];
 
-  const _emitter = options._emitter || new EventEmitter();
+  const _emitter: EventEmitter = options['_emitter'] || new EventEmitter();
 
   // Creates a promise which will resolve to a GraphQL schema. Connects a
   // client from our pool to introspect the database.

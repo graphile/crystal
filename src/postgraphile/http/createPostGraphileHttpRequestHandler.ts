@@ -142,7 +142,7 @@ export default function createPostGraphileHttpRequestHandler(
     pgDefaultRole,
     queryCacheMaxSize = 50 * MEGABYTE,
   } = options;
-  if (options.absoluteRoutes) {
+  if (options['absoluteRoutes']) {
     throw new Error(
       'Sorry - the `absoluteRoutes` setting has been replaced with `externalUrlBase` which solves the issue in a cleaner way. Please update your settings. Thank you for testing a PostGraphile pre-release 🙏',
     );

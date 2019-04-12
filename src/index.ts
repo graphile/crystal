@@ -1,5 +1,6 @@
 export {
   mixed,
+  Middleware,
   PostGraphileOptions,
   CreateRequestHandlerOptions,
   GraphQLFormattedErrorExtended,
