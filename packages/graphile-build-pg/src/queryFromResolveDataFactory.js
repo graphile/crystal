@@ -18,7 +18,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   from: SQL,
   fromAlias: ?SQL,
   resolveData: DataForType,
-  options: {
+  inOptions: {
     withPagination?: boolean,
     withPaginationAsFields?: boolean,
     asJson?: boolean,
@@ -36,10 +36,20 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     pgQuery,
     pgAggregateQuery,
     pgCursorPrefix: reallyRawCursorPrefix,
+    pgDontUseAsterisk,
     calculateHasNextPage,
     calculateHasPreviousPage,
     usesCursor: explicitlyUsesCursor,
   } = resolveData;
+
+  const preventAsterisk = pgDontUseAsterisk
+    ? pgDontUseAsterisk.length > 0
+    : false;
+  const options = {
+    ...inOptions,
+    // Allow pgDontUseAsterisk to override useAsterisk
+    useAsterisk: inOptions.useAsterisk && !preventAsterisk,
+  };
 
   const usesCursor: boolean =
     (explicitlyUsesCursor && explicitlyUsesCursor.length > 0) ||
