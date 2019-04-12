@@ -1,4 +1,12 @@
-export * from './interfaces';
+export {
+  mixed,
+  PostGraphileOptions,
+  CreateRequestHandlerOptions,
+  GraphQLFormattedErrorExtended,
+  GraphQLErrorExtended,
+  HttpRequestHandler,
+  WithPostGraphileContextOptions,
+} from './interfaces';
 
 export {
   Plugin,

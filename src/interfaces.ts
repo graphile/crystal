@@ -240,8 +240,6 @@ export interface PostGraphileOptions {
   // Max query cache size in MBs of queries. Default, 50MB.
   /* @middlewareOnly */
   queryCacheMaxSize?: number;
-  // Allow arbitrary extensions for consumption by plugins.
-  [propName: string]: any;
 }
 
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
