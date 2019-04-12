@@ -26,11 +26,20 @@ import { EventEmitter } from 'events';
  */
 export type mixed = {} | string | number | boolean | undefined | null;
 
+export type Middleware = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: (err?: Error) => void,
+) => void;
+
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
 // Anything tagged `@middlewareOnly` will not appear in the schema-only docs.
 // Only comments written beginning with `//` will be put in the docs.
-export interface PostGraphileOptions {
+export interface PostGraphileOptions<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+> {
   // When true, PostGraphile will update the GraphQL API whenever your database
   // schema changes. This feature requires some changes to your database in the
   // form of the
@@ -49,6 +58,13 @@ export interface PostGraphileOptions {
   subscriptions?: boolean;
   // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
   live?: boolean;
+  // [EXPERIMENTAL] If you're using websockets (subscriptions || live) then you
+  // may want to authenticate your users using sessions or similar. You can
+  // pass some simple middlewares here that will be executed against the
+  // websocket connection in order to perform authentication. We current only
+  // support express (not Koa) middlewares here.
+  /* @middlewareOnly */
+  websocketMiddlewares?: Array<Middleware>;
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
   pgDefaultRole?: string;
@@ -104,7 +120,7 @@ export interface PostGraphileOptions {
   handleErrors?: (
     errors: ReadonlyArray<GraphQLError>,
     req: IncomingMessage,
-    res: ServerResponse,
+    res: Response,
   ) => Array<GraphQLErrorExtended>;
   // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // after the default plugins.
@@ -217,16 +233,14 @@ export interface PostGraphileOptions {
   // Promise to the same) based on the incoming web request (e.g. to extract
   // session data).
   /* @middlewareOnly */
-  pgSettings?:
-    | { [key: string]: mixed }
-    | ((req: IncomingMessage) => Promise<{ [key: string]: mixed }>);
+  pgSettings?: { [key: string]: mixed } | ((req: Request) => Promise<{ [key: string]: mixed }>);
   // Some Graphile Engine schema plugins may need additional information
   // available on the `context` argument to the resolver - you can use this
   // function to provide such information based on the incoming request - you
   // can even use this to change the response [experimental], e.g. setting
   // cookies.
   /* @middlewareOnly */
-  additionalGraphQLContextFromRequest?: (req: IncomingMessage, res: ServerResponse) => Promise<{}>;
+  additionalGraphQLContextFromRequest?: (req: Request, res: Response) => Promise<{}>;
   // [experimental] Plugin hook function, enables functionality within
   // PostGraphile to be expanded with plugins. Generate with
   // `makePluginHook(plugins)` passing a list of plugin objects.
@@ -240,8 +254,6 @@ export interface PostGraphileOptions {
   // Max query cache size in MBs of queries. Default, 50MB.
   /* @middlewareOnly */
   queryCacheMaxSize?: number;
-  // Allow arbitrary extensions for consumption by plugins.
-  [propName: string]: any;
 }
 
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
@@ -274,23 +286,26 @@ export type GraphQLErrorExtended = GraphQLError & {
 /**
  * A request handler for one of many different `http` frameworks.
  */
-export interface HttpRequestHandler {
-  (req: IncomingMessage, res: ServerResponse, next?: (error?: mixed) => void): Promise<void>;
-  (ctx: { req: IncomingMessage; res: ServerResponse }, next: () => void): Promise<void>;
+export interface HttpRequestHandler<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+> {
+  (req: Request, res: Response, next?: (error?: mixed) => void): Promise<void>;
+  (ctx: { req: Request; res: Response }, next: () => void): Promise<void>;
   formatError: (e: GraphQLError) => GraphQLFormattedErrorExtended;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
   pgPool: Pool;
   withPostGraphileContextFromReqRes: (
-    req: IncomingMessage,
-    res: ServerResponse,
+    req: Request,
+    res: Response,
     moreOptions: any,
     fn: (ctx: mixed) => any,
   ) => Promise<any>;
   options: CreateRequestHandlerOptions;
   handleErrors: (
     errors: ReadonlyArray<GraphQLError>,
-    req: IncomingMessage,
-    res: ServerResponse,
+    req: Request,
+    res: Response,
   ) => Array<GraphQLErrorExtended>;
 }
 

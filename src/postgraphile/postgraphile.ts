@@ -1,4 +1,5 @@
 import { Pool, PoolConfig } from 'pg';
+import { IncomingMessage, ServerResponse } from 'http';
 import { GraphQLSchema } from 'graphql';
 import { EventEmitter } from 'events';
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core';
@@ -18,10 +19,13 @@ function isPlainObject(obj: any) {
   return false;
 }
 
-export interface PostgraphileSchemaBuilder {
+export interface PostgraphileSchemaBuilder<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+> {
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
-  options: PostGraphileOptions;
+  options: PostGraphileOptions<Request, Response>;
 }
 
 /**
@@ -29,10 +33,13 @@ export interface PostgraphileSchemaBuilder {
  * database to get a GraphQL schema, and then using that to create the Http
  * request handler.
  */
-export function getPostgraphileSchemaBuilder(
+export function getPostgraphileSchemaBuilder<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
   pgPool: Pool,
   schema: string | Array<string>,
-  incomingOptions: PostGraphileOptions,
+  incomingOptions: PostGraphileOptions<Request, Response>,
 ): PostgraphileSchemaBuilder {
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
     // live implies subscriptions
@@ -59,7 +66,7 @@ export function getPostgraphileSchemaBuilder(
   // Creates the Postgres schemas array.
   const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema];
 
-  const _emitter = options._emitter || new EventEmitter();
+  const _emitter: EventEmitter = options['_emitter'] || new EventEmitter();
 
   // Creates a promise which will resolve to a GraphQL schema. Connects a
   // client from our pool to introspect the database.
@@ -108,24 +115,33 @@ export function getPostgraphileSchemaBuilder(
     }
   }
 }
-export default function postgraphile(
+export default function postgraphile<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
   poolOrConfig?: Pool | PoolConfig | string,
   schema?: string | Array<string>,
-  options?: PostGraphileOptions,
+  options?: PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler;
-export default function postgraphile(
+export default function postgraphile<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
   poolOrConfig?: Pool | PoolConfig | string,
-  options?: PostGraphileOptions,
+  options?: PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler;
-export default function postgraphile(
+export default function postgraphile<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
   poolOrConfig?: Pool | PoolConfig | string,
-  schemaOrOptions?: string | Array<string> | PostGraphileOptions,
-  maybeOptions?: PostGraphileOptions,
+  schemaOrOptions?: string | Array<string> | PostGraphileOptions<Request, Response>,
+  maybeOptions?: PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler {
   let schema: string | Array<string>;
   // These are the raw options we're passed in; getPostgraphileSchemaBuilder
   // must process them with `pluginHook` before we can rely on them.
-  let incomingOptions: PostGraphileOptions;
+  let incomingOptions: PostGraphileOptions<Request, Response>;
 
   // If the second argument is a string or array, it is the schemas so set the
   // `schema` value and try to use the third argument (or a default) for
@@ -175,7 +191,7 @@ export default function postgraphile(
     console.error('PostgreSQL client generated error: ', err.message);
   });
 
-  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder(
+  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
     pgPool,
     schema,
     incomingOptions,
