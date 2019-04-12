@@ -819,14 +819,20 @@ export default (async function PgIntrospectionPlugin(
     client: Client | null;
     stopped: boolean;
     _reallyReleaseClient: (() => Promise<void>) | null;
+    _haveDisplayedError: boolean;
     constructor(triggerRebuild) {
       this.stopped = false;
       this._handleChange = throttle(
         async () => {
           debug(`Schema change detected: re-inspecting schema...`);
-          introspectionResultsByKind = await introspect();
-          debug(`Schema change detected: re-inspecting schema complete`);
-          triggerRebuild();
+          try {
+            introspectionResultsByKind = await introspect();
+            debug(`Schema change detected: re-inspecting schema complete`);
+            triggerRebuild();
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(`Schema introspection failed: ${e.message}`);
+          }
         },
         750,
         {
@@ -842,33 +848,6 @@ export default (async function PgIntrospectionPlugin(
     async _start() {
       if (this.stopped) {
         return;
-      }
-      // Install the watch fixtures.
-      if (!pgSkipInstallingWatchFixtures) {
-        const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
-        const sql = `begin; ${watchSqlInner}; commit;`;
-        try {
-          await withPgClient(pgOwnerConnectionString || pgConfig, pgClient =>
-            pgClient.query(sql)
-          );
-        } catch (error) {
-          /* eslint-disable no-console */
-          console.warn(
-            `${chalk.bold.yellow(
-              "Failed to setup watch fixtures in Postgres database"
-            )} ️️⚠️`
-          );
-          console.warn(
-            chalk.yellow(
-              "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection-string' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
-            )
-          );
-          console.warn(
-            chalk.yellow("Enable DEBUG='graphile-build-pg' to see the error")
-          );
-          debug(error);
-          /* eslint-enable no-console */
-        }
       }
       // Connect to DB
       try {
@@ -886,6 +865,43 @@ export default (async function PgIntrospectionPlugin(
           return this._releaseClient();
         } else {
           await pgClient.query("listen postgraphile_watch");
+
+          // Install the watch fixtures.
+          if (!pgSkipInstallingWatchFixtures) {
+            const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
+            const sql = `begin; ${watchSqlInner}; commit;`;
+            try {
+              await withPgClient(
+                pgOwnerConnectionString || pgConfig,
+                pgClient => pgClient.query(sql)
+              );
+            } catch (error) {
+              if (!this._haveDisplayedError) {
+                this._haveDisplayedError = true;
+                /* eslint-disable no-console */
+                console.warn(
+                  `${chalk.bold.yellow(
+                    "Failed to setup watch fixtures in Postgres database"
+                  )} ️️⚠️`
+                );
+                console.warn(
+                  chalk.yellow(
+                    "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection-string' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
+                  )
+                );
+                console.warn(
+                  chalk.yellow(
+                    "Enable DEBUG='graphile-build-pg' to see the error"
+                  )
+                );
+                /* eslint-enable no-console */
+              }
+              debug(error);
+            }
+          }
+
+          // Trigger re-introspection on server reconnect
+          this._handleChange();
         }
       } catch (e) {
         // If something goes wrong, disconnect and try again after a short delay
@@ -912,8 +928,6 @@ export default (async function PgIntrospectionPlugin(
       await this._releaseClient();
       setTimeout(() => {
         if (!this.stopped) {
-          // Trigger re-introspection on server reconnect
-          this._handleChange();
           // Listen for further changes
           this._start();
         }
@@ -960,6 +974,7 @@ export default (async function PgIntrospectionPlugin(
     }
 
     async _releaseClient() {
+      this._handleChange.cancel();
       const pgClient = this.client;
       const reallyReleaseClient = this._reallyReleaseClient;
       this.client = null;
@@ -984,7 +999,6 @@ export default (async function PgIntrospectionPlugin(
         await listener.stop();
       }
       listener = new Listener(triggerRebuild);
-      introspectionResultsByKind = await introspect();
     },
     async () => {
       const l = listener;
