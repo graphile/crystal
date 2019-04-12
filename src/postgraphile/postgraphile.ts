@@ -104,14 +104,23 @@ export function getPostgraphileSchemaBuilder<
           exportGqlSchema(gqlSchema);
         }
         if (attempts > 0) {
-          console.error(`Schema ${attempts > 15 ? 'eventually' : attempts > 5 ? 'finally' : 'now'} generated successfully`);
+          // tslint:disable-next-line no-console
+          console.error(
+            `Schema ${
+              attempts > 15 ? 'eventually' : attempts > 5 ? 'finally' : 'now'
+            } generated successfully`,
+          );
         }
         return gqlSchema;
       } catch (error) {
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
         // If we fail to build our schema, log the error and retry shortly
-        logSeriousError(error, 'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''), `We'll try again in ${delay}ms.`);
+        logSeriousError(
+          error,
+          'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
+          `We'll try again in ${delay}ms.`,
+        );
         await sleep(delay);
       }
     }
@@ -219,7 +228,7 @@ export default function postgraphile<
 }
 
 function logSeriousError(error: Error, when: string, nextSteps?: string) {
-  // tslint:ignore-next-line no-console
+  // tslint:disable-next-line no-console
   console.error(
     `A ${chalk.bold('serious error')} occurred when ${chalk.bold(when)}. ${
       nextSteps ? nextSteps + ' ' : ''
