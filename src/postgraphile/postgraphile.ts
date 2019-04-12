@@ -9,6 +9,8 @@ import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 import chalk = require('chalk');
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 // tslint:disable-next-line no-any
 function isPlainObject(obj: any) {
   if (!obj || typeof obj !== 'object' || String(obj) !== '[object Object]') return false;
@@ -83,26 +85,35 @@ export function getPostgraphileSchemaBuilder<
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
-    try {
-      if (options.watchPg) {
-        await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
-          gqlSchema = newSchema;
-          _emitter.emit('schemas:changed');
+    let attempts = 0;
+    while (true) {
+      try {
+        if (options.watchPg) {
+          await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
+            gqlSchema = newSchema;
+            _emitter.emit('schemas:changed');
+            exportGqlSchema(gqlSchema);
+          });
+          if (!gqlSchema) {
+            throw new Error(
+              "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
+            );
+          }
+        } else {
+          gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options);
           exportGqlSchema(gqlSchema);
-        });
-        if (!gqlSchema) {
-          throw new Error(
-            "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
-          );
         }
-      } else {
-        gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options);
-        exportGqlSchema(gqlSchema);
+        if (attempts > 0) {
+          console.error(`Schema ${attempts > 15 ? 'eventually' : attempts > 5 ? 'finally' : 'now'} generated successfully`);
+        }
+        return gqlSchema;
+      } catch (error) {
+        attempts++;
+        const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
+        // If we fail to build our schema, log the error and retry shortly
+        logSeriousError(error, 'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''), `We'll try again in ${delay}ms.`);
+        await sleep(delay);
       }
-      return gqlSchema;
-    } catch (error) {
-      // If we fail to build our schema, log the error and exit the process.
-      return handleFatalError(error, 'building the initial schema');
     }
   }
 
@@ -110,8 +121,10 @@ export function getPostgraphileSchemaBuilder<
     try {
       await exportPostGraphileSchema(newGqlSchema, options);
     } catch (error) {
-      // If we fail to export our schema, log the error and exit the process.
-      handleFatalError(error, 'exporting the schema');
+      // If we exit cleanly; let calling scripts know there was a problem.
+      process.exitCode = 35;
+      // If we fail to export our schema, log the error.
+      logSeriousError(error, 'exporting the schema');
     }
   }
 }
@@ -205,19 +218,13 @@ export default function postgraphile<
   });
 }
 
-function handleFatalError(error: Error, when: string): never {
-  process.stderr.write(
-    `A fatal error occurred when ${chalk.bold(
-      when,
-    )}, so the process will now exit. Error details:\n\n`,
+function logSeriousError(error: Error, when: string, nextSteps?: string) {
+  // tslint:ignore-next-line no-console
+  console.error(
+    `A ${chalk.bold('serious error')} occurred when ${chalk.bold(when)}. ${
+      nextSteps ? nextSteps + ' ' : ''
+    }Error details:\n\n${error.stack}\n`,
   );
-  process.stderr.write(`${error.stack}\n`); // console.error fails under the tests
-  process.exit(1);
-
-  // `process.exit` will mean all code below it will never get called.
-  // However, we need to return a value with type `never` here for
-  // TypeScript.
-  return null as never;
 }
 
 function hasPoolConstructor(obj: mixed): boolean {
