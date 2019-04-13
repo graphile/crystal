@@ -220,6 +220,10 @@ program
     'enables exporting the detected schema, in GraphQL schema format, to the given location. The directories must exist already, if the file exists it will be overwritten.',
   )
   .option(
+    '--sort-export',
+    'lexicographically (alphabetically) sort exported schema for more stable diffing.',
+  )
+  .option(
     '-X, --no-server',
     '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)',
   );
@@ -427,6 +431,7 @@ const {
   includeExtensionResources = false,
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
+  sortExport = false,
   showErrorStack,
   extendedErrors = [],
   bodySizeLimit,
@@ -581,6 +586,7 @@ const postgraphileOptions = pluginHook(
     enableCors,
     exportJsonSchemaPath,
     exportGqlSchemaPath,
+    sortExport,
     bodySizeLimit,
     appendPlugins: loadPlugins(appendPluginNames),
     prependPlugins: loadPlugins(prependPluginNames),
