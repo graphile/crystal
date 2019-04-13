@@ -3,7 +3,7 @@ import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode } from 'graph
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
-import { Plugin } from 'postgraphile-core';
+import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
 
@@ -39,7 +39,7 @@ export type Middleware = (
 export interface PostGraphileOptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
-> {
+> extends PostGraphileCoreOptions {
   // When true, PostGraphile will update the GraphQL API whenever your database
   // schema changes. This feature requires some changes to your database in the
   // form of the
