@@ -2399,7 +2399,7 @@ type PostManyPayload {
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
-  posts: [Post]
+  posts: [Post!]
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.

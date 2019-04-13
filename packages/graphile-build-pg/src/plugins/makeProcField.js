@@ -64,7 +64,10 @@ export default function makeProcField(
     describePgEntity,
     sqlCommentByAddingTags,
     pgField,
-    options: { subscriptions = false },
+    options: {
+      subscriptions = false,
+      pgForbidSetofFunctionsToReturnNull = false,
+    },
   } = build;
 
   if (computed && isMutation) {
@@ -184,9 +187,15 @@ export default function makeProcField(
   if (isTableLike) {
     if (proc.returnsSet) {
       if (isMutation) {
-        type = new GraphQLList(TableType);
+        const innerType = pgForbidSetofFunctionsToReturnNull
+          ? new GraphQLNonNull(TableType)
+          : TableType;
+        type = new GraphQLList(innerType);
       } else if (forceList) {
-        type = new GraphQLList(TableType);
+        const innerType = pgForbidSetofFunctionsToReturnNull
+          ? new GraphQLNonNull(TableType)
+          : TableType;
+        type = new GraphQLList(innerType);
         fieldScope.isPgFieldSimpleCollection = true;
       } else {
         const ConnectionType = getTypeByName(
@@ -207,6 +216,7 @@ export default function makeProcField(
     } else {
       type = TableType;
       if (rawReturnType.isPgArray) {
+        // Not implementing pgForbidSetofFunctionsToReturnNull here because it's not a set
         type = new GraphQLList(type);
       }
       fieldScope.pgFieldIntrospectionTable = returnTypeTable;

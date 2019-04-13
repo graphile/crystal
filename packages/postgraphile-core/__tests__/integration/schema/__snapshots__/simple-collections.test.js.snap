@@ -1353,7 +1353,7 @@ type Issue756SetMutationPayload {
     \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
     orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
   ): Issue756SEdge
-  issue756S: [Issue756]
+  issue756S: [Issue756!]
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2457,7 +2457,7 @@ type MutationOutTableSetofPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  people: [Person]
+  people: [Person!]
 
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
@@ -2997,7 +2997,7 @@ type Person implements Node {
 
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
     orderBy: [PeopleOrderBy!]
-  ): [Person]
+  ): [Person!]
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
@@ -3105,7 +3105,7 @@ type Person implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Type]
+  ): [Type!]
   typeFunctionList: [Type]
 }
 
@@ -3699,7 +3699,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Person] @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
+  ): [Person!] @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -3738,7 +3738,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [CompoundType]
+  ): [CompoundType!]
   currentUserId: Int
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
@@ -3861,7 +3861,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Person]
+  ): [Person!]
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiCol(
@@ -4068,7 +4068,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
     orderBy: [PeopleOrderBy!]
-  ): [Person]
+  ): [Person!]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
@@ -4120,7 +4120,7 @@ type TableSetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  people: [Person]
+  people: [Person!]
 
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
@@ -5713,7 +5713,7 @@ type Issue756SetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  issue756S: [Issue756]
+  issue756S: [Issue756!]
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -6779,7 +6779,7 @@ type MutationOutTableSetofPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  people: [Person]
+  people: [Person!]
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -7138,7 +7138,7 @@ type Person implements Node {
 
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
     orderBy: [PeopleOrderBy!]
-  ): [Person]
+  ): [Person!]
 
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
@@ -7167,7 +7167,7 @@ type Person implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Type]
+  ): [Type!]
   typeFunctionList: [Type]
 }
 
@@ -7482,7 +7482,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Person] @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
+  ): [Person!] @deprecated(reason: \\"This is deprecated (comment on function c.badly_behaved_function).\\")
 
   \\"\\"\\"Reads a single \`CompoundKey\` using its globally unique \`ID\`.\\"\\"\\"
   compoundKey(
@@ -7500,7 +7500,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [CompoundType]
+  ): [CompoundType!]
   currentUserId: Int
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
@@ -7542,7 +7542,7 @@ type Query implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Person]
+  ): [Person!]
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiColList(
@@ -7658,7 +7658,7 @@ type Query implements Node {
 
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
     orderBy: [PeopleOrderBy!]
-  ): [Person]
+  ): [Person!]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
@@ -7710,7 +7710,7 @@ type TableSetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-  people: [Person]
+  people: [Person!]
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8533,7 +8533,7 @@ type Person implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Pet]
+  ): [Pet!]
 
   \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
   petsByOwnerIdList(
@@ -9163,7 +9163,7 @@ type Person implements Node {
 
     \\"\\"\\"Skip the first \`n\` values.\\"\\"\\"
     offset: Int
-  ): [Pet]
+  ): [Pet!]
 
   \\"\\"\\"Reads and enables pagination through a set of \`Pet\`.\\"\\"\\"
   petsByOwnerId(
