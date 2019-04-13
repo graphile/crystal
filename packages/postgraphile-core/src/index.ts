@@ -55,20 +55,36 @@ export interface PostGraphileCoreOptions {
   classicIds?: boolean;
   disableDefaultMutations?: boolean;
   nodeIdFieldName?: string;
+  /**
+   * Additional Options to pass through into the graphile schema building
+   * system (received via the second argument of a plugin).
+   */
   graphileBuildOptions?: Options;
-  graphqlBuildOptions?: Options; // DEPRECATED!
+  /**
+   * @deprecated Use graphileBuildOptions instead
+   */
+  graphqlBuildOptions?: Options;
   replaceAllPlugins?: Array<Plugin>;
   appendPlugins?: Array<Plugin>;
   prependPlugins?: Array<Plugin>;
   skipPlugins?: Array<Plugin>;
   jwtPgTypeIdentifier?: string;
   jwtSecret?: string;
-  inflector?: Inflector; // NO LONGER SUPPORTED!
+  /**
+   * @deprecated UNSUPPORTED! Use an inflector plugin instead.
+   */
+  inflector?: Inflector;
+  /**
+   * @deprecated Use smart comments/tags instead
+   */
   pgColumnFilter?: <TSource>(
     attr: mixed,
     build: Build,
     context: Context<TSource>
   ) => boolean;
+  /**
+   * @deprecated Use '@primaryKey' smart comment instead
+   */
   viewUniqueKey?: string;
   enableTags?: boolean;
   readCache?: string;
