@@ -582,9 +582,7 @@ input FilmInput {
   title: String
 }
 
-\\"\\"\\"
-Represents an update to a \`Film\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Film\`. Fields that are set will be updated.\\"\\"\\"
 input FilmPatch {
   code: Int
   title: String
@@ -921,9 +919,7 @@ type Mutation {
     input: UpdateStudioByIdInput!
   ): UpdateStudioPayload
 
-  \\"\\"\\"
-  Updates a single \`TvEpisode\` using its globally unique id and a patch.
-  \\"\\"\\"
+  \\"\\"\\"Updates a single \`TvEpisode\` using its globally unique id and a patch.\\"\\"\\"
   updateTvEpisode(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1155,9 +1151,7 @@ input PostInput {
   id: Int
 }
 
-\\"\\"\\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Post\`. Fields that are set will be updated.\\"\\"\\"
 input PostPatch {
   authorId: Int
   body: String
@@ -1478,9 +1472,7 @@ type Query implements Node {
 
   \\"\\"\\"Reads a single \`TvEpisode\` using its globally unique \`ID\`.\\"\\"\\"
   tvEpisode(
-    \\"\\"\\"
-    The globally unique \`ID\` to be used in selecting a single \`TvEpisode\`.
-    \\"\\"\\"
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`TvEpisode\`.\\"\\"\\"
     nodeId: ID!
   ): TvEpisode
   tvEpisodeByCode(code: Int!): TvEpisode

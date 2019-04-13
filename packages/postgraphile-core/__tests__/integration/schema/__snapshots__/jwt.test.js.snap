@@ -1279,9 +1279,7 @@ input TypeInput {
   varchar: String!
 }
 
-\\"\\"\\"
-Represents an update to a \`Type\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Type\`. Fields that are set will be updated.\\"\\"\\"
 input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt

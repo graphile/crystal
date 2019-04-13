@@ -16,6 +16,7 @@
     "flow-copy-source": "^1.2.0",
     "jest": "^23.5.0",
     "lerna": "^3.4.3",
+    "postgraphile": "^4.4.0-beta.9",
     "prettier": "^1.4.4"
   },
   "scripts": {

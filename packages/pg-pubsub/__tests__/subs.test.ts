@@ -9,7 +9,7 @@ import {
   printSchema,
 } from "graphql";
 import { Pool, PoolClient } from "pg";
-import SupporterPlugin from "../src";
+import PgPubsub from "../src";
 import { runQuery, TestCtx } from "./runQuery";
 
 let ctx: TestCtx | null = null;
@@ -37,7 +37,7 @@ const init = async (options: PostGraphileOptions = {}) => {
     clients.splice(i, 1);
   });
 
-  const pluginHook = makePluginHook([SupporterPlugin]);
+  const pluginHook = makePluginHook([PgPubsub]);
   const middleware = postgraphile(pgPool, ["pubsub_test"], {
     pluginHook,
     ignoreRBAC: false,

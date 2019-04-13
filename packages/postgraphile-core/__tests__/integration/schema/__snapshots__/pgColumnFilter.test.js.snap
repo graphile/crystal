@@ -1911,9 +1911,7 @@ type Mutation {
     input: UpdateReservedInputRecordInput!
   ): UpdateReservedInputRecordPayload
 
-  \\"\\"\\"
-  Updates a single \`ReservedInputRecord\` using a unique key and a patch.
-  \\"\\"\\"
+  \\"\\"\\"Updates a single \`ReservedInputRecord\` using a unique key and a patch.\\"\\"\\"
   updateReservedInputRecordById(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1931,9 +1929,7 @@ type Mutation {
     input: UpdateReservedPatchRecordInput!
   ): UpdateReservedPatchRecordPayload
 
-  \\"\\"\\"
-  Updates a single \`ReservedPatchRecord\` using a unique key and a patch.
-  \\"\\"\\"
+  \\"\\"\\"Updates a single \`ReservedPatchRecord\` using a unique key and a patch.\\"\\"\\"
   updateReservedPatchRecordById(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1977,9 +1973,7 @@ type Mutation {
     input: UpdateSimilarTable2ByIdInput!
   ): UpdateSimilarTable2Payload
 
-  \\"\\"\\"
-  Updates a single \`ViewTable\` using its globally unique id and a patch.
-  \\"\\"\\"
+  \\"\\"\\"Updates a single \`ViewTable\` using its globally unique id and a patch.\\"\\"\\"
   updateViewTable(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2413,9 +2407,7 @@ type PostManyPayload {
   query: Query
 }
 
-\\"\\"\\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Post\`. Fields that are set will be updated.\\"\\"\\"
 input PostPatch {
   authorId: Int
   body: String
@@ -3059,9 +3051,7 @@ type Query implements Node {
 
   \\"\\"\\"Reads a single \`ViewTable\` using its globally unique \`ID\`.\\"\\"\\"
   viewTable(
-    \\"\\"\\"
-    The globally unique \`ID\` to be used in selecting a single \`ViewTable\`.
-    \\"\\"\\"
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`ViewTable\`.\\"\\"\\"
     nodeId: ID!
   ): ViewTable
   viewTableById(id: Int!): ViewTable

@@ -539,9 +539,7 @@ A point in time as described by the [ISO
 \\"\\"\\"
 scalar Datetime
 
-\\"\\"\\"
-All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
-\\"\\"\\"
+\\"\\"\\"All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.\\"\\"\\"
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -2755,9 +2753,7 @@ type NullTestRecordsConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`NullTestRecord\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`NullTestRecord\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 
@@ -3944,9 +3940,7 @@ type TypesMutationPayload {
   query: Query
 }
 
-\\"\\"\\"
-All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
-\\"\\"\\"
+\\"\\"\\"All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.\\"\\"\\"
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the

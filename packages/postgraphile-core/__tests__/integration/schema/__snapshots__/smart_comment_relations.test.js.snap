@@ -1166,9 +1166,7 @@ input PostInput {
   id: String!
 }
 
-\\"\\"\\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Post\`. Fields that are set will be updated.\\"\\"\\"
 input PostPatch {
   id: String
 }
@@ -1815,9 +1813,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`StreetProperty\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`StreetProperty\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 
@@ -3451,9 +3447,7 @@ input PostInput {
   id: String!
 }
 
-\\"\\"\\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Post\`. Fields that are set will be updated.\\"\\"\\"
 input PostPatch {
   id: String
 }
@@ -4100,9 +4094,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`StreetProperty\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`StreetProperty\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 
@@ -5771,9 +5763,7 @@ input PostInput {
   id: String!
 }
 
-\\"\\"\\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Post\`. Fields that are set will be updated.\\"\\"\\"
 input PostPatch {
   id: String
 }
@@ -6420,9 +6410,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`StreetProperty\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`StreetProperty\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 
@@ -8642,9 +8630,7 @@ type StreetPropertiesConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`StreetProperty\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`StreetProperty\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 

@@ -1682,9 +1682,7 @@ type NullTestRecordsConnection {
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
 
-  \\"\\"\\"
-  The count of *all* \`NullTestRecord\` you could get from the connection.
-  \\"\\"\\"
+  \\"\\"\\"The count of *all* \`NullTestRecord\` you could get from the connection.\\"\\"\\"
   totalCount: Int!
 }
 

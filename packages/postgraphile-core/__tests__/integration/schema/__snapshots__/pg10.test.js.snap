@@ -398,9 +398,7 @@ type Mutation {
     input: UpdateByDefaultAsIdentityInput!
   ): UpdateByDefaultAsIdentityPayload
 
-  \\"\\"\\"
-  Updates a single \`ByDefaultAsIdentity\` using a unique key and a patch.
-  \\"\\"\\"
+  \\"\\"\\"Updates a single \`ByDefaultAsIdentity\` using a unique key and a patch.\\"\\"\\"
   updateByDefaultAsIdentityById(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

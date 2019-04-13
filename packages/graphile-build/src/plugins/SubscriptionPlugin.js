@@ -15,7 +15,27 @@ function isValidSubscription(Subscription) {
   return true;
 }
 
-export default (async function SubscriptionPlugin(builder) {
+const description = `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`;
+const liveDescription = `The root subscription type: contains events and live queries you can subscribe to with the \`subscription\` operation.
+
+#### Live Queries
+
+Live query fields are differentiated by containing \`(live)\` at the end of their description, \
+they are added for each field in the \`Query\` type. \
+When you subscribe to a live query field, the selection set will be evaluated and sent to the \
+client, and then most things\\* that would cause the output of the selection set to change \
+will trigger the selection set to be re-evaluated and the results to be re-sent to the client.
+
+_(\\* Not everything: typically only changes to persisted data referenced by the query are detected, not computed fields.)_
+
+Live queries can be very expensive, so try and keep them small and focussed.
+
+#### Events
+
+Event fields will run their selection set when, and only when, the specified server-side event occurs. \
+This makes them a lot more efficient than Live Queries, but it is still recommended that you keep payloads fairly small.`;
+
+export default (async function SubscriptionPlugin(builder, { live }) {
   builder.hook(
     "GraphQLSchema",
     (schema: {}, build) => {
@@ -29,8 +49,7 @@ export default (async function SubscriptionPlugin(builder) {
         GraphQLObjectType,
         {
           name: inflection.builtin("Subscription"),
-          description:
-            "The root subscription type which contains root level fields which mutate data.",
+          description: live ? liveDescription : description,
         },
         {
           __origin: `graphile-build built-in (root subscription type)`,

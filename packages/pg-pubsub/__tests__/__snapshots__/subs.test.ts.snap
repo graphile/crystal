@@ -1361,7 +1361,7 @@ type Query implements Node {
 }
 
 \\"\\"\\"
-The root subscription type which contains root level fields which mutate data.
+The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.
 \\"\\"\\"
 type Subscription {
   listen(topic: String!): ListenPayload!
