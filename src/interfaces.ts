@@ -149,6 +149,10 @@ export interface PostGraphileOptions<
   // be overwritten.
   /* @middlewareOnly */
   exportGqlSchemaPath?: string;
+  // If true, lexicographically (alphabetically) sort exported schema for
+  // more stable diffing.
+  /* @middlewareOnly */
+  sortExport?: boolean;
   // The endpoint the GraphQL executer will listen on. Defaults to `/graphql`.
   /* @middlewareOnly */
   graphqlRoute?: string;

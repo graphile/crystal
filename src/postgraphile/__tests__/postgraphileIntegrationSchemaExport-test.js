@@ -35,6 +35,18 @@ test('exports a schema as GQL', async () => {
   expect(writeFile.mock.calls[0][1]).toMatchSnapshot();
 });
 
+test('exports a sorted schema as GQL', async () => {
+  writeFile.mockClear();
+  const gqlSchema = await gqlSchemaPromise;
+  await exportPostGraphileSchema(gqlSchema, {
+    exportGqlSchemaPath: '/schema.gql',
+    sortExport: true,
+  });
+  expect(writeFile.mock.calls.length).toBe(1);
+  expect(writeFile.mock.calls[0][0]).toBe('/schema.gql');
+  expect(writeFile.mock.calls[0][1]).toMatchSnapshot();
+});
+
 test('does not export a schema when not enabled', async () => {
   writeFile.mockClear();
   const gqlSchema = await gqlSchemaPromise;

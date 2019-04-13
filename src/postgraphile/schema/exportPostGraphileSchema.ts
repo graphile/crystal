@@ -1,5 +1,12 @@
 import { writeFile } from 'fs';
-import { graphql, GraphQLSchema, introspectionQuery, printSchema } from 'graphql';
+import {
+  graphql,
+  GraphQLSchema,
+  introspectionQuery,
+  printSchema,
+  lexicographicSortSchema,
+} from 'graphql';
+import { PostGraphileOptions } from '../../interfaces';
 
 async function writeFileAsync(path: string, contents: string): Promise<void> {
   await new Promise((resolve, reject) => {
@@ -15,19 +22,27 @@ async function writeFileAsync(path: string, contents: string): Promise<void> {
  */
 export default async function exportPostGraphileSchema(
   schema: GraphQLSchema,
-  options: {
-    exportJsonSchemaPath?: string;
-    exportGqlSchemaPath?: string;
-  } = {},
+  options: PostGraphileOptions = {},
 ): Promise<void> {
+  const jsonPath =
+    typeof options.exportJsonSchemaPath === 'string' ? options.exportJsonSchemaPath : null;
+  const graphqlPath =
+    typeof options.exportGqlSchemaPath === 'string' ? options.exportGqlSchemaPath : null;
+
+  // Sort schema, if requested
+  const finalSchema =
+    options.sortExport && lexicographicSortSchema && (jsonPath || graphqlPath)
+      ? lexicographicSortSchema(schema)
+      : schema;
+
   // JSON version
-  if (typeof options.exportJsonSchemaPath === 'string') {
-    const result = await graphql(schema, introspectionQuery);
-    await writeFileAsync(options.exportJsonSchemaPath, JSON.stringify(result, null, 2));
+  if (jsonPath) {
+    const result = await graphql(finalSchema, introspectionQuery);
+    await writeFileAsync(jsonPath, JSON.stringify(result, null, 2));
   }
 
   // Schema language version
-  if (typeof options.exportGqlSchemaPath === 'string') {
-    await writeFileAsync(options.exportGqlSchemaPath, printSchema(schema));
+  if (graphqlPath) {
+    await writeFileAsync(graphqlPath, printSchema(finalSchema));
   }
 }
