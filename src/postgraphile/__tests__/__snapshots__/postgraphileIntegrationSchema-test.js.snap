@@ -5495,7 +5495,7 @@ type TableSetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \"\"\"
   clientMutationId: String
-  people: [Person]
+  people: [Person!]
 
   \"\"\"An edge for our \`Person\`. May be used by Relay 1.\"\"\"
   personEdge(
