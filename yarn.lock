@@ -6232,10 +6232,10 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
-postgraphile@^4.4.0-beta.9:
-  version "4.4.0-beta.9"
-  resolved "https://registry.yarnpkg.com/postgraphile/-/postgraphile-4.4.0-beta.9.tgz#da89b47ed1758eb844e1bd4b5d4fd2e7d9d3f0d5"
-  integrity sha512-NxvbpUd0CVYaMifsHYuPLb0i+pMWvlDAm8+cN8dSS29M7I9IvMXwcseynb5AgeVvpour/k1QAEu/JAfXni9rhA==
+postgraphile@^4.4.0-beta.10:
+  version "4.4.0-beta.10"
+  resolved "https://registry.yarnpkg.com/postgraphile/-/postgraphile-4.4.0-beta.10.tgz#04ecf159aaeb5aa205ab938d5a985420f4b73749"
+  integrity sha512-4QKihgBClAxwx1HmeGwmaEkkwLhcQoLMNS5O9BiEkNDhcGq5QEBgHJ+pOw2/D2qZRKOTetXtVqTV9mQcSpbkzQ==
   dependencies:
     "@types/graphql" "^14.0.3"
     "@types/jsonwebtoken" "<7.2.1"
@@ -6256,7 +6256,7 @@ postgraphile@^4.4.0-beta.9:
     pg ">=6.1.0 <8"
     pg-connection-string "^0.1.3"
     pg-sql2 "^2.2.1"
-    postgraphile-core "4.4.0-beta.9"
+    postgraphile-core "4.4.0-beta.10"
     subscriptions-transport-ws "^0.9.15"
     tslib "^1.5.0"
     ws "^6.1.3"
@@ -7628,12 +7628,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.0.1:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
-  integrity sha512-kk80vLW9iGtjMnIv11qyxLqZm20UklzuR2tL0QAnDIygIUIemcZMxlMWudl9OOt76H3ntVzcTiddQ1/pAAJMYg==
-
-typescript@^3.3.1:
+typescript@^3.0.1, typescript@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.1.tgz#6de14e1db4b8a006ac535e482c8ba018c55f750b"
   integrity sha512-cTmIDFW7O0IHbn1DPYjkiebHxwtCMU+eTy30ZtJNBPF9j2O1ITu5XH2YnBeVRKWHqF+3JQwWJv0Q0aUgX8W7IA==
