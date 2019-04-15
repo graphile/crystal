@@ -59,13 +59,16 @@ export interface PostGraphileCoreOptions {
    * Additional Options to pass through into the graphile schema building
    * system (received via the second argument of a plugin).
    */
-  graphileBuildOptions?: Options;
+  graphileBuildOptions?: Partial<Options>;
   /**
    * @deprecated Use graphileBuildOptions instead
    */
-  graphqlBuildOptions?: Options;
+  graphqlBuildOptions?: Partial<Options>;
   replaceAllPlugins?: Array<Plugin>;
   appendPlugins?: Array<Plugin>;
+  /**
+   * @deprecated Use `appendPlugins` with dependencies instead.
+   */
   prependPlugins?: Array<Plugin>;
   skipPlugins?: Array<Plugin>;
   jwtPgTypeIdentifier?: string;
