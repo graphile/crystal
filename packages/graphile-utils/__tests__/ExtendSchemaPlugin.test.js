@@ -416,22 +416,28 @@ it("supports @scope directive with variable value", async () => {
 
 it("supports defining new types", async () => {
   const inputsSeen = [];
+  const EchoCount = gql`
+    enum EchoCount {
+      ONCE
+      TWICE
+      FOREVER
+    }
+  `;
+
+  const EchoInput = gql`
+    input EchoInput {
+      text: String!
+      int: Int
+      float: Float!
+      count: EchoCount
+    }
+  `;
   const schema = await buildSchema([
     ...simplePlugins,
     makeExtendSchemaPlugin(_build => ({
       typeDefs: gql`
-        enum EchoCount {
-          ONCE
-          TWICE
-          FOREVER
-        }
-
-        input EchoInput {
-          text: String!
-          int: Int
-          float: Float!
-          count: EchoCount
-        }
+        ${EchoCount}
+        ${EchoInput}
 
         type EchoOutput {
           text: String!
