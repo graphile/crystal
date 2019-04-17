@@ -50,11 +50,17 @@ export default (function PgColumnsPlugin(builder) {
             ReturnType
           );
           if (type.type === "c") {
+            const isDefinitelyNotATable =
+              type.class && !type.class.isSelectable;
             const jsonBuildObject = queryFromResolveData(
               sql.identifier(Symbol()), // Ignore!
               sqlFullName,
               resolveData,
-              { onlyJsonField: true, addNullCase: true }
+              {
+                onlyJsonField: true,
+                addNullCase: !isDefinitelyNotATable,
+                addNotDistinctFromNullCase: isDefinitelyNotATable,
+              }
             );
             return jsonBuildObject;
           } else {

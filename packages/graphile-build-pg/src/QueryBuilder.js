@@ -522,12 +522,32 @@ class QueryBuilder {
       ", "
     );
   }
-  buildSelectJson({ addNullCase }: { addNullCase?: boolean }) {
+  buildSelectJson({
+    addNullCase,
+    addNotDistinctFromNullCase,
+  }: {
+    addNullCase?: boolean,
+    addNotDistinctFromNullCase?: boolean,
+  }) {
     this.lockEverything();
     let buildObject = this.compiledData.select.length
       ? this.jsonbBuildObject(this.compiledData.select)
       : sql.fragment`to_json(${this.getTableAlias()})`;
-    if (addNullCase) {
+    if (addNotDistinctFromNullCase) {
+      /*
+       * `is null` is not sufficient here because the record might exist but
+       * have null as each of its values; so we use `is not distinct from null`
+       * to assert that the record itself doesn't exist. This is typically used
+       * with column values.
+       */
+      buildObject = sql.fragment`(case when (${this.getTableAlias()} is not distinct from null) then null else ${buildObject} end)`;
+    } else if (addNullCase) {
+      /*
+       * `is null` is probably used here because it's the result of a function;
+       * functions seem to have trouble differentiating between `null::my_type`
+       * and  `(null,null,null)::my_type`, always opting for the latter which
+       * then causes issues with the `GraphQLNonNull`s in the schema.
+       */
       buildObject = sql.fragment`(case when (${this.getTableAlias()} is null) then null else ${buildObject} end)`;
     }
     return buildObject;
@@ -544,31 +564,41 @@ class QueryBuilder {
   buildWhereClause(
     includeLowerBound: boolean,
     includeUpperBound: boolean,
-    { addNullCase }: { addNullCase?: boolean }
+    {
+      addNullCase,
+      addNotDistinctFromNullCase,
+    }: { addNullCase?: boolean, addNotDistinctFromNullCase?: boolean }
   ) {
     this.lock("where");
     const clauses = [
-      ...(addNullCase
-        ? /*
-           * Okay... so this is quite interesting. When we're talking about
-           * composite types, `(foo is not null)` and `not (foo is null)` are
-           * NOT equivalent! Here's why:
-           *
-           * `(foo is null)`
-           *   true if every field of the row is null
-           *
-           * `(foo is not null)`
-           *   true if every field of the row is not null
-           *
-           * `not (foo is null)`
-           *   true if there's at least one field that is not null
-           *
-           * So don't "simplify" the line below! We're probably checking if
-           * the result of a function call returning a compound type was
-           * indeed null.
-           */
-          [sql.fragment`not (${this.getTableAlias()} is null)`]
-        : []),
+      /*
+       * Okay... so this is quite interesting. When we're talking about
+       * composite types, `(foo is not null)` and `not (foo is null)` are NOT
+       * equivalent! Here's why:
+       *
+       * `(foo is null)`
+       *   true if every field of the row is null
+       *
+       * `(foo is not null)`
+       *   true if every field of the row is not null
+       *
+       * `not (foo is null)`
+       *   true if there's at least one field that is not null
+       *
+       * `is [not] distinct from null` does differentiate between these cases,
+       * but when a function returns something like `select * from my_table
+       * where false`, it actually returns `(null, null, null)::my_table`,
+       * which will cause issues when we apply the `GraphQLNonNull` constraints
+       * to the results - we want to treat this as null.
+       *
+       * So don't "simplify" the line below! We're probably checking if the
+       * result of a function call returning a compound type was indeed null.
+       */
+      ...(addNotDistinctFromNullCase
+        ? [sql.fragment`(${this.getTableAlias()} is distinct from null)`]
+        : addNullCase
+          ? [sql.fragment`not (${this.getTableAlias()} is null)`]
+          : []),
       ...this.compiledData.where,
       ...(includeLowerBound ? [this.buildWhereBoundClause(true)] : []),
       ...(includeUpperBound ? [this.buildWhereBoundClause(false)] : []),
@@ -583,6 +613,7 @@ class QueryBuilder {
       asJsonAggregate?: boolean,
       onlyJsonField?: boolean,
       addNullCase?: boolean,
+      addNotDistinctFromNullCase?: boolean,
       useAsterisk?: boolean,
     } = {}
   ) {
@@ -591,17 +622,21 @@ class QueryBuilder {
       asJsonAggregate = false,
       onlyJsonField = false,
       addNullCase = false,
+      addNotDistinctFromNullCase = false,
       useAsterisk = false,
     } = options;
 
     this.lockEverything();
     if (onlyJsonField) {
-      return this.buildSelectJson({ addNullCase });
+      return this.buildSelectJson({ addNullCase, addNotDistinctFromNullCase });
     }
     const { limit, offset, flip } = this.getFinalLimitAndOffset();
     const fields =
       asJson || asJsonAggregate
-        ? sql.fragment`${this.buildSelectJson({ addNullCase })} as object`
+        ? sql.fragment`${this.buildSelectJson({
+            addNullCase,
+            addNotDistinctFromNullCase,
+          })} as object`
         : this.buildSelectFields();
 
     let fragment = sql.fragment`

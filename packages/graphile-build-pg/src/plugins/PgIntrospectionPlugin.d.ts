@@ -77,6 +77,7 @@ export interface PgType {
   typeLength: number | void;
   isPgArray: boolean;
   classId: string | void;
+  class: PgClass | void;
   domainBaseTypeId: string | void;
   domainTypeModifier: number | void;
   tags: { [tag: string]: true | string | Array<string> };

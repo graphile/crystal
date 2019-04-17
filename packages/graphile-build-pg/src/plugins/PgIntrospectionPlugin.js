@@ -99,6 +99,7 @@ export type PgType = {
   typeLength: ?number,
   isPgArray: boolean,
   classId: ?string,
+  class: ?PgClass,
   domainBaseTypeId: ?string,
   domainTypeModifier: ?number,
   tags: { [string]: string },

@@ -24,6 +24,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     asJson?: boolean,
     asJsonAggregate?: boolean,
     addNullCase?: boolean,
+    addNotDistinctFromNullCase?: boolean,
     onlyJsonField?: boolean,
     useAsterisk?: boolean,
   },
@@ -162,7 +163,8 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
      *
      * - includeLowerBound (we want this for hasNextPage but not hasPreviousPage)
      * - includeUpperBound (we want this for hasPreviousPage but not hasNextPage)
-     * - options (specifically `{addNullCase}`) - we just pass this through.
+     * - options (specifically `{addNullCase, addNotDistinctFromNullCase}`) -
+     *   we just pass this through.
      *
      * So in hasNextPage mode (invert === false), this common SQL ends up
      * representing the collection from `(after || START)` onwards with no

@@ -95,6 +95,41 @@ insert into b.types values (
   null
 );
 
+insert into b.types values (
+  12,
+  9999, -- deliberately don't reference a real post ID
+  467131188225,
+  15.2,
+  15.2,
+  true,
+  'xyz',
+  'green',
+  ARRAY['green', 'red']::b.color[],
+  5,
+  6,
+  array['hey', 'i', 'just', 'met', 'you'],
+  '{"a":1,"b":2,"c":3,"d":{"e":4,"f":5,"g":[6,7,8,"x",false,null]}}',
+  '{"1":"a","2":"b","3":"c","4":{"5":"d","6":"e","7":["f","g","h",42,true,null]}}',
+  null,
+  numrange(-10, 52),
+  daterange('1998-07-12', '2016-10-07'),
+  '[20, 53]',
+  '1999-01-08 04:05:06',
+  '1999-01-08 04:05:06 -8:00',
+  '2016-10-07',
+  '04:05:06',
+  '04:05:06 -8:00',
+  '1 year 2 months 3 days 4 hours 5 minutes 6 seconds',
+  ARRAY['1 year 2 months 3 days 4 hours 5 minutes 6 seconds', '1 year 1 months 1 days 1 hours 1 minutes 1 seconds']::interval[],
+  '9876543.21',
+  (null, null, null, null, null, null, null, null),
+  ((3, '456', 'red', 'aed18400-2a92-46df-8204-b70c728b3520', 'BAR_FOO', 'one', interval '6 hours', 93), (null, null, null, null, null, null, null, null), 7),
+  null,
+  null,
+  point(1,3),
+  null
+);
+
 insert into c.edge_case values
   (default, 20, 1),
   (true, null, 2),

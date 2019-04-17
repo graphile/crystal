@@ -69,18 +69,28 @@ export default class QueryBuilder {
   >;
   public getSelectFieldsCount(): number;
   public buildSelectFields(): SQL;
-  public buildSelectJson({ addNullCase }: { addNullCase?: boolean }): SQL;
+  public buildSelectJson({
+    addNullCase,
+    addNotDistinctFromNullCase,
+  }: {
+    addNullCase?: boolean;
+    addNotDistinctFromNullCase?: boolean;
+  }): SQL;
   public buildWhereBoundClause(isLower: boolean): SQL;
   public buildWhereClause(
     includeLowerBound: boolean,
     includeUpperBound: boolean,
-    { addNullCase }: { addNullCase?: boolean }
+    {
+      addNullCase,
+      addNotDistinctFromNullCase,
+    }: { addNullCase?: boolean; addNotDistinctFromNullCase?: boolean }
   ): SQL;
   public build(options?: {
     asJson?: boolean;
     asJsonAggregate?: boolean;
     onlyJsonField?: boolean;
     addNullCase?: boolean;
+    addNotDistinctFromNullCase?: boolean;
     useAsterisk?: boolean;
   }): SQL;
 
