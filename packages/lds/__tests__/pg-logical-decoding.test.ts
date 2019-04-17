@@ -181,8 +181,9 @@ test("multiple notifications", () =>
     } = await client.query(
       "insert into app_public.foo(name) values('temporary1'), ('temporary2') returning id"
     );
-    await client.query(
-      `
+    try {
+      await client.query(
+        `
         begin;
         -- NOTE: this string interpolation is safe because we're using ints, but
         -- NEVER do this in production code!!!
@@ -190,9 +191,11 @@ test("multiple notifications", () =>
         update app_public.foo set name = name || name where id = ${id2};
         update app_public.foo set name = name || name where id = ${id2};
         update app_public.foo set name = name || name where id = ${id2};
-        commit;
       `
-    );
+      );
+    } finally {
+      await client.query("commit;");
+    }
     await client.query("delete from app_public.foo where id = $1", [id2]);
 
     // Get first two changes

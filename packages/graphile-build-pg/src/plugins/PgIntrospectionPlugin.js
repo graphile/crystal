@@ -870,35 +870,39 @@ export default (async function PgIntrospectionPlugin(
           // Install the watch fixtures.
           if (!pgSkipInstallingWatchFixtures) {
             const watchSqlInner = await readFile(WATCH_FIXTURES_PATH, "utf8");
-            const sql = `begin; ${watchSqlInner}; commit;`;
-            try {
-              await withPgClient(
-                pgOwnerConnectionString || pgConfig,
-                pgClient => pgClient.query(sql)
-              );
-            } catch (error) {
-              if (!this._haveDisplayedError) {
-                this._haveDisplayedError = true;
-                /* eslint-disable no-console */
-                console.warn(
-                  `${chalk.bold.yellow(
-                    "Failed to setup watch fixtures in Postgres database"
-                  )} ️️⚠️`
-                );
-                console.warn(
-                  chalk.yellow(
-                    "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection-string' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
-                  )
-                );
-                console.warn(
-                  chalk.yellow(
-                    "Enable DEBUG='graphile-build-pg' to see the error"
-                  )
-                );
-                /* eslint-enable no-console */
+            const sql = `begin; ${watchSqlInner};`;
+            await withPgClient(
+              pgOwnerConnectionString || pgConfig,
+              async pgClient => {
+                try {
+                  await pgClient.query(sql);
+                } catch (error) {
+                  if (!this._haveDisplayedError) {
+                    this._haveDisplayedError = true;
+                    /* eslint-disable no-console */
+                    console.warn(
+                      `${chalk.bold.yellow(
+                        "Failed to setup watch fixtures in Postgres database"
+                      )} ️️⚠️`
+                    );
+                    console.warn(
+                      chalk.yellow(
+                        "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection-string' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
+                      )
+                    );
+                    console.warn(
+                      chalk.yellow(
+                        "Enable DEBUG='graphile-build-pg' to see the error"
+                      )
+                    );
+                    /* eslint-enable no-console */
+                  }
+                  debug(error);
+                } finally {
+                  await pgClient.query("commit;");
+                }
               }
-              debug(error);
-            }
+            );
           }
 
           // Trigger re-introspection on server reconnect
