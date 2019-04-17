@@ -287,6 +287,8 @@ function sqlCommentByAddingTags(entity, tagsToAdd) {
       sqlThing = `VIEW ${identifier}`;
     } else if (entity.classKind === "m") {
       sqlThing = `MATERIALIZED VIEW ${identifier}`;
+    } else if (entity.classKind === "c") {
+      sqlThing = `TYPE ${identifier}`;
     } else {
       sqlThing = `PLEASE_SEND_A_PULL_REQUEST_TO_FIX_THIS ${identifier}`;
     }
