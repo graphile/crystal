@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -1016,3 +1016,18 @@ create table simple_collections.pets (
 create function simple_collections.people_odd_pets(p simple_collections.people) returns setof simple_collections.pets as $$
   select * from simple_collections.pets where owner_id = p.id and id % 2 = 1;
 $$ language sql stable;
+
+create schema live_test;
+
+create table live_test.users (
+  id serial primary key,
+  name text not null,
+  favorite_color text
+);
+
+create table live_test.todos (
+  id serial primary key,
+  user_id int not null references live_test.users on delete cascade,
+  task text not null,
+  completed boolean not null default false
+);

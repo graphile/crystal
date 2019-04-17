@@ -346,7 +346,7 @@ export default (function PgBackwardRelationPlugin(
                                   });
                                 },
                                 queryBuilder.context,
-                                queryBuilder.resolveInfo
+                                queryBuilder.rootValue
                               );
                               return sql.fragment`(${query})`;
                             }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));

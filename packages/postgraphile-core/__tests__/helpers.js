@@ -2,6 +2,9 @@ const pg = require("pg");
 const { readFile } = require("fs");
 const pgConnectionString = require("pg-connection-string");
 
+// Reduce throttling on CI
+process.env.LIVE_THROTTLE = "100";
+
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60;
 
@@ -14,29 +17,44 @@ function readFilePromise(filename, encoding) {
   });
 }
 
-const withPgClient = async (url, fn) => {
+const withTransactionlessPgClient = async (url, fn) => {
   if (!fn) {
     fn = url;
     url = process.env.TEST_DATABASE_URL;
   }
   const pgPool = new pg.Pool(pgConnectionString.parse(url));
-  let client;
   try {
-    client = await pgPool.connect();
-    await client.query("begin");
-    await client.query("set local timezone to '+04:00'");
-    const result = await fn(client);
-    await client.query("rollback");
-    return result;
-  } finally {
+    const client = await pgPool.connect();
     try {
+      return await fn(client);
+    } finally {
       await client.release();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Error releasing pgClient", e);
     }
+  } finally {
     await pgPool.end();
   }
+};
+
+const withPgClient = (url, fn) => {
+  if (!fn) {
+    fn = url;
+    url = process.env.TEST_DATABASE_URL;
+  }
+  return withTransactionlessPgClient(url, async client => {
+    await client.query("begin");
+    try {
+      await client.query("set local timezone to '+04:00'");
+      return await fn(client);
+    } finally {
+      await client.query("rollback");
+    }
+  });
+};
+
+const transactionlessQuery = (query, variables) => {
+  return withTransactionlessPgClient(pgClient =>
+    pgClient.query(query, variables)
+  );
 };
 
 const withDbFromUrl = async (url, fn) => {
@@ -123,3 +141,5 @@ withPrepopulatedDb.teardown = () => {
 exports.withRootDb = withRootDb;
 exports.withPrepopulatedDb = withPrepopulatedDb;
 exports.withPgClient = withPgClient;
+exports.withTransactionlessPgClient = withTransactionlessPgClient;
+exports.transactionlessQuery = transactionlessQuery;
