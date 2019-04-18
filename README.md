@@ -56,7 +56,7 @@ another terminal to run the tests:
 ```bash
 createdb pggql_test
 export TEST_DATABASE_URL="postgres:///pggql_test"
-lerna run test
+yarn lerna run test
 ```
 
 If the above succeeds, you're good to go! If not, please try again after

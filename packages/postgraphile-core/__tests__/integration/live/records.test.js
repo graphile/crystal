@@ -26,7 +26,7 @@ if (skipLDSTests) {
 
     await liveTest(
       gql`
-        subscription($id: Int) {
+        subscription($id: Int!) {
           user: userById(id: $id) {
             id
             name

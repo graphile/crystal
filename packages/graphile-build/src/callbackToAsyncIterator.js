@@ -7,7 +7,7 @@
 import { $$asyncIterator } from "iterall";
 
 const defaultOnError = (err: Error) => {
-  throw new Error(err);
+  throw err;
 };
 
 export default function callbackToAsyncIterator<

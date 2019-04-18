@@ -399,10 +399,12 @@ export default (function PgBackwardRelationPlugin(
                             const liveRecord =
                               resolveInfo.rootValue &&
                               resolveInfo.rootValue.liveRecord;
-                            if (subscriptions && liveRecord) {
+                            if (primaryKeys && subscriptions && liveRecord) {
                               records.forEach(
                                 r =>
-                                  r && liveRecord("pg", table, r.__identifiers)
+                                  r &&
+                                  r.__identifiers &&
+                                  liveRecord("pg", table, r.__identifiers)
                               );
                             }
                             return records;

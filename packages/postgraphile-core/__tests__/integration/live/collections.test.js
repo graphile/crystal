@@ -111,6 +111,85 @@ if (skipLDSTests) {
             }
           ));
 
+        test("composite key", async () => {
+          const {
+            rows: [user],
+          } = await transactionlessQuery(
+            "insert into live_test.users(name) values($1) returning *",
+            ["Stuart"]
+          );
+
+          const {
+            rows: [todo],
+          } = await transactionlessQuery(
+            "insert into live_test.todos(user_id, task) values($1, $2) returning *",
+            [user.id, "Write tests"]
+          );
+
+          await transactionlessQuery(
+            "insert into live_test.todos_log(user_id, todo_id, action) values($1, $2, $3) returning *",
+            [user.id, todo.id, "checked"]
+          );
+
+          await transactionlessQuery(
+            "insert into live_test.todos_log_viewed(user_id, todo_id) values($1, $2) returning *",
+            [user.id, todo.id]
+          );
+
+          await liveTest(
+            simpleCollection
+              ? gql`
+                  subscription($todoId: Int!, $userId: Int!) {
+                    log: todosLogByTodoIdAndUserId(
+                      todoId: $todoId
+                      userId: $userId
+                    ) {
+                      todosLogViewedsByUserIdAndTodoIdList {
+                        viewedAt
+                      }
+                      action
+                    }
+                  }
+                `
+              : gql`
+                  subscription($todoId: Int!, $userId: Int!) {
+                    log: todosLogByTodoIdAndUserId(
+                      todoId: $todoId
+                      userId: $userId
+                    ) {
+                      todosLogViewedsByUserIdAndTodoId {
+                        nodes {
+                          viewedAt
+                        }
+                      }
+                      action
+                    }
+                  }
+                `,
+            { userId: user.id, todoId: todo.id },
+            async (pgClient, getLatest) => {
+              let data;
+
+              let getViewedAtNodes = () =>
+                simpleCollection
+                  ? data.data.log.todosLogViewedsByUserIdAndTodoIdList
+                  : data.data.log.todosLogViewedsByUserIdAndTodoId.nodes;
+
+              data = await next(getLatest);
+              expect(data.data.log).toBeTruthy();
+              expect(getViewedAtNodes()).toHaveLength(1);
+
+              await pgClient.query(
+                "insert into live_test.todos_log_viewed(user_id, todo_id) values($1, $2) returning *",
+                [user.id, todo.id]
+              );
+              data = await next(getLatest);
+              expect(data.data.log).toBeTruthy();
+              expect(getViewedAtNodes()).toHaveLength(2);
+            }
+          );
+        });
+
         test("backward relation change", async () => {
           const {
             rows: [user],
@@ -128,7 +207,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -141,7 +220,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -206,7 +285,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -219,7 +298,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -273,7 +352,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -286,7 +365,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int) {
+                  subscription($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name

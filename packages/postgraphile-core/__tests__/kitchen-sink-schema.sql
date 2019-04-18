@@ -1031,3 +1031,18 @@ create table live_test.todos (
   task text not null,
   completed boolean not null default false
 );
+
+create table live_test.todos_log (
+  todo_id int not null references live_test.todos on delete cascade,
+  user_id int not null references live_test.users on delete cascade,
+  action text not null,
+  PRIMARY KEY ("todo_id","user_id")
+);
+
+create table live_test.todos_log_viewed (
+  id serial primary key,
+  user_id int not null,
+  todo_id int not null,
+  viewed_at timestamp not null default now(),
+  foreign key (user_id, todo_id) references live_test.todos_log(user_id, todo_id) on delete cascade
+);

@@ -264,8 +264,7 @@ class QueryBuilder {
                   allRequirements[key]
                 }`
             ),
-
-            ", "
+            ""
           )}
           )`,
           "__live"
