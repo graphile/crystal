@@ -472,6 +472,20 @@ const schemas: Array<string> = dbSchema || (isDemo ? ['forum_example'] : ['publi
 
 const ownerConnectionString = ownerConnection || pgConnectionString || process.env.DATABASE_URL;
 
+// Work around type mismatches between parsePgConnectionString and PoolConfig
+const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
+  return {
+    ...o,
+    application_name: o.application_name || undefined,
+    ssl: o.ssl != null ? !!o.ssl : undefined,
+    user: typeof o.user === 'string' ? o.user : undefined,
+    database: typeof o.database === 'string' ? o.database : undefined,
+    password: typeof o.password === 'string' ? o.password : undefined,
+    port: o.port || typeof o.port === 'number' ? o.port : undefined,
+    host: typeof o.host === 'string' ? o.host : undefined,
+  };
+};
+
 // Create our Postgres config.
 const pgConfig: PoolConfig = {
   // If we have a Postgres connection string, parse it and use that as our
@@ -479,7 +493,7 @@ const pgConfig: PoolConfig = {
   // variables or final defaults. Other environment variables should be
   // detected and used by `pg`.
   ...(pgConnectionString || process.env.DATABASE_URL || isDemo
-    ? parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL)
+    ? coerce(parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL))
     : {
         host: process.env.PGHOST || 'localhost',
         port: (process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : null) || 5432,

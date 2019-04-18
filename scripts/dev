@@ -18,7 +18,7 @@ if [ "$1" = "--" ]; then
     echo '  export DEBUG="postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain"'
   fi
   shift
-  $npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts "$@" &
+  $npm_bin/ts-node src/postgraphile/cli.ts "$@" &
 else
   export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
   $npm_bin/nodemon \
@@ -31,7 +31,7 @@ else
     --ignore __mocks__ \
     --ignore src/postgraphile/graphiql \
     --ext js,ts \
-    --exec "$npm_bin/ts-node --disableWarnings src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+    --exec "$npm_bin/ts-node src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
 fi;
 
 # Ensure forked process is killed even if we die unexpectedly
