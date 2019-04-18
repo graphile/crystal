@@ -1,4 +1,6 @@
-exports[`test mutation-create.graphql 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mutation-create.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -47,8 +49,8 @@ Object {
           "seconds": 1,
           "years": 6,
         },
-        "json": "{\"x\":1,\"y\":2,\"z\":3}",
-        "jsonb": "{\"a\":1,\"b\":2,\"c\":3}",
+        "json": "{\\"x\\":1,\\"y\\":2,\\"z\\":3}",
+        "jsonb": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
         "money": 5000,
         "nestedCompoundType": Object {
           "a": Object {
@@ -329,7 +331,7 @@ Object {
 }
 `;
 
-exports[`test mutation-delete.graphql 1`] = `
+exports[`mutation-delete.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -473,7 +475,7 @@ Object {
 }
 `;
 
-exports[`test mutation-update.graphql 1`] = `
+exports[`mutation-update.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -618,7 +620,7 @@ Object {
 }
 `;
 
-exports[`test procedure-mutation.graphql 1`] = `
+exports[`procedure-mutation.graphql 1`] = `
 Object {
   "data": Object {
     "add1Mutation": Object {
@@ -657,7 +659,7 @@ Object {
       ],
     },
     "jsonIdentityMutation": Object {
-      "json": "{\"a\":1,\"b\":2,\"c\":3}",
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     },
     "mult1": Object {
       "integer": 0,

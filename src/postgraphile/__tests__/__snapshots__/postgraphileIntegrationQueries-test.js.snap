@@ -1,4 +1,6 @@
-exports[`test classic-ids.graphql 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`classic-ids.graphql 1`] = `
 Object {
   "data": Object {
     "allEdgeCases": Object {
@@ -21,7 +23,7 @@ Object {
 }
 `;
 
-exports[`test connections.graphql 1`] = `
+exports[`connections.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -504,7 +506,7 @@ Object {
 }
 `;
 
-exports[`test dynamic-json.graphql 1`] = `
+exports[`dynamic-json.graphql 1`] = `
 Object {
   "data": Object {
     "a": true,
@@ -617,7 +619,7 @@ Object {
 }
 `;
 
-exports[`test node.graphql 1`] = `
+exports[`node.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -782,7 +784,7 @@ Object {
 }
 `;
 
-exports[`test procedure-computed-fields.graphql 1`] = `
+exports[`procedure-computed-fields.graphql 1`] = `
 Object {
   "data": Object {
     "allEdgeCases": Object {
@@ -1035,7 +1037,7 @@ Object {
 }
 `;
 
-exports[`test procedure-query.graphql 1`] = `
+exports[`procedure-query.graphql 1`] = `
 Object {
   "data": Object {
     "add1Query": 3,
@@ -1128,7 +1130,7 @@ Object {
 }
 `;
 
-exports[`test query.graphql 1`] = `
+exports[`query.graphql 1`] = `
 Object {
   "data": Object {
     "a": null,
@@ -1170,7 +1172,7 @@ Object {
 }
 `;
 
-exports[`test relation-head-tail.graphql 1`] = `
+exports[`relation-head-tail.graphql 1`] = `
 Object {
   "data": Object {
     "allCompoundKeys": Object {
@@ -1417,7 +1419,7 @@ Object {
 }
 `;
 
-exports[`test relation-tail-head.graphql 1`] = `
+exports[`relation-tail-head.graphql 1`] = `
 Object {
   "data": Object {
     "allCompoundKeys": Object {
@@ -1546,7 +1548,7 @@ Object {
 }
 `;
 
-exports[`test types.graphql 1`] = `
+exports[`types.graphql 1`] = `
 Object {
   "data": Object {
     "allTypes": Object {
@@ -1574,8 +1576,8 @@ Object {
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
-          "json": "{\"a\":1,\"b\":2,\"c\":3,\"d\":{\"e\":4,\"f\":5,\"g\":[6,7,8,\"x\",false,null]}}",
-          "jsonb": "{\"1\":\"a\",\"2\":\"b\",\"3\":\"c\",\"4\":{\"5\":\"d\",\"6\":\"e\",\"7\":[\"f\",\"g\",\"h\",42,true,null]}}",
+          "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
+          "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "money": 1000,
           "nestedCompoundType": Object {
             "a": Object {
@@ -1620,7 +1622,7 @@ Object {
 }
 `;
 
-exports[`test unique-constraints.graphql 1`] = `
+exports[`unique-constraints.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {

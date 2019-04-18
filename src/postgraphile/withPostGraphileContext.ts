@@ -8,8 +8,10 @@ import { pluginHookFromOptions } from './pluginHook';
 import { mixed, WithPostGraphileContextOptions } from '../interfaces';
 import { formatSQLForDebugging } from 'postgraphile-core';
 
-const undefinedIfEmpty = (o?: Array<string> | string): undefined | Array<string> | string =>
-  o && o.length ? o : undefined;
+const undefinedIfEmpty = (
+  o?: Array<string | RegExp> | string | RegExp,
+): undefined | Array<string | RegExp> | string | RegExp =>
+  o && (!Array.isArray(o) || o.length) ? o : undefined;
 
 interface PostGraphileContext {
   [$$pgClient]: PoolClient;
@@ -298,7 +300,7 @@ async function getSettingsForPgClientTransaction({
           `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
         );
 
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, {
+      const claims = jwt.verify(jwtToken, jwtSecret, {
         ...jwtVerifyOptions,
         audience:
           jwtAudiences ||
@@ -306,6 +308,13 @@ async function getSettingsForPgClientTransaction({
             ? undefinedIfEmpty(jwtVerifyOptions.audience)
             : ['postgraphile']),
       });
+
+      if (typeof claims === 'string') {
+        throw new Error('Invalid JWT payload');
+      }
+
+      // jwt.verify returns `object | string`; but the `object` part is really a map
+      jwtClaims = claims as typeof jwtClaims;
 
       const roleClaim = getPath(jwtClaims, jwtRole);
 
