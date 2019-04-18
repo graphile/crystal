@@ -314,7 +314,7 @@ async function getSettingsForPgClientTransaction({
       }
 
       // jwt.verify returns `object | string`; but the `object` part is really a map
-      jwtClaims = claims as any;
+      jwtClaims = claims as typeof jwtClaims;
 
       const roleClaim = getPath(jwtClaims, jwtRole);
 
