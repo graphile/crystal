@@ -8,7 +8,6 @@
     "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "inlineSourceMap": true,
     "pretty": true,
     "importHelpers": true,

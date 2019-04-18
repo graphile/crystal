@@ -476,7 +476,7 @@ const ownerConnectionString = ownerConnection || pgConnectionString || process.e
 const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
   return {
     ...o,
-    application_name: o.application_name || undefined,
+    application_name: o['application_name'] || undefined,
     ssl: o.ssl != null ? !!o.ssl : undefined,
     user: typeof o.user === 'string' ? o.user : undefined,
     database: typeof o.database === 'string' ? o.database : undefined,
