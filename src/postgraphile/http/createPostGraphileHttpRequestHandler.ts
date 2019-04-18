@@ -744,11 +744,13 @@ export default function createPostGraphileHttpRequestHandler(
             });
             // Log the query. If this debugger isn’t enabled, don’t run it.
             if (!options.disableQueryLog && queryDocumentAst) {
+              // To appease TypeScript
+              const definitelyQueryDocumentAst = queryDocumentAst;
               // We must reference this before it's deleted!
               const resultStatusCode = result.statusCode;
               const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
               setImmediate(() => {
-                const prettyQuery = printGraphql(queryDocumentAst)
+                const prettyQuery = printGraphql(definitelyQueryDocumentAst)
                   .replace(/\s+/g, ' ')
                   .trim();
                 const errorCount = (result.errors || []).length;
