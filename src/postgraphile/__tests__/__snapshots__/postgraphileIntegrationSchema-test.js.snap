@@ -213,9 +213,7 @@ A point in time as described by the [ISO
 \"\"\"
 scalar Datetime
 
-\"\"\"
-All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -1138,9 +1136,7 @@ type TypesMutationPayload {
   query: Query
 }
 
-\"\"\"
-All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -2193,9 +2189,7 @@ input TypeInput {
   varchar: String!
 }
 
-\"\"\"
-Represents an update to a \`Type\`. Fields that are set will be updated.
-\"\"\"
+\"\"\"Represents an update to a \`Type\`. Fields that are set will be updated.\"\"\"
 input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
@@ -3258,9 +3252,7 @@ A point in time as described by the [ISO
 \"\"\"
 scalar Datetime
 
-\"\"\"
-All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -4774,9 +4766,7 @@ input PostInput {
   id: Int
 }
 
-\"\"\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\"\"\"
+\"\"\"Represents an update to a \`Post\`. Fields that are set will be updated.\"\"\"
 input PostPatch {
   authorId: Int
   body: String
@@ -5661,9 +5651,7 @@ input TypeInput {
   varchar: String!
 }
 
-\"\"\"
-Represents an update to a \`Type\`. Fields that are set will be updated.
-\"\"\"
+\"\"\"Represents an update to a \`Type\`. Fields that are set will be updated.\"\"\"
 input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
@@ -5885,9 +5873,7 @@ enum UpdatableViewsOrderBy {
   X_DESC
 }
 
-\"\"\"
-All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -7070,9 +7056,7 @@ A point in time as described by the [ISO
 \"\"\"
 scalar Datetime
 
-\"\"\"
-All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`deleteCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input DeleteCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -8586,9 +8570,7 @@ input PostInput {
   id: Int
 }
 
-\"\"\"
-Represents an update to a \`Post\`. Fields that are set will be updated.
-\"\"\"
+\"\"\"Represents an update to a \`Post\`. Fields that are set will be updated.\"\"\"
 input PostPatch {
   authorId: Int
   body: String
@@ -9473,9 +9455,7 @@ input TypeInput {
   varchar: String!
 }
 
-\"\"\"
-Represents an update to a \`Type\`. Fields that are set will be updated.
-\"\"\"
+\"\"\"Represents an update to a \`Type\`. Fields that are set will be updated.\"\"\"
 input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
@@ -9697,9 +9677,7 @@ enum UpdatableViewsOrderBy {
   X_DESC
 }
 
-\"\"\"
-All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.
-\"\"\"
+\"\"\"All input for the \`updateCompoundKeyByPersonId1AndPersonId2\` mutation.\"\"\"
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   \"\"\"
   An arbitrary string value with no semantic meaning. Will be included in the
