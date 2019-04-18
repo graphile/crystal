@@ -298,7 +298,7 @@ async function getSettingsForPgClientTransaction({
           `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
         );
 
-      jwtClaims = jwt.verify(jwtToken, jwtSecret, {
+      const claims = jwt.verify(jwtToken, jwtSecret, {
         ...jwtVerifyOptions,
         audience:
           jwtAudiences ||
@@ -306,6 +306,13 @@ async function getSettingsForPgClientTransaction({
             ? undefinedIfEmpty(jwtVerifyOptions.audience)
             : ['postgraphile']),
       });
+
+      if (typeof claims === 'string') {
+        throw new Error("Invalid JWT payload");
+      }
+
+      // jwt.verify returns `object | string`; but the `object` part is really a map
+      jwtClaims = (claims as any);
 
       const roleClaim = getPath(jwtClaims, jwtRole);
 
