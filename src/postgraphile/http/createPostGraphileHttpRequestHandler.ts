@@ -20,7 +20,7 @@ import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import { Context as KoaContext } from 'koa';
 
-import chalk = require('chalk');
+import chalk from 'chalk';
 import Debugger = require('debug'); // tslint:disable-line variable-name
 import httpError = require('http-errors');
 import parseUrl = require('parseurl');

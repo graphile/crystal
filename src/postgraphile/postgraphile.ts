@@ -7,7 +7,7 @@ import createPostGraphileHttpRequestHandler from './http/createPostGraphileHttpR
 import exportPostGraphileSchema from './schema/exportPostGraphileSchema';
 import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
-import chalk = require('chalk');
+import chalk from 'chalk';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

@@ -8,8 +8,7 @@ import { parse as parsePgConnectionString } from 'pg-connection-string';
 import { createPostGraphileSchema, watchPostGraphileSchema } from '..';
 import createPostGraphileHttpRequestHandler from '../http/createPostGraphileHttpRequestHandler';
 import postgraphile from '../postgraphile';
-
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 createPostGraphileHttpRequestHandler.mockImplementation(({ getGqlSchema }) =>
   Promise.resolve(getGqlSchema()).then(() => null),

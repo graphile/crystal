@@ -11,7 +11,7 @@
 import config from './postgraphilerc';
 
 import { createServer } from 'http';
-import chalk = require('chalk');
+import chalk from 'chalk';
 import program = require('commander');
 import jwt = require('jsonwebtoken');
 import { parse as parsePgConnectionString } from 'pg-connection-string';
