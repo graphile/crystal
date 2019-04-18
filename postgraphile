@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 NODE_PATH="$DIR/node_modules"
-node $DIR/node_modules/.bin/ts-node --project $DIR --ignore node_modules --disableWarnings $DIR/src/postgraphile/cli.ts $@
+node $DIR/node_modules/.bin/ts-node --project $DIR --ignore node_modules $DIR/src/postgraphile/cli.ts $@
