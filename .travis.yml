@@ -10,11 +10,7 @@ addons:
 env:
   TEST_PG_URL: postgres://localhost:5432/travis
 
-cache:
-  yarn: true
-  directories:
-    - node_modules
-    - $NVM_DIR
+cache: yarn
 
 script:
   - scripts/ci
