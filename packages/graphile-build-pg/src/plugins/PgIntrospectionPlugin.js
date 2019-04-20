@@ -329,11 +329,12 @@ function smartCommentConstraints(introspectionResults) {
     if (!namespace) {
       return;
     }
-    if (klass.tags.foreignKey) {
+    const getType = () =>
+      introspectionResults.type.find(t => t.id === klass.typeId);
+    const foreignKey = klass.tags.foreignKey || getType().tags.foreignKey;
+    if (foreignKey) {
       const foreignKeys =
-        typeof klass.tags.foreignKey === "string"
-          ? [klass.tags.foreignKey]
-          : klass.tags.foreignKey;
+        typeof foreignKey === "string" ? [foreignKey] : foreignKey;
       if (!Array.isArray(foreignKeys)) {
         throw new Error(
           `Invalid foreign key smart comment specified on '${

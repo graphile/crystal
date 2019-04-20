@@ -304,6 +304,9 @@ type AuthenticatePayloadPayload {
   \\"\\"\\"
   clientMutationId: String
 
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
+
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
@@ -314,6 +317,9 @@ type AuthPayload {
   admin: Boolean
   id: Int
   jwt: JwtToken
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
 }
 
 \\"\\"\\"
@@ -10340,6 +10346,9 @@ type AuthenticatePayloadPayload {
   \\"\\"\\"
   clientMutationId: String
 
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
+
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
@@ -10350,6 +10359,9 @@ type AuthPayload {
   admin: Boolean
   id: Int
   jwt: JwtToken
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
 }
 
 \\"\\"\\"

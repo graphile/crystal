@@ -393,6 +393,8 @@ create type b.auth_payload as (
   admin bool
 );
 
+comment on type b.auth_payload is E'@foreignKey (id) references c.person';
+
 create function b.authenticate_payload(a integer, b numeric, c bigint) returns b.auth_payload as $$ select (('yay', extract(epoch from '2037-07-12'::timestamp), a, b, c)::b.jwt_token, 1, true)::b.auth_payload $$ language sql;
 
 create table a.similar_table_1 (

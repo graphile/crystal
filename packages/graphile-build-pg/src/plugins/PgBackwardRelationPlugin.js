@@ -71,6 +71,10 @@ export default (function PgBackwardRelationPlugin(
           }
           const table =
             introspectionResultsByKind.classById[constraint.classId];
+          if (!table.isSelectable) {
+            // Could be a composite type
+            return memo;
+          }
           const tableTypeName = inflection.tableType(table);
           const gqlTableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,

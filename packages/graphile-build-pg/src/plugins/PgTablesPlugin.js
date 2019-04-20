@@ -155,7 +155,8 @@ export default (function PgTablesPlugin(
                 )}`,
                 pgIntrospection: table,
                 isPgRowType: table.isSelectable,
-                isPgCompoundType: !table.isSelectable,
+                isPgCompoundType: !table.isSelectable, // TODO:v5: remove - typo
+                isPgCompositeType: !table.isSelectable,
               }
             );
             cb(TableType);

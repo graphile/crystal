@@ -92,19 +92,25 @@ const tests = [
           jwt
           id
           admin
+          personById {
+            id
+            name
+          }
+        }
+        personById {
+          id
+          name
         }
       }
     }`,
     schema: "withJwt",
-    process: ({
-      data: {
-        authenticatePayload: { authPayload },
-      },
-    }) => {
-      const { jwt: str } = authPayload;
-      return Object.assign({}, authPayload, {
-        jwt: Object.assign(jwt.verify(str, jwtSecret), {
-          iat: "[timestamp]",
+    process: ({ data: { authenticatePayload } }) => {
+      const { jwt: str } = authenticatePayload.authPayload;
+      return Object.assign({}, authenticatePayload, {
+        authPayload: Object.assign({}, authenticatePayload.authPayload, {
+          jwt: Object.assign(jwt.verify(str, jwtSecret), {
+            iat: "[timestamp]",
+          }),
         }),
       });
     },

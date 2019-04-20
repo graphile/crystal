@@ -24,6 +24,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
       const {
         scope: {
           isPgRowType,
+          isPgCompositeType,
           isMutationPayload,
           pgIntrospection,
           pgIntrospectionTable,
@@ -34,7 +35,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
 
       const table = pgIntrospectionTable || pgIntrospection;
       if (
-        !(isPgRowType || isMutationPayload) ||
+        !(isPgRowType || isMutationPayload || isPgCompositeType) ||
         !table ||
         table.kind !== "class" ||
         !table.namespace

@@ -41,17 +41,27 @@ Object {
 
 exports[`jwt pgJwtTypeIdentifier with payload 1`] = `
 Object {
-  "admin": true,
-  "id": 1,
-  "jwt": Object {
-    "a": 1,
-    "aud": "postgraphile",
-    "b": 2,
-    "c": 3,
-    "exp": 2130969600,
-    "iat": "[timestamp]",
-    "iss": "postgraphile",
-    "role": "yay",
+  "authPayload": Object {
+    "admin": true,
+    "id": 1,
+    "jwt": Object {
+      "a": 1,
+      "aud": "postgraphile",
+      "b": 2,
+      "c": 3,
+      "exp": 2130969600,
+      "iat": "[timestamp]",
+      "iss": "postgraphile",
+      "role": "yay",
+    },
+    "personById": Object {
+      "id": 1,
+      "name": "John Smith",
+    },
+  },
+  "personById": Object {
+    "id": 1,
+    "name": "John Smith",
   },
 }
 `;
