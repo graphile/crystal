@@ -399,7 +399,7 @@ export default (function PgTypesPlugin(
       const oidLookup = {
         "20": stringType(
           inflection.builtin("BigInt"),
-          "A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
+          "A signed eight-byte integer. The upper big integer values are greater than the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
         ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
         "21": GraphQLInt, // int2
         "23": GraphQLInt, // int4

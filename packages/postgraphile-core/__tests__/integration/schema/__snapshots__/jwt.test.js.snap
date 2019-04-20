@@ -206,7 +206,7 @@ input BigFloatRangeInput {
 }
 
 \\"\\"\\"
-A signed eight-byte integer. The upper big integer values are greater then the
+A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
 strings and not numbers.
 \\"\\"\\"
