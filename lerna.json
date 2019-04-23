@@ -5,7 +5,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "4.4.0-beta.13",
+  "version": "4.4.0-rc.0",
   "command": {
     "publish": {
       "allowBranch": [
