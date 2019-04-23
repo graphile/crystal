@@ -249,7 +249,7 @@ input BigFloatRangeInput {
 }
 
 \\"\\"\\"
-A signed eight-byte integer. The upper big integer values are greater then the
+A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
 strings and not numbers.
 \\"\\"\\"
@@ -9127,7 +9127,7 @@ exports[`exports a schema as JSON 1`] = `
         {
           \\"kind\\": \\"SCALAR\\",
           \\"name\\": \\"BigInt\\",
-          \\"description\\": \\"A signed eight-byte integer. The upper big integer values are greater then the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers.\\",
+          \\"description\\": \\"A signed eight-byte integer. The upper big integer values are greater than the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers.\\",
           \\"fields\\": null,
           \\"inputFields\\": null,
           \\"interfaces\\": null,
@@ -20460,7 +20460,7 @@ input BigFloatRangeInput {
 }
 
 \\"\\"\\"
-A signed eight-byte integer. The upper big integer values are greater then the
+A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
 strings and not numbers.
 \\"\\"\\"
