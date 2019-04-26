@@ -54,7 +54,7 @@ export interface PostGraphileOptions<
   watchPg?: boolean;
   // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
   ownerConnectionString?: string;
-  // [EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
+  // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
   subscriptions?: boolean;
   // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
   live?: boolean;
@@ -85,10 +85,10 @@ export interface PostGraphileOptions<
   // types & fields. Database mutation will only be possible through Postgres
   // functions.
   disableDefaultMutations?: boolean;
-  // Set false (recommended) to exclude fields, queries and mutations that the
-  // user isn't permitted to access from the generated GraphQL schema; set this
-  // option true to skip these checks and create GraphQL fields and types for
-  // everything.
+  // Set false (recommended) to exclude fields, queries and mutations that are
+  // not available to any possible user (determined from the user in connection
+  // string and any role they can become); set this option true to skip these
+  // checks and create GraphQL fields and types for everything.
   // The default is `true`, in v5 the default will change to `false`.
   ignoreRBAC?: boolean;
   // Set false (recommended) to exclude filters, orderBy, and relations that
