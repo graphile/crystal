@@ -119,7 +119,7 @@ export interface PostGraphileOptions<
   /* @middlewareOnly */
   handleErrors?: (
     errors: ReadonlyArray<GraphQLError>,
-    req: IncomingMessage,
+    req: Request,
     res: Response,
   ) => Array<GraphQLErrorExtended>;
   // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
