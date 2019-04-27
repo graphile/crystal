@@ -31,12 +31,13 @@ export class LDSLiveSource {
   };
   private ws: WebSocket | null;
   private sleepDuration?: number;
+  private tablePattern?: string;
 
   /**
    * @param url - If not specified, we'll spawn our own LDS listener
    */
   constructor(options: Options) {
-    const { ldsURL, connectionString, sleepDuration } = options;
+    const { ldsURL, connectionString, sleepDuration, tablePattern } = options;
     if (!ldsURL && !connectionString) {
       throw new Error(
         "No LDS URL or connectionString was passed to LDSLiveSource; this likely means that you don't have `ownerConnectionString` specified in the PostGraphile library call."
@@ -45,6 +46,7 @@ export class LDSLiveSource {
     this.url = ldsURL || null;
     this.connectionString = connectionString || null;
     this.sleepDuration = sleepDuration;
+    this.tablePattern = tablePattern;
 
     this.lds = null;
     this.slotName = this.url ? null : generateRandomString(30);
@@ -71,6 +73,7 @@ export class LDSLiveSource {
           slotName: this.slotName,
           temporary: true,
           sleepDuration: this.sleepDuration,
+          tablePattern: this.tablePattern,
         }
       );
     }
@@ -285,6 +288,10 @@ interface Options {
   ldsURL?: string;
   connectionString?: string;
   sleepDuration?: number;
+  /*
+   * Not valid when used with `ldsUrl`
+   */
+  tablePattern?: string;
 }
 
 async function makeLDSLiveSource(options: Options): Promise<LDSLiveSource> {
@@ -293,9 +300,24 @@ async function makeLDSLiveSource(options: Options): Promise<LDSLiveSource> {
   return ldsLiveSource;
 }
 
+function getSafeNumber(str: string | undefined): number | undefined {
+  if (str) {
+    const n = parseInt(str, 10);
+    if (n && isFinite(n) && n > 0) {
+      return n;
+    }
+  }
+  return undefined;
+}
+
 const PgLDSSourcePlugin: Plugin = async function(
   builder,
-  { pgLDSUrl = process.env.LDS_URL, pgOwnerConnectionString, ldsSleepDuration }
+  {
+    pgLDSUrl = process.env.LDS_URL,
+    pgOwnerConnectionString,
+    ldsSleepDuration = getSafeNumber(process.env.LD_WAIT),
+    ldsTablePattern = process.env.LD_TABLE_PATTERN,
+  }
 ) {
   // Connect to LDS server
   try {
@@ -304,6 +326,7 @@ const PgLDSSourcePlugin: Plugin = async function(
       // @ts-ignore
       connectionString: pgOwnerConnectionString as string,
       sleepDuration: ldsSleepDuration,
+      tablePattern: ldsTablePattern,
     });
     builder.hook(
       "build",
