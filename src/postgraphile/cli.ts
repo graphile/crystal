@@ -112,7 +112,7 @@ program
   )
   .option(
     '-S, --subscriptions',
-    '[EXPERIMENTAL] Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
+    'Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
   )
   .option(
     '-L, --live',
@@ -157,7 +157,7 @@ program
   )
   .option(
     '--no-ignore-rbac',
-    "[RECOMMENDED] set this to exclude fields, queries and mutations that the user isn't permitted to access; this will be enabled by default in v5",
+    '[RECOMMENDED] set this to exclude fields, queries and mutations that are not available to any possible user (determined from the user in connection string and any role they can become); this will be enabled by default in v5',
   )
   .option(
     '--no-ignore-indexes',
