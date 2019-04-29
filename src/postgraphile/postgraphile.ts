@@ -115,13 +115,14 @@ export function getPostgraphileSchemaBuilder<
       } catch (error) {
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-        // exitOnFail defaults to true
-        const { exitOnFail = true } = options;
+        const exitOnFail = !options.retryOnInitFail;
         // If we fail to build our schema, log the error and either exit or retry shortly
         logSeriousError(
           error,
           'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
-          exitOnFail ? 'Exiting because `exitOnFail` is true.' : `We'll try again in ${delay}ms.`,
+          exitOnFail
+            ? 'Exiting because `retryOnInitFail` is not set.'
+            : `We'll try again in ${delay}ms.`,
         );
         if (exitOnFail) {
           process.exit(34);
