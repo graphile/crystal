@@ -52,6 +52,14 @@ export interface PostGraphileOptions<
   //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
+  // When false (default), PostGraphile will exit if it fails to build the
+  // initial schema (for example if it cannot connect to the database, or if
+  // there are fatal naming conflicts in the schema). When true, PostGraphile
+  // will keep trying to rebuild the schema indefinitely, using an exponential
+  // backoff between attempts, starting at 100ms and increasing up to 30s delay
+  // between retries.
+  /* @middlewareOnly */
+  retryOnInitFail?: boolean;
   // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
   ownerConnectionString?: string;
   // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)

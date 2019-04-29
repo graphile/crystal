@@ -132,6 +132,10 @@ program
   .option(
     '-r, --default-role <string>',
     'the default Postgres role to use when a request is made. supercedes the role used to connect to the database',
+  )
+  .option(
+    '--retry-on-init-fail',
+    'if an error occurs building the initial schema, this flag will cause PostGraphile to keep trying to build the schema with exponential backoff rather than exiting',
   );
 
 pluginHook('cli:flags:add:standard', addFlag);
@@ -405,6 +409,7 @@ const {
   timeout: serverTimeout,
   maxPoolSize,
   defaultRole: pgDefaultRole,
+  retryOnInitFail,
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
   enhanceGraphiql = false,
@@ -590,6 +595,7 @@ const postgraphileOptions = pluginHook(
     jwtAudiences,
     jwtRole,
     jwtVerifyOptions,
+    retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
     live,
