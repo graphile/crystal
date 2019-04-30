@@ -227,8 +227,8 @@ export async function enhanceHttpServerWithSubscriptions(
           return response;
         };
         params.formatResponse = formatResponse;
-        const hookedParams = options.pluginHook
-          ? options.pluginHook('postgraphile:ws:onOperation', params, {
+        const hookedParams = pluginHook
+          ? pluginHook('postgraphile:ws:onOperation', params, {
               message,
               params,
               socket,
