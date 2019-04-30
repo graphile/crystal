@@ -61,7 +61,7 @@ export interface PostGraphilePlugin {
 type HookName = keyof PostGraphilePlugin;
 
 const identityHook = <T>(input: T): T => input;
-const identityPluginHook = <T>(_hookName: HookName, input: T): T => input;
+const identityPluginHook = <T>(_hookName: HookName, input: T, _options: any): T => input;
 
 function contextIsSame(context1: {}, context2: {}): boolean {
   // Shortcut if obvious
