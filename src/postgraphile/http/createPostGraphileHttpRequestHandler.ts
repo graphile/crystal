@@ -106,7 +106,7 @@ function withPostGraphileContextFromReqResGenerator(
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
         ? await additionalGraphQLContextFromRequest(req, res)
-        : {};
+        : null;
     return withPostGraphileContext(
       {
         ...options,
@@ -115,7 +115,7 @@ function withPostGraphileContextFromReqResGenerator(
         ...moreOptions,
       },
       context => {
-        const graphqlContext = { ...additionalContext, ...(context as object) };
+        const graphqlContext = additionalContext ? { ...additionalContext, ...(context as object) } : context;
         return fn(graphqlContext);
       },
     );
