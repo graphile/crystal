@@ -115,7 +115,9 @@ function withPostGraphileContextFromReqResGenerator(
         ...moreOptions,
       },
       context => {
-        const graphqlContext = additionalContext ? { ...additionalContext, ...(context as object) } : context;
+        const graphqlContext = additionalContext
+          ? { ...additionalContext, ...(context as object) }
+          : context;
         return fn(graphqlContext);
       },
     );
@@ -569,7 +571,7 @@ export default function createPostGraphileHttpRequestHandler(
     try {
       // First thing we need to do is get the GraphQL schema for this request.
       // It should never really change unless we are in watch mode.
-      const gqlSchema = theOneAndOnlyGraphQLSchema || await getGqlSchema();
+      const gqlSchema = theOneAndOnlyGraphQLSchema || (await getGqlSchema());
 
       // Note that we run our middleware after we make sure we are on the
       // correct route. This is so that if our middleware modifies the `req` or
@@ -653,10 +655,7 @@ export default function createPostGraphileHttpRequestHandler(
 
             // Throw an error if `variables` is not an object.
             if (variables != null && typeof variables !== 'object')
-              throw httpError(
-                400,
-                `Variables must be an object, not '${typeof variables}'.`,
-              );
+              throw httpError(400, `Variables must be an object, not '${typeof variables}'.`);
 
             // Throw an error if `operationName` is not a string.
             if (operationName != null && typeof operationName !== 'string')
@@ -701,7 +700,7 @@ export default function createPostGraphileHttpRequestHandler(
               // Lazily log the query. If this debugger isn’t enabled, don’t run it.
               if (debugGraphql.enabled)
                 debugGraphql(
-                  "%s",
+                  '%s',
                   printGraphql(queryDocumentAst)
                     .replace(/\s+/g, ' ')
                     .trim(),

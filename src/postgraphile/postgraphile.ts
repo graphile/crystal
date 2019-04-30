@@ -80,7 +80,7 @@ export function getPostgraphileSchemaBuilder<
 
   return {
     _emitter,
-    getGraphQLSchema: () => gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise,
+    getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
     options,
   };
 
