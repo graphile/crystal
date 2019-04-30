@@ -809,7 +809,7 @@ export default function createPostGraphileHttpRequestHandler(
         if (res.statusCode === 200 && results[0].statusCode) {
           res.statusCode = results[0].statusCode!;
         }
-        delete results[0].statusCode;
+        results[0].statusCode = undefined;
       }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
