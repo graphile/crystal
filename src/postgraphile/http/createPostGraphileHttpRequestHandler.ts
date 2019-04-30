@@ -73,13 +73,12 @@ const calculateQueryHash = (queryString: string): string =>
     .digest('base64');
 
 // Fast way of checking if an object is empty,
-// faster than `Object.keys(value).length === 0`
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+// faster than `Object.keys(value).length === 0`.
+// NOTE: we don't need a `hasOwnProperty` call here because isEmpty is called
+// with an `Object.create(null)` object, so it has no no-own properties.
 export function isEmpty(value: any): boolean {
-  for (const key in value) {
-    if (hasOwnProperty.call(value, key)) {
-      return false;
-    }
+  for (const _key in value) {
+    return false;
   }
   return true;
 }
@@ -616,7 +615,7 @@ export default function createPostGraphileHttpRequestHandler(
         paramsList.map(async (params: any) => {
           let queryDocumentAst: DocumentNode | null = null;
           let result: any;
-          const meta = {};
+          const meta = Object.create(null);
           try {
             if (!params.query) throw httpError(400, 'Must provide a query string.');
 
