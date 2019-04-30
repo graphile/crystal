@@ -701,6 +701,7 @@ export default function createPostGraphileHttpRequestHandler(
               // Lazily log the query. If this debugger isn’t enabled, don’t run it.
               if (debugGraphql.enabled)
                 debugGraphql(
+                  "%s",
                   printGraphql(queryDocumentAst)
                     .replace(/\s+/g, ' ')
                     .trim(),
