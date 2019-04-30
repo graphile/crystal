@@ -125,12 +125,6 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     const pgClient = await pgPool.connect();
 
     // Enhance our Postgres client with debugging stuffs.
-    if (
-      (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
-      !pgClient[$$pgClientOrigQuery]
-    ) {
-      debugPgClient(pgClient);
-    }
 
     // Begin our transaction, if necessary.
     if (needTransaction) {
@@ -395,7 +389,7 @@ const $$pgClientOrigQuery = Symbol();
  * @private
  */
 // tslint:disable no-any
-function debugPgClient(pgClient: PoolClient): PoolClient {
+export function debugPgClient(pgClient: PoolClient): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {
