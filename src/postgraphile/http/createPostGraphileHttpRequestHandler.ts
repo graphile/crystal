@@ -628,19 +628,22 @@ export default function createPostGraphileHttpRequestHandler(
           let result: any;
           const meta = Object.create(null);
           try {
-            if (!params.query) throw httpError(400, 'Must provide a query string.');
+            if (!params) throw httpError(400, 'Invalid query structure.');
+            const { query, operationName } = params;
+            let { variables } = params;
+            if (!query) throw httpError(400, 'Must provide a query string.');
 
             // If variables is a string, we assume it is a JSON string and that it
             // needs to be parsed.
-            if (typeof params.variables === 'string') {
+            if (typeof variables === 'string') {
               // If variables is just an empty string, we should set it to null and
               // ignore it.
-              if (params.variables === '') {
-                params.variables = null;
+              if (variables === '') {
+                variables = null;
               } else {
                 // Otherwise, let us try to parse it as JSON.
                 try {
-                  params.variables = JSON.parse(params.variables);
+                  variables = JSON.parse(variables);
                 } catch (error) {
                   error.statusCode = 400;
                   throw error;
@@ -649,21 +652,21 @@ export default function createPostGraphileHttpRequestHandler(
             }
 
             // Throw an error if `variables` is not an object.
-            if (params.variables != null && typeof params.variables !== 'object')
+            if (variables != null && typeof variables !== 'object')
               throw httpError(
                 400,
-                `Variables must be an object, not '${typeof params.variables}'.`,
+                `Variables must be an object, not '${typeof variables}'.`,
               );
 
             // Throw an error if `operationName` is not a string.
-            if (params.operationName != null && typeof params.operationName !== 'string')
+            if (operationName != null && typeof operationName !== 'string')
               throw httpError(
                 400,
-                `Operation name must be a string, not '${typeof params.operationName}'.`,
+                `Operation name must be a string, not '${typeof operationName}'.`,
               );
 
             let validationErrors: ReadonlyArray<GraphQLError>;
-            ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, params.query));
+            ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, query));
 
             if (validationErrors.length === 0) {
               // You are strongly encouraged to use
@@ -673,8 +676,8 @@ export default function createPostGraphileHttpRequestHandler(
                 options,
                 req,
                 res,
-                variables: params.variables,
-                operationName: params.operationName,
+                variables,
+                operationName,
                 meta,
               });
               if (moreValidationRules.length) {
@@ -709,8 +712,8 @@ export default function createPostGraphileHttpRequestHandler(
                 {
                   singleStatement: false,
                   queryDocumentAst,
-                  variables: params.variables,
-                  operationName: params.operationName,
+                  variables,
+                  operationName,
                 },
                 (graphqlContext: any) => {
                   pgRole = graphqlContext.pgRole;
@@ -719,8 +722,8 @@ export default function createPostGraphileHttpRequestHandler(
                     queryDocumentAst!,
                     null,
                     graphqlContext,
-                    params.variables,
-                    params.operationName,
+                    variables,
+                    operationName,
                   );
                 },
               );
