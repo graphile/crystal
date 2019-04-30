@@ -125,7 +125,9 @@ function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): Ho
       return previousHook;
     }
   }, identityHook);
-  if (shouldMemoizeHook(hookName)) {
+  if (combinedHook === identityHook) {
+    return identityHook;
+  } else if (shouldMemoizeHook(hookName)) {
     return memoizeHook<T>(combinedHook);
   } else {
     return combinedHook;
