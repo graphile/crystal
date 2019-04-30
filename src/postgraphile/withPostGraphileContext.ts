@@ -231,9 +231,11 @@ const withPostGraphileContext: WithPostGraphileContextFn = async (
   callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
 ): Promise<ExecutionResult> => {
   const pluginHook = pluginHookFromOptions(options);
-  const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
-    options,
-  });
+  const withContext = pluginHook
+    ? pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
+        options,
+      })
+    : withDefaultPostGraphileContext;
   return withContext(options, callback);
 };
 

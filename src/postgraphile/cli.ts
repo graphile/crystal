@@ -68,7 +68,7 @@ function extractPlugins(
 
 const { argv: argvSansPlugins, plugins: extractedPlugins } = extractPlugins(process.argv);
 
-const pluginHook = makePluginHook(extractedPlugins);
+const pluginHook = extractedPlugins.length ? makePluginHook(extractedPlugins) : null;
 
 program
   .version(manifest.version)
@@ -138,7 +138,7 @@ program
     'if an error occurs building the initial schema, this flag will cause PostGraphile to keep trying to build the schema with exponential backoff rather than exiting',
   );
 
-pluginHook('cli:flags:add:standard', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:standard', addFlag);
 
 // Schema configuration
 program
@@ -172,7 +172,7 @@ program
     'by default, tables and functions that come from extensions are excluded; use this flag to include them (not recommended)',
   );
 
-pluginHook('cli:flags:add:schema', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:schema', addFlag);
 
 // Error enhancements
 program
@@ -186,7 +186,7 @@ program
     (option: string) => option.split(',').filter(_ => _),
   );
 
-pluginHook('cli:flags:add:errorHandling', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:errorHandling', addFlag);
 
 // Plugin-related options
 program
@@ -203,7 +203,7 @@ program
     'a comma-separated list of Graphile Engine schema plugins to skip',
   );
 
-pluginHook('cli:flags:add:plugins', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:plugins', addFlag);
 
 // Things that relate to -X
 program
@@ -232,7 +232,7 @@ program
     '[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)',
   );
 
-pluginHook('cli:flags:add:noServer', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:noServer', addFlag);
 
 // Webserver configuration
 program
@@ -272,7 +272,7 @@ program
   )
   .option('--disable-query-log', 'disable logging queries to console (recommended in production)');
 
-pluginHook('cli:flags:add:webserver', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:webserver', addFlag);
 
 // JWT-related options
 program
@@ -320,10 +320,10 @@ program
     'the Postgres identifier for a composite type that will be used to create JWT tokens',
   );
 
-pluginHook('cli:flags:add:jwt', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:jwt', addFlag);
 
 // Any other options
-pluginHook('cli:flags:add', addFlag);
+if (pluginHook) pluginHook('cli:flags:add', addFlag);
 
 // Deprecated
 program
@@ -345,7 +345,7 @@ program
     '[DEPRECATED] PostGraphile 4.1.0 introduced support for PostgreSQL functions than declare parameters with IN/OUT/INOUT or declare RETURNS TABLE(...); enable this flag to ignore these types of functions. This option will be removed in v5.',
   );
 
-pluginHook('cli:flags:add:deprecated', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:deprecated', addFlag);
 
 // Awkward application workarounds / legacy support
 program
@@ -358,7 +358,7 @@ program
     `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`,
   );
 
-pluginHook('cli:flags:add:workarounds', addFlag);
+if (pluginHook) pluginHook('cli:flags:add:workarounds', addFlag);
 
 program.on('--help', () => {
   console.log(`
@@ -576,55 +576,58 @@ const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
   subject: jwtVerifySubject,
 });
 
+const baseOptions = {
+  ...config['options'],
+  classicIds,
+  dynamicJson,
+  disableDefaultMutations,
+  ignoreRBAC: ignoreRbac,
+  includeExtensionResources,
+  graphqlRoute,
+  graphiqlRoute,
+  graphiql: !disableGraphiql,
+  enhanceGraphiql: enhanceGraphiql ? true : undefined,
+  jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
+  jwtSecret: jwtSecret || deprecatedJwtSecret,
+  jwtAudiences,
+  jwtRole,
+  jwtVerifyOptions,
+  retryOnInitFail,
+  pgDefaultRole,
+  subscriptions: subscriptions || live,
+  live,
+  watchPg,
+  showErrorStack,
+  extendedErrors,
+  disableQueryLog,
+  enableCors,
+  exportJsonSchemaPath,
+  exportGqlSchemaPath,
+  sortExport,
+  bodySizeLimit,
+  appendPlugins: loadPlugins(appendPluginNames),
+  prependPlugins: loadPlugins(prependPluginNames),
+  skipPlugins: loadPlugins(skipPluginNames),
+  readCache,
+  writeCache,
+  legacyRelations,
+  setofFunctionsContainNulls,
+  legacyJsonUuid,
+  enableQueryBatching,
+  ...(pluginHook
+    ? {
+        pluginHook,
+      }
+    : null),
+  simpleCollections,
+  legacyFunctionsOnly,
+  ignoreIndexes,
+  ownerConnectionString,
+};
 // The options to pass through to the schema builder, or the middleware
-const postgraphileOptions = pluginHook(
-  'cli:library:options',
-  {
-    ...config['options'],
-    classicIds,
-    dynamicJson,
-    disableDefaultMutations,
-    ignoreRBAC: ignoreRbac,
-    includeExtensionResources,
-    graphqlRoute,
-    graphiqlRoute,
-    graphiql: !disableGraphiql,
-    enhanceGraphiql: enhanceGraphiql ? true : undefined,
-    jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
-    jwtSecret: jwtSecret || deprecatedJwtSecret,
-    jwtAudiences,
-    jwtRole,
-    jwtVerifyOptions,
-    retryOnInitFail,
-    pgDefaultRole,
-    subscriptions: subscriptions || live,
-    live,
-    watchPg,
-    showErrorStack,
-    extendedErrors,
-    disableQueryLog,
-    enableCors,
-    exportJsonSchemaPath,
-    exportGqlSchemaPath,
-    sortExport,
-    bodySizeLimit,
-    appendPlugins: loadPlugins(appendPluginNames),
-    prependPlugins: loadPlugins(prependPluginNames),
-    skipPlugins: loadPlugins(skipPluginNames),
-    readCache,
-    writeCache,
-    legacyRelations,
-    setofFunctionsContainNulls,
-    legacyJsonUuid,
-    enableQueryBatching,
-    pluginHook,
-    simpleCollections,
-    legacyFunctionsOnly,
-    ignoreIndexes,
-    ownerConnectionString,
-  },
-  { config, cliOptions: program },
-);
+const postgraphileOptions = pluginHook
+  ? pluginHook('cli:library:options', baseOptions, { config, cliOptions: program })
+  : baseOptions;
 
 if (noServer) {
   // No need for a server, let's just spin up the schema builder
@@ -704,13 +707,11 @@ if (noServer) {
     // You probably don't want this hook; likely you want
     // `postgraphile:middleware` instead. This hook will likely be removed in
     // future without warning.
-    const middleware = pluginHook(
-      /* DO NOT USE -> */ 'cli:server:middleware' /* <- DO NOT USE */,
-      rawMiddleware,
-      {
-        options: postgraphileOptions,
-      },
-    );
+    const middleware = pluginHook
+      ? pluginHook(/* DO NOT USE -> */ 'cli:server:middleware' /* <- DO NOT USE */, rawMiddleware, {
+          options: postgraphileOptions,
+        })
+      : rawMiddleware;
 
     const server = createServer(middleware);
     if (serverTimeout) {
@@ -721,10 +722,11 @@ if (noServer) {
       enhanceHttpServerWithSubscriptions(server, middleware);
     }
 
-    pluginHook('cli:server:created', server, {
-      options: postgraphileOptions,
-      middleware,
-    });
+    if (pluginHook)
+      pluginHook('cli:server:created', server, {
+        options: postgraphileOptions,
+        middleware,
+      });
 
     // Start our server by listening to a specific port and host name. Also log
     // some instructions and other interesting information.
@@ -763,45 +765,46 @@ if (noServer) {
               pgPort !== 5432 ? `:${pgConfig.port || 5432}` : ''
             }${pgDatabase ? `/${pgDatabase}` : ''}`;
 
-        const information: Array<string> = pluginHook(
-          'cli:greeting',
-          [
-            `GraphQL API:         ${chalk.underline.bold.blue(
-              `http://${hostname}:${actualPort}${graphqlRoute}`,
-            )}` +
-              (postgraphileOptions.subscriptions
-                ? ` (${postgraphileOptions.live ? 'live ' : ''}subscriptions enabled)`
-                : ''),
-            !disableGraphiql &&
-              `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
+        const defaultGreetings: Array<string | null> = [
+          `GraphQL API:         ${chalk.underline.bold.blue(
+            `http://${hostname}:${actualPort}${graphqlRoute}`,
+          )}` +
+            (postgraphileOptions.subscriptions
+              ? ` (${postgraphileOptions.live ? 'live ' : ''}subscriptions enabled)`
+              : ''),
+          !disableGraphiql
+            ? `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
                 `http://${hostname}:${actualPort}${graphiqlRoute}`,
               )}` +
-                (postgraphileOptions.enhanceGraphiql ||
-                postgraphileOptions.live ||
-                postgraphileOptions.subscriptions
-                  ? ''
-                  : ` (enhance with '--enhance-graphiql')`),
-            `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
-              postgraphileOptions.watchPg ? ' (watching)' : ''
-            }`,
-            `Postgres schema(s):  ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`,
-            `Documentation:       ${chalk.underline(
-              `https://graphile.org/postgraphile/introduction/`,
-            )}`,
-            extractedPlugins.length === 0
-              ? `Join ${chalk.bold(
-                  sponsor,
-                )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
-                  `https://graphile.org/sponsor/`,
-                )}`
-              : null,
-          ],
-          {
-            options: postgraphileOptions,
-            middleware,
-            port: actualPort,
-            chalk,
-          },
+              (postgraphileOptions.enhanceGraphiql ||
+              postgraphileOptions.live ||
+              postgraphileOptions.subscriptions
+                ? ''
+                : ` (enhance with '--enhance-graphiql')`)
+            : null,
+          `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
+            postgraphileOptions.watchPg ? ' (watching)' : ''
+          }`,
+          `Postgres schema(s):  ${schemas.map(schema => chalk.magenta(schema)).join(', ')}`,
+          `Documentation:       ${chalk.underline(
+            `https://graphile.org/postgraphile/introduction/`,
+          )}`,
+          extractedPlugins.length === 0
+            ? `Join ${chalk.bold(
+                sponsor,
+              )} in supporting PostGraphile development: ${chalk.underline.bold.blue(
+                `https://graphile.org/sponsor/`,
+              )}`
+            : null,
+        ];
+        const information: Array<string> = (pluginHook
+          ? pluginHook('cli:greeting', defaultGreetings, {
+              options: postgraphileOptions,
+              middleware,
+              port: actualPort,
+              chalk,
+            })
+          : defaultGreetings
         ).filter(isString);
         console.log(information.map(msg => `  ‣ ${msg}`).join('\n'));
 
