@@ -161,11 +161,9 @@ export async function enhanceHttpServerWithSubscriptions(
       });
     }
   });
-  const staticValidationRules = pluginHook
-    ? pluginHook('postgraphile:validationRules:static', specifiedRules, {
-        options,
-      })
-    : specifiedRules;
+  const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
+    options,
+  });
 
   SubscriptionServer.create(
     {
@@ -246,16 +244,14 @@ export async function enhanceHttpServerWithSubscriptions(
         // You are strongly encouraged to use
         // `postgraphile:validationRules:static` if possible - you should
         // only use this one if you need access to variables.
-        const moreValidationRules = pluginHook
-          ? pluginHook('postgraphile:validationRules', [], {
-              options,
-              req,
-              res,
-              variables: params.variables,
-              operationName: params.operationName,
-              meta,
-            })
-          : [];
+        const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
+          options,
+          req,
+          res,
+          variables: params.variables,
+          operationName: params.operationName,
+          meta,
+        });
         if (moreValidationRules.length) {
           const validationErrors: ReadonlyArray<GraphQLError> = validate(
             params.schema,

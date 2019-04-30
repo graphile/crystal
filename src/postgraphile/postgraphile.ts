@@ -49,12 +49,10 @@ export function getPostgraphileSchemaBuilder<
     incomingOptions.subscriptions = true;
   }
   const pluginHook = pluginHookFromOptions(incomingOptions);
-  const options = pluginHook
-    ? pluginHook('postgraphile:options', incomingOptions, {
-        pgPool,
-        schema,
-      })
-    : incomingOptions;
+  const options = pluginHook('postgraphile:options', incomingOptions, {
+    pgPool,
+    schema,
+  });
   // Check for a jwtSecret without a jwtPgTypeIdentifier
   // a secret without a token identifier prevents JWT creation
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {

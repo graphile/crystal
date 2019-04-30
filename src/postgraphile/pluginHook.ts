@@ -61,6 +61,7 @@ export interface PostGraphilePlugin {
 type HookName = keyof PostGraphilePlugin;
 
 const identityHook = <T>(input: T): T => input;
+const identityPluginHook = <T>(_hookName: HookName, input: T, _options: any): T => input;
 
 function contextIsSame(context1: {}, context2: {}): boolean {
   // Shortcut if obvious
@@ -150,10 +151,10 @@ export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn
   return pluginHook;
 }
 
-export function pluginHookFromOptions(options: PostGraphileOptions): PluginHookFn | null {
+export function pluginHookFromOptions(options: PostGraphileOptions): PluginHookFn {
   if (typeof options.pluginHook === 'function') {
     return options.pluginHook;
   } else {
-    return null;
+    return identityPluginHook;
   }
 }

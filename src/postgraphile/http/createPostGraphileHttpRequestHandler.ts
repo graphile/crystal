@@ -157,9 +157,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const pluginHook = pluginHookFromOptions(options);
 
-  const origGraphiqlHtml = pluginHook
-    ? pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options })
-    : baseGraphiqlHtml;
+  const origGraphiqlHtml = pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options });
 
   if (pgDefaultRole && typeof pgSettings === 'function') {
     throw new Error(
@@ -275,11 +273,9 @@ export default function createPostGraphileHttpRequestHandler(
 
   const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
 
-  const staticValidationRules = pluginHook
-    ? pluginHook('postgraphile:validationRules:static', specifiedRules, {
-        options,
-      })
-    : specifiedRules;
+  const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
+    options,
+  });
 
   // Typically clients use static queries, so we can cache the parse and
   // validate stages for when we see the same query again. Limit the store size
@@ -376,13 +372,11 @@ export default function createPostGraphileHttpRequestHandler(
     // PostGraphile not to handle the request further (return null). NOTE: if
     // you return `null` from this hook then you are also responsible for
     // calling `next()` (should that be required).
-    const req = pluginHook
-      ? pluginHook('postgraphile:http:handler', incomingReq, {
-          options,
-          res,
-          next,
-        })
-      : incomingReq;
+    const req = pluginHook('postgraphile:http:handler', incomingReq, {
+      options,
+      res,
+      next,
+    });
     if (req == null) {
       return;
     }
@@ -623,15 +617,13 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         paramsList = [paramsList];
       }
-      if (pluginHook) {
-        paramsList = pluginHook('postgraphile:httpParamsList', paramsList, {
-          options,
-          req,
-          res,
-          returnArray,
-          httpError,
-        });
-      }
+      paramsList = pluginHook('postgraphile:httpParamsList', paramsList, {
+        options,
+        req,
+        res,
+        returnArray,
+        httpError,
+      });
       results = await Promise.all(
         paramsList.map(async (params: any) => {
           let queryDocumentAst: DocumentNode | null = null;
@@ -675,7 +667,7 @@ export default function createPostGraphileHttpRequestHandler(
             let validationErrors: ReadonlyArray<GraphQLError>;
             ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, query));
 
-            if (validationErrors.length === 0 && pluginHook) {
+            if (validationErrors.length === 0) {
               // You are strongly encouraged to use
               // `postgraphile:validationRules:static` if possible - you should
               // only use this one if you need access to variables.
@@ -754,17 +746,15 @@ export default function createPostGraphileHttpRequestHandler(
             if (!isEmpty(meta)) {
               result.meta = meta;
             }
-            if (pluginHook) {
-              result = pluginHook('postgraphile:http:result', result, {
-                options,
-                returnArray,
-                queryDocumentAst,
-                req,
-                pgRole,
-                // We don't pass `res` here because this is for just a single
-                // result; if you need that, use postgraphile:http:end.
-              });
-            }
+            result = pluginHook('postgraphile:http:result', result, {
+              options,
+              returnArray,
+              queryDocumentAst,
+              req,
+              pgRole,
+              // We don't pass `res` here because this is for just a single
+              // result; if you need that, use postgraphile:http:end.
+            });
             // Log the query. If this debugger isn’t enabled, don’t run it.
             if (!options.disableQueryLog && queryDocumentAst) {
               // To appease TypeScript
@@ -826,18 +816,19 @@ export default function createPostGraphileHttpRequestHandler(
       }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      const preliminaryResult = {
-        statusCode: res.statusCode,
-        result: returnArray ? results : results[0]!,
-      };
-      const { statusCode, result } = pluginHook
-        ? pluginHook('postgraphile:http:end', preliminaryResult, {
-            options,
-            returnArray,
-            req,
-            res,
-          })
-        : preliminaryResult;
+      const { statusCode, result } = pluginHook(
+        'postgraphile:http:end',
+        {
+          statusCode: res.statusCode,
+          result: returnArray ? results : results[0]!,
+        },
+        {
+          options,
+          returnArray,
+          req,
+          res,
+        },
+      );
 
       if (statusCode) {
         res.statusCode = statusCode;
@@ -895,11 +886,9 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.handleErrors = handleErrors;
   middleware.options = options;
 
-  const hookedMiddleware = pluginHook
-    ? pluginHook('postgraphile:middleware', middleware, {
-        options,
-      })
-    : middleware;
+  const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
+    options,
+  });
   // Sanity check:
   if (!hookedMiddleware.getGraphQLSchema) {
     throw new Error(
