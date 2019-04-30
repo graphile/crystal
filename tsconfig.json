@@ -24,6 +24,7 @@
     "index.js",
     "node_modules",
     "build",
+    "fastbuild",
     "examples",
     "utils",
     "resources",

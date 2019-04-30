@@ -6,17 +6,19 @@ cd $(dirname $0)/..
 npm_bin=$(npm bin)
 
 echo "Cleaning build"
-rm -rf build
-mkdir build
+rm -rf build fastbuild
+mkdir build fastbuild
 
 echo "Preparing assets"
 scripts/make-assets
 
 echo "Compiling with TypeScript"
+"$npm_bin"/tsc --target esnext --lib esnext --outDir fastbuild --declarationDir fastbuild
+echo "Compiling with TypeScript and backwards compatibility"
 "$npm_bin"/tsc
-find build -wholename '*/__tests__/*' -delete
-find build -name '__tests__' -delete
 
 echo "Removing tests/mocks"
 find build -wholename '*/__tests__/*' -delete
 find build -name '__tests__' -delete
+find fastbuild -wholename '*/__tests__/*' -delete
+find fastbuild -name '__tests__' -delete
