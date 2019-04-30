@@ -345,7 +345,52 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  let isFirstRequest = true;
+  let firstRequestHandler = (req: IncomingMessage, pathname: string) => {
+    // Never be called again
+    firstRequestHandler = () => {};
+
+      if (externalUrlBase == null) {
+        // User hasn't specified externalUrlBase; let's try and guess it
+        const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+        if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+          // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
+          // Figure out our externalUrlBase for ourselves.
+          externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
+        }
+        // Make sure we have a string, at least
+        externalUrlBase = externalUrlBase || '';
+      }
+
+      // Takes the original GraphiQL HTML file and replaces the default config object.
+      graphiqlHtml = origGraphiqlHtml
+        ? origGraphiqlHtml.replace(
+            /<\/head>/,
+            `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
+              graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
+              streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
+              enhanceGraphiql:
+                options.enhanceGraphiql === false
+                  ? false
+                  : !!options.enhanceGraphiql || options.subscriptions || options.live,
+              subscriptions: !!options.subscriptions,
+            })};</script>\n  </head>`,
+          )
+        : null;
+
+      if (options.subscriptions) {
+        const server = req && req.connection && req.connection['server'];
+        if (!server) {
+          // tslint:disable-next-line no-console
+          console.warn(
+            "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
+          );
+        } else {
+          // Relying on this means that a normal request must come in before an
+          // upgrade attempt. It's better to call it manually.
+          enhanceHttpServerWithSubscriptions(server, middleware);
+        }
+      }
+    }
 
   /*
    * If we're not in watch mode, then avoid the cost of `await`ing the schema
@@ -391,52 +436,10 @@ export default function createPostGraphileHttpRequestHandler(
     const { pathname = '' } = parseUrl(req) || {};
 
     // Certain things depend on externalUrlBase, which we guess if the user
-    // doesn't supply it, so we calculate them on the first request.
-    if (isFirstRequest) {
-      isFirstRequest = false;
+    // doesn't supply it, so we calculate them on the first request. After
+    // first request, this function becomes a NOOP
+    firstRequestHandler(req, pathname);
 
-      if (externalUrlBase == null) {
-        // User hasn't specified externalUrlBase; let's try and guess it
-        const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
-        if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
-          // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
-          // Figure out our externalUrlBase for ourselves.
-          externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
-        }
-        // Make sure we have a string, at least
-        externalUrlBase = externalUrlBase || '';
-      }
-
-      // Takes the original GraphiQL HTML file and replaces the default config object.
-      graphiqlHtml = origGraphiqlHtml
-        ? origGraphiqlHtml.replace(
-            /<\/head>/,
-            `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-              graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
-              streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
-              enhanceGraphiql:
-                options.enhanceGraphiql === false
-                  ? false
-                  : !!options.enhanceGraphiql || options.subscriptions || options.live,
-              subscriptions: !!options.subscriptions,
-            })};</script>\n  </head>`,
-          )
-        : null;
-
-      if (options.subscriptions) {
-        const server = req && req.connection && req.connection['server'];
-        if (!server) {
-          // tslint:disable-next-line no-console
-          console.warn(
-            "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
-          );
-        } else {
-          // Relying on this means that a normal request must come in before an
-          // upgrade attempt. It's better to call it manually.
-          enhanceHttpServerWithSubscriptions(server, middleware);
-        }
-      }
-    }
     const isGraphqlRoute = pathname === graphqlRoute;
 
     // ========================================================================
