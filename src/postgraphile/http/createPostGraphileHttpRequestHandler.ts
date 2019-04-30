@@ -345,6 +345,17 @@ export default function createPostGraphileHttpRequestHandler(
 
   let isFirstRequest = true;
 
+  /*
+   * If we're not in watch mode, then avoid the cost of `await`ing the schema
+   * on every tick by having it available once it was generated.
+   */
+  let theOneAndOnlyGraphQLSchema: GraphQLSchema | null = null;
+  if (!options.watchPg) {
+    getGqlSchema().then(schema => {
+      theOneAndOnlyGraphQLSchema = schema;
+    });
+  }
+
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
@@ -558,7 +569,7 @@ export default function createPostGraphileHttpRequestHandler(
     try {
       // First thing we need to do is get the GraphQL schema for this request.
       // It should never really change unless we are in watch mode.
-      const gqlSchema = await getGqlSchema();
+      const gqlSchema = theOneAndOnlyGraphQLSchema || await getGqlSchema();
 
       // Note that we run our middleware after we make sure we are on the
       // correct route. This is so that if our middleware modifies the `req` or
