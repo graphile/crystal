@@ -142,7 +142,17 @@ export default function createPostGraphileHttpRequestHandler(
     pgSettings,
     pgDefaultRole,
     queryCacheMaxSize = 50 * MEGABYTE,
+    extendedErrors,
+    showErrorStack,
+    watchPg,
+    disableQueryLog,
+    enableQueryBatching,
   } = options;
+  const subscriptions = !!options.subscriptions;
+  const live = !!options.live;
+  const enhanceGraphiql = options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
+  const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
+  const graphiql = options.graphiql === true;
   if (options['absoluteRoutes']) {
     throw new Error(
       'Sorry - the `absoluteRoutes` setting has been replaced with `externalUrlBase` which solves the issue in a cleaner way. Please update your settings. Thank you for testing a PostGraphile pre-release 🙏',
@@ -176,13 +186,14 @@ export default function createPostGraphileHttpRequestHandler(
       'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
     );
   }
-  if (options.graphiql && shouldOmitAssets) {
+  if (graphiql && shouldOmitAssets) {
     throw new Error('Cannot enable GraphiQL when POSTGRAPHILE_OMIT_ASSETS is set');
   }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
-  const graphiqlRoute = options.graphiql === true ? options.graphiqlRoute || '/graphiql' : null;
+  const graphiqlRoute = graphiql ? options.graphiqlRoute || '/graphiql' : null;
+  const streamRoute = `${graphqlRoute}/stream`;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -196,17 +207,15 @@ export default function createPostGraphileHttpRequestHandler(
     // Get the appropriate formatted error object, including any extended error
     // fields if the user wants them.
     const formattedError =
-      options.extendedErrors && options.extendedErrors.length
-        ? extendedFormatError(error, options.extendedErrors)
+      extendedErrors && extendedErrors.length
+        ? extendedFormatError(error, extendedErrors)
         : defaultFormatError(error);
 
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
-    if (options.showErrorStack)
+    if (showErrorStack)
       (formattedError as object)['stack'] =
-        error.stack != null && options.showErrorStack === 'json'
-          ? error.stack.split('\n')
-          : error.stack;
+        error.stack != null && showErrorStack === 'json' ? error.stack.split('\n') : error.stack;
 
     return formattedError;
   };
@@ -349,55 +358,52 @@ export default function createPostGraphileHttpRequestHandler(
     // Never be called again
     firstRequestHandler = () => {};
 
-      if (externalUrlBase == null) {
-        // User hasn't specified externalUrlBase; let's try and guess it
-        const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
-        if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
-          // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
-          // Figure out our externalUrlBase for ourselves.
-          externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
-        }
-        // Make sure we have a string, at least
-        externalUrlBase = externalUrlBase || '';
+    if (externalUrlBase == null) {
+      // User hasn't specified externalUrlBase; let's try and guess it
+      const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+      if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+        // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
+        // Figure out our externalUrlBase for ourselves.
+        externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
       }
+      // Make sure we have a string, at least
+      externalUrlBase = externalUrlBase || '';
+    }
 
-      // Takes the original GraphiQL HTML file and replaces the default config object.
-      graphiqlHtml = origGraphiqlHtml
-        ? origGraphiqlHtml.replace(
-            /<\/head>/,
-            `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-              graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
-              streamUrl: options.watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
-              enhanceGraphiql:
-                options.enhanceGraphiql === false
-                  ? false
-                  : !!options.enhanceGraphiql || options.subscriptions || options.live,
-              subscriptions: !!options.subscriptions,
-            })};</script>\n  </head>`,
-          )
-        : null;
+    // Takes the original GraphiQL HTML file and replaces the default config object.
+    graphiqlHtml = origGraphiqlHtml
+      ? origGraphiqlHtml.replace(
+          /<\/head>/,
+          `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
+            graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
+            streamUrl: watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
+            enhanceGraphiql,
+            subscriptions,
+          })};</script>\n  </head>`,
+        )
+      : null;
 
-      if (options.subscriptions) {
-        const server = req && req.connection && req.connection['server'];
-        if (!server) {
-          // tslint:disable-next-line no-console
-          console.warn(
-            "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
-          );
-        } else {
-          // Relying on this means that a normal request must come in before an
-          // upgrade attempt. It's better to call it manually.
-          enhanceHttpServerWithSubscriptions(server, middleware);
-        }
+    if (subscriptions) {
+      const server = req && req.connection && req.connection['server'];
+      if (!server) {
+        // tslint:disable-next-line no-console
+        console.warn(
+          "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
+        );
+      } else {
+        // Relying on this means that a normal request must come in before an
+        // upgrade attempt. It's better to call it manually.
+        enhanceHttpServerWithSubscriptions(server, middleware);
       }
     }
+  };
 
   /*
    * If we're not in watch mode, then avoid the cost of `await`ing the schema
    * on every tick by having it available once it was generated.
    */
   let theOneAndOnlyGraphQLSchema: GraphQLSchema | null = null;
-  if (!options.watchPg) {
+  if (!watchPg) {
     getGqlSchema().then(schema => {
       theOneAndOnlyGraphQLSchema = schema;
     });
@@ -431,7 +437,7 @@ export default function createPostGraphileHttpRequestHandler(
     //
     // Always enable CORS when developing PostGraphile because GraphiQL will be
     // on port 5783.
-    if (options.enableCors || isPostGraphileDevelopmentMode) addCORSHeaders(res);
+    if (enableCors) addCORSHeaders(res);
 
     const { pathname = '' } = parseUrl(req) || {};
 
@@ -446,7 +452,7 @@ export default function createPostGraphileHttpRequestHandler(
     // Serve GraphiQL and Related Assets
     // ========================================================================
 
-    if (!shouldOmitAssets && options.graphiql && !isGraphqlRoute) {
+    if (!shouldOmitAssets && graphiql && !isGraphqlRoute) {
       // ======================================================================
       // Favicon
       // ======================================================================
@@ -482,8 +488,8 @@ export default function createPostGraphileHttpRequestHandler(
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === `${graphqlRoute}/stream` || pathname === '/_postgraphile/stream') {
-        if (!options.watchPg || req.headers.accept !== 'text/event-stream') {
+      if (pathname === streamRoute|| pathname === '/_postgraphile/stream') {
+        if (!watchPg || req.headers.accept !== 'text/event-stream') {
           res.statusCode = 405;
           res.end();
           return;
@@ -540,7 +546,7 @@ export default function createPostGraphileHttpRequestHandler(
 
     // If we didn’t call `next` above, all requests will return 200 by default!
     res.statusCode = 200;
-    if (options.watchPg) {
+    if (watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
       res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${graphqlRoute}/stream`);
@@ -562,7 +568,7 @@ export default function createPostGraphileHttpRequestHandler(
       errors?: Array<GraphQLError>;
       statusCode?: number;
     }> = [];
-    const queryTimeStart = !options.disableQueryLog && process.hrtime();
+    const queryTimeStart = !disableQueryLog && process.hrtime();
     let pgRole: string;
 
     if (debugRequest.enabled) debugRequest('GraphQL query request has begun.');
@@ -609,7 +615,7 @@ export default function createPostGraphileHttpRequestHandler(
           `Expected parameter object, not value of type '${typeof paramsList}'.`,
         );
       if (Array.isArray(paramsList)) {
-        if (!options.enableQueryBatching) {
+        if (!enableQueryBatching) {
           throw httpError(
             501,
             'Batching queries as an array is currently unsupported. Please provide a single query object.',
@@ -759,7 +765,7 @@ export default function createPostGraphileHttpRequestHandler(
               // result; if you need that, use postgraphile:http:end.
             });
             // Log the query. If this debugger isn’t enabled, don’t run it.
-            if (!options.disableQueryLog && queryDocumentAst) {
+            if (!disableQueryLog && queryDocumentAst) {
               // To appease TypeScript
               const definitelyQueryDocumentAst = queryDocumentAst;
               // We must reference this before it's deleted!
