@@ -11,4 +11,7 @@ next2latest graphile-build
 next2latest graphile-build-pg
 next2latest postgraphile-core
 next2latest graphile-utils
+next2latest @graphile/pg-pubsub
+next2latest @graphile/lds
+next2latest @graphile/subscriptions-lds
 next2latest postgraphile
