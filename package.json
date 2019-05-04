@@ -30,7 +30,7 @@
   "main": "index.js",
   "types": "build/index.d.ts",
   "bin": {
-    "postgraphile": "build/postgraphile/cli.js"
+    "postgraphile": "cli.js"
   },
   "scripts": {
     "build": "./scripts/build",
@@ -118,7 +118,7 @@
     "roots": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
-  "files": ["sponsors.json", "build"],
+  "files": ["sponsors.json", "build", "index.js", "cli.js"],
   "engines": {
     "node": ">=8.6"
   }
