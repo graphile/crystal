@@ -76,7 +76,7 @@ const pgPool = {
 };
 
 const defaultOptions = {
-  getGqlSchema: () => gqlSchema,
+  getGqlSchema: () => Promise.resolve(gqlSchema),
   pgPool,
   disableQueryLog: true,
 };

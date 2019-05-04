@@ -410,9 +410,13 @@ export default function createPostGraphileHttpRequestHandler(
    */
   let theOneAndOnlyGraphQLSchema: GraphQLSchema | null = null;
   if (!watchPg) {
-    getGqlSchema().then(schema => {
-      theOneAndOnlyGraphQLSchema = schema;
-    });
+    getGqlSchema()
+      .then(schema => {
+        theOneAndOnlyGraphQLSchema = schema;
+      })
+      .catch(() => {
+        /*noop*/
+      });
   }
 
   /**
