@@ -76,12 +76,14 @@ const calculateQueryHash = (queryString: string): string =>
 // faster than `Object.keys(value).length === 0`.
 // NOTE: we don't need a `hasOwnProperty` call here because isEmpty is called
 // with an `Object.create(null)` object, so it has no no-own properties.
+/* tslint:disable forin */
 export function isEmpty(value: any): boolean {
   for (const _key in value) {
     return false;
   }
   return true;
 }
+/* tslint:enable forin */
 
 const isPostGraphileDevelopmentMode = process.env.POSTGRAPHILE_ENV === 'development';
 
@@ -355,9 +357,12 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  let firstRequestHandler = (req: IncomingMessage, pathname: string) => {
+  let firstRequestHandler: ((req: IncomingMessage, pathname: string) => void) | null = (
+    req,
+    pathname,
+  ) => {
     // Never be called again
-    firstRequestHandler = () => {};
+    firstRequestHandler = null;
 
     if (externalUrlBase == null) {
       // User hasn't specified externalUrlBase; let's try and guess it
@@ -445,7 +450,7 @@ export default function createPostGraphileHttpRequestHandler(
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
     // first request, this function becomes a NOOP
-    firstRequestHandler(req, pathname);
+    if (firstRequestHandler) firstRequestHandler(req, pathname);
 
     const isGraphqlRoute = pathname === graphqlRoute;
 
