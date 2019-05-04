@@ -150,7 +150,8 @@ export default function createPostGraphileHttpRequestHandler(
   } = options;
   const subscriptions = !!options.subscriptions;
   const live = !!options.live;
-  const enhanceGraphiql = options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
+  const enhanceGraphiql =
+    options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
   const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
   const graphiql = options.graphiql === true;
   if (options['absoluteRoutes']) {
@@ -488,7 +489,7 @@ export default function createPostGraphileHttpRequestHandler(
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === streamRoute|| pathname === '/_postgraphile/stream') {
+      if (pathname === streamRoute || pathname === '/_postgraphile/stream') {
         if (!watchPg || req.headers.accept !== 'text/event-stream') {
           res.statusCode = 405;
           res.end();
