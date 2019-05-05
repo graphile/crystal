@@ -129,6 +129,7 @@
   "files": [
     "sponsors.json",
     "build",
+    "build-turbo",
     "index.js",
     "cli.js"
   ],
