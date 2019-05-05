@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-core",
-  "version": "4.4.0",
+  "version": "4.4.1-alpha.0",
   "description": "",
   "main": "node8plus/index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@types/graphql": "^14.2.0",
-    "graphile-build": "4.4.0",
-    "graphile-build-pg": "4.4.0"
+    "graphile-build": "4.4.1-alpha.0",
+    "graphile-build-pg": "4.4.1-alpha.0"
   },
   "devDependencies": {
     "@types/node": "^12.0.0",
@@ -44,7 +44,9 @@
     "pg": ">=6.1.0 <8"
   },
   "jest": {
-    "transform": { "^.+\\.jsx?$": "../../.jest-wrapper.js" },
+    "transform": {
+      "^.+\\.jsx?$": "../../.jest-wrapper.js"
+    },
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
   "files": [
