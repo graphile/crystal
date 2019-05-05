@@ -1,7 +1,7 @@
 import { Plugin, Options, Build } from "graphile-build";
 
 interface Inflectors {
-  [str: string]: ((...args: Array<any>) => any);
+  [str: string]: (...args: Array<any>) => any;
 }
 type InflectorsGenerator = (
   inflection: Inflectors,

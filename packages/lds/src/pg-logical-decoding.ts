@@ -246,9 +246,11 @@ export default class PgLogicalDecoding extends EventEmitter {
 
   private onPoolError = (err: Error) => {
     if (this.client) {
-      this.client.then(c => c.release(err)).catch(() => {
-        // noop
-      });
+      this.client
+        .then(c => c.release(err))
+        .catch(() => {
+          // noop
+        });
     }
     this.client = null;
     console.error("LDS pool error:", err.message);

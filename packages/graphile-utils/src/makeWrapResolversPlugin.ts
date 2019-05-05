@@ -153,8 +153,8 @@ export default function makeWrapResolversPlugin<T>(
         ...field,
         async resolve(...resolveParams) {
           const smartResolve = (...overrideParams: Array<any>) =>
-            // @ts-ignore We're calling it dynamically, allowing the parent to override args.
             oldResolve(
+              // @ts-ignore We're calling it dynamically, allowing the parent to override args.
               ...overrideParams.concat(
                 resolveParams.slice(overrideParams.length)
               )

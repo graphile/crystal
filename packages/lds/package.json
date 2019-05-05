@@ -36,16 +36,16 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/lds#readme",
   "dependencies": {
-    "@types/pg": "^7.4.11",
+    "@types/pg": "^7.4.14",
     "@types/ws": "^6.0.1",
     "pg": ">=6.5 <8",
-    "ws": "^6.1.3"
+    "ws": "^7.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.5",
-    "jest": "23.x",
-    "ts-jest": "^23.10.5",
-    "typescript": "^3.3.1"
+    "@types/jest": "^24.0.12",
+    "jest": "24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
   },
   "files": [
     "dist"

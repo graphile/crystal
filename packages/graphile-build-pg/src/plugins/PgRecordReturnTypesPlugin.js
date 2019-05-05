@@ -68,11 +68,11 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         const procFieldName = isMutation
           ? inflection.functionMutationName(proc)
           : computed
-            ? inflection.computedColumn(
-                proc.name.substr(firstArgType.name.length + 1),
-                proc
-              )
-            : inflection.functionQueryName(proc);
+          ? inflection.computedColumn(
+              proc.name.substr(firstArgType.name.length + 1),
+              proc
+            )
+          : inflection.functionQueryName(proc);
         newWithHooks(
           GraphQLObjectType,
           {

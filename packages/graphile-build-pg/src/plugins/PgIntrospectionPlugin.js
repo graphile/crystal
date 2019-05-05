@@ -448,8 +448,8 @@ export default (async function PgIntrospectionPlugin(
   }
 ) {
   const augment = introspectionResults => {
-    [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(
-      fn => (fn ? fn(introspectionResults) : null)
+    [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
+      fn ? fn(introspectionResults) : null
     );
   };
   async function introspect() {

@@ -263,7 +263,7 @@ const getPostGraphileBuilder = async (
 
   if (readCache) {
     const cacheString: string = await new Promise<string>((resolve, reject) => {
-      fs.readFile(readCache, "utf8", (err?: Error, data?: string) => {
+      fs.readFile(readCache, "utf8", (err?: Error | null, data?: string) => {
         if (err) {
           reject(err);
         } else {

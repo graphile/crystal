@@ -138,8 +138,8 @@ export default (function PgConditionComputedColumnPlugin(builder) {
         pgFieldIntrospection.kind === "class"
           ? pgFieldIntrospection
           : proc
-            ? pgFieldIntrospectionTable
-            : null;
+          ? pgFieldIntrospectionTable
+          : null;
       if (
         !table ||
         table.kind !== "class" ||

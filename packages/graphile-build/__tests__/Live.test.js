@@ -1,9 +1,9 @@
-import {
+const {
   LiveSource,
   LiveCoordinator,
   LiveProvider,
   makeAsyncIteratorFromMonitor,
-} from "../src/Live";
+} = require("../node8plus/Live");
 
 // TODO: this file needs a *lot* more tests!
 

@@ -229,8 +229,8 @@ export default (function PgColumnsPlugin(builder) {
           const action = isPgBaseInput
             ? "base"
             : isPgPatch
-              ? "update"
-              : "create";
+            ? "update"
+            : "create";
           if (omit(attr, action)) return memo;
           if (attr.identity === "a") return memo;
 

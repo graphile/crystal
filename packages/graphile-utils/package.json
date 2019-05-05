@@ -31,24 +31,25 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-utils",
   "dependencies": {
-    "debug": ">=2 <3",
+    "debug": "^4.1.1",
     "graphql": ">=0.9 <0.14 || ^14.0.2"
   },
   "engines": {
     "node": ">=8.6"
   },
   "devDependencies": {
-    "eslint_d": "^5.3.1",
+    "eslint_d": "^7.3.0",
     "graphile-build": "4.4.0",
     "graphile-build-pg": "4.4.0",
-    "jest": "^23.5.0",
-    "prettier": "^1.14.2",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.0.1"
+    "jest": "^24.8.0",
+    "prettier": "^1.17.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.5"
   },
   "jest": {
+    "transform": { "^.+\\.jsx?$": "../../.jest-wrapper.js" },
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
   "files": [

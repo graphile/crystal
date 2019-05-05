@@ -90,19 +90,19 @@ export default async function viaTemporaryTable(
          */
         sql.query`(case when ${sqlResultSourceAlias} is null then null else ${sqlResultSourceAlias} end)`
       : isPgRecord
-        ? sql.query`array[${sql.join(
-            outputArgNames.map(
-              (outputArgName, idx) =>
-                sql.query`${sqlResultSourceAlias}.${sql.identifier(
-                  // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
-                  // "If you omit the name for an output argument, the system will choose a default column name."
-                  // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.
-                  outputArgName !== "" ? outputArgName : `column${idx + 1}`
-                )}::text`
-            ),
-            " ,"
-          )}]`
-        : sql.query`(${sqlResultSourceAlias}.${sqlResultSourceAlias})::${sqlTypeIdentifier}`;
+      ? sql.query`array[${sql.join(
+          outputArgNames.map(
+            (outputArgName, idx) =>
+              sql.query`${sqlResultSourceAlias}.${sql.identifier(
+                // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
+                // "If you omit the name for an output argument, the system will choose a default column name."
+                // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.
+                outputArgName !== "" ? outputArgName : `column${idx + 1}`
+              )}::text`
+          ),
+          " ,"
+        )}]`
+      : sql.query`(${sqlResultSourceAlias}.${sqlResultSourceAlias})::${sqlTypeIdentifier}`;
     const result = await performQuery(
       pgClient,
       sql.query`
@@ -125,7 +125,7 @@ export default async function viaTemporaryTable(
               select (str::${sqlTypeIdentifier}).*
               from unnest((${sql.value(values)})::text[]) str`
       : isPgRecord
-        ? sql.query`\
+      ? sql.query`\
           select ${sql.join(
             outputArgNames.map(
               (outputArgName, idx) =>
@@ -148,7 +148,7 @@ export default async function viaTemporaryTable(
             values.map(value => sql.query`(${sql.value(value)}::text[])`),
             ", "
           )}) as ${sqlValuesAlias}(output_value_list)`
-        : sql.query`\
+      : sql.query`\
         select str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}
         from unnest((${sql.value(values)})::text[]) str`;
     const { rows: filteredValuesResults } =
@@ -163,15 +163,14 @@ export default async function viaTemporaryTable(
               `
           )
         : { rows: [] };
-    const finalRows = rawValues.map(
-      rawValue =>
-        /*
-         * We can't simply return 'null' here because this is expected to have
-         * come from PG, and that would never return 'null' for a row - only
-         * the fields within said row. Using `__isNull` here is a simple
-         * workaround to this, that's caught by `pg2gql`.
-         */
-        rawValue === null ? { __isNull: true } : filteredValuesResults.shift()
+    const finalRows = rawValues.map(rawValue =>
+      /*
+       * We can't simply return 'null' here because this is expected to have
+       * come from PG, and that would never return 'null' for a row - only
+       * the fields within said row. Using `__isNull` here is a simple
+       * workaround to this, that's caught by `pg2gql`.
+       */
+      rawValue === null ? { __isNull: true } : filteredValuesResults.shift()
     );
     return finalRows;
   }

@@ -255,7 +255,7 @@ export default (function PgTypesPlugin(
         sql.fragment`(${fragment})::numeric::text`;
       const pgTweaksByTypeIdAndModifer = {};
       const pgTweaksByTypeId = Object.assign(
-        // ::text rawTypes
+        // '::text' rawTypes
         rawTypes.reduce((memo, typeId) => {
           memo[typeId] = tweakToText;
           return memo;
@@ -494,10 +494,10 @@ export default (function PgTypesPlugin(
       let depth = 0;
 
       /*
-     * Enforce: this is the fallback when we can't find a specific GraphQL type
-     * for a specific PG type.  Use the generators from
-     * `pgRegisterGqlTypeByTypeId` first, this is a last resort.
-     */
+       * Enforce: this is the fallback when we can't find a specific GraphQL type
+       * for a specific PG type.  Use the generators from
+       * `pgRegisterGqlTypeByTypeId` first, this is a last resort.
+       */
       const enforceGqlTypeByPgTypeId = (typeId, typeModifier) => {
         const type = introspectionResultsByKind.type.find(t => t.id === typeId);
         depth++;

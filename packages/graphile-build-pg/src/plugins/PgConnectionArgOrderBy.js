@@ -89,8 +89,8 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
         pgFieldIntrospection.kind === "class"
           ? pgFieldIntrospection
           : proc
-            ? pgFieldIntrospectionTable
-            : null;
+          ? pgFieldIntrospectionTable
+          : null;
       if (
         !table ||
         !table.namespace ||
@@ -152,8 +152,8 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
                     specNullsFirst != null
                       ? specNullsFirst
                       : orderByNullsLast != null
-                        ? !orderByNullsLast
-                        : undefined;
+                      ? !orderByNullsLast
+                      : undefined;
                   queryBuilder.orderBy(expr, ascending, nullsFirst);
                 });
                 if (unique) {

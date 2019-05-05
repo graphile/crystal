@@ -49,8 +49,8 @@ export default function makeChangeNullabilityPlugin(
         type: shouldBeNullable
           ? nullableType
           : nullableType === field.type
-            ? new GraphQLNonNull(field.type)
-            : field.type, // Optimisation if it's already non-null
+          ? new GraphQLNonNull(field.type)
+          : field.type, // Optimisation if it's already non-null
       };
     }
     builder.hook("GraphQLInputObjectType:fields:field", changeNullability);

@@ -584,10 +584,10 @@ export default function makeProcField(
         description: proc.description
           ? proc.description
           : isTableLike && proc.returnsSet
-            ? `Reads and enables pagination through a set of \`${
-                TableType.name
-              }\`.`
-            : null,
+          ? `Reads and enables pagination through a set of \`${
+              TableType.name
+            }\`.`
+          : null,
         type: nullableIf(GraphQLNonNull, !proc.tags.notNull, ReturnType),
         args: args,
         resolve: computed
@@ -686,8 +686,8 @@ export default function makeProcField(
                       isPgClass
                         ? sql.query`${intermediateIdentifier}.*`
                         : isPgRecord
-                          ? sql.query`${intermediateIdentifier}.*`
-                          : sql.query`${intermediateIdentifier} as ${functionAlias}`
+                        ? sql.query`${intermediateIdentifier}.*`
+                        : sql.query`${intermediateIdentifier} as ${functionAlias}`
                     } from ${sqlMutationQuery} ${intermediateIdentifier}`,
                     functionAlias,
                     query,

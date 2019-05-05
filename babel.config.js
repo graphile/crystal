@@ -1,22 +1,22 @@
-{
-  "plugins": ["transform-es2015-modules-commonjs", "syntax-object-rest-spread"],
+module.exports = {
+  "plugins": ["@babel/plugin-transform-modules-commonjs", "@babel/plugin-syntax-object-rest-spread"],
   "presets": [
-    ["env", {
+    ["@babel/env", {
       "targets": {
         "node": "8.6"
       }
     }],
-    "flow"
+    "@babel/flow"
   ],
   "env": {
     "test": {
       "presets": [
-        ["env", {
+        ["@babel/env", {
           "targets": {
             "node": "current"
           }
         }],
-        "flow"
+        "@babel/flow"
       ]
     }
   }

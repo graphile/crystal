@@ -596,8 +596,8 @@ class QueryBuilder {
       ...(addNotDistinctFromNullCase
         ? [sql.fragment`(${this.getTableAlias()} is distinct from null)`]
         : addNullCase
-          ? [sql.fragment`not (${this.getTableAlias()} is null)`]
-          : []),
+        ? [sql.fragment`not (${this.getTableAlias()} is null)`]
+        : []),
       ...this.compiledData.where,
       ...(includeLowerBound ? [this.buildWhereBoundClause(true)] : []),
       ...(includeUpperBound ? [this.buildWhereBoundClause(false)] : []),
@@ -659,8 +659,8 @@ class QueryBuilder {
                     nullsFirst === true
                       ? sql.fragment` NULLS FIRST`
                       : nullsFirst === false
-                        ? sql.fragment` NULLS LAST`
-                        : null
+                      ? sql.fragment` NULLS LAST`
+                      : null
                   }`
               ),
               ","

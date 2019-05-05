@@ -31,11 +31,11 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/pg-pubsub#readme",
   "dependencies": {
-    "@types/debug": "^4.1.2",
-    "@types/graphql": "^14.0.7",
-    "@types/pg": "^7.4.13",
+    "@types/debug": "^4.1.4",
+    "@types/graphql": "^14.2.0",
+    "@types/pg": "^7.4.14",
     "debug": "^4.1.1",
-    "graphql-subscriptions": "^1.0.0"
+    "graphql-subscriptions": "^1.1.0"
   },
   "peerDependencies": {
     "graphile-build": "4.x",
@@ -43,15 +43,15 @@
     "postgraphile": "^4.4.0-beta.10"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.5",
+    "@types/jest": "^24.0.12",
     "graphql": ">=0.6 <15",
-    "jest": "23.x",
+    "jest": "24.8.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
-    "pg": ">=6.5 <8",
-    "postgraphile": "^4.4.0-beta.10",
-    "ts-jest": "^23.10.5",
-    "typescript": "^3.3.1"
+    "pg": "^7.10.0",
+    "postgraphile": "^4.4.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
   },
   "files": [
     "dist"

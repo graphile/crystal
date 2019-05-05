@@ -20,8 +20,8 @@ export const parseTags = (str: string) => {
           [key]: !prev.tags.hasOwnProperty(key)
             ? value
             : Array.isArray(prev.tags[key])
-              ? [...prev.tags[key], value]
-              : [prev.tags[key], value],
+            ? [...prev.tags[key], value]
+            : [prev.tags[key], value],
         }),
       });
     },
