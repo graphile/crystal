@@ -15,6 +15,7 @@
     ],
     "no-implicit-dependencies": [true, "dev"],
     "no-empty": [false],
-    "no-string-literal": [false]
+    "no-string-literal": [false],
+    "curly": false
   }
 }

@@ -12,6 +12,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
         gql2pg,
         pgQueryFromResolveData: queryFromResolveData,
         pgOmit: omit,
+        pgPrepareAndRun,
       } = build;
       const {
         scope: { isPgRowType, pgIntrospection: table },
@@ -81,7 +82,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
           if (debugSql.enabled) debugSql(text);
           const {
             rows: [row],
-          } = await pgClient.query(text, values);
+          } = await pgPrepareAndRun(pgClient, text, values);
           if (subscriptions && liveRecord && row) {
             liveRecord("pg", table, row.__identifiers);
           }
@@ -111,6 +112,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
         pgOmit: omit,
         describePgEntity,
         sqlCommentByAddingTags,
+        pgPrepareAndRun,
       } = build;
       const {
         scope: { isRootQuery },
@@ -219,7 +221,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                           if (debugSql.enabled) debugSql(text);
                           const {
                             rows: [row],
-                          } = await pgClient.query(text, values);
+                          } = await pgPrepareAndRun(pgClient, text, values);
                           if (liveRecord && row) {
                             liveRecord("pg", table, row.__identifiers);
                           }

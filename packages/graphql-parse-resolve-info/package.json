@@ -2,11 +2,11 @@
   "name": "graphql-parse-resolve-info",
   "version": "4.4.1-alpha.0",
   "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
-  "main": "node8plus/index.js",
+  "main": "index.js",
   "types": "node8plus/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prepack": "mkdir -p node8plus && tsc",
+    "prepack": "mkdir -p node8plus && tsc && tsc --target esnext --lib esnext --outDir build-turbo --declarationDir build-turbo",
     "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
     "watch": "mkdir -p node8plus && tsc --watch"
   },
@@ -48,10 +48,7 @@
     "@types/graphql": "^14.2.0",
     "debug": "^4.1.1"
   },
-  "files": [
-    "node8plus",
-    "index.js"
-  ],
+  "files": ["node8plus", "index.js", "build-turbo"],
   "engines": {
     "node": ">=8.6"
   }

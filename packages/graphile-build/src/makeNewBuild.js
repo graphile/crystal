@@ -175,8 +175,15 @@ const mergeData = (
   if (!results) {
     return;
   }
-  for (const result: MetaData of results) {
-    for (const k of Object.keys(result)) {
+  for (
+    let resultIndex = 0, resultCount = results.length;
+    resultIndex < resultCount;
+    resultIndex++
+  ) {
+    const result: MetaData = results[resultIndex];
+    const keys = Object.keys(result);
+    for (let i = 0, l = keys.length; i < l; i++) {
+      const k = keys[i];
       data[k] = data[k] || [];
       const value: mixed = result[k];
       const newData: ?Array<mixed> = ensureArray(value);
@@ -406,7 +413,12 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             if (argDataGeneratorsForSelfByFieldName) {
               const argDataGenerators =
                 argDataGeneratorsForSelfByFieldName[fieldName];
-              for (const gen of argDataGenerators) {
+              for (
+                let genIndex = 0, genCount = argDataGenerators.length;
+                genIndex < genCount;
+                genIndex++
+              ) {
+                const gen = argDataGenerators[genIndex];
                 const local = ensureArray(gen(args, ReturnType, ...rest));
                 if (local) {
                   results.push(...local);
@@ -419,12 +431,23 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
               !isAbstractType(StrippedType)
             ) {
               const typeFields = StrippedType.getFields();
-              for (const alias of Object.keys(fields)) {
+              const keys = Object.keys(fields);
+              for (
+                let keyIndex = 0, keyCount = keys.length;
+                keyIndex < keyCount;
+                keyIndex++
+              ) {
+                const alias = keys[keyIndex];
                 const field = fields[alias];
                 // Run generators with `field` as the `parsedResolveInfoFragment`, pushing results to `results`
                 const gens = fieldDataGeneratorsByFieldName[field.name];
                 if (gens) {
-                  for (const gen of gens) {
+                  for (
+                    let genIndex = 0, genCount = gens.length;
+                    genIndex < genCount;
+                    genIndex++
+                  ) {
+                    const gen = gens[genIndex];
                     const local = ensureArray(
                       gen(field, typeFields[field.name].type, ...rest)
                     );
@@ -534,7 +557,12 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                     );
 
                     // Args -> argDataGenerators
-                    for (const gen of argDataGenerators) {
+                    for (
+                      let dgIndex = 0, dgCount = argDataGenerators.length;
+                      dgIndex < dgCount;
+                      dgIndex++
+                    ) {
+                      const gen = argDataGenerators[dgIndex];
                       try {
                         mergeData(data, gen, ReturnType, args);
                       } catch (e) {
@@ -563,13 +591,19 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                       !isAbstractType(Type)
                     ) {
                       const typeFields = Type.getFields();
-                      for (const alias of Object.keys(fields)) {
+                      const keys = Object.keys(fields);
+                      for (
+                        let keyIndex = 0, keyCount = keys.length;
+                        keyIndex < keyCount;
+                        keyIndex++
+                      ) {
+                        const alias = keys[keyIndex];
                         const field = fields[alias];
                         const gens = fieldDataGeneratorsByFieldName[field.name];
                         if (gens) {
                           const FieldReturnType = typeFields[field.name].type;
-                          for (const gen of gens) {
-                            mergeData(data, gen, FieldReturnType, field);
+                          for (let i = 0, l = gens.length; i < l; i++) {
+                            mergeData(data, gens[i], FieldReturnType, field);
                           }
                         }
                       }

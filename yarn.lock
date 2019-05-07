@@ -6580,10 +6580,18 @@ pg-pool@^2.0.4:
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-2.0.6.tgz#7b561a482feb0a0e599b58b5137fd2db3ad8111c"
   integrity sha512-hod2zYQxM8Gt482q+qONGTYcg/qVcV32VHVPtktbBJs0us3Dj7xibISw0BAAXVMCzt8A/jhfJvpZaxUlqtqs0g==
 
-pg-sql2@2.2.2, pg-sql2@^2.2.1:
+pg-sql2@^2.2.1:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-2.2.2.tgz#a7e609711489169796a84dafc6e983a09c7221c5"
   integrity sha512-xrrq7M4h9iCNaCIPAHpdZZokiV/dJOU9VgYS63BVHwjEirY4BNBFMkkzlLy2+BUzOWVE5zn3NTZj8EGeEvHNyQ==
+  dependencies:
+    "@types/pg" ">=6 <8"
+    debug ">=3 <5"
+
+pg-sql2@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-2.2.3.tgz#4c26577d16ec338803d7b1efb1e51db0155c5d8b"
+  integrity sha512-1faHscJdFTWbeqHC4dsn4l6L4XqYvzd6teBcQ3pHhcK53Iw3I0VQvW8kM6TVxU0vXtGkA49/n928x7+NQ7sRgw==
   dependencies:
     "@types/pg" ">=6 <8"
     debug ">=3 <5"

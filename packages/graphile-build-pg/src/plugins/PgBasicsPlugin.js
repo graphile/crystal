@@ -31,6 +31,7 @@ import viaTemporaryTable from "./viaTemporaryTable";
 import chalk from "chalk";
 import pickBy from "lodash/pickBy";
 import PgLiveProvider from "../PgLiveProvider";
+import pgPrepareAndRun from "../pgPrepareAndRun";
 
 const defaultPgColumnFilter = (_attr, _build, _context) => true;
 type Keys = Array<{
@@ -352,6 +353,7 @@ export default (function PgBasicsPlugin(
         describePgEntity,
         pgField,
         sqlCommentByAddingTags,
+        pgPrepareAndRun,
       });
     },
     ["PgBasics"]

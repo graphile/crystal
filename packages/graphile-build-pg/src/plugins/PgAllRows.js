@@ -22,6 +22,7 @@ export default (async function PgAllRows(
         pgQueryFromResolveData: queryFromResolveData,
         pgAddStartEndCursor: addStartEndCursor,
         pgOmit: omit,
+        pgPrepareAndRun,
       } = build;
       const {
         fieldWithHooks,
@@ -163,7 +164,11 @@ export default (async function PgAllRows(
                     );
                     const { text, values } = sql.compile(query);
                     if (debugSql.enabled) debugSql(text);
-                    const result = await pgClient.query(text, values);
+                    const result = await pgPrepareAndRun(
+                      pgClient,
+                      text,
+                      values
+                    );
 
                     const liveCollection =
                       resolveInfo.rootValue &&

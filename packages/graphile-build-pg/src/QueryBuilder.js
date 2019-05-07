@@ -100,6 +100,9 @@ class QueryBuilder {
     last: ?number,
     cursorComparator: ?CursorComparator,
   };
+  lockContext: {
+    queryBuilder: QueryBuilder,
+  };
 
   constructor(
     options: QueryBuilderOptions = {},
@@ -181,6 +184,9 @@ class QueryBuilder {
     this.beforeLock("last", () => {
       this.lock("limit");
       this.lock("offset");
+    });
+    this.lockContext = Object.freeze({
+      queryBuilder: this,
     });
   }
 
@@ -702,14 +708,13 @@ class QueryBuilder {
   }
   lock(type: string) {
     if (this.locks[type]) return;
-    const getContext = () => ({
-      queryBuilder: this,
-    });
-    const beforeLocks = this.data.beforeLock[type];
-    if (beforeLocks && beforeLocks.length) {
-      this.data.beforeLock[type] = null;
-      for (const fn of beforeLocks) {
-        fn();
+    const context = this.lockContext;
+    const { beforeLock } = this.data;
+    let locks = beforeLock[type];
+    if (locks) {
+      beforeLock[type] = [];
+      for (let i = 0, l = locks.length; i < l; i++) {
+        locks[i]();
       }
     }
     if (type !== "select") {
@@ -720,7 +725,6 @@ class QueryBuilder {
       this.compiledData[type] = this.data[type];
     } else if (type === "whereBound") {
       // Handle properties separately
-      const context = getContext();
       this.compiledData[type].lower = callIfNecessaryArray(
         this.data[type].lower,
         context
@@ -739,7 +743,6 @@ class QueryBuilder {
       // Assume that duplicate fields must be identical, don't output the same
       // key multiple times
       const seenFields = {};
-      const context = getContext();
       const data = [];
       const selects = this.data[type];
 
@@ -751,11 +754,11 @@ class QueryBuilder {
           // $FlowFixMe
           seenFields[columnName] = true;
           data.push([callIfNecessary(valueOrGenerator, context), columnName]);
-          const newBeforeLocks = this.data.beforeLock[type];
-          if (newBeforeLocks && newBeforeLocks.length) {
-            this.data.beforeLock[type] = null;
-            for (const fn of newBeforeLocks) {
-              fn();
+          locks = beforeLock[type];
+          if (locks) {
+            beforeLock[type] = [];
+            for (let i = 0, l = locks.length; i < l; i++) {
+              locks[i]();
             }
           }
         }
@@ -763,7 +766,6 @@ class QueryBuilder {
       this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
       this.compiledData[type] = data;
     } else if (type === "orderBy") {
-      const context = getContext();
       this.compiledData[type] = this.data[type].map(([a, b, c]) => [
         callIfNecessary(a, context),
         b,
@@ -772,24 +774,19 @@ class QueryBuilder {
     } else if (type === "from") {
       if (this.data.from) {
         const f = this.data.from;
-        const context = getContext();
         this.compiledData.from = [callIfNecessary(f[0], context), f[1]];
       }
     } else if (type === "join" || type === "where") {
-      const context = getContext();
       this.compiledData[type] = callIfNecessaryArray(this.data[type], context);
     } else if (type === "selectCursor") {
-      const context = getContext();
       this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "cursorPrefix") {
       this.compiledData[type] = this.data[type];
     } else if (type === "orderIsUnique") {
       this.compiledData[type] = this.data[type];
     } else if (type === "limit") {
-      const context = getContext();
       this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "offset") {
-      const context = getContext();
       this.compiledData[type] = callIfNecessary(this.data[type], context);
     } else if (type === "first") {
       this.compiledData[type] = this.data[type];

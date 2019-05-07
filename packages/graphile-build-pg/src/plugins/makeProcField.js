@@ -68,6 +68,7 @@ export default function makeProcField(
       subscriptions = false,
       pgForbidSetofFunctionsToReturnNull = false,
     },
+    pgPrepareAndRun,
   } = build;
 
   if (computed && isMutation) {
@@ -718,7 +719,11 @@ export default function makeProcField(
                 );
                 const { text, values } = sql.compile(query);
                 if (debugSql.enabled) debugSql(text);
-                const queryResult = await pgClient.query(text, values);
+                const queryResult = await pgPrepareAndRun(
+                  pgClient,
+                  text,
+                  values
+                );
                 queryResultRows = queryResult.rows;
               }
               const rows = queryResultRows;

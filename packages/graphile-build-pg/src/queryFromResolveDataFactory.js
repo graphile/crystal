@@ -72,8 +72,10 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   if (withBuilder) {
     withBuilder(queryBuilder);
   }
-  for (const fn of pgQuery || []) {
-    fn(queryBuilder, resolveData);
+  if (pgQuery) {
+    for (let i = 0, l = pgQuery.length; i < l; i++) {
+      pgQuery[i](queryBuilder, resolveData);
+    }
   }
 
   function generateNextPrevPageSql(
@@ -433,8 +435,8 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
         queryBuilder.getTableAlias()
       );
 
-      for (const fn of pgAggregateQuery) {
-        fn(aggregateQueryBuilder);
+      for (let i = 0, l = pgAggregateQuery.length; i < l; i++) {
+        pgAggregateQuery[i](aggregateQueryBuilder);
       }
       const aggregateJsonBuildObject = aggregateQueryBuilder.build({
         onlyJsonField: true,
