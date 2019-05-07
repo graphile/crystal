@@ -29,6 +29,8 @@ import bodyParser = require('body-parser');
 import LRU = require('lru-cache');
 import crypto = require('crypto');
 
+const { createHash } = crypto;
+
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
  * client.
@@ -66,11 +68,17 @@ function safeJSONStringify(obj: {}) {
 const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === '1';
 
 // Used by `createPostGraphileHttpRequestHandler`
-const calculateQueryHash = (queryString: string): string =>
-  crypto
-    .createHash('sha1')
-    .update(queryString)
-    .digest('base64');
+let lastString: string;
+let lastHash: string;
+const calculateQueryHash = (queryString: string): string => {
+  if (queryString !== lastString) {
+    lastString = queryString;
+    lastHash = createHash('sha1')
+      .update(queryString)
+      .digest('base64');
+  }
+  return lastHash;
+};
 
 // Fast way of checking if an object is empty,
 // faster than `Object.keys(value).length === 0`.
