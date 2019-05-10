@@ -42,7 +42,7 @@ function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice)
 }
 
 type WithAuthenticatedPgClientFunction = <T>(
-  fn: (pgClient: PoolClient) => Promise<T>,
+  cb: (pgClient: PoolClient) => Promise<T>,
 ) => Promise<T>;
 
 const simpleWithPgClientCache = new WeakMap<Pool, WithAuthenticatedPgClientFunction>();
@@ -51,16 +51,16 @@ function simpleWithPgClient(pgPool: Pool) {
   if (cached) {
     return cached;
   }
-  const fn: WithAuthenticatedPgClientFunction = async fn => {
+  const func: WithAuthenticatedPgClientFunction = async cb => {
     const pgClient = await pgPool.connect();
     try {
-      return await fn(pgClient);
+      return await cb(pgClient);
     } finally {
       pgClient.release();
     }
   };
-  simpleWithPgClientCache.set(pgPool, fn);
-  return fn;
+  simpleWithPgClientCache.set(pgPool, func);
+  return func;
 }
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
@@ -142,7 +142,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
   const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
     ? simpleWithPgClient(pgPool)
-    : async fn => {
+    : async cb => {
         // Connect a new Postgres client
         const pgClient = await pgPool.connect();
 
@@ -156,7 +156,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
           }
 
           // Use the client, wait for it to be finished with, then go to 'finally'
-          return await fn(pgClient);
+          return await cb(pgClient);
         } finally {
           // Cleanup our Postgres client by ending the transaction and releasing
           // the client back to the pool. Always do this even if the query fails.
