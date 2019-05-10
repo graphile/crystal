@@ -889,13 +889,8 @@ export default function createPostGraphileHttpRequestHandler(
       const res = b as ServerResponse;
       const next = c || finalHandler(req, res);
 
-      // Execute our request handler.
-      requestHandler(req, res, next).then(
-        // If the request was fulfilled, noop.
-        noop,
-        // If the request errored out, call `next` with the error.
-        next,
-      );
+      // Execute our request handler. If the request errored out, call `next` with the error.
+      requestHandler(req, res, next).catch(next);
     }
   };
 
