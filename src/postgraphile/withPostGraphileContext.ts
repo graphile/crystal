@@ -1,6 +1,6 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { PoolClient, QueryConfig, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
 import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
@@ -39,6 +39,28 @@ function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice)
     object.where ? ` | WHERE: ${object.where}` : '',
     object.hint ? ` | HINT: ${object.hint}` : '',
   );
+}
+
+type WithAuthenticatedPgClientFunction = <T>(
+  fn: (pgClient: PoolClient) => Promise<T>,
+) => Promise<T>;
+
+const simpleWithPgClientCache = new WeakMap<Pool, WithAuthenticatedPgClientFunction>();
+function simpleWithPgClient(pgPool: Pool) {
+  const cached = simpleWithPgClientCache.get(pgPool);
+  if (cached) {
+    return cached;
+  }
+  const fn: WithAuthenticatedPgClientFunction = async fn => {
+    const pgClient = await pgPool.connect();
+    try {
+      return await fn(pgClient);
+    } finally {
+      pgClient.release();
+    }
+  };
+  simpleWithPgClientCache.set(pgPool, fn);
+  return fn;
 }
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
@@ -118,39 +140,33 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     (operationType !== 'query' && operationType !== 'subscription');
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
-  async function withAuthenticatedPgClient<T>(
-    fn: (pgClient: PoolClient) => Promise<T>,
-  ): Promise<T> {
-    // Connect a new Postgres client
-    const pgClient = await pgPool.connect();
+  const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
+    ? simpleWithPgClient(pgPool)
+    : async fn => {
+        // Connect a new Postgres client
+        const pgClient = await pgPool.connect();
 
-    // Enhance our Postgres client with debugging stuffs.
+        // Begin our transaction
+        await pgClient.query('begin');
 
-    // Begin our transaction, if necessary.
-    if (needTransaction) {
-      await pgClient.query('begin');
-    }
+        try {
+          // If there is at least one local setting, load it into the database.
+          if (sqlSettingsQuery) {
+            await pgClient.query(sqlSettingsQuery);
+          }
 
-    try {
-      // If there is at least one local setting, load it into the database.
-      if (sqlSettingsQuery) {
-        await pgClient.query(sqlSettingsQuery);
-      }
-
-      // Use the client, wait for it to be finished with, then go to 'finally'
-      return await fn(pgClient);
-    } finally {
-      // Cleanup our Postgres client by ending the transaction and releasing
-      // the client back to the pool. Always do this even if the query fails.
-      try {
-        if (needTransaction) {
-          await pgClient.query('commit');
+          // Use the client, wait for it to be finished with, then go to 'finally'
+          return await fn(pgClient);
+        } finally {
+          // Cleanup our Postgres client by ending the transaction and releasing
+          // the client back to the pool. Always do this even if the query fails.
+          try {
+            await pgClient.query('commit');
+          } finally {
+            pgClient.release();
+          }
         }
-      } finally {
-        pgClient.release();
-      }
-    }
-  }
+      };
   if (singleStatement) {
     // TODO:v5: remove this workaround
     /*
