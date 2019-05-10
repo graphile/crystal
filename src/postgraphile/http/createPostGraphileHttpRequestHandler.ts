@@ -29,6 +29,10 @@ import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
 
+const noop = () => {
+  /* noop */
+};
+
 const { createHash } = crypto;
 
 /**
@@ -415,9 +419,7 @@ export default function createPostGraphileHttpRequestHandler(
       .then(schema => {
         theOneAndOnlyGraphQLSchema = schema;
       })
-      .catch(() => {
-        /*noop*/
-      });
+      .catch(noop);
   }
 
   /**
@@ -890,11 +892,9 @@ export default function createPostGraphileHttpRequestHandler(
       // Execute our request handler.
       requestHandler(req, res, next).then(
         // If the request was fulfilled, noop.
-        () => {
-          /* noop */
-        },
+        noop,
         // If the request errored out, call `next` with the error.
-        error => next(error),
+        next,
       );
     }
   };
