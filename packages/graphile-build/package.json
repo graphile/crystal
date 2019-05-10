@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "4.4.1-alpha.1",
+  "version": "4.4.1-alpha.2",
   "description": "Build a GraphQL schema from plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@graphile/lru": "4.4.1-alpha.1",
+    "@graphile/lru": "4.4.1-alpha.2",
     "@types/graphql": "^14.2.0",
     "chalk": "^2.4.2",
     "debug": "^4.1.1",

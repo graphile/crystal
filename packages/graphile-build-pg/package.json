@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "4.4.1-alpha.1",
+  "version": "4.4.1-alpha.2",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -37,15 +37,15 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-build-pg",
   "dependencies": {
-    "@graphile/lru": "4.4.1-alpha.1",
+    "@graphile/lru": "4.4.1-alpha.2",
     "chalk": "^2.4.2",
     "debug": "^4.1.1",
-    "graphile-build": "4.4.1-alpha.1",
+    "graphile-build": "4.4.1-alpha.2",
     "graphql-iso-date": "^3.6.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": ">=4 <5",
     "lru-cache": ">=4 <5",
-    "pg-sql2": "4.4.1-alpha.1",
+    "pg-sql2": "4.4.1-alpha.2",
     "postgres-interval": "^1.2.0"
   },
   "peerDependencies": {
@@ -63,7 +63,11 @@
     },
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
-  "files": ["node8plus", "res", "index.js"],
+  "files": [
+    "node8plus",
+    "res",
+    "index.js"
+  ],
   "engines": {
     "node": ">=8.6"
   }

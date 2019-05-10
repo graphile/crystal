@@ -1,6 +1,6 @@
 {
   "name": "@graphile/lru",
-  "version": "4.4.1-alpha.1",
+  "version": "4.4.1-alpha.2",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -14,14 +14,15 @@
     "type": "git",
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
-  "keywords": ["lru"],
+  "keywords": [
+    "lru"
+  ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/graphile-build/issues"
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/lru",
-  "dependencies": {},
   "engines": {
     "node": ">=8.6"
   },
@@ -40,5 +41,7 @@
     },
     "testRegex": "__tests__/.*\\.test\\.js$"
   },
-  "files": ["node8plus"]
+  "files": [
+    "node8plus"
+  ]
 }
