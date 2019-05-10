@@ -154,10 +154,9 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
      * just invert everything.
      */
 
-    const sqlCommonUnbounded = sql.fragment`
-      select 1
-      from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
-      `;
+    const sqlCommonUnbounded = sql.fragment`\
+select 1
+from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}`;
     /*
      * This variable is a fragment to go into an `EXISTS(...)` call (after some tweaks).
      *
@@ -173,10 +172,9 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
      * upper bound. In hasPreviousPage mode (invert === true), it represents
      * everything from `(before || END)` backwards, with no lower bound.
      */
-    const sqlCommon = sql.fragment`
-      ${sqlCommonUnbounded}
-      where ${queryBuilder.buildWhereClause(!invert, invert, options)}
-    `;
+    const sqlCommon = sql.fragment`\
+${sqlCommonUnbounded}
+where ${queryBuilder.buildWhereClause(!invert, invert, options)}`;
 
     /*
      * Since the offset makes the diagram asymmetric, if offset === 0
@@ -207,11 +205,12 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
          * `first` clause, otherwise there could be a next page before the
          * `before` clause.
          */
-        return sql.fragment`exists(
-          ${sqlCommonUnbounded}
-          where ${queryBuilder.buildWhereClause(false, false, options)}
-          and not (${queryBuilder.buildWhereBoundClause(invert)})
-        )`;
+        return sql.fragment`\
+exists(
+  ${sqlCommonUnbounded}
+  where ${queryBuilder.buildWhereClause(false, false, options)}
+  and not (${queryBuilder.buildWhereBoundClause(invert)})
+)`;
       } else {
         assert(queryHasFirst);
         // queryHasBefore could be true or false.
@@ -234,13 +233,12 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
          */
         // Drop the `first` limit, see if there are any records that aren't
         // already in the list we've fetched.
-        return sql.fragment`exists(
-          ${sqlCommon}
-          and (${queryBuilder.getSelectCursor()})::text not in (select __cursor::text from ${sqlQueryAlias})
-          ${
-            offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`
-          }
-        )`;
+        return sql.fragment`\
+exists(
+  ${sqlCommon}
+  and (${queryBuilder.getSelectCursor()})::text not in (select __cursor::text from ${sqlQueryAlias})
+  ${offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`}
+)`;
       }
     } else {
       assert(!invert || offset === 0); // isForwardOrSymmetric
@@ -266,10 +264,11 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
          *
          * We want to see if there's more than limit+offset records in sqlCommon.
          */
-        return sql.fragment`exists(
-          ${sqlCommon}
-          offset ${sql.literal(limit + offset)}
-        )`;
+        return sql.fragment`\
+exists(
+  ${sqlCommon}
+  offset ${sql.literal(limit + offset)}
+)`;
       }
     }
   }
@@ -329,21 +328,16 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
               : sql.fragment`<`;
 
           const sqlOldFilter = sqlFilter;
-          sqlFilter = sql.fragment`
-          (
-            (
-              ${sqlExpression} ${comparison} ${sqlCursors[i] || sql.null}
-            )
-          OR
-            (
-              (
-                ${sqlExpression} = ${sqlCursors[i] || sql.null}
-              AND
-                ${sqlOldFilter}
-              )
-            )
-          )
-          `;
+          sqlFilter = sql.fragment`\
+(\
+  (${sqlExpression} ${comparison} ${sqlCursors[i] || sql.null})
+OR\
+  (\
+    ${sqlExpression} = ${sqlCursors[i] || sql.null}\
+  AND\
+    ${sqlOldFilter}\
+  )\
+)`;
         }
         queryBuilder.whereBound(sqlFilter, isAfter);
       } else if (
@@ -441,13 +435,12 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
       const aggregateJsonBuildObject = aggregateQueryBuilder.build({
         onlyJsonField: true,
       });
-      const aggregatesSql = sql.fragment`
-      (
-        select ${aggregateJsonBuildObject}
-        from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
-        where ${queryBuilder.buildWhereClause(false, false, options)}
-      )
-      `;
+      const aggregatesSql = sql.fragment`\
+(
+  select ${aggregateJsonBuildObject}
+  from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
+  where ${queryBuilder.buildWhereClause(false, false, options)}
+)`;
       fields.push([aggregatesSql, "aggregates"]);
     }
     if (options.withPaginationAsFields) {

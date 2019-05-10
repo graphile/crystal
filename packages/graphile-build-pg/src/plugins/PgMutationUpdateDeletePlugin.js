@@ -126,23 +126,20 @@ export default (async function PgMutationUpdateDeletePlugin(
                   if (sqlColumns.length === 0) {
                     return null;
                   }
-                  sqlMutationQuery = sql.query`
-                update ${sql.identifier(
-                  table.namespace.name,
-                  table.name
-                )} set ${sql.join(
+                  sqlMutationQuery = sql.query`\
+update ${sql.identifier(table.namespace.name, table.name)} set ${sql.join(
                     sqlColumns.map(
                       (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
                     ),
                     ", "
                   )}
-                where ${condition}
-                returning *`;
+where ${condition}
+returning *`;
                 } else {
-                  sqlMutationQuery = sql.query`
-                delete from ${sql.identifier(table.namespace.name, table.name)}
-                where ${condition}
-                returning *`;
+                  sqlMutationQuery = sql.query`\
+delete from ${sql.identifier(table.namespace.name, table.name)}
+where ${condition}
+returning *`;
                 }
 
                 const modifiedRowAlias = sql.identifier(Symbol());

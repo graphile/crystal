@@ -1,0 +1,64 @@
+{
+  "name": "pg-sql2",
+  "version": "4.4.1-alpha.1",
+  "description": "Generate safe Postgres-compliant SQL with tagged template literals",
+  "main": "node8plus/index.js",
+  "types": "node8plus/index.d.ts",
+  "scripts": {
+    "jest": "jest",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
+    "test": "tsc && node node8plus/index.js && jest && markdown-doctest",
+    "test:u": "tsc && node node8plus/index.js && jest -u && markdown-doctest",
+    "test:docs": "markdown-doctest",
+    "watch": "tsc --watch",
+    "prepack": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "sql",
+    "injection",
+    "pg",
+    "postgres",
+    "postgresql",
+    "tagged",
+    "template",
+    "literal",
+    "es6"
+  ],
+  "author": "Benjie Gillam <benjie@jemjie.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-engine/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/pg-sql2",
+  "devDependencies": {
+    "@types/debug": "4.1.4",
+    "@types/node": "12.0.0",
+    "jest": "24.8.0",
+    "markdown-doctest": "^0.9.1",
+    "prettier": "1.17.0",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.1.0",
+    "tslint": "5.16.0",
+    "tslint-config-prettier": "1.18.0",
+    "typescript": "3.4.5"
+  },
+  "jest": {
+    "testRegex": "__tests__/.*\\.test\\.js$"
+  },
+  "peerDependencies": {
+    "pg": ">=6.1.0 <8"
+  },
+  "dependencies": {
+    "@graphile/lru": "4.4.1-alpha.1",
+    "@types/pg": ">=6 <8",
+    "debug": ">=3 <5"
+  },
+  "files": ["node8plus"],
+  "engines": {
+    "node": ">=8.6"
+  }
+}

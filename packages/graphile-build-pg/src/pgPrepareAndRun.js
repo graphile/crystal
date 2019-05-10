@@ -1,6 +1,6 @@
 //@flow
 import { createHash } from "crypto";
-import LRU from "lru-cache";
+import LRU from "@graphile/lru";
 import type { PoolClient } from "pg";
 
 const POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE =
@@ -35,8 +35,8 @@ export default function pgPrepareAndRun(
   } else {
     const name = hash(text);
     if (!connection._graphilePreparedStatementCache) {
-      connection._graphilePreparedStatementCache = LRU({
-        max: POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE,
+      connection._graphilePreparedStatementCache = new LRU({
+        maxLength: POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE,
         dispose(key) {
           if (connection.parsedStatements[key]) {
             pgClient

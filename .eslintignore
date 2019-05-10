@@ -4,3 +4,4 @@ node8plus
 build-turbo
 examples
 dist
+packages/pg-sql2/lib

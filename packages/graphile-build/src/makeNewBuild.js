@@ -15,7 +15,7 @@ import {
 import debugFactory from "debug";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
-import LRUCache from "lru-cache";
+import LRU from "@graphile/lru";
 import semver from "semver";
 import { upperCamelCase, camelCase, constantCase } from "./utils";
 import swallowError from "./swallowError";
@@ -49,7 +49,7 @@ const debug = debugFactory("graphile-build");
  * produce half a million hashes per second on my machine, the LRU only gives
  * us a 10x speedup!
  */
-const hashCache = new LRUCache(100000);
+const hashCache = new LRU({ maxLength: 100000 });
 
 /*
  * This function must never return a string longer than 56 characters.
@@ -483,12 +483,14 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         );
 
         const rawSpec = newSpec;
-        newSpec = Object.assign({}, newSpec, {
+        newSpec = {
+          ...newSpec,
           interfaces: () => {
-            const interfacesContext = Object.assign({}, commonContext, {
+            const interfacesContext = {
+              ...commonContext,
               Self,
               GraphQLObjectType: rawSpec,
-            });
+            };
             let rawInterfaces = rawSpec.interfaces || [];
             if (typeof rawInterfaces === "function") {
               rawInterfaces = rawInterfaces(interfacesContext);
@@ -503,7 +505,8 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           },
           fields: () => {
             const processedFields = [];
-            const fieldsContext = Object.assign({}, commonContext, {
+            const fieldsContext = {
+              ...commonContext,
               addDataGeneratorForField,
               recurseDataGeneratorsForField,
               Self,
@@ -532,7 +535,8 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                 ] = argDataGenerators;
 
                 let newSpec = spec;
-                let context = Object.assign({}, commonContext, {
+                let context = {
+                  ...commonContext,
                   Self,
                   addDataGenerator(fn) {
                     return addDataGeneratorForField(fieldName, fn);
@@ -623,7 +627,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                       rawSpec.name
                     }'`
                   ),
-                });
+                };
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
                 }
@@ -651,7 +655,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                 processedFields.push(finalSpec);
                 return finalSpec;
               }: FieldWithHooksFunction),
-            });
+            };
             let rawFields = rawSpec.fields || {};
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
@@ -685,7 +689,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             }
             return fieldsSpec;
           },
-        });
+        };
       } else if (Type === GraphQLInputObjectType) {
         const commonContext = {
           type: "GraphQLInputObjectType",
@@ -701,7 +705,8 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         newSpec.fields = newSpec.fields || {};
 
         const rawSpec = newSpec;
-        newSpec = Object.assign({}, newSpec, {
+        newSpec = {
+          ...newSpec,
           fields: () => {
             const processedFields = [];
             const fieldsContext = Object.assign({}, commonContext, {
@@ -713,7 +718,8 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
-                let context = Object.assign({}, commonContext, {
+                let context = {
+                  ...commonContext,
                   Self,
                   scope: extend(
                     extend(
@@ -730,7 +736,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                       rawSpec.name
                     }'`
                   ),
-                });
+                };
                 let newSpec = spec;
                 if (typeof newSpec === "function") {
                   newSpec = newSpec(context);
@@ -780,7 +786,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             }
             return fieldsSpec;
           },
-        });
+        };
       } else if (Type === GraphQLEnumType) {
         const commonContext = {
           type: "GraphQLEnumType",

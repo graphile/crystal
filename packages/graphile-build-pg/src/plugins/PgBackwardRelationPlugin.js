@@ -150,6 +150,7 @@ export default (function PgBackwardRelationPlugin(
                     getDataFromParsedResolveInfoFragment,
                     addDataGenerator,
                   }) => {
+                    const sqlFrom = sql.identifier(schema.name, table.name);
                     addDataGenerator(parsedResolveInfoFragment => {
                       return {
                         pgQuery: queryBuilder => {
@@ -161,7 +162,7 @@ export default (function PgBackwardRelationPlugin(
                             const tableAlias = sql.identifier(Symbol());
                             const foreignTableAlias = queryBuilder.getTableAlias();
                             const query = queryFromResolveData(
-                              sql.identifier(schema.name, table.name),
+                              sqlFrom,
                               tableAlias,
                               resolveData,
                               {
@@ -262,6 +263,13 @@ export default (function PgBackwardRelationPlugin(
                       getDataFromParsedResolveInfoFragment,
                       addDataGenerator,
                     }) => {
+                      const sqlFrom = sql.identifier(schema.name, table.name);
+                      const queryOptions = {
+                        useAsterisk: table.canUseAsterisk,
+                        withPagination: isConnection,
+                        withPaginationAsFields: false,
+                        asJsonAggregate: !isConnection,
+                      };
                       addDataGenerator(parsedResolveInfoFragment => {
                         return {
                           pgQuery: queryBuilder => {
@@ -273,15 +281,10 @@ export default (function PgBackwardRelationPlugin(
                               const tableAlias = sql.identifier(Symbol());
                               const foreignTableAlias = queryBuilder.getTableAlias();
                               const query = queryFromResolveData(
-                                sql.identifier(schema.name, table.name),
+                                sqlFrom,
                                 tableAlias,
                                 resolveData,
-                                {
-                                  useAsterisk: table.canUseAsterisk,
-                                  withPagination: isConnection,
-                                  withPaginationAsFields: false,
-                                  asJsonAggregate: !isConnection,
-                                },
+                                queryOptions,
                                 innerQueryBuilder => {
                                   innerQueryBuilder.parentQueryBuilder = queryBuilder;
                                   if (subscriptions) {

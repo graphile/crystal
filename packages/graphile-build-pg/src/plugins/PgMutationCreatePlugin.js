@@ -219,15 +219,13 @@ export default (function PgMutationCreatePlugin(
                         }
                       });
 
-                      const mutationQuery = sql.query`
-                    insert into ${sql.identifier(
-                      table.namespace.name,
-                      table.name
-                    )} ${
+                      const mutationQuery = sql.query`\
+insert into ${sql.identifier(table.namespace.name, table.name)} ${
                         sqlColumns.length
-                          ? sql.fragment`(
-                        ${sql.join(sqlColumns, ", ")}
-                      ) values(${sql.join(sqlValues, ", ")})`
+                          ? sql.fragment`(${sql.join(
+                              sqlColumns,
+                              ", "
+                            )}) values(${sql.join(sqlValues, ", ")})`
                           : sql.fragment`default values`
                       } returning *`;
 

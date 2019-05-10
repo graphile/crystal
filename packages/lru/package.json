@@ -1,0 +1,44 @@
+{
+  "name": "@graphile/lru",
+  "version": "4.4.1-alpha.1",
+  "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
+  "main": "node8plus/index.js",
+  "types": "node8plus/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "prepack": "mkdir -p node8plus && tsc",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config ../../tslint.json --project tsconfig.json",
+    "watch": "mkdir -p node8plus && tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": ["lru"],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/lru",
+  "dependencies": {},
+  "engines": {
+    "node": ">=8.6"
+  },
+  "devDependencies": {
+    "eslint_d": "^7.3.0",
+    "jest": "^24.8.0",
+    "prettier": "^1.17.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.5"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "../../.jest-wrapper.js"
+    },
+    "testRegex": "__tests__/.*\\.test\\.js$"
+  },
+  "files": ["node8plus"]
+}

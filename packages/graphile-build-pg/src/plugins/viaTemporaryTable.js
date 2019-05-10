@@ -62,10 +62,7 @@ export default async function viaTemporaryTable(
     // It returns void, just perform the query!
     const { rows } = await performQuery(
       pgClient,
-      sql.query`
-      with ${sqlResultSourceAlias} as (
-        ${sqlMutationQuery}
-      ) ${sqlResultQuery}`
+      sql.query`with ${sqlResultSourceAlias} as (${sqlMutationQuery}) ${sqlResultQuery}`
     );
     return rows;
   } else {
@@ -105,11 +102,7 @@ export default async function viaTemporaryTable(
       : sql.query`(${sqlResultSourceAlias}.${sqlResultSourceAlias})::${sqlTypeIdentifier}`;
     const result = await performQuery(
       pgClient,
-      sql.query`
-      with ${sqlResultSourceAlias} as (
-        ${sqlMutationQuery}
-      )
-      select (${selectionField})::text from ${sqlResultSourceAlias}`
+      sql.query`with ${sqlResultSourceAlias} as (${sqlMutationQuery}) select (${selectionField})::text from ${sqlResultSourceAlias}`
     );
     const { rows } = result;
     const firstNonNullRow = rows.find(row => row !== null);
@@ -122,45 +115,39 @@ export default async function viaTemporaryTable(
     const sqlValuesAlias = sql.identifier(Symbol());
     const convertFieldBack = isPgClassLike
       ? sql.query`\
-              select (str::${sqlTypeIdentifier}).*
-              from unnest((${sql.value(values)})::text[]) str`
+select (str::${sqlTypeIdentifier}).*
+from unnest((${sql.value(values)})::text[]) str`
       : isPgRecord
       ? sql.query`\
-          select ${sql.join(
-            outputArgNames.map(
-              (outputArgName, idx) =>
-                sql.query`\
-                    (${sqlValuesAlias}.output_value_list)[${sql.literal(
-                  idx + 1
-                )}]::${sql.identifier(
-                  outputArgTypes[idx].namespaceName,
-                  outputArgTypes[idx].name
-                )} as ${sql.identifier(
-                  // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
-                  // "If you omit the name for an output argument, the system will choose a default column name."
-                  // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.
-                  outputArgName !== "" ? outputArgName : `column${idx + 1}`
-                )}`
-            ),
-            ", "
-          )}
-          from (values ${sql.join(
-            values.map(value => sql.query`(${sql.value(value)}::text[])`),
-            ", "
-          )}) as ${sqlValuesAlias}(output_value_list)`
+select ${sql.join(
+          outputArgNames.map(
+            (outputArgName, idx) =>
+              sql.query`(${sqlValuesAlias}.output_value_list)[${sql.literal(
+                idx + 1
+              )}]::${sql.identifier(
+                outputArgTypes[idx].namespaceName,
+                outputArgTypes[idx].name
+              )} as ${sql.identifier(
+                // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
+                // "If you omit the name for an output argument, the system will choose a default column name."
+                // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.
+                outputArgName !== "" ? outputArgName : `column${idx + 1}`
+              )}`
+          ),
+          ", "
+        )}
+from (values ${sql.join(
+          values.map(value => sql.query`(${sql.value(value)}::text[])`),
+          ", "
+        )}) as ${sqlValuesAlias}(output_value_list)`
       : sql.query`\
-        select str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}
-        from unnest((${sql.value(values)})::text[]) str`;
+select str::${sqlTypeIdentifier} as ${sqlResultSourceAlias}
+from unnest((${sql.value(values)})::text[]) str`;
     const { rows: filteredValuesResults } =
       values.length > 0
         ? await performQuery(
             pgClient,
-            sql.query`\
-              with ${sqlResultSourceAlias} as (
-                ${convertFieldBack}
-              )
-              ${sqlResultQuery}
-              `
+            sql.query`with ${sqlResultSourceAlias} as (${convertFieldBack}) ${sqlResultQuery}`
           )
         : { rows: [] };
     const finalRows = rawValues.map(rawValue =>

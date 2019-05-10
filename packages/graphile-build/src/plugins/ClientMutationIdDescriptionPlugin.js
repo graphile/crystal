@@ -70,7 +70,8 @@ export default (function ClientMutationIdDescriptionPlugin(
       if (!isRootMutation || !args.input || args.input.description) {
         return args;
       }
-      return Object.assign({}, args, {
+      return {
+        ...args,
         input: extend(
           args.input,
           {
@@ -81,7 +82,7 @@ export default (function ClientMutationIdDescriptionPlugin(
             field.name
           }' field in '${Self.name}'`
         ),
-      });
+      };
     },
     ["ClientMutationIdDescription"]
   );

@@ -4,7 +4,7 @@ import type { Plugin } from "graphile-build";
 import makeGraphQLJSONType from "../GraphQLJSON";
 
 import rawParseInterval from "postgres-interval";
-import LRU from "lru-cache";
+import LRU from "@graphile/lru";
 
 function indent(str) {
   return "  " + str.replace(/\n/g, "\n  ");
@@ -14,7 +14,7 @@ function identity(value) {
   return value;
 }
 
-const parseCache = LRU(500);
+const parseCache = new LRU({ maxLength: 500 });
 function parseInterval(str) {
   let result = parseCache.get(str);
   if (!result) {
@@ -91,31 +91,32 @@ export default (function PgTypesPlugin(
         {},
         build.pgGqlInputTypeByTypeIdAndModifier
       );
+      const isNull = val => val == null || val.__isNull;
       const pg2GqlMapper = {};
-      const pg2gql = (val, type) => {
-        if (val == null) {
-          return val;
-        }
-        if (val.__isNull) {
-          return null;
-        }
+      const pg2gqlForType = type => {
         if (pg2GqlMapper[type.id]) {
-          return pg2GqlMapper[type.id].map(val);
+          const map = pg2GqlMapper[type.id].map;
+          return val => (isNull(val) ? null : map(val));
         } else if (type.domainBaseType) {
-          return pg2gql(val, type.domainBaseType);
+          return pg2gqlForType(type.domainBaseType);
         } else if (type.isPgArray) {
-          if (!Array.isArray(val)) {
-            throw new Error(
-              `Expected array when converting PostgreSQL data into GraphQL; failing type: '${
-                type.namespaceName
-              }.${type.name}'`
-            );
-          }
-          return val.map(v => pg2gql(v, type.arrayItemType));
+          const elementHandler = pg2gqlForType(type.arrayItemType);
+          return val => {
+            if (isNull(val)) return null;
+            if (!Array.isArray(val)) {
+              throw new Error(
+                `Expected array when converting PostgreSQL data into GraphQL; failing type: '${
+                  type.namespaceName
+                }.${type.name}'`
+              );
+            }
+            return val.map(elementHandler);
+          };
         } else {
-          return val;
+          return identity;
         }
       };
+      const pg2gql = (val, type) => pg2gqlForType(type)(val);
       const gql2pg = (val, type, modifier) => {
         if (modifier === undefined) {
           let stack;
@@ -697,27 +698,30 @@ export default (function PgTypesPlugin(
           }
           pgTweaksByTypeIdAndModifer[type.id][
             typeModifierKey
-          ] = fragment => sql.fragment`case
-          when (${fragment}) is null then null else json_build_object(
-            'start', case
-              when lower(${fragment}) is null then null
-              else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
-                sql.fragment`lower(${fragment})`,
-                subtype,
-                typeModifier,
-                {}
-              )}, 'inclusive', lower_inc(${fragment}))
-            end,
-            'end', case
-              when upper(${fragment}) is null then null
-              else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
-                sql.fragment`upper(${fragment})`,
-                subtype,
-                typeModifier,
-                {}
-              )}, 'inclusive', upper_inc(${fragment}))
-            end
-        ) end`;
+          ] = fragment => sql.fragment`\
+case
+when (${fragment}) is null then null
+else json_build_object(
+  'start',
+  case when lower(${fragment}) is null then null
+  else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
+    sql.fragment`lower(${fragment})`,
+    subtype,
+    typeModifier,
+    {}
+  )}, 'inclusive', lower_inc(${fragment}))
+  end,
+  'end',
+  case when upper(${fragment}) is null then null
+  else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
+    sql.fragment`upper(${fragment})`,
+    subtype,
+    typeModifier,
+    {}
+  )}, 'inclusive', upper_inc(${fragment}))
+  end
+)
+end`;
           pg2GqlMapper[type.id] = {
             map: identity,
             unmap: ({ start, end }) => {
@@ -1030,6 +1034,7 @@ export default (function PgTypesPlugin(
         pgGetGqlInputTypeByTypeIdAndModifier: getGqlInputTypeByTypeIdAndModifier,
         pg2GqlMapper,
         pg2gql,
+        pg2gqlForType,
         gql2pg,
         pgTweakFragmentForTypeAndModifier,
         pgTweaksByTypeId,
