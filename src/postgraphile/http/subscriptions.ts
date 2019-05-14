@@ -62,6 +62,7 @@ export async function enhanceHttpServerWithSubscriptions(
     handleErrors,
   } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
+  const externalUrlBase = options.externalUrlBase || '';
   const graphqlRoute = options.graphqlRoute || '/graphql';
 
   const schema = await getGraphQLSchema();
@@ -152,9 +153,8 @@ export async function enhanceHttpServerWithSubscriptions(
   let socketId = 0;
 
   websocketServer.on('upgrade', (req, socket, head) => {
-    // TODO: this will not support mounting postgraphile at a subpath right now...
     const { pathname = '' } = parseUrl(req) || {};
-    const isGraphqlRoute = pathname === graphqlRoute;
+    const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
       wss.handleUpgrade(req, socket, head, ws => {
         wss.emit('connection', ws, req);
