@@ -37,5 +37,5 @@ sponsor](https://graphile.org/sponsor/).
 - Frank
 - Mark Rapoza
 - innovation.rocks
-- Carlos Rodrigues
+- cybere
 - Daniel Woelfel
