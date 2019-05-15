@@ -12,11 +12,9 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - DOMONDA
-- Alec Wenzowski
 - James Allain
+- Alec Wenzowski
 - Stagency
-- Gustin Prudner
-- Daniel Einspanjer
 - 8th Light
 - NodeSource
 - Nigel Taylor
@@ -26,7 +24,6 @@ sponsor](https://graphile.org/sponsor/).
 - Michael Tng
 - Matt Bretl (also a major community contributor!)
 - Sam Levin
-- BMD Studio
 - stlbucket
 - Michel Pelletier
 - Dan Lynch
@@ -40,3 +37,5 @@ sponsor](https://graphile.org/sponsor/).
 - Frank
 - Mark Rapoza
 - innovation.rocks
+- Carlos Rodrigues
+- Daniel Woelfel
