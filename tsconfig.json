@@ -24,6 +24,7 @@
     "index.js",
     "node_modules",
     "build",
+    "build-turbo",
     "examples",
     "utils",
     "resources",

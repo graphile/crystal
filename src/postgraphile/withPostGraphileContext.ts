@@ -1,6 +1,6 @@
 import createDebugger = require('debug');
 import jwt = require('jsonwebtoken');
-import { PoolClient, QueryConfig, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
 import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
@@ -39,6 +39,28 @@ function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice)
     object.where ? ` | WHERE: ${object.where}` : '',
     object.hint ? ` | HINT: ${object.hint}` : '',
   );
+}
+
+type WithAuthenticatedPgClientFunction = <T>(
+  cb: (pgClient: PoolClient) => Promise<T>,
+) => Promise<T>;
+
+const simpleWithPgClientCache = new WeakMap<Pool, WithAuthenticatedPgClientFunction>();
+function simpleWithPgClient(pgPool: Pool) {
+  const cached = simpleWithPgClientCache.get(pgPool);
+  if (cached) {
+    return cached;
+  }
+  const func: WithAuthenticatedPgClientFunction = async cb => {
+    const pgClient = await pgPool.connect();
+    try {
+      return await cb(pgClient);
+    } finally {
+      pgClient.release();
+    }
+  };
+  simpleWithPgClientCache.set(pgPool, func);
+  return func;
 }
 
 const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
@@ -80,7 +102,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null;
 
-  const { role: pgRole, localSettings, jwtClaims } = await getSettingsForPgClientTransaction({
+  const { role: pgRole, localSettings, jwtClaims } = getSettingsForPgClientTransaction({
     jwtToken,
     jwtSecret,
     jwtAudiences,
@@ -118,45 +140,33 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     (operationType !== 'query' && operationType !== 'subscription');
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
-  async function withAuthenticatedPgClient<T>(
-    fn: (pgClient: PoolClient) => Promise<T>,
-  ): Promise<T> {
-    // Connect a new Postgres client
-    const pgClient = await pgPool.connect();
+  const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
+    ? simpleWithPgClient(pgPool)
+    : async cb => {
+        // Connect a new Postgres client
+        const pgClient = await pgPool.connect();
 
-    // Enhance our Postgres client with debugging stuffs.
-    if (
-      (debugPg.enabled || debugPgError.enabled || debugPgNotice.enabled) &&
-      !pgClient[$$pgClientOrigQuery]
-    ) {
-      debugPgClient(pgClient);
-    }
+        // Begin our transaction
+        await pgClient.query('begin');
 
-    // Begin our transaction, if necessary.
-    if (needTransaction) {
-      await pgClient.query('begin');
-    }
+        try {
+          // If there is at least one local setting, load it into the database.
+          if (sqlSettingsQuery) {
+            await pgClient.query(sqlSettingsQuery);
+          }
 
-    try {
-      // If there is at least one local setting, load it into the database.
-      if (sqlSettingsQuery) {
-        await pgClient.query(sqlSettingsQuery);
-      }
-
-      // Use the client, wait for it to be finished with, then go to 'finally'
-      return await fn(pgClient);
-    } finally {
-      // Cleanup our Postgres client by ending the transaction and releasing
-      // the client back to the pool. Always do this even if the query fails.
-      try {
-        if (needTransaction) {
-          await pgClient.query('commit');
+          // Use the client, wait for it to be finished with, then go to 'finally'
+          return await cb(pgClient);
+        } finally {
+          // Cleanup our Postgres client by ending the transaction and releasing
+          // the client back to the pool. Always do this even if the query fails.
+          try {
+            await pgClient.query('commit');
+          } finally {
+            pgClient.release();
+          }
         }
-      } finally {
-        pgClient.release();
-      }
-    }
-  }
+      };
   if (singleStatement) {
     // TODO:v5: remove this workaround
     /*
@@ -254,7 +264,7 @@ export default withPostGraphileContext;
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-async function getSettingsForPgClientTransaction({
+function getSettingsForPgClientTransaction({
   jwtToken,
   jwtSecret,
   jwtAudiences,
@@ -270,11 +280,11 @@ async function getSettingsForPgClientTransaction({
   jwtVerifyOptions?: jwt.VerifyOptions;
   pgDefaultRole?: string;
   pgSettings?: { [key: string]: mixed };
-}): Promise<{
+}): {
   role: string | undefined;
   localSettings: Array<[string, string]>;
   jwtClaims: { [claimName: string]: mixed } | null;
-}> {
+} {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
   let jwtClaims: { [claimName: string]: mixed } = {};
@@ -395,7 +405,7 @@ const $$pgClientOrigQuery = Symbol();
  * @private
  */
 // tslint:disable no-any
-function debugPgClient(pgClient: PoolClient): PoolClient {
+export function debugPgClient(pgClient: PoolClient): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {

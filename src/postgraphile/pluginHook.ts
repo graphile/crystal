@@ -61,7 +61,7 @@ export interface PostGraphilePlugin {
 type HookName = keyof PostGraphilePlugin;
 
 const identityHook = <T>(input: T): T => input;
-const identityPluginHook = <T>(_hookName: HookName, input: T): T => input;
+const identityPluginHook: PluginHookFn = (_hookName, input, _options) => input;
 
 function contextIsSame(context1: {}, context2: {}): boolean {
   // Shortcut if obvious
@@ -125,7 +125,9 @@ function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): Ho
       return previousHook;
     }
   }, identityHook);
-  if (shouldMemoizeHook(hookName)) {
+  if (combinedHook === identityHook) {
+    return identityHook;
+  } else if (shouldMemoizeHook(hookName)) {
     return memoizeHook<T>(combinedHook);
   } else {
     return combinedHook;

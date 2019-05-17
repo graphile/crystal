@@ -8,6 +8,7 @@ import exportPostGraphileSchema from './schema/exportPostGraphileSchema';
 import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 import chalk from 'chalk';
+import { debugPgClient } from './withPostGraphileContext';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -80,7 +81,7 @@ export function getPostgraphileSchemaBuilder<
 
   return {
     _emitter,
-    getGraphQLSchema: () => Promise.resolve(gqlSchema || gqlSchemaPromise),
+    getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
     options,
   };
 
@@ -218,6 +219,11 @@ export default function postgraphile<
      */
     // tslint:disable-next-line no-console
     console.error('PostgreSQL client generated error: ', err.message);
+  });
+
+  pgPool.on('connect', pgClient => {
+    // Enhance our Postgres client with debugging stuffs.
+    debugPgClient(pgClient);
   });
 
   const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
