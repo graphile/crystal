@@ -163,9 +163,11 @@ class PostGraphiQL extends React.PureComponent {
      * a message event listener to allow windows with that origin to update our Authorization header.
      */
     if (POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin) {
-      console.log('Setting up listener for messages from ', POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin);
+      // We want to support a space separated list of origins but avoid a false positive if someone is tricky.
+      const paddedOriginsList = ` ${POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin} `;
+      console.log('Setting up listener for messages from', paddedOriginsList);
       window.addEventListener("message", (event) => {
-          if (event.origin !== POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin) {
+          if (!paddedOriginsList.includes(event.origin)) {
             console.error('window.postMessage received from an unauthorized origin: ', event.origin);
             return;
           }
@@ -174,7 +176,7 @@ class PostGraphiQL extends React.PureComponent {
             const val = JSON.stringify({ Authorization: event.data.Authorization });
             // destructuring to be paranoid and grab only the Authorization header value
             this.updateHeadersState(val);
-            console.log('Authorization header updated by ', POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin);
+            console.log('Authorization header updated by ', event.origin);
           }
         }, false);
     } else {
