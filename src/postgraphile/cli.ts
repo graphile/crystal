@@ -249,6 +249,10 @@ program
     '[DEVELOPMENT] opt in to additional GraphiQL functionality (this may change over time - only intended for use in development; automatically enables with `subscriptions` and `live`)',
   )
   .option(
+    '--graphiql-authorization-event-origin <string>',
+    'specifies the URI of a window that is allowed to use window.postMessage to update the Authorization header value GraphiQL uses to make GraphQL requests.',
+  )
+  .option(
     '-b, --disable-graphiql',
     'disables the GraphiQL interface. overrides the GraphiQL route option',
   )
@@ -413,6 +417,7 @@ const {
   graphql: graphqlRoute = '/graphql',
   graphiql: graphiqlRoute = '/graphiql',
   enhanceGraphiql = false,
+  graphiqlAuthorizationEventOrigin = null,
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   jwtSecret,
@@ -590,6 +595,7 @@ const postgraphileOptions = pluginHook(
     graphiqlRoute,
     graphiql: !disableGraphiql,
     enhanceGraphiql: enhanceGraphiql ? true : undefined,
+    graphiqlAuthorizationEventOrigin,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
     jwtAudiences,

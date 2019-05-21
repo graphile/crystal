@@ -166,6 +166,7 @@ export default function createPostGraphileHttpRequestHandler(
   const live = !!options.live;
   const enhanceGraphiql =
     options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
+  const graphiqlAuthorizationEventOrigin = options.graphiqlAuthorizationEventOrigin;
   const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
   const graphiql = options.graphiql === true;
   if (options['absoluteRoutes']) {
@@ -389,6 +390,7 @@ export default function createPostGraphileHttpRequestHandler(
             graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
             streamUrl: watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
             enhanceGraphiql,
+            graphiqlAuthorizationEventOrigin,
             subscriptions,
           })};</script>\n  </head>`,
         )
@@ -535,8 +537,15 @@ export default function createPostGraphileHttpRequestHandler(
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+
+        if (graphiqlAuthorizationEventOrigin) {
+          res.setHeader('X-Frame-Options', `allow-from ${graphiqlAuthorizationEventOrigin}`);
+          res.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${graphiqlAuthorizationEventOrigin}`);
+        } else {
+          console.log('did not set up ', options);
+          res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+          res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+        }
 
         // End early if the method is `HEAD`.
         if (req.method === 'HEAD') {

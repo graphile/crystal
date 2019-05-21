@@ -184,6 +184,10 @@ export interface PostGraphileOptions<
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
+  // Set this to a URI to allow windows from that origin to call window.postMessage on the graphiql window
+  // with data object containing an Authorization header value.  Defaults to `null` which disables this functionality.
+  /* @middlewareOnly */
+  graphiqlAuthorizationEventOrigin?: string;
   // Set this to `true` to add some enhancements to GraphiQL; intended for development usage only (automatically enables with `subscriptions` and `live`).
   /* @middlewareOnly */
   enhanceGraphiql?: boolean;

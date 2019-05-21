@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- As a very rough example, this page can be hosted with http-server.
+	Longer term, better to have it be a page that could be served by the postgraphile cli or something maybe?
+	
+	1. npm install http-server -g
+	2. cd .../public/example_authorization_wrapper
+	3. http-server
+	4. postgraphile -c ... --jwt-secret magic --graphiql-authorization-event-origin http://localhost:8080
+	5. Visit http://localhost:8080/
+	6. Open Developer Tools console
+	7. Should see message: "Setting up listener for messages from  http://localhost:8080"
+	8. Make a JWT token using the secret above (i.e. jwt.io)
+	9. Paste it into the input field at the top of the page
+	10. Should see the messages: "Sending changed authorization value to graphiql iframe" and "Authorization header updated by  http://localhost:8080"
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>PostGraphile GraphiQL with Authorization Passthrough</title>
+    <meta name="robots" content="noindex"/>
+    <style>
+      body, html {width: 100%; height: 100%; margin: 0; padding: 0}
+      .row-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+      .first-row {}
+      .second-row { flex-grow: 1; border: none; margin: 0; padding: 0; }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector("#authorization").addEventListener("change",function (evt) {
+          console.log('Sending changed authorization value to graphiql iframe');
+          document.querySelector("#graphiql").contentWindow.postMessage(
+            // The data to pass
+            { Authorization: evt.target.value },
+            // The expected origin of the target
+            "http://localhost:5000/"
+          );
+        });
+      }, false);
+    </script>
+  </head>
+  <body>
+    <div class="row-container">
+      <div class="first-row">
+        <p>This example shows how to embed the GraphiQL app inside another site and use window.postMessage to update the Authorization header used for queries.</p>
+
+        <label for="authorization">Enter an Authorization header value (i.e. a Bearer JWT token):</label>
+
+        <input type="text" id="authorization" name="authorization" required size="50" placeholder="Bearer ..."/>
+      </div>
+      <iframe id="graphiql"
+              title="Embedded GraphiQL" 
+              class="second-row"
+              src="http://localhost:5000/graphiql"/>
+    </div>
+  </body>
+</html>

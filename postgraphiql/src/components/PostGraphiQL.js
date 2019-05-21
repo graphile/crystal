@@ -19,6 +19,7 @@ const {
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
     subscriptions: true,
+    graphiqlAuthorizationEventOrigin: null
   },
 } = window;
 
@@ -94,13 +95,18 @@ class PostGraphiQL extends React.PureComponent {
     // stuffs.
     schema: null,
     showHeaderEditor: false,
+
+    // deinspanjer: I think we'd like to have a way to wait for an initial value
+    // if we are using graphiqlAuthorizationEventOrigin but I'm not sure how to do that.
     headersText: '{\n"Authorization": null\n}\n',
     headersTextValid: true,
+
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
     socketStatus:
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
   };
+
 
   subscriptionsClient =
     POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
@@ -150,6 +156,30 @@ class PostGraphiQL extends React.PureComponent {
         unlisten5();
         unlisten6();
       };
+    }
+
+    /**
+     * If we were configured with a graphiqlAuthorizationEventOrigin then we will set up
+     * a message event listener to allow windows with that origin to update our Authorization header.
+     */
+    if (POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin) {
+      console.log('Setting up listener for messages from ', POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin);
+      window.addEventListener("message", (event) => {
+          if (event.origin !== POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin) {
+            console.error('window.postMessage received from an unauthorized origin: ', event.origin);
+            return;
+          }
+
+          if (event.data && event.data.Authorization) {
+            const val = JSON.stringify({ Authorization: event.data.Authorization });
+            // destructuring to be paranoid and grab only the Authorization header value
+            this.updateHeadersState(val);
+            console.log('Authorization header updated by ', POSTGRAPHILE_CONFIG.graphiqlAuthorizationEventOrigin);
+          }
+        }, false);
+    } else {
+      // This message should be skipped after debugging of the feature.
+      console.log('graphiqlAuthorizationEventOrigin not set, skipping listener... ', POSTGRAPHILE_CONFIG);
     }
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
@@ -208,6 +238,21 @@ class PostGraphiQL extends React.PureComponent {
       });
     }
   };
+
+  updateHeadersState(newHeaderText) {
+     this.setState(
+       {
+         headersText: newHeaderText,
+         headersTextValid: isValidJSON(newHeaderText),
+       },
+       () => {
+         if (this.state.headersTextValid && this.subscriptionsClient) {
+           // Reconnect to websocket with new headers
+           this.subscriptionsClient.close(false, true);
+         }
+       }
+     )
+  }
 
   /**
    * Get the user editable headers as an object
@@ -618,20 +663,7 @@ class PostGraphiQL extends React.PureComponent {
             open={this.state.showHeaderEditor}
             value={this.state.headersText}
             valid={this.state.headersTextValid}
-            onChange={e =>
-              this.setState(
-                {
-                  headersText: e.target.value,
-                  headersTextValid: isValidJSON(e.target.value),
-                },
-                () => {
-                  if (this.state.headersTextValid && this.subscriptionsClient) {
-                    // Reconnect to websocket with new headers
-                    this.subscriptionsClient.close(false, true);
-                  }
-                },
-              )
-            }
+            onChange={e => this.updateHeadersState(e.target.value)}
           >
             <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
               {'\u2715'}
