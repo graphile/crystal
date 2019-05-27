@@ -330,6 +330,7 @@ export interface WithPostGraphileContextOptions {
   pgPool: Pool;
   jwtToken?: string;
   jwtSecret?: string;
+  jwtPublicKey?: string;
   jwtAudiences?: Array<string>;
   jwtRole?: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;

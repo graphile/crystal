@@ -279,7 +279,11 @@ program
 
   .option(
     '-e, --jwt-secret <string>',
-    'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled',
+    'the secret or private key to be used when creating and verifying JWTs. if none is provided auth will be disabled. in case of private key, the value should be in the PEM format. if PostGraphile will be used to verify tokens, public key should be set to the --jwt-public-key parameter',
+  )
+  .option(
+    '--jwt-public-key <string>',
+    'the PEM-encoded public key to be used when verifying JWTs. if set, private key should be set to the --jwt-secret option',
   )
   .option(
     '--jwt-verify-algorithms <string>',
@@ -417,6 +421,7 @@ const {
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   jwtSecret,
+  jwtPublicKey,
   jwtAudiences,
   jwtVerifyAlgorithms,
   jwtVerifyAudience,
@@ -593,6 +598,7 @@ const postgraphileOptions = pluginHook(
     enhanceGraphiql: enhanceGraphiql ? true : undefined,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
+    jwtPublicKey,
     jwtAudiences,
     jwtRole,
     jwtVerifyOptions,

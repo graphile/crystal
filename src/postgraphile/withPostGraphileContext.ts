@@ -71,6 +71,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     pgPool,
     jwtToken,
     jwtSecret,
+    jwtPublicKey,
     jwtAudiences,
     jwtRole = ['role'],
     jwtVerifyOptions,
@@ -104,7 +105,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
 
   const { role: pgRole, localSettings, jwtClaims } = getSettingsForPgClientTransaction({
     jwtToken,
-    jwtSecret,
+    jwtSecretOrPublicKey: jwtPublicKey || jwtSecret,
     jwtAudiences,
     jwtRole,
     jwtVerifyOptions,
@@ -266,7 +267,7 @@ export default withPostGraphileContext;
 // errors, however, as this will stop the request execution.
 function getSettingsForPgClientTransaction({
   jwtToken,
-  jwtSecret,
+  jwtSecretOrPublicKey,
   jwtAudiences,
   jwtRole,
   jwtVerifyOptions,
@@ -274,7 +275,7 @@ function getSettingsForPgClientTransaction({
   pgSettings,
 }: {
   jwtToken?: string;
-  jwtSecret?: string;
+  jwtSecretOrPublicKey?: string;
   jwtAudiences?: Array<string>;
   jwtRole: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;
@@ -297,7 +298,7 @@ function getSettingsForPgClientTransaction({
     try {
       // If a JWT token was defined, but a secret was not provided to the server or
       // secret had unsupported type, throw a 403 error.
-      if (!Buffer.isBuffer(jwtSecret) && typeof jwtSecret !== 'string') {
+      if (!Buffer.isBuffer(jwtSecretOrPublicKey) && typeof jwtSecretOrPublicKey !== 'string') {
         // tslint:disable-next-line no-console
         console.error(
           'ERROR: `jwtToken` was provided, but `jwtSecret` was not set to a string or buffer - rejecting request.',
@@ -310,7 +311,7 @@ function getSettingsForPgClientTransaction({
           `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
         );
 
-      const claims = jwt.verify(jwtToken, jwtSecret, {
+      const claims = jwt.verify(jwtToken, jwtSecretOrPublicKey, {
         ...jwtVerifyOptions,
         audience:
           jwtAudiences ||
