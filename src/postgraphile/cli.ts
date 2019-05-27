@@ -286,6 +286,46 @@ program
     'the PEM-encoded public key to be used when verifying JWTs. if set, private key should be set to the --jwt-secret option',
   )
   .option(
+    '--jwt-sign-algorithm <string>',
+    'the JWT encoding algorithm',
+  )
+  .option(
+    '--jwt-sign-key-id <string>',
+    'jsonwebtoken keyid option',
+  )
+  .option(
+    '--jwt-sign-expires-in <string>',
+    'expressed in seconds or a string describing a time span zeit/ms. eg: 60, "2 days", "10h", "7d". a numeric value is interpreted as a seconds count. if you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default ("120" is equal to "120ms")',
+  )
+  .option(
+    '--jwt-sign-not-before <string>',
+    'expressed in seconds or a string describing a time span zeit/ms. eg: 60, "2 days", "10h", "7d". a numeric value is interpreted as a seconds count. if you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default ("120" is equal to "120ms")',
+  )
+  .option(
+    '--jwt-sign-audience <string>',
+    'jsonwebtoken audience option',
+  )
+  .option(
+    '--jwt-sign-subject <string>',
+    'jsonwebtoken subject option',
+  )
+  .option(
+    '--jwt-sign-issuer <string>',
+    'jsonwebtoken issuer option',
+  )
+  .option(
+    '--jwt-sign-jwt-id <string>',
+    'jsonwebtoken jwtid option',
+  )
+  .option(
+    '--jwt-sign-no-timestamp <string>',
+    'jsonwebtoken noTimestamp option',
+  )
+  .option(
+    '--jwt-sign-encoding <string>',
+    'jsonwebtoken encoding option',
+  )
+  .option(
     '--jwt-verify-algorithms <string>',
     'a comma separated list of the names of the allowed jwt token algorithms',
     (option: string) => option.split(','),
@@ -431,6 +471,16 @@ const {
   jwtVerifyIgnoreNotBefore,
   jwtVerifyIssuer,
   jwtVerifySubject,
+  jwtSignAlgorithm,
+  jwtSignKeyId,
+  jwtSignExpiresIn,
+  jwtSignNotBefore,
+  jwtSignAudience,
+  jwtSignSubject,
+  jwtSignIssuer,
+  jwtSignJwtId,
+  jwtSignNoTimestamp,
+  jwtSignEncoding,
   jwtRole = ['role'],
   token: deprecatedJwtPgTypeIdentifier,
   jwtTokenIdentifier: jwtPgTypeIdentifier,
@@ -571,6 +621,19 @@ function trimNulls(obj: object): object {
   }, {});
 }
 
+const jwtSignOptions: jwt.SignOptions = trimNulls({
+  algorithm: jwtSignAlgorithm,
+  keyid: jwtSignKeyId,
+  expiresIn: jwtSignExpiresIn,
+  notBefore: jwtSignNotBefore,
+  audience: jwtSignAudience,
+  subject: jwtSignSubject,
+  issuer: jwtSignIssuer,
+  jwtid: jwtSignJwtId,
+  noTimestamp: jwtSignNoTimestamp,
+  encoding: jwtSignEncoding,
+});
+
 const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
   algorithms: jwtVerifyAlgorithms,
   audience: jwtVerifyAudience,
@@ -600,6 +663,7 @@ const postgraphileOptions = pluginHook(
     jwtSecret: jwtSecret || deprecatedJwtSecret,
     jwtPublicKey,
     jwtAudiences,
+    jwtSignOptions,
     jwtRole,
     jwtVerifyOptions,
     retryOnInitFail,
