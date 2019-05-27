@@ -276,6 +276,7 @@ pluginHook('cli:flags:add:webserver', addFlag);
 
 // JWT-related options
 program
+
   .option(
     '-e, --jwt-secret <string>',
     'the secret to be used when creating and verifying JWTs. if none is provided auth will be disabled',
