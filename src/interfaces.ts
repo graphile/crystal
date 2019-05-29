@@ -109,6 +109,11 @@ export interface PostGraphileOptions<
   // from the generated GraphQL schema as general applications don't need them
   // to be exposed to the end user. You can use this flag to include them in
   // the generated schema (not recommended).
+  ignoreSchemas?: boolean;
+  // Not recommended. By default, database objects within generated queries
+  // consist of the PostgreSQL schema name and table name separated by a dot.
+  // Set 'true' to omit the schema name, such that relevant table is determined
+  // based on the current search_path.  Useful in multi-tenant applications.
   includeExtensionResources?: boolean;
   // Enables adding a `stack` field to the error response.  Can be either the
   // boolean `true` (which results in a single stack string) or the string
