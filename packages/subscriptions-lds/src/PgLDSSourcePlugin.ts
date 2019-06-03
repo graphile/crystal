@@ -260,7 +260,8 @@ export class LDSLiveSource {
       const messageString = message.toString("utf8");
       const payload = JSON.parse(messageString);
       switch (payload._) {
-        case "insert":
+        case "insertC":
+        case "updateC":
         case "update":
         case "delete":
           return this.handleAnnouncement(payload);
