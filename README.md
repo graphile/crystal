@@ -44,6 +44,10 @@ Graphile Engine has matured into the production-ready system it is today.
 
 ## Development
 
+Below is a quick-start, for more detailed instructions, please [see the
+CONTRIBUTING.md doc in
+PostGraphile](https://github.com/graphile/postgraphile/blob/master/CONTRIBUTING.md).
+
 ```bash
 yarn
 yarn lerna bootstrap
@@ -53,15 +57,21 @@ yarn watch
 `yarn watch` will keep monitoring and compiling the babel files, so open
 another terminal to run the tests:
 
+(Note: before you can run the tests, you'll need to configure your PostgreSQL
+server to support logical decoding for our live queries tests. See
+[the @graphile/lds README](packages/lds/README.md#postgresql-configuration) for how
+to enable `wal_level = logical`.)
+
 ```bash
 createdb pggql_test
+createdb pubsub_test
 export TEST_DATABASE_URL="postgres:///pggql_test"
 yarn lerna run test
 ```
 
 If the above succeeds, you're good to go! If not, please try again after
-running `yarn install --force` and failing that reach out on twitter:
-[@Benjie](https://twitter.com/benjie).
+running `yarn install --force` and always feel free to reach out via [our
+discord chat](http://discord.gg/graphile) on the #core-development channel.
 
 ### Working with Docker
 
