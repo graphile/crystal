@@ -888,7 +888,7 @@ export default (async function PgIntrospectionPlugin(
                     );
                     console.warn(
                       chalk.yellow(
-                        "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection-string' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
+                        "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
                       )
                     );
                     console.warn(
