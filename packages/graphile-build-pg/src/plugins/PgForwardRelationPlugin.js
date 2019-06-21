@@ -42,6 +42,14 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
       ) {
         return fields;
       }
+      if (
+        isMutationPayload &&
+        pgIntrospection.kind === "procedure" &&
+        (pgIntrospection.returnTypeId !== table.typeId ||
+          pgIntrospection.returnsSet)
+      ) {
+        return fields;
+      }
       // This is a relation in which we (table) are local, and there's a foreign table
 
       const foreignKeyConstraints = table.constraints.filter(

@@ -1347,12 +1347,6 @@ type Issue756SetMutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-
-  \\"\\"\\"An edge for our \`Issue756\`. May be used by Relay 1.\\"\\"\\"
-  issue756Edge(
-    \\"\\"\\"The method to use when ordering \`Issue756\`.\\"\\"\\"
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
   issue756S: [Issue756!]
 
   \\"\\"\\"
@@ -1825,8 +1819,6 @@ type Mutation {
     \\"\\"\\"
     input: Issue756MutationInput!
   ): Issue756MutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Issue756\`.\\"\\"\\"
   issue756SetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1929,8 +1921,6 @@ type Mutation {
     \\"\\"\\"
     input: MutationOutTableInput!
   ): MutationOutTablePayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   mutationOutTableSetof(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1973,8 +1963,6 @@ type Mutation {
     \\"\\"\\"
     input: TableMutationInput!
   ): TableMutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   tableSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2458,12 +2446,6 @@ type MutationOutTableSetofPayload {
   \\"\\"\\"
   clientMutationId: String
   people: [Person!]
-
-  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
-  personEdge(
-    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4121,12 +4103,6 @@ type TableSetMutationPayload {
   \\"\\"\\"
   clientMutationId: String
   people: [Person!]
-
-  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
-  personEdge(
-    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -6153,8 +6129,6 @@ type Mutation {
     \\"\\"\\"
     input: Issue756MutationInput!
   ): Issue756MutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Issue756\`.\\"\\"\\"
   issue756SetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -6257,8 +6231,6 @@ type Mutation {
     \\"\\"\\"
     input: MutationOutTableInput!
   ): MutationOutTablePayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   mutationOutTableSetof(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -6301,8 +6273,6 @@ type Mutation {
     \\"\\"\\"
     input: TableMutationInput!
   ): TableMutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   tableSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

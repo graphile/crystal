@@ -840,8 +840,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3025,8 +3023,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -5210,8 +5206,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -7380,8 +7374,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -9564,8 +9556,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -11747,8 +11737,6 @@ type Mutation {
     \\"\\"\\"
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Flamble\`.\\"\\"\\"
   getflamble(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

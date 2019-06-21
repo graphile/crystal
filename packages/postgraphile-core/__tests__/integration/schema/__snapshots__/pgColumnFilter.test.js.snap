@@ -1790,8 +1790,6 @@ type Mutation {
     \\"\\"\\"
     input: MutationTextArrayInput!
   ): MutationTextArrayPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Post\`.\\"\\"\\"
   postMany(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2393,12 +2391,6 @@ type PostManyPayload {
   unchanged and unused. May be used by a client to track mutations.
   \\"\\"\\"
   clientMutationId: String
-
-  \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
-  postEdge(
-    \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostsEdge
   posts: [Post!]
 
   \\"\\"\\"

@@ -740,8 +740,6 @@ type Mutation {
     \\"\\"\\"
     input: CompoundTypeMutationInput!
   ): CompoundTypeMutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`CompoundType\`.\\"\\"\\"
   compoundTypeSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -810,8 +808,6 @@ type Mutation {
     \\"\\"\\"
     input: Mult4Input!
   ): Mult4Payload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
   typeFunctionConnectionMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -1173,12 +1169,6 @@ type TypeFunctionConnectionMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
   query: Query
-
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
-  typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TypesEdge
   types: [Type]
 }
 
@@ -1203,12 +1193,6 @@ type TypeFunctionListMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
   query: Query
-
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
-  typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TypesEdge
   types: [Type]
 }
 

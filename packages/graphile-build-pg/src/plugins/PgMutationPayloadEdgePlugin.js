@@ -38,6 +38,13 @@ export default (function PgMutationPayloadEdgePlugin(
       ) {
         return fields;
       }
+      if (
+        pgIntrospection.kind === "procedure" &&
+        (pgIntrospection.returnTypeId !== table.typeId ||
+          pgIntrospection.returnsSet)
+      ) {
+        return fields;
+      }
       const simpleCollections =
         table.tags.simpleCollections || pgSimpleCollections;
       const hasConnections = simpleCollections !== "only";
