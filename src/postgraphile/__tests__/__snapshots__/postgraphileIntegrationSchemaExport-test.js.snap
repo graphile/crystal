@@ -1905,8 +1905,6 @@ type Mutation {
     \\"\\"\\"
     input: TableMutationInput!
   ): TableMutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   tableSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3034,12 +3032,6 @@ type TableSetMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
   query: Query
-
-  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
-  personEdge(
-    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
-  ): PeopleEdge
 }
 
 \\"\\"\\"
@@ -12914,7 +12906,7 @@ exports[`exports a schema as JSON 1`] = `
             },
             {
               \\"name\\": \\"tableSetMutation\\",
-              \\"description\\": \\"Reads and enables pagination through a set of \`Person\`.\\",
+              \\"description\\": null,
               \\"args\\": [
                 {
                   \\"name\\": \\"input\\",
@@ -19137,37 +19129,6 @@ exports[`exports a schema as JSON 1`] = `
               },
               \\"isDeprecated\\": false,
               \\"deprecationReason\\": null
-            },
-            {
-              \\"name\\": \\"personEdge\\",
-              \\"description\\": \\"An edge for our \`Person\`. May be used by Relay 1.\\",
-              \\"args\\": [
-                {
-                  \\"name\\": \\"orderBy\\",
-                  \\"description\\": \\"The method to use when ordering \`Person\`.\\",
-                  \\"type\\": {
-                    \\"kind\\": \\"LIST\\",
-                    \\"name\\": null,
-                    \\"ofType\\": {
-                      \\"kind\\": \\"NON_NULL\\",
-                      \\"name\\": null,
-                      \\"ofType\\": {
-                        \\"kind\\": \\"ENUM\\",
-                        \\"name\\": \\"PeopleOrderBy\\",
-                        \\"ofType\\": null
-                      }
-                    }
-                  },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
-                }
-              ],
-              \\"type\\": {
-                \\"kind\\": \\"OBJECT\\",
-                \\"name\\": \\"PeopleEdge\\",
-                \\"ofType\\": null
-              },
-              \\"isDeprecated\\": false,
-              \\"deprecationReason\\": null
             }
           ],
           \\"inputFields\\": null,
@@ -22011,8 +21972,6 @@ type Mutation {
     \\"\\"\\"
     input: TableMutationInput!
   ): TableMutationPayload
-
-  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
   tableSetMutation(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23248,12 +23207,6 @@ type TableSetMutationPayload {
   \\"\\"\\"
   clientMutationId: String
   people: [Person]
-
-  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
-  personEdge(
-    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
-  ): PeopleEdge
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
