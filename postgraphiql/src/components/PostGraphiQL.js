@@ -1,17 +1,16 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
-import { parse } from 'graphql';
+import { parse, getOperationAST } from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
-const isSubscription = ({ query }) =>
-  parse(query).definitions.some(
-    definition =>
-      definition.kind === 'OperationDefinition' && definition.operation === 'subscription',
-  );
+const isSubscription = ({ query, operationName }) => {
+  const operationAST = getOperationAST(parse(query), operationName);
+  return operationAST && operationAST.operation === 'subscription';
+};
 
 const {
   POSTGRAPHILE_CONFIG = {

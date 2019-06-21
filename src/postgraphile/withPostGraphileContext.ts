@@ -84,6 +84,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
 
   let operation: OperationDefinitionNode | void;
   if (!pgForceTransaction && queryDocumentAst) {
+    // We don't use 'getOperationAST' here because we want to throw a more helpful error message
     // tslint:disable-next-line
     for (let i = 0, l = queryDocumentAst.definitions.length; i < l; i++) {
       const definition = queryDocumentAst.definitions[i];
