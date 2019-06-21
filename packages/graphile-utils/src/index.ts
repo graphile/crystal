@@ -7,6 +7,14 @@ import makeChangeNullabilityPlugin from "./makeChangeNullabilityPlugin";
 import makeProcessSchemaPlugin from "./makeProcessSchemaPlugin";
 
 export {
+  AugmentedGraphQLFieldResolver,
+  ObjectFieldResolver,
+  ObjectResolver,
+  EnumResolver,
+  Resolvers,
+  ExtensionDefinition,
+} from "./makeExtendSchemaPlugin";
+export {
   embed,
   gql,
   makeAddInflectorsPlugin,
