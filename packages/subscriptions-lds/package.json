@@ -1,6 +1,6 @@
 {
   "name": "@graphile/subscriptions-lds",
-  "version": "4.4.1-alpha.0",
+  "version": "4.4.1",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL logicial decoding",
   "main": "dist/index.js",
   "scripts": {
