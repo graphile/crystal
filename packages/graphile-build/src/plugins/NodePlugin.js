@@ -6,7 +6,6 @@ import type {
   Context,
   ContextGraphQLObjectTypeFields,
 } from "../SchemaBuilder";
-import resolveNode from "../resolveNode";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import type {
   GraphQLType,
@@ -198,6 +197,7 @@ export default (function NodePlugin(
         extend,
         graphql: { GraphQLNonNull, GraphQLID },
         inflection,
+        resolveNode,
       } = build;
       return extend(
         fields,

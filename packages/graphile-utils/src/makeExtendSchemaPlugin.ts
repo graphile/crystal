@@ -97,7 +97,15 @@ export default function makeExtendSchemaPlugin(
     // Add stuff to the schema
     builder.hook("build", build => {
       const {
-        graphql: { GraphQLEnumType, GraphQLInputObjectType, GraphQLObjectType },
+        graphql: {
+          GraphQLEnumType,
+          GraphQLInputObjectType,
+          GraphQLObjectType,
+          GraphQLScalarType,
+          GraphQLDirective,
+          GraphQLUnionType,
+        },
+        addType,
       } = build;
       const { typeDefs, resolvers = {} } =
         typeof generator === "function"
@@ -109,6 +117,10 @@ export default function makeExtendSchemaPlugin(
         );
       }
       const typeExtensions = {
+        GraphQLSchema: {
+          directives: [] as Array<any>,
+          types: [] as Array<any>,
+        },
         GraphQLInputObjectType: {},
         GraphQLObjectType: {},
       };
@@ -141,6 +153,36 @@ export default function makeExtendSchemaPlugin(
             type: GraphQLInputObjectType,
             definition,
           });
+        } else if (definition.kind === "UnionTypeDefinition") {
+          newTypes.push({
+            type: GraphQLUnionType,
+            definition,
+          });
+        } else if (definition.kind === "DirectiveDefinition") {
+          newTypes.push({
+            type: GraphQLDirective,
+            definition,
+          });
+        } else if (definition.kind === "ScalarTypeDefinition") {
+          // TODO: add validation
+          const name = getName(definition.name);
+          if (resolvers[name]) {
+            const gqlScalarType = resolvers[name];
+            if (gqlScalarType.name !== name) {
+              throw new Error(
+                `Names for scalar type do not match; schema: '${name}' vs type: '${String(
+                  gqlScalarType.name
+                )}'`
+              );
+            }
+            addType(gqlScalarType);
+          } else {
+            // Create a string type
+            newTypes.push({
+              type: GraphQLScalarType,
+              definition,
+            });
+          }
         } else {
           if ((definition.kind as any) === "TypeExtensionDefinition") {
             throw new Error(
@@ -164,9 +206,18 @@ export default function makeExtendSchemaPlugin(
     builder.hook("init", (_, build, _context) => {
       const {
         newWithHooks,
+        [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions, // ONLY use this for GraphQLSchema in this hook
         [`ExtendSchemaPlugin_${uniqueId}_newTypes`]: newTypes,
         [`ExtendSchemaPlugin_${uniqueId}_resolvers`]: resolvers,
-        graphql: { GraphQLEnumType, GraphQLObjectType, GraphQLInputObjectType },
+        graphql: {
+          GraphQLEnumType,
+          GraphQLObjectType,
+          GraphQLInputObjectType,
+          GraphQLUnionType,
+          GraphQLScalarType,
+          GraphQLDirective,
+          Kind,
+        },
       } = build;
       newTypes.forEach(({ type, definition }: NewTypeDef) => {
         if (type === GraphQLEnumType) {
@@ -275,6 +326,75 @@ export default function makeExtendSchemaPlugin(
             },
             scope
           );
+        } else if (type === GraphQLUnionType) {
+          // https://graphql.org/graphql-js/type/#graphqluniontype
+          const name = getName(definition.name);
+          const description = getDescription(definition.description);
+          const directives = getDirectives(definition.directives);
+          const scope = {
+            __origin: `makeExtendSchemaPlugin`,
+            directives,
+            ...(directives.scope || {}),
+          };
+          const resolveType = resolvers[name] && resolvers[name].__resolveType;
+          newWithHooks(
+            type,
+            {
+              name,
+              types: () => {
+                if (Array.isArray(definition.types)) {
+                  return definition.types.map((typeAST: any) => {
+                    if (typeAST.kind !== "NamedType") {
+                      throw new Error("Only support unions of named types");
+                    }
+                    return getType(typeAST, build);
+                  });
+                }
+              },
+              ...(resolveType ? { resolveType } : null),
+              ...(description ? { description } : null),
+            },
+            scope
+          );
+        } else if (type === GraphQLScalarType) {
+          const name = getName(definition.name);
+          const description = getDescription(definition.description);
+          const directives = getDirectives(definition.directives);
+          const scope = {
+            __origin: `makeExtendSchemaPlugin`,
+            directives,
+            ...(directives.scope || {}),
+          };
+          newWithHooks(
+            type,
+            {
+              name,
+              description,
+              serialize: (value: any) => String(value),
+              parseValue: (value: any) => String(value),
+              parseLiteral: (ast: any) => {
+                if (ast.kind !== Kind.STRING) {
+                  throw new Error("Can only parse string values");
+                }
+                return ast.value;
+              },
+            },
+            scope
+          );
+        } else if (type === GraphQLDirective) {
+          // https://github.com/graphql/graphql-js/blob/3c54315ab13c6b9d337fb7c33ad7e27b92ca4a40/src/type/directives.js#L106-L113
+          const name = getName(definition.name);
+          const description = getDescription(definition.description);
+          const locations = definition.locations.map(getName);
+          const args = getArguments(definition.arguments, build);
+          // Ignoring isRepeatable and astNode for now
+          const directive = new GraphQLDirective({
+            name,
+            locations,
+            args,
+            ...(description ? { description } : null),
+          });
+          typeExtensions.GraphQLSchema.directives.push(directive);
         } else {
           throw new Error(
             `We have no code to build an object of type '${type}'; it should not have reached this area of the code.`
@@ -282,6 +402,20 @@ export default function makeExtendSchemaPlugin(
         }
       });
       return _;
+    });
+
+    builder.hook("GraphQLSchema", (schema, build, _context) => {
+      const {
+        [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions,
+      } = build;
+      return {
+        ...schema,
+        directives: [
+          ...(schema.directives || []),
+          ...typeExtensions.GraphQLSchema.directives,
+        ],
+        types: [...(schema.types || []), ...typeExtensions.GraphQLSchema.types],
+      };
     });
 
     builder.hook("GraphQLObjectType:fields", (fields, build, context: any) => {

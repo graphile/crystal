@@ -17,6 +17,7 @@ import type {
   parseResolveInfo,
 } from "graphql-parse-resolve-info";
 import type { GraphQLResolveInfo } from "graphql/type/definition";
+import type resolveNode from "./resolveNode";
 
 import type { FieldWithHooksFunction } from "./makeNewBuild";
 const { GraphQLSchema } = graphql;
@@ -71,6 +72,8 @@ export type Build = {|
     [string]: (...args: Array<any>) => string,
   },
   swallowError: (e: Error) => void,
+  // resolveNode: EXPERIMENTAL, API might change!
+  resolveNode: resolveNode,
   status: {
     currentHookName: ?string,
     currentHookEvent: ?string,
@@ -217,6 +220,13 @@ class SchemaBuilder extends EventEmitter {
       GraphQLEnumType: [],
       "GraphQLEnumType:values": [],
       "GraphQLEnumType:values:value": [],
+
+      // When creating a GraphQLUnionType via `newWithHooks`, we'll
+      // execute, the following hooks:
+      // - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
+      // - 'GraphQLUnionType:types' to add additional types to this union
+      GraphQLUnionType: [],
+      "GraphQLUnionType:types": [],
     };
   }
 

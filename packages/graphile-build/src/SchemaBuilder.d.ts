@@ -3,6 +3,7 @@ import {
   GraphQLSchemaConfig,
   GraphQLObjectTypeConfig,
   GraphQLInterfaceType,
+  GraphQLObjectType,
   GraphQLInputObjectTypeConfig,
   GraphQLEnumTypeConfig,
   GraphQLFieldConfigArgumentMap,
@@ -12,6 +13,7 @@ import {
   GraphQLEnumValueConfig,
   GraphQLInputFieldConfigMap,
   GraphQLInputFieldConfig,
+  GraphQLUnionTypeConfig,
 } from "graphql";
 import { EventEmitter } from "events";
 
@@ -160,6 +162,20 @@ export default class SchemaBuilder extends EventEmitter {
   hook(
     hookName: "GraphQLEnumType:values:value",
     fn: Hook<GraphQLEnumValueConfig>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook<TSource, TContext>(
+    hookName: "GraphQLUnionType",
+    fn: Hook<GraphQLUnionTypeConfig<TSource, TContext>>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook(
+    hookName: "GraphQLUnionType:types",
+    fn: Hook<Array<GraphQLObjectType>>,
     provides?: Array<string>,
     before?: Array<string>,
     after?: Array<string>

@@ -160,6 +160,7 @@ const {
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLEnumType,
+  GraphQLUnionType,
   getNamedType,
   isCompositeType,
   isAbstractType,
@@ -199,6 +200,7 @@ const knownTypes = [
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLEnumType,
+  GraphQLUnionType,
 ];
 const knownTypeNames = knownTypes.map(k => k.name);
 
@@ -820,7 +822,43 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           memo[valueKey] = newValue;
           return memo;
         }, {});
+      } else if (Type === GraphQLUnionType) {
+        const commonContext = {
+          type: "GraphQLUnionType",
+          scope,
+        };
+        newSpec = builder.applyHooks(
+          this,
+          "GraphQLUnionType",
+          newSpec,
+          Object.assign({}, commonContext),
+          `|${newSpec.name}`
+        );
+
+        const rawSpec = newSpec;
+        newSpec = {
+          ...newSpec,
+          types: () => {
+            const typesContext = {
+              ...commonContext,
+              Self,
+              GraphQLUnionType: rawSpec,
+            };
+            let rawTypes = rawSpec.types || [];
+            if (typeof rawTypes === "function") {
+              rawTypes = rawTypes(typesContext);
+            }
+            return builder.applyHooks(
+              this,
+              "GraphQLUnionType:types",
+              rawTypes,
+              typesContext,
+              `|${getNameFromType(Self)}`
+            );
+          },
+        };
       }
+
       const finalSpec: ConfigType = newSpec;
 
       const Self: T = new Type(finalSpec);
