@@ -49,8 +49,8 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "graphile-build": "^4.4.1-alpha.2",
-    "graphile-build-pg": "^4.4.1-alpha.2"
+    "graphile-build": "^4.4.2",
+    "graphile-build-pg": "^4.4.2"
   },
   "jest": {
     "transform": {
