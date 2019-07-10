@@ -276,54 +276,9 @@ pluginHook('cli:flags:add:webserver', addFlag);
 
 // JWT-related options
 program
-
   .option(
     '-e, --jwt-secret <string>',
     'the secret or private key to be used when creating and verifying JWTs. if none is provided auth will be disabled. in case of private key, the value should be in the PEM format. if PostGraphile will be used to verify tokens, public key should be set to the --jwt-public-key parameter',
-  )
-  .option(
-    '--jwt-public-key <string>',
-    'the PEM-encoded public key to be used when verifying JWTs. if set, private key should be set to the --jwt-secret option',
-  )
-  .option(
-    '--jwt-sign-algorithm <string>',
-    'the JWT encoding algorithm',
-  )
-  .option(
-    '--jwt-sign-key-id <string>',
-    'jsonwebtoken keyid option',
-  )
-  .option(
-    '--jwt-sign-expires-in <string>',
-    'expressed in seconds or a string describing a time span zeit/ms. eg: 60, "2 days", "10h", "7d". a numeric value is interpreted as a seconds count. if you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default ("120" is equal to "120ms")',
-  )
-  .option(
-    '--jwt-sign-not-before <string>',
-    'expressed in seconds or a string describing a time span zeit/ms. eg: 60, "2 days", "10h", "7d". a numeric value is interpreted as a seconds count. if you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default ("120" is equal to "120ms")',
-  )
-  .option(
-    '--jwt-sign-audience <string>',
-    'jsonwebtoken audience option',
-  )
-  .option(
-    '--jwt-sign-subject <string>',
-    'jsonwebtoken subject option',
-  )
-  .option(
-    '--jwt-sign-issuer <string>',
-    'jsonwebtoken issuer option',
-  )
-  .option(
-    '--jwt-sign-jwt-id <string>',
-    'jsonwebtoken jwtid option',
-  )
-  .option(
-    '--jwt-sign-no-timestamp <string>',
-    'jsonwebtoken noTimestamp option',
-  )
-  .option(
-    '--jwt-sign-encoding <string>',
-    'jsonwebtoken encoding option',
   )
   .option(
     '--jwt-verify-algorithms <string>',
