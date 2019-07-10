@@ -501,7 +501,7 @@ const pgConfig: PoolConfig = {
   ...(pgConnectionString || process.env.DATABASE_URL || isDemo
     ? coerce(parsePgConnectionString(pgConnectionString || process.env.DATABASE_URL || DEMO_PG_URL))
     : {
-        host: process.env.PGHOST || 'localhost',
+        host: process.env.PGHOST || process.env.PGHOSTADDR || 'localhost',
         port: (process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : null) || 5432,
         database: process.env.PGDATABASE,
         user: process.env.PGUSER,

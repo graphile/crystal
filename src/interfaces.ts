@@ -263,7 +263,9 @@ export interface PostGraphileOptions<
   // "only" (not recommended) - simple collections only (no Relay connections),
   // "both" - both.
   simpleCollections?: 'omit' | 'both' | 'only';
-  // Max query cache size in MBs of queries. Default, 50MB.
+  // Max query cache size in bytes (extremely approximate, not
+  // accurate at all). Default `50000000` (~50MB). Set to 0 to
+  // disable.
   /* @middlewareOnly */
   queryCacheMaxSize?: number;
 }
