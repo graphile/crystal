@@ -12,6 +12,27 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 ## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
+<!-- SPONSORS_BEGIN -->
+
+## Crowd-funded open-source software
+
+To help us develop this software sustainably under the MIT license, we ask
+all individuals and businesses that use it to help support its ongoing
+maintenance and development via sponsorship.
+
+### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
+
+And please give some love to our featured sponsors 🤩:
+
+<table><tr>
+<td align="center"><a href="http://chads.website/"><img src="https://www.graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a></td>
+<td align="center"><a href="https://timescale.com/"><img src="https://www.graphile.org/images/sponsors/timescale.svg" width="90" height="90" alt="Timescale" /><br />Timescale</a></td>
+</tr></table>
+
+<!-- SPONSORS_END -->
+
+## About
+
 **GraphQL** is a new way of communicating with your server. It eliminates the problems of over- and under-fetching, incorporates strong data types, has built-in introspection, documentation and deprecation capabilities, and is implemented in many programming languages. This all leads to gloriously low-latency user experiences, better developer experiences, and much increased productivity. Because of all this, GraphQL is typically used as a replacement for (or companion to) RESTful API services.
 
 **PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” with each new release bring more amazing features and performance gains. Thinking of your database as a plain CRUD store is now an archaic viewpoint as modern PostgreSQL can do so much for you &mdash; from authorization with Row-Level Security (RLS, introduced in PG9.5), through Foreign Data Wrappers (FDW), to real time notifications with `LISTEN`/`NOTIFY`.
@@ -19,15 +40,6 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 **PostGraphile** pairs these two incredible technologies together, helping you not only build applications more rapidly, but to build lightning-fast applications. PostGraphile allows you to access the power of PostgreSQL through a well designed, extensible, customisable and incredibly performant GraphQL server. It automatically detects tables, columns, indexes, relationships, views, types, functions, comments, and more - providing a GraphQL server that is highly intelligent about your data, and that automatically updates itself without restarting when you change your database schema.
 
 With PostGraphile, a well designed database schema should serve the basis for a well thought out API. PostgreSQL already has amazing authorization and relationship infrastructure, _why duplicate that logic_ in a custom API? A PostGraphile API is likely to provide a more performant and standards compliant GraphQL API than any created in-house, and can be built in a fraction of the time. Focus on your product and let PostGraphile worry about the API layer. Once you need to expand beyond this, we have a powerful plugin system including many [community contributed plugins](https://www.graphile.org/postgraphile/community-plugins/). For a critical evaluation of PostGraphile to determine if it fits in your tech stack, read [evaluating PostGraphile for your project](https://www.graphile.org/postgraphile/evaluating/).
-
-## Crowd-funded open-source software
-
-In exchange for the incredible freedom we give in how this software can be
-used (thanks to the permissive MIT license) we ask the individuals and
-businesses that use it to sponsor ongoing maintenance and development. A huge
-amount of work goes into producing and maintaining this powerful and
-professional software, please give back [via
-sponsorship](https://graphile.org/sponsor/).
 
 ## Introduction
 
