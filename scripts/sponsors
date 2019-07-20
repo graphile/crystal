@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+const fs = require("fs");
+const glob = require("glob");
+
+const sponsorsMessage = `
+## Crowd-funded open-source software
+
+To help us develop this software sustainably under the MIT license, we ask
+all individuals and businesses that use it to help support its ongoing
+maintenance and development via sponsorship.
+
+### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
+
+And please give some love to our featured sponsors 🤩:
+
+<table><tr>
+<td align="center"><a href="http://chads.website/"><img src="https://www.graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a></td>
+<td align="center"><a href="https://timescale.com/"><img src="https://www.graphile.org/images/sponsors/timescale.svg" width="90" height="90" alt="Timescale" /><br />Timescale</a></td>
+</tr></table>
+`;
+
+const readmes = [
+  "README.md",
+  "postgraphile/README.md",
+  ...glob.sync("packages/*/README.md"),
+];
+if (readmes.length < 5) {
+  throw new Error("Too few READMEs");
+}
+readmes.forEach(readme => {
+  const contents = fs.readFileSync(readme, "utf8");
+  const output = contents.replace(
+    /(<!-- SPONSORS_BEGIN -->)[\s\S]*(<!-- SPONSORS_END -->)/,
+    `$1\n${sponsorsMessage}\n$2`
+  );
+  fs.writeFileSync(readme, output);
+});

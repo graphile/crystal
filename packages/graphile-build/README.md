@@ -22,6 +22,27 @@ performant standards-compliant GraphQL API. The separate `graphile-build-pg`
 module contains the plugins that are specific to PostgreSQL support
 (`graphile-build` itself does not know about databases).
 
+<!-- SPONSORS_BEGIN -->
+
+## Crowd-funded open-source software
+
+To help us develop this software sustainably under the MIT license, we ask
+all individuals and businesses that use it to help support its ongoing
+maintenance and development via sponsorship.
+
+### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
+
+And please give some love to our featured sponsors 🤩:
+
+<table><tr>
+<td align="center"><a href="http://chads.website/"><img src="https://www.graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a></td>
+<td align="center"><a href="https://timescale.com/"><img src="https://www.graphile.org/images/sponsors/timescale.svg" width="90" height="90" alt="Timescale" /><br />Timescale</a></td>
+</tr></table>
+
+<!-- SPONSORS_END -->
+
+## Documentation
+
 **For in-depth documentation about `graphile-build`, please see [the graphile
 documentation website at graphile.org](https://www.graphile.org/).** The
 below just serves as a limited quick-reference for people already familiar
