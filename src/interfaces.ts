@@ -213,9 +213,9 @@ export interface PostGraphileOptions<
   /* @middlewareOnly */
   jwtVerifyOptions?: jwt.VerifyOptions;
   // An array of (strings) path components that make the path in the jwt from which to extract the postgres role.
-  // By default, the role is extracted from token.role, so the default value is ['role'].
-  // e.g. { iat: 123456789, creds: { local: { role: "my_role" } }
-  // the path would be token.creds.local.role i.e. ['creds', 'local', 'role']
+  // By default, the role is extracted from `token.role`, so the default value is `['role']`.
+  // e.g. `{ iat: 123456789, creds: { local: { role: "my_role" } } }`
+  // the path would be `token.creds.local.role` i.e. `['creds', 'local', 'role']`
   /* @middlewareOnly */
   jwtRole?: Array<string>;
   // The Postgres type identifier for the compound type which will be signed as
