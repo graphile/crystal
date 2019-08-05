@@ -31,6 +31,7 @@ sponsor](https://graphile.org/sponsor/).
 - Dan Lynch
 - James Rascoe
 - Chris Watland
+- Antwaan Harrison
 - James Cavanaugh
 - Mark Lipscombe
 - purge
