@@ -15,6 +15,7 @@ test("cleans up", async () => {
   );
   expect(initialPgRows.length).toEqual(1);
   await l.close();
+  await sleep(20);
   const { rows: finalPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [l.slotName]
