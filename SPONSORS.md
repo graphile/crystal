@@ -7,6 +7,7 @@ sponsor](https://graphile.org/sponsor/).
 ## Featured
 
 - Chad Furman
+- Timescale
 
 ## Leaders
 
@@ -29,12 +30,11 @@ sponsor](https://graphile.org/sponsor/).
 - Michel Pelletier
 - Dan Lynch
 - James Rascoe
-- Jimmy McBroom
-- James Cavanaugh
 - Chris Watland
 - Antwaan Harrison
-- Simon Elliott
+- James Cavanaugh
 - Mark Lipscombe
+- purge
 - Frank
 - Mark Rapoza
 - innovation.rocks
