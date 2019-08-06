@@ -4,7 +4,7 @@ import { sign as signJwt } from "jsonwebtoken";
 
 export default (function PgJWTPlugin(
   builder,
-  { pgJwtTypeIdentifier, pgJwtSecret }
+  { pgJwtTypeIdentifier, pgJwtSecret, pgJwtSignOptions }
 ) {
   builder.hook(
     "init",
@@ -78,17 +78,18 @@ export default (function PgJWTPlugin(
                 pgJwtSecret,
                 Object.assign(
                   {},
-                  token.aud
+                  pgJwtSignOptions,
+                  token.aud || (pgJwtSignOptions && pgJwtSignOptions.audience)
                     ? null
                     : {
                         audience: "postgraphile",
                       },
-                  token.iss
+                  token.iss || (pgJwtSignOptions && pgJwtSignOptions.issuer)
                     ? null
                     : {
                         issuer: "postgraphile",
                       },
-                  token.exp
+                  token.exp || (pgJwtSignOptions && pgJwtSignOptions.expiresIn)
                     ? null
                     : {
                         expiresIn: "1 day",
