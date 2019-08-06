@@ -89,7 +89,9 @@ export default (function PgMutationPayloadEdgePlugin(
                       type: new GraphQLList(
                         new GraphQLNonNull(TableOrderByType)
                       ),
-                      defaultValue: defaultValueEnum && defaultValueEnum.value,
+                      defaultValue: defaultValueEnum
+                        ? [defaultValueEnum.value]
+                        : null,
                     },
                   }
                 : {},
