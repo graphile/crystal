@@ -101,6 +101,7 @@ export type PgType = {
   classId: ?string,
   class: ?PgClass,
   domainBaseTypeId: ?string,
+  domainBaseType: ?PgType,
   domainTypeModifier: ?number,
   tags: { [string]: string },
 };

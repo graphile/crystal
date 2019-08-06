@@ -3,7 +3,7 @@ import * as sql from "pg-sql2";
 import type { SQL } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import chunk from "lodash/chunk";
-import type { PgClass } from "./plugins/PgIntrospectionPlugin";
+import type { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
 
 // eslint-disable-next-line flowtype/no-weak-types
 type GraphQLContext = any;
@@ -44,6 +44,26 @@ type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 export type QueryBuilderOptions = {
   supportsJSONB?: boolean, // Defaults to true
 };
+
+function escapeLarge(sqlFragment: SQL, type: PgType) {
+  const actualType = type.domainBaseType || type;
+  if (actualType.category === "N") {
+    if (
+      [
+        "21" /* int2 */,
+        "23" /* int4 */,
+        "700" /* float4 */,
+        "701" /* float8 */,
+      ].includes(actualType.id)
+    ) {
+      // No need for special handling
+      return sqlFragment;
+    }
+    // Otherwise force the id to be a string
+    return sql.fragment`((${sqlFragment})::numeric)::text`;
+  }
+  return sqlFragment;
+}
 
 class QueryBuilder {
   parentQueryBuilder: QueryBuilder | void;
@@ -366,9 +386,11 @@ ${sql.join(
     const primaryKeys = primaryKey.keyAttributes;
     this.select(
       sql.fragment`json_build_array(${sql.join(
-        primaryKeys.map(
-          key =>
-            sql.fragment`${this.getTableAlias()}.${sql.identifier(key.name)}`
+        primaryKeys.map(key =>
+          escapeLarge(
+            sql.fragment`${this.getTableAlias()}.${sql.identifier(key.name)}`,
+            key.type
+          )
         ),
         ", "
       )})`,

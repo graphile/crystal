@@ -215,3 +215,6 @@ insert into smart_comment_relations.buildings (id, property_id, name, floors, is
   (3, 3, 'Our shed', 1, false),
   (4, 1, 'Home sweet home', 2, true),
   (5, 4, 'The Tower', 200, true);
+
+insert into large_bigint.large_node_id (id, text) values (9007199254740990, 'Should be fine');
+insert into large_bigint.large_node_id (id, text) values (2098288669218571760, 'Graphile Engine issue #491');

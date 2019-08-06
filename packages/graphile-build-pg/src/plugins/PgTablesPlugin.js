@@ -131,12 +131,42 @@ export default (function PgTablesPlugin(
                         "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
                       type: new GraphQLNonNull(GraphQLID),
                       resolve(data) {
-                        return (
-                          data.__identifiers &&
-                          getNodeIdForTypeAndIdentifiers(
-                            Self,
-                            ...data.__identifiers
-                          )
+                        const identifiers = data.__identifiers;
+                        if (!identifiers) {
+                          return null;
+                        }
+                        /*
+                         * For bigint we want NodeIDs to be the same as int up
+                         * to the limits of int, and only to be strings after
+                         * that point.
+                         */
+                        const finalIdentifiers = identifiers.map(
+                          (identifier, idx) => {
+                            const key = primaryKeys[idx];
+                            const type = key.type.domainBaseType || key.type;
+                            if (type.id === "20" /* bigint */) {
+                              /*
+                               * When migrating from 'int' to 'bigint' we want
+                               * to maintain nodeIDs in the safe range before
+                               * moving to strings for larger numbers. Since we
+                               * can represent ints up to MAX_SAFE_INTEGER
+                               * (2^53 - 1) fine, we're using that as the
+                               * boundary.
+                               */
+                              const int = parseInt(identifier, 10);
+                              if (
+                                int >= -Number.MAX_SAFE_INTEGER &&
+                                int <= Number.MAX_SAFE_INTEGER
+                              ) {
+                                return int;
+                              }
+                            }
+                            return identifier;
+                          }
+                        );
+                        return getNodeIdForTypeAndIdentifiers(
+                          Self,
+                          ...finalIdentifiers
                         );
                       },
                     };

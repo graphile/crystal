@@ -54,6 +54,7 @@ beforeAll(() => {
       simpleCollections,
       orderByNullsLast,
       smartCommentRelations,
+      largeBigint,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
@@ -89,6 +90,7 @@ beforeAll(() => {
         },
       }),
       createPostGraphileSchema(pgClient, ["smart_comment_relations"], {}),
+      createPostGraphileSchema(pgClient, ["large_bigint"], {}),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -109,6 +111,7 @@ beforeAll(() => {
       orderByNullsLast,
       rbac,
       smartCommentRelations,
+      largeBigint,
     };
   });
 
@@ -164,6 +167,8 @@ beforeAll(() => {
               gqlSchema = gqlSchemas.rbac;
             } else if (fileName.startsWith("smart_comment_relations.")) {
               gqlSchema = gqlSchemas.smartCommentRelations;
+            } else if (fileName.startsWith("large_bigint")) {
+              gqlSchema = gqlSchemas.largeBigint;
             } else {
               gqlSchema = gqlSchemas.normal;
             }

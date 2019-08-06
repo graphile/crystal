@@ -1815,6 +1815,37 @@ Object {
 }
 `;
 
+exports[`large_bigint.issue491.graphql 1`] = `
+Object {
+  "data": Object {
+    "allLargeNodeIds": Object {
+      "nodes": Array [
+        Object {
+          "id": "9007199254740990",
+          "nodeId": "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+          "text": "Should be fine",
+        },
+        Object {
+          "id": "2098288669218571760",
+          "nodeId": "WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ==",
+          "text": "Graphile Engine issue #491",
+        },
+      ],
+    },
+    "largeInt": Object {
+      "id": "2098288669218571760",
+      "nodeId": "WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ==",
+      "text": "Graphile Engine issue #491",
+    },
+    "safeInt": Object {
+      "id": "9007199254740990",
+      "nodeId": "WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0=",
+      "text": "Should be fine",
+    },
+  },
+}
+`;
+
 exports[`longAliases.graphql 1`] = `
 Object {
   "data": Object {

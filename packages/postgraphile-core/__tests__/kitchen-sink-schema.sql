@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test, large_bigint cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -8,6 +8,7 @@ create schema a;
 create schema b;
 create schema c;
 create schema d;
+create schema large_bigint;
 
 alter default privileges revoke execute on functions from public;
 
@@ -1047,4 +1048,9 @@ create table live_test.todos_log_viewed (
   todo_id int not null,
   viewed_at timestamp not null default now(),
   foreign key (user_id, todo_id) references live_test.todos_log(user_id, todo_id) on delete cascade
+);
+
+create table large_bigint.large_node_id (
+  id bigint primary key,
+  text text
 );
