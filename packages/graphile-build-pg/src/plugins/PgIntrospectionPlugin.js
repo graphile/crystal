@@ -308,6 +308,7 @@ function smartCommentConstraints(introspectionResults) {
       const fakeConstraint = {
         kind: "constraint",
         isFake: true,
+        isIndexed: true, // otherwise it gets ignored by ignoreIndexes
         id: Math.random(),
         name: `FAKE_${klass.namespaceName}_${klass.name}_primaryKey`,
         type: "p", // primary key
@@ -416,6 +417,7 @@ function smartCommentConstraints(introspectionResults) {
         const fakeConstraint = {
           kind: "constraint",
           isFake: true,
+          isIndexed: true, // otherwise it gets ignored by ignoreIndexes
           id: Math.random(),
           name: `FAKE_${klass.namespaceName}_${klass.name}_foreignKey_${index}`,
           type: "f", // foreign key

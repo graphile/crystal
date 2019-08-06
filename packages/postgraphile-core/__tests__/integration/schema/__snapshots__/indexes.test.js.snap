@@ -805,6 +805,9 @@ type AuthenticatePayloadPayload {
   \\"\\"\\"
   clientMutationId: String
 
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
+
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
   \\"\\"\\"
@@ -815,6 +818,9 @@ type AuthPayload {
   admin: Boolean
   id: Int
   jwt: JwtToken
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`AuthPayload\`.\\"\\"\\"
+  personById: Person
 }
 
 \\"\\"\\"
@@ -1846,6 +1852,9 @@ type CreateTypePayload {
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2924,6 +2933,9 @@ type DeleteTypePayload {
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -6492,6 +6504,35 @@ type Post implements Node {
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesConnection! @deprecated(reason: \\"Please use typeById instead\\")
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  typesBySmallint(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: TypeCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TypesConnection!
 }
 
 \\"\\"\\"A connection to a list of \`Interval\` values.\\"\\"\\"
@@ -8358,6 +8399,9 @@ type Type implements Node {
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -8443,6 +8487,9 @@ type TypeFunctionMutationPayload {
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -9722,6 +9769,9 @@ type UpdateTypePayload {
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postById: Post
+
+  \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
+  postBySmallint: Post
 
   \\"\\"\\"
   Our root query field type. Allows us to run any query from our mutation payload.
