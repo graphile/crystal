@@ -12,9 +12,8 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
         inflection,
       } = build;
       const {
-        scope: { isPgFieldConnection, pgFieldIntrospection: table },
+        scope: { fieldName, isPgFieldConnection, pgFieldIntrospection: table },
         Self,
-        field,
       } = context;
 
       if (
@@ -46,7 +45,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
           {
             defaultValue: defaultValueEnum && [defaultValueEnum.value],
           },
-          `Adding defaultValue to orderBy for field '${field.name}' of '${
+          `Adding defaultValue to orderBy for field '${fieldName}' of '${
             Self.name
           }'`
         ),

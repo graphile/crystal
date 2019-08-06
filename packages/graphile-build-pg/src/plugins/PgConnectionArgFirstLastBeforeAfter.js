@@ -14,12 +14,12 @@ export default (function PgConnectionArgs(builder) {
       } = build;
       const {
         scope: {
+          fieldName,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
           pgFieldIntrospection: source,
         },
         addArgDataGenerator,
-        field,
         Self,
       } = context;
 
@@ -120,10 +120,10 @@ export default (function PgConnectionArgs(builder) {
             : null),
         },
         isPgFieldConnection
-          ? `Adding connection pagination args to field '${field.name}' of '${
+          ? `Adding connection pagination args to field '${fieldName}' of '${
               Self.name
             }'`
-          : `Adding simple collection args to field '${field.name}' of '${
+          : `Adding simple collection args to field '${fieldName}' of '${
               Self.name
             }'`
       );

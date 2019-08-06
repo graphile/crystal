@@ -69,6 +69,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
       } = build;
       const {
         scope: {
+          fieldName,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
           pgFieldIntrospection,
@@ -76,7 +77,6 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
         },
         addArgDataGenerator,
         Self,
-        field,
       } = context;
 
       if (!isPgFieldConnection && !isPgFieldSimpleCollection) {
@@ -178,7 +178,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
             type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
           },
         },
-        `Adding 'orderBy' argument to field '${field.name}' of '${Self.name}'`
+        `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`
       );
     },
     ["PgConnectionArgOrderBy"]

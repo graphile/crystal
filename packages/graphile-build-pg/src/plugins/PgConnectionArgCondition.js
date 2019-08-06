@@ -97,6 +97,7 @@ export default (function PgConnectionArgCondition(builder) {
       } = build;
       const {
         scope: {
+          fieldName,
           isPgFieldConnection,
           isPgFieldSimpleCollection,
           pgFieldIntrospection,
@@ -104,7 +105,6 @@ export default (function PgConnectionArgCondition(builder) {
         },
         addArgDataGenerator,
         Self,
-        field,
       } = context;
 
       const shouldAddCondition =
@@ -186,7 +186,7 @@ export default (function PgConnectionArgCondition(builder) {
             type: TableConditionType,
           },
         },
-        `Adding condition to connection field '${field.name}' of '${Self.name}'`
+        `Adding condition to connection field '${fieldName}' of '${Self.name}'`
       );
     },
     ["PgConnectionArgCondition"]
