@@ -460,9 +460,7 @@ export default (async function PgIntrospectionPlugin(
     const cacheKey = `PgIntrospectionPlugin-introspectionResultsByKind-v${version}`;
     const cloneResults = obj => {
       const result = Object.keys(obj).reduce((memo, k) => {
-        memo[k] = Array.isArray(obj[k])
-          ? obj[k].map(v => Object.assign({}, v))
-          : obj[k];
+        memo[k] = Array.isArray(obj[k]) ? obj[k].map(v => ({ ...v })) : obj[k];
         return memo;
       }, {});
       return result;

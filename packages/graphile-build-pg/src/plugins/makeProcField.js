@@ -518,21 +518,18 @@ export default function makeProcField(
               );
             },
           },
-          Object.assign(
-            {},
-            {
-              __origin: `Adding mutation function payload type for ${describePgEntity(
-                proc
-              )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
-                proc,
-                {
-                  name: "newNameHere",
-                }
-              )}`,
-              isMutationPayload: true,
-            },
-            payloadTypeScope
-          )
+          {
+            __origin: `Adding mutation function payload type for ${describePgEntity(
+              proc
+            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+              proc,
+              {
+                name: "newNameHere",
+              }
+            )}`,
+            isMutationPayload: true,
+            ...payloadTypeScope,
+          }
         );
         ReturnType = PayloadType;
         const InputType = newWithHooks(
@@ -542,14 +539,12 @@ export default function makeProcField(
             description: `All input for the \`${inflection.functionMutationName(
               proc
             )}\` mutation.`,
-            fields: Object.assign(
-              {
-                clientMutationId: {
-                  type: GraphQLString,
-                },
+            fields: {
+              clientMutationId: {
+                type: GraphQLString,
               },
-              args
-            ),
+              ...args,
+            },
           },
           {
             __origin: `Adding mutation function input type for ${describePgEntity(

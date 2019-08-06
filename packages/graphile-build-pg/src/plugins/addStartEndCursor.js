@@ -10,8 +10,9 @@ export default (function addStartEndCursor(value) {
   const data = value && value.data && value.data.length ? value.data : null;
   const startCursor = cursorify(data && data[0]);
   const endCursor = cursorify(data && data[value.data.length - 1]);
-  return Object.assign({}, value, {
+  return {
+    ...value,
     startCursor,
     endCursor,
-  });
+  };
 }: Plugin);

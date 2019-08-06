@@ -83,14 +83,12 @@ export default (function PgTypesPlugin(
           "Sorry! This interface is no longer supported because it is not granular enough. It's not hard to port it to the new system - please contact Benjie and he'll walk you through it."
         );
       }
-      const gqlTypeByTypeIdAndModifier = Object.assign(
-        {},
-        build.pgGqlTypeByTypeIdAndModifier
-      );
-      const gqlInputTypeByTypeIdAndModifier = Object.assign(
-        {},
-        build.pgGqlInputTypeByTypeIdAndModifier
-      );
+      const gqlTypeByTypeIdAndModifier = {
+        ...build.pgGqlTypeByTypeIdAndModifier,
+      };
+      const gqlInputTypeByTypeIdAndModifier = {
+        ...build.pgGqlInputTypeByTypeIdAndModifier,
+      };
       const isNull = val => val == null || val.__isNull;
       const pg2GqlMapper = {};
       const pg2gqlForType = type => {
@@ -255,25 +253,24 @@ export default (function PgTypesPlugin(
       const tweakToNumericText = fragment =>
         sql.fragment`(${fragment})::numeric::text`;
       const pgTweaksByTypeIdAndModifer = {};
-      const pgTweaksByTypeId = Object.assign(
+      const pgTweaksByTypeId = {
         // '::text' rawTypes
-        rawTypes.reduce((memo, typeId) => {
+        ...rawTypes.reduce((memo, typeId) => {
           memo[typeId] = tweakToText;
           return memo;
         }, {}),
-        {
-          // cast numbers above our ken to strings to avoid loss of precision
-          "20": tweakToText,
-          "1700": tweakToText,
-          // to_json all dates to make them ISO (overrides rawTypes above)
-          "1082": tweakToJson,
-          "1114": tweakToJson,
-          "1184": tweakToJson,
-          "1083": tweakToJson,
-          "1266": tweakToJson,
-          "790": tweakToNumericText,
-        }
-      );
+
+        // cast numbers above our ken to strings to avoid loss of precision
+        "20": tweakToText,
+        "1700": tweakToText,
+        // to_json all dates to make them ISO (overrides rawTypes above)
+        "1082": tweakToJson,
+        "1114": tweakToJson,
+        "1184": tweakToJson,
+        "1083": tweakToJson,
+        "1266": tweakToJson,
+        "790": tweakToNumericText,
+      };
 
       const pgTweakFragmentForTypeAndModifier = (
         fragment,

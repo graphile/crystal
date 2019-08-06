@@ -477,10 +477,11 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           this,
           "GraphQLObjectType",
           newSpec,
-          Object.assign({}, commonContext, {
+          {
+            ...commonContext,
             addDataGeneratorForField,
             recurseDataGeneratorsForField,
-          }),
+          },
           `|${newSpec.name}`
         );
 
@@ -641,18 +642,20 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                   `|${getNameFromType(Self)}.fields.${fieldName}`
                 );
                 newSpec.args = newSpec.args || {};
-                newSpec = Object.assign({}, newSpec, {
+                newSpec = {
+                  ...newSpec,
                   args: builder.applyHooks(
                     this,
                     "GraphQLObjectType:fields:field:args",
                     newSpec.args,
-                    Object.assign({}, context, {
+                    {
+                      ...context,
                       field: newSpec,
                       returnType: newSpec.type,
-                    }),
+                    },
                     `|${getNameFromType(Self)}.fields.${fieldName}`
                   ),
-                });
+                };
                 const finalSpec = newSpec;
                 processedFields.push(finalSpec);
                 return finalSpec;
@@ -711,7 +714,8 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           ...newSpec,
           fields: () => {
             const processedFields = [];
-            const fieldsContext = Object.assign({}, commonContext, {
+            const fieldsContext = {
+              ...commonContext,
               Self,
               GraphQLInputObjectType: rawSpec,
               fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
@@ -754,7 +758,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                 processedFields.push(finalSpec);
                 return finalSpec;
               }: InputFieldWithHooksFunction),
-            });
+            };
             let rawFields = rawSpec.fields;
             if (typeof rawFields === "function") {
               rawFields = rawFields(fieldsContext);
@@ -831,7 +835,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           this,
           "GraphQLUnionType",
           newSpec,
-          Object.assign({}, commonContext),
+          { ...commonContext },
           `|${newSpec.name}`
         );
 

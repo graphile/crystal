@@ -106,13 +106,15 @@ const tests = [
     schema: "withJwt",
     process: ({ data: { authenticatePayload } }) => {
       const { jwt: str } = authenticatePayload.authPayload;
-      return Object.assign({}, authenticatePayload, {
-        authPayload: Object.assign({}, authenticatePayload.authPayload, {
+      return {
+        ...authenticatePayload,
+        authPayload: {
+          ...authenticatePayload.authPayload,
           jwt: Object.assign(jwt.verify(str, jwtSecret), {
             iat: "[timestamp]",
           }),
-        }),
-      });
+        },
+      };
     },
   },
 ];

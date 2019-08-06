@@ -256,7 +256,11 @@ function sqlCommentByAddingTags(entity, tagsToAdd) {
     );
 
   // tagsToAdd is here twice to ensure that the keys in tagsToAdd come first, but that they also "win" any conflicts.
-  const tags = Object.assign({}, tagsToAdd, entity.tags, tagsToAdd);
+  const tags = {
+    ...tagsToAdd,
+    ...entity.tags,
+    ...tagsToAdd,
+  };
 
   const description = entity.description;
   const tagsSql = Object.keys(tags)
