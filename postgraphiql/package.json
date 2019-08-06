@@ -4,17 +4,23 @@
   "version": "1.0.0",
   "homepage": "https://graphile.org/postgraphile/",
   "dependencies": {
-    "graphiql": "npm:@benjie/graphiql@0.13.1-benjie.0",
+    "graphiql": "0.13.2",
     "graphiql-explorer": "^0.3.7",
     "graphql": "^14.2.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "^3.0.0"
+    "react-scripts": "^3.0.0",
+    "snyk": "^1.210.0"
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
