@@ -103,6 +103,7 @@ export interface PostGraphileCoreOptions {
   ignoreRBAC?: boolean;
   legacyFunctionsOnly?: boolean;
   ignoreIndexes?: boolean;
+  hideIndexWarnings?: boolean;
   subscriptions?: boolean;
   live?: boolean;
   ownerConnectionString?: string;
@@ -222,6 +223,7 @@ const getPostGraphileBuilder = async (
     ignoreRBAC = true, // TODO:v5: Change to 'false' in v5
     legacyFunctionsOnly = false, // TODO:v5: Remove in v5
     ignoreIndexes = true, // TODO:v5: Change to 'false' in v5
+    hideIndexWarnings = false,
     subscriptions: inSubscriptions = false, // TODO:v5: Change to 'true' in v5
     live = false,
     ownerConnectionString,
@@ -384,6 +386,7 @@ const getPostGraphileBuilder = async (
     pgIgnoreRBAC: ignoreRBAC,
     pgLegacyFunctionsOnly: legacyFunctionsOnly,
     pgIgnoreIndexes: ignoreIndexes,
+    pgHideIndexWarnings: hideIndexWarnings,
     pgOwnerConnectionString: ownerConnectionString,
 
     /*

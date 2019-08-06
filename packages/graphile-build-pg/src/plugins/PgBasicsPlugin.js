@@ -138,7 +138,7 @@ const omitWithRBACChecks = omit => (
   return omit(entity, permission);
 };
 
-const omitUnindexed = omit => (
+const omitUnindexed = (omit, hideIndexWarnings) => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
   permission: string
 ) => {
@@ -157,7 +157,9 @@ const omitUnindexed = omit => (
   ) {
     let klass = entity.class;
     if (klass) {
-      if (!entity._omitUnindexedReadWarningGiven) {
+      const shouldOutputWarning =
+        !entity._omitUnindexedReadWarningGiven && !hideIndexWarnings;
+      if (shouldOutputWarning) {
         // $FlowFixMe
         entity._omitUnindexedReadWarningGiven = true;
         // eslint-disable-next-line no-console
@@ -324,6 +326,7 @@ export default (function PgBasicsPlugin(
     pgColumnFilter = defaultPgColumnFilter,
     pgIgnoreRBAC = false,
     pgIgnoreIndexes = true, // TODO:v5: change this to false
+    pgHideIndexWarnings = false,
     pgLegacyJsonUuid = false, // TODO:v5: remove this
   }
 ) {
@@ -332,7 +335,7 @@ export default (function PgBasicsPlugin(
     pgOmit = omitWithRBACChecks(pgOmit);
   }
   if (!pgIgnoreIndexes) {
-    pgOmit = omitUnindexed(pgOmit);
+    pgOmit = omitUnindexed(pgOmit, pgHideIndexWarnings);
   }
   builder.hook(
     "build",
