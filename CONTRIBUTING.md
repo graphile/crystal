@@ -178,6 +178,10 @@ PostGraphile uses [Jest](http://facebook.github.io/jest/) for testing to take
 advantage of Jest’s snapshot feature. We test against a local database, so
 make sure PostgreSQL is running on `localhost:5432`.
 
+```
+createdb postgraphile_test
+```
+
 ### Graphile Engine
 
 Graphile Engine uses a user-configurable test database. For historic reasons,
