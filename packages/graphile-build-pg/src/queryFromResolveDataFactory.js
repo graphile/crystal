@@ -306,18 +306,26 @@ exists(
   }
   if (options.withPagination || options.withPaginationAsFields) {
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
+      function badCursor() {
+        queryBuilder.whereBound(sql.fragment`false`, isAfter);
+      }
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
       if (
         orderByExpressionsAndDirections.length > 0 &&
         queryBuilder.isOrderUnique()
       ) {
-        const sqlCursors = cursorValue[getPgCursorPrefix().length].map(val =>
-          sql.value(val)
-        );
-        if (!Array.isArray(sqlCursors)) {
-          queryBuilder.whereBound(sql.literal(false), isAfter);
+        const rawPrefixes = cursorValue.slice(0, cursorValue.length - 1);
+        const rawCursors = cursorValue[cursorValue.length - 1];
+        if (rawPrefixes.length !== getPgCursorPrefix().length) {
+          badCursor();
+          return;
+        }
+        if (!Array.isArray(rawCursors)) {
+          badCursor();
+          return;
         }
         let sqlFilter = sql.fragment`false`;
+        const sqlCursors = rawCursors.map(val => sql.value(val));
         for (let i = orderByExpressionsAndDirections.length - 1; i >= 0; i--) {
           const [sqlExpression, ascending] = orderByExpressionsAndDirections[i];
           // If ascending and isAfter then >
@@ -339,6 +347,16 @@ OR\
   )\
 )`;
         }
+
+        // Check the cursor prefixes apply
+        // TODO:v5: we should be able to do this in JS-land rather than SQL-land
+        sqlFilter = sql.fragment`(((${sql.join(
+          getPgCursorPrefix(),
+          ", "
+        )}) = (${sql.join(
+          rawPrefixes.map(val => sql.value(val)),
+          ", "
+        )})) AND (${sqlFilter}))`;
         queryBuilder.whereBound(sqlFilter, isAfter);
       } else if (
         cursorValue[0] === "natural" &&
@@ -354,7 +372,7 @@ OR\
           });
         }
       } else {
-        throw new Error("Cannot use cursors without orderBy");
+        throw new Error("Cannot use 'before'/'after' without unique 'orderBy'");
       }
     });
 
