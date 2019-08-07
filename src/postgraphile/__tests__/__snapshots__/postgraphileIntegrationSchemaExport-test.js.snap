@@ -457,7 +457,7 @@ type CreateCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 }
 
@@ -492,7 +492,7 @@ type CreateEdgeCasePayload {
   \\"\\"\\"An edge for our \`EdgeCase\`. May be used by Relay 1.\\"\\"\\"
   edgeCaseEdge(
     \\"\\"\\"The method to use when ordering \`EdgeCase\`.\\"\\"\\"
-    orderBy: [EdgeCasesOrderBy!] = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesEdge
 }
 
@@ -533,7 +533,7 @@ type CreateForeignKeyPayload {
   \\"\\"\\"An edge for our \`ForeignKey\`. May be used by Relay 1.\\"\\"\\"
   foreignKeyEdge(
     \\"\\"\\"The method to use when ordering \`ForeignKey\`.\\"\\"\\"
-    orderBy: [ForeignKeysOrderBy!] = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysEdge
 }
 
@@ -568,7 +568,7 @@ type CreatePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 }
 
@@ -606,7 +606,7 @@ type CreatePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 }
 
@@ -641,7 +641,7 @@ type CreateSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -676,7 +676,7 @@ type CreateSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -711,7 +711,7 @@ type CreateTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -746,7 +746,7 @@ type CreateUpdatableViewPayload {
   \\"\\"\\"An edge for our \`UpdatableView\`. May be used by Relay 1.\\"\\"\\"
   updatableViewEdge(
     \\"\\"\\"The method to use when ordering \`UpdatableView\`.\\"\\"\\"
-    orderBy: [UpdatableViewsOrderBy!] = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsEdge
 }
 
@@ -853,7 +853,7 @@ type DeleteCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 }
 
@@ -911,7 +911,7 @@ type DeletePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 }
 
@@ -962,7 +962,7 @@ type DeletePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 }
 
@@ -1010,7 +1010,7 @@ type DeleteSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -1058,7 +1058,7 @@ type DeleteSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -1106,7 +1106,7 @@ type DeleteTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -3006,7 +3006,7 @@ type TableMutationPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 }
 
@@ -3467,7 +3467,7 @@ type UpdateCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 }
 
@@ -3539,7 +3539,7 @@ type UpdatePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 }
 
@@ -3599,7 +3599,7 @@ type UpdatePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 }
 
@@ -3656,7 +3656,7 @@ type UpdateSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -3713,7 +3713,7 @@ type UpdateSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -3770,7 +3770,7 @@ type UpdateTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -13125,7 +13125,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"NATURAL\\"
+                  \\"defaultValue\\": \\"[NATURAL]\\"
                 }
               ],
               \\"type\\": {
@@ -13305,7 +13305,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -13473,7 +13473,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -13641,7 +13641,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -14125,7 +14125,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -14289,7 +14289,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"NATURAL\\"
+                  \\"defaultValue\\": \\"[NATURAL]\\"
                 }
               ],
               \\"type\\": {
@@ -14475,7 +14475,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -14629,7 +14629,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"NATURAL\\"
+                  \\"defaultValue\\": \\"[NATURAL]\\"
                 }
               ],
               \\"type\\": {
@@ -14811,7 +14811,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -15001,7 +15001,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -15228,7 +15228,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -15455,7 +15455,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -15906,7 +15906,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -16147,7 +16147,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -16398,7 +16398,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -16633,7 +16633,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -16793,7 +16793,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -16953,7 +16953,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -17113,7 +17113,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -17297,7 +17297,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -17471,7 +17471,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -19047,7 +19047,7 @@ exports[`exports a schema as JSON 1`] = `
                       }
                     }
                   },
-                  \\"defaultValue\\": \\"PRIMARY_KEY_ASC\\"
+                  \\"defaultValue\\": \\"[PRIMARY_KEY_ASC]\\"
                 }
               ],
               \\"type\\": {
@@ -20619,7 +20619,7 @@ type CreateCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`CompoundKey\`.\\"\\"\\"
@@ -20660,7 +20660,7 @@ type CreateEdgeCasePayload {
   \\"\\"\\"An edge for our \`EdgeCase\`. May be used by Relay 1.\\"\\"\\"
   edgeCaseEdge(
     \\"\\"\\"The method to use when ordering \`EdgeCase\`.\\"\\"\\"
-    orderBy: [EdgeCasesOrderBy!] = NATURAL
+    orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesEdge
 
   \\"\\"\\"
@@ -20698,7 +20698,7 @@ type CreateForeignKeyPayload {
   \\"\\"\\"An edge for our \`ForeignKey\`. May be used by Relay 1.\\"\\"\\"
   foreignKeyEdge(
     \\"\\"\\"The method to use when ordering \`ForeignKey\`.\\"\\"\\"
-    orderBy: [ForeignKeysOrderBy!] = NATURAL
+    orderBy: [ForeignKeysOrderBy!] = [NATURAL]
   ): ForeignKeysEdge
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`ForeignKey\`.\\"\\"\\"
@@ -20736,7 +20736,7 @@ type CreatePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   \\"\\"\\"
@@ -20774,7 +20774,7 @@ type CreatePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   \\"\\"\\"
@@ -20814,7 +20814,7 @@ type CreateSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -20849,7 +20849,7 @@ type CreateSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -20884,7 +20884,7 @@ type CreateTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -20919,7 +20919,7 @@ type CreateUpdatableViewPayload {
   \\"\\"\\"An edge for our \`UpdatableView\`. May be used by Relay 1.\\"\\"\\"
   updatableViewEdge(
     \\"\\"\\"The method to use when ordering \`UpdatableView\`.\\"\\"\\"
-    orderBy: [UpdatableViewsOrderBy!] = NATURAL
+    orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsEdge
 }
 
@@ -21014,7 +21014,7 @@ type DeleteCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
   deletedCompoundKeyId: ID
 
@@ -21079,7 +21079,7 @@ type DeletePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   \\"\\"\\"
@@ -21130,7 +21130,7 @@ type DeletePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   \\"\\"\\"
@@ -21183,7 +21183,7 @@ type DeleteSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -21231,7 +21231,7 @@ type DeleteSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -21279,7 +21279,7 @@ type DeleteTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
@@ -23181,7 +23181,7 @@ type TableMutationPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   \\"\\"\\"
@@ -23637,7 +23637,7 @@ type UpdateCompoundKeyPayload {
   \\"\\"\\"An edge for our \`CompoundKey\`. May be used by Relay 1.\\"\\"\\"
   compoundKeyEdge(
     \\"\\"\\"The method to use when ordering \`CompoundKey\`.\\"\\"\\"
-    orderBy: [CompoundKeysOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysEdge
 
   \\"\\"\\"Reads a single \`Person\` that is related to this \`CompoundKey\`.\\"\\"\\"
@@ -23715,7 +23715,7 @@ type UpdatePersonPayload {
   \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
   personEdge(
     \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
-    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleEdge
 
   \\"\\"\\"
@@ -23775,7 +23775,7 @@ type UpdatePostPayload {
   \\"\\"\\"An edge for our \`Post\`. May be used by Relay 1.\\"\\"\\"
   postEdge(
     \\"\\"\\"The method to use when ordering \`Post\`.\\"\\"\\"
-    orderBy: [PostsOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsEdge
 
   \\"\\"\\"
@@ -23837,7 +23837,7 @@ type UpdateSimilarTable1Payload {
   \\"\\"\\"An edge for our \`SimilarTable1\`. May be used by Relay 1.\\"\\"\\"
   similarTable1Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable1\`.\\"\\"\\"
-    orderBy: [SimilarTable1SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable1SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable1SEdge
 }
 
@@ -23894,7 +23894,7 @@ type UpdateSimilarTable2Payload {
   \\"\\"\\"An edge for our \`SimilarTable2\`. May be used by Relay 1.\\"\\"\\"
   similarTable2Edge(
     \\"\\"\\"The method to use when ordering \`SimilarTable2\`.\\"\\"\\"
-    orderBy: [SimilarTable2SOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [SimilarTable2SOrderBy!] = [PRIMARY_KEY_ASC]
   ): SimilarTable2SEdge
 }
 
@@ -23951,7 +23951,7 @@ type UpdateTypePayload {
   \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
   typeEdge(
     \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
-    orderBy: [TypesOrderBy!] = PRIMARY_KEY_ASC
+    orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
