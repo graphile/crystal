@@ -7,6 +7,39 @@ import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
+const defaultQuery = `\
+# Welcome to PostGraphile's built-in GraphiQL IDE
+#
+# GraphiQL is an in-browser tool for writing, validating, and
+# testing GraphQL queries.
+#
+# Type queries into this side of the screen, and you will see intelligent
+# typeaheads aware of the current GraphQL type schema and live syntax and
+# validation errors highlighted within the text.
+#
+# GraphQL queries typically start with a "{" character. Lines that starts
+# with a # are ignored.
+#
+# An example GraphQL query might look like:
+#
+#     {
+#       field(arg: "value") {
+#         subField
+#       }
+#     }
+#
+# Keyboard shortcuts:
+#
+#  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
+#
+#     Merge Query:  Shift-Ctrl-M (or press the merge button above)
+#
+#       Run Query:  Ctrl-Enter (or press the play button above)
+#
+#   Auto Complete:  Ctrl-Space (or just start typing)
+#
+`;
+
 const isSubscription = ({ query }) =>
   parse(query).definitions.some(
     definition =>
@@ -31,49 +64,6 @@ const isValidJSON = json => {
   }
 };
 
-/**
- * The GraphiQL Explorer sidebar.
- */
-class ExplorerWrapper extends React.PureComponent {
-  state = {
-    query: '',
-  };
-  componentDidMount() {
-    const graphiql = this.props.graphiql;
-    // Extract query from the graphiql ref
-    if (graphiql) {
-      this.setState({ query: graphiql.state.query });
-    }
-    // Set onEditQuery in the parent so that we can be notified of query changes
-    this.props.setOnEditQuery(query => this.setState({ query }));
-  }
-
-  componentDidUpdate(prevProps) {
-    if (!prevProps.graphiql && this.props.graphiql) {
-      // Extract query from the graphiql ref
-      this.setState({ query: this.props.graphiql.state.query });
-    }
-  }
-
-  _onEditQuery = query => {
-    const graphiql = this.props.graphiql;
-    if (graphiql) {
-      graphiql.handleEditQuery(query);
-    }
-  };
-  render() {
-    return (
-      <GraphiQLExplorer
-        schema={this.props.schema}
-        query={this.state.query}
-        onEdit={this._onEditQuery}
-        explorerIsOpen={this.props.explorerIsOpen}
-        onToggleExplorer={this.props.onToggleExplorer}
-      />
-    );
-  }
-}
-
 const l = window.location;
 const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
   ? POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws')
@@ -93,6 +83,7 @@ class PostGraphiQL extends React.PureComponent {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.
     schema: null,
+    query: '',
     showHeaderEditor: false,
     headersText: '{\n"Authorization": null\n}\n',
     headersTextValid: true,
@@ -100,6 +91,10 @@ class PostGraphiQL extends React.PureComponent {
     haveActiveSubscription: false,
     socketStatus:
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
+  };
+
+  _onEditQuery = query => {
+    this.setState({ query });
   };
 
   subscriptionsClient =
@@ -191,6 +186,13 @@ class PostGraphiQL extends React.PureComponent {
       // Store our event source so we can unsubscribe later.
       this._eventSource = eventSource;
     }
+    const graphiql = this.graphiql;
+    this.setState({ query: graphiql._storage.get('query') || defaultQuery });
+    const editor = graphiql.getQueryEditor();
+    editor.setOption('extraKeys', {
+      ...(editor.options.extraKeys || {}),
+      'Shift-Alt-LeftClick': this._handleInspectOperation,
+    });
   }
 
   componentWillUnmount() {
@@ -199,6 +201,59 @@ class PostGraphiQL extends React.PureComponent {
     this._eventSource.close();
     this._eventSource = null;
   }
+
+  _handleInspectOperation = (cm, mousePos) => {
+    const parsedQuery = parse(this.state.query || '');
+
+    if (!parsedQuery) {
+      console.error("Couldn't parse query document");
+      return null;
+    }
+
+    var token = cm.getTokenAt(mousePos);
+    var start = { line: mousePos.line, ch: token.start };
+    var end = { line: mousePos.line, ch: token.end };
+    var relevantMousePos = {
+      start: cm.indexFromPos(start),
+      end: cm.indexFromPos(end),
+    };
+
+    var position = relevantMousePos;
+
+    var def = parsedQuery.definitions.find(definition => {
+      if (!definition.loc) {
+        console.log('Missing location information for definition');
+        return false;
+      }
+
+      const { start, end } = definition.loc;
+      return start <= position.start && end >= position.end;
+    });
+
+    if (!def) {
+      console.error('Unable to find definition corresponding to mouse position');
+      return null;
+    }
+
+    var operationKind =
+      def.kind === 'OperationDefinition'
+        ? def.operation
+        : def.kind === 'FragmentDefinition'
+        ? 'fragment'
+        : 'unknown';
+
+    var operationName =
+      def.kind === 'OperationDefinition' && !!def.name
+        ? def.name.value
+        : def.kind === 'FragmentDefinition' && !!def.name
+        ? def.name.value
+        : 'unknown';
+
+    var selector = `.graphiql-explorer-root #${operationKind}-${operationName}`;
+
+    var el = document.querySelector(selector);
+    el && el.scrollIntoView();
+  };
 
   cancelSubscription = () => {
     if (this.activeSubscription !== null) {
@@ -522,13 +577,18 @@ class PostGraphiQL extends React.PureComponent {
     );
   }
 
+  setGraphiqlRef = ref => {
+    if (!ref) {
+      return;
+    }
+    this.graphiql = ref;
+    this.setState({ mounted: true });
+  };
+
   render() {
     const { schema } = this.state;
     const sharedProps = {
-      ref: ref => {
-        this.setState({ graphiql: ref });
-        this.graphiql = ref;
-      },
+      ref: this.setGraphiqlRef,
       schema: schema,
       fetcher: this.fetcher,
     };
@@ -537,14 +597,17 @@ class PostGraphiQL extends React.PureComponent {
     } else {
       return (
         <div className="postgraphiql-container graphiql-container">
-          <ExplorerWrapper
+          <GraphiQLExplorer
             schema={schema}
-            graphiql={this.state.graphiql}
-            setOnEditQuery={onEditQuery => this.setState({ onEditQuery })}
+            query={this.state.query}
+            onEdit={this._onEditQuery}
+            onRunOperation={operationName => this.graphiql.handleRunQuery(operationName)}
             explorerIsOpen={this.state.explorerIsOpen}
             onToggleExplorer={this.handleToggleExplorer}
+            //getDefaultScalarArgValue={getDefaultScalarArgValue}
+            //makeDefaultArg={makeDefaultArg}
           />
-          <GraphiQL onEditQuery={this.state.onEditQuery} {...sharedProps}>
+          <GraphiQL onEditQuery={this._onEditQuery} query={this.state.query} {...sharedProps}>
             <GraphiQL.Logo>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div>
