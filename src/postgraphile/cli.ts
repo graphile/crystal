@@ -278,7 +278,7 @@ pluginHook('cli:flags:add:webserver', addFlag);
 program
   .option(
     '-e, --jwt-secret <string>',
-    'the secret or private key to be used when creating and verifying JWTs. if none is provided auth will be disabled. in case of private key, the value should be in the PEM format. if PostGraphile will be used to verify tokens, public key should be set to the --jwt-public-key parameter',
+    'the secret or private key to be used when creating and/or verifying JWTs. If none is provided, JWT auth will be disabled. If using a private key, the value should be in the PEM format and the public key should be provided via `--jwt-public-key`',
   )
   .option(
     '--jwt-verify-algorithms <string>',
