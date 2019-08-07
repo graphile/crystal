@@ -6,6 +6,9 @@ import PgGenericSubscriptionPlugin from "./PgGenericSubscriptionPlugin";
 import PgSubscriptionResolverPlugin from "./PgSubscriptionResolverPlugin";
 import * as pg from "pg";
 
+const RECONNECT_BASE_DELAY = 100;
+const RECONNECT_MAX_DELAY = 30000;
+
 declare module "postgraphile" {
   interface PostGraphileOptions {
     simpleSubscriptions?: boolean;
@@ -109,7 +112,7 @@ const plugin: PostGraphilePlugin = {
       const sql = "UNLISTEN " + client.escapeIdentifier(channel);
       await client.query(sql);
     };
-    const channelListenCount = {};
+    const channelListenCount: { [key: string]: number } = {};
     const listen = async function(channel: string) {
       channelListenCount[channel] = (channelListenCount[channel] || 0) + 1;
       if (channelListenCount[channel] === 1 && listeningClient) {
@@ -144,9 +147,10 @@ const plugin: PostGraphilePlugin = {
     };
 
     const setupClient = async function(attempts = 0): Promise<void> {
-      if (attempts > 9) {
-        throw new Error(
-          "Attempted connection too many times, setupClient failed"
+      if (attempts > 0 && attempts % 5 === 0) {
+        // tslint:disable-next-line no-console
+        console.warn(
+          `WARNING: @graphile/pg-pubsub cannot establish a connection to the server; reattempting with exponential backoff (attempt ${attempts})`
         );
       }
       // Permanently check client out of the pool
@@ -154,7 +158,14 @@ const plugin: PostGraphilePlugin = {
       try {
         client = await pgPool.connect();
       } catch (e) {
-        await sleep(1000);
+        // Exponential back-off
+        const delay = Math.floor(
+          Math.min(
+            RECONNECT_MAX_DELAY,
+            RECONNECT_BASE_DELAY * Math.random() * 2 ** attempts
+          )
+        );
+        await sleep(delay);
         return setupClient(attempts + 1);
       }
       listeningClient = client;
@@ -163,7 +174,9 @@ const plugin: PostGraphilePlugin = {
       client["keepAliveInterval"] = setInterval(() => {
         client.query("select 1").catch(e => {
           // tslint:disable-next-line no-console
-          console.error("Listen client keepalive error");
+          console.error(
+            "Listen client keepalive error (will attempt reconnect):"
+          );
           // tslint:disable-next-line no-console
           console.error(e);
           releaseClient(client);
