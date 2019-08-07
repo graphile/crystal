@@ -202,7 +202,7 @@ class PostGraphiQL extends React.PureComponent {
     this._eventSource = null;
   }
 
-  _handleInspectOperation = (cm: any, mousePos: { line: Number, ch: Number }) => {
+  _handleInspectOperation = (cm, mousePos) => {
     const parsedQuery = parse(this.state.query || '');
 
     if (!parsedQuery) {
