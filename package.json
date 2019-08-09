@@ -63,7 +63,7 @@
     "pg": ">=6.1.0 <8",
     "pg-connection-string": "^2.0.0",
     "pg-sql2": "^4.4.1-alpha.2",
-    "postgraphile-core": "4.4.3",
+    "postgraphile-core": "4.4.4",
     "subscriptions-transport-ws": "^0.9.15",
     "tslib": "^1.5.0",
     "ws": "^6.1.3"
