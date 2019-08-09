@@ -5,6 +5,7 @@ const { readdirSync, readFile: rawReadFile } = require("fs");
 const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphile-build:schema");
+const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -58,6 +59,20 @@ beforeAll(() => {
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
+        appendPlugins: [
+          makeExtendSchemaPlugin({
+            typeDefs: gql`
+              extend type Query {
+                extended: Boolean
+              }
+            `,
+            resolvers: {
+              Query: {
+                extended: () => true,
+              },
+            },
+          }),
+        ],
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,

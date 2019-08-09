@@ -1214,6 +1214,15 @@ Object {
 }
 `;
 
+exports[`directives.graphql 1`] = `
+Object {
+  "data": Object {
+    "a": "query",
+    "d": "query",
+  },
+}
+`;
+
 exports[`dynamic-json.condition-json-field-variable.graphql 1`] = `
 Object {
   "data": Object {

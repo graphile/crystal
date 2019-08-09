@@ -476,7 +476,9 @@ class SchemaBuilder extends EventEmitter {
       const build = this.createBuild();
       const schema = build.newWithHooks(
         GraphQLSchema,
-        {},
+        {
+          directives: [...build.graphql.specifiedDirectives],
+        },
         {
           __origin: `GraphQL built-in`,
           isSchema: true,

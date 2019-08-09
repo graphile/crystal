@@ -109,7 +109,7 @@ Very optional:
 
 This package installs the `graphile-lds` command. If you installed it globally you should be able to execute it directly, otherwise we advise you run `npx` to run it:
 
-`LD_DATABASE_URL="postgres://localhost/my_db" npx graphile-lds`
+`LD_DATABASE_URL="postgres:///my_db" npx graphile-lds`
 
 ## Cleaning up
 

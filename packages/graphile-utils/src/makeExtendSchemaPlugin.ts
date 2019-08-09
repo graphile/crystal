@@ -411,7 +411,7 @@ export default function makeExtendSchemaPlugin(
       return {
         ...schema,
         directives: [
-          ...(schema.directives || []),
+          ...(schema.directives || build.graphql.specifiedDirectives || []),
           ...typeExtensions.GraphQLSchema.directives,
         ],
         types: [...(schema.types || []), ...typeExtensions.GraphQLSchema.types],
