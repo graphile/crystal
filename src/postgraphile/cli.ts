@@ -426,16 +426,8 @@ const {
   jwtVerifyIgnoreNotBefore,
   jwtVerifyIssuer,
   jwtVerifySubject,
-  jwtSignAlgorithm,
-  jwtSignKeyId,
-  jwtSignExpiresIn,
-  jwtSignNotBefore,
-  jwtSignAudience,
-  jwtSignSubject,
-  jwtSignIssuer,
-  jwtSignJwtId,
-  jwtSignNoTimestamp,
-  jwtSignEncoding,
+  jwtSignOptions = {},
+  jwtVerifyOptions,
   jwtRole = ['role'],
   token: deprecatedJwtPgTypeIdentifier,
   jwtTokenIdentifier: jwtPgTypeIdentifier,
@@ -576,29 +568,19 @@ function trimNulls(obj: object): object {
   }, {});
 }
 
-const jwtSignOptions: jwt.SignOptions = trimNulls({
-  algorithm: jwtSignAlgorithm,
-  keyid: jwtSignKeyId,
-  expiresIn: jwtSignExpiresIn,
-  notBefore: jwtSignNotBefore,
-  audience: jwtSignAudience,
-  subject: jwtSignSubject,
-  issuer: jwtSignIssuer,
-  jwtid: jwtSignJwtId,
-  noTimestamp: jwtSignNoTimestamp,
-  encoding: jwtSignEncoding,
-});
-
-const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
-  algorithms: jwtVerifyAlgorithms,
-  audience: jwtVerifyAudience,
-  clockTolerance: jwtVerifyClockTolerance,
-  jwtId: jwtVerifyId,
-  ignoreExpiration: jwtVerifyIgnoreExpiration,
-  ignoreNotBefore: jwtVerifyIgnoreNotBefore,
-  issuer: jwtVerifyIssuer,
-  subject: jwtVerifySubject,
-});
+const jwtVerifyOptionsActual: jwt.VerifyOptions =
+  jwtVerifyOptions ?
+    jwtVerifyOptions :
+    trimNulls({
+      algorithms: jwtVerifyAlgorithms,
+      audience: jwtVerifyAudience,
+      clockTolerance: jwtVerifyClockTolerance,
+      jwtId: jwtVerifyId,
+      ignoreExpiration: jwtVerifyIgnoreExpiration,
+      ignoreNotBefore: jwtVerifyIgnoreNotBefore,
+      issuer: jwtVerifyIssuer,
+      subject: jwtVerifySubject,
+    });
 
 // The options to pass through to the schema builder, or the middleware
 const postgraphileOptions = pluginHook(
@@ -620,7 +602,7 @@ const postgraphileOptions = pluginHook(
     jwtAudiences,
     jwtSignOptions,
     jwtRole,
-    jwtVerifyOptions,
+    jwtVerifyOptions: jwtVerifyOptionsActual,
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
