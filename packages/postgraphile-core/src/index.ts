@@ -183,7 +183,7 @@ const awaitKeys = async (obj: { [key: string]: Promise<any> }) => {
   return result;
 };
 
-const getPostGraphileBuilder = async (
+export const getPostGraphileBuilder = async (
   pgConfig: PgConfig,
   schemas: string | Array<string>,
   options: PostGraphileCoreOptions = {}
