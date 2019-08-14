@@ -568,6 +568,21 @@ function trimNulls(obj: object): object {
   }, {});
 }
 
+if (
+  jwtVerifyOptions &&
+  (jwtVerifyAlgorithms ||
+    jwtVerifyAudience ||
+    jwtVerifyClockTolerance ||
+    jwtVerifyId ||
+    jwtVerifyIgnoreExpiration ||
+    jwtVerifyIgnoreNotBefore ||
+    jwtVerifyIssuer ||
+    jwtVerifySubject)
+) {
+  throw new Error(
+    'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.'
+  );
+}
 const jwtVerifyOptionsActual: jwt.VerifyOptions =
   jwtVerifyOptions ?
     jwtVerifyOptions :
