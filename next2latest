@@ -15,3 +15,5 @@ next2latest @graphile/pg-pubsub
 next2latest @graphile/lds
 next2latest @graphile/subscriptions-lds
 next2latest postgraphile
+
+echo "DON'T FORGET - you need to push the latest tag to the v4 branch on PostGraphile for Docker to build"
