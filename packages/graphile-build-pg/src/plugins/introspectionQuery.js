@@ -166,9 +166,9 @@ with
       -- - https://www.postgresql.org/message-id/CAEZATCV2_qN9P3zbvADwME_TkYf2gR_X2cLQR4R+pqkwxGxqJg@mail.gmail.com
       -- - https://github.com/postgres/postgres/blob/2410a2543e77983dab1f63f48b2adcd23dba994e/src/backend/utils/adt/misc.c#L684
       -- - https://github.com/postgres/postgres/blob/3aff33aa687e47d52f453892498b30ac98a296af/src/backend/rewrite/rewriteHandler.c#L2351
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00010000') = B'00010000' as "isInsertable",
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00001000') = B'00001000' as "isUpdatable",
-      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00000100') = B'00000100' as "isDeletable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00010000') = B'00010000' as "isDeletable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00001000') = B'00001000' as "isInsertable",
+      (pg_catalog.pg_relation_is_updatable(rel.oid, true)::bit(8) operator(pg_catalog.&) B'00000100') = B'00000100' as "isUpdatable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'SELECT')) as "aclSelectable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'INSERT')) as "aclInsertable",
       exists(select 1 from accessible_roles where has_table_privilege(accessible_roles.oid, rel.oid, 'UPDATE')) as "aclUpdatable",
