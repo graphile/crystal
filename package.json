@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "@graphile/lru": "^4.4.1-alpha.2",
-    "@types/graphql": "^14.0.3",
     "@types/jsonwebtoken": "^8.3.2",
     "@types/koa": "^2.0.44",
     "@types/pg": "^7.4.10",
