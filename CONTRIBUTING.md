@@ -16,6 +16,8 @@ Since PostGraphile is mostly powered by Graphile Engine the best way to
 develop it is to do it in the context of a Graphile Engine build so that you
 may dig into the depths if you need to.
 
+### Yarn
+
 We use yarn workspaces, so it's very important that you use the `yarn`
 package manager rather an npm whilst developing PostGraphile.
 
@@ -53,6 +55,8 @@ a time), but if you're using zsh you may want to run this first so that comments
 set -k
 ```
 
+### Setup
+
 Okay, here's the setup:
 
 ```bash
@@ -86,6 +90,41 @@ yarn
 # Builds GraphiQL, images, etc so they can be require()d:
 yarn make-assets
 ```
+
+### Database setup
+
+For testing, Postgraphile of course requires a Postgres database. [Download and install](https://www.postgresql.org/download/) it, e.g. with:
+```
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib postgresql-client-common
+```
+Then we need to set up a superuser (who can install extensions) and create test databases for the individual test suites.
+You can use the [command line utilities](https://www.postgresql.org/docs/current/reference-client.html) or go with `psql`:
+```
+sudo -u postgres psql
+  CREATE ROLE me WITH LOGIN SUPERUSER; -- PASSWORD 'mypassword'
+  SET ROLE me;
+  CREATE DATABASE postgraphile_test;
+  COMMENT ON DATABASE postgraphile_test IS 'https://github.com/graphile/postgraphile';
+  CREATE DATABASE graphileengine_test;
+  COMMENT ON DATABASE graphileengine_test IS 'https://github.com/graphile/graphile-engine';
+```
+You may use the default `postgres` superuser as well instead of your own one.
+Using your OS login for naming the user `me` requires fewer customisations down the road, as it will be the default.
+
+The [`lds` package](./lds/README.md) does use another database `lds_test`, created by its `yarn db:init` script.
+The `pg-pubsub` package does use another database `subs`, created by its `test.sh` script.
+
+To allow login without a password, best change the [`pg_hba.conf`](https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html) so that the user is always accepted from the local machine:
+```
+# for postgraphile testing
+local	postgraphile_test,graphileengine_test,lds_test	all				trust
+host	postgraphile_test,graphileengine_test,lds_test	me	127.0.0.1/32		trust
+host	postgraphile_test,graphileengine_test,lds_test	me	::1/128			trust
+```
+
+You don't need to install Postgres locally, running it on an external server or in a Docker container (like [this](./run-pg)) works as well.
+See below for how to make your database connections known to the test runner.
 
 ## Developing
 
@@ -175,28 +214,29 @@ otherwise yarn will restore the release versions of `postgraphile-core`,
 ## Tests
 
 PostGraphile uses [Jest](http://facebook.github.io/jest/) for testing to take
-advantage of Jest’s snapshot feature. We test against a local database, so
-make sure PostgreSQL is running on `localhost:5432`.
-
-```
-createdb postgraphile_test
-```
+advantage of Jest’s snapshot feature. We test against a local database, so make sure [it is set up](#Database_setup).
+PostgreSQL is by default running on `localhost:5432` (if that port isn't already used).
 
 ### Graphile Engine
 
-Graphile Engine uses a user-configurable test database. For historic reasons,
-Benjie calls it `pggql_test` (this is from before Graphile Engine had a
-name!), so we'll use that name here:
-
+Graphile Engine uses a user-configurable test database, for example `graphileengine_test`:
 ```
-createdb pggql_test
+createdb graphileengine_test
 ```
 
-We must then export a `TEST_DATABASE_URL` environment variable so the tests
+The tests of the `postgraphile-core`, `graphile-utils` and `pg-pubsub` packages use the `TEST_DATABASE_URL` environment variable, which is mandatory.
+Its format is a [connection URL](https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6), passed to [node-postgres](https://node-postgres.com/features/connecting#Connection URI).
+
+The tests of the `lds` and `subscriptions-lds` packages use the `LDS_TEST_DATABASE_URL` environment variable, with `"lds_test"` as the fallback.
+Note: before you can run those tests, you'll need to configure your PostgreSQL server to support logical decoding for the live queries tests.
+See [the @graphile/lds README](packages/lds/README.md#postgresql-configuration) for how to enable `wal_level = logical`.
+
+We must then export this `TEST_DATABASE_URL` environment variable so the tests
 know where to install. **WARNING**: this database will be overwritten!
 
 ```
-export TEST_DATABASE_URL="postgres://localhost/pggql_test"
+# assuming passwordless login is set up
+export TEST_DATABASE_URL="postgres://localhost/graphileengine_test"
 ```
 
 Then you can run the tests with
@@ -223,6 +263,9 @@ To run PostGraphile tests you will need to first create the
 ```bash
 createdb postgraphile_test
 ```
+
+The tests use the `TEST_PG_URL` environment variable as a connection URL, which can be overwritten.
+The default value is `'postgres:///postgraphile_test'`.
 
 Then run the test suite with:
 
