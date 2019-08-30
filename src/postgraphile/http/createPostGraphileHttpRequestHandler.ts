@@ -208,7 +208,7 @@ export default function createPostGraphileHttpRequestHandler(
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
   const graphiqlRoute = graphiql ? options.graphiqlRoute || '/graphiql' : null;
-  const streamRoute = `${graphqlRoute}/stream`;
+  const streamRoute = `${graphqlRoute.replace(/\/*$/, '')}/stream`;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -387,7 +387,7 @@ export default function createPostGraphileHttpRequestHandler(
           /<\/head>/,
           `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
             graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
-            streamUrl: watchPg ? `${externalUrlBase}${graphqlRoute}/stream` : null,
+            streamUrl: watchPg ? `${externalUrlBase}${streamRoute}` : null,
             enhanceGraphiql,
             subscriptions,
           })};</script>\n  </head>`,
@@ -562,7 +562,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${graphqlRoute}/stream`);
+      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${streamRoute}`);
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
