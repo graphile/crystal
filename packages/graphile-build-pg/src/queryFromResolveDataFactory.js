@@ -310,10 +310,12 @@ exists(
         queryBuilder.whereBound(sql.fragment`false`, isAfter);
       }
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
-      if (
-        orderByExpressionsAndDirections.length > 0 &&
-        queryBuilder.isOrderUnique()
-      ) {
+      if (orderByExpressionsAndDirections.length > 0) {
+        if (!queryBuilder.isOrderUnique()) {
+          throw new Error(
+            "The order supplied is not unique, so before/after cursors cannot be used. Please ensure the supplied order includes all the columns from the primary key or a unique constraint."
+          );
+        }
         const rawPrefixes = cursorValue.slice(0, cursorValue.length - 1);
         const rawCursors = cursorValue[cursorValue.length - 1];
         if (rawPrefixes.length !== getPgCursorPrefix().length) {
