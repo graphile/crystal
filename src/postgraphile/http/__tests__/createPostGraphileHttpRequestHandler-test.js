@@ -932,6 +932,15 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('X-GraphQL-Event-Stream', `${subpath}/graphql/stream`);
     });
 
+    test('will set domain relative X-GraphQL-Event-Stream if prefix ends with a /', async () => {
+      const server = await createServer({ watchPg: true, graphqlRoute: '/' });
+      await request(server)
+        .post(`${subpath}/`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('X-GraphQL-Event-Stream', `${subpath}/stream`);
+    });
+
     test('will render GraphiQL on another route if desired', async () => {
       const server1 = await createServer({ graphiqlRoute: `/x` });
       const server2 = await createServer({ graphiql: true, graphiqlRoute: `/x` });
