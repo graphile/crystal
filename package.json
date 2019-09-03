@@ -34,6 +34,7 @@
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint": "eslint packages && lerna run tslint",
+    "lint:fix": "eslint --fix 'packages/**/*.{ts,js}'",
     "flow": "flow",
     "flow:check": "flow check",
     "test": "lerna run --concurrency 1 test",
