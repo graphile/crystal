@@ -1,1 +1,1 @@
-rm -Rf node_modules/graphile-utils node_modules/graphile-build node_modules/graphile-build-pg node_modules/postgraphile-core/ node_modules/graphql-parse-resolve-info node_modules/graphql node_modules/pg-sql2 node_modules/@types/graphql node_modules/@types/pg node_modules/pg-sql2 node_modules/@graphile
+rm -Rf node_modules/graphile-utils node_modules/graphile-build node_modules/graphile-build-pg node_modules/postgraphile-core/ node_modules/graphql-parse-resolve-info node_modules/graphql node_modules/pg-sql2 node_modules/@types/pg node_modules/pg-sql2 node_modules/@graphile
