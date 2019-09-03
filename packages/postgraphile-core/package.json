@@ -20,7 +20,6 @@
     "url": "https://github.com/graphile/graphile-build/issues"
   },
   "dependencies": {
-    "@types/graphql": "^14.2.0",
     "graphile-build": "4.4.4",
     "graphile-build-pg": "4.4.4"
   },
