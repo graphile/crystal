@@ -15,7 +15,6 @@ export default function extend<Obj1: *, Obj2: *>(
   extra: Obj2,
   hint?: string
 ): Obj1 & Obj2 {
-  // $FlowFixMe
   const hints = base[$$hints] || {};
 
   const keysB = Object.keys(extra);
@@ -24,7 +23,6 @@ export default function extend<Obj1: *, Obj2: *>(
     const newValue = extra[key];
     const hintB = extraHints[key] || hint;
     if (key in base && base[key] !== newValue) {
-      // $FlowFixMe
       const hintA: ?string = hints[key];
       const firstEntityDetails = !hintA
         ? "We don't have any information about the first entity."
@@ -43,7 +41,7 @@ export default function extend<Obj1: *, Obj2: *>(
     }
   }
   return Object.assign(base, extra, {
-    // $FlowFixMe
+    // $FlowFixMe: symbols
     [$$hints]: hints,
   });
 }

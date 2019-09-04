@@ -59,6 +59,7 @@ export const getBuilder = async (
         )}`
       );
     }
+    // $FlowFixMe: displayName
     builder._setPluginName(plugin.displayName || plugin.name);
     await plugin(builder, options);
     builder._setPluginName(null);

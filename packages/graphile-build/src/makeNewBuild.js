@@ -172,7 +172,9 @@ const mergeData = (
   ReturnType,
   arg
 ) => {
-  const results: ?Array<MetaData> = ensureArray(gen(arg, ReturnType, data));
+  const results: ?Array<MetaData> = ensureArray<MetaData>(
+    gen(arg, ReturnType, data)
+  );
   if (!results) {
     return;
   }
@@ -187,7 +189,7 @@ const mergeData = (
       const k = keys[i];
       data[k] = data[k] || [];
       const value: mixed = result[k];
-      const newData: ?Array<mixed> = ensureArray(value);
+      const newData: ?Array<mixed> = ensureArray<mixed>(value);
       if (newData) {
         data[k].push(...newData);
       }
@@ -204,13 +206,14 @@ const knownTypes = [
 ];
 const knownTypeNames = knownTypes.map(k => k.name);
 
-function ensureArray<T>(val: void | Array<T> | T): void | Array<T> {
+function ensureArray<T>(val: null | T | Array<T>): void | Array<T> {
   if (val == null) {
     return;
   } else if (Array.isArray(val)) {
-    return val;
+    // $FlowFixMe
+    return (val: Array<T>);
   } else {
-    return [val];
+    return ([val]: Array<T>);
   }
 }
 
@@ -218,6 +221,7 @@ function ensureArray<T>(val: void | Array<T> | T): void | Array<T> {
 let ensureName = fn => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   ensureName = fn => {
+    // $FlowFixMe: displayName
     if (isDev && !fn.displayName && !fn.name && debug.enabled) {
       // eslint-disable-next-line no-console
       console.trace(
@@ -372,7 +376,9 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           fieldName,
           fn: DataGeneratorFunction
         ) => {
+          // $FlowFixMe: displayName
           fn.displayName =
+            // $FlowFixMe: displayName
             fn.displayName ||
             `${getNameFromType(Self)}:${fieldName}[${fn.name || "anonymous"}]`;
           fieldDataGeneratorsByFieldName[fieldName] =

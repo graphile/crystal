@@ -60,7 +60,7 @@ export default (function ClientMutationIdDescriptionPlugin(
 
   builder.hook(
     "GraphQLObjectType:fields:field:args",
-    (args: {}, build, context) => {
+    (args: { input?: { description?: string, ... }, ... }, build, context) => {
       const { extend } = build;
       const {
         scope: { isRootMutation, fieldName },

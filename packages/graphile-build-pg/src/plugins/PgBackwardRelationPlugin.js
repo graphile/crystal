@@ -419,9 +419,9 @@ export default (function PgBackwardRelationPlugin(
                         },
                         ...(isDeprecated
                           ? {
-                              deprecationReason:
-                                // $FlowFixMe
-                                `Please use ${singleRelationFieldName} instead`,
+                              deprecationReason: singleRelationFieldName
+                                ? `Please use ${singleRelationFieldName} instead`
+                                : `Please use singular instead`, // This should never happen
                             }
                           : null),
                       };

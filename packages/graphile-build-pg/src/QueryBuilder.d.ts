@@ -15,7 +15,7 @@ export type RawAlias = symbol | string;
 export type SQLAlias = SQL;
 export type SQLGen = Gen<SQL> | SQL;
 export type NumberGen = Gen<number> | number;
-export type CursorValue = object;
+export type CursorValue = Array<any>;
 export type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
 export default class QueryBuilder {

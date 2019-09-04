@@ -15,7 +15,10 @@ type GenContext = {
 };
 type Gen<T> = (context: GenContext) => T;
 
-function callIfNecessary<T>(o: Gen<T> | T, context: GenContext): T {
+// Importantly, this cannot include a function
+type CallResult = null | string | number | boolean | SQL;
+
+function callIfNecessary<T: CallResult>(o: Gen<T> | T, context: GenContext): T {
   if (typeof o === "function") {
     return o(context);
   } else {
@@ -23,7 +26,7 @@ function callIfNecessary<T>(o: Gen<T> | T, context: GenContext): T {
   }
 }
 
-function callIfNecessaryArray<T>(
+function callIfNecessaryArray<T: CallResult>(
   o: Array<Gen<T> | T>,
   context: GenContext
 ): Array<T> {
@@ -38,7 +41,7 @@ export type RawAlias = Symbol | string;
 type SQLAlias = SQL;
 type SQLGen = Gen<SQL> | SQL;
 type NumberGen = Gen<number> | number;
-type CursorValue = {};
+type CursorValue = Array<mixed>;
 type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
 export type QueryBuilderOptions = {
@@ -278,7 +281,7 @@ class QueryBuilder {
     if (!this.data.beforeLock[field]) {
       this.data.beforeLock[field] = [];
     }
-    // $FlowFixMe
+    // $FlowFixMe: this is guaranteed to be set, due to the if statement above
     this.data.beforeLock[field].push(fn);
   }
 
@@ -298,12 +301,13 @@ class QueryBuilder {
       return record => checkers.every(checker => checker(record));
     };
     if (this.parentQueryBuilder) {
+      const parentQueryBuilder = this.parentQueryBuilder;
       if (cb) {
         throw new Error(
           "Either use parentQueryBuilder or pass callback, not both."
         );
       }
-      this.parentQueryBuilder.beforeLock("select", () => {
+      parentQueryBuilder.beforeLock("select", () => {
         const id = this.rootValue.liveConditions.push(checkerGenerator) - 1;
         // BEWARE: it's easy to override others' conditions, and that will cause issues. Be sensible.
         const allRequirements = this.data.liveConditions.reduce(
@@ -311,8 +315,7 @@ class QueryBuilder {
             requirements ? Object.assign(memo, requirements) : memo,
           {}
         );
-        // $FlowFixMe
-        this.parentQueryBuilder.select(
+        parentQueryBuilder.select(
           sql.fragment`\
 json_build_object('__id', ${sql.value(id)}::int
 ${sql.join(
@@ -788,16 +791,14 @@ order by (row_number() over (partition by 1)) desc`;
 
       // Assume that duplicate fields must be identical, don't output the same
       // key multiple times
-      const seenFields = {};
+      const seenFields: { [key: string | Symbol]: true } = {};
       const data = [];
       const selects = this.data[type];
 
       // DELIBERATE slow loop, see NOTICE above
       for (let i = 0; i < selects.length; i++) {
         const [valueOrGenerator, columnName] = selects[i];
-        // $FlowFixMe
         if (!seenFields[columnName]) {
-          // $FlowFixMe
           seenFields[columnName] = true;
           data.push([callIfNecessary(valueOrGenerator, context), columnName]);
           locks = beforeLock[type];

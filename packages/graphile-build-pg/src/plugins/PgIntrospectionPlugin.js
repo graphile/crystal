@@ -223,13 +223,19 @@ const removeQuotes = str => {
   }
 };
 
-const parseSqlColumn = (str, array = false) => {
+const parseSqlColumnArray = str => {
   if (!str) {
     throw new Error(`Cannot parse '${str}'`);
   }
-  const parts = array ? str.split(",") : [str];
-  const parsedParts = parts.map(removeQuotes);
-  return array ? parsedParts : parsedParts[0];
+  const parts = str.split(",");
+  return parts.map(removeQuotes);
+};
+
+const parseSqlColumnString = str => {
+  if (!str) {
+    throw new Error(`Cannot parse '${str}'`);
+  }
+  return removeQuotes(str);
 };
 
 function parseConstraintSpec(rawSpec) {
@@ -293,8 +299,7 @@ function smartCommentConstraints(introspectionResults) {
       const { spec: pkSpec, tags, description } = parseConstraintSpec(
         klass.tags.primaryKey
       );
-      // $FlowFixMe
-      const columns: string[] = parseSqlColumn(pkSpec, true);
+      const columns: string[] = parseSqlColumnArray(pkSpec);
       const attributes = attributesByNames(
         klass,
         columns,
@@ -376,15 +381,11 @@ function smartCommentConstraints(introspectionResults) {
           ? rawSchemaOrTable
           : `"${klass.namespaceName}"`;
         const rawTable = rawTableOnly || rawSchemaOrTable;
-        // $FlowFixMe
-        const columns: string[] = parseSqlColumn(rawColumns, true);
-        // $FlowFixMe
-        const foreignSchema: string = parseSqlColumn(rawSchema);
-        // $FlowFixMe
-        const foreignTable: string = parseSqlColumn(rawTable);
-        // $FlowFixMe
-        const foreignColumns: string[] = rawForeignColumns
-          ? parseSqlColumn(rawForeignColumns, true)
+        const columns: string[] = parseSqlColumnArray(rawColumns);
+        const foreignSchema: string = parseSqlColumnString(rawSchema);
+        const foreignTable: string = parseSqlColumnString(rawTable);
+        const foreignColumns: string[] | null = rawForeignColumns
+          ? parseSqlColumnArray(rawForeignColumns)
           : null;
 
         const foreignKlass = introspectionResults.class.find(
@@ -857,9 +858,9 @@ export default (async function PgIntrospectionPlugin(
         const {
           pgClient,
           releasePgClient,
-          // $FlowFixMe: 'Cannot call await with getPgClientAndReleaserFromConfig(...) bound to p because property pgClient is missing in Promise [1].'
         } = await getPgClientAndReleaserFromConfig(pgConfig);
         this.client = pgClient;
+        // $FlowFixMe: hack property
         this._reallyReleaseClient = releasePgClient;
         pgClient.on("notification", this._listener);
         pgClient.on("error", this._handleClientError);
@@ -981,6 +982,7 @@ export default (async function PgIntrospectionPlugin(
     }
 
     async _releaseClient() {
+      // $FlowFixMe
       this._handleChange.cancel();
       const pgClient = this.client;
       const reallyReleaseClient = this._reallyReleaseClient;
@@ -1023,7 +1025,6 @@ export default (async function PgIntrospectionPlugin(
         // TODO:v5: remove this workaround
         // This is a bit of a hack, but until we have plugin priorities it's the
         // easiest way to conditionally support PG9.4.
-        // $FlowFixMe
         build.pgQueryFromResolveData = queryFromResolveDataFactory({
           supportsJSONB: false,
         });
