@@ -8,6 +8,7 @@ sponsor](https://graphile.org/sponsor/).
 
 - Chad Furman
 - Timescale
+- Point 72 Ventures
 
 ## Leaders
 
@@ -24,14 +25,13 @@ sponsor](https://graphile.org/sponsor/).
 
 - Daniel Einspanger
 - Michael Tng
-- Matt Bretl (also a major community contributor!)
 - Sam Levin
+- Matt Bretl (also a major community contributor!)
 - stlbucket
 - Michel Pelletier
 - Dan Lynch
 - James Rascoe
 - Chris Watland
-- Antwaan Harrison
 - James Cavanaugh
 - Mark Lipscombe
 - purge
@@ -39,5 +39,7 @@ sponsor](https://graphile.org/sponsor/).
 - Mark Rapoza
 - innovation.rocks
 - cybere
-- Daniel Woelfel
+- dwwoelfel
 - Bjørn Michelsen
+- Storyscript
+- cj
