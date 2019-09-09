@@ -427,7 +427,7 @@ const {
   jwtVerifyIssuer,
   jwtVerifySubject,
   jwtSignOptions = {},
-  jwtVerifyOptions,
+  jwtVerifyOptions: rawJwtVerifyOptions,
   jwtRole = ['role'],
   token: deprecatedJwtPgTypeIdentifier,
   jwtTokenIdentifier: jwtPgTypeIdentifier,
@@ -569,7 +569,7 @@ function trimNulls(obj: object): object {
 }
 
 if (
-  jwtVerifyOptions &&
+  rawJwtVerifyOptions &&
   (jwtVerifyAlgorithms ||
     jwtVerifyAudience ||
     jwtVerifyClockTolerance ||
@@ -583,9 +583,9 @@ if (
     'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.'
   );
 }
-const jwtVerifyOptionsActual: jwt.VerifyOptions =
-  jwtVerifyOptions ?
-    jwtVerifyOptions :
+const jwtVerifyOptions: jwt.VerifyOptions =
+  rawJwtVerifyOptions ?
+    rawJwtVerifyOptions :
     trimNulls({
       algorithms: jwtVerifyAlgorithms,
       audience: jwtVerifyAudience,
@@ -617,7 +617,7 @@ const postgraphileOptions = pluginHook(
     jwtAudiences,
     jwtSignOptions,
     jwtRole,
-    jwtVerifyOptions: jwtVerifyOptionsActual,
+    jwtVerifyOptions,
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
