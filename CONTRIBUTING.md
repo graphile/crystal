@@ -113,7 +113,6 @@ You may use the default `postgres` superuser as well instead of your own one.
 Using your OS login for naming the user `me` requires fewer customisations down the road, as it will be the default.
 
 The [`lds` package](./lds/README.md) does use another database `lds_test`, created by its `yarn db:init` script.
-The `pg-pubsub` package does use another database `subs`, created by its `test.sh` script.
 
 To allow login without a password, best change the [`pg_hba.conf`](https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html) so that the user is always accepted from the local machine:
 ```
@@ -227,7 +226,7 @@ createdb graphileengine_test
 The tests of the `postgraphile-core`, `graphile-utils` and `pg-pubsub` packages use the `TEST_DATABASE_URL` environment variable, which is mandatory.
 Its format is a [connection URL](https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6), passed to [node-postgres](https://node-postgres.com/features/connecting#Connection URI).
 
-The tests of the `lds` and `subscriptions-lds` packages use the `LDS_TEST_DATABASE_URL` environment variable, with `"lds_test"` as the fallback.
+The `lds` and `subscriptions-lds` packages' test commands will create and use a new `"lds_test"` database using the `createdb` command. If you cannot make `createdb` run directly without options (e.g. if you're not using `trust` authentication) then you may set the `LDS_TEST_DATABASE_URL` environment variable and seed the DB and run the tests manually (see the relevant `package.json` to see what is done by the `yarn test` command).
 Note: before you can run those tests, you'll need to configure your PostgreSQL server to support logical decoding for the live queries tests.
 See [the @graphile/lds README](packages/lds/README.md#postgresql-configuration) for how to enable `wal_level = logical`.
 
@@ -264,7 +263,7 @@ To run PostGraphile tests you will need to first create the
 createdb postgraphile_test
 ```
 
-The tests use the `TEST_PG_URL` environment variable as a connection URL, which can be overwritten.
+The PostGraphile tests use the `TEST_PG_URL` environment variable as a connection URL, which can be overwritten. (This differs from the Graphile Engine `TEST_DATABASE_URL` to avoid conflicts between these two independent test suites.)
 The default value is `'postgres:///postgraphile_test'`.
 
 Then run the test suite with:
