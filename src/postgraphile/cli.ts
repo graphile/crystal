@@ -580,13 +580,12 @@ if (
     jwtVerifySubject)
 ) {
   throw new Error(
-    'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.'
+    'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.',
   );
 }
-const jwtVerifyOptions: jwt.VerifyOptions =
-  rawJwtVerifyOptions ?
-    rawJwtVerifyOptions :
-    trimNulls({
+const jwtVerifyOptions: jwt.VerifyOptions = rawJwtVerifyOptions
+  ? rawJwtVerifyOptions
+  : trimNulls({
       algorithms: jwtVerifyAlgorithms,
       audience: jwtVerifyAudience,
       clockTolerance: jwtVerifyClockTolerance,
