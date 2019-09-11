@@ -21,7 +21,7 @@ function getCompatibleComputedColumns(build, table) {
     const { pseudoColumnName } = computedColumnDetails;
 
     // Must have only one required argument
-    const nonOptionalArgumentsCount = proc.argDefaultsNum - proc.inputArgsCount;
+    const nonOptionalArgumentsCount = proc.inputArgsCount - proc.argDefaultsNum;
     if (nonOptionalArgumentsCount > 1) {
       return memo;
     }

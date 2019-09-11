@@ -6256,6 +6256,8 @@ type Post implements Node {
     after: Cursor
   ): PostComputedIntervalSetConnection!
   computedTextArray: [String]
+  computedWithOptionalArg(i: Int): Int
+  computedWithRequiredArg(i: Int!): Int
   headlineTrimmed(length: Int, omission: String): String
   headlineTrimmedNoDefaults(length: Int, omission: String): String
   headlineTrimmedStrict(length: Int, omission: String): String
@@ -6302,6 +6304,9 @@ input PostCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`comptypes\` field.\\"\\"\\"
   comptypes: [ComptypeInput]
+
+  \\"\\"\\"Checks for equality with the object’s \`computedWithOptionalArg\` field.\\"\\"\\"
+  computedWithOptionalArg: Int
 }
 
 \\"\\"\\"An input for mutations affecting \`Post\`\\"\\"\\"
@@ -6390,6 +6395,8 @@ enum PostsOrderBy {
   ENUMS_DESC
   COMPTYPES_ASC
   COMPTYPES_DESC
+  COMPUTED_WITH_OPTIONAL_ARG_ASC
+  COMPUTED_WITH_OPTIONAL_ARG_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }

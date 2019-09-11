@@ -41,7 +41,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
 
           // Must have only one required argument
           const nonOptionalArgumentsCount =
-            proc.argDefaultsNum - proc.inputArgsCount;
+            proc.inputArgsCount - proc.argDefaultsNum;
           if (nonOptionalArgumentsCount > 1) {
             return memo;
           }

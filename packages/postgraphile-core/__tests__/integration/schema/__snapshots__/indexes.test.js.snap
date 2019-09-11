@@ -6458,6 +6458,8 @@ type Post implements Node {
     offset: Int
   ): PostComputedIntervalSetConnection!
   computedTextArray: [String]
+  computedWithOptionalArg(i: Int): Int
+  computedWithRequiredArg(i: Int!): Int
   enums: [AnEnum]
   headline: String!
   headlineTrimmed(length: Int, omission: String): String
@@ -6562,6 +6564,9 @@ input PostCondition {
   \\"\\"\\"Checks for equality with the object’s \`authorId\` field.\\"\\"\\"
   authorId: Int
 
+  \\"\\"\\"Checks for equality with the object’s \`computedWithOptionalArg\` field.\\"\\"\\"
+  computedWithOptionalArg: Int
+
   \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
   id: Int
 }
@@ -6641,6 +6646,8 @@ type PostsEdge {
 enum PostsOrderBy {
   AUTHOR_ID_ASC
   AUTHOR_ID_DESC
+  COMPUTED_WITH_OPTIONAL_ARG_ASC
+  COMPUTED_WITH_OPTIONAL_ARG_DESC
   ID_ASC
   ID_DESC
   NATURAL
