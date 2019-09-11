@@ -93,13 +93,16 @@ yarn make-assets
 
 ### Database setup
 
-For testing, Postgraphile of course requires a Postgres database. [Download and install](https://www.postgresql.org/download/) it, e.g. with:
+For testing, PostGraphile of course requires a Postgres database. [Download and install](https://www.postgresql.org/download/) it, e.g. with:
+
 ```
 sudo apt-get update
 sudo apt-get install postgresql postgresql-contrib postgresql-client-common
 ```
+
 Then we need to set up a superuser (who can install extensions) and create test databases for the individual test suites.
-You can use the [command line utilities](https://www.postgresql.org/docs/current/reference-client.html) or go with `psql`:
+You can use the [command line utilities](https://www.postgresql.org/docs/11/reference-client.html) or go with `psql`:
+
 ```
 sudo -u postgres psql
   CREATE ROLE me WITH LOGIN SUPERUSER; -- PASSWORD 'mypassword'
@@ -109,12 +112,14 @@ sudo -u postgres psql
   CREATE DATABASE graphileengine_test;
   COMMENT ON DATABASE graphileengine_test IS 'https://github.com/graphile/graphile-engine';
 ```
-You may use the default `postgres` superuser as well instead of your own one.
-Using your OS login for naming the user `me` requires fewer customisations down the road, as it will be the default.
 
-The [`lds` package](./lds/README.md) does use another database `lds_test`, created by its `yarn db:init` script.
+You may use the default `postgres` superuser instead of your own one if you prefer.
+Using your OS login for naming the user `me` requires fewer customisations down the road, as on many systems it will be the default.
 
-To allow login without a password, best change the [`pg_hba.conf`](https://www.postgresql.org/docs/9.1/auth-pg-hba-conf.html) so that the user is always accepted from the local machine:
+The [`lds` package](./lds/README.md) uses another database `lds_test`, this should be created automatically by its `yarn db:init` script.
+
+To allow login without a password (please evaluate your own security requirements), you may change the [`pg_hba.conf`](https://www.postgresql.org/docs/11/auth-pg-hba-conf.html) so that the user is always accepted from the local machine:
+
 ```
 # for postgraphile testing
 local	postgraphile_test,graphileengine_test,lds_test	all				trust
@@ -219,12 +224,13 @@ PostgreSQL is by default running on `localhost:5432` (if that port isn't already
 ### Graphile Engine
 
 Graphile Engine uses a user-configurable test database, for example `graphileengine_test`:
+
 ```
 createdb graphileengine_test
 ```
 
 The tests of the `postgraphile-core`, `graphile-utils` and `pg-pubsub` packages use the `TEST_DATABASE_URL` environment variable, which is mandatory.
-Its format is a [connection URL](https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6), passed to [node-postgres](https://node-postgres.com/features/connecting#Connection URI).
+Its format is a [connection URL](https://www.postgresql.org/docs/11/libpq-connect.html#id-1.7.3.8.3.6), passed to [node-postgres](https://node-postgres.com/features/connecting#Connection URI).
 
 The `lds` and `subscriptions-lds` packages' test commands will create and use a new `"lds_test"` database using the `createdb` command. If you cannot make `createdb` run directly without options (e.g. if you're not using `trust` authentication) then you may set the `LDS_TEST_DATABASE_URL` environment variable and seed the DB and run the tests manually (see the relevant `package.json` to see what is done by the `yarn test` command).
 Note: before you can run those tests, you'll need to configure your PostgreSQL server to support logical decoding for the live queries tests.
