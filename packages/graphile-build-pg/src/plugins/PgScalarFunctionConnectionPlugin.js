@@ -89,7 +89,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           {
             __origin: `Adding function result edge type for ${describePgEntity(
               proc
-            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
@@ -145,7 +145,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           {
             __origin: `Adding function connection type for ${describePgEntity(
               proc
-            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",

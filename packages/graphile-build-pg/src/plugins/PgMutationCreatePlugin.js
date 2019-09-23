@@ -101,7 +101,7 @@ export default (function PgMutationCreatePlugin(
             {
               __origin: `Adding table create input type for ${describePgEntity(
                 table
-              )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+              )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
@@ -144,7 +144,7 @@ export default (function PgMutationCreatePlugin(
             {
               __origin: `Adding table create payload type for ${describePgEntity(
                 table
-              )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+              )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
@@ -264,7 +264,7 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
             },
             `Adding create mutation for ${describePgEntity(
               table
-            )}. You can omit this default mutation with:\n\n  ${sqlCommentByAddingTags(
+            )}. You can omit this default mutation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 omit: "create",

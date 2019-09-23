@@ -148,12 +148,12 @@ export default (function PgRecordReturnTypesPlugin(builder) {
           {
             __origin: `Adding record return type for ${describePgEntity(
               proc
-            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
               }
-            )}\n\nYou can rename just the function's GraphQL result type via:\n\n  ${sqlCommentByAddingTags(
+            )}\n\nYou can rename just the function's GraphQL result type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 resultTypeName: "newNameHere",

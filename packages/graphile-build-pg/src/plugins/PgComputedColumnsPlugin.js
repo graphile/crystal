@@ -106,7 +106,7 @@ export default (function PgComputedColumnsPlugin(
                 },
                 `Adding computed column for ${describePgEntity(
                   proc
-                )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   proc,
                   {
                     fieldName: "newNameHere",

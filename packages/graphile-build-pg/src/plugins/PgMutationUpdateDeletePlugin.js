@@ -270,7 +270,7 @@ returning *`;
                   {
                     __origin: `Adding table ${mode} mutation payload type for ${describePgEntity(
                       table
-                    )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                    )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                       table,
                       {
                         name: "newNameHere",
@@ -327,7 +327,7 @@ returning *`;
                     {
                       __origin: `Adding table ${mode} (by node ID) mutation input type for ${describePgEntity(
                         table
-                      )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                      )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                         table,
                         {
                           name: "newNameHere",
@@ -487,7 +487,7 @@ returning *`;
                     {
                       __origin: `Adding table ${mode} mutation input type for ${describePgEntity(
                         constraint
-                      )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+                      )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                         table,
                         {
                           name: "newNameHere",

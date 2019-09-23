@@ -209,7 +209,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
             },
             `Forward relation for ${describePgEntity(
               constraint
-            )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+            )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               constraint,
               {
                 fieldName: "newNameHere",

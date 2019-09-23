@@ -39,7 +39,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
           {
             __origin: `Adding connection "orderBy" argument for ${describePgEntity(
               table
-            )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 name: "newNameHere",

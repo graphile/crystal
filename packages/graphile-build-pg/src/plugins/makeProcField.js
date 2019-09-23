@@ -139,7 +139,7 @@ export default function makeProcField(
       const hint = type.class
         ? `; this might be because no INSERT column privileges are granted on ${describePgEntity(
             type.class
-          )}. You can use smart comments to tell PostGraphile to instead use the "${chalk.bold.green(
+          )}. You can use 'Smart Comments' to tell PostGraphile to instead use the "${chalk.bold.green(
             "base"
           )}" input type which includes all columns:\n\n  ${sqlCommentByAddingTags(
             proc,
@@ -521,7 +521,7 @@ export default function makeProcField(
           {
             __origin: `Adding mutation function payload type for ${describePgEntity(
               proc
-            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
@@ -549,7 +549,7 @@ export default function makeProcField(
           {
             __origin: `Adding mutation function input type for ${describePgEntity(
               proc
-            )}. You can rename the function's GraphQL field (and its dependent types) via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",

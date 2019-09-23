@@ -63,7 +63,7 @@ export default (function PgConnectionArgCondition(builder) {
           {
             __origin: `Adding condition type for ${describePgEntity(
               table
-            )}. You can rename the table's GraphQL type via:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 name: "newNameHere",

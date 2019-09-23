@@ -173,7 +173,7 @@ end
             },
             `Adding field for ${describePgEntity(
               attr
-            )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",
@@ -273,7 +273,7 @@ end
             },
             `Adding input object field for ${describePgEntity(
               attr
-            )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+            )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",

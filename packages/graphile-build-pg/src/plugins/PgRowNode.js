@@ -240,7 +240,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
               },
               `Adding row by globally unique identifier field for ${describePgEntity(
                 table
-              )}. You can rename this table via:\n\n  ${sqlCommentByAddingTags(
+              )}. You can rename this table via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 { name: "newNameHere" }
               )}`

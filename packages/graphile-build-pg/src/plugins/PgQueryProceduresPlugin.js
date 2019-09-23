@@ -80,7 +80,7 @@ export default (function PgQueryProceduresPlugin(
                 },
                 `Adding query field for ${describePgEntity(
                   proc
-                )}. You can rename this field with:\n\n  ${sqlCommentByAddingTags(
+                )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   proc,
                   {
                     name: "newNameHere",

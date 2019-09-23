@@ -226,7 +226,7 @@ export default (function PgBackwardRelationPlugin(
               },
               `Backward relation (single) for ${describePgEntity(
                 constraint
-              )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+              )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 constraint,
                 {
                   foreignSingleFieldName: "newNameHere",
@@ -439,7 +439,7 @@ export default (function PgBackwardRelationPlugin(
                   isConnection ? "connection" : "simple collection"
                 }) for ${describePgEntity(
                   constraint
-                )}. To rename this relation with smart comments:\n\n  ${sqlCommentByAddingTags(
+                )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   constraint,
                   {
                     [isConnection

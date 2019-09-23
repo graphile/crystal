@@ -5,13 +5,13 @@ exports[`column naming clash - rename 1`] = `
 
   The first entity was:
 
-    [35mAdding ascending orderBy enum value for column [1m"wont_cast_easy"[22m on table [1m"c"."edge_case"[22m. You can rename this field with:[39m
+    [35mAdding ascending orderBy enum value for column [1m"wont_cast_easy"[22m on table [1m"c"."edge_case"[22m. You can rename this field with a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON COLUMN "c"."edge_case"."wont_cast_easy" IS E'[1m[32m@name newNameHere[35m[22m';[39m
 
   The second entity was:
 
-    [33mAdding ascending orderBy enum value for column [1m"row_id"[22m on table [1m"c"."edge_case"[22m (with smart comments: [1m@name wontCastEasy[22m). You can rename this field with:[39m
+    [33mAdding ascending orderBy enum value for column [1m"row_id"[22m on table [1m"c"."edge_case"[22m (with smart comments: [1m@name wontCastEasy[22m). You can rename this field with a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON COLUMN "c"."edge_case"."row_id" IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -21,13 +21,13 @@ exports[`function naming clash - computed 1`] = `
 
   The first entity was:
 
-    [35mAdding field for column [1m"row_id"[22m on table [1m"c"."edge_case"[22m. You can rename this field with:[39m
+    [35mAdding field for column [1m"row_id"[22m on table [1m"c"."edge_case"[22m. You can rename this field with a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON COLUMN "c"."edge_case"."row_id" IS E'[1m[32m@name newNameHere[35m[22m';[39m
 
   The second entity was:
 
-    [33mAdding computed column for function [1m"c"."edge_case_computed"(...args...)[22m (with smart comments: [1m@fieldName rowId[22m). You can rename this field with:[39m
+    [33mAdding computed column for function [1m"c"."edge_case_computed"(...args...)[22m (with smart comments: [1m@fieldName rowId[22m). You can rename this field with a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON FUNCTION "c"."edge_case_computed"(...arg types go here...) IS E'[1m[32m@fieldName newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -37,7 +37,7 @@ exports[`function naming clash - createPost 1`] = `
 
   The first entity was:
 
-    [35mAdding table create payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via:[39m
+    [35mAdding table create payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m';[39m
     [35m[39m
@@ -47,7 +47,7 @@ exports[`function naming clash - createPost 1`] = `
 
   The second entity was:
 
-    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name createPost[22m). You can rename the function's GraphQL field (and its dependent types) via:[39m
+    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name createPost[22m). You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON FUNCTION "a"."mutation_text_array"(...arg types go here...) IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -57,13 +57,13 @@ exports[`function naming clash - deletePost 1`] = `
 
   The first entity was:
 
-    [35mAdding table delete mutation payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via:[39m
+    [35mAdding table delete mutation payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m';[39m
 
   The second entity was:
 
-    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name deletePost[22m). You can rename the function's GraphQL field (and its dependent types) via:[39m
+    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name deletePost[22m). You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON FUNCTION "a"."mutation_text_array"(...arg types go here...) IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -77,7 +77,7 @@ exports[`function naming clash - nodeId 1`] = `
 
   The second entity was:
 
-    [33mAdding query field for function [1m"c"."int_set_query"(...args...)[22m (with smart comments: [1m@name nodeId[22m). You can rename this field with:[39m
+    [33mAdding query field for function [1m"c"."int_set_query"(...args...)[22m (with smart comments: [1m@name nodeId[22m). You can rename this field with a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON FUNCTION "c"."int_set_query"(...arg types go here...) IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -87,13 +87,13 @@ exports[`function naming clash - payload 1`] = `
 
   The first entity was:
 
-    [35mAdding function result edge type for function [1m"c"."int_set_query"(...args...)[22m (with smart comments: [1m@name q[22m). You can rename the function's GraphQL field (and its dependent types) via:[39m
+    [35mAdding function result edge type for function [1m"c"."int_set_query"(...args...)[22m (with smart comments: [1m@name q[22m). You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON FUNCTION "c"."int_set_query"(...arg types go here...) IS E'[1m[32m@name newNameHere[35m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m
 
   The second entity was:
 
-    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name q_edge[22m). You can rename the table's GraphQL type via:[39m
+    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name q_edge[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -103,13 +103,13 @@ exports[`function naming clash - updatePost 1`] = `
 
   The first entity was:
 
-    [35mAdding table update mutation payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via:[39m
+    [35mAdding table update mutation payload type for table [1m"a"."post"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m';[39m
 
   The second entity was:
 
-    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name updatePost[22m). You can rename the function's GraphQL field (and its dependent types) via:[39m
+    [33mAdding mutation function payload type for function [1m"a"."mutation_text_array"(...args...)[22m (with smart comments: [1m@name updatePost[22m). You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON FUNCTION "a"."mutation_text_array"(...arg types go here...) IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -119,13 +119,13 @@ exports[`simple collections naming clash 1`] = `
 
   The first entity was:
 
-    [35mBackward relation (connection) for constraint [1m"post_author_id_fkey"[22m on table [1m"a"."post"[22m (with smart comments: [1m@foreignFieldName clash[22m). To rename this relation with smart comments:[39m
+    [35mBackward relation (connection) for constraint [1m"post_author_id_fkey"[22m on table [1m"a"."post"[22m (with smart comments: [1m@foreignFieldName clash[22m). To rename this relation with a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON CONSTRAINT "post_author_id_fkey" ON "a"."post" IS E'[1m[32m@foreignFieldName newNameHere[35m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m
 
   The second entity was:
 
-    [33mBackward relation (simple collection) for constraint [1m"post_author_id_fkey"[22m on table [1m"a"."post"[22m (with smart comments: [1m@foreignFieldName clash[22m). To rename this relation with smart comments:[39m
+    [33mBackward relation (simple collection) for constraint [1m"post_author_id_fkey"[22m on table [1m"a"."post"[22m (with smart comments: [1m@foreignFieldName clash[22m). To rename this relation with a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON CONSTRAINT "post_author_id_fkey" ON "a"."post" IS E'[1m[32m@foreignSimpleFieldName newNameHere[33m[22m\\n@foreignFieldName clash\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -135,13 +135,13 @@ exports[`table naming clash - condition 1`] = `
 
   The first entity was:
 
-    [35mAdding condition type for table [1m"c"."person"[22m. You can rename the table's GraphQL type via:[39m
+    [35mAdding condition type for table [1m"c"."person"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "c"."person" IS E'[1m[32m@name newNameHere[35m[22m\\nPerson test comment';[39m
 
   The second entity was:
 
-    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name person_condition[22m). You can rename the table's GraphQL type via:[39m
+    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name person_condition[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -151,13 +151,13 @@ exports[`table naming clash - direct 1`] = `
 
   The first entity was:
 
-    [35mAdding connection "orderBy" argument for table [1m"a"."post"[22m (with smart comments: [1m@name person[22m). You can rename the table's GraphQL type via:[39m
+    [35mAdding connection "orderBy" argument for table [1m"a"."post"[22m (with smart comments: [1m@name person[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m
 
   The second entity was:
 
-    [33mAdding connection "orderBy" argument for table [1m"c"."person"[22m. You can rename the table's GraphQL type via:[39m
+    [33mAdding connection "orderBy" argument for table [1m"c"."person"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON TABLE "c"."person" IS E'[1m[32m@name newNameHere[33m[22m\\nPerson test comment';[39m]
 `;
@@ -167,7 +167,7 @@ exports[`table naming clash - mutation 1`] = `
 
   The first entity was:
 
-    [35mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name mutation[22m). You can rename the table's GraphQL type via:[39m
+    [35mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name mutation[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m
 
@@ -181,13 +181,13 @@ exports[`table naming clash - order 1`] = `
 
   The first entity was:
 
-    [35mAdding connection "orderBy" argument for table [1m"c"."person"[22m. You can rename the table's GraphQL type via:[39m
+    [35mAdding connection "orderBy" argument for table [1m"c"."person"[22m. You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "c"."person" IS E'[1m[32m@name newNameHere[35m[22m\\nPerson test comment';[39m
 
   The second entity was:
 
-    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name people_order_by[22m). You can rename the table's GraphQL type via:[39m
+    [33mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name people_order_by[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -201,7 +201,7 @@ exports[`table naming clash - query 1`] = `
 
   The second entity was:
 
-    [33mAdding row by globally unique identifier field for table [1m"a"."post"[22m (with smart comments: [1m@name query[22m). You can rename this table via:[39m
+    [33mAdding row by globally unique identifier field for table [1m"a"."post"[22m (with smart comments: [1m@name query[22m). You can rename this table via a 'Smart Comment':[39m
     [33m[39m
     [33m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[33m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m]
 `;
@@ -211,7 +211,7 @@ exports[`table naming clash - subscription 1`] = `
 
   The first entity was:
 
-    [35mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name subscription[22m). You can rename the table's GraphQL type via:[39m
+    [35mAdding table type for table [1m"a"."post"[22m (with smart comments: [1m@name subscription[22m). You can rename the table's GraphQL type via a 'Smart Comment':[39m
     [35m[39m
     [35m  COMMENT ON TABLE "a"."post" IS E'[1m[32m@name newNameHere[35m[22m\\nRest of existing \\'comment\\' \\nhere.';[39m
 
