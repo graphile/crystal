@@ -132,18 +132,17 @@ class Test extends Request {
    */
 
   end(fn: any) {
-    let self = this;
     let server = this._server;
     let end = Request.prototype.end;
 
     end.call(this, (err: any, res: any) => {
+      const localAssert = () => {
+        this.assert(err, res, fn);
+      };
+
       if (server && server._handle) return server.close(localAssert);
 
       localAssert();
-
-      function localAssert() {
-        self.assert(err, res, fn);
-      }
     });
 
     return this;

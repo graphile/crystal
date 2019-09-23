@@ -129,6 +129,9 @@ export async function enhanceHttpServerWithSubscriptions(
         }
       };
       await applyMiddleware(options.websocketMiddlewares, req, dummyRes);
+
+      // reqResFromSocket is only called once per socket, so there's no race condition here
+      // eslint-disable-next-line require-atomic-updates
       socket['__postgraphileRes'] = dummyRes;
     }
     return { req, res: dummyRes };
@@ -226,6 +229,8 @@ export async function enhanceHttpServerWithSubscriptions(
 
           return response;
         };
+        // onOperation is only called once per params object, so there's no race condition here
+        // eslint-disable-next-line require-atomic-updates
         params.formatResponse = formatResponse;
         const hookedParams = pluginHook
           ? pluginHook('postgraphile:ws:onOperation', params, {

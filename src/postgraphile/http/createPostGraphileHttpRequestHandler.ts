@@ -1,4 +1,4 @@
-/* tslint:disable:no-any */
+/* eslint-disable @typescript-eslint/no-explicit-any,require-atomic-updates */
 import {
   Source,
   parse as parseGraphql,
@@ -62,7 +62,7 @@ const JS_ESCAPE_LOOKUP = {
   '\u2029': '\\u2029',
 };
 function safeJSONStringify(obj: {}) {
-  return JSON.stringify(obj).replace(/[<>\/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
+  return JSON.stringify(obj).replace(/[<>/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
 }
 
 /**

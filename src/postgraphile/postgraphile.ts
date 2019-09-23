@@ -87,6 +87,7 @@ export function getPostgraphileSchemaBuilder<
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
     let attempts = 0;
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
         if (options.watchPg) {

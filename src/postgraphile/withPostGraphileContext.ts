@@ -360,7 +360,10 @@ function getSettingsForPgClientTransaction({
   // this prevents an accidentional overwriting
   if (pgSettings && typeof pgSettings === 'object') {
     for (const key in pgSettings) {
-      if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
+      if (
+        Object.prototype.hasOwnProperty.call(pgSettings, key) &&
+        isPgSettingValid(pgSettings[key])
+      ) {
         if (key === 'role') {
           role = String(pgSettings[key]);
         } else {
@@ -379,7 +382,7 @@ function getSettingsForPgClientTransaction({
   // If we have some JWT claims, we want to set those claims as local
   // settings with the namespace `jwt.claims`.
   for (const key in jwtClaims) {
-    if (jwtClaims.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(jwtClaims, key)) {
       const rawValue = jwtClaims[key];
       // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
       const value: mixed =

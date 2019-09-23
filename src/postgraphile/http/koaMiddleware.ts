@@ -41,6 +41,7 @@ export const middleware = async (
   } finally {
     (ctx.res as object)['end'] = oldEnd;
     if (ctx.res.statusCode && ctx.res.statusCode !== 200) {
+      // eslint-disable-next-line require-atomic-updates
       ctx.response.status = ctx.res.statusCode;
     }
   }
