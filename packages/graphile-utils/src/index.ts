@@ -5,6 +5,11 @@ import makePluginByCombiningPlugins from "./makePluginByCombiningPlugins";
 import makeWrapResolversPlugin from "./makeWrapResolversPlugin";
 import makeChangeNullabilityPlugin from "./makeChangeNullabilityPlugin";
 import makeProcessSchemaPlugin from "./makeProcessSchemaPlugin";
+import makeAddPgTableConditionPlugin from "./makeAddPgTableConditionPlugin";
+import makeAddPgTableOrderByPlugin, {
+  orderByAscDesc,
+  MakeAddPgTableOrderByPluginOrders,
+} from "./makeAddPgTableOrderByPlugin";
 
 export {
   AugmentedGraphQLFieldResolver,
@@ -23,4 +28,8 @@ export {
   makeWrapResolversPlugin,
   makeChangeNullabilityPlugin,
   makeProcessSchemaPlugin,
+  makeAddPgTableConditionPlugin,
+  makeAddPgTableOrderByPlugin,
+  orderByAscDesc,
+  MakeAddPgTableOrderByPluginOrders,
 };
