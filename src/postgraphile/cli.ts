@@ -457,10 +457,10 @@ const {
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program, ...overridesFromOptions } as any;
+} = { ...config['options'], ...program, ...overridesFromOptions };
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
-if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
+if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   throw new Error(
     `Invalid argument to '--legacy-relations' - expected on of 'omit', 'deprecated', 'only'; but received '${rawLegacyRelations}'`,
   );

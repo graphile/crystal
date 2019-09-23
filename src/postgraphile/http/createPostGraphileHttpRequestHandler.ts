@@ -195,7 +195,7 @@ export default function createPostGraphileHttpRequestHandler(
     typeof pgSettings === 'object' &&
     Object.keys(pgSettings)
       .map(s => s.toLowerCase())
-      .indexOf('role') >= 0
+      .includes('role')
   ) {
     throw new Error(
       'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
@@ -832,7 +832,7 @@ export default function createPostGraphileHttpRequestHandler(
       // Finally, we send the client the results.
       if (!returnArray) {
         if (res.statusCode === 200 && results[0].statusCode) {
-          res.statusCode = results[0].statusCode!;
+          res.statusCode = results[0].statusCode;
         }
         results[0].statusCode = undefined;
       }

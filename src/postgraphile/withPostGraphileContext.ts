@@ -120,7 +120,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     // TODO:perf: looping backwards is slow
     for (let i = localSettings.length - 1; i >= 0; i--) {
       const [key, value] = localSettings[i];
-      if (seenKeys.indexOf(key) < 0) {
+      if (!seenKeys.includes(key)) {
         seenKeys.push(key);
         // Make sure that the third config is always `true` so that we are only
         // ever setting variables on the transaction.

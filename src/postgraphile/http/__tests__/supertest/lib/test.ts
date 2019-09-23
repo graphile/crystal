@@ -65,9 +65,9 @@ class Test extends Request {
    */
 
   serverAddress(app: any, path: any, host: any) {
-    var addr = app.address();
-    var port;
-    var protocol;
+    let addr = app.address();
+    let port;
+    let protocol;
 
     if (!addr) this._server = app.listen(0);
     port = app.address().port;
@@ -132,9 +132,9 @@ class Test extends Request {
    */
 
   end(fn: any) {
-    var self = this;
-    var server = this._server;
-    var end = Request.prototype.end;
+    let self = this;
+    let server = this._server;
+    let end = Request.prototype.end;
 
     end.call(this, (err: any, res: any) => {
       if (server && server._handle) return server.close(localAssert);
@@ -160,14 +160,14 @@ class Test extends Request {
 
   assert(resError: any, res: any, fn: any) {
     this.completeCallback(res);
-    var error;
-    var i;
+    let error;
+    let i;
 
     // check for unexpected network errors or server not running/reachable errors
     // when there is no response and superagent sends back a System Error
     // do not check further for other asserts, if any, in such case
     // https://nodejs.org/api/errors.html#errors_common_system_errors
-    var sysErrors = {
+    let sysErrors = {
       ECONNREFUSED: 'Connection refused',
       ECONNRESET: 'Connection reset by peer',
       EPIPE: 'Broken pipe',
@@ -209,9 +209,9 @@ class Test extends Request {
    */
 
   _assertBody(body: any, res: any) {
-    var isregexp = body instanceof RegExp;
-    var a;
-    var b;
+    let isregexp = body instanceof RegExp;
+    let a;
+    let b;
 
     // parsed
     if (typeof body === 'object' && !isregexp) {
@@ -248,9 +248,9 @@ class Test extends Request {
    */
 
   _assertHeader(header: any, res: any) {
-    var field = header.name;
-    var actual = res.header[field.toLowerCase()];
-    var fieldExpected = header.value;
+    let field = header.name;
+    let actual = res.header[field.toLowerCase()];
+    let fieldExpected = header.value;
 
     if (typeof actual === 'undefined') return new Error('expected "' + field + '" header field');
     // This check handles header values that may be a String or single element Array
@@ -281,8 +281,8 @@ class Test extends Request {
    */
 
   _assertStatus(status: any, res: any) {
-    var a;
-    var b;
+    let a;
+    let b;
     if (res.status !== status) {
       a = http.STATUS_CODES[status];
       b = http.STATUS_CODES[res.status];
@@ -299,7 +299,7 @@ class Test extends Request {
    * @api private
    */
   _assertFunction(fn: any, res: any) {
-    var err;
+    let err;
     try {
       err = fn(res);
     } catch (e) {
@@ -320,7 +320,7 @@ class Test extends Request {
  */
 
 function error(msg: any, expected: any, actual: any) {
-  var err: any = new Error(msg);
+  let err: any = new Error(msg);
   err.expected = expected;
   err.actual = actual;
   err.showDiff = true;
