@@ -35,7 +35,7 @@ export default function makeAddPgTableConditionPlugin(
     builder.hook("finalize", function checkSeen(schema, build) {
       const meta = build._pluginMeta[instance];
       if (!meta.seen) {
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line no-console
         console.error(
           `WARNING: failed to add condition '${conditionFieldName}' to table "${schemaName}"."${tableName}"; did you get the schema/table name right?`
         );

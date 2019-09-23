@@ -41,12 +41,15 @@ export abstract class LiveProvider {
 export class LiveMonitor {
   providers: { [namespace: string]: LiveProvider };
   subscriptionReleasersByCounter: {
-    [counter: string]: (() => void)[],
+    [counter: string]: (() => void)[];
   };
   liveConditionsByCounter: { [counter: string]: Array<PredicateGenerator> };
   changeCounter: number;
 
-  constructor(providers: { [namespace: string]: LiveProvider }, extraRootValue: any);
+  constructor(
+    providers: { [namespace: string]: LiveProvider },
+    extraRootValue: any
+  );
 
   resetBefore(currentCounter: number): void;
   release(): void;

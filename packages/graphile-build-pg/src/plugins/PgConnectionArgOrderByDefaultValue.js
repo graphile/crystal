@@ -45,9 +45,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
           {
             defaultValue: defaultValueEnum && [defaultValueEnum.value],
           },
-          `Adding defaultValue to orderBy for field '${fieldName}' of '${
-            Self.name
-          }'`
+          `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}'`
         ),
       });
     },

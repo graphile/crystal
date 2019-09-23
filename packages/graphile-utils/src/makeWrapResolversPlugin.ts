@@ -95,7 +95,7 @@ export default function makeWrapResolversPlugin<T>(
         const filterResult: any = filter(context, build, field, options);
         if (!filterResult) {
           if (filterResult !== null) {
-            // tslint:disable-next-line no-console
+            // eslint-disable-next-line no-console
             console.error(
               `Filter should return either a truthy value, or 'null', instead received: '${filterResult}'`
             );

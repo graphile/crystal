@@ -120,12 +120,8 @@ export default (function PgConnectionArgs(builder) {
             : null),
         },
         isPgFieldConnection
-          ? `Adding connection pagination args to field '${fieldName}' of '${
-              Self.name
-            }'`
-          : `Adding simple collection args to field '${fieldName}' of '${
-              Self.name
-            }'`
+          ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
+          : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`
       );
     },
     ["PgConnectionArgFirstLastBeforeAfter"]

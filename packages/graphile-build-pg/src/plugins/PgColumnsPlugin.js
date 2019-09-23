@@ -117,9 +117,7 @@ end
           const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on class '${
-                table.namespaceName
-              }.${table.name}'; one of them is '${attr.name}'`
+              `Two columns produce the same GraphQL field name '${fieldName}' on class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
             );
           }
           memo = extend(
@@ -234,9 +232,7 @@ end
           const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${
-                table.namespaceName
-              }.${table.name}'; one of them is '${attr.name}'`
+              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
             );
           }
           memo = extend(

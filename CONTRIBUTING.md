@@ -16,7 +16,7 @@ Please see [the CONTRIBUTING.md in PostGraphile](https://github.com/graphile/pos
 
 There's nothing worse than having your PR with 3 days of work in it rejected
 because it's just too complex to be sensibly reviewed! If you're interested
-in opening a PR please open an issue to discuss it, or come chat with us: 
+in opening a PR please open an issue to discuss it, or come chat with us:
 http://discord.gg/graphile
 
 Sometimes, your suggestions are more appropriate as a plugin rather than in
@@ -78,7 +78,7 @@ to do `.endsWith('_id')` when appropriate, but use whatever makes sense.
 ### DRY
 
 Try to avoid repeating yourself - by putting shared logic into a shared
-function, V8 can perform shared JIT optimisations and ultimately this should 
+function, V8 can perform shared JIT optimisations and ultimately this should
 mean that the code runs faster (and uses less memory).
 
 ### Leverage ES6

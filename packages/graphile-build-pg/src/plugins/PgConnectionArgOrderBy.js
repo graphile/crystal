@@ -111,7 +111,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
       );
       const cursorPrefixFromOrderBy = orderBy => {
         if (orderBy) {
-          let cursorPrefixes = [];
+          const cursorPrefixes = [];
           for (
             let itemIndex = 0, itemCount = orderBy.length;
             itemIndex < itemCount;

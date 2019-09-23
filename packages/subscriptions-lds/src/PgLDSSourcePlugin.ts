@@ -1,4 +1,4 @@
-/* tslint:disable no-console */
+/* eslint-disable no-console */
 import { Plugin } from "postgraphile-core";
 import * as WebSocket from "ws";
 import subscribeToLogicalDecoding, {
@@ -130,9 +130,7 @@ export class LDSLiveSource {
     }
     if (!this.url.match(/^wss?:\/\//)) {
       throw new Error(
-        `Invalid URL, must be a websocket ws:// or wss:// URL, you passed '${
-          this.url
-        }'`
+        `Invalid URL, must be a websocket ws:// or wss:// URL, you passed '${this.url}'`
       );
     }
     this.ws = new WebSocket(this.url);

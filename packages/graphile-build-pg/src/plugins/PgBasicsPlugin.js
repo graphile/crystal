@@ -155,7 +155,7 @@ const omitUnindexed = (omit, hideIndexWarnings) => (
     !entity.isIndexed &&
     permission === "read"
   ) {
-    let klass = entity.class;
+    const klass = entity.class;
     if (klass) {
       const shouldOutputWarning =
         // $FlowFixMe
@@ -168,9 +168,7 @@ const omitUnindexed = (omit, hideIndexWarnings) => (
           "%s",
           `Disabled 'read' permission for ${describePgEntity(
             entity
-          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${
-            klass.namespaceName
-          }"."${klass.name}"`}("${entity.keyAttributes
+          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${klass.namespaceName}"."${klass.name}"`}("${entity.keyAttributes
             .map(a => a.name)
             .join('", "')}");`
         );
@@ -301,18 +299,12 @@ function sqlCommentByAddingTags(entity, tagsToAdd) {
       sqlThing = `PLEASE_SEND_A_PULL_REQUEST_TO_FIX_THIS ${identifier}`;
     }
   } else if (entity.kind === "attribute") {
-    sqlThing = `COLUMN "${entity.class.namespaceName}"."${
-      entity.class.name
-    }"."${entity.name}"`;
+    sqlThing = `COLUMN "${entity.class.namespaceName}"."${entity.class.name}"."${entity.name}"`;
   } else if (entity.kind === "procedure") {
-    sqlThing = `FUNCTION "${entity.namespaceName}"."${
-      entity.name
-    }"(...arg types go here...)`;
+    sqlThing = `FUNCTION "${entity.namespaceName}"."${entity.name}"(...arg types go here...)`;
   } else if (entity.kind === "constraint") {
     // TODO: TEST!
-    sqlThing = `CONSTRAINT "${entity.name}" ON "${
-      entity.class.namespaceName
-    }"."${entity.class.name}"`;
+    sqlThing = `CONSTRAINT "${entity.name}" ON "${entity.class.namespaceName}"."${entity.class.name}"`;
   } else {
     sqlThing = `UNKNOWN_ENTITY_PLEASE_SEND_A_PULL_REQUEST`;
   }

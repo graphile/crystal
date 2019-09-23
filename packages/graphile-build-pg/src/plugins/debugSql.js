@@ -3,7 +3,7 @@ import chalk from "chalk";
 
 export function formatSQLForDebugging(sql) {
   let colourIndex = 0;
-  let allowedColours = [
+  const allowedColours = [
     chalk.red,
     chalk.green,
     chalk.yellow,

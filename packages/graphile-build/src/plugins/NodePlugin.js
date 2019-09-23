@@ -100,9 +100,7 @@ export default (function NodePlugin(
             ) {
               // eslint-disable-next-line no-console
               console.warn(
-                `SERIOUS WARNING: two GraphQL types (${typeName} and ${
-                  nodeTypeNameByAlias[alias]
-                }) are trying to use the same node alias '${alias}' which may mean that the Relay Global Object Identification identifiers in your schema may not be unique. To solve this, you should skip the PgNodeAliasPostGraphile plugin, but note this will change all your existing Node IDs. For alternative solutions, get in touch via GitHub or Discord`
+                `SERIOUS WARNING: two GraphQL types (${typeName} and ${nodeTypeNameByAlias[alias]}) are trying to use the same node alias '${alias}' which may mean that the Relay Global Object Identification identifiers in your schema may not be unique. To solve this, you should skip the PgNodeAliasPostGraphile plugin, but note this will change all your existing Node IDs. For alternative solutions, get in touch via GitHub or Discord`
               );
             }
             nodeAliasByTypeName[typeName] = alias;

@@ -56,9 +56,7 @@ export default (function PgBackwardRelationPlugin(
       );
       if (!gqlForeignTableType) {
         debug(
-          `Could not determine type for foreign table with id ${
-            foreignTable.type.id
-          }`
+          `Could not determine type for foreign table with id ${foreignTable.type.id}`
         );
         return fields;
       }
@@ -88,9 +86,7 @@ export default (function PgBackwardRelationPlugin(
           }
           if (!table) {
             throw new Error(
-              `Could not find the table that referenced us (constraint: ${
-                constraint.name
-              })`
+              `Could not find the table that referenced us (constraint: ${constraint.name})`
             );
           }
           const schema = table.namespace;

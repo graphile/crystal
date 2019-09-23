@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* tslint:disable no-console curly */
+/* eslint-disable no-console,curly */
 import subscribeToLogicalDecoding, { AnnounceCallback } from "./index";
 import * as WebSocket from "ws";
 

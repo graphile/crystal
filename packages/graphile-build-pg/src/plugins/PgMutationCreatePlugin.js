@@ -59,9 +59,7 @@ export default (function PgMutationCreatePlugin(
           const Table = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
           if (!Table) {
             debug(
-              `There was no table type for table '${table.namespace.name}.${
-                table.name
-              }', so we're not generating a create mutation for it.`
+              `There was no table type for table '${table.namespace.name}.${table.name}', so we're not generating a create mutation for it.`
             );
             return memo;
           }
@@ -71,9 +69,7 @@ export default (function PgMutationCreatePlugin(
           );
           if (!TableInput) {
             debug(
-              `There was no input type for table '${table.namespace.name}.${
-                table.name
-              }', so we're going to omit it from the create mutation.`
+              `There was no input type for table '${table.namespace.name}.${table.name}', so we're going to omit it from the create mutation.`
             );
           }
           const tableTypeName = inflection.tableType(table);

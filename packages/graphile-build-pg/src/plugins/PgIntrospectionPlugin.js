@@ -261,9 +261,7 @@ function smartCommentConstraints(introspectionResults) {
         return pk.keyAttributeNums.map(n => attributes.find(a => a.num === n));
       } else {
         throw new Error(
-          `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${
-            tbl.id
-          }) and no PK found (${debugStr}).`
+          `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${tbl.id}) and no PK found (${debugStr}).`
         );
       }
     }
@@ -271,9 +269,7 @@ function smartCommentConstraints(introspectionResults) {
       const attr = attributes.find(a => a.name === colName);
       if (!attr) {
         throw new Error(
-          `Could not find attribute '${colName}' in '${tbl.namespaceName}.${
-            tbl.name
-          }'`
+          `Could not find attribute '${colName}' in '${tbl.namespaceName}.${tbl.name}'`
         );
       }
       return attr;
@@ -291,9 +287,7 @@ function smartCommentConstraints(introspectionResults) {
     if (klass.tags.primaryKey) {
       if (typeof klass.tags.primaryKey !== "string") {
         throw new Error(
-          `@primaryKey configuration of '${klass.namespaceName}.${
-            klass.name
-          }' is invalid; please specify just once "@primaryKey col1,col2"`
+          `@primaryKey configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "@primaryKey col1,col2"`
         );
       }
       const { spec: pkSpec, tags, description } = parseConstraintSpec(
@@ -344,17 +338,13 @@ function smartCommentConstraints(introspectionResults) {
         typeof foreignKey === "string" ? [foreignKey] : foreignKey;
       if (!Array.isArray(foreignKeys)) {
         throw new Error(
-          `Invalid foreign key smart comment specified on '${
-            klass.namespaceName
-          }.${klass.name}'`
+          `Invalid foreign key smart comment specified on '${klass.namespaceName}.${klass.name}'`
         );
       }
       foreignKeys.forEach((fkSpecRaw, index) => {
         if (typeof fkSpecRaw !== "string") {
           throw new Error(
-            `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${
-              klass.name
-            }'`
+            `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${klass.name}'`
           );
         }
         const { spec: fkSpec, tags, description } = parseConstraintSpec(
@@ -365,9 +355,7 @@ function smartCommentConstraints(introspectionResults) {
         );
         if (!matches) {
           throw new Error(
-            `Invalid foreignKey syntax for '${klass.namespaceName}.${
-              klass.name
-            }'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${fkSpecRaw}'`
+            `Invalid foreignKey syntax for '${klass.namespaceName}.${klass.name}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${fkSpecRaw}'`
           );
         }
         const [
@@ -1007,6 +995,8 @@ export default (async function PgIntrospectionPlugin(
       if (listener) {
         await listener.stop();
       }
+      // We're not worried about a race condition here.
+      // eslint-disable-next-line require-atomic-updates
       listener = new Listener(triggerRebuild);
     },
     async () => {

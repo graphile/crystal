@@ -34,7 +34,6 @@ import {
   ValueNode,
 } from "graphql";
 import { GraphileEmbed } from "./gql";
-// tslint:disable-next-line
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
 import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
@@ -190,9 +189,7 @@ export default function makeExtendSchemaPlugin(
             );
           }
           throw new Error(
-            `Unexpected '${
-              definition.kind
-            }' definition; we were expecting 'GraphQLEnumType', 'ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
+            `Unexpected '${definition.kind}' definition; we were expecting 'GraphQLEnumType', 'ObjectTypeExtension', 'InputObjectTypeExtension', 'ObjectTypeDefinition' or 'InputObjectTypeDefinition', i.e. something like 'extend type Foo { ... }'`
           );
         }
       });
@@ -489,9 +486,7 @@ function getDescription(desc: StringValueNode | void) {
     return desc.value;
   } else {
     throw new Error(
-      `AST issue, we weren't expecting a description of kind '${
-        desc.kind
-      }' - PRs welcome!`
+      `AST issue, we weren't expecting a description of kind '${desc.kind}' - PRs welcome!`
     );
   }
 }
@@ -627,9 +622,7 @@ function getArguments(
         };
       } else {
         throw new Error(
-          `Unexpected '${
-            arg.kind
-          }', we were expecting an 'InputValueDefinition'`
+          `Unexpected '${arg.kind}', we were expecting an 'InputValueDefinition'`
         );
       }
       return memo;
@@ -806,7 +799,7 @@ function getFields<TSource>(
           if (!recurseDataGeneratorsWorkaroundFieldByType.get(Self)) {
             recurseDataGeneratorsWorkaroundFieldByType.set(Self, fieldName);
           }
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.warn(
             "DEPRECATION: `recurseDataGenerators` is misleading, please use `pgField` instead"
           );
@@ -821,7 +814,6 @@ function getFields<TSource>(
           //   e.g. `@requires(columns: ["id", "name"])`
           //
           if (directives.requires && pgIntrospection.kind === "class") {
-            // tslint:disable-next-line no-shadowed-variable
             const table: PgClass = pgIntrospection;
             if (Array.isArray(directives.requires.columns)) {
               const attrs = table.attributes.filter(
@@ -961,9 +953,7 @@ function getFields<TSource>(
         }
       } else {
         throw new Error(
-          `AST issue: expected 'FieldDefinition', instead received '${
-            field.kind
-          }'`
+          `AST issue: expected 'FieldDefinition', instead received '${field.kind}'`
         );
       }
     }, {});
@@ -993,9 +983,7 @@ function getInputFields<TSource>(
         };
       } else {
         throw new Error(
-          `AST issue: expected 'FieldDefinition', instead received '${
-            field.kind
-          }'`
+          `AST issue: expected 'FieldDefinition', instead received '${field.kind}'`
         );
       }
       return memo;

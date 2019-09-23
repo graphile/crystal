@@ -87,22 +87,16 @@ export default function omit(
 
   if (omitSpecRaw && includeSpecRaw) {
     throw new Error(
-      `Error when processing instructions for ${entity.kind} '${
-        entity.name
-      }' - you must only specify @omit or @include, not both`
+      `Error when processing instructions for ${entity.kind} '${entity.name}' - you must only specify @omit or @include, not both`
     );
   }
   const omitSpec = parse(
     omitSpecRaw,
-    `Error when processing @omit instructions for ${entity.kind} '${
-      entity.name
-    }'`
+    `Error when processing @omit instructions for ${entity.kind} '${entity.name}'`
   );
   const includeSpec = parse(
     includeSpecRaw,
-    `Error when processing @include instructions for ${entity.kind} '${
-      entity.name
-    }'`
+    `Error when processing @include instructions for ${entity.kind} '${entity.name}'`
   );
 
   if (omitSpec) {
@@ -127,9 +121,7 @@ export default function omit(
   } else if (includeSpec) {
     if (includeSpec === true) {
       throw new Error(
-        `Error when processing instructions for ${entity.kind} '${
-          entity.name
-        }' - @include should specify a list of actions`
+        `Error when processing instructions for ${entity.kind} '${entity.name}' - @include should specify a list of actions`
       );
     }
     if (includeSpec.indexOf(READ) === -1) {
@@ -138,9 +130,7 @@ export default function omit(
       );
       if (bad) {
         throw new Error(
-          `Error when processing @include for ${entity.kind} '${
-            entity.name
-          }' - we currently don't support '${bad}' when '${READ}' is forbidden`
+          `Error when processing @include for ${entity.kind} '${entity.name}' - we currently don't support '${bad}' when '${READ}' is forbidden`
         );
       }
     }

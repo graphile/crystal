@@ -10,7 +10,7 @@ const hasNonNullKey = row => {
     return true;
   }
   for (const k in row) {
-    if (row.hasOwnProperty(k)) {
+    if (Object.prototype.hasOwnProperty.call(row, k)) {
       if ((k[0] !== "_" || k[1] !== "_") && row[k] !== null) {
         return true;
       }
@@ -98,9 +98,7 @@ export default (function PgTablesPlugin(
             if (pg2GqlMapper[tablePgType.id]) {
               // Already handled
               throw new Error(
-                `Register was called but there's already a mapper in place for '${
-                  tablePgType.id
-                }'!`
+                `Register was called but there's already a mapper in place for '${tablePgType.id}'!`
               );
             }
             TableType = newWithHooks(

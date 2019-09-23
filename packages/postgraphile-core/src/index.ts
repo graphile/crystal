@@ -421,10 +421,10 @@ export const getPostGraphileBuilder = async (
 };
 
 function abort(e: Error) {
-  /* tslint:disable no-console */
+  // eslint-disable-next-line no-console
   console.error("Error occured whilst writing cache");
+  // eslint-disable-next-line no-console
   console.error(e);
-  /* tslint:enable no-console */
   process.exit(1);
 }
 

@@ -109,9 +109,7 @@ export default (async function PgRowByUniqueConstraint(
                         );
                         if (!InputType) {
                           throw new Error(
-                            `Could not find input type for key '${name}' on type '${
-                              TableType.name
-                            }'`
+                            `Could not find input type for key '${name}' on type '${TableType.name}'`
                           );
                         }
                         memo[columnName] = {

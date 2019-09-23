@@ -66,9 +66,7 @@ export default (async function PgAllRows(
             : undefined;
           if (isView && table.tags.uniqueKey && !uniqueIdAttribute) {
             throw new Error(
-              `Could not find the named unique key '${
-                table.tags.uniqueKey
-              }' on view '${table.namespaceName}.${table.name}'`
+              `Could not find the named unique key '${table.tags.uniqueKey}' on view '${table.namespaceName}.${table.name}'`
             );
           }
           if (!ConnectionType) {

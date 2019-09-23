@@ -582,9 +582,7 @@ export default function makeProcField(
           : isMutation
           ? null
           : isTableLike && proc.returnsSet
-          ? `Reads and enables pagination through a set of \`${
-              TableType.name
-            }\`.`
+          ? `Reads and enables pagination through a set of \`${TableType.name}\`.`
           : null,
         type: nullableIf(GraphQLNonNull, !proc.tags.notNull, ReturnType),
         args: args,

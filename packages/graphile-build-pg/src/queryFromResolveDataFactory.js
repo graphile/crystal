@@ -281,27 +281,25 @@ exists(
   ) {
     // Sometimes we need a __cursor even if it's not a collection; e.g. to get the edge field on a mutation
     if (usesCursor) {
-      queryBuilder.selectCursor(
-        (): SQL => {
-          const orderBy = queryBuilder
-            .getOrderByExpressionsAndDirections()
-            .map(([expr]) => expr);
-          if (queryBuilder.isOrderUnique() && orderBy.length > 0) {
-            return sql.fragment`json_build_array(${sql.join(
-              [
-                ...getPgCursorPrefix(),
-                sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
-              ],
-              ", "
-            )})`;
-          } else {
-            return sql.fragment`json_build_array(${sql.join(
-              getPgCursorPrefix(),
-              ", "
-            )}, (row_number() over (partition by 1)))`;
-          }
+      queryBuilder.selectCursor((): SQL => {
+        const orderBy = queryBuilder
+          .getOrderByExpressionsAndDirections()
+          .map(([expr]) => expr);
+        if (queryBuilder.isOrderUnique() && orderBy.length > 0) {
+          return sql.fragment`json_build_array(${sql.join(
+            [
+              ...getPgCursorPrefix(),
+              sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
+            ],
+            ", "
+          )})`;
+        } else {
+          return sql.fragment`json_build_array(${sql.join(
+            getPgCursorPrefix(),
+            ", "
+          )}, (row_number() over (partition by 1)))`;
         }
-      );
+      });
     }
   }
   if (options.withPagination || options.withPaginationAsFields) {

@@ -1,5 +1,16 @@
 {
   "private": true,
+  "scripts": {
+    "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
+    "lint:fix": "yarn run lint --fix && prettier --write '**/*.{json,md,html}'",
+    "flow": "flow",
+    "flow:check": "flow check",
+    "test": "lerna run --concurrency 1 test",
+    "prepack:all": "scripts/prepack-all",
+    "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
+    "clean": "rm -Rf packages/*/node8plus/"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
@@ -8,20 +19,20 @@
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-flow": "^7.0.0",
-    "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.13.0",
-    "@typescript-eslint/typescript-estree": "^1.13.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
+    "@typescript-eslint/typescript-estree": "^2.3.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.4.2",
+    "babel-jest": "^24.9.0",
     "concurrently": "^4.1.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.2.0",
-    "eslint-plugin-flowtype": "^3.7.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-flowtype": "^4.3.0",
     "eslint-plugin-graphql": "^3.0.3",
     "eslint-plugin-jest": "^22.5.1",
     "eslint-plugin-prettier": "^3.0.1",
-    "eslint_d": "^7.3.0",
+    "eslint_d": "^8.0.0",
     "flow-bin": "^0.106.3",
     "flow-copy-source": "^1.2.0",
     "graphql": ">=0.9 <0.14 || ^14.0.2",
@@ -29,17 +40,8 @@
     "lerna": "^3.13.4",
     "pg": "^7.10.0",
     "postgraphile": "^4.4.0",
-    "prettier": "^1.17.0"
-  },
-  "scripts": {
-    "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
-    "lint": "eslint packages && lerna run tslint",
-    "flow": "flow",
-    "flow:check": "flow check",
-    "test": "lerna run --concurrency 1 test",
-    "prepack:all": "scripts/prepack-all",
-    "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
-    "clean": "rm -Rf packages/*/node8plus/"
+    "prettier": "^1.17.0",
+    "typescript": "^3.6.3"
   },
   "workspaces": [
     "packages/*"

@@ -81,9 +81,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                   fieldWithHooks,
                   "node",
                   {
-                    description: `The \`${
-                      NodeType.name
-                    }\` at the end of the edge.`,
+                    description: `The \`${NodeType.name}\` at the end of the edge.`,
                     type: nullableIf(
                       !pgForbidSetofFunctionsToReturnNull,
                       NodeType
@@ -121,9 +119,7 @@ export default (function PgRecordFunctionConnectionPlugin(
           GraphQLObjectType,
           {
             name: inflection.recordFunctionConnection(proc),
-            description: `A connection to a list of \`${
-              NodeType.name
-            }\` values.`,
+            description: `A connection to a list of \`${NodeType.name}\` values.`,
             fields: ({ fieldWithHooks }) => {
               return {
                 nodes: pgField(build, fieldWithHooks, "nodes", {
@@ -143,9 +139,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                   fieldWithHooks,
                   "edges",
                   {
-                    description: `A list of edges which contains the \`${
-                      NodeType.name
-                    }\` and cursor to aid in pagination.`,
+                    description: `A list of edges which contains the \`${NodeType.name}\` and cursor to aid in pagination.`,
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),

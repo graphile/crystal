@@ -17,7 +17,6 @@ import {
   InlineFragmentNode,
   NamedTypeNode,
 } from "graphql";
-// tslint:disable-next-line
 import { getArgumentValues } from "graphql/execution/values";
 import * as debugFactory from "debug";
 
@@ -183,7 +182,6 @@ function fieldTreeFromAST<T extends SelectionNode>(
   }
   const outerDepth = depth;
   return asts.reduce((tree, selectionVal: SelectionNode, idx) => {
-    // tslint:disable-next-line no-shadowed-variable
     const depth = DEBUG_ENABLED ? `${outerDepth}  ` : null;
     if (DEBUG_ENABLED)
       debug(

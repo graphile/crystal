@@ -59,7 +59,7 @@ const teardown = async () => {
     try {
       await ctx.release();
     } catch (e) {
-      // tslint:disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(e);
     }
   }
@@ -89,7 +89,8 @@ describe("Subscriptions", () => {
     init({
       ...CLI_DEFAULTS,
       simpleSubscriptions: true,
-    }));
+    })
+  );
   afterAll(teardown);
 
   it("handles the introspection query", async () => {

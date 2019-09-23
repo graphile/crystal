@@ -129,7 +129,7 @@ const plugin: PostGraphilePlugin = {
     eventEmitter.addListener = function(name, hook) {
       if (typeof name === "string") {
         listen(name).catch(e => {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error("Error occurred when unlistening:", e.message);
         });
       }
@@ -139,7 +139,7 @@ const plugin: PostGraphilePlugin = {
     eventEmitter.removeListener = function(name, hook) {
       if (typeof name === "string") {
         unlisten(name).catch(e => {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error("Error occurred when unlistening:", e.message);
         });
       }
@@ -148,7 +148,7 @@ const plugin: PostGraphilePlugin = {
 
     const setupClient = async function(attempts = 0): Promise<void> {
       if (attempts > 0 && attempts % 5 === 0) {
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line no-console
         console.warn(
           `WARNING: @graphile/pg-pubsub cannot establish a connection to the server; reattempting with exponential backoff (attempt ${attempts})`
         );
@@ -173,11 +173,11 @@ const plugin: PostGraphilePlugin = {
       // Every 25 seconds, send 'select 1' to keep the connection alive
       client["keepAliveInterval"] = setInterval(() => {
         client.query("select 1").catch(e => {
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error(
             "Listen client keepalive error (will attempt reconnect):"
           );
-          // tslint:disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.error(e);
           releaseClient(client);
           if (!pgPool.ending) {
@@ -193,12 +193,12 @@ const plugin: PostGraphilePlugin = {
           channels.map(channel => listenToChannelWithClient(client, channel))
         );
       } catch (e) {
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line no-console
         console.error(
           `Error occurred when listening to channel; retrying after ${attempts *
             2} seconds`
         );
-        // tslint:disable-next-line no-console
+        // eslint-disable-next-line no-console
         console.error(e);
         releaseClient(client);
         if (!pgPool.ending) {
@@ -208,7 +208,7 @@ const plugin: PostGraphilePlugin = {
       }
     };
     setupClient().catch(e => {
-      // tslint:disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error(
         "Error occurred when trying to set up initial client. Current state is undefined. Suggest server restart.",
         e

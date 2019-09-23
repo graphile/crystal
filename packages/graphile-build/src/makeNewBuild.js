@@ -218,7 +218,7 @@ function ensureArray<T>(val: null | T | Array<T>): void | Array<T> {
 }
 
 // eslint-disable-next-line no-unused-vars
-let ensureName = fn => {};
+let ensureName = _fn => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV) >= 0) {
   ensureName = fn => {
     // $FlowFixMe: displayName
@@ -340,9 +340,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
       if (!inScope) {
         // eslint-disable-next-line no-console
         console.warn(
-          `No scope was provided to new ${Type.name}[name=${
-            spec.name
-          }], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
+          `No scope was provided to new ${Type.name}[name=${spec.name}], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
         );
       }
       if (!Type) {
@@ -361,9 +359,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         knownTypeNames.indexOf(Type.name) >= 0
       ) {
         throw new Error(
-          `GraphQL conflict for '${
-            Type.name
-          }' detected! Multiple versions of graphql exist in your node_modules?`
+          `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
         );
       }
       if (Type === GraphQLSchema) {
@@ -538,13 +534,13 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                   );
                 }
 
-                let argDataGenerators = [];
+                const argDataGenerators = [];
                 fieldArgDataGeneratorsByFieldName[
                   fieldName
                 ] = argDataGenerators;
 
                 let newSpec = spec;
-                let context = {
+                const context = {
                   ...commonContext,
                   Self,
                   addDataGenerator(fn) {
@@ -632,9 +628,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                       `Within context for GraphQLObjectType '${rawSpec.name}'`
                     ),
                     fieldScope,
-                    `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${
-                      rawSpec.name
-                    }'`
+                    `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`
                   ),
                 };
                 if (typeof newSpec === "function") {
@@ -730,7 +724,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
                   );
                 }
-                let context = {
+                const context = {
                   ...commonContext,
                   Self,
                   scope: extend(
@@ -739,14 +733,10 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
                       {
                         fieldName,
                       },
-                      `Within context for GraphQLInputObjectType '${
-                        rawSpec.name
-                      }'`
+                      `Within context for GraphQLInputObjectType '${rawSpec.name}'`
                     ),
                     fieldScope,
-                    `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${
-                      rawSpec.name
-                    }'`
+                    `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`
                   ),
                 };
                 let newSpec = spec;
@@ -913,9 +903,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
           Self,
           scope.__origin ||
             (this
-              ? `'newWithHooks' call during hook '${
-                  this.status.currentHookName
-                }'`
+              ? `'newWithHooks' call during hook '${this.status.currentHookName}'`
               : null)
         );
       }

@@ -77,9 +77,7 @@ export default (function ClientMutationIdDescriptionPlugin(
             description:
               "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
           },
-          `Adding a description to input arg for field '${fieldName}' field in '${
-            Self.name
-          }'`
+          `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`
         ),
       };
     },

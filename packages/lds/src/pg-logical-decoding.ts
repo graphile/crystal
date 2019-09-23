@@ -1,4 +1,4 @@
-/* tslint:disable no-console */
+/* eslint-disable no-console */
 import * as pg from "pg";
 import { EventEmitter } from "events";
 import FatalError from "./fatal-error";

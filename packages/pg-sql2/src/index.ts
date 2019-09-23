@@ -279,7 +279,7 @@ export function literal(val: string | number | boolean | null): SQLNode {
  * Join some Sql items together seperated by a string. Useful when dealing
  * with lists of Sql items that doesn’t make sense as a Sql query.
  */
-export function join(items: Array<SQL>, rawSeparator: string = ""): SQLQuery {
+export function join(items: Array<SQL>, rawSeparator = ""): SQLQuery {
   ensureNonEmptyArray(items, true);
   if (typeof rawSeparator !== "string") {
     throw new Error("Invalid separator - must be a string");

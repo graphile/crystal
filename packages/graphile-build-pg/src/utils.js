@@ -15,7 +15,7 @@ export const parseTags = (str: string) => {
         ...prev,
         tags: {
           ...prev.tags,
-          [key]: !prev.tags.hasOwnProperty(key)
+          [key]: !Object.prototype.hasOwnProperty.call(prev.tags, key)
             ? value
             : Array.isArray(prev.tags[key])
             ? [...prev.tags[key], value]

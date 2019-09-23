@@ -103,9 +103,7 @@ export default (function PgTypesPlugin(
             if (isNull(val)) return null;
             if (!Array.isArray(val)) {
               throw new Error(
-                `Expected array when converting PostgreSQL data into GraphQL; failing type: '${
-                  type.namespaceName
-                }.${type.name}'`
+                `Expected array when converting PostgreSQL data into GraphQL; failing type: '${type.namespaceName}.${type.name}'`
               );
             }
             return val.map(elementHandler);
@@ -295,9 +293,7 @@ export default (function PgTypesPlugin(
           );
         } else if (type.isPgArray) {
           const error = new Error(
-            `Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: "${
-              type.namespaceName
-            }.${type.name}")`
+            `Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: "${type.namespaceName}.${type.name}")`
           );
           if (process.env.NODE_ENV === "test") {
             // This is to ensure that Graphile core does not introduce these problems
@@ -869,9 +865,7 @@ end`;
                 gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] !== result
               ) {
                 throw new Error(
-                  `Callback and return types differ when defining type for '${
-                    type.id
-                  }'`
+                  `Callback and return types differ when defining type for '${type.id}'`
                 );
               }
               gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = result;
@@ -927,9 +921,7 @@ end`;
                   result
               ) {
                 throw new Error(
-                  `Callback and return types differ when defining type for '${
-                    type.id
-                  }'`
+                  `Callback and return types differ when defining type for '${type.id}'`
                 );
               }
               gqlInputTypeByTypeIdAndModifier[type.id][

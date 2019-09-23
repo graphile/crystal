@@ -82,17 +82,13 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
           const foreignTableTypeName = gqlForeignTableType.name;
           if (!gqlForeignTableType) {
             debug(
-              `Could not determine type for foreign table with id ${
-                constraint.foreignClassId
-              }`
+              `Could not determine type for foreign table with id ${constraint.foreignClassId}`
             );
             return memo;
           }
           if (!foreignTable) {
             throw new Error(
-              `Could not find the foreign table (constraint: ${
-                constraint.name
-              })`
+              `Could not find the foreign table (constraint: ${constraint.name})`
             );
           }
           if (omit(foreignTable, "read")) {

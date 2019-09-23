@@ -1,4 +1,4 @@
-/* tslint:disable no-console curly */
+/* eslint-disable no-console,curly */
 import PgLogicalDecoding, {
   changeToRecord,
   changeToPk,
