@@ -101,13 +101,13 @@ To run via Docker, simply pass the [CLI options](https://www.graphile.org/postgr
 
 ```bash
 docker pull graphile/postgraphile
-docker run graphile/postgraphile --help
+docker run --init graphile/postgraphile --help
 ```
 
 E.g. you might run this command (substituting the relevant variables):
 
 ```bash
-docker run -p 5000:5000 graphile/postgraphile --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE --schema app_public --watch
+docker run --init -p 5000:5000 graphile/postgraphile --connection postgres://POSTGRES_USER:POSTGRES_PASSWORD@POSTGRES_HOST:POSTGRES_PORT/POSTGRES_DATABASE --schema app_public --watch
 ```
 
 ## Read More

@@ -4,12 +4,12 @@ WORKDIR /postgraphile/
 
 # Add yarn ASAP because it's the slowest
 COPY package.json yarn.lock /postgraphile/
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --frozen-lockfile --production=false --no-progress
 
 # Now for PostGraphiQL's yarn
 COPY postgraphiql/ /postgraphile/postgraphiql/
 WORKDIR /postgraphile/postgraphiql/
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --frozen-lockfile --production=false --no-progress
 WORKDIR /postgraphile/
 
 # Copy everything else we need; this stuff will likely change
@@ -49,4 +49,4 @@ WORKDIR /postgraphile/
 ENTRYPOINT ["./cli.js"]
 
 COPY --from=clean /postgraphile/ /postgraphile/
-RUN yarn install --frozen-lockfile --production=true
+RUN yarn install --frozen-lockfile --production=true --no-progress
