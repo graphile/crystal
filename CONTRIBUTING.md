@@ -305,8 +305,7 @@ with the rest of your changes in the PR review process.
 
 ### Linting
 
-PostGraphile uses [TSLint](http://palantir.github.io/tslint/) and Travis CI to
-test builds and enforce lint rules:
+PostGraphile uses ESLint and Travis CI to test builds and enforce lint rules:
 [travis-ci.org/graphile/postgraphile](https://travis-ci.org/graphile/postgraphile).
 
 ## GraphiQL
