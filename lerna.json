@@ -2,11 +2,16 @@
   "lerna": "2.0.0-rc.5",
   "useWorkspaces": true,
   "npmClient": "yarn",
-  "packages": ["packages/*"],
-  "version": "4.4.4",
+  "packages": [
+    "packages/*"
+  ],
+  "version": "4.4.5",
   "command": {
     "publish": {
-      "allowBranch": ["master", "canary/*"]
+      "allowBranch": [
+        "master",
+        "canary/*"
+      ]
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@graphile/lru",
-  "version": "4.4.1-alpha.2",
+  "version": "4.4.5",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",

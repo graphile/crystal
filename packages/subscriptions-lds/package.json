@@ -1,6 +1,6 @@
 {
   "name": "@graphile/subscriptions-lds",
-  "version": "4.4.4",
+  "version": "4.4.5",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL logicial decoding",
   "main": "dist/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/subscriptions-lds#readme",
   "dependencies": {
-    "@graphile/lds": "4.4.4",
+    "@graphile/lds": "4.4.5",
     "@types/ws": "^6.0.1",
     "ws": "^7.0.0"
   },
