@@ -530,12 +530,9 @@ const loadPlugins = (rawNames: mixed) => {
       throw e;
     }
     let plugin = root;
-    while (true) {
-      const part = parts.shift();
-      if (part == null) {
-        break;
-      }
-      plugin = root[part];
+    let part: string | void;
+    while ((part = parts.shift())) {
+      plugin = plugin[part];
       if (plugin == null) {
         throw new Error(`No plugin found matching spec '${name}' - failed at '${part}'`);
       }
