@@ -37,11 +37,9 @@
     "node": ">=8.6"
   },
   "devDependencies": {
-    "eslint_d": "^8.0.0",
     "graphile-build": "4.4.5",
     "graphile-build-pg": "4.4.5",
     "jest": "^24.8.0",
-    "prettier": "^1.17.0",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
