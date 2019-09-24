@@ -1,4 +1,4 @@
-/* tslint:disable:no-any */
+/* eslint-disable @typescript-eslint/no-explicit-any,require-atomic-updates */
 import {
   Source,
   parse as parseGraphql,
@@ -62,7 +62,7 @@ const JS_ESCAPE_LOOKUP = {
   '\u2029': '\\u2029',
 };
 function safeJSONStringify(obj: {}) {
-  return JSON.stringify(obj).replace(/[<>\/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
+  return JSON.stringify(obj).replace(/[<>/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
 }
 
 /**
@@ -195,7 +195,7 @@ export default function createPostGraphileHttpRequestHandler(
     typeof pgSettings === 'object' &&
     Object.keys(pgSettings)
       .map(s => s.toLowerCase())
-      .indexOf('role') >= 0
+      .includes('role')
   ) {
     throw new Error(
       'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
@@ -832,7 +832,7 @@ export default function createPostGraphileHttpRequestHandler(
       // Finally, we send the client the results.
       if (!returnArray) {
         if (res.statusCode === 200 && results[0].statusCode) {
-          res.statusCode = results[0].statusCode!;
+          res.statusCode = results[0].statusCode;
         }
         results[0].statusCode = undefined;
       }

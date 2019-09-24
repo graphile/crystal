@@ -457,10 +457,10 @@ const {
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program, ...overridesFromOptions } as any;
+} = { ...config['options'], ...program, ...overridesFromOptions } as typeof program;
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
-if (['omit', 'only', 'deprecated'].indexOf(rawLegacyRelations) < 0) {
+if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   throw new Error(
     `Invalid argument to '--legacy-relations' - expected on of 'omit', 'deprecated', 'only'; but received '${rawLegacyRelations}'`,
   );
@@ -530,12 +530,9 @@ const loadPlugins = (rawNames: mixed) => {
       throw e;
     }
     let plugin = root;
-    while (true) {
-      const part = parts.shift();
-      if (part == null) {
-        break;
-      }
-      plugin = root[part];
+    let part: string | void;
+    while ((part = parts.shift())) {
+      plugin = plugin[part];
       if (plugin == null) {
         throw new Error(`No plugin found matching spec '${name}' - failed at '${part}'`);
       }
@@ -626,9 +623,18 @@ const postgraphileOptions = pluginHook(
   { config, cliOptions: program },
 );
 
+function killAllWorkers(signal = 'SIGTERM'): void {
+  for (const id in cluster.workers) {
+    const worker = cluster.workers[id];
+    if (Object.prototype.hasOwnProperty.call(cluster.workers, id) && worker) {
+      worker.kill(signal);
+    }
+  }
+}
+
 if (noServer) {
   // No need for a server, let's just spin up the schema builder
-  (async () => {
+  (async (): Promise<void> => {
     const pgPool = new Pool(pgConfig);
     pgPool.on('error', err => {
       // tslint:disable-next-line no-console
@@ -645,14 +651,6 @@ if (noServer) {
     process.exit(1);
   });
 } else {
-  function killAllWorkers(signal = 'SIGTERM'): void {
-    for (const id in cluster.workers) {
-      if (cluster.workers.hasOwnProperty(id) && !!cluster.workers[id]) {
-        cluster.workers[id]!.kill(signal);
-      }
-    }
-  }
-
   if (clusterWorkers >= 2 && cluster.isMaster) {
     let shuttingDown = false;
     const shutdown = () => {

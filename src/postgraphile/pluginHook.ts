@@ -80,7 +80,7 @@ function contextIsSame(context1: {}, context2: {}): boolean {
     if (context1[key] !== context2[key]) {
       return false;
     }
-    if (keys2.indexOf(key) === -1) {
+    if (!keys2.includes(key)) {
       return false;
     }
   }

@@ -46,7 +46,7 @@ TestAgent.prototype.host = function(host: any) {
 methods.forEach(method => {
   TestAgent.prototype[method] = function(url: any, _fn: any) {
     // eslint-disable-line no-unused-vars
-    var req = new Test(this.app, method.toUpperCase(), url, this._host);
+    let req = new Test(this.app, method.toUpperCase(), url, this._host);
     req.ca(this._ca);
     req.cert(this._cert);
     req.key(this._key);

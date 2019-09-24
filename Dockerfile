@@ -13,7 +13,7 @@ RUN yarn install --frozen-lockfile --production=false --no-progress
 WORKDIR /postgraphile/
 
 # Copy everything else we need; this stuff will likely change
-COPY tsconfig.json tslint.json /postgraphile/
+COPY tsconfig.json .eslintrc.js .eslintignore prettier.config.js .prettierignore /postgraphile/
 COPY index.js cli.js /postgraphile/
 COPY *.md /postgraphile/
 COPY src/ /postgraphile/src/
