@@ -457,7 +457,7 @@ const {
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
-} = { ...config['options'], ...program, ...overridesFromOptions };
+} = { ...config['options'], ...program, ...overridesFromOptions } as typeof program;
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
