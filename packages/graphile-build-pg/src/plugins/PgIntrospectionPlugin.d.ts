@@ -49,9 +49,9 @@ export interface PgClass {
   namespace: PgNamespace;
   type: PgType;
   tags: { [tag: string]: boolean | string | Array<string> };
-  attributes: [PgAttribute];
-  constraints: [PgConstraint];
-  foreignConstraints: [PgConstraint];
+  attributes: Array<PgAttribute>;
+  constraints: Array<PgConstraint>;
+  foreignConstraints: Array<PgConstraint>;
   primaryKeyConstraint: PgConstraint | void;
   aclSelectable: boolean;
   aclInsertable: boolean;
