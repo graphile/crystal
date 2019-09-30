@@ -64,7 +64,9 @@ export default (async function PgMutationUpdateDeletePlugin(
               const canUpdate =
                 mode === "update" &&
                 table.isUpdatable &&
-                !omit(table, "update");
+                !omit(table, "update") &&
+                // Check at least one attribute is updatable
+                table.attributes.find(attr => !omit(attr, "update"));
               const canDelete =
                 mode === "delete" &&
                 table.isDeletable &&
