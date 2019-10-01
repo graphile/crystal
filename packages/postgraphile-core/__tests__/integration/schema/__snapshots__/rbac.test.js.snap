@@ -4061,6 +4061,11 @@ type FuncOutComplexSetofConnection {
 
   \\"\\"\\"A list of \`FuncOutComplexSetofRecord\` objects.\\"\\"\\"
   nodes: [FuncOutComplexSetofRecord]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncOutComplexSetofRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncOutComplexSetofRecord\` edge in the connection.\\"\\"\\"
@@ -4100,6 +4105,11 @@ type FuncOutOutSetofConnection {
 
   \\"\\"\\"A list of \`FuncOutOutSetofRecord\` objects.\\"\\"\\"
   nodes: [FuncOutOutSetofRecord]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncOutOutSetofRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncOutOutSetofRecord\` edge in the connection.\\"\\"\\"
@@ -4132,6 +4142,9 @@ type FuncOutSetofConnection {
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
   nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -4159,6 +4172,11 @@ type FuncReturnsTableMultiColConnection {
 
   \\"\\"\\"A list of \`FuncReturnsTableMultiColRecord\` objects.\\"\\"\\"
   nodes: [FuncReturnsTableMultiColRecord]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncReturnsTableMultiColRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncReturnsTableMultiColRecord\` edge in the connection.\\"\\"\\"
@@ -4185,6 +4203,9 @@ type FuncReturnsTableOneColConnection {
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
   nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -4381,6 +4402,9 @@ type IntSetQueryConnection {
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
   nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -7616,6 +7640,9 @@ type PostComputedIntervalSetConnection {
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
   nodes: [Interval]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -8966,6 +8993,9 @@ type QueryIntervalSetConnection {
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
   nodes: [Interval]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -9399,6 +9429,9 @@ type StaticBigIntegerConnection {
 
   \\"\\"\\"A list of \`BigInt\` objects.\\"\\"\\"
   nodes: [BigInt]!
+
+  \\"\\"\\"The count of *all* \`BigInt\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`BigInt\` edge in the connection.\\"\\"\\"

@@ -38,12 +38,12 @@ query {
   tableSetQueryWithOffset10: tableSetQuery(before: "WyJuYXR1cmFsIiwxXQ==", last: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   # Using after and offset together should not throw
   tableSetQueryWithOffset11: tableSetQuery(after: "WyJuYXR1cmFsIiwxXQ==", offset: 1, first: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
-  intSetQuery(x: 5, z: 6) { edges { cursor node } }
+  intSetQuery(x: 5, z: 6) { edges { cursor node } totalCount }
   noArgsQuery
-  staticBigInteger { edges { node } }
+  staticBigInteger { edges { node } totalCount }
 
   queryCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
   queryTextArray
   queryIntervalArray { seconds minutes hours days months years }
-  queryIntervalSet { nodes { seconds minutes hours days months years } edges { node { seconds minutes hours } cursor } }
+  queryIntervalSet { nodes { seconds minutes hours days months years } edges { node { seconds minutes hours } cursor } totalCount }
 }

@@ -2336,6 +2336,9 @@ type PostComputedIntervalSetConnection {
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
   nodes: [Interval]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -3065,6 +3068,9 @@ type QueryIntervalSetConnection {
 
   \\"\\"\\"A list of \`Interval\` objects.\\"\\"\\"
   nodes: [Interval]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -3491,6 +3497,9 @@ type StaticBigIntegerConnection {
 
   \\"\\"\\"A list of \`BigInt\` objects.\\"\\"\\"
   nodes: [BigInt]!
+
+  \\"\\"\\"The count of *all* \`BigInt\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`BigInt\` edge in the connection.\\"\\"\\"

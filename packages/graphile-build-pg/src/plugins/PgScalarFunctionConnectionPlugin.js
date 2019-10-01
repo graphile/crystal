@@ -146,6 +146,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
               }
             )}`,
             isConnectionType: true,
+            isPgRowConnectionType: true,
             edgeType: EdgeType,
             nodeType: NodeType,
             pgIntrospection: proc,

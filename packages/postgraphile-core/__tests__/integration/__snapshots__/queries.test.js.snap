@@ -1521,6 +1521,7 @@ Object {
           },
         },
       ],
+      "totalCount": 1,
     },
     "funcOutOut": Object {
       "firstOut": 42,
@@ -1545,6 +1546,7 @@ Object {
           "o2": "out2",
         },
       ],
+      "totalCount": 2,
     },
     "funcOutOutUnnamed": Object {
       "arg1": 42,
@@ -1555,6 +1557,7 @@ Object {
         42,
         43,
       ],
+      "totalCount": 2,
     },
     "funcOutTable": Object {
       "id": 1,
@@ -1587,6 +1590,7 @@ Object {
           "nodeId": "WyJwZW9wbGUiLDZd",
         },
       ],
+      "totalCount": 6,
     },
     "funcOutUnnamed": 42,
     "funcOutUnnamedOutOutUnnamed": Object {
@@ -1605,12 +1609,14 @@ Object {
           "col2": "out2",
         },
       ],
+      "totalCount": 2,
     },
     "funcReturnsTableOneCol": Object {
       "nodes": Array [
         62,
         63,
       ],
+      "totalCount": 2,
     },
     "personById": Object {
       "computedComplex": Object {
@@ -4574,6 +4580,7 @@ Object {
           "node": 6,
         },
       ],
+      "totalCount": 7,
     },
     "jsonIdentity": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
     "jsonIdentityIssue85": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
@@ -4705,6 +4712,7 @@ Object {
           "years": null,
         },
       ],
+      "totalCount": 3,
     },
     "queryTextArray": Array [
       "str1",
@@ -4747,6 +4755,7 @@ Object {
           "node": "30894622507013200",
         },
       ],
+      "totalCount": 11,
     },
     "tableQuery": Object {
       "authorId": 5,

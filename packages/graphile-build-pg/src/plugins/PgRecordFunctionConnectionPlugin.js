@@ -172,6 +172,7 @@ export default (function PgRecordFunctionConnectionPlugin(
               }
             )}`,
             isConnectionType: true,
+            isPgRowConnectionType: true,
             edgeType: EdgeType,
             nodeType: NodeType,
             pgIntrospection: proc,

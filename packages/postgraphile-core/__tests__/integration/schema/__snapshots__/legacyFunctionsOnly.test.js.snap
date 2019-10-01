@@ -1077,6 +1077,9 @@ type IntSetQueryConnection {
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
   nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -3001,6 +3004,9 @@ type TypesConnection {
 
   \\"\\"\\"Information to aid in pagination.\\"\\"\\"
   pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Type\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Type\` edge in the connection.\\"\\"\\"

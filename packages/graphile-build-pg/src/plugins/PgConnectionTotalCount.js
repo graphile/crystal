@@ -12,20 +12,24 @@ export default (function PgConnectionTotalCount(builder) {
         pgSql: sql,
       } = build;
       const {
-        scope: { isPgRowConnectionType, pgIntrospection: table },
+        scope: { isPgRowConnectionType, pgIntrospection: table, nodeType },
         fieldWithHooks,
         Self,
       } = context;
 
-      if (
-        !isPgRowConnectionType ||
-        !table ||
-        table.kind !== "class" ||
-        !table.namespace
-      ) {
+      if (!isPgRowConnectionType) {
         return fields;
       }
-      const tableTypeName = inflection.tableType(table);
+
+      const nodeTypeName =
+        nodeType && nodeType.name
+          ? nodeType.name
+          : table && table.kind === "class"
+          ? inflection.tableType(table)
+          : null;
+      if (!nodeTypeName) {
+        return fields;
+      }
 
       return extend(
         fields,
@@ -44,7 +48,7 @@ export default (function PgConnectionTotalCount(builder) {
                 };
               });
               return {
-                description: `The count of *all* \`${tableTypeName}\` you could get from the connection.`,
+                description: `The count of *all* \`${nodeTypeName}\` you could get from the connection.`,
                 type: new GraphQLNonNull(GraphQLInt),
                 resolve(parent) {
                   return (

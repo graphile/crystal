@@ -2735,6 +2735,11 @@ type FuncOutComplexSetofConnection {
   A list of edges which contains the \`FuncOutComplexSetofRecord\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [FuncOutComplexSetofEdge!]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncOutComplexSetofRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncOutComplexSetofRecord\` edge in the connection.\\"\\"\\"
@@ -2774,6 +2779,11 @@ type FuncOutOutSetofConnection {
   A list of edges which contains the \`FuncOutOutSetofRecord\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [FuncOutOutSetofEdge!]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncOutOutSetofRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncOutOutSetofRecord\` edge in the connection.\\"\\"\\"
@@ -2806,6 +2816,9 @@ type FuncOutSetofConnection {
   A list of edges which contains the \`Int\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [FuncOutSetofEdge!]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -2833,6 +2846,11 @@ type FuncReturnsTableMultiColConnection {
   A list of edges which contains the \`FuncReturnsTableMultiColRecord\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [FuncReturnsTableMultiColEdge!]!
+
+  \\"\\"\\"
+  The count of *all* \`FuncReturnsTableMultiColRecord\` you could get from the connection.
+  \\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`FuncReturnsTableMultiColRecord\` edge in the connection.\\"\\"\\"
@@ -2859,6 +2877,9 @@ type FuncReturnsTableOneColConnection {
   A list of edges which contains the \`Int\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [FuncReturnsTableOneColEdge!]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -3054,6 +3075,9 @@ type IntSetQueryConnection {
   A list of edges which contains the \`Int\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [IntSetQueryEdge!]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -6272,6 +6296,9 @@ type PostComputedIntervalSetConnection {
   A list of edges which contains the \`Interval\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [PostComputedIntervalSetEdge!]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -7625,6 +7652,9 @@ type QueryIntervalSetConnection {
   A list of edges which contains the \`Interval\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [QueryIntervalSetEdge!]!
+
+  \\"\\"\\"The count of *all* \`Interval\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Interval\` edge in the connection.\\"\\"\\"
@@ -8053,6 +8083,9 @@ type StaticBigIntegerConnection {
   A list of edges which contains the \`BigInt\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [StaticBigIntegerEdge!]!
+
+  \\"\\"\\"The count of *all* \`BigInt\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`BigInt\` edge in the connection.\\"\\"\\"
