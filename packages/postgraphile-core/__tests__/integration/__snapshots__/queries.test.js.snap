@@ -79,7 +79,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
         Object {
@@ -91,7 +93,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
         Object {
@@ -103,7 +107,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
         Object {
@@ -116,7 +122,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -132,7 +140,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -145,7 +155,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -166,7 +178,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
         Object {
@@ -178,7 +192,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
       ],
@@ -205,7 +221,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -218,7 +236,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -241,7 +261,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
         Object {
@@ -257,7 +279,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -267,7 +291,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
         Object {
@@ -280,7 +306,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -292,7 +320,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
         Object {
@@ -305,7 +335,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -329,7 +361,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
         Object {
@@ -341,7 +375,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
         Object {
@@ -354,7 +390,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -364,7 +402,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
         Object {
@@ -380,7 +420,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -392,7 +434,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
       ],
@@ -413,7 +457,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
       ],
@@ -436,7 +482,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
         Object {
@@ -449,7 +497,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -465,7 +515,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -478,7 +530,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -680,7 +734,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
         Object {
@@ -692,7 +748,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
         Object {
@@ -705,7 +763,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
       ],
@@ -770,7 +830,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -786,7 +848,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
       ],
@@ -809,7 +873,9 @@ Object {
             "email": "budd.deey@email.com",
             "id": 3,
             "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
             "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
           },
         },
       ],
@@ -833,7 +899,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -854,7 +922,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
         Object {
@@ -866,7 +936,9 @@ Object {
             "email": "sara.smith@email.com",
             "id": 2,
             "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
             "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
           },
         },
         Object {
@@ -879,7 +951,9 @@ Object {
             "email": "kathryn.ramirez@email.com",
             "id": 4,
             "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
             "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
           },
         },
         Object {
@@ -895,7 +969,9 @@ Object {
             "email": "joe.tucker@email.com",
             "id": 5,
             "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
             "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
           },
         },
         Object {
@@ -908,7 +984,9 @@ Object {
             "email": "graphile-build.issue.27.exists@example.com",
             "id": 6,
             "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
             "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
           },
         },
       ],
@@ -961,7 +1039,9 @@ Object {
             "email": "john.smith@email.com",
             "id": 1,
             "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
             "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
           },
         },
       ],
@@ -1016,6 +1096,52 @@ Object {
           },
         },
       ],
+    },
+    "w": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "x": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
     },
   },
 }
@@ -1878,6 +2004,118 @@ Object {
 }
 `;
 
+exports[`network_types.graphql 1`] = `
+Object {
+  "data": Object {
+    "cidrTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "inetTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "macaddrTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/24",
+            "id": 2,
+            "inet": "192.168.0.1",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/12",
+            "id": 3,
+            "inet": "172.16.0.0/12",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/24",
+            "id": 4,
+            "inet": "172.16.0.1/12",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba::/64",
+            "id": 5,
+            "inet": "2001:4f8:3:ba::",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128",
+            "id": 6,
+            "inet": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1",
+            "macaddr": "08:00:2b:01:02:03",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+  },
+}
+`;
+
 exports[`node.graphql 1`] = `
 Object {
   "data": Object {
@@ -2254,6 +2492,227 @@ Object {
           "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiw0XQ==",
         },
       ],
+    },
+  },
+}
+`;
+
+exports[`pg10.network_types.graphql 1`] = `
+Object {
+  "data": Object {
+    "cidrTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "inetTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "macaddr8Test": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/24",
+            "id": 2,
+            "inet": "192.168.0.1",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/12",
+            "id": 3,
+            "inet": "172.16.0.0/12",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/24",
+            "id": 4,
+            "inet": "172.16.0.1/12",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba::/64",
+            "id": 5,
+            "inet": "2001:4f8:3:ba::",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128",
+            "id": 6,
+            "inet": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+          "node": Object {
+            "cidr": "::ffff:1.2.3.0/120",
+            "id": 7,
+            "inet": "::ffff:1.2.3.0/120",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "cidr": "::ffff:1.2.3.0/128",
+            "id": 8,
+            "inet": "::ffff:1.2.3.0",
+            "macaddr": "aa:bb:cc:dd:ee:ff",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 8,
+    },
+    "macaddrTest": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/16",
+            "id": 1,
+            "inet": "192.168.0.0",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "cidr": "192.168.0.0/24",
+            "id": 2,
+            "inet": "192.168.0.1",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/12",
+            "id": 3,
+            "inet": "172.16.0.0/12",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "cidr": "172.16.0.0/24",
+            "id": 4,
+            "inet": "172.16.0.1/12",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba::/64",
+            "id": 5,
+            "inet": "2001:4f8:3:ba::",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "cidr": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128",
+            "id": 6,
+            "inet": "2001:4f8:3:ba:2e0:81ff:fe22:d1f1",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+          "node": Object {
+            "cidr": "::ffff:1.2.3.0/120",
+            "id": 7,
+            "inet": "::ffff:1.2.3.0/120",
+            "macaddr": "08:00:2b:01:02:03",
+            "macaddr8": "08:00:2b:01:02:03:04:05",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 7,
     },
   },
 }

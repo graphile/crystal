@@ -1,0 +1,19 @@
+mutation {
+  createNetwork(input: {
+    network: {
+      inet: "10.0.0.0"
+      cidr: "10.0.0.0/8"
+      macaddr: "000000000000"
+      macaddr8: "0000000000000000"
+    }
+  }) {
+    network {
+      nodeId
+      id
+      inet
+      cidr
+      macaddr
+      macaddr8
+    }
+  }
+}

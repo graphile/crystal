@@ -6167,6 +6167,7 @@ type Person implements Node {
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
 
   \\"\\"\\"Reads a single \`LeftArm\` that is related to this \`Person\`.\\"\\"\\"
   leftArmByPersonId: LeftArm
@@ -6292,6 +6293,7 @@ type Person implements Node {
     offset: Int
   ): TypesConnection!
   typeFunctionList: [Type]
+  userMac: String
 }
 
 \\"\\"\\"The return type of our \`computedComplex\` query.\\"\\"\\"
@@ -6344,10 +6346,12 @@ input PersonInput {
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String!
   site: WrappedUrlInput
+  userMac: String
 }
 
 \\"\\"\\"
@@ -6363,10 +6367,12 @@ input PersonPatch {
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
 
   \\"\\"\\"The person’s name\\"\\"\\"
   name: String
   site: WrappedUrlInput
+  userMac: String
 }
 
 \\"\\"\\"Tracks the person's secret\\"\\"\\"
@@ -8409,6 +8415,7 @@ type Type implements Node {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  cidr: String
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
@@ -8418,10 +8425,12 @@ type Type implements Node {
   enum: Color!
   enumArray: [Color]!
   id: Int!
+  inet: InternetAddress
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
 
@@ -8549,6 +8558,7 @@ input TypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
   boolean: Boolean!
+  cidr: String
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
@@ -8558,10 +8568,12 @@ input TypeInput {
   enum: Color!
   enumArray: [Color]!
   id: Int
+  inet: InternetAddress
   interval: IntervalInput!
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
   nullableCompoundType: CompoundTypeInput
@@ -8585,6 +8597,7 @@ input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
   boolean: Boolean
+  cidr: String
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
@@ -8594,10 +8607,12 @@ input TypePatch {
   enum: Color
   enumArray: [Color]
   id: Int
+  inet: InternetAddress
   interval: IntervalInput
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  macaddr: String
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
   nullableCompoundType: CompoundTypeInput

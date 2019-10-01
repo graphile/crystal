@@ -1,7 +1,7 @@
 const { resolve: resolvePath } = require("path");
 const { readdirSync, readFile: rawReadFile } = require("fs");
 const { graphql } = require("graphql");
-const { withPgClient } = require("../helpers");
+const { withPgClient, getServerVersionNum } = require("../helpers");
 const { createPostGraphileSchema } = require("../..");
 
 function readFile(filename, encoding) {
@@ -13,16 +13,13 @@ function readFile(filename, encoding) {
   });
 }
 
-async function getServerVersionNum(pgClient) {
-  const versionResult = await pgClient.query("show server_version_num;");
-  return parseInt(versionResult.rows[0].server_version_num, 10);
-}
-
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
+
+const pg10Data = () => readFile(`${__dirname}/../pg10-data.sql`, "utf8");
 
 const dSchemaComments = () =>
   readFile(`${__dirname}/../kitchen-sink-d-schema-comments.sql`, "utf8");
@@ -42,12 +39,26 @@ beforeAll(() => {
       dSchema,
       inheritenceSchema,
       pg10Schema,
+      useCustomNetworkScalarsSchema,
+      pg10UseCustomNetworkScalarsSchema,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["d"]),
       createPostGraphileSchema(pgClient, ["inheritence"]),
       serverVersionNum >= 100000
         ? createPostGraphileSchema(pgClient, ["pg10"])
+        : null,
+      createPostGraphileSchema(pgClient, ["network_types"], {
+        graphileBuildOptions: {
+          pgUseCustomNetworkScalars: true,
+        },
+      }),
+      serverVersionNum >= 100000
+        ? createPostGraphileSchema(pgClient, ["pg10"], {
+            graphileBuildOptions: {
+              pgUseCustomNetworkScalars: true,
+            },
+          })
         : null,
     ]);
     // Now for RBAC-enabled tests
@@ -60,6 +71,8 @@ beforeAll(() => {
       dSchema,
       inheritenceSchema,
       pg10Schema,
+      useCustomNetworkScalarsSchema,
+      pg10UseCustomNetworkScalarsSchema,
       rbacSchema,
     };
   });
@@ -77,6 +90,8 @@ beforeAll(() => {
       dSchema,
       inheritenceSchema,
       pg10Schema,
+      useCustomNetworkScalarsSchema,
+      pg10UseCustomNetworkScalarsSchema,
       rbacSchema,
     } = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
@@ -90,19 +105,29 @@ beforeAll(() => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
 
+      const serverVersionNum = await getServerVersionNum(pgClient);
+      if (serverVersionNum >= 100000) {
+        await pgClient.query(await pg10Data());
+      }
+
       let schemaToUse;
       if (fileName.startsWith("d.")) {
         schemaToUse = dSchema;
       } else if (fileName.startsWith("inheritence.")) {
         schemaToUse = inheritenceSchema;
       } else if (fileName.startsWith("pg10.")) {
-        const serverVersionNum = await getServerVersionNum(pgClient);
         if (serverVersionNum < 100000) {
           // eslint-disable-next-line
           console.log("Skipping test as PG version is less than 10");
           return;
         }
-        schemaToUse = pg10Schema;
+        if (fileName.startsWith("pg10.network_types.")) {
+          schemaToUse = pg10UseCustomNetworkScalarsSchema;
+        } else {
+          schemaToUse = pg10Schema;
+        }
+      } else if (fileName.startsWith("network_types.")) {
+        schemaToUse = useCustomNetworkScalarsSchema;
       } else if (fileName.startsWith("rbac.")) {
         await pgClient.query(
           "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)"

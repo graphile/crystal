@@ -1,0 +1,729 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prints a schema to test network scalars using custom network scalar types 1`] = `
+"\\"\\"\\"An IPv4 or IPv6 CIDR address.\\"\\"\\"
+scalar CidrAddress
+
+\\"\\"\\"All input for the create \`Network\` mutation.\\"\\"\\"
+input CreateNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` to be created by this mutation.\\"\\"\\"
+  network: NetworkInput!
+}
+
+\\"\\"\\"The output of our create \`Network\` mutation.\\"\\"\\"
+type CreateNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` that was created by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"All input for the \`deleteNetworkById\` mutation.\\"\\"\\"
+input DeleteNetworkByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteNetwork\` mutation.\\"\\"\\"
+input DeleteNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Network\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Network\` mutation.\\"\\"\\"
+type DeleteNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedNetworkId: ID
+
+  \\"\\"\\"The \`Network\` that was deleted by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
+\\"\\"\\"A 6-byte MAC address.\\"\\"\\"
+scalar MacAddress
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`Network\`.\\"\\"\\"
+  createNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateNetworkInput!
+  ): CreateNetworkPayload
+
+  \\"\\"\\"Deletes a single \`Network\` using its globally unique id.\\"\\"\\"
+  deleteNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNetworkInput!
+  ): DeleteNetworkPayload
+
+  \\"\\"\\"Deletes a single \`Network\` using a unique key.\\"\\"\\"
+  deleteNetworkById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNetworkByIdInput!
+  ): DeleteNetworkPayload
+
+  \\"\\"\\"Updates a single \`Network\` using its globally unique id and a patch.\\"\\"\\"
+  updateNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNetworkInput!
+  ): UpdateNetworkPayload
+
+  \\"\\"\\"Updates a single \`Network\` using a unique key and a patch.\\"\\"\\"
+  updateNetworkById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNetworkByIdInput!
+  ): UpdateNetworkPayload
+}
+
+type Network implements Node {
+  cidr: CidrAddress
+  id: Int!
+  inet: InternetAddress
+  macaddr: MacAddress
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`Network\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input NetworkCondition {
+  \\"\\"\\"Checks for equality with the object’s \`cidr\` field.\\"\\"\\"
+  cidr: CidrAddress
+
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`inet\` field.\\"\\"\\"
+  inet: InternetAddress
+
+  \\"\\"\\"Checks for equality with the object’s \`macaddr\` field.\\"\\"\\"
+  macaddr: MacAddress
+}
+
+\\"\\"\\"An input for mutations affecting \`Network\`\\"\\"\\"
+input NetworkInput {
+  cidr: CidrAddress
+  id: Int
+  inet: InternetAddress
+  macaddr: MacAddress
+}
+
+\\"\\"\\"
+Represents an update to a \`Network\`. Fields that are set will be updated.
+\\"\\"\\"
+input NetworkPatch {
+  cidr: CidrAddress
+  id: Int
+  inet: InternetAddress
+  macaddr: MacAddress
+}
+
+\\"\\"\\"A connection to a list of \`Network\` values.\\"\\"\\"
+type NetworksConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Network\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [NetworksEdge!]!
+
+  \\"\\"\\"A list of \`Network\` objects.\\"\\"\\"
+  nodes: [Network]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Network\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Network\` edge in the connection.\\"\\"\\"
+type NetworksEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Network\` at the end of the edge.\\"\\"\\"
+  node: Network
+}
+
+\\"\\"\\"Methods to use when ordering \`Network\`.\\"\\"\\"
+enum NetworksOrderBy {
+  CIDR_ASC
+  CIDR_DESC
+  ID_ASC
+  ID_DESC
+  INET_ASC
+  INET_DESC
+  MACADDR_ASC
+  MACADDR_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`Network\`.\\"\\"\\"
+  allNetworks(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NetworkCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksConnection
+
+  \\"\\"\\"Reads a single \`Network\` using its globally unique \`ID\`.\\"\\"\\"
+  network(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Network\`.\\"\\"\\"
+    nodeId: ID!
+  ): Network
+  networkById(id: Int!): Network
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+
+\\"\\"\\"All input for the \`updateNetworkById\` mutation.\\"\\"\\"
+input UpdateNetworkByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Network\` being updated.
+  \\"\\"\\"
+  networkPatch: NetworkPatch!
+}
+
+\\"\\"\\"All input for the \`updateNetwork\` mutation.\\"\\"\\"
+input UpdateNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Network\` being updated.
+  \\"\\"\\"
+  networkPatch: NetworkPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Network\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`Network\` mutation.\\"\\"\\"
+type UpdateNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` that was updated by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+"
+`;
+
+exports[`prints a schema to test network scalars without using custom network scalar types 1`] = `
+"\\"\\"\\"All input for the create \`Network\` mutation.\\"\\"\\"
+input CreateNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` to be created by this mutation.\\"\\"\\"
+  network: NetworkInput!
+}
+
+\\"\\"\\"The output of our create \`Network\` mutation.\\"\\"\\"
+type CreateNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` that was created by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"All input for the \`deleteNetworkById\` mutation.\\"\\"\\"
+input DeleteNetworkByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteNetwork\` mutation.\\"\\"\\"
+input DeleteNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Network\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Network\` mutation.\\"\\"\\"
+type DeleteNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedNetworkId: ID
+
+  \\"\\"\\"The \`Network\` that was deleted by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`Network\`.\\"\\"\\"
+  createNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateNetworkInput!
+  ): CreateNetworkPayload
+
+  \\"\\"\\"Deletes a single \`Network\` using its globally unique id.\\"\\"\\"
+  deleteNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNetworkInput!
+  ): DeleteNetworkPayload
+
+  \\"\\"\\"Deletes a single \`Network\` using a unique key.\\"\\"\\"
+  deleteNetworkById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNetworkByIdInput!
+  ): DeleteNetworkPayload
+
+  \\"\\"\\"Updates a single \`Network\` using its globally unique id and a patch.\\"\\"\\"
+  updateNetwork(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNetworkInput!
+  ): UpdateNetworkPayload
+
+  \\"\\"\\"Updates a single \`Network\` using a unique key and a patch.\\"\\"\\"
+  updateNetworkById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNetworkByIdInput!
+  ): UpdateNetworkPayload
+}
+
+type Network implements Node {
+  cidr: String
+  id: Int!
+  inet: InternetAddress
+  macaddr: String
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`Network\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input NetworkCondition {
+  \\"\\"\\"Checks for equality with the object’s \`cidr\` field.\\"\\"\\"
+  cidr: String
+
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`inet\` field.\\"\\"\\"
+  inet: InternetAddress
+
+  \\"\\"\\"Checks for equality with the object’s \`macaddr\` field.\\"\\"\\"
+  macaddr: String
+}
+
+\\"\\"\\"An input for mutations affecting \`Network\`\\"\\"\\"
+input NetworkInput {
+  cidr: String
+  id: Int
+  inet: InternetAddress
+  macaddr: String
+}
+
+\\"\\"\\"
+Represents an update to a \`Network\`. Fields that are set will be updated.
+\\"\\"\\"
+input NetworkPatch {
+  cidr: String
+  id: Int
+  inet: InternetAddress
+  macaddr: String
+}
+
+\\"\\"\\"A connection to a list of \`Network\` values.\\"\\"\\"
+type NetworksConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Network\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [NetworksEdge!]!
+
+  \\"\\"\\"A list of \`Network\` objects.\\"\\"\\"
+  nodes: [Network]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Network\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Network\` edge in the connection.\\"\\"\\"
+type NetworksEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Network\` at the end of the edge.\\"\\"\\"
+  node: Network
+}
+
+\\"\\"\\"Methods to use when ordering \`Network\`.\\"\\"\\"
+enum NetworksOrderBy {
+  CIDR_ASC
+  CIDR_DESC
+  ID_ASC
+  ID_DESC
+  INET_ASC
+  INET_DESC
+  MACADDR_ASC
+  MACADDR_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`Network\`.\\"\\"\\"
+  allNetworks(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NetworkCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksConnection
+
+  \\"\\"\\"Reads a single \`Network\` using its globally unique \`ID\`.\\"\\"\\"
+  network(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Network\`.\\"\\"\\"
+    nodeId: ID!
+  ): Network
+  networkById(id: Int!): Network
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+
+\\"\\"\\"All input for the \`updateNetworkById\` mutation.\\"\\"\\"
+input UpdateNetworkByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Network\` being updated.
+  \\"\\"\\"
+  networkPatch: NetworkPatch!
+}
+
+\\"\\"\\"All input for the \`updateNetwork\` mutation.\\"\\"\\"
+input UpdateNetworkInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Network\` being updated.
+  \\"\\"\\"
+  networkPatch: NetworkPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Network\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`Network\` mutation.\\"\\"\\"
+type UpdateNetworkPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Network\` that was updated by this mutation.\\"\\"\\"
+  network: Network
+
+  \\"\\"\\"An edge for our \`Network\`. May be used by Relay 1.\\"\\"\\"
+  networkEdge(
+    \\"\\"\\"The method to use when ordering \`Network\`.\\"\\"\\"
+    orderBy: [NetworksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NetworksEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+"
+`;

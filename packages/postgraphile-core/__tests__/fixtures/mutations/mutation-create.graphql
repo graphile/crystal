@@ -99,7 +99,9 @@ mutation CreateMutation($config: KeyValueHash!) {
       point: {
         x: 1
         y: 3
-      }
+      },
+      cidr: "192.168.0.0/16",
+      macaddr: "0cafec0ffee0"
     }
   }) {
     clientMutationId
@@ -158,6 +160,8 @@ mutation CreateMutation($config: KeyValueHash!) {
       about: "Son of Sara and John Smith."
       config: $config
       lastLoginFromIp: "172.16.1.2"
+      lastLoginFromSubnet: "172.16.0.0/12"
+      userMac: "00:00:00:00:00:00"
     }
   }) { ...createPersonPayload }
   c: createPerson(input: {
@@ -169,6 +173,8 @@ mutation CreateMutation($config: KeyValueHash!) {
       about: "My archnemisis is Budd Deey."
       config: null
       lastLoginFromIp: "192.168.0.42"
+      lastLoginFromSubnet: "192.168.0.0/16"
+      userMac: "0000.0000.0000"
     }
   }) { ...createPersonPayload }
   d: createCompoundKey(input: {
@@ -235,6 +241,8 @@ mutation CreateMutation($config: KeyValueHash!) {
         null_string: "null"
       }
       lastLoginFromIp: "10.0.1.42"
+      lastLoginFromSubnet: "10.0.0.0/8"
+      userMac: "aa-bb-cc-dd-ee-ff"
     }
   }) { ...createPersonPayload }
   h: createPerson(input: {
@@ -353,6 +361,8 @@ fragment createPersonPayload on CreatePersonPayload {
     about
     config
     lastLoginFromIp
+    lastLoginFromSubnet
+    userMac
     issue27UserExists: exists(email: "graphile-build.issue.27@example.com")
   }
   a: personEdge(orderBy: PRIMARY_KEY_ASC) { ...peopleEdge }

@@ -31,6 +31,7 @@ export default (function PgTypesPlugin(
     pgExtendedTypes = true,
     // Adding hstore support is technically a breaking change; this allows people to opt out easily:
     pgSkipHstore = false,
+    pgUseCustomNetworkScalars = false,
     disableIssue390Fix = false,
   }
 ) {
@@ -337,6 +338,21 @@ export default (function PgTypesPlugin(
         inflection.builtin("InternetAddress"),
         "An IPv4 or IPv6 host address, and optionally its subnet."
       );
+      const CidrType = pgUseCustomNetworkScalars
+        ? stringType(
+            inflection.builtin("CidrAddress"),
+            "An IPv4 or IPv6 CIDR address."
+          )
+        : GraphQLString;
+      const MacAddrType = pgUseCustomNetworkScalars
+        ? stringType(inflection.builtin("MacAddress"), "A 6-byte MAC address.")
+        : GraphQLString;
+      const MacAddr8Type = pgUseCustomNetworkScalars
+        ? stringType(
+            inflection.builtin("MacAddress8"),
+            "An 8-byte MAC address."
+          )
+        : GraphQLString;
 
       // pgExtendedTypes might change what types we use for things
       const JSONType = pgExtendedTypes
@@ -423,6 +439,9 @@ export default (function PgTypesPlugin(
         "600": Point, // point
 
         "869": InetType,
+        "650": CidrType,
+        "829": MacAddrType,
+        "774": MacAddr8Type,
       };
       const oidInputLookup = {
         "1186": GQLIntervalInput, // interval

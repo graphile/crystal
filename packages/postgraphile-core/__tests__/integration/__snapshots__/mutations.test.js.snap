@@ -285,8 +285,10 @@ Object {
         "id": 9000,
         "issue27UserExists": false,
         "lastLoginFromIp": "172.16.1.2",
+        "lastLoginFromSubnet": "172.16.0.0/12",
         "name": "John Smith Jr.",
         "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        "userMac": "00:00:00:00:00:00",
       },
       "query": Object {
         "nodeId": "query",
@@ -357,8 +359,10 @@ Object {
         "id": 20,
         "issue27UserExists": false,
         "lastLoginFromIp": "192.168.0.42",
+        "lastLoginFromSubnet": "192.168.0.0/16",
         "name": "Best Pal",
         "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        "userMac": "00:00:00:00:00:00",
       },
       "query": Object {
         "nodeId": "query",
@@ -478,8 +482,10 @@ Object {
         "id": 1998,
         "issue27UserExists": false,
         "lastLoginFromIp": "10.0.1.42",
+        "lastLoginFromSubnet": "10.0.0.0/8",
         "name": "Budd Deey",
         "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        "userMac": "aa:bb:cc:dd:ee:ff",
       },
       "query": Object {
         "nodeId": "query",
@@ -1155,6 +1161,22 @@ Object {
 }
 `;
 
+exports[`network_types.createNetwork.graphql 1`] = `
+Object {
+  "data": Object {
+    "createNetwork": Object {
+      "network": Object {
+        "cidr": "10.0.0.0/8",
+        "id": 7,
+        "inet": "10.0.0.0",
+        "macaddr": "00:00:00:00:00:00",
+        "nodeId": "WyJuZXR3b3JrcyIsN10=",
+      },
+    },
+  },
+}
+`;
+
 exports[`pg10.identity.graphql 1`] = `
 Object {
   "data": Object {
@@ -1174,6 +1196,23 @@ Object {
       "byDefaultAsIdentity": Object {
         "id": 100,
         "t": "test",
+      },
+    },
+  },
+}
+`;
+
+exports[`pg10.network_types.createNetwork.graphql 1`] = `
+Object {
+  "data": Object {
+    "createNetwork": Object {
+      "network": Object {
+        "cidr": "10.0.0.0/8",
+        "id": 9,
+        "inet": "10.0.0.0",
+        "macaddr": "00:00:00:00:00:00",
+        "macaddr8": "00:00:00:00:00:00:00:00",
+        "nodeId": "WyJuZXR3b3JrcyIsOV0=",
       },
     },
   },

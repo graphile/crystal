@@ -41,6 +41,8 @@ query {
       }
     }
   }
+  w: allPeople(condition: { lastLoginFromSubnet: "192.168.0.0/24" }) { ...personConnection }
+  x: allPeople(condition: { userMac: "0000.0000.0000" }) { ...personConnection }
   nullTest1: allNullTestRecords { nodes { nullableText nullableInt } }
 }
 
@@ -60,6 +62,8 @@ fragment personConnection on PeopleConnection {
       email
       config
       lastLoginFromIp
+      lastLoginFromSubnet
+      userMac
     }
   }
 }

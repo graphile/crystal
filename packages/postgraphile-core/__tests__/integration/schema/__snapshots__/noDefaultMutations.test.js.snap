@@ -1775,6 +1775,8 @@ enum PeopleOrderBy {
   ID_DESC
   LAST_LOGIN_FROM_IP_ASC
   LAST_LOGIN_FROM_IP_DESC
+  LAST_LOGIN_FROM_SUBNET_ASC
+  LAST_LOGIN_FROM_SUBNET_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
@@ -1782,6 +1784,8 @@ enum PeopleOrderBy {
   PRIMARY_KEY_DESC
   SITE_ASC
   SITE_DESC
+  USER_MAC_ASC
+  USER_MAC_DESC
 }
 
 \\"\\"\\"Person test comment\\"\\"\\"
@@ -1887,6 +1891,7 @@ type Person implements Node {
   \\"\\"\\"The primary unique identifier for the person\\"\\"\\"
   id: Int!
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
 
   \\"\\"\\"Reads a single \`LeftArm\` that is related to this \`Person\`.\\"\\"\\"
   leftArmByPersonId: LeftArm
@@ -1983,6 +1988,7 @@ type Person implements Node {
     offset: Int
   ): TypesConnection!
   typeFunctionList: [Type]
+  userMac: String
 }
 
 \\"\\"\\"The return type of our \`computedComplex\` query.\\"\\"\\"
@@ -2038,11 +2044,17 @@ input PersonCondition {
   \\"\\"\\"Checks for equality with the object’s \`lastLoginFromIp\` field.\\"\\"\\"
   lastLoginFromIp: InternetAddress
 
+  \\"\\"\\"Checks for equality with the object’s \`lastLoginFromSubnet\` field.\\"\\"\\"
+  lastLoginFromSubnet: String
+
   \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
   name: String
 
   \\"\\"\\"Checks for equality with the object’s \`site\` field.\\"\\"\\"
   site: WrappedUrlInput
+
+  \\"\\"\\"Checks for equality with the object’s \`userMac\` field.\\"\\"\\"
+  userMac: String
 }
 
 \\"\\"\\"Tracks the person's secret\\"\\"\\"
@@ -2729,6 +2741,7 @@ type Type {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  cidr: String
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
@@ -2738,10 +2751,12 @@ type Type {
   enum: Color!
   enumArray: [Color]!
   id: Int!
+  inet: InternetAddress
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
   nullableCompoundType: CompoundType

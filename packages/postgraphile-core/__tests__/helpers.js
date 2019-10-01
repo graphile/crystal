@@ -138,8 +138,14 @@ withPrepopulatedDb.teardown = () => {
   prepopulatedDBKeepalive = null;
 };
 
+async function getServerVersionNum(pgClient) {
+  const versionResult = await pgClient.query("show server_version_num;");
+  return parseInt(versionResult.rows[0].server_version_num, 10);
+}
+
 exports.withRootDb = withRootDb;
 exports.withPrepopulatedDb = withPrepopulatedDb;
 exports.withPgClient = withPgClient;
 exports.withTransactionlessPgClient = withTransactionlessPgClient;
 exports.transactionlessQuery = transactionlessQuery;
+exports.getServerVersionNum = getServerVersionNum;

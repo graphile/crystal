@@ -5731,6 +5731,10 @@ enum PeopleOrderBy {
   CONFIG_DESC
   LAST_LOGIN_FROM_IP_ASC
   LAST_LOGIN_FROM_IP_DESC
+  LAST_LOGIN_FROM_SUBNET_ASC
+  LAST_LOGIN_FROM_SUBNET_DESC
+  USER_MAC_ASC
+  USER_MAC_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   COMPUTED_OUT_ASC
@@ -5757,6 +5761,8 @@ type Person implements Node {
   site: WrappedUrl @deprecated(reason: \\"Don’t use me\\")
   config: KeyValueHash
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+  userMac: String
   createdAt: Datetime
 
   \\"\\"\\"This \`Person\`'s \`PersonSecret\`.\\"\\"\\"
@@ -6050,6 +6056,12 @@ input PersonCondition {
   \\"\\"\\"Checks for equality with the object’s \`lastLoginFromIp\` field.\\"\\"\\"
   lastLoginFromIp: InternetAddress
 
+  \\"\\"\\"Checks for equality with the object’s \`lastLoginFromSubnet\` field.\\"\\"\\"
+  lastLoginFromSubnet: String
+
+  \\"\\"\\"Checks for equality with the object’s \`userMac\` field.\\"\\"\\"
+  userMac: String
+
   \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
   createdAt: Datetime
 
@@ -6070,6 +6082,8 @@ input PersonInput {
   site: WrappedUrlInput
   config: KeyValueHash
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+  userMac: String
   createdAt: Datetime
 }
 
@@ -6088,6 +6102,8 @@ input PersonPatch {
   site: WrappedUrlInput
   config: KeyValueHash
   lastLoginFromIp: InternetAddress
+  lastLoginFromSubnet: String
+  userMac: String
   createdAt: Datetime
 }
 
@@ -8262,6 +8278,9 @@ type Type implements Node {
   nullableNestedCompoundType: NestedCompoundType
   point: Point!
   nullablePoint: Point
+  inet: InternetAddress
+  cidr: String
+  macaddr: String
 
   \\"\\"\\"Reads a single \`Post\` that is related to this \`Type\`.\\"\\"\\"
   postBySmallint: Post
@@ -8371,6 +8390,15 @@ input TypeCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`nullablePoint\` field.\\"\\"\\"
   nullablePoint: PointInput
+
+  \\"\\"\\"Checks for equality with the object’s \`inet\` field.\\"\\"\\"
+  inet: InternetAddress
+
+  \\"\\"\\"Checks for equality with the object’s \`cidr\` field.\\"\\"\\"
+  cidr: String
+
+  \\"\\"\\"Checks for equality with the object’s \`macaddr\` field.\\"\\"\\"
+  macaddr: String
 }
 
 \\"\\"\\"All input for the \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
@@ -8492,6 +8520,9 @@ input TypeInput {
   nullableNestedCompoundType: NestedCompoundTypeInput
   point: PointInput!
   nullablePoint: PointInput
+  inet: InternetAddress
+  cidr: String
+  macaddr: String
 }
 
 \\"\\"\\"Represents an update to a \`Type\`. Fields that are set will be updated.\\"\\"\\"
@@ -8528,6 +8559,9 @@ input TypePatch {
   nullableNestedCompoundType: NestedCompoundTypeInput
   point: PointInput
   nullablePoint: PointInput
+  inet: InternetAddress
+  cidr: String
+  macaddr: String
 }
 
 \\"\\"\\"A connection to a list of \`Type\` values.\\"\\"\\"
@@ -8653,6 +8687,12 @@ enum TypesOrderBy {
   POINT_DESC
   NULLABLE_POINT_ASC
   NULLABLE_POINT_DESC
+  INET_ASC
+  INET_DESC
+  CIDR_ASC
+  CIDR_DESC
+  MACADDR_ASC
+  MACADDR_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }

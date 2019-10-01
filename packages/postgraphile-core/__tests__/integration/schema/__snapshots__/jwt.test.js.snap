@@ -527,6 +527,9 @@ type GuidFnPayload {
   query: Query
 }
 
+\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+scalar InternetAddress
+
 \\"\\"\\"
 An interval of time that has passed where the smallest distinct unit is a second.
 \\"\\"\\"
@@ -1009,6 +1012,7 @@ type Type implements Node {
   anIntRange: AnIntRange!
   bigint: BigInt!
   boolean: Boolean!
+  cidr: String
   compoundType: CompoundType!
   date: Date!
   daterange: DateRange!
@@ -1018,10 +1022,12 @@ type Type implements Node {
   enum: Color!
   enumArray: [Color]!
   id: Int!
+  inet: InternetAddress
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
 
@@ -1058,6 +1064,9 @@ input TypeCondition {
   \\"\\"\\"Checks for equality with the object’s \`boolean\` field.\\"\\"\\"
   boolean: Boolean
 
+  \\"\\"\\"Checks for equality with the object’s \`cidr\` field.\\"\\"\\"
+  cidr: String
+
   \\"\\"\\"Checks for equality with the object’s \`compoundType\` field.\\"\\"\\"
   compoundType: CompoundTypeInput
 
@@ -1085,6 +1094,9 @@ input TypeCondition {
   \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
   id: Int
 
+  \\"\\"\\"Checks for equality with the object’s \`inet\` field.\\"\\"\\"
+  inet: InternetAddress
+
   \\"\\"\\"Checks for equality with the object’s \`interval\` field.\\"\\"\\"
   interval: IntervalInput
 
@@ -1096,6 +1108,9 @@ input TypeCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`jsonb\` field.\\"\\"\\"
   jsonb: JSON
+
+  \\"\\"\\"Checks for equality with the object’s \`macaddr\` field.\\"\\"\\"
+  macaddr: String
 
   \\"\\"\\"Checks for equality with the object’s \`money\` field.\\"\\"\\"
   money: Float
@@ -1232,6 +1247,7 @@ input TypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
   boolean: Boolean!
+  cidr: String
   compoundType: CompoundTypeInput!
   date: Date!
   daterange: DateRangeInput!
@@ -1241,10 +1257,12 @@ input TypeInput {
   enum: Color!
   enumArray: [Color]!
   id: Int
+  inet: InternetAddress
   interval: IntervalInput!
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
   nullableCompoundType: CompoundTypeInput
@@ -1268,6 +1286,7 @@ input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
   boolean: Boolean
+  cidr: String
   compoundType: CompoundTypeInput
   date: Date
   daterange: DateRangeInput
@@ -1277,10 +1296,12 @@ input TypePatch {
   enum: Color
   enumArray: [Color]
   id: Int
+  inet: InternetAddress
   interval: IntervalInput
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  macaddr: String
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
   nullableCompoundType: CompoundTypeInput
@@ -1333,6 +1354,8 @@ enum TypesOrderBy {
   BIGINT_DESC
   BOOLEAN_ASC
   BOOLEAN_DESC
+  CIDR_ASC
+  CIDR_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
   DATE_ASC
@@ -1351,6 +1374,8 @@ enum TypesOrderBy {
   ENUM_DESC
   ID_ASC
   ID_DESC
+  INET_ASC
+  INET_DESC
   INTERVAL_ARRAY_ASC
   INTERVAL_ARRAY_DESC
   INTERVAL_ASC
@@ -1359,6 +1384,8 @@ enum TypesOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  MACADDR_ASC
+  MACADDR_DESC
   MONEY_ASC
   MONEY_DESC
   NATURAL
