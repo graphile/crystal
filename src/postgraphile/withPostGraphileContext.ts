@@ -305,7 +305,9 @@ function getSettingsForPgClientTransaction({
       if (!Buffer.isBuffer(jwtVerificationSecret) && typeof jwtVerificationSecret !== 'string') {
         // tslint:disable-next-line no-console
         console.error(
-          `ERROR: '${jwtPublicKey ? 'jwtPublicKey' : 'jwtSecret'}' was not set to a string or buffer - rejecting JWT-authenticated request.`,
+          `ERROR: '${
+            jwtPublicKey ? 'jwtPublicKey' : 'jwtSecret'
+          }' was not set to a string or buffer - rejecting JWT-authenticated request.`,
         );
         throw new Error('Not allowed to provide a JWT token.');
       }
