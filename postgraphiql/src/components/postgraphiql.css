@@ -58,3 +58,14 @@
 .postgraphiql-container .toolbar {
   align-items: center;
 }
+
+.postgraphiql-container > .historyPaneWrap {
+  min-width: 380px;
+  max-width: 50%;
+  /* Allow for longer width */
+  width: auto !important;
+}
+
+.graphiql-explorer-root {
+  overflow: auto !important;
+}

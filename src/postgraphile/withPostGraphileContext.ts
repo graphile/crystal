@@ -122,7 +122,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     // TODO:perf: looping backwards is slow
     for (let i = localSettings.length - 1; i >= 0; i--) {
       const [key, value] = localSettings[i];
-      if (seenKeys.indexOf(key) < 0) {
+      if (!seenKeys.includes(key)) {
         seenKeys.push(key);
         // Make sure that the third config is always `true` so that we are only
         // ever setting variables on the transaction.
@@ -367,7 +367,10 @@ function getSettingsForPgClientTransaction({
   // this prevents an accidentional overwriting
   if (pgSettings && typeof pgSettings === 'object') {
     for (const key in pgSettings) {
-      if (pgSettings.hasOwnProperty(key) && isPgSettingValid(pgSettings[key])) {
+      if (
+        Object.prototype.hasOwnProperty.call(pgSettings, key) &&
+        isPgSettingValid(pgSettings[key])
+      ) {
         if (key === 'role') {
           role = String(pgSettings[key]);
         } else {
@@ -386,7 +389,7 @@ function getSettingsForPgClientTransaction({
   // If we have some JWT claims, we want to set those claims as local
   // settings with the namespace `jwt.claims`.
   for (const key in jwtClaims) {
-    if (jwtClaims.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(jwtClaims, key)) {
       const rawValue = jwtClaims[key];
       // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
       const value: mixed =

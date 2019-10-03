@@ -7,7 +7,7 @@ try {
 }
 
 const config = postgraphileRCFile ? require(postgraphileRCFile) : {}; // tslint:disable-line no-var-requires
-if (postgraphileRCFile && !config.hasOwnProperty('options')) {
+if (postgraphileRCFile && !Object.prototype.hasOwnProperty.call(config, 'options')) {
   console.warn('WARNING: Your configuration file does not export any options');
 }
 

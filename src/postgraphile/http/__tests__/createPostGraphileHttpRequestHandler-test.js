@@ -217,7 +217,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
 
     if (subpath) {
       test('will 404 for route other than that specified 2', async () => {
-        const server2 = await createServer({ graphqlRoute: `${subpath}/graphql` });
+        const server2 = await createServer({
+          graphqlRoute: `${subpath}/graphql`,
+        });
         await request(server2)
           .post(`${subpath}/graphql`)
           .expect(404);
@@ -249,7 +251,10 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
 
     if (subpath) {
       test("will respond to queries on a different route with externalUrlBase = ''", async () => {
-        const server = await createServer({ graphqlRoute: `/x`, externalUrlBase: '' });
+        const server = await createServer({
+          graphqlRoute: `/x`,
+          externalUrlBase: '',
+        });
         await request(server)
           .post(`${subpath}/x`)
           .send({ query: '{hello}' })
@@ -857,7 +862,10 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     if (!subpath) {
       test('will serve a favicon when graphiql is enabled', async () => {
         const server1 = await createServer({ graphiql: true });
-        const server2 = await createServer({ graphiql: true, route: `${subpath}/graphql` });
+        const server2 = await createServer({
+          graphiql: true,
+          route: `${subpath}/graphql`,
+        });
         await request(server1)
           .get('/favicon.ico')
           .expect(200)
@@ -932,10 +940,25 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('X-GraphQL-Event-Stream', `${subpath}/graphql/stream`);
     });
 
+    test('will set domain relative X-GraphQL-Event-Stream if prefix ends with a /', async () => {
+      const server = await createServer({ watchPg: true, graphqlRoute: '/' });
+      await request(server)
+        .post(`${subpath}/`)
+        .send({ query: '{hello}' })
+        .expect(200)
+        .expect('X-GraphQL-Event-Stream', `${subpath}/stream`);
+    });
+
     test('will render GraphiQL on another route if desired', async () => {
       const server1 = await createServer({ graphiqlRoute: `/x` });
-      const server2 = await createServer({ graphiql: true, graphiqlRoute: `/x` });
-      const server3 = await createServer({ graphiql: false, graphiqlRoute: `/x` });
+      const server2 = await createServer({
+        graphiql: true,
+        graphiqlRoute: `/x`,
+      });
+      const server3 = await createServer({
+        graphiql: false,
+        graphiqlRoute: `/x`,
+      });
       await request(server1)
         .get(`${subpath}/x`)
         .expect(404);
