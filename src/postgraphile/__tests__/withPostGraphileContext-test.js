@@ -980,8 +980,8 @@ describe('jwtVerifyOptions', () => {
   });
 
   test('will succeed with asymmetric encryption verification', async () => {
-    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`)
-    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`)
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
     await withPostGraphileContext(
       {
         pgPool,
@@ -992,7 +992,7 @@ describe('jwtVerifyOptions', () => {
         jwtPublicKey: publicKey,
         jwtVerifyOptions: {
           algorithms: ['RS256'],
-        }
+        },
       },
       () => {},
     );
@@ -1002,16 +1002,16 @@ describe('jwtVerifyOptions', () => {
         {
           text: 'select set_config($1, $2, true)',
           values: ['jwt.claims.aud', 'postgraphile'],
-          },
-        ],
-        ['commit'],
-      ]);
+        },
+      ],
+      ['commit'],
+    ]);
   });
 
   test('will throw an error on invalid public key on asymmetric encryption verification', async () => {
-    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`)
-    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`)
-    publicKey.write('ASDF', 100) // Make the key invalid while keeping correct format
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
+    publicKey.write('ASDF', 100); // Make the key invalid while keeping correct format
     await expectHttpError(
       withPostGraphileContext(
         {
@@ -1023,19 +1023,19 @@ describe('jwtVerifyOptions', () => {
           jwtPublicKey: publicKey,
           jwtVerifyOptions: {
             algorithms: ['RS256'],
-          }
+          },
         },
         () => {},
       ),
       403,
-      'invalid signature'
+      'invalid signature',
     );
     expect(pgClient.query.mock.calls).toEqual([]);
   });
 
   test('will throw an error on unsupported algorithms on asymmetric encryption verification', async () => {
-    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`)
-    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`)
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
     await expectHttpError(
       withPostGraphileContext(
         {
@@ -1047,12 +1047,12 @@ describe('jwtVerifyOptions', () => {
           jwtPublicKey: publicKey,
           jwtVerifyOptions: {
             algorithms: ['RS512'],
-          }
+          },
         },
         () => {},
       ),
       403,
-      'invalid algorithm'
+      'invalid algorithm',
     );
     expect(pgClient.query.mock.calls).toEqual([]);
   });
