@@ -953,4 +953,28 @@ describe('jwtVerifyOptions', () => {
     // No need for transaction since there's no settings
     expect(pgClient.query.mock.calls).toEqual([]);
   });
+
+  test('will succeed using jwtPublicKey instead of jwtSecret if both options are provided', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'postgraphile' }, 'public key', {
+          noTimestamp: true,
+        }),
+        jwtSecret: 'secret',
+        jwtPublicKey: 'public key',
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true)',
+          values: ['jwt.claims.aud', 'postgraphile'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
 });
