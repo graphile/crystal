@@ -3,8 +3,8 @@ const {
   GraphQLObjectType,
   GraphQLInt,
   GraphQLNonNull,
+  printSchema,
 } = require("graphql");
-const { printSchema } = require("graphql/utilities");
 const {
   getBuilder,
   defaultPlugins: allDefaultPlugins,
@@ -91,12 +91,12 @@ test("generated schema n = 0, n = 3", async () => {
     ...defaultPlugins,
     makePluginEtc(0).plugin,
   ])).buildSchema();
-  expect(printSchema(schema0)).toMatchSnapshot();
+  expect(schema0).toMatchSnapshot();
   const schema3 = (await getBuilder([
     ...defaultPlugins,
     makePluginEtc(3).plugin,
   ])).buildSchema();
-  expect(printSchema(schema3)).toMatchSnapshot();
+  expect(schema3).toMatchSnapshot();
 });
 
 test("schema is cached if no watcher fires", async () => {

@@ -48,10 +48,18 @@
     "mock-res": "^0.5.0",
     "pg": "^7.10.0",
     "postgraphile": "^4.4.0",
-    "ts-jest": "^24.0.2",
+    "ts-jest": "^24.1.0",
     "typescript": "^3.4.5"
   },
   "files": [
     "dist"
-  ]
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "snapshotSerializers": [
+      "jest-serializer-graphql-schema"
+    ],
+    "testRegex": "(/__tests__/.*\\.(test|spec))\\.[tj]sx?$"
+  }
 }

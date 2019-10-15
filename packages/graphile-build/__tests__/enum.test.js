@@ -1,5 +1,4 @@
 const { GraphQLEnumType } = require("graphql");
-const { printSchema } = require("graphql/utilities");
 const { buildSchema, defaultPlugins } = require("../");
 
 function EnumPlugin(builder) {
@@ -60,5 +59,5 @@ function EnumPlugin(builder) {
 
 test("generated schema", async () => {
   const schema = await buildSchema([...defaultPlugins, EnumPlugin]);
-  expect(printSchema(schema)).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
 });

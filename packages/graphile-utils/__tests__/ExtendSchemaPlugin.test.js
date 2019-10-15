@@ -13,7 +13,7 @@ import {
   SubscriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "graphile-build";
-import { graphql, subscribe, parse, printSchema } from "graphql";
+import { graphql, subscribe, parse } from "graphql";
 import { $$asyncIterator } from "iterall";
 
 function TestUtils_ExtractScopePlugin(
@@ -157,8 +157,7 @@ it("allows adding a simple type", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data } = await graphql(
     schema,
     `
@@ -185,8 +184,7 @@ it("allows adding a non-null type", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data } = await graphql(
     schema,
     `
@@ -213,8 +211,7 @@ it("allows adding a non-null list of non-null type", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data } = await graphql(
     schema,
     `
@@ -241,8 +238,7 @@ it("allows adding a field with arguments", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data } = await graphql(
     schema,
     `
@@ -280,8 +276,7 @@ it("allows adding a field with arguments named using a custom inflector", async 
       },
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -336,8 +331,7 @@ it("supports @scope directive with simple values", async () => {
   expect(scope.floatTest).toEqual(3.141592);
   expect(scope.nullTest).toEqual(null);
   expect(scope).toMatchSnapshot();
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -400,8 +394,7 @@ it("supports @scope directive with variable value", async () => {
   expect(scope.embedTest[secret]).toEqual("Fred");
   expect(scope.embedTest.sub[1][1]).toEqual(44);
   expect(scope).toMatchSnapshot();
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -476,8 +469,7 @@ it("supports defining new types", async () => {
       },
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -536,8 +528,7 @@ it("supports defining a simple mutation", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -587,8 +578,7 @@ it("supports defining a more complex mutation", async () => {
       },
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const { data, errors } = await graphql(
     schema,
     `
@@ -637,8 +627,7 @@ it("supports defining a simple subscription", async () => {
       resolvers,
     })),
   ]);
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
 
   // Let's do a standard resolve:
   let before = Date.now();

@@ -6,7 +6,6 @@ import {
 import {
   introspectionQuery as INTROSPECTION_QUERY,
   buildClientSchema,
-  printSchema,
 } from "graphql";
 import { Pool, PoolClient } from "pg";
 import PgPubsub from "../src";
@@ -14,9 +13,6 @@ import { runQuery, TestCtx } from "./runQuery";
 
 let ctx: TestCtx | null = null;
 const CLI_DEFAULTS = {};
-
-const printIntrospectionResults = (json: any) =>
-  printSchema(buildClientSchema(json.data));
 
 const init = async (options: PostGraphileOptions = {}) => {
   if (ctx) {
@@ -78,7 +74,9 @@ describe("Middleware defaults", () => {
       {},
       async (json, _req, res) => {
         expect(res.statusCode).toEqual(200);
-        expect(printIntrospectionResults(json)).toMatchSnapshot();
+        expect(json.errors).toBeFalsy();
+        const schema = buildClientSchema(json.data);
+        expect(schema).toMatchSnapshot();
       }
     );
   });
@@ -101,7 +99,8 @@ describe("Subscriptions", () => {
       {},
       async (json, _req, res) => {
         expect(res.statusCode).toEqual(200);
-        expect(printIntrospectionResults(json)).toMatchSnapshot();
+        const schema = buildClientSchema(json.data);
+        expect(schema).toMatchSnapshot();
       }
     );
   });

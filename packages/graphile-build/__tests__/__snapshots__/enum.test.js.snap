@@ -1,40 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`generated schema 1`] = `
-"enum MyEnum {
-  ONE @deprecated(reason: \\"We no longer support numbers smaller than PI\\")
-  TWO @deprecated(reason: \\"We no longer support numbers smaller than PI\\")
-  THREE @deprecated(reason: \\"We no longer support numbers smaller than PI\\")
+enum MyEnum {
+  ONE @deprecated(reason: "We no longer support numbers smaller than PI")
+  TWO @deprecated(reason: "We no longer support numbers smaller than PI")
+  THREE @deprecated(reason: "We no longer support numbers smaller than PI")
   FOUR
 }
 
-\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+"""An object with a globally unique \`ID\`."""
 interface Node {
-  \\"\\"\\"
+  """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
+  """
   id: ID!
 }
 
-\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+"""The root query type which gives access points into the data universe."""
 type Query implements Node {
-  \\"\\"\\"
+  """
   Exposes the root query type nested one level down. This is helpful for Relay 1
   which can only query top level fields if they are in a particular form.
-  \\"\\"\\"
+  """
   query: Query!
 
-  \\"\\"\\"
+  """
   The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  \\"\\"\\"
+  """
   id: ID!
 
-  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  """Fetches an object given its globally unique \`ID\`."""
   node(
-    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    """The globally unique \`ID\`."""
     id: ID!
   ): Node
   enum: MyEnum
 }
-"
+
 `;

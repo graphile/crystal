@@ -38,6 +38,9 @@
     "pg": ">=6.1.0 <8"
   },
   "jest": {
+    "snapshotSerializers": [
+      "jest-serializer-graphql-schema"
+    ],
     "transform": {
       "^.+\\.jsx?$": "../../.jest-wrapper.js"
     },

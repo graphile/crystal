@@ -1,156 +1,156 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`prints a schema with a JWT generating mutation 1`] = `
-"scalar AnInt
+scalar AnInt
 
-\\"\\"\\"A range of \`AnInt\`.\\"\\"\\"
+"""A range of \`AnInt\`."""
 type AnIntRange {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: AnIntRangeBound
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: AnIntRangeBound
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 type AnIntRangeBound {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: AnInt!
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 input AnIntRangeBoundInput {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: AnInt!
 }
 
-\\"\\"\\"A range of \`AnInt\`.\\"\\"\\"
+"""A range of \`AnInt\`."""
 input AnIntRangeInput {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: AnIntRangeBoundInput
 }
 
 scalar AnotherInt
 
-\\"\\"\\"All input for the \`authenticateFail\` mutation.\\"\\"\\"
+"""All input for the \`authenticateFail\` mutation."""
 input AuthenticateFailInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`authenticateFail\` mutation.\\"\\"\\"
+"""The output of our \`authenticateFail\` mutation."""
 type AuthenticateFailPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   jwtToken: JwtToken
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`authenticate\` mutation.\\"\\"\\"
+"""All input for the \`authenticate\` mutation."""
 input AuthenticateInput {
   a: Int
   b: BigFloat
   c: BigInt
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"All input for the \`authenticateMany\` mutation.\\"\\"\\"
+"""All input for the \`authenticateMany\` mutation."""
 input AuthenticateManyInput {
   a: Int
   b: BigFloat
   c: BigInt
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`authenticateMany\` mutation.\\"\\"\\"
+"""The output of our \`authenticateMany\` mutation."""
 type AuthenticateManyPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   jwtTokens: [JwtToken]
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"The output of our \`authenticate\` mutation.\\"\\"\\"
+"""The output of our \`authenticate\` mutation."""
 type AuthenticatePayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   jwtToken: JwtToken
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`authenticatePayload\` mutation.\\"\\"\\"
+"""All input for the \`authenticatePayload\` mutation."""
 input AuthenticatePayloadInput {
   a: Int
   b: BigFloat
   c: BigInt
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`authenticatePayload\` mutation.\\"\\"\\"
+"""The output of our \`authenticatePayload\` mutation."""
 type AuthenticatePayloadPayload {
   authPayload: AuthPayload
 
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
@@ -160,56 +160,56 @@ type AuthPayload {
   jwt: JwtToken
 }
 
-\\"\\"\\"
+"""
 A floating point number that requires more precision than IEEE 754 binary 64
-\\"\\"\\"
+"""
 scalar BigFloat
 
-\\"\\"\\"A range of \`BigFloat\`.\\"\\"\\"
+"""A range of \`BigFloat\`."""
 type BigFloatRange {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: BigFloatRangeBound
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: BigFloatRangeBound
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 type BigFloatRangeBound {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: BigFloat!
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 input BigFloatRangeBoundInput {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: BigFloat!
 }
 
-\\"\\"\\"A range of \`BigFloat\`.\\"\\"\\"
+"""A range of \`BigFloat\`."""
 input BigFloatRangeInput {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: BigFloatRangeBoundInput
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: BigFloatRangeBoundInput
 }
 
-\\"\\"\\"
+"""
 A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
 strings and not numbers.
-\\"\\"\\"
+"""
 scalar BigInt
 
 enum Color {
@@ -218,7 +218,7 @@ enum Color {
   RED
 }
 
-\\"\\"\\"Awesome feature!\\"\\"\\"
+"""Awesome feature!"""
 type CompoundType {
   a: Int
   b: String
@@ -230,32 +230,32 @@ type CompoundType {
   g: Interval
 }
 
-\\"\\"\\"All input for the \`compoundTypeArrayMutation\` mutation.\\"\\"\\"
+"""All input for the \`compoundTypeArrayMutation\` mutation."""
 input CompoundTypeArrayMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   object: CompoundTypeInput
 }
 
-\\"\\"\\"The output of our \`compoundTypeArrayMutation\` mutation.\\"\\"\\"
+"""The output of our \`compoundTypeArrayMutation\` mutation."""
 type CompoundTypeArrayMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   compoundTypes: [CompoundType]
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"An input for mutations affecting \`CompoundType\`\\"\\"\\"
+"""An input for mutations affecting \`CompoundType\`"""
 input CompoundTypeInput {
   a: Int
   b: String
@@ -267,222 +267,222 @@ input CompoundTypeInput {
   g: IntervalInput
 }
 
-\\"\\"\\"All input for the \`compoundTypeMutation\` mutation.\\"\\"\\"
+"""All input for the \`compoundTypeMutation\` mutation."""
 input CompoundTypeMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   object: CompoundTypeInput
 }
 
-\\"\\"\\"The output of our \`compoundTypeMutation\` mutation.\\"\\"\\"
+"""The output of our \`compoundTypeMutation\` mutation."""
 type CompoundTypeMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   compoundType: CompoundType
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`compoundTypeSetMutation\` mutation.\\"\\"\\"
+"""All input for the \`compoundTypeSetMutation\` mutation."""
 input CompoundTypeSetMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   object: CompoundTypeInput
 }
 
-\\"\\"\\"The output of our \`compoundTypeSetMutation\` mutation.\\"\\"\\"
+"""The output of our \`compoundTypeSetMutation\` mutation."""
 type CompoundTypeSetMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   compoundTypes: [CompoundType]
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the create \`Type\` mutation.\\"\\"\\"
+"""All input for the create \`Type\` mutation."""
 input CreateTypeInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"The \`Type\` to be created by this mutation.\\"\\"\\"
+  """The \`Type\` to be created by this mutation."""
   type: TypeInput!
 }
 
-\\"\\"\\"The output of our create \`Type\` mutation.\\"\\"\\"
+"""The output of our create \`Type\` mutation."""
 type CreateTypePayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 
-  \\"\\"\\"The \`Type\` that was created by this mutation.\\"\\"\\"
+  """The \`Type\` that was created by this mutation."""
   type: Type
 
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  """An edge for our \`Type\`. May be used by Relay 1."""
   typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    """The method to use when ordering \`Type\`."""
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
-\\"\\"\\"All input for the create \`UpdatableView\` mutation.\\"\\"\\"
+"""All input for the create \`UpdatableView\` mutation."""
 input CreateUpdatableViewInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"The \`UpdatableView\` to be created by this mutation.\\"\\"\\"
+  """The \`UpdatableView\` to be created by this mutation."""
   updatableView: UpdatableViewInput!
 }
 
-\\"\\"\\"The output of our create \`UpdatableView\` mutation.\\"\\"\\"
+"""The output of our create \`UpdatableView\` mutation."""
 type CreateUpdatableViewPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 
-  \\"\\"\\"The \`UpdatableView\` that was created by this mutation.\\"\\"\\"
+  """The \`UpdatableView\` that was created by this mutation."""
   updatableView: UpdatableView
 
-  \\"\\"\\"An edge for our \`UpdatableView\`. May be used by Relay 1.\\"\\"\\"
+  """An edge for our \`UpdatableView\`. May be used by Relay 1."""
   updatableViewEdge(
-    \\"\\"\\"The method to use when ordering \`UpdatableView\`.\\"\\"\\"
+    """The method to use when ordering \`UpdatableView\`."""
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsEdge
 }
 
-\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+"""A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
-\\"\\"\\"The day, does not include a time.\\"\\"\\"
+"""The day, does not include a time."""
 scalar Date
 
-\\"\\"\\"A range of \`Date\`.\\"\\"\\"
+"""A range of \`Date\`."""
 type DateRange {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: DateRangeBound
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: DateRangeBound
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 type DateRangeBound {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: Date!
 }
 
-\\"\\"\\"
+"""
 The value at one end of a range. A range can either include this value, or not.
-\\"\\"\\"
+"""
 input DateRangeBoundInput {
-  \\"\\"\\"Whether or not the value of this bound is included in the range.\\"\\"\\"
+  """Whether or not the value of this bound is included in the range."""
   inclusive: Boolean!
 
-  \\"\\"\\"The value at one end of our range.\\"\\"\\"
+  """The value at one end of our range."""
   value: Date!
 }
 
-\\"\\"\\"A range of \`Date\`.\\"\\"\\"
+"""A range of \`Date\`."""
 input DateRangeInput {
-  \\"\\"\\"The ending bound of our range.\\"\\"\\"
+  """The ending bound of our range."""
   end: DateRangeBoundInput
 
-  \\"\\"\\"The starting bound of our range.\\"\\"\\"
+  """The starting bound of our range."""
   start: DateRangeBoundInput
 }
 
-\\"\\"\\"
+"""
 A point in time as described by the [ISO
 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
-\\"\\"\\"
+"""
 scalar Datetime
 
-\\"\\"\\"All input for the \`deleteTypeById\` mutation.\\"\\"\\"
+"""All input for the \`deleteTypeById\` mutation."""
 input DeleteTypeByIdInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   id: Int!
 }
 
-\\"\\"\\"All input for the \`deleteType\` mutation.\\"\\"\\"
+"""All input for the \`deleteType\` mutation."""
 input DeleteTypeInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   The globally unique \`ID\` which will identify a single \`Type\` to be deleted.
-  \\"\\"\\"
+  """
   nodeId: ID!
 }
 
-\\"\\"\\"The output of our delete \`Type\` mutation.\\"\\"\\"
+"""The output of our delete \`Type\` mutation."""
 type DeleteTypePayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   deletedTypeId: ID
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 
-  \\"\\"\\"The \`Type\` that was deleted by this mutation.\\"\\"\\"
+  """The \`Type\` that was deleted by this mutation."""
   type: Type
 
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  """An edge for our \`Type\`. May be used by Relay 1."""
   typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    """The method to use when ordering \`Type\`."""
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
@@ -502,347 +502,347 @@ enum EnumWithEmptyString {
 
 scalar Guid
 
-\\"\\"\\"All input for the \`guidFn\` mutation.\\"\\"\\"
+"""All input for the \`guidFn\` mutation."""
 input GuidFnInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   g: Guid
 }
 
-\\"\\"\\"The output of our \`guidFn\` mutation.\\"\\"\\"
+"""The output of our \`guidFn\` mutation."""
 type GuidFnPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   guid: Guid
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"An IPv4 or IPv6 host address, and optionally its subnet.\\"\\"\\"
+"""An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
 
-\\"\\"\\"
+"""
 An interval of time that has passed where the smallest distinct unit is a second.
-\\"\\"\\"
+"""
 type Interval {
-  \\"\\"\\"A quantity of days.\\"\\"\\"
+  """A quantity of days."""
   days: Int
 
-  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  """A quantity of hours."""
   hours: Int
 
-  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  """A quantity of minutes."""
   minutes: Int
 
-  \\"\\"\\"A quantity of months.\\"\\"\\"
+  """A quantity of months."""
   months: Int
 
-  \\"\\"\\"
+  """
   A quantity of seconds. This is the only non-integer field, as all the other
   fields will dump their overflow into a smaller unit of time. Intervals don’t
   have a smaller unit than seconds.
-  \\"\\"\\"
+  """
   seconds: Float
 
-  \\"\\"\\"A quantity of years.\\"\\"\\"
+  """A quantity of years."""
   years: Int
 }
 
-\\"\\"\\"
+"""
 An interval of time that has passed where the smallest distinct unit is a second.
-\\"\\"\\"
+"""
 input IntervalInput {
-  \\"\\"\\"A quantity of days.\\"\\"\\"
+  """A quantity of days."""
   days: Int
 
-  \\"\\"\\"A quantity of hours.\\"\\"\\"
+  """A quantity of hours."""
   hours: Int
 
-  \\"\\"\\"A quantity of minutes.\\"\\"\\"
+  """A quantity of minutes."""
   minutes: Int
 
-  \\"\\"\\"A quantity of months.\\"\\"\\"
+  """A quantity of months."""
   months: Int
 
-  \\"\\"\\"
+  """
   A quantity of seconds. This is the only non-integer field, as all the other
   fields will dump their overflow into a smaller unit of time. Intervals don’t
   have a smaller unit than seconds.
-  \\"\\"\\"
+  """
   seconds: Float
 
-  \\"\\"\\"A quantity of years.\\"\\"\\"
+  """A quantity of years."""
   years: Int
 }
 
-\\"\\"\\"
+"""
 A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-\\"\\"\\"
+"""
 scalar JSON
 
-\\"\\"\\"
+"""
 A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519)
 which securely represents claims between two parties.
-\\"\\"\\"
+"""
 scalar JwtToken
 
-\\"\\"\\"All input for the \`mult1\` mutation.\\"\\"\\"
+"""All input for the \`mult1\` mutation."""
 input Mult1Input {
   arg0: Int
   arg1: Int
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`mult1\` mutation.\\"\\"\\"
+"""The output of our \`mult1\` mutation."""
 type Mult1Payload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   integer: Int
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`mult2\` mutation.\\"\\"\\"
+"""All input for the \`mult2\` mutation."""
 input Mult2Input {
   arg0: Int
   arg1: Int
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`mult2\` mutation.\\"\\"\\"
+"""The output of our \`mult2\` mutation."""
 type Mult2Payload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   integer: Int
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`mult3\` mutation.\\"\\"\\"
+"""All input for the \`mult3\` mutation."""
 input Mult3Input {
   arg0: Int!
   arg1: Int!
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`mult3\` mutation.\\"\\"\\"
+"""The output of our \`mult3\` mutation."""
 type Mult3Payload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   integer: Int
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"All input for the \`mult4\` mutation.\\"\\"\\"
+"""All input for the \`mult4\` mutation."""
 input Mult4Input {
   arg0: Int!
   arg1: Int!
 
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`mult4\` mutation.\\"\\"\\"
+"""The output of our \`mult4\` mutation."""
 type Mult4Payload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
   integer: Int
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 }
 
-\\"\\"\\"
+"""
 The root mutation type which contains root level fields which mutate data.
-\\"\\"\\"
+"""
 type Mutation {
   authenticate(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: AuthenticateInput!
   ): AuthenticatePayload
   authenticateFail(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: AuthenticateFailInput!
   ): AuthenticateFailPayload
   authenticateMany(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: AuthenticateManyInput!
   ): AuthenticateManyPayload
   authenticatePayload(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: AuthenticatePayloadInput!
   ): AuthenticatePayloadPayload
   compoundTypeArrayMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: CompoundTypeArrayMutationInput!
   ): CompoundTypeArrayMutationPayload
   compoundTypeMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: CompoundTypeMutationInput!
   ): CompoundTypeMutationPayload
   compoundTypeSetMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: CompoundTypeSetMutationInput!
   ): CompoundTypeSetMutationPayload
 
-  \\"\\"\\"Creates a single \`Type\`.\\"\\"\\"
+  """Creates a single \`Type\`."""
   createType(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: CreateTypeInput!
   ): CreateTypePayload
 
-  \\"\\"\\"Creates a single \`UpdatableView\`.\\"\\"\\"
+  """Creates a single \`UpdatableView\`."""
   createUpdatableView(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: CreateUpdatableViewInput!
   ): CreateUpdatableViewPayload
 
-  \\"\\"\\"Deletes a single \`Type\` using its globally unique id.\\"\\"\\"
+  """Deletes a single \`Type\` using its globally unique id."""
   deleteType(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: DeleteTypeInput!
   ): DeleteTypePayload
 
-  \\"\\"\\"Deletes a single \`Type\` using a unique key.\\"\\"\\"
+  """Deletes a single \`Type\` using a unique key."""
   deleteTypeById(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: DeleteTypeByIdInput!
   ): DeleteTypePayload
   guidFn(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: GuidFnInput!
   ): GuidFnPayload
   mult1(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: Mult1Input!
   ): Mult1Payload
   mult2(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: Mult2Input!
   ): Mult2Payload
   mult3(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: Mult3Input!
   ): Mult3Payload
   mult4(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: Mult4Input!
   ): Mult4Payload
   typeFunctionConnectionMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: TypeFunctionConnectionMutationInput!
   ): TypeFunctionConnectionMutationPayload
   typeFunctionListMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: TypeFunctionListMutationInput!
   ): TypeFunctionListMutationPayload
   typeFunctionMutation(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: TypeFunctionMutationInput!
   ): TypeFunctionMutationPayload
 
-  \\"\\"\\"Updates a single \`Type\` using its globally unique id and a patch.\\"\\"\\"
+  """Updates a single \`Type\` using its globally unique id and a patch."""
   updateType(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: UpdateTypeInput!
   ): UpdateTypePayload
 
-  \\"\\"\\"Updates a single \`Type\` using a unique key and a patch.\\"\\"\\"
+  """Updates a single \`Type\` using a unique key and a patch."""
   updateTypeById(
-    \\"\\"\\"
+    """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    \\"\\"\\"
+    """
     input: UpdateTypeByIdInput!
   ): UpdateTypePayload
 }
@@ -853,33 +853,33 @@ type NestedCompoundType {
   bazBuz: Int
 }
 
-\\"\\"\\"An input for mutations affecting \`NestedCompoundType\`\\"\\"\\"
+"""An input for mutations affecting \`NestedCompoundType\`"""
 input NestedCompoundTypeInput {
   a: CompoundTypeInput
   b: CompoundTypeInput
   bazBuz: Int
 }
 
-\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+"""An object with a globally unique \`ID\`."""
 interface Node {
-  \\"\\"\\"
+  """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
+  """
   nodeId: ID!
 }
 
-\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+"""Information about pagination in a connection."""
 type PageInfo {
-  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  """When paginating forwards, the cursor to continue."""
   endCursor: Cursor
 
-  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
-  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
 
-  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
 }
 
@@ -893,119 +893,119 @@ input PointInput {
   y: Float!
 }
 
-\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+"""The root query type which gives access points into the data universe."""
 type Query implements Node {
-  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  """Reads and enables pagination through a set of \`Type\`."""
   allTypes(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
-    \\"\\"\\"
+    """
     A condition to be used in determining which values should be returned by the collection.
-    \\"\\"\\"
+    """
     condition: TypeCondition
 
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    """Only read the first \`n\` values of the set."""
     first: Int
 
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    """Only read the last \`n\` values of the set."""
     last: Int
 
-    \\"\\"\\"
+    """
     Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     based pagination. May not be used with \`last\`.
-    \\"\\"\\"
+    """
     offset: Int
 
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    """The method to use when ordering \`Type\`."""
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesConnection
 
-  \\"\\"\\"Reads and enables pagination through a set of \`UpdatableView\`.\\"\\"\\"
+  """Reads and enables pagination through a set of \`UpdatableView\`."""
   allUpdatableViews(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
-    \\"\\"\\"
+    """
     A condition to be used in determining which values should be returned by the collection.
-    \\"\\"\\"
+    """
     condition: UpdatableViewCondition
 
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    """Only read the first \`n\` values of the set."""
     first: Int
 
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    """Only read the last \`n\` values of the set."""
     last: Int
 
-    \\"\\"\\"
+    """
     Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     based pagination. May not be used with \`last\`.
-    \\"\\"\\"
+    """
     offset: Int
 
-    \\"\\"\\"The method to use when ordering \`UpdatableView\`.\\"\\"\\"
+    """The method to use when ordering \`UpdatableView\`."""
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
   ): UpdatableViewsConnection
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
-  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  """Fetches an object given its globally unique \`ID\`."""
   node(
-    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    """The globally unique \`ID\`."""
     nodeId: ID!
   ): Node
 
-  \\"\\"\\"
+  """
   The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  \\"\\"\\"
+  """
   nodeId: ID!
 
-  \\"\\"\\"
+  """
   Exposes the root query type nested one level down. This is helpful for Relay 1
   which can only query top level fields if they are in a particular form.
-  \\"\\"\\"
+  """
   query: Query!
 
-  \\"\\"\\"Reads a single \`Type\` using its globally unique \`ID\`.\\"\\"\\"
+  """Reads a single \`Type\` using its globally unique \`ID\`."""
   type(
-    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Type\`.\\"\\"\\"
+    """The globally unique \`ID\` to be used in selecting a single \`Type\`."""
     nodeId: ID!
   ): Type
   typeById(id: Int!): Type
   typeFunction(id: Int): Type
 
-  \\"\\"\\"Reads and enables pagination through a set of \`Type\`.\\"\\"\\"
+  """Reads and enables pagination through a set of \`Type\`."""
   typeFunctionConnection(
-    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    """Read all values in the set before (above) this cursor."""
     before: Cursor
 
-    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    """Only read the first \`n\` values of the set."""
     first: Int
 
-    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    """Only read the last \`n\` values of the set."""
     last: Int
 
-    \\"\\"\\"
+    """
     Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     based pagination. May not be used with \`last\`.
-    \\"\\"\\"
+    """
     offset: Int
   ): TypesConnection!
   typeFunctionList: [Type]
 }
 
-\\"\\"\\"
+"""
 The exact time of day, does not include the date. May or may not have a timezone offset.
-\\"\\"\\"
+"""
 scalar Time
 
 type Type implements Node {
@@ -1031,9 +1031,9 @@ type Type implements Node {
   money: Float!
   nestedCompoundType: NestedCompoundType!
 
-  \\"\\"\\"
+  """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
+  """
   nodeId: ID!
   nullableCompoundType: CompoundType
   nullableNestedCompoundType: NestedCompoundType
@@ -1051,198 +1051,198 @@ type Type implements Node {
   varchar: String!
 }
 
-\\"\\"\\"
+"""
 A condition to be used against \`Type\` object types. All fields are tested for equality and combined with a logical ‘and.’
-\\"\\"\\"
+"""
 input TypeCondition {
-  \\"\\"\\"Checks for equality with the object’s \`anIntRange\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`anIntRange\` field."""
   anIntRange: AnIntRangeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`bigint\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`bigint\` field."""
   bigint: BigInt
 
-  \\"\\"\\"Checks for equality with the object’s \`boolean\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`boolean\` field."""
   boolean: Boolean
 
-  \\"\\"\\"Checks for equality with the object’s \`cidr\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`cidr\` field."""
   cidr: String
 
-  \\"\\"\\"Checks for equality with the object’s \`compoundType\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`compoundType\` field."""
   compoundType: CompoundTypeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`date\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`date\` field."""
   date: Date
 
-  \\"\\"\\"Checks for equality with the object’s \`daterange\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`daterange\` field."""
   daterange: DateRangeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`decimal\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`decimal\` field."""
   decimal: BigFloat
 
-  \\"\\"\\"Checks for equality with the object’s \`domain\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`domain\` field."""
   domain: AnInt
 
-  \\"\\"\\"Checks for equality with the object’s \`domain2\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`domain2\` field."""
   domain2: AnotherInt
 
-  \\"\\"\\"Checks for equality with the object’s \`enum\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`enum\` field."""
   enum: Color
 
-  \\"\\"\\"Checks for equality with the object’s \`enumArray\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`enumArray\` field."""
   enumArray: [Color]
 
-  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`id\` field."""
   id: Int
 
-  \\"\\"\\"Checks for equality with the object’s \`inet\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`inet\` field."""
   inet: InternetAddress
 
-  \\"\\"\\"Checks for equality with the object’s \`interval\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`interval\` field."""
   interval: IntervalInput
 
-  \\"\\"\\"Checks for equality with the object’s \`intervalArray\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`intervalArray\` field."""
   intervalArray: [IntervalInput]
 
-  \\"\\"\\"Checks for equality with the object’s \`json\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`json\` field."""
   json: JSON
 
-  \\"\\"\\"Checks for equality with the object’s \`jsonb\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`jsonb\` field."""
   jsonb: JSON
 
-  \\"\\"\\"Checks for equality with the object’s \`macaddr\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`macaddr\` field."""
   macaddr: String
 
-  \\"\\"\\"Checks for equality with the object’s \`money\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`money\` field."""
   money: Float
 
-  \\"\\"\\"Checks for equality with the object’s \`nestedCompoundType\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`nestedCompoundType\` field."""
   nestedCompoundType: NestedCompoundTypeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`nullableCompoundType\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`nullableCompoundType\` field."""
   nullableCompoundType: CompoundTypeInput
 
-  \\"\\"\\"
+  """
   Checks for equality with the object’s \`nullableNestedCompoundType\` field.
-  \\"\\"\\"
+  """
   nullableNestedCompoundType: NestedCompoundTypeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`nullablePoint\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`nullablePoint\` field."""
   nullablePoint: PointInput
 
-  \\"\\"\\"Checks for equality with the object’s \`nullableRange\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`nullableRange\` field."""
   nullableRange: BigFloatRangeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`numeric\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`numeric\` field."""
   numeric: BigFloat
 
-  \\"\\"\\"Checks for equality with the object’s \`numrange\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`numrange\` field."""
   numrange: BigFloatRangeInput
 
-  \\"\\"\\"Checks for equality with the object’s \`point\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`point\` field."""
   point: PointInput
 
-  \\"\\"\\"Checks for equality with the object’s \`smallint\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`smallint\` field."""
   smallint: Int
 
-  \\"\\"\\"Checks for equality with the object’s \`textArray\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`textArray\` field."""
   textArray: [String]
 
-  \\"\\"\\"Checks for equality with the object’s \`time\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`time\` field."""
   time: Time
 
-  \\"\\"\\"Checks for equality with the object’s \`timestamp\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`timestamp\` field."""
   timestamp: Datetime
 
-  \\"\\"\\"Checks for equality with the object’s \`timestamptz\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`timestamptz\` field."""
   timestamptz: Datetime
 
-  \\"\\"\\"Checks for equality with the object’s \`timetz\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`timetz\` field."""
   timetz: Time
 
-  \\"\\"\\"Checks for equality with the object’s \`varchar\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`varchar\` field."""
   varchar: String
 }
 
-\\"\\"\\"All input for the \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+"""All input for the \`typeFunctionConnectionMutation\` mutation."""
 input TypeFunctionConnectionMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`typeFunctionConnectionMutation\` mutation.\\"\\"\\"
+"""The output of our \`typeFunctionConnectionMutation\` mutation."""
 type TypeFunctionConnectionMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
   types: [Type]
 }
 
-\\"\\"\\"All input for the \`typeFunctionListMutation\` mutation.\\"\\"\\"
+"""All input for the \`typeFunctionListMutation\` mutation."""
 input TypeFunctionListMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 }
 
-\\"\\"\\"The output of our \`typeFunctionListMutation\` mutation.\\"\\"\\"
+"""The output of our \`typeFunctionListMutation\` mutation."""
 type TypeFunctionListMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
   types: [Type]
 }
 
-\\"\\"\\"All input for the \`typeFunctionMutation\` mutation.\\"\\"\\"
+"""All input for the \`typeFunctionMutation\` mutation."""
 input TypeFunctionMutationInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   id: Int
 }
 
-\\"\\"\\"The output of our \`typeFunctionMutation\` mutation.\\"\\"\\"
+"""The output of our \`typeFunctionMutation\` mutation."""
 type TypeFunctionMutationPayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
   type: Type
 
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  """An edge for our \`Type\`. May be used by Relay 1."""
   typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    """The method to use when ordering \`Type\`."""
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
-\\"\\"\\"An input for mutations affecting \`Type\`\\"\\"\\"
+"""An input for mutations affecting \`Type\`"""
 input TypeInput {
   anIntRange: AnIntRangeInput!
   bigint: BigInt!
@@ -1281,7 +1281,7 @@ input TypeInput {
   varchar: String!
 }
 
-\\"\\"\\"Represents an update to a \`Type\`. Fields that are set will be updated.\\"\\"\\"
+"""Represents an update to a \`Type\`. Fields that are set will be updated."""
 input TypePatch {
   anIntRange: AnIntRangeInput
   bigint: BigInt
@@ -1320,33 +1320,33 @@ input TypePatch {
   varchar: String
 }
 
-\\"\\"\\"A connection to a list of \`Type\` values.\\"\\"\\"
+"""A connection to a list of \`Type\` values."""
 type TypesConnection {
-  \\"\\"\\"
+  """
   A list of edges which contains the \`Type\` and cursor to aid in pagination.
-  \\"\\"\\"
+  """
   edges: [TypesEdge!]!
 
-  \\"\\"\\"A list of \`Type\` objects.\\"\\"\\"
+  """A list of \`Type\` objects."""
   nodes: [Type]!
 
-  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  \\"\\"\\"The count of *all* \`Type\` you could get from the connection.\\"\\"\\"
+  """The count of *all* \`Type\` you could get from the connection."""
   totalCount: Int!
 }
 
-\\"\\"\\"A \`Type\` edge in the connection.\\"\\"\\"
+"""A \`Type\` edge in the connection."""
 type TypesEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  \\"\\"\\"The \`Type\` at the end of the edge.\\"\\"\\"
+  """The \`Type\` at the end of the edge."""
   node: Type
 }
 
-\\"\\"\\"Methods to use when ordering \`Type\`.\\"\\"\\"
+"""Methods to use when ordering \`Type\`."""
 enum TypesOrderBy {
   AN_INT_RANGE_ASC
   AN_INT_RANGE_DESC
@@ -1423,69 +1423,69 @@ enum TypesOrderBy {
   VARCHAR_DESC
 }
 
-\\"\\"\\"YOYOYO!!\\"\\"\\"
+"""YOYOYO!!"""
 type UpdatableView {
-  \\"\\"\\"This is constantly 2\\"\\"\\"
+  """This is constantly 2"""
   constant: Int
   description: String
   name: String
   x: Int
 }
 
-\\"\\"\\"
+"""
 A condition to be used against \`UpdatableView\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
-\\"\\"\\"
+"""
 input UpdatableViewCondition {
-  \\"\\"\\"Checks for equality with the object’s \`constant\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`constant\` field."""
   constant: Int
 
-  \\"\\"\\"Checks for equality with the object’s \`description\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`description\` field."""
   description: String
 
-  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`name\` field."""
   name: String
 
-  \\"\\"\\"Checks for equality with the object’s \`x\` field.\\"\\"\\"
+  """Checks for equality with the object’s \`x\` field."""
   x: Int
 }
 
-\\"\\"\\"An input for mutations affecting \`UpdatableView\`\\"\\"\\"
+"""An input for mutations affecting \`UpdatableView\`"""
 input UpdatableViewInput {
-  \\"\\"\\"This is constantly 2\\"\\"\\"
+  """This is constantly 2"""
   constant: Int
   description: String
   name: String
   x: Int
 }
 
-\\"\\"\\"A connection to a list of \`UpdatableView\` values.\\"\\"\\"
+"""A connection to a list of \`UpdatableView\` values."""
 type UpdatableViewsConnection {
-  \\"\\"\\"
+  """
   A list of edges which contains the \`UpdatableView\` and cursor to aid in pagination.
-  \\"\\"\\"
+  """
   edges: [UpdatableViewsEdge!]!
 
-  \\"\\"\\"A list of \`UpdatableView\` objects.\\"\\"\\"
+  """A list of \`UpdatableView\` objects."""
   nodes: [UpdatableView]!
 
-  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  \\"\\"\\"The count of *all* \`UpdatableView\` you could get from the connection.\\"\\"\\"
+  """The count of *all* \`UpdatableView\` you could get from the connection."""
   totalCount: Int!
 }
 
-\\"\\"\\"A \`UpdatableView\` edge in the connection.\\"\\"\\"
+"""A \`UpdatableView\` edge in the connection."""
 type UpdatableViewsEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  """A cursor for use in pagination."""
   cursor: Cursor
 
-  \\"\\"\\"The \`UpdatableView\` at the end of the edge.\\"\\"\\"
+  """The \`UpdatableView\` at the end of the edge."""
   node: UpdatableView
 }
 
-\\"\\"\\"Methods to use when ordering \`UpdatableView\`.\\"\\"\\"
+"""Methods to use when ordering \`UpdatableView\`."""
 enum UpdatableViewsOrderBy {
   CONSTANT_ASC
   CONSTANT_DESC
@@ -1498,66 +1498,66 @@ enum UpdatableViewsOrderBy {
   X_DESC
 }
 
-\\"\\"\\"All input for the \`updateTypeById\` mutation.\\"\\"\\"
+"""All input for the \`updateTypeById\` mutation."""
 input UpdateTypeByIdInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
   id: Int!
 
-  \\"\\"\\"
+  """
   An object where the defined keys will be set on the \`Type\` being updated.
-  \\"\\"\\"
+  """
   typePatch: TypePatch!
 }
 
-\\"\\"\\"All input for the \`updateType\` mutation.\\"\\"\\"
+"""All input for the \`updateType\` mutation."""
 input UpdateTypeInput {
-  \\"\\"\\"
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   The globally unique \`ID\` which will identify a single \`Type\` to be updated.
-  \\"\\"\\"
+  """
   nodeId: ID!
 
-  \\"\\"\\"
+  """
   An object where the defined keys will be set on the \`Type\` being updated.
-  \\"\\"\\"
+  """
   typePatch: TypePatch!
 }
 
-\\"\\"\\"The output of our update \`Type\` mutation.\\"\\"\\"
+"""The output of our update \`Type\` mutation."""
 type UpdateTypePayload {
-  \\"\\"\\"
+  """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
+  """
   clientMutationId: String
 
-  \\"\\"\\"
+  """
   Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
+  """
   query: Query
 
-  \\"\\"\\"The \`Type\` that was updated by this mutation.\\"\\"\\"
+  """The \`Type\` that was updated by this mutation."""
   type: Type
 
-  \\"\\"\\"An edge for our \`Type\`. May be used by Relay 1.\\"\\"\\"
+  """An edge for our \`Type\`. May be used by Relay 1."""
   typeEdge(
-    \\"\\"\\"The method to use when ordering \`Type\`.\\"\\"\\"
+    """The method to use when ordering \`Type\`."""
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
 
-\\"\\"\\"
+"""
 A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-\\"\\"\\"
+"""
 scalar UUID
-"
+
 `;

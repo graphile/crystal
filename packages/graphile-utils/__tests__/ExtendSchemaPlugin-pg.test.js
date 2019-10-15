@@ -1,5 +1,5 @@
 import pg from "pg";
-import { graphql, printSchema } from "graphql";
+import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
 import { makeExtendSchemaPlugin, gql, embed } from "../";
 
@@ -71,8 +71,7 @@ it("allows adding a custom single field to PG schema", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -134,8 +133,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -235,8 +233,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   await pgClient.query("begin");
   try {
@@ -313,8 +310,7 @@ it("allows adding a field to an existing table, and requesting necessary data al
       })),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -373,8 +369,7 @@ it("allows adding a custom connection", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -451,8 +446,7 @@ it("allows adding a custom connection without requiring directives", async () =>
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -527,8 +521,7 @@ it("allows adding a custom connection to a nested type", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -625,8 +618,7 @@ it("allows adding a custom list to a nested type", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(
@@ -684,8 +676,7 @@ it("allows adding a single table entry to a nested type", async () => {
       }),
     ],
   });
-  const printedSchema = printSchema(schema);
-  expect(printedSchema).toMatchSnapshot();
+  expect(schema).toMatchSnapshot();
   const pgClient = await pgPool.connect();
   try {
     const { data, errors } = await graphql(

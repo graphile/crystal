@@ -36,7 +36,7 @@ Object {
 `;
 
 exports[`generated schema 1`] = `
-"\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+"""A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
 type Dummy {
@@ -62,35 +62,35 @@ type DummyEdge {
   node: Dummy
 }
 
-\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+"""An object with a globally unique \`ID\`."""
 interface Node {
-  \\"\\"\\"
+  """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
+  """
   id: ID!
 }
 
-\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+"""The root query type which gives access points into the data universe."""
 type Query implements Node {
-  \\"\\"\\"
+  """
   Exposes the root query type nested one level down. This is helpful for Relay 1
   which can only query top level fields if they are in a particular form.
-  \\"\\"\\"
+  """
   query: Query!
 
-  \\"\\"\\"
+  """
   The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  \\"\\"\\"
+  """
   id: ID!
 
-  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  """Fetches an object given its globally unique \`ID\`."""
   node(
-    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    """The globally unique \`ID\`."""
     id: ID!
   ): Node
   dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection
 }
-"
+
 `;
 
 exports[`no arguments 1`] = `

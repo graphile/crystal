@@ -58,6 +58,9 @@
     "jest": "^24.8.0"
   },
   "jest": {
+    "snapshotSerializers": [
+      "jest-serializer-graphql-schema"
+    ],
     "transform": {
       "^.+\\.jsx?$": "../../.jest-wrapper.js"
     },
