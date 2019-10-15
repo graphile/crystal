@@ -30,12 +30,6 @@
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.jsx?$": "../../.jest-wrapper.js"
-    },
-    "testRegex": "__tests__/.*\\.test\\.js$"
-  },
   "files": [
     "node8plus"
   ]

@@ -47,15 +47,6 @@
     "graphile-build": "^4.4.2",
     "graphile-build-pg": "^4.4.2"
   },
-  "jest": {
-    "snapshotSerializers": [
-      "jest-serializer-graphql-schema"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "../../.jest-wrapper.js"
-    },
-    "testRegex": "__tests__/.*\\.test\\.js$"
-  },
   "files": [
     "node8plus"
   ]
