@@ -375,6 +375,7 @@ with
       idx.indimmediate as "isImmediate", -- enforce uniqueness immediately on insert
       idx.indisreplident as "isReplicaIdentity",
       idx.indisvalid as "isValid", -- if false, don't use for queries
+      idx.indpred is not null as "isPartial", -- if true, index is not on on rows.
       idx.indkey as "attributeNums",
       am.amname as "indexType",
       ${

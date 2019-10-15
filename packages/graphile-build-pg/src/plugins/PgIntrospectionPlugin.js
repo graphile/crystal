@@ -182,6 +182,7 @@ export type PgIndex = {
   isReplicaIdentity: boolean,
   isValid: boolean,
   */
+  isPartial: boolean,
   attributeNums: Array<number>,
   attributePropertiesAsc: ?Array<boolean>,
   attributePropertiesNullsFirst: ?Array<boolean>,
