@@ -709,3 +709,125 @@ it("allows adding a single table entry to a nested type", async () => {
     pgClient.release();
   }
 });
+
+it("allows to retrieve a single scalar value", async () => {
+  const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
+    disableDefaultMutations: true,
+    appendPlugins: [
+      makeExtendSchemaPlugin(build => {
+        const { pgSql: sql } = build;
+        return {
+          typeDefs: gql`
+            extend type User {
+              myCustomScalar: Int! @pgQuery(
+                fragment: ${embed(sql.fragment`(SELECT 100)`)}
+              )
+              myCustomScalarWithFunction: String! @pgQuery(
+                fragment: ${embed(
+                  queryBuilder =>
+                    sql.fragment`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`
+                )}
+              )
+              myCustomScalarWithFunctionAndArgument(test: Int!): Int! @pgQuery(
+                fragment: ${embed(
+                  (queryBuilder, args) =>
+                    sql.fragment`(SELECT ${sql.value(args.test)}::integer)`
+                )}
+              )
+            }
+          `,
+        };
+      }),
+    ],
+  });
+  expect(schema).toMatchSnapshot();
+  const pgClient = await pgPool.connect();
+  try {
+    const { data, errors } = await graphql(
+      schema,
+      `
+        query {
+          user: userById(id: 1) {
+            id
+            name
+            myCustomScalar
+            myCustomScalarWithFunction
+            myCustomScalarWithFunctionAndArgument(test: 102)
+            m100: myCustomScalar
+            mAlice: myCustomScalarWithFunction
+            m103: myCustomScalarWithFunctionAndArgument(test: 103)
+          }
+        }
+      `,
+      null,
+      { pgClient },
+      {}
+    );
+    expect(errors).toBeFalsy();
+    expect(data).toBeTruthy();
+    expect(data.user).toBeTruthy();
+    expect(data.user.myCustomScalar).toBe(100);
+    expect(data.user.myCustomScalarWithFunction).toBe(
+      "Alice alice@example.com"
+    );
+    expect(data.user.myCustomScalarWithFunctionAndArgument).toBe(102);
+    expect(data.user.m100).toBe(100);
+    expect(data.user.mAlice).toBe("Alice alice@example.com");
+    expect(data.user.m103).toBe(103);
+  } finally {
+    pgClient.release();
+  }
+});
+
+it("allows to retrieve array scalar values", async () => {
+  const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
+    disableDefaultMutations: true,
+    appendPlugins: [
+      makeExtendSchemaPlugin(build => {
+        const { pgSql: sql } = build;
+        return {
+          typeDefs: gql`
+            extend type User {
+              myCustomArrayOfScalars: [String!]! @pgQuery(
+                fragment: ${embed(
+                  sql.fragment`array(SELECT name from graphile_utils.pets)`
+                )}
+              )
+              
+            }
+          `,
+        };
+      }),
+    ],
+  });
+  expect(schema).toMatchSnapshot();
+  const pgClient = await pgPool.connect();
+  try {
+    const { data, errors } = await graphql(
+      schema,
+      `
+        query {
+          user: userById(id: 1) {
+            id
+            name
+            myCustomArrayOfScalars
+          }
+        }
+      `,
+      null,
+      { pgClient },
+      {}
+    );
+    expect(errors).toBeFalsy();
+    expect(data).toBeTruthy();
+    expect(data.user).toBeTruthy();
+    expect(data.user.myCustomArrayOfScalars).toEqual([
+      "Felix",
+      "Fido",
+      "Goldie",
+      "Spot",
+    ]);
+  } finally {
+    pgClient.release();
+  }
+});
