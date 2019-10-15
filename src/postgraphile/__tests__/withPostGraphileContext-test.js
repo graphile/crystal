@@ -2,6 +2,7 @@
 
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext';
 import withPostGraphileContext from '../withPostGraphileContext';
+import { readFileSync } from 'fs';
 
 const jwt = require('jsonwebtoken');
 
@@ -951,6 +952,108 @@ describe('jwtVerifyOptions', () => {
       'jwt audience invalid. expected: postgraphile',
     );
     // No need for transaction since there's no settings
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
+
+  test('will succeed using jwtPublicKey instead of jwtSecret if both options are provided', async () => {
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'postgraphile' }, 'public key', {
+          noTimestamp: true,
+        }),
+        jwtSecret: 'secret',
+        jwtPublicKey: 'public key',
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true)',
+          values: ['jwt.claims.aud', 'postgraphile'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will succeed with asymmetric encryption verification', async () => {
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'postgraphile' }, privateKey, {
+          noTimestamp: true,
+          algorithm: 'RS256',
+        }),
+        jwtPublicKey: publicKey,
+        jwtVerifyOptions: {
+          algorithms: ['RS256'],
+        },
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true)',
+          values: ['jwt.claims.aud', 'postgraphile'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will throw an error on invalid public key on asymmetric encryption verification', async () => {
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
+    publicKey.write('ASDF', 100); // Make the key invalid while keeping correct format
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtToken: jwt.sign({ aud: 'postgraphile' }, privateKey, {
+            noTimestamp: true,
+            algorithm: 'RS256',
+          }),
+          jwtPublicKey: publicKey,
+          jwtVerifyOptions: {
+            algorithms: ['RS256'],
+          },
+        },
+        () => {},
+      ),
+      403,
+      'invalid signature',
+    );
+    expect(pgClient.query.mock.calls).toEqual([]);
+  });
+
+  test('will throw an error on unsupported algorithms on asymmetric encryption verification', async () => {
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    const publicKey = readFileSync(`${__dirname}/assets/public-key.pem`);
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtToken: jwt.sign({ aud: 'postgraphile' }, privateKey, {
+            noTimestamp: true,
+            algorithm: 'RS256',
+          }),
+          jwtPublicKey: publicKey,
+          jwtVerifyOptions: {
+            algorithms: ['RS512'],
+          },
+        },
+        () => {},
+      ),
+      403,
+      'invalid algorithm',
+    );
     expect(pgClient.query.mock.calls).toEqual([]);
   });
 });

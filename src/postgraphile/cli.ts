@@ -416,6 +416,7 @@ const {
   disableGraphiql = false,
   secret: deprecatedJwtSecret,
   jwtSecret,
+  jwtPublicKey,
   jwtAudiences,
   jwtVerifyAlgorithms,
   jwtVerifyAudience,
@@ -425,6 +426,8 @@ const {
   jwtVerifyIgnoreNotBefore,
   jwtVerifyIssuer,
   jwtVerifySubject,
+  jwtSignOptions = {},
+  jwtVerifyOptions: rawJwtVerifyOptions,
   jwtRole = ['role'],
   token: deprecatedJwtPgTypeIdentifier,
   jwtTokenIdentifier: jwtPgTypeIdentifier,
@@ -562,16 +565,33 @@ function trimNulls(obj: object): object {
   }, {});
 }
 
-const jwtVerifyOptions: jwt.VerifyOptions = trimNulls({
-  algorithms: jwtVerifyAlgorithms,
-  audience: jwtVerifyAudience,
-  clockTolerance: jwtVerifyClockTolerance,
-  jwtId: jwtVerifyId,
-  ignoreExpiration: jwtVerifyIgnoreExpiration,
-  ignoreNotBefore: jwtVerifyIgnoreNotBefore,
-  issuer: jwtVerifyIssuer,
-  subject: jwtVerifySubject,
-});
+if (
+  rawJwtVerifyOptions &&
+  (jwtVerifyAlgorithms ||
+    jwtVerifyAudience ||
+    jwtVerifyClockTolerance ||
+    jwtVerifyId ||
+    jwtVerifyIgnoreExpiration ||
+    jwtVerifyIgnoreNotBefore ||
+    jwtVerifyIssuer ||
+    jwtVerifySubject)
+) {
+  throw new Error(
+    'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.',
+  );
+}
+const jwtVerifyOptions: jwt.VerifyOptions = rawJwtVerifyOptions
+  ? rawJwtVerifyOptions
+  : trimNulls({
+      algorithms: jwtVerifyAlgorithms,
+      audience: jwtVerifyAudience,
+      clockTolerance: jwtVerifyClockTolerance,
+      jwtId: jwtVerifyId,
+      ignoreExpiration: jwtVerifyIgnoreExpiration,
+      ignoreNotBefore: jwtVerifyIgnoreNotBefore,
+      issuer: jwtVerifyIssuer,
+      subject: jwtVerifySubject,
+    });
 
 // The options to pass through to the schema builder, or the middleware
 const postgraphileOptions = pluginHook(
@@ -589,7 +609,9 @@ const postgraphileOptions = pluginHook(
     enhanceGraphiql: enhanceGraphiql ? true : undefined,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
     jwtSecret: jwtSecret || deprecatedJwtSecret,
+    jwtPublicKey,
     jwtAudiences,
+    jwtSignOptions,
     jwtRole,
     jwtVerifyOptions,
     retryOnInitFail,
