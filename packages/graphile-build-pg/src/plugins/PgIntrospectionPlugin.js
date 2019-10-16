@@ -200,6 +200,25 @@ export type PgEntity =
   | PgExtension
   | PgIndex;
 
+export type PgIntrospectionResultsByKind = {
+  __pgVersion: number,
+  attribute: PgAttribute[],
+  attributeByClassIdAndNum: {
+    [classId: string]: { [num: string]: PgAttribute },
+  },
+  class: PgClass[],
+  classById: { [classId: string]: PgClass },
+  constraint: PgConstraint[],
+  extension: PgExtension[],
+  extensionById: { [extId: string]: PgExtension },
+  index: PgIndex[],
+  namespace: PgNamespace[],
+  namespaceById: { [namespaceId: string]: PgNamespace },
+  procedure: PgProc[],
+  type: PgType[],
+  typeById: { [typeId: string]: PgType },
+};
+
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
     rawReadFile(filename, encoding, (err, res) => {
@@ -445,7 +464,11 @@ export default (async function PgIntrospectionPlugin(
       fn ? fn(introspectionResults) : null
     );
   };
-  async function introspect() {
+  /**
+   * @summary introspect database and get the table/view/constraints.
+   * @returns {Promise<PgIntrospectionResultsByKind>}
+   */
+  async function introspect(): Promise<PgIntrospectionResultsByKind> {
     // Perform introspection
     if (!Array.isArray(schemas)) {
       throw new Error("Argument 'schemas' (array) is required");

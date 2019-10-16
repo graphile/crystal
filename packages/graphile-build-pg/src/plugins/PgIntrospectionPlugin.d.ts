@@ -1,3 +1,5 @@
+import { SchemaBuilder, Options } from "graphile-build";
+
 export interface PgNamespace {
   kind: "namespace";
   id: string;
@@ -160,6 +162,25 @@ export interface PgIndex {
   tags: { [tag: string]: true | string | Array<string> };
 }
 
+export type PgIntrospectionResultsByKind = {
+  __pgVersion: number;
+  attribute: PgAttribute[];
+  attributeByClassIdAndNum: {
+    [classId: string]: { [num: string]: PgAttribute };
+  };
+  class: PgClass[];
+  classById: { [classId: string]: PgClass };
+  constraint: PgConstraint[];
+  extension: PgExtension[];
+  extensionById: { [extId: string]: PgExtension };
+  index: PgIndex[];
+  namespace: PgNamespace[];
+  namespaceById: { [namespaceId: string]: PgNamespace };
+  procedure: PgProc[];
+  type: PgType[];
+  typeById: { [typeId: string]: PgType };
+};
+
 export type PgEntity =
   | PgNamespace
   | PgProc
@@ -169,3 +190,8 @@ export type PgEntity =
   | PgConstraint
   | PgExtension
   | PgIndex;
+
+export default function PgIntrospectionPlugin(
+  builder: SchemaBuilder,
+  options: Options
+): Promise<void> | void;
