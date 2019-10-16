@@ -277,8 +277,8 @@ function getSettingsForPgClientTransaction({
   pgSettings,
 }: {
   jwtToken?: string;
-  jwtSecret?: string | Buffer;
-  jwtPublicKey?: string | Buffer;
+  jwtSecret?: jwt.Secret;
+  jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;
   jwtAudiences?: Array<string>;
   jwtRole: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;
@@ -302,7 +302,7 @@ function getSettingsForPgClientTransaction({
       const jwtVerificationSecret = jwtPublicKey || jwtSecret;
       // If a JWT token was defined, but a secret was not provided to the server or
       // secret had unsupported type, throw a 403 error.
-      if (!Buffer.isBuffer(jwtVerificationSecret) && typeof jwtVerificationSecret !== 'string') {
+      if (!Buffer.isBuffer(jwtVerificationSecret) && typeof jwtVerificationSecret !== 'string' && typeof jwtVerificationSecret !== 'function') {
         // tslint:disable-next-line no-console
         console.error(
           `ERROR: '${

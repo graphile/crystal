@@ -204,7 +204,8 @@ export interface PostGraphileOptions<
   // The secret for your JSON web tokens. This will be used to verify tokens in
   // the `Authorization` header, and signing JWT tokens you return in
   // procedures.
-  jwtSecret?: string;
+  jwtSecret?: jwt.Secret;
+  jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;
   // Options with which to perform JWT verification - see
   // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
   // If 'audience' property is unspecified, it will default to
@@ -330,8 +331,8 @@ export interface HttpRequestHandler<
 export interface WithPostGraphileContextOptions {
   pgPool: Pool;
   jwtToken?: string;
-  jwtSecret?: string;
-  jwtPublicKey?: string;
+  jwtSecret?: jwt.Secret;
+  jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;
   jwtAudiences?: Array<string>;
   jwtRole?: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;
