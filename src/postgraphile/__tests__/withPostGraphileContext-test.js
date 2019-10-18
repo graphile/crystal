@@ -967,7 +967,7 @@ describe('jwtVerifyOptions', () => {
         }),
         jwtPublicKey: loadKey,
       },
-      () => {}
+      () => {},
     );
     expect(loadKey.mock.calls.length).toBe(1);
     expect(loadKey.mock.calls[0][0]).toEqual({ alg: 'HS256', typ: 'JWT' });
@@ -995,10 +995,10 @@ describe('jwtVerifyOptions', () => {
             callback(new Error('could not load key'));
           },
         },
-        () => {}
+        () => {},
       ),
       403, // 500 might be more appropriate, but jwt.verify does not distinguish errors
-      'error in secret or public key callback: could not load key'
+      'error in secret or public key callback: could not load key',
     );
   });
 
@@ -1071,7 +1071,7 @@ describe('jwtVerifyOptions', () => {
           algorithms: ['RS256'],
         },
       },
-      () => {}
+      () => {},
     );
     expect(pgClient.query.mock.calls).toEqual([
       ['begin'],

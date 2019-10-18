@@ -302,7 +302,11 @@ async function getSettingsForPgClientTransaction({
       const jwtVerificationSecret = jwtPublicKey || jwtSecret;
       // If a JWT token was defined, but a secret was not provided to the server or
       // secret had unsupported type, throw a 403 error.
-      if (!Buffer.isBuffer(jwtVerificationSecret) && typeof jwtVerificationSecret !== 'string' && typeof jwtVerificationSecret !== 'function') {
+      if (
+        !Buffer.isBuffer(jwtVerificationSecret) &&
+        typeof jwtVerificationSecret !== 'string' &&
+        typeof jwtVerificationSecret !== 'function'
+      ) {
         // tslint:disable-next-line no-console
         console.error(
           `ERROR: '${
@@ -318,18 +322,22 @@ async function getSettingsForPgClientTransaction({
         );
 
       const claims = await new Promise((resolve, reject) => {
-        jwt.verify(jwtToken, jwtVerificationSecret, {
-          ...jwtVerifyOptions,
-          audience:
-            jwtAudiences ||
-            (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
-              ? undefinedIfEmpty(jwtVerifyOptions.audience)
-              : ['postgraphile']),
-        },
-        (err, decoded) => {
-          if (err) reject(err);
-          else resolve(decoded);
-        });
+        jwt.verify(
+          jwtToken,
+          jwtVerificationSecret,
+          {
+            ...jwtVerifyOptions,
+            audience:
+              jwtAudiences ||
+              (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+                ? undefinedIfEmpty(jwtVerifyOptions.audience)
+                : ['postgraphile']),
+          },
+          (err, decoded) => {
+            if (err) reject(err);
+            else resolve(decoded);
+          },
+        );
       });
 
       if (typeof claims === 'string') {
