@@ -103,7 +103,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
   // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null;
 
-  const { role: pgRole, localSettings, jwtClaims } = getSettingsForPgClientTransaction({
+  const { role: pgRole, localSettings, jwtClaims } = await getSettingsForPgClientTransaction({
     jwtToken,
     jwtSecret,
     jwtPublicKey,
@@ -266,7 +266,7 @@ export default withPostGraphileContext;
 // client. If this happens it’s a huge security vulnerability. Never using the
 // keyword `return` in this function is a good first step. You can still throw
 // errors, however, as this will stop the request execution.
-function getSettingsForPgClientTransaction({
+async function getSettingsForPgClientTransaction({
   jwtToken,
   jwtSecret,
   jwtPublicKey,
@@ -284,11 +284,11 @@ function getSettingsForPgClientTransaction({
   jwtVerifyOptions?: jwt.VerifyOptions;
   pgDefaultRole?: string;
   pgSettings?: { [key: string]: mixed };
-}): {
+}): Promise<{
   role: string | undefined;
   localSettings: Array<[string, string]>;
   jwtClaims: { [claimName: string]: mixed } | null;
-} {
+}> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
   let jwtClaims: { [claimName: string]: mixed } = {};
@@ -317,13 +317,19 @@ function getSettingsForPgClientTransaction({
           `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
         );
 
-      const claims = jwt.verify(jwtToken, jwtVerificationSecret, {
-        ...jwtVerifyOptions,
-        audience:
-          jwtAudiences ||
-          (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
-            ? undefinedIfEmpty(jwtVerifyOptions.audience)
-            : ['postgraphile']),
+      const claims = await new Promise((resolve, reject) => {
+        jwt.verify(jwtToken, jwtVerificationSecret, {
+          ...jwtVerifyOptions,
+          audience:
+            jwtAudiences ||
+            (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+              ? undefinedIfEmpty(jwtVerifyOptions.audience)
+              : ['postgraphile']),
+        },
+        (err, decoded) => {
+          if (err) reject(err);
+          else resolve(decoded);
+        });
       });
 
       if (typeof claims === 'string') {
