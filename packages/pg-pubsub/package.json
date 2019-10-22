@@ -44,6 +44,7 @@
     "@types/jest": "^24.0.12",
     "graphql": ">=0.6 <15",
     "jest": "24.9.0",
+    "jest-serializer-graphql-schema": "4.4.5",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": "^7.10.0",

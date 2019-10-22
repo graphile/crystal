@@ -55,7 +55,8 @@
     "@babel/cli": "^7.0.0",
     "eslint_d": "^8.0.0",
     "flow-copy-source": "^1.2.0",
-    "jest": "^24.8.0"
+    "jest": "^24.8.0",
+    "jest-serializer-graphql-schema": "4.4.5"
   },
   "files": [
     "node8plus",

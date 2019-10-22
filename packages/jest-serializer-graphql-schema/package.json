@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "tsc",
+    "watch": "tsc --watch",
     "test": "jest"
   },
   "repository": {
@@ -24,7 +25,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-graphql-schema#readme",
   "peerDependencies": {
-    "graphql": "^14.5.8"
+    "graphql": "^14.0.2"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.2",
