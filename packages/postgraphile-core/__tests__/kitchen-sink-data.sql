@@ -231,3 +231,22 @@ insert into network_types.network values
   (6, '2001:4f8:3:ba:2e0:81ff:fe22:d1f1', '2001:4f8:3:ba:2e0:81ff:fe22:d1f1/128', '08002b010203');
 
 alter sequence network_types.network_id_seq restart with 7;
+
+
+insert into named_query_builder.categories (id, name) values
+  (1, 'Dinosaurs'),
+  (2, 'Science'),
+  (3, 'Military');
+insert into named_query_builder.toys (id, name) values
+  (1, 'Rex'),
+  (2, 'Toy Soldiers'),
+  (3, 'Dino-Rocket Launcher'),
+  (4, 'History of Dinosaurs book');
+insert into named_query_builder.toy_categories(toy_id, category_id, approved) values
+  (1, 1, true),
+  (2, 3, true),
+  (3, 1, true),
+  (3, 3, true),
+  (4, 1, true),
+  (4, 2, true),
+  (1, 3, false);

@@ -6,6 +6,7 @@ const { resolve: resolvePath } = require("path");
 const { printSchema } = require("graphql/utilities");
 const debug = require("debug")("graphile-build:schema");
 const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
+const ToyCategoriesPlugin = require("./ToyCategoriesPlugin");
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {
@@ -57,6 +58,7 @@ beforeAll(() => {
       largeBigint,
       useCustomNetworkScalars,
       pg10UseCustomNetworkScalars,
+      namedQueryBuilder,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
@@ -119,6 +121,10 @@ beforeAll(() => {
             },
           })
         : null,
+      createPostGraphileSchema(pgClient, ["named_query_builder"], {
+        subscriptions: true,
+        appendPlugins: [ToyCategoriesPlugin],
+      }),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -142,6 +148,7 @@ beforeAll(() => {
       largeBigint,
       useCustomNetworkScalars,
       pg10UseCustomNetworkScalars,
+      namedQueryBuilder,
     };
   });
 
@@ -212,6 +219,8 @@ beforeAll(() => {
               gqlSchema = gqlSchemas.smartCommentRelations;
             } else if (fileName.startsWith("large_bigint")) {
               gqlSchema = gqlSchemas.largeBigint;
+            } else if (fileName.startsWith("named_query_builder")) {
+              gqlSchema = gqlSchemas.namedQueryBuilder;
             } else {
               gqlSchema = gqlSchemas.normal;
             }

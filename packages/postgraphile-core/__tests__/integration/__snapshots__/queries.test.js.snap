@@ -2004,6 +2004,37 @@ Object {
 }
 `;
 
+exports[`named_query_builder.toys.graphql 1`] = `
+Object {
+  "data": Object {
+    "t1": Object {
+      "categories": Array [
+        Object {
+          "name": "Dinosaurs",
+        },
+        Object {
+          "name": "Military",
+        },
+      ],
+    },
+    "t2": Object {
+      "categories": Array [
+        Object {
+          "name": "Dinosaurs",
+        },
+      ],
+    },
+    "t3": Object {
+      "categories": Array [
+        Object {
+          "name": "Military",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`network_types.graphql 1`] = `
 Object {
   "data": Object {

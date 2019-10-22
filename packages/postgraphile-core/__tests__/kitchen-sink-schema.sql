@@ -1,5 +1,5 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test, large_bigint, network_types cascade;
+drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test, large_bigint, network_types, named_query_builder cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -1070,4 +1070,24 @@ create table network_types.network (
   inet inet,
   cidr cidr,
   macaddr macaddr
+);
+
+/******************************************************************************/
+
+create schema named_query_builder;
+
+create table named_query_builder.toys (
+  id serial primary key,
+  name text not null
+);
+
+create table named_query_builder.categories (
+  id serial primary key,
+  name text not null
+);
+
+create table named_query_builder.toy_categories (
+  toy_id int not null references named_query_builder.toys,
+  category_id int not null references named_query_builder.categories,
+  approved boolean not null
 );
