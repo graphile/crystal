@@ -78,7 +78,7 @@ export interface Resolvers<TSource = any, TContext = any> {
 
 export interface ExtensionDefinition {
   typeDefs: DocumentNode;
-  resolvers: Resolvers;
+  resolvers?: Resolvers;
 }
 
 interface NewTypeDef {

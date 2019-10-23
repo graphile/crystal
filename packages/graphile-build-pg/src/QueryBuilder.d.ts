@@ -42,8 +42,8 @@ export default class QueryBuilder {
   public setOrderIsUnique(): void;
   public orderBy(
     exprGen: SQLGen,
-    ascending: boolean,
-    nullsFirst: boolean | null
+    ascending?: boolean,
+    nullsFirst?: boolean | null
   ): void;
   public limit(limitGen: NumberGen): void;
   public offset(offsetGen: NumberGen): void;
