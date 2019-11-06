@@ -861,7 +861,7 @@ export default (async function PgIntrospectionPlugin(
       this._start();
     }
 
-    async _start() {
+    async _start(isReconnect = false) {
       if (this.stopped) {
         return;
       }
@@ -921,7 +921,9 @@ export default (async function PgIntrospectionPlugin(
           }
 
           // Trigger re-introspection on server reconnect
-          this._handleChange();
+          if (isReconnect) {
+            this._handleChange();
+          }
         }
       } catch (e) {
         // If something goes wrong, disconnect and try again after a short delay
@@ -949,7 +951,7 @@ export default (async function PgIntrospectionPlugin(
       setTimeout(() => {
         if (!this.stopped) {
           // Listen for further changes
-          this._start();
+          this._start(true);
         }
       }, 2000);
     }

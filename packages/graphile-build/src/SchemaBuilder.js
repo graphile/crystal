@@ -510,7 +510,15 @@ class SchemaBuilder extends EventEmitter {
     try {
       this._busy = true;
       this._explicitSchemaListener = listener;
+
+      // We want to ignore `triggerChange` calls that occur whilst we're setting
+      // up the listeners to prevent an unnecessary double schema build.
+      let ignoreChangeTriggers = true;
+
       this.triggerChange = () => {
+        if (ignoreChangeTriggers) {
+          return;
+        }
         this._generatedSchema = null;
         // XXX: optionally debounce
         try {
@@ -530,10 +538,16 @@ class SchemaBuilder extends EventEmitter {
       for (const fn of this.watchers) {
         await fn(this.triggerChange);
       }
+
+      // Now we're about to build the first schema, any further `triggerChange`
+      // calls should be honoured.
+      ignoreChangeTriggers = false;
+
       if (listener) {
         this.on("schema", listener);
       }
       this.emit("schema", this.buildSchema());
+
       this._watching = true;
     } finally {
       this._busy = false;
