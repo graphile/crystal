@@ -71,6 +71,8 @@ const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
       l.port !== 80 && l.port !== 443 ? ':' + l.port : ''
     }${POSTGRAPHILE_CONFIG.graphqlUrl}`;
 
+const STORAGE_KEY_HEADERS_TEXT = 'PostGraphiQL_headersText';
+
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
  * Including a JWT setter and live schema udpate capabilities.
@@ -85,7 +87,7 @@ class PostGraphiQL extends React.PureComponent {
     schema: null,
     query: '',
     showHeaderEditor: false,
-    headersText: '{\n"Authorization": null\n}\n',
+    headersText: this._storage.get(STORAGE_KEY_HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
@@ -688,6 +690,9 @@ class PostGraphiQL extends React.PureComponent {
                   headersTextValid: isValidJSON(e.target.value),
                 },
                 () => {
+                  if (this.state.headersTextValid) {
+                    this._storage.set(STORAGE_KEY_HEADERS_TEXT, this.state.headersText);
+                  }
                   if (this.state.headersTextValid && this.subscriptionsClient) {
                     // Reconnect to websocket with new headers
                     this.subscriptionsClient.close(false, true);
