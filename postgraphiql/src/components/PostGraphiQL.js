@@ -71,7 +71,10 @@ const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
       l.port !== 80 && l.port !== 443 ? ':' + l.port : ''
     }${POSTGRAPHILE_CONFIG.graphqlUrl}`;
 
-const STORAGE_KEY_HEADERS_TEXT = 'PostGraphiQL_headersText';
+const STORAGE_KEYS = {
+  SAVE_HEADERS_TEXT: 'PostGraphiQL:saveHeadersText',
+  HEADERS_TEXT: 'PostGraphiQL:headersText',
+};
 
 /**
  * The standard GraphiQL interface wrapped with some PostGraphile extensions.
@@ -87,13 +90,29 @@ class PostGraphiQL extends React.PureComponent {
     schema: null,
     query: '',
     showHeaderEditor: false,
-    headersText: this._storage.get(STORAGE_KEY_HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
+    saveHeadersText: false,
+    headersText: '{\n"Authorization": null\n}\n',
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
     socketStatus:
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
   };
+
+  constructor(params) {
+    super(params);
+
+    const saveHeadersText = JSON.parse(
+      this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) || 'false',
+    );
+    if (saveHeadersText) {
+      this.state.saveHeadersText = saveHeadersText;
+      const headersText = this._storage.get(STORAGE_KEYS.HEADERS_TEXT);
+      if (headersText) {
+        this.state.headersText = headersText;
+      }
+    }
+  }
 
   _onEditQuery = query => {
     this.setState({ query });
@@ -512,6 +531,19 @@ class PostGraphiQL extends React.PureComponent {
     );
   };
 
+  handleToggleSaveHeaders = () => {
+    this.setState(
+      oldState => ({ saveHeadersText: !oldState.saveHeadersText }),
+      () => {
+        this._storage.set(STORAGE_KEYS.SAVE_HEADERS_TEXT, this.state.saveHeadersText);
+        this._storage.set(
+          STORAGE_KEYS.HEADERS_TEXT,
+          this.state.saveHeadersText ? this.state.headersText : '',
+        );
+      },
+    );
+  };
+
   renderSocketStatus() {
     const { socketStatus, error } = this.state;
     if (socketStatus === null) {
@@ -683,6 +715,8 @@ class PostGraphiQL extends React.PureComponent {
             open={this.state.showHeaderEditor}
             value={this.state.headersText}
             valid={this.state.headersTextValid}
+            toggleSaveHeaders={this.handleToggleSaveHeaders}
+            saveHeaders={this.state.saveHeadersText}
             onChange={e =>
               this.setState(
                 {
@@ -690,8 +724,8 @@ class PostGraphiQL extends React.PureComponent {
                   headersTextValid: isValidJSON(e.target.value),
                 },
                 () => {
-                  if (this.state.headersTextValid) {
-                    this._storage.set(STORAGE_KEY_HEADERS_TEXT, this.state.headersText);
+                  if (this.state.headersTextValid && this.state.saveHeadersText) {
+                    this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
                   }
                   if (this.state.headersTextValid && this.subscriptionsClient) {
                     // Reconnect to websocket with new headers
@@ -711,7 +745,7 @@ class PostGraphiQL extends React.PureComponent {
   }
 }
 
-function EditHeaders({ children, open, value, onChange, valid }) {
+function EditHeaders({ children, open, value, onChange, valid, saveHeaders, toggleSaveHeaders }) {
   return (
     <div
       className="graphiql-container not-really"
@@ -728,6 +762,10 @@ function EditHeaders({ children, open, value, onChange, valid }) {
             <div className="doc-explorer-rhs">{children}</div>
           </div>
           <div className="doc-explorer-contents">
+            <label>
+              <input type="checkbox" checked={saveHeaders} onChange={toggleSaveHeaders} />
+              save headers to localStorage
+            </label>
             <textarea
               value={value}
               onChange={onChange}
