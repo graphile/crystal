@@ -38,6 +38,8 @@ query {
   tableSetQueryWithOffset10: tableSetQuery(before: "WyJuYXR1cmFsIiwxXQ==", last: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   # Using after and offset together should not throw
   tableSetQueryWithOffset11: tableSetQuery(after: "WyJuYXR1cmFsIiwxXQ==", offset: 1, first: 2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryPlpgsql(first:2) { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
+  tableSetQueryPlpgsqlOffset2: tableSetQueryPlpgsql(first:2, after: "WyJuYXR1cmFsIiwyXQ==") { edges { cursor node { name } } pageInfo { startCursor endCursor hasNextPage hasPreviousPage } }
   intSetQuery(x: 5, z: 6) { edges { cursor node } totalCount }
   noArgsQuery
   staticBigInteger { edges { node } totalCount }

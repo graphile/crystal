@@ -770,9 +770,14 @@ with ${sql.identifier(flipAlias)} as (
 )
 select *
 from ${sql.identifier(flipAlias)}
-order by (row_number() over (partition by 1)) desc`;
+order by (row_number() over (partition by 1)) desc`; /* We don't need to factor useAsterisk into this row_number() usage */
     }
     if (useAsterisk) {
+      /*
+       * NOTE[useAsterisk/row_number]: since LIMIT/OFFSET is inside this
+       * subquery, row_number() outside of this subquery WON'T include the
+       * offset. We must add it back wherever row_number() is used.
+       */
       fragment = sql.fragment`select ${fields} from (${fragment}) ${this.getTableAlias()}`;
     }
     if (asJsonAggregate) {

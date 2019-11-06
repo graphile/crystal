@@ -297,7 +297,19 @@ exists(
           return sql.fragment`json_build_array(${sql.join(
             getPgCursorPrefix(),
             ", "
-          )}, (row_number() over (partition by 1)))`;
+          )}, ${
+            /*
+             * NOTE[useAsterisk/row_number]: If we have useAsterisk then the
+             * query with limit offset is in a subquery, so our row_number()
+             * call doesn't know about it. Here we add the offset back in
+             * again. See matching NOTE in QueryBuilder.js.
+             */
+            options.useAsterisk
+              ? sql.fragment`${sql.literal(
+                  queryBuilder.getFinalOffset() || 0
+                )} + `
+              : sql.fragment``
+          }(row_number() over (partition by 1)))`;
         }
       });
     }
