@@ -90,29 +90,14 @@ class PostGraphiQL extends React.PureComponent {
     schema: null,
     query: '',
     showHeaderEditor: false,
-    saveHeadersText: false,
-    headersText: '{\n"Authorization": null\n}\n',
+    saveHeadersText: this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === 'true' ? true : false,
+    headersText: this._storage.get(STORAGE_KEYS.HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
     socketStatus:
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
   };
-
-  constructor(params) {
-    super(params);
-
-    const saveHeadersText = JSON.parse(
-      this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) || 'false',
-    );
-    if (saveHeadersText) {
-      this.state.saveHeadersText = saveHeadersText;
-      const headersText = this._storage.get(STORAGE_KEYS.HEADERS_TEXT);
-      if (headersText) {
-        this.state.headersText = headersText;
-      }
-    }
-  }
 
   _onEditQuery = query => {
     this.setState({ query });
@@ -535,7 +520,10 @@ class PostGraphiQL extends React.PureComponent {
     this.setState(
       oldState => ({ saveHeadersText: !oldState.saveHeadersText }),
       () => {
-        this._storage.set(STORAGE_KEYS.SAVE_HEADERS_TEXT, this.state.saveHeadersText);
+        this._storage.set(
+          STORAGE_KEYS.SAVE_HEADERS_TEXT,
+          JSON.stringify(this.state.saveHeadersText),
+        );
         this._storage.set(
           STORAGE_KEYS.HEADERS_TEXT,
           this.state.saveHeadersText ? this.state.headersText : '',
