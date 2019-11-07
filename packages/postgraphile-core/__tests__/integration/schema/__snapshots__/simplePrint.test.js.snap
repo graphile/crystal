@@ -3322,7 +3322,7 @@ type JsonIdentityMutationPayload {
 
 type JwtToken {
   role: String
-  exp: Int
+  exp: BigInt
   a: Int
   b: BigFloat
   c: BigInt

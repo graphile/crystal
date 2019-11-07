@@ -70,7 +70,13 @@ export default (function PgJWTPlugin(
               "A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519) which securely represents claims between two parties.",
             serialize(value) {
               const token = attributes.reduce((memo, attr) => {
-                memo[attr.name] = value[attr.name];
+                if (attr.name === "exp") {
+                  memo[attr.name] = value[attr.name]
+                    ? parseFloat(value[attr.name])
+                    : undefined;
+                } else {
+                  memo[attr.name] = value[attr.name];
+                }
                 return memo;
               }, {});
               return signJwt(

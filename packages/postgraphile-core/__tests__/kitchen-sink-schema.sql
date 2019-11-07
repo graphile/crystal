@@ -388,7 +388,7 @@ create function b.type_function_connection_mutation() returns setof b.types as $
 
 create type b.jwt_token as (
   role text,
-  exp integer,
+  exp bigint,
   a integer,
   b numeric,
   c bigint
