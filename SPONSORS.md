@@ -7,7 +7,7 @@ sponsor](https://graphile.org/sponsor/).
 ## Featured
 
 - Chad Furman
-- Timescale
+- Storyscript
 - Point 72 Ventures
 
 ## Leaders
@@ -16,10 +16,13 @@ sponsor](https://graphile.org/sponsor/).
 - DOMONDA
 - James Allain
 - Stagency
-- NodeSource
 - 8th Light
-- Nigel Taylor
 - Jack Dinker
+- Nigel Taylor
+- OpenLaw NZ
+- Partners in School Innovation
+- Sterblue
+- HR-ON
 
 ## Supporters
 
@@ -41,5 +44,4 @@ sponsor](https://graphile.org/sponsor/).
 - cybere
 - dwwoelfel
 - Bjørn Michelsen
-- Storyscript
 - cj
