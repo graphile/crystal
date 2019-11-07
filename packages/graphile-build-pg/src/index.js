@@ -1,6 +1,8 @@
 // @flow
 import PgBasicsPlugin from "./plugins/PgBasicsPlugin";
-import PgIntrospectionPlugin from "./plugins/PgIntrospectionPlugin";
+import PgIntrospectionPlugin, {
+  PgEntityKind,
+} from "./plugins/PgIntrospectionPlugin";
 import PgTypesPlugin from "./plugins/PgTypesPlugin";
 import PgJWTPlugin from "./plugins/PgJWTPlugin";
 import PgTablesPlugin from "./plugins/PgTablesPlugin";
@@ -80,6 +82,9 @@ export const defaultPlugins = [
 ];
 
 export { inflections };
+
+// TypeScript compatibility
+export { PgEntityKind };
 
 export {
   PgBasicsPlugin,

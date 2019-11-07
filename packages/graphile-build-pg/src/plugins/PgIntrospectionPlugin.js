@@ -1054,3 +1054,15 @@ export default (async function PgIntrospectionPlugin(
     ["PgBasics"]
   );
 }: Plugin);
+
+// TypeScript compatibility
+export const PgEntityKind = {
+  NAMESPACE: "namespace",
+  PROCEDURE: "procedure",
+  CLASS: "class",
+  TYPE: "type",
+  ATTRIBUTE: "attribute",
+  CONSTRAINT: "constraint",
+  EXTENSION: "extension",
+  INDEX: "index",
+};

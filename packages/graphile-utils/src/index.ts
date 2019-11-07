@@ -19,6 +19,7 @@ export {
   Resolvers,
   ExtensionDefinition,
 } from "./makeExtendSchemaPlugin";
+export * from "./makePgSmartTagsPlugin";
 export {
   embed,
   gql,
