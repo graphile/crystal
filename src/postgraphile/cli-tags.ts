@@ -2,7 +2,7 @@ import { readFileSync, Stats, readFile, watchFile, unwatchFile } from 'fs';
 import { makeJSONPgSmartTagsPlugin, JSONPgSmartTags } from 'graphile-utils';
 import * as JSON5 from 'json5';
 
-const TAGS_FILE = process.cwd() + '/.postgraphile.tags.json5';
+const TAGS_FILE = process.cwd() + '/postgraphile.tags.json5';
 
 function handleTagsError(err: Error): void {
   console.error(`Failed to process '${TAGS_FILE}': ${err.message}`);
