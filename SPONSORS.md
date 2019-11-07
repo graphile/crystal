@@ -7,7 +7,6 @@ sponsor](https://graphile.org/sponsor/).
 ## Featured
 
 - Chad Furman
-- Timescale
 - Storyscript
 - Point 72 Ventures
 
