@@ -660,15 +660,12 @@ it("allows adding a single table entry to a nested type", async () => {
           typeDefs: gql`
             extend type User {
               myCustomRecord(id: Int!): User @pgQuery(
-                source: ${embed(sql.fragment`graphile_utils.users`)}
-                withQueryBuilder: ${embed((queryBuilder, args) => {
-                  queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.id = ${sql.value(
+                source: ${embed(
+                  (parentQueryBuilder, args) =>
+                    sql.fragment`(select * from graphile_utils.users where users.id = ${sql.value(
                       args.id
-                    )}`
-                  );
-                  queryBuilder.limit(1);
-                })}
+                    )} and users.id <> ${parentQueryBuilder.getTableAlias()}.id limit 1)`
+                )}
               )
             }
           `,
@@ -691,6 +688,11 @@ it("allows adding a single table entry to a nested type", async () => {
               bio
               email
             }
+            expectNull: myCustomRecord(id: 1) {
+              id
+              bio
+              email
+            }
           }
         }
       `,
@@ -705,6 +707,7 @@ it("allows adding a single table entry to a nested type", async () => {
     expect(data.user.myCustomRecord.id).toBe(2);
     expect(data.user.myCustomRecord.bio).not.toBe(undefined);
     expect(data.user.myCustomRecord.email).toBeTruthy();
+    expect(data.user.expectNull).toBe(null);
   } finally {
     pgClient.release();
   }
