@@ -6,6 +6,10 @@ function next2latest {
   V=$(npm info $1 dist-tags.next | xargs)
   npm dist-tags add $1@$V latest
 }
+next2latest graphile
+next2latest pg-sql2
+next2latest jest-serializer-graphql-schema
+next2latest @graphile/lru
 next2latest graphql-parse-resolve-info
 next2latest graphile-build
 next2latest graphile-build-pg
