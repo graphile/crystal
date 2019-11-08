@@ -39,6 +39,7 @@ export type DataForType = {
 export type InitObject = never;
 
 export interface Build {
+  graphql: typeof import("graphql");
   [str: string]: any;
 }
 export interface Inflection {

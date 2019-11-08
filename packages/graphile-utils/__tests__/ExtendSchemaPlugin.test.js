@@ -409,6 +409,7 @@ it("supports @scope directive with variable value", async () => {
 
 it("supports defining new types", async () => {
   const inputsSeen = [];
+  const enumsSeen = [];
   const EchoCount = gql`
     enum EchoCount {
       ONCE
@@ -422,7 +423,7 @@ it("supports defining new types", async () => {
       text: String!
       int: Int
       float: Float!
-      count: EchoCount
+      count: EchoCount = FOREVER
     }
   `;
   const schema = await buildSchema([
@@ -451,7 +452,7 @@ it("supports defining new types", async () => {
           """
           Gives you back what you put in
           """
-          echo(input: EchoInput): EchoOutput
+          echo(input: EchoInput, enum: EchoCount = FOREVER): EchoOutput
         }
       `,
       resolvers: {
@@ -462,6 +463,7 @@ it("supports defining new types", async () => {
           echo: {
             resolve(_query, args) {
               inputsSeen.push(args.input);
+              enumsSeen.push(args.enum);
               return args.input;
             },
           },
@@ -474,6 +476,13 @@ it("supports defining new types", async () => {
     schema,
     `
       {
+        t0: echo(input: { text: "Hi0", float: -0.42 }, enum: ONCE) {
+          text
+          int
+          float
+          intList
+          count
+        }
         t1: echo(input: { text: "Hi1", float: 0.23, count: ONCE }) {
           text
           int
@@ -508,10 +517,18 @@ it("supports defining new types", async () => {
   );
   expect(errors).toBeFalsy();
   expect(data).toMatchSnapshot();
-  expect(inputsSeen.length).toEqual(3);
+  expect(inputsSeen.length).toEqual(4);
+  expect(enumsSeen.length).toEqual(4);
   expect(inputsSeen.map(s => s.count)).toEqual([
+    "forever and ever and ever",
     "ONCE",
     "TWICE",
+    "forever and ever and ever",
+  ]);
+  expect(enumsSeen).toEqual([
+    "ONCE",
+    "forever and ever and ever",
+    "forever and ever and ever",
     "forever and ever and ever",
   ]);
 });

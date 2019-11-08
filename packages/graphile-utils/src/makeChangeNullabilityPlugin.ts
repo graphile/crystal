@@ -11,23 +11,9 @@ export default function makeChangeNullabilityPlugin(
   rules: ChangeNullabilityRules
 ): Plugin {
   return (builder: SchemaBuilder, _options: Options) => {
-    function changeNullability(
-      field: GraphQLInputFieldConfig,
-      build: Build,
-      context: Context<GraphQLInputFieldConfig>
-    ): typeof field;
-    function changeNullability<TSource, TContext>(
-      field: GraphQLFieldConfig<TSource, TContext>,
-      build: Build,
-      context: Context<GraphQLFieldConfig<TSource, TContext>>
-    ): typeof field;
-    function changeNullability<TSource, TContext>(
-      field: GraphQLInputFieldConfig | GraphQLFieldConfig<TSource, TContext>,
-      build: Build,
-      context: Context<
-        GraphQLInputFieldConfig | GraphQLFieldConfig<TSource, TContext>
-      >
-    ): typeof field {
+    function changeNullability<
+      Field extends GraphQLInputFieldConfig | GraphQLFieldConfig<any, any>
+    >(field: Field, build: Build, context: Context<Field>): typeof field {
       const {
         Self,
         scope: { fieldName },

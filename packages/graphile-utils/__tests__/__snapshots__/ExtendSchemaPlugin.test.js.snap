@@ -313,7 +313,7 @@ input EchoInput {
   text: String!
   int: Int
   float: Float!
-  count: EchoCount
+  count: EchoCount = FOREVER
   intList: [Int!]
 }
 
@@ -334,13 +334,20 @@ type Query {
   query: Query!
 
   """Gives you back what you put in"""
-  echo(input: EchoInput): EchoOutput
+  echo(input: EchoInput, enum: EchoCount = FOREVER): EchoOutput
 }
 
 `;
 
 exports[`supports defining new types 2`] = `
 Object {
+  "t0": Object {
+    "count": "FOREVER",
+    "float": -0.42,
+    "int": null,
+    "intList": null,
+    "text": "Hi0",
+  },
   "t1": Object {
     "count": "ONCE",
     "float": 0.23,
