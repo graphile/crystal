@@ -1,3 +1,5 @@
+export * from 'graphile-utils';
+
 export {
   mixed,
   Middleware,

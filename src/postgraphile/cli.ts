@@ -16,6 +16,7 @@ import program = require('commander');
 import jwt = require('jsonwebtoken');
 import { parse as parsePgConnectionString } from 'pg-connection-string';
 import postgraphile, { getPostgraphileSchemaBuilder } from './postgraphile';
+import smartTagsPlugin from './cli-tags';
 import { Pool, PoolConfig } from 'pg';
 import cluster = require('cluster');
 import { makePluginHook, PostGraphilePlugin } from './pluginHook';
@@ -27,8 +28,7 @@ import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
 
 const isDev = process.env.POSTGRAPHILE_ENV === 'development';
 
-// tslint:disable-next-line no-any
-function isString(str: any): str is string {
+function isString(str: unknown): str is string {
   return typeof str === 'string';
 }
 
@@ -627,7 +627,7 @@ const postgraphileOptions = pluginHook(
     exportGqlSchemaPath,
     sortExport,
     bodySizeLimit,
-    appendPlugins: loadPlugins(appendPluginNames),
+    appendPlugins: [smartTagsPlugin, ...(loadPlugins(appendPluginNames) || [])],
     prependPlugins: loadPlugins(prependPluginNames),
     skipPlugins: loadPlugins(skipPluginNames),
     readCache,
