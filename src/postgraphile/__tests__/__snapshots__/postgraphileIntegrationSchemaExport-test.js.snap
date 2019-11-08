@@ -1359,6 +1359,9 @@ type IntSetQueryConnection {
   A list of edges which contains the \`Int\` and cursor to aid in pagination.
   \\"\\"\\"
   edges: [IntSetQueryEdge!]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
@@ -11406,6 +11409,22 @@ exports[`exports a schema as JSON 1`] = `
                       \\"ofType\\": null
                     }
                   }
+                }
+              },
+              \\"isDeprecated\\": false,
+              \\"deprecationReason\\": null
+            },
+            {
+              \\"name\\": \\"totalCount\\",
+              \\"description\\": \\"The count of *all* \`Int\` you could get from the connection.\\",
+              \\"args\\": [],
+              \\"type\\": {
+                \\"kind\\": \\"NON_NULL\\",
+                \\"name\\": null,
+                \\"ofType\\": {
+                  \\"kind\\": \\"SCALAR\\",
+                  \\"name\\": \\"Int\\",
+                  \\"ofType\\": null
                 }
               },
               \\"isDeprecated\\": false,
@@ -21532,6 +21551,9 @@ type IntSetQueryConnection {
 
   \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
   nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
