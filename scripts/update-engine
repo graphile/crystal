@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-yarn add postgraphile-core@next graphile-utils@next @graphile/lru@next pg-sql2@next
+yarn add --exact postgraphile-core@next graphile-utils@next @graphile/lru@next pg-sql2@next
 npx yarn-deduplicate && yarn

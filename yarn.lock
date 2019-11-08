@@ -744,7 +744,7 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@graphile/lru@4.4.6-alpha.0", "@graphile/lru@^4.4.6-alpha.0":
+"@graphile/lru@4.4.6-alpha.0":
   version "4.4.6-alpha.0"
   resolved "https://registry.yarnpkg.com/@graphile/lru/-/lru-4.4.6-alpha.0.tgz#8846c85d9396e4d002b40d5ba4f2905f2ea56996"
   integrity sha512-YaEkXY81M5vxzcLylZ8PqIe7pOUUvcA+EIZnfV8wd2tJsu7xvS+ml8wzqHT7IyLAIgaHFQRyHRlvjIoMo3TXlQ==
@@ -3595,7 +3595,7 @@ graphile-build@4.4.6-alpha.0:
     pluralize "^7.0.0"
     semver "^6.0.0"
 
-graphile-utils@^4.4.6-alpha.0:
+graphile-utils@4.4.6-alpha.0:
   version "4.4.6-alpha.0"
   resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.4.6-alpha.0.tgz#8a55cec65e86017943c0764933274669e6a98b2f"
   integrity sha512-nJ7SDEEm7rv1E9lrSl3r2tmlD1paub6vsYUVeFclfVaI94LKNM/MN+Umigdey+JDEJ0AJkIV0R4KjsybvrOm6Q==
@@ -5884,7 +5884,7 @@ pg-pool@^2.0.4:
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-2.0.7.tgz#f14ecab83507941062c313df23f6adcd9fd0ce54"
   integrity sha512-UiJyO5B9zZpu32GSlP0tXy8J2NsJ9EFGFfz5v6PSbdz/1hBLX1rNiiy5+mAm5iJJYwfCv4A0EBcQLGWwjbpzZw==
 
-pg-sql2@4.4.6-alpha.0, pg-sql2@^4.4.6-alpha.0:
+pg-sql2@4.4.6-alpha.0:
   version "4.4.6-alpha.0"
   resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-4.4.6-alpha.0.tgz#d7a6e1a1b915a6ab7107652617b1021cc12296dc"
   integrity sha512-Fy+C3Ihl7elunip0y1f083ekSX7mRPpPyoH6TSGWx1O0M0tOf9Kmpn3NiUg4eBoCvnDqIl1vsks1lr7GAbSjwg==
@@ -6035,7 +6035,7 @@ postcss@^7.0.14, postcss@^7.0.5, postcss@^7.0.6:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postgraphile-core@^4.4.6-alpha.0:
+postgraphile-core@4.4.6-alpha.0:
   version "4.4.6-alpha.0"
   resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.4.6-alpha.0.tgz#965837e7d9ffdfe5e0dbb4044be839c465bde73f"
   integrity sha512-rtUM1v4X+aNfNIB3TVLutYNOqMrhDxwP8OvbFCyqNf5wcihG6+SkXEOhikReGkbCvPjJcNtZeE7+KvYsJJVwqw==
