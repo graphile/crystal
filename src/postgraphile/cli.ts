@@ -381,7 +381,7 @@ function exitWithErrorMessage(message: string): never {
   console.error(message);
   console.error();
   console.error('For help, run `postgraphile --help`');
-  return process.exit(1);
+  process.exit(1);
 }
 
 if (program.args.length) {
