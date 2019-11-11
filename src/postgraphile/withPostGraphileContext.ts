@@ -530,13 +530,14 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
 
           if (pgClient._explainResults) {
             const query = a && a.text ? a.text : a;
+            const values = a && a.text ? a.values : b;
             if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
               // Explain it
               const explain = `explain ${query}`;
               pgClient._explainResults.push({
                 query,
                 result: pgClient[$$pgClientOrigQuery]
-                  .call(this, explain)
+                  .call(this, explain, values)
                   .then((data: any) => data.rows),
               });
             }
