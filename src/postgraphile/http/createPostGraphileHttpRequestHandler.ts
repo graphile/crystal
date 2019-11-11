@@ -753,7 +753,7 @@ export default function createPostGraphileHttpRequestHandler(
                 },
                 (graphqlContext: any) => {
                   pgRole = graphqlContext.pgRole;
-                  return executeGraphql(
+                  const graphqlResult = executeGraphql(
                     gqlSchema,
                     queryDocumentAst!,
                     null,
@@ -761,6 +761,15 @@ export default function createPostGraphileHttpRequestHandler(
                     variables,
                     operationName,
                   );
+                  if (typeof graphqlContext.getExplainResults === 'function') {
+                    return Promise.resolve(graphqlResult).then(async obj => ({
+                      ...obj,
+                      // Add our explain data
+                      explain: await graphqlContext.getExplainResults(),
+                    }));
+                  } else {
+                    return graphqlResult;
+                  }
                 },
               );
             }
