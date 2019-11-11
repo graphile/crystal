@@ -781,7 +781,7 @@ function EditHeaders({ children, open, value, onChange, valid, saveHeaders, togg
           <div className="doc-explorer-contents">
             <label>
               <input type="checkbox" checked={saveHeaders} onChange={toggleSaveHeaders} />
-              save headers to localStorage
+              Persist headers
             </label>
             <textarea
               value={value}
