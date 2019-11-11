@@ -705,7 +705,7 @@ class PostGraphiQL extends React.PureComponent {
               <div className="postgraphile-footer">
                 {this.state.explainResult && this.state.explainResult.length ? (
                   <div>
-                    <h4>Explain results</h4>
+                    <h4>Explain: analysis of executed queries</h4>
                     {this.state.explainResult.map(res => (
                       <div>
                         <pre>
