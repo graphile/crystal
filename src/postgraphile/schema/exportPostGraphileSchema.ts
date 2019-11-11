@@ -1,4 +1,4 @@
-import { writeFile } from 'fs';
+import { readFile as origReadFile, writeFile as origWriteFile } from 'fs';
 import {
   graphql,
   GraphQLSchema,
@@ -7,14 +7,21 @@ import {
   lexicographicSortSchema,
 } from 'graphql';
 import { PostGraphileOptions } from '../../interfaces';
+import { promisify } from 'util';
 
-async function writeFileAsync(path: string, contents: string): Promise<void> {
-  await new Promise((resolve, reject) => {
-    writeFile(path, contents, error => {
-      if (error) reject(error);
-      else resolve();
-    });
-  });
+const readFile = promisify(origReadFile);
+const writeFile = promisify(origWriteFile);
+
+async function writeFileIfDiffers(path: string, contents: string): Promise<void> {
+  let oldContents: string | null = null;
+  try {
+    oldContents = await readFile(path, 'utf8');
+  } catch (e) {
+    /* noop */
+  }
+  if (oldContents !== contents) {
+    await writeFile(path, contents);
+  }
 }
 
 /**
@@ -38,11 +45,11 @@ export default async function exportPostGraphileSchema(
   // JSON version
   if (jsonPath) {
     const result = await graphql(finalSchema, introspectionQuery);
-    await writeFileAsync(jsonPath, JSON.stringify(result, null, 2));
+    await writeFileIfDiffers(jsonPath, JSON.stringify(result, null, 2));
   }
 
   // Schema language version
   if (graphqlPath) {
-    await writeFileAsync(graphqlPath, printSchema(finalSchema));
+    await writeFileIfDiffers(graphqlPath, printSchema(finalSchema));
   }
 }
