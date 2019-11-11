@@ -716,6 +716,10 @@ class PostGraphiQL extends React.PureComponent {
                         </pre>
                       </div>
                     ))}
+                    <p>
+                      Having performance issues?{' '}
+                      <a href="https://www.graphile.org/support/">We can help with that!</a>
+                    </p>
                     <hr />
                   </div>
                 ) : null}
@@ -741,7 +745,15 @@ class PostGraphiQL extends React.PureComponent {
                   href="https://graphile.org/sponsor/"
                   target="new"
                 >
-                  Sponsor Development
+                  Sponsor
+                </a>{' '}
+                |{' '}
+                <a
+                  title="Get support from the team behind PostGraphile"
+                  href="https://graphile.org/support/"
+                  target="new"
+                >
+                  Support
                 </a>
               </div>
             </GraphiQL.Footer>
