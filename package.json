@@ -42,7 +42,9 @@
     "prettier:fix": "yarn prettier --write",
     "prettier:check": "yarn prettier --list-different",
     "test": "./scripts/test",
-    "prepack": "./scripts/build"
+    "prepack": "./scripts/build",
+    "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
+    "version": "yarn run changelog && git add CHANGELOG.md"
   },
   "dependencies": {
     "@graphile/lru": "4.4.6-alpha.0",
@@ -54,6 +56,7 @@
     "body-parser": "^1.15.2",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
+    "conventional-changelog-cli": "^2.0.27",
     "debug": "^4.1.1",
     "finalhandler": "^1.0.6",
     "graphile-utils": "4.4.6-alpha.0",
