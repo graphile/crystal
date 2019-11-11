@@ -5,3 +5,4 @@ node_modules
 /operation-hooks/
 /.vscode
 *.tgz
+yarn-error.log

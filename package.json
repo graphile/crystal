@@ -9,7 +9,9 @@
     "test": "lerna run --concurrency 1 test",
     "prepack:all": "scripts/prepack-all",
     "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
-    "clean": "rm -Rf packages/*/node8plus/"
+    "clean": "rm -Rf packages/*/node8plus/",
+    "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
+    "version": "yarn run changelog && git add CHANGELOG.md"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -25,6 +27,7 @@
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.9.0",
     "concurrently": "^4.1.0",
+    "conventional-changelog-cli": "^2.0.27",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-flowtype": "^4.3.0",
@@ -36,7 +39,7 @@
     "flow-copy-source": "^1.2.0",
     "graphql": ">=0.9 <0.14 || ^14.0.2",
     "jest": "^24.8.0",
-    "lerna": "^3.17.0",
+    "lerna": "^3.18.4",
     "pg": "^7.10.0",
     "postgraphile": "^4.4.4",
     "prettier": "^1.18.2",
