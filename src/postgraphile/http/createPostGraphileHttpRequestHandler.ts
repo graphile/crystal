@@ -29,6 +29,7 @@ import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
 
+const ALLOW_EXPLAIN_PLACEHOLDER = '__SHOULD_ALLOW_EXPLAIN__';
 const noop = () => {
   /* noop */
 };
@@ -180,7 +181,6 @@ export default function createPostGraphileHttpRequestHandler(
   const live = !!options.live;
   const enhanceGraphiql =
     options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
-  const allowExplain = !!options.allowExplain;
   const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
   const graphiql = options.graphiql === true;
   if (options['absoluteRoutes']) {
@@ -405,7 +405,10 @@ export default function createPostGraphileHttpRequestHandler(
             streamUrl: watchPg ? `${externalUrlBase}${streamRoute}` : null,
             enhanceGraphiql,
             subscriptions,
-            allowExplain,
+            allowExplain:
+              typeof options.allowExplain === 'function'
+                ? ALLOW_EXPLAIN_PLACEHOLDER
+                : !!options.allowExplain,
           })};</script>\n  </head>`,
         )
       : null;
@@ -561,7 +564,16 @@ export default function createPostGraphileHttpRequestHandler(
         }
 
         // Actually renders GraphiQL.
-        res.end(graphiqlHtml);
+        if (graphiqlHtml && typeof options.allowExplain === 'function') {
+          res.end(
+            graphiqlHtml.replace(
+              `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
+              JSON.stringify(!!(await options.allowExplain(req))),
+            ),
+          );
+        } else {
+          res.end(graphiqlHtml);
+        }
         return;
       }
     }
