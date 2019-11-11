@@ -180,6 +180,7 @@ export default function createPostGraphileHttpRequestHandler(
   const live = !!options.live;
   const enhanceGraphiql =
     options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
+  const allowExplain = !!options.allowExplain;
   const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
   const graphiql = options.graphiql === true;
   if (options['absoluteRoutes']) {
@@ -404,6 +405,7 @@ export default function createPostGraphileHttpRequestHandler(
             streamUrl: watchPg ? `${externalUrlBase}${streamRoute}` : null,
             enhanceGraphiql,
             subscriptions,
+            allowExplain,
           })};</script>\n  </head>`,
         )
       : null;
