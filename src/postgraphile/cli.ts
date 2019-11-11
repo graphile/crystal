@@ -270,7 +270,11 @@ program
     '--enable-query-batching',
     '[experimental] enable the server to process multiple GraphQL queries in one request',
   )
-  .option('--disable-query-log', 'disable logging queries to console (recommended in production)');
+  .option('--disable-query-log', 'disable logging queries to console (recommended in production)')
+  .option(
+    '--allow-explain',
+    '[EXPERIMENTAL] allows users to use the Explain button in GraphiQL to view the plan for the SQL that is executed (DO NOT USE IN PRODUCTION)',
+  );
 
 pluginHook('cli:flags:add:webserver', addFlag);
 
@@ -456,11 +460,16 @@ const {
   setofFunctionsContainNulls = true,
   legacyJsonUuid,
   disableQueryLog,
+  allowExplain,
   simpleCollections,
   legacyFunctionsOnly,
   ignoreIndexes,
   // tslint:disable-next-line no-any
 } = { ...config['options'], ...program, ...overridesFromOptions } as typeof program;
+
+if (allowExplain && !disableGraphiql && !enhanceGraphiql) {
+  throw new Error('`--allow-explain` requires `--enhance-graphiql` or `--disable-graphiql`');
+}
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
@@ -622,6 +631,7 @@ const postgraphileOptions = pluginHook(
     showErrorStack,
     extendedErrors,
     disableQueryLog,
+    allowExplain: allowExplain ? true : undefined,
     enableCors,
     exportJsonSchemaPath,
     exportGqlSchemaPath,

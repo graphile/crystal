@@ -77,6 +77,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     jwtVerifyOptions,
     pgDefaultRole,
     pgSettings,
+    explain,
     queryDocumentAst,
     operationName,
     pgForceTransaction,
@@ -169,6 +170,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
           }
         }
       };
+
   if (singleStatement) {
     // TODO:v5: remove this workaround
     /*
@@ -209,13 +211,31 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
       jwtClaims,
     });
   } else {
-    return withAuthenticatedPgClient(pgClient =>
-      callback({
-        [$$pgClient]: pgClient,
-        pgRole,
-        jwtClaims,
-      }),
-    );
+    return withAuthenticatedPgClient(async pgClient => {
+      let results: Promise<Array<ExplainResult>> | null = null;
+      if (explain) {
+        pgClient.startExplain();
+      }
+      try {
+        return await callback({
+          [$$pgClient]: pgClient,
+          pgRole,
+          jwtClaims,
+          ...(explain
+            ? {
+                getExplainResults: (): Promise<Array<ExplainResult>> => {
+                  results = results || pgClient.stopExplain();
+                  return results;
+                },
+              }
+            : null),
+        });
+      } finally {
+        if (explain) {
+          results = results || pgClient.stopExplain();
+        }
+      }
+    });
   }
 };
 
@@ -423,19 +443,62 @@ async function getSettingsForPgClientTransaction({
 
 const $$pgClientOrigQuery = Symbol();
 
+interface RawExplainResult {
+  query: string;
+  result: any;
+}
+type ExplainResult = Omit<RawExplainResult, 'result'> & {
+  plan: string;
+};
+
+declare module 'pg' {
+  interface ClientBase {
+    _explainResults: Array<RawExplainResult> | null;
+    startExplain: () => void;
+    stopExplain: () => Promise<Array<ExplainResult>>;
+  }
+}
+
 /**
  * Adds debug logging funcionality to a Postgres client.
  *
  * @private
  */
 // tslint:disable no-any
-export function debugPgClient(pgClient: PoolClient): PoolClient {
+export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {
     // Set the original query method to a key on our client. If that key is
     // already set, use that.
     pgClient[$$pgClientOrigQuery] = pgClient.query;
+
+    pgClient.startExplain = () => {
+      pgClient._explainResults = [];
+    };
+
+    pgClient.stopExplain = async () => {
+      const results = pgClient._explainResults;
+      pgClient._explainResults = null;
+      if (!results) {
+        return Promise.resolve([]);
+      }
+      return (await Promise.all(
+        results.map(async r => {
+          const { result: resultPromise, ...rest } = r;
+          const result = await resultPromise;
+          const firstKey = result && result[0] && Object.keys(result[0])[0];
+          if (!firstKey) {
+            return null;
+          }
+          const plan = result.map((r: any) => r[firstKey]).join('\n');
+          return {
+            ...rest,
+            plan,
+          };
+        }),
+      )).filter((entry: unknown): entry is ExplainResult => !!entry);
+    };
 
     if (debugPgNotice.enabled) {
       pgClient.on('notice', (msg: PgNotice) => {
@@ -450,23 +513,42 @@ export function debugPgClient(pgClient: PoolClient): PoolClient {
       }
     };
 
-    if (debugPg.enabled || debugPgError.enabled) {
+    if (debugPg.enabled || debugPgNotice.enabled || allowExplain) {
       // tslint:disable-next-line only-arrow-functions
       pgClient.query = function(...args: Array<any>): any {
         const [a, b, c] = args;
-        // If we understand it (and it uses the promises API), log it out
+        // If we understand it (and it uses the promises API)
         if (
           (typeof a === 'string' && !c && (!b || Array.isArray(b))) ||
           (typeof a === 'object' && !b && !c)
         ) {
-          // Debug just the query text. We don’t want to debug variables because
-          // there may be passwords in there.
-          debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
+          if (debugPg.enabled) {
+            // Debug just the query text. We don’t want to debug variables because
+            // there may be passwords in there.
+            debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
+          }
+
+          if (pgClient._explainResults) {
+            const query = a && a.text ? a.text : a;
+            const values = a && a.text ? a.values : b;
+            if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
+              // Explain it
+              const explain = `explain ${query}`;
+              pgClient._explainResults.push({
+                query,
+                result: pgClient[$$pgClientOrigQuery]
+                  .call(this, explain, values)
+                  .then((data: any) => data.rows),
+              });
+            }
+          }
 
           const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
 
-          // Report the error with our Postgres debugger.
-          promiseResult.catch(logError);
+          if (debugPgError.enabled) {
+            // Report the error with our Postgres debugger.
+            promiseResult.catch(logError);
+          }
 
           return promiseResult;
         } else {

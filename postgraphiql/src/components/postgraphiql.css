@@ -37,8 +37,12 @@
   margin: 0;
 }
 
+.resultWrap .footer {
+  max-height: 50%;
+  overflow: auto;
+}
+
 .postgraphile-footer {
-  height: 30px;
   line-height: 30px;
   overflow: hidden;
   display: block;
@@ -50,6 +54,12 @@
 .postgraphile-footer a {
   text-decoration: none;
   color: #3b5998;
+}
+.postgraphile-footer pre {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.1em;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .resultWrap {
   width: 5rem;

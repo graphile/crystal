@@ -7,6 +7,9 @@ import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
 
+type PromiseOrDirect<T> = T | Promise<T>;
+type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
+
 /**
  * A narrower type than `any` that won’t swallow errors from assumptions about
  * code.
@@ -247,7 +250,14 @@ export interface PostGraphileOptions<
   // Promise to the same) based on the incoming web request (e.g. to extract
   // session data).
   /* @middlewareOnly */
-  pgSettings?: { [key: string]: mixed } | ((req: Request) => Promise<{ [key: string]: mixed }>);
+  pgSettings?: DirectOrCallback<Request, { [key: string]: mixed }>;
+  // [Experimental] Determines if the 'Explain' feature in GraphiQL can be used
+  // to show the user the SQL statements that were executed. Set to a boolean to
+  // enable all users to use this, or to a function that filters each request to
+  // determine if the request may use Explain. DO NOT USE IN PRODUCTION unless
+  // you're comfortable with the security repurcussions of doing so.
+  /* @middlewareOnly */
+  allowExplain?: DirectOrCallback<Request, boolean>;
   // Some Graphile Engine schema plugins may need additional information
   // available on the `context` argument to the resolver - you can use this
   // function to provide such information based on the incoming request - you
@@ -338,6 +348,7 @@ export interface WithPostGraphileContextOptions {
   jwtVerifyOptions?: jwt.VerifyOptions;
   pgDefaultRole?: string;
   pgSettings?: { [key: string]: mixed };
+  explain?: boolean;
   queryDocumentAst?: DocumentNode;
   operationName?: string;
   pgForceTransaction?: boolean;

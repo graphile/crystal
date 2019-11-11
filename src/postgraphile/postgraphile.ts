@@ -224,7 +224,7 @@ export default function postgraphile<
 
   pgPool.on('connect', pgClient => {
     // Enhance our Postgres client with debugging stuffs.
-    debugPgClient(pgClient);
+    debugPgClient(pgClient, !!options.allowExplain);
   });
 
   const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
