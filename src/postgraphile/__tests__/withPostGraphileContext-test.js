@@ -2,7 +2,7 @@
 
 import { $$pgClient } from '../../postgres/inventory/pgClientFromContext';
 import withPostGraphileContext from '../withPostGraphileContext';
-import { readFileSync } from 'fs';
+import { readFileSync, readFile } from 'fs';
 
 const jwt = require('jsonwebtoken');
 
@@ -955,6 +955,53 @@ describe('jwtVerifyOptions', () => {
     expect(pgClient.query.mock.calls).toEqual([]);
   });
 
+  test('will succeed using callback for jwtPublicKey', async () => {
+    const loadKey = jest.fn((header, callback) => {
+      setTimeout(() => callback(null, 'public key'), 10);
+    });
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'postgraphile' }, 'public key', {
+          noTimestamp: true,
+        }),
+        jwtPublicKey: loadKey,
+      },
+      () => {},
+    );
+    expect(loadKey.mock.calls.length).toBe(1);
+    expect(loadKey.mock.calls[0][0]).toEqual({ alg: 'HS256', typ: 'JWT' });
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true)',
+          values: ['jwt.claims.aud', 'postgraphile'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will fail using callback for jwtPublicKey that errors', async () => {
+    await expectHttpError(
+      withPostGraphileContext(
+        {
+          pgPool,
+          jwtToken: jwt.sign({ aud: 'postgraphile' }, 'public key', {
+            noTimestamp: true,
+          }),
+          jwtPublicKey: function loadKey(header, callback) {
+            callback(new Error('could not load key'));
+          },
+        },
+        () => {},
+      ),
+      403, // 500 might be more appropriate, but jwt.verify does not distinguish errors
+      'error in secret or public key callback: could not load key',
+    );
+  });
+
   test('will succeed using jwtPublicKey instead of jwtSecret if both options are provided', async () => {
     await withPostGraphileContext(
       {
@@ -990,6 +1037,36 @@ describe('jwtVerifyOptions', () => {
           algorithm: 'RS256',
         }),
         jwtPublicKey: publicKey,
+        jwtVerifyOptions: {
+          algorithms: ['RS256'],
+        },
+      },
+      () => {},
+    );
+    expect(pgClient.query.mock.calls).toEqual([
+      ['begin'],
+      [
+        {
+          text: 'select set_config($1, $2, true)',
+          values: ['jwt.claims.aud', 'postgraphile'],
+        },
+      ],
+      ['commit'],
+    ]);
+  });
+
+  test('will succeed with asynchronously loaded key for asymmetric encryption verification', async () => {
+    const privateKey = readFileSync(`${__dirname}/assets/private-key.pem`);
+    await withPostGraphileContext(
+      {
+        pgPool,
+        jwtToken: jwt.sign({ aud: 'postgraphile' }, privateKey, {
+          noTimestamp: true,
+          algorithm: 'RS256',
+        }),
+        jwtPublicKey: function loadKey(header, callback) {
+          readFile(`${__dirname}/assets/public-key.pem`, callback);
+        },
         jwtVerifyOptions: {
           algorithms: ['RS256'],
         },
