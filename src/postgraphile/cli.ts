@@ -156,7 +156,7 @@ program
     'disable default mutations, mutation will only be possible through Postgres functions',
   )
   .option(
-    '--simple-collections [omit|both|only]',
+    '--simple-collections <omit|both|only>',
     '"omit" (default) - relay connections only, "only" - simple collections only (no Relay connections), "both" - both',
   )
   .option(
@@ -177,7 +177,7 @@ pluginHook('cli:flags:add:schema', addFlag);
 // Error enhancements
 program
   .option(
-    '--show-error-stack',
+    '--show-error-stack [json|string]',
     'show JavaScript error stacks in the GraphQL result errors (recommended in development)',
   )
   .option(
@@ -377,8 +377,23 @@ Get started:
 
 program.parse(argvSansPlugins);
 
+function exitWithErrorMessage(message: string): never {
+  console.error(message);
+  console.error();
+  console.error('For help, run `postgraphile --help`');
+  return process.exit(1);
+}
+
+if (program.args.length) {
+  exitWithErrorMessage(
+    `ERROR: some of the parameters you passed could not be processed: '${program.args.join(
+      "', '",
+    )}'`,
+  );
+}
+
 if (program['plugins']) {
-  throw new Error(`--plugins must be the first argument to postgraphile if specified`);
+  exitWithErrorMessage(`--plugins must be the first argument to postgraphile if specified`);
 }
 
 // Kill server on exit.
@@ -444,7 +459,7 @@ const {
   exportSchemaJson: exportJsonSchemaPath,
   exportSchemaGraphql: exportGqlSchemaPath,
   sortExport = false,
-  showErrorStack,
+  showErrorStack: rawShowErrorStack,
   extendedErrors = [],
   bodySizeLimit,
   appendPlugins: appendPluginNames,
@@ -467,13 +482,31 @@ const {
   // tslint:disable-next-line no-any
 } = { ...config['options'], ...program, ...overridesFromOptions } as typeof program;
 
+const showErrorStack = (val => {
+  switch (val) {
+    case 'string':
+    case true:
+      return true;
+    case null:
+    case undefined:
+      return undefined;
+    case 'json':
+      return 'json';
+    default: {
+      exitWithErrorMessage(
+        `Invalid argument for '--show-error-stack' - expected no argument, or 'string' or 'json'`,
+      );
+    }
+  }
+})(rawShowErrorStack);
+
 if (allowExplain && !disableGraphiql && !enhanceGraphiql) {
-  throw new Error('`--allow-explain` requires `--enhance-graphiql` or `--disable-graphiql`');
+  exitWithErrorMessage('`--allow-explain` requires `--enhance-graphiql` or `--disable-graphiql`');
 }
 
 let legacyRelations: 'omit' | 'deprecated' | 'only';
 if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
-  throw new Error(
+  exitWithErrorMessage(
     `Invalid argument to '--legacy-relations' - expected on of 'omit', 'deprecated', 'only'; but received '${rawLegacyRelations}'`,
   );
 } else {
@@ -562,7 +595,9 @@ const loadPlugins = (rawNames: mixed) => {
 };
 
 if (jwtAudiences != null && jwtVerifyAudience != null) {
-  throw new Error(`Provide either '--jwt-audiences' or '-A, --jwt-verify-audience' but not both`);
+  exitWithErrorMessage(
+    `Provide either '--jwt-audiences' or '-A, --jwt-verify-audience' but not both`,
+  );
 }
 
 function trimNulls(obj: object): object {
@@ -585,7 +620,7 @@ if (
     jwtVerifyIssuer ||
     jwtVerifySubject)
 ) {
-  throw new Error(
+  exitWithErrorMessage(
     'You may not mix `jwtVerifyOptions` with the legacy `jwtVerify*` settings; please only provide `jwtVerifyOptions`.',
   );
 }
