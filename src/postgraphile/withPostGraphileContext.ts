@@ -465,7 +465,7 @@ declare module 'pg' {
  * @private
  */
 // tslint:disable no-any
-export function debugPgClient(pgClient: PoolClient): PoolClient {
+export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {
@@ -513,47 +513,49 @@ export function debugPgClient(pgClient: PoolClient): PoolClient {
       }
     };
 
-    // tslint:disable-next-line only-arrow-functions
-    pgClient.query = function(...args: Array<any>): any {
-      const [a, b, c] = args;
-      // If we understand it (and it uses the promises API)
-      if (
-        (typeof a === 'string' && !c && (!b || Array.isArray(b))) ||
-        (typeof a === 'object' && !b && !c)
-      ) {
-        if (debugPg.enabled) {
-          // Debug just the query text. We don’t want to debug variables because
-          // there may be passwords in there.
-          debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
-        }
-
-        if (pgClient._explainResults) {
-          const query = a && a.text ? a.text : a;
-          if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
-            // Explain it
-            const explain = `explain ${query}`;
-            pgClient._explainResults.push({
-              query,
-              result: pgClient[$$pgClientOrigQuery]
-                .call(this, explain)
-                .then((data: any) => data.rows),
-            });
+    if (debugPg.enabled || debugPgNotice.enabled || allowExplain) {
+      // tslint:disable-next-line only-arrow-functions
+      pgClient.query = function(...args: Array<any>): any {
+        const [a, b, c] = args;
+        // If we understand it (and it uses the promises API)
+        if (
+          (typeof a === 'string' && !c && (!b || Array.isArray(b))) ||
+          (typeof a === 'object' && !b && !c)
+        ) {
+          if (debugPg.enabled) {
+            // Debug just the query text. We don’t want to debug variables because
+            // there may be passwords in there.
+            debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
           }
+
+          if (pgClient._explainResults) {
+            const query = a && a.text ? a.text : a;
+            if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
+              // Explain it
+              const explain = `explain ${query}`;
+              pgClient._explainResults.push({
+                query,
+                result: pgClient[$$pgClientOrigQuery]
+                  .call(this, explain)
+                  .then((data: any) => data.rows),
+              });
+            }
+          }
+
+          const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
+
+          if (debugPgError.enabled) {
+            // Report the error with our Postgres debugger.
+            promiseResult.catch(logError);
+          }
+
+          return promiseResult;
+        } else {
+          // We don't understand it (e.g. `pgPool.query`), just let it happen.
+          return pgClient[$$pgClientOrigQuery].apply(this, args);
         }
-
-        const promiseResult = pgClient[$$pgClientOrigQuery].apply(this, args);
-
-        if (debugPgError.enabled) {
-          // Report the error with our Postgres debugger.
-          promiseResult.catch(logError);
-        }
-
-        return promiseResult;
-      } else {
-        // We don't understand it (e.g. `pgPool.query`), just let it happen.
-        return pgClient[$$pgClientOrigQuery].apply(this, args);
-      }
-    };
+      };
+    }
   }
 
   return pgClient;
