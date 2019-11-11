@@ -114,18 +114,32 @@ function withPostGraphileContextFromReqResGenerator(
   moreOptions: any,
   fn: (ctx: mixed) => any,
 ) => Promise<any> {
-  const { pgSettings, jwtSecret, additionalGraphQLContextFromRequest } = options;
+  const {
+    pgSettings: pgSettingsGenerator,
+    allowExplain: allowExplainGenerator,
+    jwtSecret,
+    additionalGraphQLContextFromRequest,
+  } = options;
   return async (req, res, moreOptions, fn) => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
         ? await additionalGraphQLContextFromRequest(req, res)
         : null;
+    const pgSettings =
+      typeof pgSettingsGenerator === 'function'
+        ? await pgSettingsGenerator(req)
+        : pgSettingsGenerator;
+    const allowExplain =
+      typeof allowExplainGenerator === 'function'
+        ? await allowExplainGenerator(req)
+        : allowExplainGenerator;
     return withPostGraphileContext(
       {
         ...options,
         jwtToken,
-        pgSettings: typeof pgSettings === 'function' ? await pgSettings(req) : pgSettings,
+        pgSettings,
+        explain: allowExplain && req.headers['x-postgraphile-explain'] === 'on',
         ...moreOptions,
       },
       context => {
@@ -945,6 +959,8 @@ function addCORSHeaders(res: ServerResponse): void {
       // like in a POST request.
       'Content-Type',
       'Content-Length',
+      // For our 'Explain' feature
+      'X-PostGraphile-Explain',
     ].join(', '),
   );
   res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));

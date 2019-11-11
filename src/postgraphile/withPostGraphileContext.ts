@@ -23,6 +23,16 @@ export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
   callback: (context: PostGraphileContext) => Promise<TResult>,
 ) => Promise<TResult>;
 
+const addExplainLayer = (
+  fn: WithAuthenticatedPgClientFunction,
+): WithAuthenticatedPgClientFunction => {
+  return async (cb): ReturnType<typeof cb> =>
+    fn(pgClient => {
+      console.log('EXPLAIN');
+      return cb(pgClient);
+    });
+};
+
 const debugPg = createDebugger('postgraphile:postgres');
 const debugPgError = createDebugger('postgraphile:postgres:error');
 const debugPgNotice = createDebugger('postgraphile:postgres:notice');
@@ -77,6 +87,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     jwtVerifyOptions,
     pgDefaultRole,
     pgSettings,
+    explain,
     queryDocumentAst,
     operationName,
     pgForceTransaction,
@@ -142,7 +153,7 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
     (operationType !== 'query' && operationType !== 'subscription');
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
-  const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
+  const baseWithAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
     ? simpleWithPgClient(pgPool)
     : async cb => {
         // Connect a new Postgres client
@@ -169,6 +180,10 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
           }
         }
       };
+
+  const withAuthenticatedPgClient = explain
+    ? addExplainLayer(baseWithAuthenticatedPgClient)
+    : baseWithAuthenticatedPgClient;
   if (singleStatement) {
     // TODO:v5: remove this workaround
     /*

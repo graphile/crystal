@@ -52,6 +52,7 @@ const {
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
     subscriptions: true,
+    allowExplain: true,
   },
 } = window;
 
@@ -74,6 +75,7 @@ const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
 const STORAGE_KEYS = {
   SAVE_HEADERS_TEXT: 'PostGraphiQL:saveHeadersText',
   HEADERS_TEXT: 'PostGraphiQL:headersText',
+  EXPLAIN: 'PostGraphiQL:explain',
 };
 
 /**
@@ -90,8 +92,9 @@ class PostGraphiQL extends React.PureComponent {
     schema: null,
     query: '',
     showHeaderEditor: false,
-    saveHeadersText: this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === 'true' ? true : false,
+    saveHeadersText: this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === 'true',
     headersText: this._storage.get(STORAGE_KEYS.HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
+    explain: this._storage.get(STORAGE_KEYS.EXPLAIN) === 'true',
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
@@ -301,6 +304,9 @@ class PostGraphiQL extends React.PureComponent {
         {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          ...(this.state.explain && POSTGRAPHILE_CONFIG.allowExplain
+            ? { 'X-PostGraphile-Explain': 'on' }
+            : null),
         },
         extraHeaders,
       ),
@@ -532,6 +538,22 @@ class PostGraphiQL extends React.PureComponent {
     );
   };
 
+  handleToggleExplain = () => {
+    this.setState(
+      oldState => ({ explain: !oldState.explain }),
+      () => {
+        this._storage.set(STORAGE_KEYS.EXPLAIN, JSON.stringify(this.state.explain));
+        if (this.state.explain) {
+          try {
+            this.graphiql.handleRunQuery();
+          } catch (e) {
+            /* ignore */
+          }
+        }
+      },
+    );
+  };
+
   renderSocketStatus() {
     const { socketStatus, error } = this.state;
     if (socketStatus === null) {
@@ -669,6 +691,13 @@ class PostGraphiQL extends React.PureComponent {
                 title="Construct a query with the GraphiQL explorer"
                 onClick={this.handleToggleExplorer}
               />
+              {POSTGRAPHILE_CONFIG.allowExplain ? (
+                <GraphiQL.Button
+                  label={this.state.explain ? 'Explain ON' : 'Explain disabled'}
+                  title="View the SQL statements that this query invokes"
+                  onClick={this.handleToggleExplain}
+                />
+              ) : null}
             </GraphiQL.Toolbar>
             <GraphiQL.Footer>
               <div className="postgraphile-footer">
