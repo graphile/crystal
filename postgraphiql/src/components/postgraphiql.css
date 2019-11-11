@@ -55,6 +55,12 @@
   text-decoration: none;
   color: #3b5998;
 }
+.postgraphile-footer pre {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.1em;
+  background-color: rgba(0, 0, 0, 0.1);
+}
 .resultWrap {
   width: 5rem;
 }

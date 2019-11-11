@@ -6,6 +6,7 @@ import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
 # Welcome to PostGraphile's built-in GraphiQL IDE
@@ -95,6 +96,7 @@ class PostGraphiQL extends React.PureComponent {
     saveHeadersText: this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === 'true',
     headersText: this._storage.get(STORAGE_KEYS.HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
     explain: this._storage.get(STORAGE_KEYS.EXPLAIN) === 'true',
+    explainResult: null,
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
@@ -315,6 +317,8 @@ class PostGraphiQL extends React.PureComponent {
     });
 
     const result = await response.json();
+
+    this.setState({ explainResult: result && result.explain ? result.explain : null });
 
     return result;
   }
@@ -543,12 +547,10 @@ class PostGraphiQL extends React.PureComponent {
       oldState => ({ explain: !oldState.explain }),
       () => {
         this._storage.set(STORAGE_KEYS.EXPLAIN, JSON.stringify(this.state.explain));
-        if (this.state.explain) {
-          try {
-            this.graphiql.handleRunQuery();
-          } catch (e) {
-            /* ignore */
-          }
+        try {
+          this.graphiql.handleRunQuery();
+        } catch (e) {
+          /* ignore */
         }
       },
     );
@@ -701,6 +703,22 @@ class PostGraphiQL extends React.PureComponent {
             </GraphiQL.Toolbar>
             <GraphiQL.Footer>
               <div className="postgraphile-footer">
+                {this.state.explainResult && this.state.explainResult.length ? (
+                  <div>
+                    <h4>Explain results</h4>
+                    {this.state.explainResult.map(res => (
+                      <div>
+                        <pre>
+                          <code>{formatSQL(res.query)}</code>
+                        </pre>
+                        <pre>
+                          <code>{res.plan}</code>
+                        </pre>
+                      </div>
+                    ))}
+                    <hr />
+                  </div>
+                ) : null}
                 PostGraphile:{' '}
                 <a
                   title="Open PostGraphile documentation"
