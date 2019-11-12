@@ -10,3 +10,7 @@ echo "TEST"
 npx lerna run --concurrency 1 test
 
 npx lerna publish --exact --npm-tag=${1:-next}
+yarn run changelog
+git add CHANGELOG.md
+git commit -m"chore: update CHANGELOG"
+git push && git push --tags
