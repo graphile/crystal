@@ -49,7 +49,7 @@ function compileRule<T extends PgEntity>(
   const { kind, match: incomingMatch, ...rest } = rule;
   if (!Object.prototype.hasOwnProperty.call(meaningByKind, kind)) {
     throw new Error(
-      `makePgPgSmartTagsPlugin rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`
+      `makePgSmartTagsPlugin rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`
     );
   }
 
@@ -66,7 +66,7 @@ function compileRule<T extends PgEntity>(
       return entityIsIdentifiedBy(obj, incomingMatch);
     } else {
       throw new Error(
-        "makePgPgSmartTagsPlugin rule 'match' is neither a string nor a function"
+        "makePgSmartTagsPlugin rule 'match' is neither a string nor a function"
       );
     }
   };
@@ -96,7 +96,7 @@ export type SubscribeToPgSmartTagUpdatesCallback = (
   cb: UpdatePgSmartTagRulesCallback | null
 ) => void | Promise<void>;
 
-export function makePgPgSmartTagsPlugin(
+export function makePgSmartTagsPlugin(
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null
 ): Plugin {
@@ -141,7 +141,7 @@ export function makePgPgSmartTagsPlugin(
         // Let people know if their rules don't match; it's probably a mistake.
         if (hits === 0) {
           console.warn(
-            `WARNING: there were no matches for makePgPgSmartTagsPlugin rule ${idx} - ${inspect(
+            `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
               rawRules[idx]
             )}`
           );
@@ -301,5 +301,5 @@ export function makeJSONPgSmartTagsPlugin(
       }
     : null;
 
-  return makePgPgSmartTagsPlugin(rules, subscribeToUpdatesCallback);
+  return makePgSmartTagsPlugin(rules, subscribeToUpdatesCallback);
 }
