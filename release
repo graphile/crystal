@@ -12,4 +12,4 @@ npx lerna run --concurrency 1 test
 echo "Enter OTP code:"
 read otp
 export NPM_CONFIG_OTP=$otp
-npx lerna publish --exact --npm-client=npm --npm-tag=${1:-next}
+npx lerna publish --exact --npm-tag=${1:-next}
