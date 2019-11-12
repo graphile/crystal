@@ -59,7 +59,7 @@
     "conventional-changelog-cli": "^2.0.27",
     "debug": "^4.1.1",
     "finalhandler": "^1.0.6",
-    "graphile-utils": "4.4.6-alpha.0",
+    "graphile-utils": "4.5.0-rc.0",
     "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2",
     "http-errors": "^1.5.1",
     "iterall": "^1.0.2",
@@ -69,7 +69,7 @@
     "pg": ">=6.1.0 <8",
     "pg-connection-string": "^2.0.0",
     "pg-sql2": "4.4.6-alpha.0",
-    "postgraphile-core": "4.4.6-alpha.0",
+    "postgraphile-core": "4.5.0-rc.0",
     "subscriptions-transport-ws": "^0.9.15",
     "tslib": "^1.5.0",
     "ws": "^6.1.3"
