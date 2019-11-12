@@ -7,6 +7,22 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.5.0-rc.0](https://github.com/graphile/postgraphile/compare/v4.4.5-alpha.0...v4.5.0-rc.0) (2019-11-12)
+
+
+### Bug Fixes
+
+* **cli:** abort if given unused arguments ([#1181](https://github.com/graphile/postgraphile/issues/1181)) ([3e7381d](https://github.com/graphile/postgraphile/commit/3e7381d5c3431aae673daffe2362e85cc5e0a37d))
+* **export:** only write schema if it differs ([#1180](https://github.com/graphile/postgraphile/issues/1180)) ([6334897](https://github.com/graphile/postgraphile/commit/6334897256dc9649a0340a07c561b99da9b11f82))
+
+
+### Features
+
+* **graphiql:** add 'explain' button ([#1179](https://github.com/graphile/postgraphile/issues/1179)) ([1a065ab](https://github.com/graphile/postgraphile/commit/1a065ab228dc9da273e7ee440d45a6c6da5c01bc))
+* **jwt:** support lazy public key loading for verification ([#1167](https://github.com/graphile/postgraphile/issues/1167)) ([d27aaf9](https://github.com/graphile/postgraphile/commit/d27aaf965261ce75456d188b882b6bd86147815e))
+
+
+
 ## [4.4.5-alpha.0](https://github.com/graphile/postgraphile/compare/v4.4.4...v4.4.5-alpha.0) (2019-11-08)
 
 
