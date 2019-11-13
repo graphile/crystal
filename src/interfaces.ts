@@ -29,11 +29,10 @@ type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
  */
 export type mixed = {} | string | number | boolean | undefined | null;
 
-export type Middleware = (
-  req: IncomingMessage,
-  res: ServerResponse,
-  next: (err?: Error) => void,
-) => void;
+export type Middleware<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+> = (req: Request, res: Response, next: (err?: Error) => void) => void;
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
@@ -75,7 +74,7 @@ export interface PostGraphileOptions<
   // websocket connection in order to perform authentication. We current only
   // support express (not Koa) middlewares here.
   /* @middlewareOnly */
-  websocketMiddlewares?: Array<Middleware>;
+  websocketMiddlewares?: Array<Middleware<Request, Response>>;
   // The default Postgres role to use. If no role was provided in a provided
   // JWT token, this role will be used.
   pgDefaultRole?: string;

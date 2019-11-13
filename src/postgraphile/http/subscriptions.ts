@@ -1,4 +1,4 @@
-import { Server, IncomingMessage, ServerResponse } from 'http';
+import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'http';
 import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
@@ -31,7 +31,7 @@ function lowerCaseKeys(obj: object): object {
 function deferred<T = void>(): Deferred<T> {
   let resolve: (input?: T | PromiseLike<T> | undefined) => void;
   let reject: (error: Error) => void;
-  const promise = new Promise<T>((_resolve, _reject) => {
+  const promise = new Promise<T>((_resolve, _reject): void => {
     resolve = _resolve;
     reject = _reject;
   });
@@ -44,13 +44,16 @@ function deferred<T = void>(): Deferred<T> {
   });
 }
 
-export async function enhanceHttpServerWithSubscriptions(
+export async function enhanceHttpServerWithSubscriptions<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
   websocketServer: Server,
   postgraphileMiddleware: HttpRequestHandler,
   subscriptionServerOptions?: {
     keepAlive?: number;
   },
-) {
+): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
   }
@@ -69,9 +72,9 @@ export async function enhanceHttpServerWithSubscriptions(
 
   const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> | null } = {};
 
-  const contextKey = (ws: WebSocket, opId: string) => ws['postgraphileId'] + '|' + opId;
+  const contextKey = (ws: WebSocket, opId: string): string => ws['postgraphileId'] + '|' + opId;
 
-  const releaseContextForSocketAndOpId = (ws: WebSocket, opId: string) => {
+  const releaseContextForSocketAndOpId = (ws: WebSocket, opId: string): void => {
     const promise = keepalivePromisesByContextKey[contextKey(ws, opId)];
     if (promise) {
       promise.resolve();
@@ -79,7 +82,11 @@ export async function enhanceHttpServerWithSubscriptions(
     }
   };
 
-  const addContextForSocketAndOpId = (context: mixed, ws: WebSocket, opId: string) => {
+  const addContextForSocketAndOpId = (
+    context: mixed,
+    ws: WebSocket,
+    opId: string,
+  ): Deferred<void> => {
     releaseContextForSocketAndOpId(ws, opId);
     const promise = deferred();
     promise['context'] = context;
@@ -88,32 +95,41 @@ export async function enhanceHttpServerWithSubscriptions(
   };
 
   const applyMiddleware = async (
-    middlewares: Array<Middleware> = [],
-    req: IncomingMessage,
-    res: ServerResponse,
-  ) => {
+    middlewares: Array<Middleware<Request, Response>> = [],
+    req: Request,
+    res: Response,
+  ): Promise<void> => {
     for (const middleware of middlewares) {
       // TODO: add Koa support
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve, reject): void => {
         middleware(req, res, err => (err ? reject(err) : resolve()));
       });
     }
   };
 
-  const reqResFromSocket = async (socket: WebSocket) => {
+  const reqResFromSocket = async (
+    socket: WebSocket,
+  ): Promise<{
+    req: Request;
+    res: Response;
+  }> => {
     const req = socket['__postgraphileReq'];
     if (!req) {
       throw new Error('req could not be extracted');
     }
-    let dummyRes = socket['__postgraphileRes'];
+    let dummyRes: Response | undefined = socket['__postgraphileRes'];
     if (req.res) {
       throw new Error(
         "Please get in touch with Benjie; we weren't expecting req.res to be present but we want to reserve it for future usage.",
       );
     }
     if (!dummyRes) {
-      dummyRes = new ServerResponse(req);
-      dummyRes.writeHead = (statusCode: number, _statusMessage: never, headers: never) => {
+      dummyRes = new ServerResponse(req) as Response;
+      dummyRes.writeHead = (
+        statusCode: number,
+        _statusMessage?: OutgoingHttpHeaders | string | undefined,
+        headers?: OutgoingHttpHeaders | undefined,
+      ): void => {
         if (statusCode && statusCode > 200) {
           // tslint:disable-next-line no-console
           console.error(
@@ -137,8 +153,8 @@ export async function enhanceHttpServerWithSubscriptions(
     return { req, res: dummyRes };
   };
 
-  const getContext = (socket: WebSocket, opId: string) => {
-    return new Promise((resolve, reject) => {
+  const getContext = (socket: WebSocket, opId: string): Promise<mixed> => {
+    return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>
           withPostGraphileContextFromReqRes(req, res, { singleStatement: true }, context => {
@@ -219,7 +235,9 @@ export async function enhanceHttpServerWithSubscriptions(
 
         const { req, res } = await reqResFromSocket(socket);
         const meta = {};
-        const formatResponse = (response: ExecutionResult) => {
+        const formatResponse = <TExecutionResult extends ExecutionResult = ExecutionResult>(
+          response: TExecutionResult,
+        ): TExecutionResult => {
           if (response.errors) {
             response.errors = handleErrors(response.errors, req, res);
           }
