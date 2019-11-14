@@ -127,7 +127,7 @@ host	postgraphile_test,graphileengine_test,lds_test	me	127.0.0.1/32		trust
 host	postgraphile_test,graphileengine_test,lds_test	me	::1/128			trust
 ```
 
-You don't need to install Postgres locally, running it on an external server or in a Docker container (like [this](./run-pg)) works as well.
+You don't need to install Postgres locally, running it on an external server or [in a Docker container](https://github.com/graphile/graphile-engine/wiki/Development-with-docker-databases) works as well.
 See below for how to make your database connections known to the test runner.
 
 ## Developing
@@ -232,7 +232,7 @@ createdb graphileengine_test
 The tests of the `postgraphile-core`, `graphile-utils` and `pg-pubsub` packages use the `TEST_DATABASE_URL` environment variable, which is mandatory.
 Its format is a [connection URL](https://www.postgresql.org/docs/11/libpq-connect.html#id-1.7.3.8.3.6), passed to [node-postgres](https://node-postgres.com/features/connecting#Connection URI).
 
-The `lds` and `subscriptions-lds` packages' test commands will create and use a new `"lds_test"` database using the `createdb` command. If you cannot make `createdb` run directly without options (e.g. if you're not using `trust` authentication) then you may set the `LDS_TEST_DATABASE_URL` environment variable and seed the DB and run the tests manually (see the relevant `package.json` to see what is done by the `yarn test` command).
+The `lds` and `subscriptions-lds` packages' test commands will create and use a new `"lds_test"` database using the `createdb` command. If you cannot make `createdb` run directly without options (e.g. if you're not using `trust` authentication) then you may set the `LDS_TEST_DATABASE_URL` environment variable and seed the DB and run the tests manually (see the relevant `package.json` to see what is done by the `yarn test` command). Alternatively, set the [environment variables for `createdb`](https://www.postgresql.org/docs/current/app-createdb.html#id-1.9.4.4.7) to direct it your server.
 Note: before you can run those tests, you'll need to configure your PostgreSQL server to support logical decoding for the live queries tests.
 See [the @graphile/lds README](packages/lds/README.md#postgresql-configuration) for how to enable `wal_level = logical`.
 
