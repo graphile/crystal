@@ -642,7 +642,13 @@ class PostGraphiQL extends React.PureComponent {
       return <GraphiQL {...sharedProps} />;
     } else {
       return (
-        <div className="postgraphiql-container graphiql-container">
+        <div
+          className={`postgraphiql-container graphiql-container ${
+            this.state.explain && this.state.explainResult && this.state.explainResult.length
+              ? 'explain-mode'
+              : ''
+          }`}
+        >
           <GraphiQLExplorer
             schema={schema}
             query={this.state.query}
@@ -704,15 +710,22 @@ class PostGraphiQL extends React.PureComponent {
             <GraphiQL.Footer>
               <div className="postgraphile-footer">
                 {this.state.explainResult && this.state.explainResult.length ? (
-                  <div>
-                    <h4>Explain: analysis of executed queries</h4>
+                  <div className="postgraphile-plan-footer">
                     {this.state.explainResult.map(res => (
                       <div>
-                        <pre>
-                          <code>{formatSQL(res.query)}</code>
-                        </pre>
-                        <pre>
+                        <h4>
+                          Result from SQL{' '}
+                          <a href="https://www.postgresql.org/docs/current/sql-explain.html">
+                            EXPLAIN
+                          </a>{' '}
+                          on executed query:
+                        </h4>
+                        <pre className="explain-plan">
                           <code>{res.plan}</code>
+                        </pre>
+                        <h4>Executed SQL query:</h4>
+                        <pre className="explain-sql">
+                          <code>{formatSQL(res.query)}</code>
                         </pre>
                       </div>
                     ))}
@@ -723,38 +736,40 @@ class PostGraphiQL extends React.PureComponent {
                     <hr />
                   </div>
                 ) : null}
-                PostGraphile:{' '}
-                <a
-                  title="Open PostGraphile documentation"
-                  href="https://graphile.org/postgraphile/introduction/"
-                  target="new"
-                >
-                  Documentation
-                </a>{' '}
-                |{' '}
-                <a
-                  title="Open PostGraphile documentation"
-                  href="https://graphile.org/postgraphile/examples/"
-                  target="new"
-                >
-                  Examples
-                </a>{' '}
-                |{' '}
-                <a
-                  title="PostGraphile is supported by the community, please sponsor ongoing development"
-                  href="https://graphile.org/sponsor/"
-                  target="new"
-                >
-                  Sponsor
-                </a>{' '}
-                |{' '}
-                <a
-                  title="Get support from the team behind PostGraphile"
-                  href="https://graphile.org/support/"
-                  target="new"
-                >
-                  Support
-                </a>
+                <div className="postgraphile-regular-footer">
+                  PostGraphile:{' '}
+                  <a
+                    title="Open PostGraphile documentation"
+                    href="https://graphile.org/postgraphile/introduction/"
+                    target="new"
+                  >
+                    Documentation
+                  </a>{' '}
+                  |{' '}
+                  <a
+                    title="Open PostGraphile documentation"
+                    href="https://graphile.org/postgraphile/examples/"
+                    target="new"
+                  >
+                    Examples
+                  </a>{' '}
+                  |{' '}
+                  <a
+                    title="PostGraphile is supported by the community, please sponsor ongoing development"
+                    href="https://graphile.org/sponsor/"
+                    target="new"
+                  >
+                    Sponsor
+                  </a>{' '}
+                  |{' '}
+                  <a
+                    title="Get support from the team behind PostGraphile"
+                    href="https://graphile.org/support/"
+                    target="new"
+                  >
+                    Support
+                  </a>
+                </div>
               </div>
             </GraphiQL.Footer>
           </GraphiQL>
