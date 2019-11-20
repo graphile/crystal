@@ -41,11 +41,21 @@ const defaultQuery = `\
 #
 `;
 
-const isSubscription = ({ query }) =>
-  parse(query).definitions.some(
+const isSubscription = ({ query, operationName }) => {
+  const { definitions } = parse(query);
+
+  if (operationName) {
+    const definition = definitions.find(def => def.name && def.name.value === operationName);
+    if (definition) {
+      return definition.operation === 'subscription';
+    }
+  }
+
+  return definitions.some(
     definition =>
       definition.kind === 'OperationDefinition' && definition.operation === 'subscription',
   );
+};
 
 const {
   POSTGRAPHILE_CONFIG = {
