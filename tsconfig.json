@@ -22,6 +22,7 @@
   },
   "exclude": [
     "index.js",
+    "plugins.d.ts",
     "node_modules",
     "build",
     "build-turbo",
