@@ -9,7 +9,9 @@ echo "PREPACKING"
 echo "TEST"
 npx lerna run --concurrency 1 test
 
-npx lerna publish --exact --npm-tag="${1:-next}" "$@"
+TAG="${1:-next}"
+shift
+npx lerna publish --exact --npm-tag="$TAG" "$@"
 yarn run changelog
 git add CHANGELOG.md
 git commit -m"chore: update CHANGELOG"
