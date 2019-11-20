@@ -16,7 +16,7 @@ import program = require('commander');
 import jwt = require('jsonwebtoken');
 import { parse as parsePgConnectionString } from 'pg-connection-string';
 import postgraphile, { getPostgraphileSchemaBuilder } from './postgraphile';
-import smartTagsPlugin from './cli-tags';
+import { makePgSmartTagsFromFilePlugin } from '../plugins';
 import { Pool, PoolConfig } from 'pg';
 import cluster = require('cluster');
 import { makePluginHook, PostGraphilePlugin } from './pluginHook';
@@ -25,6 +25,14 @@ import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
 import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
+import { existsSync } from 'fs';
+
+const tagsFile = process.cwd() + '/postgraphile.tags.json5';
+/*
+ * Watch mode on the tags file is non-trivial, so only load the plugin if the
+ * file exists when PostGraphile starts.
+ */
+const smartTagsPlugin = existsSync(tagsFile) ? makePgSmartTagsFromFilePlugin() : null;
 
 const isDev = process.env.POSTGRAPHILE_ENV === 'development';
 
@@ -637,6 +645,10 @@ const jwtVerifyOptions: jwt.VerifyOptions = rawJwtVerifyOptions
       subject: jwtVerifySubject,
     });
 
+const appendPlugins = loadPlugins(appendPluginNames);
+const prependPlugins = loadPlugins(prependPluginNames);
+const skipPlugins = loadPlugins(skipPluginNames);
+
 // The options to pass through to the schema builder, or the middleware
 const postgraphileOptions = pluginHook(
   'cli:library:options',
@@ -672,9 +684,9 @@ const postgraphileOptions = pluginHook(
     exportGqlSchemaPath,
     sortExport,
     bodySizeLimit,
-    appendPlugins: [smartTagsPlugin, ...(loadPlugins(appendPluginNames) || [])],
-    prependPlugins: loadPlugins(prependPluginNames),
-    skipPlugins: loadPlugins(skipPluginNames),
+    appendPlugins: smartTagsPlugin ? [smartTagsPlugin, ...(appendPlugins || [])] : appendPlugins,
+    prependPlugins,
+    skipPlugins,
     readCache,
     writeCache,
     legacyRelations,

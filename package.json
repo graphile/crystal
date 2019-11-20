@@ -140,8 +140,11 @@
     "sponsors.json",
     "build",
     "build-turbo",
+    "isTurbo.js",
     "index.js",
-    "cli.js"
+    "cli.js",
+    "plugins.js",
+    "plugins.d.ts"
   ],
   "engines": {
     "node": ">=8.6"
