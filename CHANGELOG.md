@@ -6,6 +6,11 @@ helpful to you also.
 # [](https://github.com/graphile/graphile-engine/compare/v4.5.0...v) (2019-11-20)
 
 
+### Features
+
+* **tags:** improve JSON format for Smart Tags ([#568](https://github.com/graphile/graphile-engine/issues/568)) ([cb8eac1](https://github.com/graphile/graphile-engine/commit/cb8eac1146bd3805a82201d905edb3826544334a))
+
+
 
 # [4.5.0](https://github.com/graphile/graphile-engine/compare/v4.5.0-rc.0...v4.5.0) (2019-11-20)
 
