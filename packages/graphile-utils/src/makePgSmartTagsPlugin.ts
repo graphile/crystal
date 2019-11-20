@@ -1,4 +1,4 @@
-import { SchemaBuilder, Build, Plugin, Options } from "graphile-build";
+import { Build, Plugin } from "graphile-build";
 import { PgEntityKind, PgEntity } from "graphile-build-pg";
 import { inspect } from "util";
 import { entityIsIdentifiedBy } from "./introspectionHelpers";
@@ -101,7 +101,7 @@ export function makePgSmartTagsPlugin(
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null
 ): Plugin {
   let [rules, rawRules] = rulesFrom(ruleOrRules);
-  return (builder: SchemaBuilder, _options: Options) => {
+  const plugin: Plugin = (builder, _options) => {
     if (subscribeToUpdatesCallback) {
       builder.registerWatcher(
         async triggerRebuild => {
@@ -150,6 +150,7 @@ export function makePgSmartTagsPlugin(
       return build;
     });
   };
+  return plugin;
 }
 
 /**
@@ -163,8 +164,11 @@ export function makePgSmartTagsPlugin(
  *       my_table: {
  *         tags: {omit: "create,update,delete"},
  *         description: "You can overwrite the description too",
- *         columns: {
+ *         attribute: {
  *           my_private_field: {tags: {omit: true}}
+ *         },
+ *         constraint: {
+ *           my_constraint: {tags: {omit: true}}
  *         }
  *       },
  *       "my_schema.myOtherTable": {
@@ -187,8 +191,14 @@ export type JSONPgSmartTags = {
       [identifier: string]: {
         tags?: PgSmartTagTags;
         description?: string;
-        columns?: {
-          [columnName: string]: {
+        attribute?: {
+          [attributeName: string]: {
+            tags?: PgSmartTagTags;
+            description?: string;
+          };
+        };
+        constraint?: {
+          [constraintName: string]: {
             tags?: PgSmartTagTags;
             description?: string;
           };
@@ -211,6 +221,60 @@ function pgSmartTagRulesFromJSON(
   }
   const specByIdentifierByKind = json.config;
   const rules: PgSmartTagRule[] = [];
+
+  function process(
+    kind: PgEntityKind,
+    identifier: string,
+    subKind: PgEntityKind,
+    obj: unknown,
+    key: string,
+    deprecated = false
+  ): void {
+    if (kind !== PgEntityKind.CLASS) {
+      throw new Error(
+        `makeJSONPgSmartTagsPlugin: '${key}' is only valid on a class; you tried to set it on a '${kind}' at 'config.${kind}.${identifier}.${key}'`
+      );
+    }
+    const path = `config.${kind}.${identifier}.${key}`;
+    if (deprecated) {
+      console.warn(
+        `Tags JSON path '${path}' is deprecated, please use 'config.${kind}.${identifier}.attribute' instead`
+      );
+    }
+    if (typeof obj !== "object" || obj == null) {
+      throw new Error(`Invalid value for '${path}'`);
+    }
+    const entities: object = obj;
+    for (const entityName of Object.keys(entities)) {
+      if (entityName.includes(".")) {
+        throw new Error(
+          `${key} '${entityName}' should not contain a period at '${path}'. This nested entry does not need further description.`
+        );
+      }
+      const entitySpec = entities[entityName];
+      const {
+        tags: entityTags,
+        description: entityDescription,
+        ...entityRest
+      } = entitySpec;
+      if (Object.keys(entityRest).length > 0) {
+        console.warn(
+          `WARNING: makeJSONPgSmartTagsPlugin '${key}' only supports 'tags' and 'description' currently, you have also set '${Object.keys(
+            entityRest
+          ).join(
+            "', '"
+          )}' at '${path}.${entityName}'. Perhaps you forgot to add a "tags" entry containing these keys?`
+        );
+      }
+      rules.push({
+        kind: subKind,
+        match: `${identifier}.${entityName}`,
+        tags: entityTags,
+        description: entityDescription,
+      });
+    }
+  }
+
   for (const rawKind of Object.keys(specByIdentifierByKind)) {
     if (!Object.prototype.hasOwnProperty.call(meaningByKind, rawKind)) {
       throw new Error(
@@ -219,52 +283,64 @@ function pgSmartTagRulesFromJSON(
     }
     const kind: PgEntityKind = rawKind as any;
     const specByIdentifier = specByIdentifierByKind[kind];
+
     for (const identifier of Object.keys(specByIdentifier)) {
       const spec = specByIdentifier[identifier];
-      const { tags, description, columns, ...rest } = spec;
+      const {
+        tags,
+        description,
+        columns,
+        attribute,
+        constraint,
+        ...rest
+      } = spec;
       if (Object.keys(rest).length > 0) {
         console.warn(
-          `WARNING: makeJSONPgSmartTagsPlugin only supports tags, description and columns currently, you have also set '${Object.keys(
+          `WARNING: makeJSONPgSmartTagsPlugin identifier spec only supports 'tags', 'description', 'attribute' and 'constraint' currently, you have also set '${Object.keys(
             rest
-          ).join("', '")}'`
+          ).join("', '")}' at 'config.${kind}.${identifier}'`
         );
       }
+
       rules.push({
         kind,
         match: identifier,
         tags,
         description,
       });
+
       if (columns) {
-        if (kind !== PgEntityKind.CLASS) {
-          throw new Error(
-            `makeJSONPgSmartTagsPlugin: 'columns' is only valid on a class; you tried to set it on a '${kind}'`
-          );
-        }
-        for (const columnName of Object.keys(columns)) {
-          const columnSpec = columns[columnName];
-          const {
-            tags: columnTags,
-            description: columnDescription,
-            ...columnRest
-          } = columnSpec;
-          if (Object.keys(columnRest).length > 0) {
-            console.warn(
-              `WARNING: makeJSONPgSmartTagsPlugin columns only supports tags and description currently, you have also set '${columnRest.join(
-                "', '"
-              )}'`
-            );
-          }
-          rules.push({
-            kind: PgEntityKind.ATTRIBUTE,
-            match: `${identifier}.${columnName}`,
-            tags: columnTags,
-            description: columnDescription,
-          });
-        }
+        // This was in graphile-utils 4.0.0 but was deprecated in 4.0.1 for consistency reasons.
+        process(
+          kind,
+          identifier,
+          PgEntityKind.ATTRIBUTE,
+          columns,
+          "columns",
+          true
+        );
+      }
+      if (attribute) {
+        process(
+          kind,
+          identifier,
+          PgEntityKind.ATTRIBUTE,
+          attribute,
+          "attribute"
+        );
+      }
+      if (constraint) {
+        process(
+          kind,
+          identifier,
+          PgEntityKind.CONSTRAINT,
+          constraint,
+          "constraint"
+        );
       }
     }
   }
+
   return rules;
 }
 
@@ -279,7 +355,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   json: JSONPgSmartTags | null,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null
-) {
+): Plugin {
   // Get rules from JSON
   let rules = pgSmartTagRulesFromJSON(json);
 
