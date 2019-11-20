@@ -7,6 +7,15 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.5.0-rc.4](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.3...v4.5.0-rc.4) (2019-11-20)
+
+
+### Bug Fixes
+
+* **package:** move conventional-changelog-cli to devDependencies ([7d2df1b](https://github.com/graphile/postgraphile/commit/7d2df1bb6e30fdece26c6713d28aa50f89ef024d))
+
+
+
 # [4.5.0-rc.3](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.2...v4.5.0-rc.3) (2019-11-20)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "4.5.0-rc.3",
+  "version": "4.5.0-rc.4",
   "description": "A GraphQL schema created by reflection over a PostgreSQL schema 🐘 (previously known as PostGraphQL)",
   "author": "Benjie Gillam <benjie@graphile.org> (https://twitter.com/benjie)",
   "license": "MIT",
