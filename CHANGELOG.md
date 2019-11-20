@@ -7,6 +7,15 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.5.0-rc.3](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.2...v4.5.0-rc.3) (2019-11-20)
+
+
+### Bug Fixes
+
+* **graphiql:** fix operation detection on multi-op documents ([#1191](https://github.com/graphile/postgraphile/issues/1191)) ([49b2176](https://github.com/graphile/postgraphile/commit/49b2176caf269e85d18cb2ab6f06646dda93f0a4))
+
+
+
 # [4.5.0-rc.2](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.1...v4.5.0-rc.2) (2019-11-20)
 
 
