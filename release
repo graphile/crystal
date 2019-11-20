@@ -10,7 +10,10 @@ echo "TEST"
 npx lerna run --concurrency 1 test
 
 TAG="${1:-next}"
-shift
+
+# Only shift if there's something to shift
+if [ "x$1" != "x" ]; then shift; fi;
+
 npx lerna publish --exact --npm-tag="$TAG" "$@"
 yarn run changelog
 git add CHANGELOG.md
