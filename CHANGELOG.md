@@ -7,6 +7,20 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.5.0-rc.2](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.1...v4.5.0-rc.2) (2019-11-20)
+
+
+### Bug Fixes
+
+* **graphiql:** solve vertical scrolling issue ([#1188](https://github.com/graphile/postgraphile/issues/1188)) ([b811b9f](https://github.com/graphile/postgraphile/commit/b811b9f16354898d390de8eeb021bc7c2b58ba6a))
+
+
+### Features
+
+* **tags:** file watching plugin for library users ([#1190](https://github.com/graphile/postgraphile/issues/1190)) ([8d36997](https://github.com/graphile/postgraphile/commit/8d36997b21df225b8f678b5f335c6eaf56718ac5))
+
+
+
 # [4.5.0-rc.1](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.0...v4.5.0-rc.1) (2019-11-13)
 
 
