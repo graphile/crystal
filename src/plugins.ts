@@ -51,4 +51,4 @@ export const makePgSmartTagsFromFilePlugin = (
   return plugin;
 };
 
-export const PostGraphileTagsPlugin = makePgSmartTagsFromFilePlugin();
+export const TagsFilePlugin = makePgSmartTagsFromFilePlugin();
