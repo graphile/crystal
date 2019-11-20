@@ -1,6 +1,6 @@
 import React from 'react';
 import GraphiQL from 'graphiql';
-import { parse } from 'graphql';
+import { getOperationAST, parse } from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
@@ -42,19 +42,11 @@ const defaultQuery = `\
 `;
 
 const isSubscription = ({ query, operationName }) => {
-  const { definitions } = parse(query);
+  const node = parse(query);
 
-  if (operationName) {
-    const definition = definitions.find(def => def.name && def.name.value === operationName);
-    if (definition) {
-      return definition.operation === 'subscription';
-    }
-  }
+  const operation = getOperationAST(node, operationName);
 
-  return definitions.some(
-    definition =>
-      definition.kind === 'OperationDefinition' && definition.operation === 'subscription',
-  );
+  return operation && operation.operation === 'subscription';
 };
 
 const {
