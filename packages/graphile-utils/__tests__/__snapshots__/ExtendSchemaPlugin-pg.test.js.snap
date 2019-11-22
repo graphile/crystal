@@ -719,11 +719,11 @@ Object {
           ],
           "pageInfo": Object {
             "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-            "hasNextPage": false,
+            "hasNextPage": true,
             "hasPreviousPage": true,
             "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
           },
-          "totalCount": 2,
+          "totalCount": 3,
         },
         "p2": Object {
           "edges": Array [
@@ -750,11 +750,11 @@ Object {
           ],
           "pageInfo": Object {
             "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
-            "hasNextPage": false,
+            "hasNextPage": true,
             "hasPreviousPage": false,
             "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
           },
-          "totalCount": 2,
+          "totalCount": 3,
         },
       },
     ],

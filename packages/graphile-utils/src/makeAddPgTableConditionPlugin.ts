@@ -85,6 +85,7 @@ export default function makeAddPgTableConditionPlugin(
         const {
           scope: {
             isPgFieldConnection,
+            isPgFieldSimpleCollection,
             pgFieldIntrospection: procOrTable,
             pgFieldIntrospectionTable: tableIfProc,
           },
@@ -92,7 +93,7 @@ export default function makeAddPgTableConditionPlugin(
         } = context;
         const table = tableIfProc || procOrTable;
         if (
-          !isPgFieldConnection ||
+          (!isPgFieldConnection && !isPgFieldSimpleCollection) ||
           !table ||
           table.kind !== "class" ||
           table.namespaceName !== schemaName ||

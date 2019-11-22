@@ -36,4 +36,5 @@ insert into graphile_utils.pets (user_id, type, name) values
   (2, 'cat', 'Felix'),
   (2, 'dog', 'Fido'),
   (3, 'goldfish', 'Goldie'),
-  (3, 'goldfish', 'Spot');
+  (3, 'goldfish', 'Spot'),
+  (3, 'goldfish', 'Albert');

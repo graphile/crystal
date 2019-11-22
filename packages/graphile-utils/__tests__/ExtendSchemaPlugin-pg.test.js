@@ -583,7 +583,7 @@ it("allows adding a custom connection to a nested type", async () => {
     expect(bob.p2.totalCount).toEqual(2);
     expect(caroline.p2).toBeTruthy();
     expect(caroline.p2.nodes).toHaveLength(2);
-    expect(caroline.p2.totalCount).toEqual(2);
+    expect(caroline.p2.totalCount).toEqual(3);
     expect(caroline.p2.nodes.map(n => n.name)).toEqual(["Goldie", "Spot"]);
     expect(data).toMatchSnapshot();
   } finally {
@@ -829,6 +829,7 @@ it("allows to retrieve array scalar values", async () => {
       "Fido",
       "Goldie",
       "Spot",
+      "Albert",
     ]);
   } finally {
     pgClient.release();
