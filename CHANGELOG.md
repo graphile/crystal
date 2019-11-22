@@ -3,7 +3,12 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.5.1...v) (2019-11-20)
+# [](https://github.com/graphile/graphile-engine/compare/v4.5.1...v) (2019-11-22)
+
+
+### Bug Fixes
+
+* **utils:** make makeAddPgTableConditionPlugin work on simple co… ([#569](https://github.com/graphile/graphile-engine/issues/569)) ([0a4db65](https://github.com/graphile/graphile-engine/commit/0a4db65dd900c6a4ecf161db9f32d34a5719b9e5))
 
 
 
