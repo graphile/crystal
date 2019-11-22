@@ -571,7 +571,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoxLCJiIjoyLCJjIjozfQ.hxhGCCCmGV9nT1sl
 
 > **Warning:** The information in a JWT can be read by anyone, so do not put private information in a JWT. What makes JWTs secure is that unless they were signed by our secret, we can not accept the information inside the JWT as truth.
 
-This allows PostGraphile to securely make claims about who a user is. Attackers would not be able to fake a claim unless they had access to the private ‘secret’ you define when you start PostGraphile with the `--secret` option.
+This allows PostGraphile to securely make claims about who a user is. Attackers would not be able to fake a claim unless they had access to the private ‘secret’ you define when you start PostGraphile with the `--jwt-secret` option.
 
 When PostGraphile gets a JWT from an HTTP request’s `Authorization` header, like so:
 
@@ -611,7 +611,7 @@ We now know how PostGraphile uses JWTs to authorize the user, but how does PostG
 
 ### Logging In
 
-You can pass an option to PostGraphile, called `--token <identifier>` in the CLI, which takes a composite type identifier. PostGraphile will turn this type into a JWT wherever you see it in the GraphQL output. So let’s define the type we will use for our JWTs:
+You can pass an option to PostGraphile, called `--jwt-token-identifier <identifier>` in the CLI, which takes a composite type identifier. PostGraphile will turn this type into a JWT wherever you see it in the GraphQL output. So let’s define the type we will use for our JWTs:
 
 ```sql
 create type forum_example.jwt_token as (
@@ -620,10 +620,10 @@ create type forum_example.jwt_token as (
 );
 ```
 
-That’s it. We are using the [`CREATE TYPE`](https://www.postgresql.org/docs/current/static/sql-createtype.html) command again as we did before to create an enum type. This time we are creating a composite type. The definition for a composite type looks very much like the definition of a table type, except a composite type cannot store rows. i.e. you can’t `INSERT`, `SELECT`, `UPDATE`, or `DELETE` from a composite type. While you can’t store rows in a composite type, PostGraphile can turn a composite type into a JWT. Now that we’ve defined this type we will want to start PostGraphile with the `--token` flag:
+That’s it. We are using the [`CREATE TYPE`](https://www.postgresql.org/docs/current/static/sql-createtype.html) command again as we did before to create an enum type. This time we are creating a composite type. The definition for a composite type looks very much like the definition of a table type, except a composite type cannot store rows. i.e. you can’t `INSERT`, `SELECT`, `UPDATE`, or `DELETE` from a composite type. While you can’t store rows in a composite type, PostGraphile can turn a composite type into a JWT. Now that we’ve defined this type we will want to start PostGraphile with the `--jwt-token-identifier` flag:
 
 ```bash
-postgraphile --token forum_example.jwt_token
+postgraphile --jwt-token-identifier forum_example.jwt_token
 ```
 
 Next we need to create the function which will actually return the token:
@@ -800,8 +800,8 @@ postgraphile \
   --connection postgres://forum_example_postgraphile:xyz@localhost:5432 \
   --schema forum_example \
   --default-role forum_example_anonymous \
-  --secret keyboard_kitten \
-  --token forum_example.jwt_token
+  --jwt-secret keyboard_kitten \
+  --jwt-token-identifier forum_example.jwt_token
 ```
 
 ---
