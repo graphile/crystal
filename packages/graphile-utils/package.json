@@ -45,8 +45,8 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "graphile-build": "^4.4.2",
-    "graphile-build-pg": "^4.4.2"
+    "graphile-build": "^4.5.0",
+    "graphile-build-pg": "^4.5.0"
   },
   "files": [
     "node8plus"
