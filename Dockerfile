@@ -32,7 +32,7 @@ FROM node:12-alpine as clean
 COPY package.json yarn.lock /postgraphile/
 
 COPY *.md /postgraphile/
-COPY index.js cli.js /postgraphile/
+COPY index.js cli.js isTurbo.js plugins.js plugins.d.ts /postgraphile/
 COPY docker/.postgraphilerc.js /postgraphile/
 COPY --from=builder /postgraphile/build/ /postgraphile/build/
 COPY --from=builder /postgraphile/build-turbo/ /postgraphile/build-turbo/
