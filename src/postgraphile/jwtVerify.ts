@@ -1,5 +1,6 @@
 import jwt = require('jsonwebtoken');
 import { mixed } from '../interfaces';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -20,53 +21,14 @@ export default function jwtVerify(
   jwtVerifyOptions: jwt.VerifyOptions | undefined,
   pgDefaultRole: string | undefined,
   callback: jwt.VerifyCallback | undefined,
-): jwtVerifyResult {
+): jwtVerifyResult | void {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
   let jwtClaims: { [claimName: string]: mixed } = {};
+  let claims;
 
-  // If we were provided a JWT token, let us try to verify it. If verification
-  // fails we want to throw an error.
-  if (jwtToken) {
-    // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
-    // as a 403 error because the token is not trustworthy.
-    try {
-      const jwtVerificationSecret = jwtPublicKey || jwtSecret;
-      // If a JWT token was defined, but a secret was not provided to the server or
-      // secret had unsupported type, throw a 403 error.
-      if (
-        !Buffer.isBuffer(jwtVerificationSecret) &&
-        typeof jwtVerificationSecret !== 'string' &&
-        typeof jwtVerificationSecret !== 'function'
-      ) {
-        // tslint:disable-next-line no-console
-        console.error(
-          `ERROR: '${
-            jwtPublicKey ? 'jwtPublicKey' : 'jwtSecret'
-          }' was not set to a string or buffer - rejecting JWT-authenticated request.`,
-        );
-        throw new Error('Not allowed to provide a JWT token.');
-      }
-
-      if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
-        throw new Error(
-          `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
-        );
-
-      const claims = jwt.verify(
-        jwtToken,
-        jwtVerificationSecret,
-        {
-          ...jwtVerifyOptions,
-          audience:
-            jwtAudiences ||
-            (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
-              ? undefinedIfEmpty(jwtVerifyOptions.audience)
-              : ['postgraphile']),
-        },
-        callback,
-      );
-
+  const rest = (claims: any): jwtVerifyResult => {
+    if (jwtToken) {
       if (typeof claims === 'string') {
         throw new Error('Invalid JWT payload');
       }
@@ -86,6 +48,62 @@ export default function jwtVerify(
 
         role = roleClaim;
       }
+    }
+
+    return {
+      role,
+      jwtClaims: jwtToken ? jwtClaims : null,
+    };
+  };
+
+  // If we were provided a JWT token, let us try to verify it. If verification
+  // fails we want to throw an error.
+  if (jwtToken) {
+    // Try to run `jwt.verify`. If it fails, capture the error and re-throw it
+    // as a 403 error because the token is not trustworthy.
+    const jwtVerificationSecret = jwtPublicKey || jwtSecret;
+    // If a JWT token was defined, but a secret was not provided to the server or
+    // secret had unsupported type, throw a 403 error.
+    if (
+      !Buffer.isBuffer(jwtVerificationSecret) &&
+      typeof jwtVerificationSecret !== 'string' &&
+      typeof jwtVerificationSecret !== 'function'
+    ) {
+      // tslint:disable-next-line no-console
+      console.error(
+        `ERROR: '${
+          jwtPublicKey ? 'jwtPublicKey' : 'jwtSecret'
+        }' was not set to a string or buffer - rejecting JWT-authenticated request.`,
+      );
+      throw new Error('Not allowed to provide a JWT token.');
+    }
+
+    if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
+      throw new Error(`Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`);
+
+    try {
+      claims = jwt.verify(
+        jwtToken,
+        jwtVerificationSecret,
+        {
+          ...jwtVerifyOptions,
+          audience:
+            jwtAudiences ||
+            (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+              ? undefinedIfEmpty(jwtVerifyOptions.audience)
+              : ['postgraphile']),
+        },
+        callback
+          ? (err, decoded) => {
+              if (err) {
+                callback(err, {});
+              } else {
+                callback((null as unknown) as JsonWebTokenError, rest(decoded));
+              }
+            }
+          : undefined,
+      );
+      return callback ? undefined : rest(claims);
     } catch (error) {
       // In case this error is thrown in an HTTP context, we want to add status code
       // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
@@ -98,12 +116,9 @@ export default function jwtVerify(
 
       throw error;
     }
+  } else {
+    return callback ? callback((null as unknown) as JsonWebTokenError, rest(claims)) : rest(claims);
   }
-
-  return {
-    role,
-    jwtClaims: jwtToken ? jwtClaims : null,
-  };
 }
 
 /**

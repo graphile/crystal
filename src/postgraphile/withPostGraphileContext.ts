@@ -305,6 +305,7 @@ async function getSettingsForPgClientTransaction({
   localSettings: Array<[string, string]>;
   jwtClaims: { [claimName: string]: mixed } | null;
 }> {
+  console.log('withContext call verify');
   const verifyResult = await new Promise((resolve, reject) => {
     jwtVerify(
       jwtToken,
@@ -320,6 +321,7 @@ async function getSettingsForPgClientTransaction({
       },
     );
   });
+  console.log('withContext verify returned');
   let role = (verifyResult as jwtVerifyResult).role;
   const jwtClaims = (verifyResult as jwtVerifyResult).jwtClaims;
 
