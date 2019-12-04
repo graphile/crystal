@@ -1,9 +1,14 @@
-import { SchemaBuilder, Options, Plugin, Context, Build } from "graphile-build";
+import {
+  SchemaBuilder,
+  Options,
+  Plugin,
+  Build,
+  ContextGraphQLObjectTypeFieldsField,
+} from "graphile-build";
 import {
   GraphQLFieldResolver,
   GraphQLResolveInfo,
   GraphQLFieldConfig,
-  GraphQLObjectType,
 } from "graphql";
 import {
   makeFieldHelpers,
@@ -42,7 +47,7 @@ interface ResolverWrapperRules {
 type ResolverWrapperRulesGenerator = (options: Options) => ResolverWrapperRules;
 
 type ResolverWrapperFilter<T> = (
-  context: Context<GraphQLObjectType>,
+  context: ContextGraphQLObjectTypeFieldsField,
   build: Build,
   field: GraphQLFieldConfig<any, any>,
   options: Options

@@ -42,68 +42,72 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
       if (!topicGen) {
         return field;
       }
-      return extend(field, {
-        subscribe: async (
-          _parent: any,
-          args: any,
-          resolveContext: any,
-          resolveInfo: any
-        ) => {
-          const topic =
-            typeof topicGen === "function"
-              ? await topicGen(args, resolveContext, resolveInfo)
-              : topicGen;
-          if (!topic) {
-            throw new Error("Cannot subscribe at this time");
-          }
-          if (typeof topic !== "string") {
-            throw new Error("Invalid topic provided to pgSubscription");
-          }
-          const unsubscribeTopic =
-            typeof unsubscribeTopicGen === "function"
-              ? await unsubscribeTopicGen(args, resolveContext, resolveInfo)
-              : unsubscribeTopicGen;
-          const asyncIterator = pubsub.asyncIterator(topic);
-          if (unsubscribeTopic) {
-            // Subscribe to event revoking subscription
-            const unsubscribeTopics: Array<string> = Array.isArray(
-              unsubscribeTopic
-            )
-              ? unsubscribeTopic
-              : [unsubscribeTopic];
-            const unsubscribeIterators = unsubscribeTopics.map(t => {
-              const i = pubsub.asyncIterator(t);
-              i["topic"] = t;
-              return i;
-            });
-            unsubscribeIterators.forEach(unsubscribeIterator => {
-              unsubscribeIterator.next().then(() => {
-                debug(
-                  "Unsubscribe triggered on channel %s",
-                  unsubscribeIterator["topic"]
-                );
-                if (asyncIterator.return) {
-                  asyncIterator.return();
-                }
-                unsubscribeIterators.forEach(i => {
-                  if (i.return) {
-                    i.return();
+      return extend(
+        field,
+        {
+          subscribe: async (
+            _parent: any,
+            args: any,
+            resolveContext: any,
+            resolveInfo: any
+          ) => {
+            const topic =
+              typeof topicGen === "function"
+                ? await topicGen(args, resolveContext, resolveInfo)
+                : topicGen;
+            if (!topic) {
+              throw new Error("Cannot subscribe at this time");
+            }
+            if (typeof topic !== "string") {
+              throw new Error("Invalid topic provided to pgSubscription");
+            }
+            const unsubscribeTopic =
+              typeof unsubscribeTopicGen === "function"
+                ? await unsubscribeTopicGen(args, resolveContext, resolveInfo)
+                : unsubscribeTopicGen;
+            const asyncIterator = pubsub.asyncIterator(topic);
+            if (unsubscribeTopic) {
+              // Subscribe to event revoking subscription
+              const unsubscribeTopics: Array<string> = Array.isArray(
+                unsubscribeTopic
+              )
+                ? unsubscribeTopic
+                : [unsubscribeTopic];
+              const unsubscribeIterators = unsubscribeTopics.map(t => {
+                const i = pubsub.asyncIterator(t);
+                i["topic"] = t;
+                return i;
+              });
+              unsubscribeIterators.forEach(unsubscribeIterator => {
+                unsubscribeIterator.next().then(() => {
+                  debug(
+                    "Unsubscribe triggered on channel %s",
+                    unsubscribeIterator["topic"]
+                  );
+                  if (asyncIterator.return) {
+                    asyncIterator.return();
                   }
+                  unsubscribeIterators.forEach(i => {
+                    if (i.return) {
+                      i.return();
+                    }
+                  });
                 });
               });
-            });
-          }
+            }
 
-          return asyncIterator;
+            return asyncIterator;
+          },
+          ...(field.resolve
+            ? null
+            : {
+                resolve<T>(event: T): T {
+                  return event;
+                },
+              }),
         },
-        ...(field.resolve
-          ? null
-          : {
-              resolve<T>(event: T): T {
-                return event;
-              },
-            }),
-      });
+        "Adding subscribe function to Subscription field"
+      );
     },
     ["PgSubscriptionResolver"]
   );

@@ -28,7 +28,7 @@
   "devDependencies": {
     "jest": "^24.8.0",
     "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.7.2"
   },
   "files": [
     "node8plus"

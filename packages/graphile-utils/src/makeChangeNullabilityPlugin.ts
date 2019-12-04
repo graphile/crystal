@@ -1,5 +1,11 @@
-import { SchemaBuilder, Build, Context, Plugin, Options } from "graphile-build";
-import { GraphQLInputFieldConfig, GraphQLFieldConfig } from "graphql";
+import {
+  SchemaBuilder,
+  Build,
+  Plugin,
+  Options,
+  ContextGraphQLObjectTypeFieldsField,
+  ContextGraphQLInputObjectTypeFieldsField,
+} from "graphile-build";
 
 interface ChangeNullabilityRules {
   [typeName: string]: {
@@ -11,9 +17,24 @@ export default function makeChangeNullabilityPlugin(
   rules: ChangeNullabilityRules
 ): Plugin {
   return (builder: SchemaBuilder, _options: Options) => {
+    function changeNullability(
+      field: import("graphql").GraphQLInputFieldConfig,
+      build: Build,
+      context: ContextGraphQLInputObjectTypeFieldsField
+    ): typeof field;
+    function changeNullability(
+      field: import("graphql").GraphQLFieldConfig<any, any>,
+      build: Build,
+      context: ContextGraphQLObjectTypeFieldsField
+    ): typeof field;
     function changeNullability<
-      Field extends GraphQLInputFieldConfig | GraphQLFieldConfig<any, any>
-    >(field: Field, build: Build, context: Context<Field>): typeof field {
+      Field extends
+        | import("graphql").GraphQLInputFieldConfig
+        | import("graphql").GraphQLFieldConfig<any, any>,
+      Context extends
+        | ContextGraphQLInputObjectTypeFieldsField
+        | ContextGraphQLObjectTypeFieldsField
+    >(field: Field, build: Build, context: Context): typeof field {
       const {
         Self,
         scope: { fieldName },

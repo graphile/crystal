@@ -233,7 +233,7 @@ const plugin: PostGraphilePlugin = {
         ...(incomingOptions.appendPlugins || []),
         PgSubscriptionResolverPlugin,
         ...(simpleSubscriptions ? [PgGenericSubscriptionPlugin] : []),
-      ],
+      ] as any /* TODO: Once PostGraphile 4.6 is out we can remove this 'any' hack */,
     };
   },
 };

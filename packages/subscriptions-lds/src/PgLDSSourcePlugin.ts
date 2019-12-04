@@ -5,6 +5,15 @@ import subscribeToLogicalDecoding, {
   Announcement,
   LDSubscription,
 } from "@graphile/lds";
+
+declare module "graphile-build" {
+  interface GraphileBuildOptions {
+    pgLDSUrl?: string;
+    ldsSleepDuration?: number;
+    ldsTablePattern?: string;
+  }
+}
+
 type SubscriptionReleaser = () => void;
 type SubscriptionCallback = () => void;
 type Predicate = (record: any) => boolean;

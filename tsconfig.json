@@ -16,7 +16,8 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "preserveWatchOutput": true,
-    "lib": ["es2018", "esnext.asynciterable"]
+    "lib": ["es2018", "esnext.asynciterable"],
+    "noEmit": true
   },
   "exclude": ["node_modules", "node8plus", "build-turbo"]
 }

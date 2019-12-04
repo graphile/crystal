@@ -1,11 +1,11 @@
-import { Plugin, Options, Build } from "graphile-build";
+import { Plugin, Options, BuildBase } from "graphile-build";
 
 interface Inflectors {
   [str: string]: (...args: Array<any>) => any;
 }
 type InflectorsGenerator = (
   inflection: Inflectors,
-  build: Build,
+  build: BuildBase,
   options: Options
 ) => Inflectors;
 

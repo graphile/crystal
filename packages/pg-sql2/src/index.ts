@@ -11,19 +11,19 @@ function debugError(err: Error) {
 
 const $$trusted = Symbol("trusted");
 
-interface SQLRawNode {
+export interface SQLRawNode {
   text: string;
   type: "RAW";
   [$$trusted]: true;
 }
 
-interface SQLIdentifierNode {
+export interface SQLIdentifierNode {
   names: Array<string | symbol>;
   type: "IDENTIFIER";
   [$$trusted]: true;
 }
 
-interface SQLValueNode {
+export interface SQLValueNode {
   value: any;
   type: "VALUE";
   [$$trusted]: true;

@@ -3,16 +3,13 @@
 export PATH="$PATH:`pwd`/node_modules/.bin"
 
 set -e
-echo "[1/4]: Building Code"
+echo "[1/3]: Building Code"
 npm run prepack:all
 
-echo "[2/4]: Linting Code"
+echo "[2/3]: Linting Code"
 npm run lint
 
-echo "[3/4]: Checking types"
-npm run flow:check
-
-echo "[4/4]: Testing Project"
+echo "[3/3]: Testing Project"
 for I in packages/*/; do
   if [[ "$PGVERSION" != "9.4" || ( "$I" != "packages/lds/" && "$I" != "packages/subscriptions-lds/" ) ]]; then
     cd $I

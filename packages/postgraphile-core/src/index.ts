@@ -1,17 +1,15 @@
-// @flow
 import * as fs from "fs";
 import {
   defaultPlugins,
   getBuilder,
   Plugin,
-  Options,
+  GraphileBuildOptions,
   SchemaListener,
   Build,
   Context,
   SchemaBuilder,
   Inflection,
 } from "graphile-build";
-import { GraphQLSchema } from "graphql";
 import {
   defaultPlugins as pgDefaultPlugins,
   inflections,
@@ -29,7 +27,8 @@ export {
   SchemaBuilder,
   SchemaListener,
   Inflection,
-  Options,
+  GraphileBuildOptions,
+  GraphileBuildOptions as Options,
   formatSQLForDebugging,
 };
 
@@ -60,11 +59,11 @@ export interface PostGraphileCoreOptions {
    * Additional Options to pass through into the graphile schema building
    * system (received via the second argument of a plugin).
    */
-  graphileBuildOptions?: Partial<Options>;
+  graphileBuildOptions?: Partial<GraphileBuildOptions>;
   /**
    * @deprecated Use graphileBuildOptions instead
    */
-  graphqlBuildOptions?: Partial<Options>;
+  graphqlBuildOptions?: Partial<GraphileBuildOptions>;
   replaceAllPlugins?: Array<Plugin>;
   appendPlugins?: Array<Plugin>;
   /**
@@ -82,10 +81,10 @@ export interface PostGraphileCoreOptions {
   /**
    * @deprecated Use smart comments/tags instead
    */
-  pgColumnFilter?: <TSource>(
+  pgColumnFilter?: <TContext extends Context>(
     attr: mixed,
     build: Build,
-    context: Context<TSource>
+    context: TContext
   ) => boolean;
   /**
    * @deprecated Use '@primaryKey' smart comment instead
@@ -131,9 +130,11 @@ export const postGraphileClassicIdsOverrides = {
 };
 
 export const postGraphileInflection = inflections.newInflector(
+  // @ts-ignore
   postGraphileBaseOverrides
 );
 
+// @ts-ignore
 export const postGraphileClassicIdsInflection = inflections.newInflector({
   ...postGraphileBaseOverrides,
   ...postGraphileClassicIdsOverrides,
@@ -382,9 +383,13 @@ export const getPostGraphileBuilder = async (
     pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
     pgExtendedTypes: !!dynamicJson,
     pgColumnFilter: pgColumnFilter || (() => true),
-    pgInflection:
-      inflector ||
-      (classicIds ? postGraphileClassicIdsInflection : postGraphileInflection),
+    ...({
+      pgInflection:
+        inflector ||
+        (classicIds
+          ? postGraphileClassicIdsInflection
+          : postGraphileInflection),
+    } as any),
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
     pgJwtTypeIdentifier: jwtPgTypeIdentifier,
     pgJwtSecret: jwtSecret,
@@ -472,7 +477,7 @@ export const watchPostGraphileSchema = async (
     },
   });
   let released = false;
-  function handleNewSchema(schema: GraphQLSchema) {
+  function handleNewSchema(schema: import("graphql").GraphQLSchema) {
     if (writeCache) {
       writeCache().catch(abort);
     }

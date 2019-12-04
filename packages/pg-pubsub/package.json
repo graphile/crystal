@@ -37,6 +37,7 @@
   },
   "peerDependencies": {
     "graphile-build": "4.x",
+    "graphile-build-pg": "4.x",
     "graphql": ">=0.6 <15",
     "postgraphile": "^4.4.0-beta.10"
   },
@@ -50,7 +51,7 @@
     "pg": "^7.10.0",
     "postgraphile": "^4.4.0",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.7.2"
   },
   "files": [
     "dist"

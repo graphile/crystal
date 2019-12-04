@@ -1,5 +1,4 @@
-import { GraphQLResolveInfo } from "graphql";
-import { Build, Context } from "graphile-build";
+import { Build, ContextGraphQLObjectTypeFieldsField } from "graphile-build";
 import { QueryBuilder, SQL } from "graphile-build-pg";
 
 export type SelectGraphQLResultFromTable = (
@@ -7,17 +6,17 @@ export type SelectGraphQLResultFromTable = (
   builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
 ) => Promise<any>;
 
-export interface GraphileHelpers<TSource> {
+export interface GraphileHelpers {
   build: Build;
-  fieldContext: Context<TSource>;
+  fieldContext: ContextGraphQLObjectTypeFieldsField;
   selectGraphQLResultFromTable: SelectGraphQLResultFromTable;
 }
 
-export function makeFieldHelpers<TSource>(
+export function makeFieldHelpers(
   build: Build,
-  fieldContext: Context<TSource>,
+  fieldContext: ContextGraphQLObjectTypeFieldsField,
   context: any,
-  resolveInfo: GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo
 ) {
   const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
   const { getDataFromParsedResolveInfoFragment, scope } = fieldContext;
@@ -38,7 +37,7 @@ export function makeFieldHelpers<TSource>(
     builderCallback?: (alias: SQL, sqlBuilder: QueryBuilder) => void
   ) => {
     const { pgClient } = context;
-    const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+    const parsedResolveInfoFragment = parseResolveInfo(resolveInfo, true);
     const PayloadType = resolveInfo.returnType;
 
     const resolveData = getDataFromParsedResolveInfoFragment(
@@ -91,7 +90,7 @@ export function makeFieldHelpers<TSource>(
     }
   };
 
-  const graphileHelpers: GraphileHelpers<TSource> = {
+  const graphileHelpers: GraphileHelpers = {
     build,
     fieldContext,
     selectGraphQLResultFromTable,
@@ -99,9 +98,9 @@ export function makeFieldHelpers<TSource>(
   return graphileHelpers;
 }
 
-export function requireColumn<Type>(
+export function requireColumn(
   build: Build,
-  context: Context<Type>,
+  context: ContextGraphQLObjectTypeFieldsField,
   method: "addArgDataGenerator" | "addDataGenerator",
   col: string,
   alias: string
@@ -117,18 +116,18 @@ export function requireColumn<Type>(
   }));
 }
 
-export function requireChildColumn<Type>(
+export function requireChildColumn(
   build: Build,
-  context: Context<Type>,
+  context: ContextGraphQLObjectTypeFieldsField,
   col: string,
   alias: string
 ): void {
   return requireColumn(build, context, "addArgDataGenerator", col, alias);
 }
 
-export function requireSiblingColumn<Type>(
+export function requireSiblingColumn(
   build: Build,
-  context: Context<Type>,
+  context: ContextGraphQLObjectTypeFieldsField,
   col: string,
   alias: string
 ): void {
