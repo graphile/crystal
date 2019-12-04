@@ -49,6 +49,32 @@ module.exports = {
     "no-inner-declarations": "warn",
   },
   overrides: [
+    // Rules for plugins
+    {
+      files: [
+        "packages/graphile-build/src/plugins/**/*.ts",
+        "packages/graphile-build-pg/src/**/*.ts",
+        "packages/graphile-utils/src/**/*.ts",
+        "packages/pg-pubsub/src/**/*.ts",
+        "packages/postgraphile-core/src/**/*.ts",
+        "packages/subscriptions-lds/src/**/*.ts",
+      ],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            paths: [
+              {
+                name: "graphql",
+                message:
+                  'Please refer to `build.graphql` instead, or use `import("graphql")` in value positions. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues.)',
+              },
+            ],
+          },
+        ],
+      },
+    },
+
     // Rules for Flow only
     {
       files: ["*.js", "*.jsx"],

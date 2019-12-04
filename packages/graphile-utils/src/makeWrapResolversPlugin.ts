@@ -6,11 +6,6 @@ import {
   ContextGraphQLObjectTypeFieldsField,
 } from "graphile-build";
 import {
-  GraphQLFieldResolver,
-  GraphQLResolveInfo,
-  GraphQLFieldConfig,
-} from "graphql";
-import {
   makeFieldHelpers,
   requireChildColumn,
   requireSiblingColumn,
@@ -21,11 +16,11 @@ type ResolverWrapperFn<
   TContext = any,
   TArgs = { [argName: string]: any }
 > = (
-  resolve: GraphQLFieldResolver<TSource, TContext, TArgs>,
+  resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
   source: TSource,
   args: TArgs,
   context: TContext,
-  resolveInfo: GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo
 ) => any;
 interface ResolverWrapperRequirements {
   childColumns?: Array<{ column: string; alias: string }>;
@@ -49,7 +44,7 @@ type ResolverWrapperRulesGenerator = (options: Options) => ResolverWrapperRules;
 type ResolverWrapperFilter<T> = (
   context: ContextGraphQLObjectTypeFieldsField,
   build: Build,
-  field: GraphQLFieldConfig<any, any>,
+  field: import("graphql").GraphQLFieldConfig<any, any>,
   options: Options
 ) => T | null;
 
