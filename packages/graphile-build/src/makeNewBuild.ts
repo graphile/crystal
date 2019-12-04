@@ -1105,7 +1105,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
     newWithHooks,
 
     /**
-     * @deprecated
+     * @deprecated Use `fieldDataGeneratorsByFieldNameByType` instead.
      */
     fieldDataGeneratorsByType: fieldDataGeneratorsByFieldNameByType,
 

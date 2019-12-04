@@ -1586,6 +1586,20 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@microsoft/tsdoc-config@0.12.16":
+  version "0.12.16"
+  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc-config/-/tsdoc-config-0.12.16.tgz#88d85b84cbb959ac46fda5037ea71f2e4fe8c598"
+  integrity sha512-oSNFVSwkpE6wa/KFgPI+/hqYhFHcajNmQwA4uczQbhuKkyYYk9dIKKPVNdAFoduwuAX3Yy11vCPKFmhTBWP/8Q==
+  dependencies:
+    "@microsoft/tsdoc" "0.12.16"
+    ajv "~6.10.2"
+    resolve "~1.12.0"
+
+"@microsoft/tsdoc@0.12.16":
+  version "0.12.16"
+  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.12.16.tgz#13869988581fddbdfdbcb92e26edc955fc6e00ca"
+  integrity sha512-SX8JNEVy6U5+56aQnQB8A2XK+WSF//b0kBa6KqxE48pcccqVuIu1ePAR/EWd1cQB6zWv26QIY5uv/++qm+Z3Mw==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -2060,7 +2074,7 @@ agentkeepalive@^3.4.1:
   dependencies:
     humanize-ms "^1.2.1"
 
-ajv@^6.10.0, ajv@^6.10.2, ajv@^6.5.5:
+ajv@^6.10.0, ajv@^6.10.2, ajv@^6.5.5, ajv@~6.10.2:
   version "6.10.2"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.2.tgz#d3cea04d6b017b2894ad69040fec8b623eb4bd52"
   integrity sha512-TXtUUEYHuaTEbLZWIKUr5pmBuhDLy+8KYtPYdcV8qC+pOZL+NKqYwvWSRrVXHn+ZmRRAu8vJTAznH7Oag6RVRw==
@@ -3476,6 +3490,14 @@ eslint-plugin-prettier@^3.0.1:
   integrity sha512-A+TZuHZ0KU0cnn56/9mfR7/KjUJ9QNVXUhwvRFSR7PGPe0zQR6PTkmyqg1AtUUEOzTqeRsUwyKFh0oVZKVCrtA==
   dependencies:
     prettier-linter-helpers "^1.0.0"
+
+eslint-plugin-tsdoc@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-tsdoc/-/eslint-plugin-tsdoc-0.2.0.tgz#b31d7a8d1a302a8e1afaa3e3b0f0837461df0a49"
+  integrity sha512-Ciei/N/95nCAqFUhAmN3FNq4r75GtQTFuNBKNOoT1m8OsxhPf+MoD5JJFbvssaaYU0K9jGEjbR/mVyUKg5hWJg==
+  dependencies:
+    "@microsoft/tsdoc" "0.12.16"
+    "@microsoft/tsdoc-config" "0.12.16"
 
 eslint-scope@^4.0.0:
   version "4.0.3"
@@ -7197,6 +7219,13 @@ resolve@1.x, resolve@^1.10.0, resolve@^1.12.0, resolve@^1.3.2, resolve@^1.8.1:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.12.0.tgz#3fc644a35c84a48554609ff26ec52b66fa577df6"
   integrity sha512-B/dOmuoAik5bKcD6s6nXDCjzUKnaDvdkRyAk6rsmsKLipWj4797iothd7jmmUhWTfinVMU+wc56rYKsit2Qy4w==
+  dependencies:
+    path-parse "^1.0.6"
+
+resolve@~1.12.0:
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.12.3.tgz#96d5253df8005ce19795c14338f2a013c38a8c15"
+  integrity sha512-hF6+hAPlxjqHWrw4p1rF3Wztbgxd4AjA5VlUzY5zcTb4J8D3JK4/1RjU48pHz2PJWzGVsLB1VWZkvJzhK2CCOA==
   dependencies:
     path-parse "^1.0.6"
 

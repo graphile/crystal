@@ -86,8 +86,9 @@ export interface PostGraphileCoreOptions {
     build: Build,
     context: TContext
   ) => boolean;
+
   /**
-   * @deprecated Use '@primaryKey' smart comment instead
+   * @deprecated Use '\@primaryKey' smart comment instead
    */
   viewUniqueKey?: string;
   enableTags?: boolean;

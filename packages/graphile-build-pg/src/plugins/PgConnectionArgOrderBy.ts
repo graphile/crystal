@@ -29,7 +29,7 @@ export type OrderBySpec =
        *
        * - true: `NULLS FIRST`
        * - false: `NULLS LAST`
-       * - null: ``
+       * - null: ` `
        */
       boolean | null | undefined
     ];

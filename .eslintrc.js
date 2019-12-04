@@ -9,7 +9,7 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier/@typescript-eslint",
   ],
-  plugins: ["jest", "graphql"],
+  plugins: ["jest", "graphql", "tsdoc"],
   env: {
     jest: true,
     node: true,
@@ -42,6 +42,7 @@ module.exports = {
     "no-await-in-loop": 0,
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
+    "tsdoc/syntax": 2,
 
     // Rules that we should enable:
     "@typescript-eslint/no-use-before-define": "warn",
