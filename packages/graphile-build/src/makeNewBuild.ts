@@ -33,10 +33,12 @@ import SchemaBuilder, {
   ContextGraphQLObjectTypeFieldsField,
   ContextGraphQLObjectTypeFieldsFieldArgs,
   ScopeGraphQLObjectTypeFieldsField,
+  ScopeGraphQLObjectTypeFieldsFieldWithFieldName,
   ScopeGraphQLInputObjectTypeFieldsField,
   ArgDataGeneratorFunction,
   DataGeneratorFunction,
   Build,
+  ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName,
 } from "./SchemaBuilder";
 
 import extend, { indent } from "./extend";
@@ -204,7 +206,7 @@ export type FieldWithHooksFunction = (
   spec:
     | FieldSpec
     | ((context: ContextGraphQLObjectTypeFieldsField) => FieldSpec),
-  fieldScope: Omit<ScopeGraphQLObjectTypeFieldsField, "fieldName">
+  fieldScope: ScopeGraphQLObjectTypeFieldsField
 ) => graphql.GraphQLFieldConfig<any, any>;
 
 export type InputFieldWithHooksFunction = (
@@ -214,7 +216,7 @@ export type InputFieldWithHooksFunction = (
     | ((
         ContextGraphQLInputObjectTypeFieldsField
       ) => graphql.GraphQLInputFieldConfig),
-  fieldScope: Omit<ScopeGraphQLInputObjectTypeFieldsField, "fieldName">
+  fieldScope: ScopeGraphQLInputObjectTypeFieldsField
 ) => graphql.GraphQLInputFieldConfig;
 
 function getNameFromType(
@@ -606,6 +608,19 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
             fieldArgDataGeneratorsByFieldName[fieldName] = argDataGenerators;
 
             let newSpec = spec;
+            const scopeWithFieldName: ScopeGraphQLObjectTypeFieldsFieldWithFieldName = extend(
+              extend(
+                { ...scope },
+                {
+                  fieldName,
+                },
+
+                `Within context for GraphQLObjectType '${rawSpec.name}'`
+              ),
+
+              fieldScope,
+              `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`
+            );
             const context: ContextGraphQLObjectTypeFieldsField = {
               ...commonContext,
               Self: Self as graphql.GraphQLObjectType,
@@ -687,19 +702,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 }
                 return data;
               },
-              scope: extend(
-                extend(
-                  { ...scope },
-                  {
-                    fieldName,
-                  },
-
-                  `Within context for GraphQLObjectType '${rawSpec.name}'`
-                ),
-
-                fieldScope,
-                `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`
-              ),
+              scope: scopeWithFieldName,
             };
 
             if (typeof newSpec === "function") {
@@ -811,22 +814,23 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
               );
             }
+            const finalFieldScope: ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName = extend(
+              extend(
+                { ...scope },
+                {
+                  fieldName,
+                },
+
+                `Within context for GraphQLInputObjectType '${rawSpec.name}'`
+              ),
+
+              fieldScope,
+              `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`
+            );
             const context: ContextGraphQLInputObjectTypeFieldsField = {
               ...commonContext,
               Self: Self as graphql.GraphQLInputObjectType,
-              scope: extend(
-                extend(
-                  { ...scope },
-                  {
-                    fieldName,
-                  },
-
-                  `Within context for GraphQLInputObjectType '${rawSpec.name}'`
-                ),
-
-                fieldScope,
-                `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`
-              ),
+              scope: finalFieldScope,
             };
 
             let newSpec = spec;

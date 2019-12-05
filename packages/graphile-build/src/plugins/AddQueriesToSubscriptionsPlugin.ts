@@ -1,12 +1,5 @@
 import { Plugin } from "../SchemaBuilder";
 
-declare module "../SchemaBuilder" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isLiveField?: true;
-    originalField?: import("graphql").GraphQLField<any, any>;
-  }
-}
-
 const AddQueriesToSubscriptionsPlugin: Plugin = function(
   builder,
   { subscriptions, live }

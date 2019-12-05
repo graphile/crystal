@@ -36,7 +36,6 @@
     "graphql-parse-resolve-info": "4.5.0",
     "iterall": "^1.2.2",
     "lodash": ">=4 <5",
-    "lru-cache": "^5.0.0",
     "pluralize": "^7.0.0",
     "semver": "^6.0.0"
   },

@@ -46,7 +46,6 @@
     "graphql-iso-date": "^3.6.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": ">=4 <5",
-    "lru-cache": ">=4 <5",
     "pg-sql2": "4.5.0",
     "postgres-interval": "^1.2.0"
   },

@@ -10,5 +10,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../graphile-build" },
+    { "path": "../lru" },
+    { "path": "../jest-serializer-graphql-schema" },
+    { "path": "../pg-sql2" }
+  ]
 }

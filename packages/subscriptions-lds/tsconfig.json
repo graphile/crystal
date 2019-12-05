@@ -6,5 +6,6 @@
     "outDir": "./dist",
     "noEmit": false
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "references": [{ "path": "../lds" }, { "path": "../postgraphile-core" }]
 }

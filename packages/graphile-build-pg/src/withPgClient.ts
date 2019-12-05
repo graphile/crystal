@@ -3,8 +3,14 @@ import debugFactory from "debug";
 
 const debug = debugFactory("graphile-build-pg");
 
-function constructorName(obj) {
-  return obj && typeof obj.constructor === "function" && obj.constructor.name;
+function constructorName(obj: unknown): string | null {
+  return (
+    (typeof obj === "object" &&
+      obj &&
+      typeof obj.constructor === "function" &&
+      obj.constructor.name) ||
+    null
+  );
 }
 
 // Some duck-typing
@@ -88,7 +94,7 @@ const withPgClient = async (
     pgConfig
   );
 
-  const errorHandler = e => {
+  const errorHandler = (e: Error) => {
     // eslint-disable-next-line no-console
     console.error("withPgClient client error:", e.message);
   };

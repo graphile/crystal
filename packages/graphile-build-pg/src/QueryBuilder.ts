@@ -283,7 +283,7 @@ class QueryBuilder {
   ) {
     if (this.supportsJSONB && fields.length > 50) {
       const fieldsChunks = chunk(fields, 50);
-      const chunkToJson = fieldsChunk =>
+      const chunkToJson = (fieldsChunk: [SQL, string][]) =>
         sql.fragment`jsonb_build_object(${sql.join(
           fieldsChunk.map(
             ([expr, alias]) =>
@@ -320,19 +320,19 @@ class QueryBuilder {
   }
 
   makeLiveCollection(
-    table: PgClass,
+    _table: PgClass,
     cb?: (checker: (data: any) => (record: any) => boolean) => void
   ) {
     /* the actual condition doesn't matter hugely, 'select' should work */
     if (!this.rootValue || !this.rootValue.liveConditions) return;
     const liveConditions = this.data.liveConditions;
-    const checkerGenerator = data => {
+    const checkerGenerator = (data: any) => {
       // Compute this once.
       const checkers = liveConditions.map(([checkerGenerator]) =>
         checkerGenerator(data)
       );
 
-      return record => checkers.every(checker => checker(record));
+      return (record: any) => checkers.every(checker => checker(record));
     };
     if (this.parentQueryBuilder) {
       const parentQueryBuilder = this.parentQueryBuilder;

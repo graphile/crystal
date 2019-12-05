@@ -20,29 +20,6 @@ export type NodeFetcher<T = any> = (
   resolveInfo: import("graphql").GraphQLResolveInfo
 ) => T;
 
-declare module "../SchemaBuilder" {
-  interface Build {
-    nodeIdFieldName: string;
-    $$nodeType: symbol;
-    nodeFetcherByTypeName: { [a: string]: NodeFetcher };
-    getNodeIdForTypeAndIdentifiers: (
-      Type: import("graphql").GraphQLType,
-      ...identifiers: Array<unknown>
-    ) => string;
-    getTypeAndIdentifiersFromNodeId: (
-      nodeId: string
-    ) => {
-      Type: import("graphql").GraphQLType;
-      identifiers: Array<unknown>;
-    };
-
-    addNodeFetcherForTypeName: (typeName: string, fetcher: NodeFetcher) => void;
-    getNodeAlias: (typeName: string) => string;
-    getNodeType: (alias: string) => import("graphql").GraphQLType;
-    setNodeAlias: (typeName: string, alias: string) => void;
-  }
-}
-
 export default (function NodePlugin(
   builder,
   { nodeIdFieldName: inNodeIdFieldName }

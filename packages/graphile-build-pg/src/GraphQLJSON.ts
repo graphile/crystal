@@ -27,14 +27,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-export default function makeGraphQLJSONType(graphql, name) {
+export default function makeGraphQLJSONType(
+  graphql: typeof import("graphql"),
+  name: string
+) {
   const { GraphQLScalarType, Kind } = graphql;
 
-  function identity(value) {
+  function identity(value: any) {
     return value;
   }
 
-  function parseLiteral(ast, variables) {
+  const parseLiteral: import("graphql").GraphQLScalarLiteralParser<any> = (
+    ast,
+    variables
+  ) => {
     switch (ast.kind) {
       case Kind.STRING:
       case Kind.BOOLEAN:
@@ -61,7 +67,7 @@ export default function makeGraphQLJSONType(graphql, name) {
       default:
         return undefined;
     }
-  }
+  };
 
   return new GraphQLScalarType({
     name,

@@ -43,6 +43,8 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.12",
+    "graphile-build": "4.x",
+    "graphile-build-pg": "4.x",
     "graphql": ">=0.6 <15",
     "jest": "24.9.0",
     "jest-serializer-graphql-schema": "4.5.0",

@@ -343,7 +343,7 @@ export class LiveCoordinator {
     _info: import("graphql").GraphQLResolveInfo
   ): AsyncIterator<void> {
     const monitor = this.getMonitor({
-      liveAbort: e => {
+      liveAbort: (e: Error) => {
         if (iterator && iterator.throw) iterator.throw(e);
       },
     });

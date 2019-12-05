@@ -1,11 +1,5 @@
 import { Plugin, ScopeGraphQLObjectType } from "../SchemaBuilder";
 
-declare module "../SchemaBuilder" {
-  interface ScopeGraphQLObjectType {
-    isRootSubscription?: true;
-  }
-}
-
 function isValidSubscription(Subscription) {
   try {
     if (!Subscription) {

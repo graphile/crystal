@@ -40,6 +40,7 @@ import EventEmitter = require("events");
 
 import { LiveCoordinator } from "./Live";
 import { ResolveTree } from "graphql-parse-resolve-info";
+import { NodeFetcher } from "./plugins/NodePlugin";
 
 export { FieldWithHooksFunction, InputFieldWithHooksFunction };
 
@@ -59,6 +60,7 @@ export interface GraphileBuildOptions {
   subscriptions?: boolean;
   live?: boolean;
   nodeIdFieldName?: string;
+  dontSwallowErrors?: boolean;
 }
 
 // Deprecated 'Options' in favour of 'GraphileBuildOptions':
@@ -297,7 +299,30 @@ export interface BuildBase {
   liveCoordinator: LiveCoordinator;
 }
 
-export interface Build extends BuildBase {}
+export interface Build extends BuildBase {
+  // QueryPlugin
+  $$isQuery: symbol;
+
+  // NodePlugin
+  nodeIdFieldName: string;
+  $$nodeType: symbol;
+  nodeFetcherByTypeName: { [typeName: string]: NodeFetcher };
+  getNodeIdForTypeAndIdentifiers: (
+    Type: import("graphql").GraphQLType,
+    ...identifiers: Array<unknown>
+  ) => string;
+  getTypeAndIdentifiersFromNodeId: (
+    nodeId: string
+  ) => {
+    Type: import("graphql").GraphQLType;
+    identifiers: Array<unknown>;
+  };
+
+  addNodeFetcherForTypeName: (typeName: string, fetcher: NodeFetcher) => void;
+  getNodeAlias: (typeName: string) => string;
+  getNodeType: (alias: string) => import("graphql").GraphQLType;
+  setNodeAlias: (typeName: string, alias: string) => void;
+}
 
 export interface Scope {
   __origin?: string | null | undefined;
@@ -371,7 +396,11 @@ export interface ContextGraphQLScalarType extends Context {
 }
 
 export interface ScopeGraphQLObjectType extends Scope {
+  isRootQuery?: true;
+  isRootMutation?: true;
+  isRootSubscription?: true;
   isMutationPayload?: true;
+  isPageInfo?: true;
 }
 export interface ContextGraphQLObjectTypeBase extends Context {
   scope: ScopeGraphQLObjectType;
@@ -417,18 +446,23 @@ export interface ContextGraphQLObjectTypeFields
 
 export interface ScopeGraphQLObjectTypeFieldsField
   extends ScopeGraphQLObjectType {
-  fieldName: string;
+  fieldName?: string;
   autoField?: true;
   fieldDirectives?: DirectiveMap;
 
-  // TODO: Relocate these to the relevant places
+  isLiveField?: true;
+  originalField?: import("graphql").GraphQLField<any, any>;
   isRootNodeField?: true;
   isPageInfoHasNextPageField?: true;
   isPageInfoHasPreviousPageField?: true;
 }
+export interface ScopeGraphQLObjectTypeFieldsFieldWithFieldName
+  extends ScopeGraphQLObjectTypeFieldsField {
+  fieldName: string;
+}
 export interface ContextGraphQLObjectTypeFieldsField
   extends ContextGraphQLObjectTypeBase {
-  scope: ScopeGraphQLObjectTypeFieldsField;
+  scope: ScopeGraphQLObjectTypeFieldsFieldWithFieldName;
   Self: GraphQLObjectType;
   addDataGenerator: (fn: DataGeneratorFunction) => void;
   addArgDataGenerator: (fn: ArgDataGeneratorFunction) => void;
@@ -486,12 +520,16 @@ export interface ContextGraphQLInputObjectTypeFields
 
 export interface ScopeGraphQLInputObjectTypeFieldsField
   extends ScopeGraphQLInputObjectType {
-  fieldName: string;
+  fieldName?: string;
   autoField?: true;
+}
+export interface ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName
+  extends ScopeGraphQLInputObjectTypeFieldsField {
+  fieldName: string;
 }
 export interface ContextGraphQLInputObjectTypeFieldsField
   extends ContextGraphQLInputObjectType {
-  scope: ScopeGraphQLInputObjectTypeFieldsField;
+  scope: ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName;
   Self: GraphQLInputObjectType;
 }
 
@@ -529,6 +567,7 @@ export type SomeScope =
   | ScopeGraphQLObjectTypeInterfaces
   | ScopeGraphQLObjectTypeFields
   | ScopeGraphQLObjectTypeFieldsField
+  | ScopeGraphQLObjectTypeFieldsFieldWithFieldName
   | ScopeGraphQLObjectTypeFieldsFieldArgs
   | ScopeGraphQLInterfaceType
   | ScopeGraphQLUnionType
@@ -536,6 +575,7 @@ export type SomeScope =
   | ScopeGraphQLInputObjectType
   | ScopeGraphQLInputObjectTypeFields
   | ScopeGraphQLInputObjectTypeFieldsField
+  | ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName
   | ScopeGraphQLEnumType
   | ScopeGraphQLEnumTypeValues
   | ScopeGraphQLEnumTypeValuesValue
@@ -853,9 +893,9 @@ class SchemaBuilder extends EventEmitter {
       // TODO: I think there are situations in which this algorithm may result in unnecessary conflict errors; we should take a more iterative approach or find a better algorithm
       const relevantHooks = this.hooks[hookName];
       let minIndex = 0;
-      let minReason = null;
+      let minReason: Hook<any, any> | null = null;
       let maxIndex = relevantHooks.length;
-      let maxReason = null;
+      let maxReason: Hook<any, any> | null = null;
       const { provides: newProvides, before: newBefore, after: newAfter } = fn;
       const describe = (hook: any, index?: number) => {
         if (!hook) {
@@ -882,14 +922,14 @@ class SchemaBuilder extends EventEmitter {
           );
         }
       };
-      const setMin = (newMin, reason) => {
+      const setMin = (newMin: number, reason: Hook<any, any>) => {
         if (newMin > minIndex) {
           minIndex = newMin;
           minReason = reason;
           check();
         }
       };
-      const setMax = (newMax, reason) => {
+      const setMax = (newMax: number, reason: Hook<any, any>) => {
         if (newMax < maxIndex) {
           maxIndex = newMax;
           maxReason = reason;
