@@ -25,6 +25,7 @@ sponsor](https://graphile.org/sponsor/).
 - HR-ON
 - DocIQ
 - Ian Stewart
+- Principia Mentis
 
 ## Supporters
 
