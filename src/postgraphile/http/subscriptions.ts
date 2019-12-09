@@ -1,5 +1,5 @@
 import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'http';
-import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
+import { HttpRequestHandler, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
   ExecutionResult,
@@ -15,6 +15,7 @@ import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
 import liveSubscribe from './liveSubscribe';
+import { GraphileResolverContext } from 'postgraphile-core';
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -83,7 +84,7 @@ export async function enhanceHttpServerWithSubscriptions<
   };
 
   const addContextForSocketAndOpId = (
-    context: mixed,
+    context: GraphileResolverContext,
     ws: WebSocket,
     opId: string,
   ): Deferred<void> => {
@@ -153,7 +154,7 @@ export async function enhanceHttpServerWithSubscriptions<
     return { req, res: dummyRes };
   };
 
-  const getContext = (socket: WebSocket, opId: string): Promise<mixed> => {
+  const getContext = (socket: WebSocket, opId: string): Promise<GraphileResolverContext> => {
     return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>

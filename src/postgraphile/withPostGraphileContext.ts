@@ -5,22 +5,17 @@ import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
 import * as sql from 'pg-sql2';
 import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
 import { pluginHookFromOptions } from './pluginHook';
-import { mixed, WithPostGraphileContextOptions } from '../interfaces';
-import { formatSQLForDebugging } from 'postgraphile-core';
+import { mixed, WithPostGraphileContextOptions, GraphileClaims } from '../interfaces';
+import { formatSQLForDebugging, GraphileResolverContext } from 'postgraphile-core';
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
 ): undefined | Array<string | RegExp> | string | RegExp =>
   o && (!Array.isArray(o) || o.length) ? o : undefined;
 
-interface PostGraphileContext {
-  [$$pgClient]: PoolClient;
-  [key: string]: PoolClient | mixed;
-}
-
 export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
   options: WithPostGraphileContextOptions,
-  callback: (context: PostGraphileContext) => Promise<TResult>,
+  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
 ) => Promise<TResult>;
 
 const debugPg = createDebugger('postgraphile:postgres');
@@ -63,10 +58,10 @@ function simpleWithPgClient(pgPool: Pool) {
   return func;
 }
 
-const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
+const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
   options: WithPostGraphileContextOptions,
-  callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
-): Promise<ExecutionResult> => {
+  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
+): Promise<TResult> => {
   const {
     pgPool,
     jwtToken,
@@ -264,16 +259,16 @@ const withDefaultPostGraphileContext: WithPostGraphileContextFn = async (
  * });
  * ```
  */
-const withPostGraphileContext: WithPostGraphileContextFn = async (
+async function withPostGraphileContext<TResult = ExecutionResult>(
   options: WithPostGraphileContextOptions,
-  callback: (context: PostGraphileContext) => Promise<ExecutionResult>,
-): Promise<ExecutionResult> => {
+  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
+): Promise<TResult> {
   const pluginHook = pluginHookFromOptions(options);
   const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
     options,
   });
   return withContext(options, callback);
-};
+}
 
 export default withPostGraphileContext;
 
@@ -307,11 +302,11 @@ async function getSettingsForPgClientTransaction({
 }): Promise<{
   role: string | undefined;
   localSettings: Array<[string, string]>;
-  jwtClaims: { [claimName: string]: mixed } | null;
+  jwtClaims: GraphileClaims | null;
 }> {
   // Setup our default role. Once we decode our token, the role may change.
   let role = pgDefaultRole;
-  let jwtClaims: { [claimName: string]: mixed } = {};
+  let jwtClaims: GraphileClaims = {};
 
   // If we were provided a JWT token, let us try to verify it. If verification
   // fails we want to throw an error.
@@ -365,7 +360,7 @@ async function getSettingsForPgClientTransaction({
       }
 
       // jwt.verify returns `object | string`; but the `object` part is really a map
-      jwtClaims = claims as typeof jwtClaims;
+      jwtClaims = claims as GraphileClaims;
 
       const roleClaim = getPath(jwtClaims, jwtRole);
 

@@ -56,7 +56,7 @@ export interface PostGraphilePlugin {
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
 
-  withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
+  withPostGraphileContext?: HookFn<WithPostGraphileContextFn<any>>;
 }
 type HookName = keyof PostGraphilePlugin;
 

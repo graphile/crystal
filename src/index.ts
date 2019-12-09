@@ -23,6 +23,7 @@ export {
   postGraphileClassicIdsOverrides,
   PostGraphileInflectionPlugin,
   PostGraphileClassicIdsInflectionPlugin,
+  GraphileResolverContext,
 } from 'postgraphile-core';
 
 export {
@@ -31,7 +32,7 @@ export {
   watchPostGraphileSchema,
   withPostGraphileContext,
   enhanceHttpServerWithSubscriptions,
-  // Backwards compatability
+  // Backwards compatibility
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,
   watchPostGraphileSchema as watchPostGraphQLSchema,
