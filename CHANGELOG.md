@@ -7,50 +7,17 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
-## [4.5.5](https://github.com/graphile/postgraphile/compare/v4.5.4...v4.5.5) (2019-12-13)
-
-
-
-## [4.5.4](https://github.com/graphile/postgraphile/compare/v4.5.3...v4.5.4) (2019-12-11)
+# [4.6.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.5.0...v4.6.0-alpha.0) (2019-12-09)
 
 
 ### Bug Fixes
 
-* **deps:** upgrade graphile-utils ([3d3c41e](https://github.com/graphile/postgraphile/commit/3d3c41eb314ef83715db321a7236da7666a08fa7))
-
-
-
-## [4.5.3](https://github.com/graphile/postgraphile/compare/v4.5.2...v4.5.3) (2019-12-11)
-
-
-### Bug Fixes
-
-* **deps:** upgrade graphile-utils ([e19184f](https://github.com/graphile/postgraphile/commit/e19184f1153b7a6c57af7a5150094398ed192e8f))
-
-
-
-## [4.5.2](https://github.com/graphile/postgraphile/compare/v4.5.1...v4.5.2) (2019-12-11)
-
-
-### Bug Fixes
-
-* **deps:** solve serialize-javascript issue ([02af643](https://github.com/graphile/postgraphile/commit/02af64361d634ff009a7cf9ab2fd52b510987b9e))
-
-
-### Reverts
-
-* Revert "chore(deps): upgrade PostGraphiQL deps" ([7147e50](https://github.com/graphile/postgraphile/commit/7147e5093aac7488eb14e5e9a517dfb41b881746))
-
-
-
-## [4.5.1](https://github.com/graphile/postgraphile/compare/v4.5.0...v4.5.1) (2019-12-11)
-
-
-### Bug Fixes
-
-* **deps:** upgrade postgraphile-core ([ff5784a](https://github.com/graphile/postgraphile/commit/ff5784a436ead9412dad9075280d524139c682d3))
-* **deps:** upgrade serialize-javascript dep ([c735ea1](https://github.com/graphile/postgraphile/commit/c735ea11fde31c7ef5deb09347f41a9175176358))
 * **docker:** add missing files to Dockerfile ([04310e2](https://github.com/graphile/postgraphile/commit/04310e2b1766bd1705e39fef078738298a5444f4))
+
+
+### Features
+
+* **types:** much stronger TypeScript types ([#1205](https://github.com/graphile/postgraphile/issues/1205)) ([d2f799d](https://github.com/graphile/postgraphile/commit/d2f799d9465ba74ed800004abf3e4420f86b7862))
 
 
 
