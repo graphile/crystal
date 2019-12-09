@@ -3,7 +3,7 @@ import { Plugin } from "graphile-build";
 export default (function PgColumnDeprecationPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field",
-    (field, build, context) => {
+    (field, _build, context) => {
       const {
         scope: { pgFieldIntrospection },
       } = context;

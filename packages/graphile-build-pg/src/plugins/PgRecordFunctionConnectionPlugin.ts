@@ -3,8 +3,7 @@ import {
   GraphileObjectTypeConfig,
   ScopeGraphQLObjectType,
 } from "graphile-build";
-
-const base64 = str => Buffer.from(String(str)).toString("base64");
+import { base64, nullableIf } from "../utils";
 
 export default (function PgRecordFunctionConnectionPlugin(
   builder,
@@ -33,8 +32,6 @@ export default (function PgRecordFunctionConnectionPlugin(
         pgField,
       } = build;
 
-      const nullableIf = (condition, Type) =>
-        condition ? Type : new GraphQLNonNull(Type);
       const Cursor = getTypeByName("Cursor");
 
       introspectionResultsByKind.procedure.forEach(proc => {
@@ -104,6 +101,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                     getNamedType(NodeType).name
                   }\` at the end of the edge.`,
                   type: nullableIf(
+                    GraphQLNonNull,
                     !pgForbidSetofFunctionsToReturnNull,
                     NodeType
                   ),
@@ -158,13 +156,17 @@ export default (function PgRecordFunctionConnectionPlugin(
                   }\` objects.`,
                   type: new GraphQLNonNull(
                     new GraphQLList(
-                      nullableIf(!pgForbidSetofFunctionsToReturnNull, NodeType)
+                      nullableIf(
+                        GraphQLNonNull,
+                        !pgForbidSetofFunctionsToReturnNull,
+                        NodeType
+                      )
                     )
                   ),
 
                   resolve(data, _args, _context, resolveInfo) {
                     const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
-                    return data.data.map(entry => entry[safeAlias]);
+                    return data.data.map((entry: object) => entry[safeAlias]);
                   },
                 }),
 
@@ -185,10 +187,12 @@ export default (function PgRecordFunctionConnectionPlugin(
                         resolveInfo
                       );
 
-                      return data.data.map(entry => ({
-                        __cursor: entry.__cursor,
-                        ...entry[safeAlias],
-                      }));
+                      return data.data.map(
+                        (entry: object & { __cursor?: string }) => ({
+                          __cursor: entry.__cursor,
+                          ...entry[safeAlias],
+                        })
+                      );
                     },
                   },
 

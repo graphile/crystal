@@ -1,6 +1,6 @@
 import { Plugin } from "../SchemaBuilder";
 
-function isValidMutation(Mutation) {
+function isValidMutation(Mutation: import("graphql").GraphQLObjectType | null) {
   try {
     if (!Mutation) {
       return false;

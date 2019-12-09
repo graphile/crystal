@@ -1,4 +1,6 @@
-export default function parseIdentifier(typeIdentifier) {
+export default function parseIdentifier(
+  typeIdentifier: string
+): { namespaceName: string; entityName: string } {
   const match = typeIdentifier.match(
     /^(?:([a-zA-Z0-9_]+)|"([^"]*)")\.(?:([a-zA-Z0-9_]+)|"([^"]*)")$/
   );

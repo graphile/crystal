@@ -7,7 +7,7 @@ import { PgType } from "./PgIntrospectionPlugin";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectType {
-    isRecordReturnType?: true;
+    isRecordReturnType?: boolean;
   }
 }
 

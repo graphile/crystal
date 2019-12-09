@@ -2,8 +2,8 @@ import { Plugin } from "graphile-build";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPageInfoStartCursorField?: true;
-    isPageInfoEndCursorField?: true;
+    isPageInfoStartCursorField?: boolean;
+    isPageInfoEndCursorField?: boolean;
   }
 }
 

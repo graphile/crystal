@@ -8,7 +8,7 @@ declare module "graphile-build" {
     pgJwtSignOptions?: import("jsonwebtoken").SignOptions;
   }
   interface ScopeGraphQLScalarType {
-    isPgJwtType?: true;
+    isPgJwtType?: boolean;
   }
 }
 

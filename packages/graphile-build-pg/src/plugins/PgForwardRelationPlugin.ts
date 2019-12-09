@@ -4,7 +4,7 @@ import { stringTag } from "./PgBasicsPlugin";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPgForwardRelationField?: true;
+    isPgForwardRelationField?: boolean;
   }
 }
 
@@ -196,7 +196,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                       stringTag(constraint, "forwardDescription") ||
                       `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
                     type: gqlForeignTableType, // Nullable since RLS may forbid fetching
-                    resolve: (rawData, _args, resolveContext, resolveInfo) => {
+                    resolve: (rawData, _args, _resolveContext, resolveInfo) => {
                       const data = isMutationPayload ? rawData.data : rawData;
                       if (!data) return null;
                       const safeAlias = getSafeAliasFromResolveInfo(

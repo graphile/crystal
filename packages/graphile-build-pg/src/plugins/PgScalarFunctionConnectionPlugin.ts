@@ -4,7 +4,7 @@ import {
   ScopeGraphQLObjectType,
 } from "graphile-build";
 
-const base64 = str => Buffer.from(String(str)).toString("base64");
+const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
 
 export default (function PgScalarFunctionConnectionPlugin(builder) {
   builder.hook(
@@ -151,7 +151,9 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                   }\` objects.`,
                   type: new GraphQLNonNull(new GraphQLList(NodeType)),
                   resolve(data) {
-                    return data.data.map(entry => entry.value);
+                    return data.data.map(
+                      (entry: { value: any }) => entry.value
+                    );
                   },
                 }),
 

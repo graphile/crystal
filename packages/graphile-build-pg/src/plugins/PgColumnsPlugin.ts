@@ -3,6 +3,7 @@ import { ResolveTree } from "graphql-parse-resolve-info";
 import { PgTypeModifier } from "./PgBasicsPlugin";
 import { PgType } from "./PgIntrospectionPlugin";
 import QueryBuilder, { SQL } from "../QueryBuilder";
+import { nullableIf } from "../utils";
 
 type PgGetSelectValueForFieldAndTypeAndModifier = (
   ReturnType: import("graphql").GraphQLOutputType,
@@ -19,13 +20,6 @@ declare module "graphile-build" {
     pgGetSelectValueForFieldAndTypeAndModifier: PgGetSelectValueForFieldAndTypeAndModifier;
   }
 }
-
-const nullableIf = <T extends import("graphql").GraphQLNullableType>(
-  GraphQLNonNull: typeof import("graphql").GraphQLNonNull,
-  condition: boolean,
-  Type: T
-): T | import("graphql").GraphQLNonNull<T> =>
-  condition ? Type : (new GraphQLNonNull(Type as any) as any); // Ugh.
 
 export default (function PgColumnsPlugin(builder) {
   builder.hook(

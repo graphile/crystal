@@ -1,6 +1,7 @@
 import { Plugin } from "graphile-build";
 
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const base64Decode = (str: string) =>
+  Buffer.from(String(str), "base64").toString("utf8");
 
 export default (function PgConnectionArgs(builder) {
   builder.hook(
@@ -48,10 +49,10 @@ export default (function PgConnectionArgs(builder) {
               queryBuilder.offset(offset);
             }
             if (isPgFieldConnection) {
-              if (after != null) {
+              if (typeof after === "string") {
                 addCursorConstraint(after, true);
               }
-              if (before != null) {
+              if (typeof before === "string") {
                 addCursorConstraint(before, false);
               }
               if (typeof last === "number") {
@@ -69,7 +70,7 @@ export default (function PgConnectionArgs(builder) {
               }
             }
 
-            function addCursorConstraint(cursor, isAfter) {
+            function addCursorConstraint(cursor: string, isAfter: boolean) {
               try {
                 const cursorValues = JSON.parse(base64Decode(cursor));
                 return queryBuilder.addCursorCondition(cursorValues, isAfter);

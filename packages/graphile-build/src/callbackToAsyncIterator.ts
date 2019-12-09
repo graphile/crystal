@@ -28,7 +28,7 @@ export default function callbackToAsyncIterator<
   }) => void)[] = [];
   let pushQueue: (CallbackInput | undefined)[] = [];
   let listening = true;
-  let listenerReturnValue;
+  let listenerReturnValue: ReturnVal | null | undefined;
 
   function pushValue(value?: CallbackInput) {
     if (pullQueue.length !== 0) {

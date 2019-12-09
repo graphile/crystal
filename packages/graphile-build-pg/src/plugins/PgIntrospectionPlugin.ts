@@ -10,6 +10,7 @@ import chalk from "chalk";
 import throttle = require("lodash/throttle");
 import flatMap = require("lodash/flatMap");
 import { makeIntrospectionQuery } from "./introspectionQuery";
+import { describePgEntity } from "./PgBasicsPlugin";
 
 // @ts-ignore
 import { version } from "../../package.json";
@@ -17,6 +18,8 @@ import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 
 const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
+
+// TODO: rename RawishIntrospectionResults
 
 declare module "graphile-build" {
   interface GraphileBuildOptions {
@@ -26,8 +29,8 @@ declare module "graphile-build" {
     pgLegacyFunctionsOnly?: boolean;
     pgSkipInstallingWatchFixtures?: boolean;
     pgAugmentIntrospectionResults?: (
-      introspectionResult: PgIntrospectionResultsByKind
-    ) => PgIntrospectionResultsByKind;
+      introspectionResult: RawishIntrospectionResults
+    ) => RawishIntrospectionResults;
     pgOwnerConnectionString?: string;
   }
 
@@ -135,6 +138,8 @@ export interface PgType {
   domainBaseType: PgType | void;
   domainTypeModifier: number | void;
   domainHasDefault: boolean;
+  enumVariants: Array<string> | null;
+  rangeSubTypeId: string | null;
   tags: SmartTags;
 }
 
@@ -180,6 +185,9 @@ export interface PgConstraint {
   namespace: PgNamespace;
   isIndexed: boolean | void;
   tags: SmartTags;
+
+  // For @foreignKey etc smart tags
+  isFake?: boolean;
 }
 
 export interface PgExtension {
@@ -202,6 +210,7 @@ export interface PgIndex {
   name: string;
   namespaceName: string;
   classId: string;
+  class: PgClass;
   numberOfAttributes: number;
   indexType: string;
   isUnique: boolean;
@@ -219,6 +228,7 @@ export interface PgIndex {
   attributePropertiesAsc: Array<boolean> | void;
   attributePropertiesNullsFirst: Array<boolean> | void;
   description: string | void;
+  comment: string | void;
   tags: SmartTags;
 }
 
@@ -251,7 +261,7 @@ export type PgIntrospectionResultsByKind = {
   typeById: { [typeId: string]: PgType };
 };
 
-function readFile(filename, encoding) {
+function readFile(filename: string, encoding: string) {
   return new Promise((resolve, reject) => {
     rawReadFile(filename, encoding, (err, res) => {
       if (err) reject(err);
@@ -260,7 +270,7 @@ function readFile(filename, encoding) {
   });
 }
 
-const removeQuotes = str => {
+const removeQuotes = (str: string) => {
   const trimmed = str.trim();
   if (trimmed[0] === '"') {
     if (trimmed[trimmed.length - 1] !== '"') {
@@ -275,7 +285,7 @@ const removeQuotes = str => {
   }
 };
 
-const parseSqlColumnArray = str => {
+const parseSqlColumnArray = (str: string) => {
   if (!str) {
     throw new Error(`Cannot parse '${str}'`);
   }
@@ -283,14 +293,14 @@ const parseSqlColumnArray = str => {
   return parts.map(removeQuotes);
 };
 
-const parseSqlColumnString = str => {
+const parseSqlColumnString = (str: string) => {
   if (!str) {
     throw new Error(`Cannot parse '${str}'`);
   }
   return removeQuotes(str);
 };
 
-function parseConstraintSpec(rawSpec) {
+function parseConstraintSpec(rawSpec: string) {
   const [spec, ...tagComponents] = rawSpec.split(/\|/);
   const parsed = parseTags(tagComponents.join("\n"));
   return {
@@ -300,8 +310,14 @@ function parseConstraintSpec(rawSpec) {
   };
 }
 
-function smartCommentConstraints(introspectionResults) {
-  const attributesByNames = (tbl, cols, debugStr) => {
+function smartCommentConstraints(
+  introspectionResults: RawishIntrospectionResults
+) {
+  const attributesByNames = (
+    tbl: PgClass,
+    cols: string[],
+    debugStr: string
+  ): PgAttribute[] => {
     const attributes = introspectionResults.attribute
       .filter(a => a.classId === tbl.id)
       .sort((a, b) => a.num - b.num);
@@ -311,7 +327,15 @@ function smartCommentConstraints(introspectionResults) {
       );
 
       if (pk) {
-        return pk.keyAttributeNums.map(n => attributes.find(a => a.num === n));
+        return pk.keyAttributeNums.map(n => {
+          const attr = attributes.find(a => a.num === n);
+          if (!attr) {
+            throw new Error(
+              `Could not find attribute '${n}' in '${describePgEntity(pk)}'`
+            );
+          }
+          return attr;
+        });
       } else {
         throw new Error(
           `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${tbl.id}) and no PK found (${debugStr}).`
@@ -360,20 +384,27 @@ function smartCommentConstraints(introspectionResults) {
       });
       const keyAttributeNums = attributes.map(a => a.num);
       // Now we need to fake a constraint for this:
-      const fakeConstraint = {
-        kind: "constraint",
+      const fakeConstraint: PgConstraint = {
+        kind: PgEntityKind.CONSTRAINT,
         isFake: true,
         isIndexed: true, // otherwise it gets ignored by ignoreIndexes
-        id: Math.random(),
+        id: String(Math.random()),
         name: `FAKE_${klass.namespaceName}_${klass.name}_primaryKey`,
         type: "p", // primary key
         classId: klass.id,
-        foreignClassId: null,
-        comment: null,
+        foreignClassId: void 0,
+        comment: void 0,
         description,
         keyAttributeNums,
-        foreignKeyAttributeNums: null,
+        foreignKeyAttributeNums: [],
         tags,
+
+        // Too early for linking
+        class: null as any,
+        foreignClass: null as any,
+        keyAttributes: null as any,
+        foreignKeyAttributes: null as any,
+        namespace: null as any,
       };
 
       introspectionResults.constraint.push(fakeConstraint);
@@ -389,7 +420,7 @@ function smartCommentConstraints(introspectionResults) {
       return;
     }
     const getType = () =>
-      introspectionResults.type.find(t => t.id === klass.typeId);
+      introspectionResults.type.find(t => t.id === klass.typeId)!;
     const foreignKey = klass.tags.foreignKey || getType().tags.foreignKey;
     if (foreignKey) {
       const foreignKeys =
@@ -460,25 +491,32 @@ function smartCommentConstraints(introspectionResults) {
         ).map(a => a.num);
         const foreignKeyAttributeNums = attributesByNames(
           foreignKlass,
-          foreignColumns,
+          foreignColumns!,
           `@foreignKey ${fkSpecRaw}`
         ).map(a => a.num);
 
         // Now we need to fake a constraint for this:
-        const fakeConstraint = {
-          kind: "constraint",
+        const fakeConstraint: PgConstraint = {
+          kind: PgEntityKind.CONSTRAINT,
           isFake: true,
           isIndexed: true, // otherwise it gets ignored by ignoreIndexes
-          id: Math.random(),
+          id: String(Math.random()),
           name: `FAKE_${klass.namespaceName}_${klass.name}_foreignKey_${index}`,
           type: "f", // foreign key
           classId: klass.id,
           foreignClassId: foreignKlass.id,
-          comment: null,
+          comment: void 0,
           description,
           keyAttributeNums,
           foreignKeyAttributeNums,
           tags,
+
+          // Too early for linking
+          class: null as any,
+          foreignClass: null as any,
+          keyAttributes: null as any,
+          foreignKeyAttributes: null as any,
+          namespace: null as any,
         };
 
         introspectionResults.constraint.push(fakeConstraint);
@@ -487,13 +525,26 @@ function smartCommentConstraints(introspectionResults) {
   });
 }
 
+type RawishIntrospectionResults = Pick<
+  PgIntrospectionResultsByKind,
+  | "__pgVersion"
+  | "namespace"
+  | "class"
+  | "attribute"
+  | "type"
+  | "constraint"
+  | "procedure"
+  | "extension"
+  | "index"
+>;
+
 export default (async function PgIntrospectionPlugin(
   builder,
   {
     pgConfig,
     pgSchemas: schemas,
     pgEnableTags,
-    persistentMemoizeWithKey = (key, fn) => fn(),
+    persistentMemoizeWithKey = (_key, fn) => fn(),
     pgThrowOnMissingSchema = false,
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
@@ -502,7 +553,7 @@ export default (async function PgIntrospectionPlugin(
     pgOwnerConnectionString,
   }
 ) {
-  const augment = introspectionResults => {
+  const augment = (introspectionResults: RawishIntrospectionResults) => {
     [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
       fn ? fn(introspectionResults) : null
     );
@@ -520,7 +571,7 @@ export default (async function PgIntrospectionPlugin(
       const result = Object.keys(obj).reduce(
         (memo, k) => {
           memo[k] = Array.isArray(obj[k])
-            ? obj[k].map(v => ({ ...v }))
+            ? obj[k].map((v: object) => ({ ...v }))
             : obj[k];
           return memo;
         },
@@ -528,107 +579,106 @@ export default (async function PgIntrospectionPlugin(
       );
       return result;
     };
-    const introspectionResultsByKind = cloneResults(
-      await persistentMemoizeWithKey(cacheKey, () =>
-        withPgClient(pgConfig, async pgClient => {
-          const versionResult = await pgClient.query(
-            "show server_version_num;"
-          );
+    const rawishIntrospectionResultsByKind = cloneResults(
+      await persistentMemoizeWithKey(
+        cacheKey,
+        (): Promise<RawishIntrospectionResults> =>
+          withPgClient(
+            pgConfig,
+            async (pgClient): Promise<RawishIntrospectionResults> => {
+              const versionResult = await pgClient.query(
+                "show server_version_num;"
+              );
 
-          const serverVersionNum = parseInt(
-            versionResult.rows[0].server_version_num,
-            10
-          );
+              const serverVersionNum = parseInt(
+                versionResult.rows[0].server_version_num,
+                10
+              );
 
-          const introspectionQuery = makeIntrospectionQuery(serverVersionNum, {
-            pgLegacyFunctionsOnly,
-          });
+              const introspectionQuery = makeIntrospectionQuery(
+                serverVersionNum,
+                {
+                  pgLegacyFunctionsOnly,
+                }
+              );
 
-          const { rows } = await pgClient.query(introspectionQuery, [
-            schemas,
-            pgIncludeExtensionResources,
-          ]);
+              const { rows } = await pgClient.query(introspectionQuery, [
+                schemas,
+                pgIncludeExtensionResources,
+              ]);
 
-          const result: Pick<
-            PgIntrospectionResultsByKind,
-            | "__pgVersion"
-            | "namespace"
-            | "class"
-            | "attribute"
-            | "type"
-            | "constraint"
-            | "procedure"
-            | "extension"
-            | "index"
-          > = {
-            __pgVersion: serverVersionNum,
-            namespace: [],
-            class: [],
-            attribute: [],
-            type: [],
-            constraint: [],
-            procedure: [],
-            extension: [],
-            index: [],
-          };
+              const result: RawishIntrospectionResults = {
+                __pgVersion: serverVersionNum,
+                namespace: [],
+                class: [],
+                attribute: [],
+                type: [],
+                constraint: [],
+                procedure: [],
+                extension: [],
+                index: [],
+              };
 
-          for (const { object } of rows) {
-            result[object.kind].push(object);
-          }
-
-          // Parse tags from comments
-          [
-            "namespace",
-            "class",
-            "attribute",
-            "type",
-            "constraint",
-            "procedure",
-            "extension",
-            "index",
-          ].forEach(kind => {
-            result[kind].forEach(object => {
-              // Keep a copy of the raw comment
-              object.comment = object.description;
-              if (pgEnableTags && object.description) {
-                const parsed = parseTags(object.description);
-                object.tags = parsed.tags;
-                object.description = parsed.text;
-              } else {
-                object.tags = {};
+              for (const { object } of rows) {
+                result[object.kind].push(object);
               }
-            });
-          });
 
-          const extensionConfigurationClassIds = flatMap(
-            result.extension,
-            e => e.configurationClassIds
-          );
+              // Parse tags from comments
+              [
+                "namespace",
+                "class",
+                "attribute",
+                "type",
+                "constraint",
+                "procedure",
+                "extension",
+                "index",
+              ].forEach(kind => {
+                result[kind].forEach((object: PgEntity) => {
+                  // Keep a copy of the raw comment
+                  object.comment = object.description;
+                  if (pgEnableTags && object.description) {
+                    const parsed = parseTags(object.description);
+                    object.tags = parsed.tags;
+                    object.description = parsed.text;
+                  } else {
+                    object.tags = {};
+                  }
+                });
+              });
 
-          result.class.forEach(klass => {
-            klass.isExtensionConfigurationTable =
-              extensionConfigurationClassIds.indexOf(klass.id) >= 0;
-          });
+              const extensionConfigurationClassIds = flatMap(
+                result.extension,
+                e => e.configurationClassIds
+              );
 
-          [
-            "namespace",
-            "class",
-            "attribute",
-            "type",
-            "constraint",
-            "procedure",
-            "extension",
-            "index",
-          ].forEach(k => {
-            result[k].forEach(Object.freeze);
-          });
+              result.class.forEach(klass => {
+                klass.isExtensionConfigurationTable =
+                  extensionConfigurationClassIds.indexOf(klass.id) >= 0;
+              });
 
-          return Object.freeze(result);
-        })
+              [
+                "namespace",
+                "class",
+                "attribute",
+                "type",
+                "constraint",
+                "procedure",
+                "extension",
+                "index",
+              ].forEach(k => {
+                result[k].forEach(Object.freeze);
+              });
+
+              return Object.freeze(result);
+            }
+          )
       )
     );
 
-    const knownSchemas = introspectionResultsByKind.namespace.map(n => n.name);
+    const knownSchemas = rawishIntrospectionResultsByKind.namespace.map(
+      n => n.name
+    );
     const missingSchemas = schemas.filter(s => knownSchemas.indexOf(s) < 0);
     if (missingSchemas.length) {
       const errorMessage = `You requested to use schema '${schemas.join(
@@ -643,44 +693,43 @@ export default (async function PgIntrospectionPlugin(
       }
     }
 
-    const xByY = (arrayOfX, attrKey) =>
-      arrayOfX.reduce((memo, x) => {
-        memo[x[attrKey]] = x;
-        return memo;
-      }, {});
-    const xByYAndZ = (arrayOfX, attrKey, attrKey2) =>
-      arrayOfX.reduce((memo, x) => {
-        if (!memo[x[attrKey]]) memo[x[attrKey]] = {};
-        memo[x[attrKey]][x[attrKey2]] = x;
-        return memo;
-      }, {});
-    introspectionResultsByKind.namespaceById = xByY(
-      introspectionResultsByKind.namespace,
-      "id"
-    );
+    const xByY = <X>(arrayOfX: X[], attrKey: string) =>
+      arrayOfX.reduce(
+        (memo, x) => {
+          memo[x[attrKey]] = x;
+          return memo;
+        },
+        {} as { [attrKey: string]: X }
+      );
+    const xByYAndZ = <X>(arrayOfX: X[], attrKey: string, attrKey2: string) =>
+      arrayOfX.reduce(
+        (memo, x) => {
+          if (!memo[x[attrKey]]) memo[x[attrKey]] = {};
+          memo[x[attrKey]][x[attrKey2]] = x;
+          return memo;
+        },
+        {} as { [attrKey: string]: { [attrKey: string]: X } }
+      );
+    const introspectionResultsByKind: PgIntrospectionResultsByKind = {
+      ...rawishIntrospectionResultsByKind,
+      namespaceById: xByY(rawishIntrospectionResultsByKind.namespace, "id"),
+      classById: xByY(rawishIntrospectionResultsByKind.class, "id"),
+      typeById: xByY(rawishIntrospectionResultsByKind.type, "id"),
+      attributeByClassIdAndNum: xByYAndZ(
+        rawishIntrospectionResultsByKind.attribute,
+        "classId",
+        "num"
+      ),
+      extensionById: xByY(rawishIntrospectionResultsByKind.extension, "id"),
+    };
 
-    introspectionResultsByKind.classById = xByY(
-      introspectionResultsByKind.class,
-      "id"
-    );
-
-    introspectionResultsByKind.typeById = xByY(
-      introspectionResultsByKind.type,
-      "id"
-    );
-
-    introspectionResultsByKind.attributeByClassIdAndNum = xByYAndZ(
-      introspectionResultsByKind.attribute,
-      "classId",
-      "num"
-    );
-
-    introspectionResultsByKind.extensionById = xByY(
-      introspectionResultsByKind.extension,
-      "id"
-    );
-
-    const relate = (array, newAttr, lookupAttr, lookup, missingOk = false) => {
+    function relate<TEntity extends PgEntity>(
+      array: TEntity[],
+      newAttr: string,
+      lookupAttr: string,
+      lookup: { [id: string]: PgEntity },
+      missingOk = false
+    ) {
       array.forEach(entry => {
         const key = entry[lookupAttr];
         if (Array.isArray(key)) {
@@ -715,7 +764,7 @@ export default (async function PgIntrospectionPlugin(
           entry[newAttr] = result;
         }
       });
-    };
+    }
 
     augment(introspectionResultsByKind);
 
@@ -850,15 +899,36 @@ export default (async function PgIntrospectionPlugin(
     // Constraint attributes
     introspectionResultsByKind.constraint.forEach(constraint => {
       if (constraint.keyAttributeNums && constraint.class) {
-        constraint.keyAttributes = constraint.keyAttributeNums.map(nr =>
-          constraint.class.attributes.find(attr => attr.num === nr)
-        );
+        constraint.keyAttributes = constraint.keyAttributeNums.map(nr => {
+          const attr = constraint.class.attributes.find(
+            attr => attr.num === nr
+          );
+          if (!attr) {
+            throw new Error(
+              `Could not find attribute with index '${nr}' on '${describePgEntity(
+                constraint.class
+              )}`
+            );
+          }
+          return attr;
+        });
       } else {
         constraint.keyAttributes = [];
       }
-      if (constraint.foreignKeyAttributeNums && constraint.foreignClass) {
+      const { foreignClass } = constraint;
+      if (constraint.foreignKeyAttributeNums && foreignClass) {
         constraint.foreignKeyAttributes = constraint.foreignKeyAttributeNums.map(
-          nr => constraint.foreignClass.attributes.find(attr => attr.num === nr)
+          nr => {
+            const attr = foreignClass.attributes.find(attr => attr.num === nr);
+            if (!attr) {
+              throw new Error(
+                `Could not find attribute with index '${nr}' on '${describePgEntity(
+                  constraint.class
+                )}`
+              );
+            }
+            return attr;
+          }
         );
       } else {
         constraint.foreignKeyAttributes = [];
@@ -899,7 +969,7 @@ export default (async function PgIntrospectionPlugin(
 
   let introspectionResultsByKind = await introspect();
 
-  let listener;
+  let listener: Listener | null = null;
 
   class Listener {
     _handleChange: {
@@ -910,7 +980,7 @@ export default (async function PgIntrospectionPlugin(
     stopped: boolean;
     _reallyReleaseClient: (() => void) | null;
     _haveDisplayedError: boolean;
-    constructor(triggerRebuild) {
+    constructor(triggerRebuild: () => void) {
       this.stopped = false;
       this._handleChange = throttle(
         async () => {
@@ -1015,7 +1085,7 @@ export default (async function PgIntrospectionPlugin(
       this._reallyReleaseClient = null;
       this._reconnect(e);
     }
-    async _reconnect(e) {
+    async _reconnect(e: Error) {
       if (this.stopped) {
         return;
       }
@@ -1039,10 +1109,24 @@ export default (async function PgIntrospectionPlugin(
         return;
       }
       try {
-        const payload = JSON.parse(notification.payload);
-        payload.payload = payload.payload || [];
+        // See watch-fixtures.sql for types
+        const payload:
+          | {
+              type: "ddl";
+              payload:
+                | {
+                    schema: string;
+                    command: string;
+                  }[]
+                | null;
+            }
+          | {
+              type: "drop";
+              payload: string[] | null;
+            }
+          | { type: "manual" } = JSON.parse(notification.payload);
         if (payload.type === "ddl") {
-          const commands = payload.payload
+          const commands = (payload.payload || [])
             .filter(
               ({ schema }) => schema == null || schemas.indexOf(schema) >= 0
             )
@@ -1051,7 +1135,7 @@ export default (async function PgIntrospectionPlugin(
             this._handleChange();
           }
         } else if (payload.type === "drop") {
-          const affectsOurSchemas = payload.payload.some(
+          const affectsOurSchemas = (payload.payload || []).some(
             schemaName => schemas.indexOf(schemaName) >= 0
           );
 

@@ -5,12 +5,13 @@ import {
   ScopeGraphQLObjectType,
   GraphileInputObjectTypeConfig,
 } from "graphile-build";
-import { PgProc, PgType } from "./PgIntrospectionPlugin";
+import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
 import { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
 import chalk from "chalk";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import QueryBuilder, { GraphileResolverContext } from "../QueryBuilder";
+import { nullableIf } from "../utils";
 
 declare module "graphile-build" {
   interface GraphileBuildOptions {
@@ -18,17 +19,14 @@ declare module "graphile-build" {
   }
 }
 
-const nullableIf = (GraphQLNonNull, condition, Type) =>
-  condition ? Type : new GraphQLNonNull(Type);
-
-const firstValue = obj => {
+const firstValue = (obj: { [key: string]: any }): any => {
   let firstKey;
   for (const k in obj) {
     if (k[0] !== "_" && k[1] !== "_") {
       firstKey = k;
     }
   }
-  return obj[firstKey];
+  return firstKey != null ? obj[firstKey] : undefined;
 };
 
 export default function makeProcField(
@@ -69,6 +67,7 @@ export default function makeProcField(
       GraphQLInputObjectType,
       getNamedType,
       isCompositeType,
+      isOutputType,
     },
 
     inflection,
@@ -142,25 +141,29 @@ export default function makeProcField(
     [] as PgType[]
   );
   const requiredArgCount = Math.max(0, argNames.length - proc.argDefaultsNum);
-  const variantFromName = (name, _type) => {
+  const variantFromName = (name: string) => {
     if (name.match(/(_p|P)atch$/)) {
       return "patch";
     }
     return null;
   };
-  const variantFromTags = (tags, idx) => {
+  const variantFromTags = (tags: SmartTags, idx: number) => {
     const variant = tags[`arg${idx}variant`];
-    if (variant && variant.match && variant.match(/^[0-9]+$/)) {
-      return parseInt(variant, 10);
+    if (typeof variant === "string") {
+      if (variant.match(/^[0-9]+$/)) {
+        return parseInt(variant, 10);
+      } else {
+        return variant;
+      }
     }
-    return variant;
+    return null;
   };
   const notNullArgCount =
     proc.isStrict || strictFunctions ? requiredArgCount : 0;
   const argGqlTypes = argTypes.map((type, idx) => {
     // TODO: PG10 doesn't support the equivalent of pg_attribute.atttypemod on function return values, but maybe a later version might
     const variant =
-      variantFromTags(proc.tags, idx) || variantFromName(argNames[idx], type);
+      variantFromTags(proc.tags, idx) || variantFromName(argNames[idx]);
     const Type = pgGetGqlInputTypeByTypeIdAndModifier(type.id, variant);
     if (!Type) {
       const hint = type.class
@@ -200,7 +203,7 @@ export default function makeProcField(
       `Could not determine return type for function '${proc.name}'`
     );
   }
-  let type;
+  let type: import("graphql").GraphQLOutputType;
   const fieldScope: ScopeGraphQLObjectTypeFieldsField = {
     fieldName,
   };
@@ -258,14 +261,17 @@ export default function makeProcField(
       }
     }
   } else if (isRecordLike) {
-    const RecordType = getTypeByName(inflection.recordFunctionReturnType(proc));
-    if (!RecordType) {
+    const tmpRecordType = getTypeByName(
+      inflection.recordFunctionReturnType(proc)
+    );
+    if (!tmpRecordType || !isOutputType(tmpRecordType)) {
       throw new Error(
-        `Do not have a record type '${inflection.recordFunctionReturnType(
+        `Do not have an output record type '${inflection.recordFunctionReturnType(
           proc
         )}' for '${proc.name}' so cannot create procedure field`
       );
     }
+    const RecordType = tmpRecordType;
     if (proc.returnsSet) {
       if (isMutation) {
         type = new GraphQLList(RecordType);
@@ -333,7 +339,7 @@ export default function makeProcField(
       addDataGenerator,
       getDataFromParsedResolveInfoFragment,
       addArgDataGenerator,
-    }) => {
+    }): import("graphql").GraphQLFieldConfig<any, any> => {
       if (
         proc.returnsSet &&
         !isTableLike &&
@@ -349,7 +355,7 @@ export default function makeProcField(
       }
       function makeMutationCall(
         parsedResolveInfoFragment: ResolveTree,
-        ReturnType: import("graphql").GraphQLOutputType,
+        _ReturnType: import("graphql").GraphQLOutputType,
         { implicitArgs = [] }: { implicitArgs?: SQL[] } = {}
       ): SQL {
         const { args: rawArgs = {} } = parsedResolveInfoFragment;
@@ -365,7 +371,7 @@ export default function makeProcField(
           const value = args[gqlArgName];
           const variant =
             variantFromTags(proc.tags, argIndex) ||
-            variantFromName(argNames[argIndex], type);
+            variantFromName(argNames[argIndex]);
 
           const sqlValue = gql2pg(value, argTypes[argIndex], variant);
 
@@ -628,7 +634,7 @@ export default function makeProcField(
       // setof function we must dereference '.value' from it, because this
       // makes space for '__cursor' to exist alongside it (whereas on a table
       // the '__cursor' can just be on the table object itself)
-      const scalarAwarePg2gql = v =>
+      const scalarAwarePg2gql = (v: any) =>
         isTableLike
           ? pg2gql(v, returnType)
           : {
@@ -649,7 +655,7 @@ export default function makeProcField(
         type: nullableIf(GraphQLNonNull, !proc.tags.notNull, ReturnType),
         args: args,
         resolve: computed
-          ? (data, _args, resolveContext, resolveInfo) => {
+          ? (data, _args, _resolveContext, resolveInfo) => {
               const liveRecord =
                 resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
               const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
@@ -659,14 +665,18 @@ export default function makeProcField(
                 if (proc.returnsSet && !forceList) {
                   // EITHER `isMutation` is true, or `ConnectionType` does not
                   // exist - either way, we're not returning a connection.
-                  return value.data.map(v => pg2gql(firstValue(v), returnType));
+                  return value.data.map((v: any) =>
+                    pg2gql(firstValue(v), returnType)
+                  );
                 } else if (proc.returnsSet || rawReturnType.isPgArray) {
-                  return value.map(v => pg2gql(firstValue(v), returnType));
+                  return value.map((v: any) =>
+                    pg2gql(firstValue(v), returnType)
+                  );
                 } else {
                   return pg2gql(value, returnType);
                 }
               } else {
-                const makeRecordLive =
+                const makeRecordLive: (record: any) => void =
                   subscriptions && isTableLike && returnTypeTable && liveRecord
                     ? record => {
                         if (record) {
@@ -686,7 +696,7 @@ export default function makeProcField(
                   });
                 } else if (proc.returnsSet || rawReturnType.isPgArray) {
                   // List
-                  const records = value.map(v => {
+                  const records = value.map((v: any) => {
                     makeRecordLive(v);
                     return pg2gql(v, returnType);
                   });
@@ -700,7 +710,7 @@ export default function makeProcField(
                 }
               }
             }
-          : async (data, args, resolveContext, resolveInfo) => {
+          : async (_data, args, resolveContext, resolveInfo) => {
               const { pgClient } = resolveContext;
               const liveRecord =
                 resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
@@ -795,7 +805,7 @@ export default function makeProcField(
               const rows = queryResultRows;
               const [row] = rows;
               const result = (() => {
-                const makeRecordLive =
+                const makeRecordLive: (record: any) => void =
                   subscriptions && isTableLike && returnTypeTable && liveRecord
                     ? record => {
                         if (record) {
@@ -812,7 +822,7 @@ export default function makeProcField(
                   // true, or `ConnectionType` does not exist - either way,
                   // we're not returning a connection.
                   if (proc.returnsSet && !isMutation && !forceList) {
-                    return row.data.map(v => {
+                    return row.data.map((v: any) => {
                       const fv = firstValue(v);
                       makeRecordLive(fv);
                       return pg2gql(fv, returnType);

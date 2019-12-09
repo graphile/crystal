@@ -1,5 +1,6 @@
 import { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
+import { PgClass } from "./PgIntrospectionPlugin";
 
 declare module "graphile-build" {
   interface GraphileBuildOptions {
@@ -73,7 +74,7 @@ export default (async function PgAllRows(
           const primaryKeyConstraint = table.primaryKeyConstraint;
           const primaryKeys =
             primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
-          const isView = t => t.classKind === "v";
+          const isView = (t: PgClass) => t.classKind === "v";
           const viewUniqueKey = table.tags.uniqueKey || pgViewUniqueKey;
           const uniqueIdAttribute = viewUniqueKey
             ? attributes.find(attr => attr.name === viewUniqueKey)
@@ -90,7 +91,7 @@ export default (async function PgAllRows(
           }
           const schema = table.namespace;
           const sqlFullTableName = sql.identifier(schema.name, table.name);
-          function makeField(isConnection) {
+          function makeField(isConnection: boolean) {
             const fieldName = isConnection
               ? inflection.allRows(table)
               : inflection.allRowsSimple(table);
@@ -105,7 +106,7 @@ export default (async function PgAllRows(
                     ? ConnectionType
                     : new GraphQLList(new GraphQLNonNull(TableType)),
                   args: {},
-                  async resolve(parent, args, resolveContext, resolveInfo) {
+                  async resolve(_parent, args, resolveContext, resolveInfo) {
                     const { pgClient } = resolveContext;
                     const parsedResolveInfoFragment = parseResolveInfo(
                       resolveInfo,
@@ -118,7 +119,9 @@ export default (async function PgAllRows(
                       resolveInfo.returnType
                     );
 
-                    let checkerGenerator;
+                    let checkerGenerator:
+                      | ((data?: any) => (record: any) => boolean)
+                      | undefined;
                     const query = queryFromResolveData(
                       sqlFullTableName,
                       undefined,

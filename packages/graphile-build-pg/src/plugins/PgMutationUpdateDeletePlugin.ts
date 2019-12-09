@@ -2,6 +2,9 @@ import {
   Plugin,
   GraphileObjectTypeConfig,
   ScopeGraphQLObjectType,
+  GraphileResolverContext,
+  ContextGraphQLObjectTypeFieldsField,
+  GetDataFromParsedResolveInfoFragmentFunction,
 } from "graphile-build";
 import debugFactory from "debug";
 import { SQL } from "../QueryBuilder";
@@ -14,7 +17,7 @@ declare module "graphile-build" {
   }
   interface ScopeGraphQLObjectTypeFieldsField {
     isPgNodeMutation?: boolean;
-    isPgMutationPayloadDeletedNodeIdField?: true;
+    isPgMutationPayloadDeletedNodeIdField?: boolean;
   }
   interface ScopeGraphQLInputObjectType {
     isPgUpdateInputType?: boolean;
@@ -45,7 +48,7 @@ export default (async function PgMutationUpdateDeletePlugin(
         getNodeIdForTypeAndIdentifiers,
         getTypeAndIdentifiersFromNodeId,
         nodeIdFieldName,
-        fieldDataGeneratorsByType,
+        fieldDataGeneratorsByFieldNameByType,
         extend,
         parseResolveInfo,
         getTypeByName,
@@ -100,23 +103,28 @@ export default (async function PgMutationUpdateDeletePlugin(
                 !omit(table, "delete");
               if (!canUpdate && !canDelete) return memo;
 
-              const TableType = pgGetGqlTypeByTypeIdAndModifier(
+              const tmpTableType = pgGetGqlTypeByTypeIdAndModifier(
                 table.type.id,
                 null
               );
-
-              if (!TableType) {
+              if (
+                !tmpTableType ||
+                !(tmpTableType instanceof GraphQLObjectType)
+              ) {
                 return memo;
               }
+              // So TypeScript knows this is, and forever shall be, a GraphQLObjectType
+              const TableType = tmpTableType;
+
               async function commonCodeRenameMe(
-                pgClient,
-                resolveInfo,
-                getDataFromParsedResolveInfoFragment,
-                PayloadType,
-                args,
-                condition,
-                context,
-                resolveContext
+                pgClient: GraphileResolverContext["pgClient"],
+                resolveInfo: import("graphql").GraphQLResolveInfo,
+                getDataFromParsedResolveInfoFragment: GetDataFromParsedResolveInfoFragmentFunction,
+                PayloadType: import("graphql").GraphQLObjectType<any, any>,
+                args: { [argName: string]: any },
+                condition: SQL,
+                context: ContextGraphQLObjectTypeFieldsField,
+                resolveContext: GraphileResolverContext
               ) {
                 const { input } = args;
                 const parsedResolveInfoFragment = parseResolveInfo(
@@ -287,7 +295,7 @@ returning *`;
                             [deletedNodeIdFieldName]: fieldWithHooks(
                               deletedNodeIdFieldName,
                               ({ addDataGenerator }) => {
-                                const fieldDataGeneratorsByTableType = fieldDataGeneratorsByType.get(
+                                const fieldDataGeneratorsByTableType = fieldDataGeneratorsByFieldNameByType.get(
                                   TableType
                                 );
 
@@ -441,9 +449,9 @@ returning *`;
                             },
 
                             async resolve(
-                              parent,
+                              _parent,
                               args,
-                              resolveContext,
+                              resolveContext: GraphileResolverContext,
                               resolveInfo
                             ) {
                               const { input } = args;
@@ -625,7 +633,7 @@ returning *`;
                             },
 
                             async resolve(
-                              parent,
+                              _parent,
                               args,
                               resolveContext,
                               resolveInfo

@@ -99,7 +99,7 @@ export default function pgField(
                   ? pgTweakFragmentForTypeAndModifier(
                       tableAlias,
                       options.pgType,
-                      options.pgTypeModifier,
+                      options.pgTypeModifier || null,
                       {}
                     )
                   : tableAlias,
@@ -130,7 +130,7 @@ export default function pgField(
           const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
           if (data.data == null) return null;
           if (isListType) {
-            return data.data.map(d => (d != null ? d[safeAlias] : null));
+            return data.data.map((d: any) => (d != null ? d[safeAlias] : null));
           } else {
             return data.data[safeAlias];
           }

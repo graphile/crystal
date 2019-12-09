@@ -1,10 +1,10 @@
-const base64 = str => Buffer.from(String(str)).toString("base64");
+import { base64 } from "../utils";
 
-function cursorify(val) {
+function cursorify(val: any) {
   return val && val.__cursor ? base64(JSON.stringify(val.__cursor)) : null;
 }
 
-export default (function addStartEndCursor(value) {
+export default (function addStartEndCursor(value: any) {
   const data = value && value.data && value.data.length ? value.data : null;
   const startCursor = cursorify(data && data[0]);
   const endCursor = cursorify(data && data[value.data.length - 1]);

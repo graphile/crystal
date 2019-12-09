@@ -100,10 +100,10 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   }
 
   function generateNextPrevPageSql(
-    sqlQueryAlias,
-    canHaveCursorInWhere,
-    queryHasBefore,
-    queryHasFirst,
+    sqlQueryAlias: SQL,
+    canHaveCursorInWhere: boolean,
+    queryHasBefore: boolean,
+    queryHasFirst: boolean,
     offset = 0,
     invert = false
   ) {

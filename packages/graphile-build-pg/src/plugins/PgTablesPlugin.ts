@@ -3,8 +3,9 @@ import {
   GraphileObjectTypeConfig,
   ScopeGraphQLObjectType,
 } from "graphile-build";
-import { PgType } from "./PgIntrospectionPlugin";
+import { PgType, PgAttribute } from "./PgIntrospectionPlugin";
 import { PgTypeModifier } from "./PgBasicsPlugin";
+import { nullableIf, base64 } from "../utils";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectType {
@@ -13,23 +14,23 @@ declare module "graphile-build" {
     isPgCompositeType?: boolean;
 
     /* Connections */
-    isEdgeType?: true;
-    isPgRowEdgeType?: true;
-    isConnectionType?: true;
-    isPgRowConnectionType?: true;
+    isEdgeType?: boolean;
+    isPgRowEdgeType?: boolean;
+    isConnectionType?: boolean;
+    isPgRowConnectionType?: boolean;
     nodeType?: import("graphql").GraphQLType /* But not a list */;
     edgeType?: import("graphql").GraphQLObjectType;
   }
 
   interface ScopeGraphQLInputObjectType {
     /** Mutation input type? */
-    isInputType?: true;
+    isInputType?: boolean;
 
     /** Mutation input for 'update' mutations */
-    isPgPatch?: true;
+    isPgPatch?: boolean;
 
     /** Mutation input for the 'base' variant */
-    isPgBaseInput?: true;
+    isPgBaseInput?: boolean;
 
     isPgRowType?: boolean;
     isPgCompoundType?: boolean;
@@ -43,9 +44,7 @@ declare module "graphile-build" {
   }
 }
 
-const base64 = str => Buffer.from(String(str)).toString("base64");
-
-const hasNonNullKey = row => {
+const hasNonNullKey = (row: { [key: string]: unknown }) => {
   if (
     Array.isArray(row.__identifiers) &&
     row.__identifiers.every(i => i != null)
@@ -62,14 +61,30 @@ const hasNonNullKey = row => {
   return false;
 };
 
+interface FieldSpecMap {
+  [fieldName: string]: {
+    name: string;
+    type: PgType;
+    typeModifier: string | number | null | undefined;
+  };
+}
+
 export default (function PgTablesPlugin(
   builder,
   { pgForbidSetofFunctionsToReturnNull = false, subscriptions = false }
 ) {
-  const handleNullRow = pgForbidSetofFunctionsToReturnNull
+  const handleNullRow: <T extends {}>(
+    row: T,
+    identifiers: unknown[]
+  ) => T | null = pgForbidSetofFunctionsToReturnNull
     ? (row, _identifiers) => row
     : (row, identifiers) => {
-        if ((identifiers && hasNonNullKey(identifiers)) || hasNonNullKey(row)) {
+        if (
+          (identifiers &&
+            Array.isArray(identifiers) &&
+            identifiers.some(i => i !== null)) ||
+          hasNonNullKey(row)
+        ) {
           return row;
         } else {
           return null;
@@ -101,6 +116,7 @@ export default (function PgTablesPlugin(
           GraphQLInputObjectType,
           GraphQLInterfaceType,
           GraphQLScalarType,
+          isInputType,
         },
 
         inflection,
@@ -109,8 +125,6 @@ export default (function PgTablesPlugin(
         pgField,
       } = build;
 
-      const nullableIf = (condition, Type) =>
-        condition ? Type : new GraphQLNonNull(Type);
       const Cursor = getTypeByName("Cursor");
       if (!Cursor || !(Cursor instanceof GraphQLScalarType)) {
         throw new Error("Expected 'Cursor' type to exist");
@@ -135,9 +149,13 @@ export default (function PgTablesPlugin(
           primaryKeys.length
             ? true
             : false;
-        let TableType: import("graphql").GraphQLObjectType | null | undefined;
-        let TablePatchType;
-        let TableBaseInputType;
+        let TableType: import("graphql").GraphQLObjectType;
+        let TablePatchType:
+          | import("graphql").GraphQLInputObjectType
+          | null = null;
+        let TableBaseInputType:
+          | import("graphql").GraphQLInputObjectType
+          | null = null;
         pgRegisterGqlTypeByTypeId(
           tablePgType.id,
           cb => {
@@ -177,8 +195,9 @@ export default (function PgTablesPlugin(
                     description:
                       "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
                     type: new GraphQLNonNull(GraphQLID),
-                    resolve(data) {
-                      const identifiers = data.__identifiers;
+                    resolve(data: any) {
+                      const identifiers: (string | number)[] | null =
+                        data.__identifiers;
                       if (!identifiers) {
                         return null;
                       }
@@ -200,7 +219,7 @@ export default (function PgTablesPlugin(
                              * (2^53 - 1) fine, we're using that as the
                              * boundary.
                              */
-                            const int = parseInt(identifier, 10);
+                            const int = parseInt(String(identifier), 10);
                             if (
                               int >= -Number.MAX_SAFE_INTEGER &&
                               int <= Number.MAX_SAFE_INTEGER
@@ -222,7 +241,7 @@ export default (function PgTablesPlugin(
                 return fields;
               },
             };
-            TableType = newWithHooks(
+            const tmpTableType = newWithHooks(
               GraphQLObjectType,
               tableSpec,
 
@@ -241,16 +260,17 @@ export default (function PgTablesPlugin(
                 isPgCompositeType: !table.isSelectable,
               }
             );
-            if (!TableType) {
+            if (!tmpTableType) {
               throw new Error(
                 `Failed to construct TableType for '${tableSpec.name}'`
               );
             }
+            TableType = tmpTableType;
 
             cb(TableType);
-            const pgCreateInputFields = {};
-            const pgPatchInputFields = {};
-            const pgBaseInputFields = {};
+            const pgCreateInputFields: FieldSpecMap = {};
+            const pgPatchInputFields: FieldSpecMap = {};
+            const pgBaseInputFields: FieldSpecMap = {};
             newWithHooks(
               GraphQLInputObjectType,
               {
@@ -372,7 +392,7 @@ export default (function PgTablesPlugin(
             pg2GqlMapper[tablePgType.id] = {
               map: _ => _,
               unmap: (obj, modifier) => {
-                let fieldLookup;
+                let fieldLookup: FieldSpecMap;
                 if (modifier === "patch") {
                   fieldLookup = pgPatchInputFields;
                 } else if (modifier === "base") {
@@ -381,7 +401,7 @@ export default (function PgTablesPlugin(
                   fieldLookup = pgCreateInputFields;
                 }
 
-                const attr2sql = attr => {
+                const attr2sql = (attr: PgAttribute) => {
                   // TODO: this should use `fieldInput[*].name` to find the attribute
                   const fieldName = inflection.column(attr);
                   const inputField = fieldLookup[fieldName];
@@ -448,11 +468,12 @@ export default (function PgTablesPlugin(
                     {
                       description: `The \`${tableTypeName}\` at the end of the edge.`,
                       type: nullableIf(
+                        GraphQLNonNull,
                         !pgForbidSetofFunctionsToReturnNull,
                         TableType
                       ),
 
-                      resolve(data, _args, resolveContext, resolveInfo) {
+                      resolve(data, _args, _resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
@@ -532,13 +553,14 @@ export default (function PgTablesPlugin(
                       type: new GraphQLNonNull(
                         new GraphQLList(
                           nullableIf(
+                            GraphQLNonNull,
                             !pgForbidSetofFunctionsToReturnNull,
                             TableType
                           )
                         )
                       ),
 
-                      resolve(data, _args, resolveContext, resolveInfo) {
+                      resolve(data, _args, _resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
@@ -546,7 +568,7 @@ export default (function PgTablesPlugin(
                         const liveRecord =
                           resolveInfo.rootValue &&
                           resolveInfo.rootValue.liveRecord;
-                        return data.data.map(entry => {
+                        return data.data.map((entry: any) => {
                           const record = handleNullRow(
                             entry[safeAlias],
                             entry[safeAlias].__identifiers
@@ -596,7 +618,7 @@ export default (function PgTablesPlugin(
                           resolveInfo
                         );
 
-                        return data.data.map(entry => ({
+                        return data.data.map((entry: any) => ({
                           ...entry,
                           ...entry[safeAlias],
                         }));
@@ -646,7 +668,7 @@ export default (function PgTablesPlugin(
 
         pgRegisterGqlInputTypeByTypeId(
           tablePgType.id,
-          (_set, modifier) => {
+          (_set, modifier): import("graphql").GraphQLInputType | null => {
             // This must come first, it triggers creation of all the types
             const TableType = pgGetGqlTypeByTypeIdAndModifier(
               tablePgType.id,
@@ -663,9 +685,12 @@ export default (function PgTablesPlugin(
               return TableBaseInputType;
             }
             if (TableType) {
-              return getTypeByName(
+              const type = getTypeByName(
                 inflection.inputType(build.graphql.getNamedType(TableType).name)
               );
+              if (isInputType(type)) {
+                return type;
+              }
             }
             return null;
           },

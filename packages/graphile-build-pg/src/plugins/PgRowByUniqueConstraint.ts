@@ -1,9 +1,10 @@
 import { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
+import QueryBuilder from "../QueryBuilder";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPgRowByUniqueConstraintField?: true;
+    isPgRowByUniqueConstraintField?: boolean;
   }
 }
 
@@ -88,7 +89,10 @@ export default (async function PgRowByUniqueConstraint(
               const queryFromResolveDataOptions = {
                 useAsterisk: false, // Because it's only a single relation, no need
               };
-              const queryFromResolveDataCallback = (queryBuilder, args) => {
+              const queryFromResolveDataCallback = (
+                queryBuilder: QueryBuilder,
+                args: { [argName: string]: any }
+              ) => {
                 if (subscriptions && table.primaryKeyConstraint) {
                   queryBuilder.selectIdentifiers(table);
                 }
@@ -134,7 +138,7 @@ export default (async function PgRowByUniqueConstraint(
                       {}
                     ),
 
-                    async resolve(parent, args, resolveContext, resolveInfo) {
+                    async resolve(_parent, args, resolveContext, resolveInfo) {
                       const { pgClient } = resolveContext;
                       const liveRecord =
                         resolveInfo.rootValue &&

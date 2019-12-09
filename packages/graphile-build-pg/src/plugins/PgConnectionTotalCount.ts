@@ -2,7 +2,7 @@ import { Plugin } from "graphile-build";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPgConnectionTotalCountField?: true;
+    isPgConnectionTotalCountField?: boolean;
   }
 }
 

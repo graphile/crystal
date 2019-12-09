@@ -11,6 +11,7 @@ import {
   PgConstraint,
   PgEntity,
   SmartTagValue,
+  SmartTags,
 } from "./PgIntrospectionPlugin";
 import pgField from "./pgField";
 
@@ -130,7 +131,7 @@ declare module "graphile-build" {
     // From here down, functions are passed database introspection results
     enumType(type: PgType): string;
     argument(name: string | null | undefined, index: number): string;
-    orderByEnum(columnName, ascending): string;
+    orderByEnum(columnName: string, ascending: boolean): string;
     orderByColumnEnum(attr: PgAttribute, ascending: boolean): string;
     orderByComputedColumnEnum(
       pseudoColumnName: string,
@@ -148,7 +149,7 @@ declare module "graphile-build" {
     functionMutationName(proc: PgProc): string;
     functionMutationResultFieldName(
       proc: PgProc,
-      gqlType,
+      gqlType: import("graphql").GraphQLNamedType,
       plural?: boolean,
       outputArgNames?: Array<string>
     ): string;
@@ -441,12 +442,13 @@ function makePgBaseInflectors(): Partial<Inflection> {
     functionMutationResultFieldName(
       this: Inflection,
       proc: PgProc,
-      gqlType,
+      gqlType: import("graphql").GraphQLNamedType,
       plural: boolean = false,
       outputArgNames: Array<string> = []
-    ) {
-      if (stringTag(proc, "resultFieldName")) {
-        return stringTag(proc, "resultFieldName");
+    ): string {
+      const resultFieldName = stringTag(proc, "resultFieldName");
+      if (resultFieldName) {
+        return resultFieldName;
       }
       let name;
       if (outputArgNames.length === 1 && outputArgNames[0] !== "") {
@@ -481,7 +483,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     functionOutputFieldName(
       this: Inflection,
-      proc: PgProc,
+      _proc: PgProc,
       outputArgName: string,
       index: number
     ) {
@@ -745,7 +747,11 @@ function makePgBaseInflectors(): Partial<Inflection> {
   return preventEmptyResult(inflectors);
 }
 
-const defaultPgColumnFilter = (_attr, _build, _context) => true;
+const defaultPgColumnFilter: PgColumnFilterFunction = (
+  _attr,
+  _build,
+  _context
+) => true;
 
 function identity<T>(val: T): T {
   return val;
@@ -754,7 +760,7 @@ function identity<T>(val: T): T {
 export function preventEmptyResult<O>(obj: O): O {
   return Object.keys(obj).reduce((memo, key) => {
     const fn = obj[key];
-    memo[key] = function(...args) {
+    memo[key] = function(...args: any[]) {
       const result = fn.apply(this, args);
       if (typeof result !== "string" || result.length === 0) {
         const stringifiedArgs = require("util").inspect(args);
@@ -772,14 +778,14 @@ export function preventEmptyResult<O>(obj: O): O {
   }, {}) as O;
 }
 
-const omitWithRBACChecks = omit => (
+const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
   permission: string
 ) => {
   const ORDINARY_TABLE = "r";
   const VIEW = "v";
   const MATERIALIZED_VIEW = "m";
-  const isTableLike = entity =>
+  const isTableLike = (entity: PgEntity) =>
     entity &&
     entity.kind === "class" &&
     (entity.classKind === ORDINARY_TABLE ||
@@ -844,7 +850,7 @@ const omitWithRBACChecks = omit => (
   return omit(entity, permission);
 };
 
-const omitUnindexed = (omit, hideIndexWarnings) => (
+const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
   permission: string
 ) => {
@@ -883,13 +889,16 @@ const omitUnindexed = (omit, hideIndexWarnings) => (
   return omit(entity, permission);
 };
 
-function describePgEntity(entity: PgEntity, includeAlias = true) {
+export function describePgEntity(
+  entity: PgEntity,
+  includeAlias = true
+): string {
   const getAlias = !includeAlias
     ? () => ""
     : () => {
-        const tags = pickBy(
+        const tags: SmartTags = pickBy(
           entity.tags,
-          (value, key) => key === "name" || key.endsWith("Name")
+          (_value, key) => key === "name" || key.endsWith("Name")
         );
 
         if (Object.keys(tags).length) {
@@ -942,13 +951,13 @@ function describePgEntity(entity: PgEntity, includeAlias = true) {
   }`;
 }
 
-function sqlCommentByAddingTags(entity, tagsToAdd) {
+function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
   // NOTE: this function is NOT intended to be SQL safe; it's for
   // displaying in error messages. Nonetheless if you find issues with
   // SQL compatibility, please send a PR or issue.
 
   // Ref: https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-BACKSLASH-TABLE
-  const escape = str =>
+  const escape = (str: string) =>
     str.replace(
       /['\\\b\f\n\r\t]/g,
       chr =>

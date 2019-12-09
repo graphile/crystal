@@ -4,11 +4,7 @@
     "rootDir": "src",
     "declarationDir": "./node8plus",
     "outDir": "./node8plus",
-    "noEmit": false,
-
-    "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noEmit": false
   },
   "include": ["src/**/*"],
   "references": [

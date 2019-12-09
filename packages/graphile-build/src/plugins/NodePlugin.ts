@@ -7,8 +7,9 @@ import {
 } from "../SchemaBuilder";
 import { ResolveTree } from "graphql-parse-resolve-info";
 
-const base64 = str => Buffer.from(String(str)).toString("base64");
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
+const base64Decode = (str: string) =>
+  Buffer.from(String(str), "base64").toString("utf8");
 
 export type NodeFetcher<T = any> = (
   data: unknown,
@@ -39,19 +40,22 @@ export default (function NodePlugin(
           nodeIdFieldName,
           $$nodeType: Symbol("nodeType"),
           nodeFetcherByTypeName,
-          getNodeIdForTypeAndIdentifiers(Type, ...identifiers) {
+          getNodeIdForTypeAndIdentifiers(
+            Type: import("graphql").GraphQLType,
+            ...identifiers: unknown[]
+          ) {
             return base64(
               JSON.stringify([this.getNodeAlias(Type), ...identifiers])
             );
           },
-          getTypeAndIdentifiersFromNodeId(nodeId) {
+          getTypeAndIdentifiersFromNodeId(nodeId: string) {
             const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
             return {
               Type: this.getNodeType(alias),
               identifiers,
             };
           },
-          addNodeFetcherForTypeName(typeName, fetcher) {
+          addNodeFetcherForTypeName(typeName: string, fetcher: NodeFetcher) {
             if (nodeFetcherByTypeName[typeName]) {
               throw new Error("There's already a fetcher for this type");
             }
@@ -60,13 +64,13 @@ export default (function NodePlugin(
             }
             nodeFetcherByTypeName[typeName] = fetcher;
           },
-          getNodeAlias(typeName) {
+          getNodeAlias(typeName: string) {
             return nodeAliasByTypeName[typeName] || typeName;
           },
-          getNodeType(alias) {
+          getNodeType(alias: string) {
             return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
           },
-          setNodeAlias(typeName, alias) {
+          setNodeAlias(typeName: string, alias: string) {
             if (
               nodeTypeNameByAlias[alias] &&
               nodeTypeNameByAlias[alias] !== typeName
@@ -98,13 +102,14 @@ export default (function NodePlugin(
         graphql: {
           GraphQLNonNull,
           GraphQLID,
+          GraphQLObjectType,
           GraphQLInterfaceType,
           getNullableType,
         },
 
         inflection,
       } = build;
-      let Query;
+      let Query: import("graphql").GraphQLObjectType | null = null;
       newWithHooks(
         GraphQLInterfaceType,
         {
@@ -112,7 +117,13 @@ export default (function NodePlugin(
           description: "An object with a globally unique `ID`.",
           resolveType: value => {
             if (value === $$isQuery) {
-              if (!Query) Query = getTypeByName(inflection.builtin("Query"));
+              if (!Query) {
+                const type = getTypeByName(inflection.builtin("Query"));
+                if (!type || !(type instanceof GraphQLObjectType)) {
+                  throw new Error("Could not find 'Query'");
+                }
+                Query = type;
+              }
               return Query;
             } else if (value[$$nodeType]) {
               return getNullableType(value[$$nodeType]);

@@ -4,11 +4,9 @@
     "rootDir": "src",
     "declarationDir": "./node8plus",
     "outDir": "./node8plus",
-    "noEmit": false,
-
-    "noImplicitAny": false
+    "noEmit": false
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "references": [
     { "path": "../lru" },
     { "path": "../graphql-parse-resolve-info" }

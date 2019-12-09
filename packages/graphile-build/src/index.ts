@@ -15,6 +15,8 @@ import resolveNode from "./resolveNode";
 
 import { Plugin, GraphileBuildOptions } from "./SchemaBuilder";
 
+export { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
+
 export {
   constantCaseAll,
   formatInsideUnderscores,

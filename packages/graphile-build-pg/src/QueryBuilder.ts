@@ -110,7 +110,7 @@ class QueryBuilder {
     cursorComparator: CursorComparator | null | undefined;
     liveConditions: Array<
       [
-        (data: {}) => (record: any) => boolean,
+        (data?: any) => (record: any) => boolean,
         { [key: string]: SQL } | undefined
       ]
     >;
@@ -326,7 +326,7 @@ class QueryBuilder {
     /* the actual condition doesn't matter hugely, 'select' should work */
     if (!this.rootValue || !this.rootValue.liveConditions) return;
     const liveConditions = this.data.liveConditions;
-    const checkerGenerator = (data: any) => {
+    const checkerGenerator = (data?: any) => {
       // Compute this once.
       const checkers = liveConditions.map(([checkerGenerator]) =>
         checkerGenerator(data)

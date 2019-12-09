@@ -318,8 +318,8 @@ with
       con.conrelid as "classId",
       nullif(con.confrelid, 0) as "foreignClassId",
       dsc.description as "description",
-      con.conkey as "keyAttributeNums",
-      con.confkey as "foreignKeyAttributeNums"
+      coalesce(con.conkey, array[]::int2[]) as "keyAttributeNums",
+      coalesce(con.confkey, array[]::int2[]) as "foreignKeyAttributeNums"
     from
       pg_catalog.pg_constraint as con
       inner join class on (con.conrelid = class.id)

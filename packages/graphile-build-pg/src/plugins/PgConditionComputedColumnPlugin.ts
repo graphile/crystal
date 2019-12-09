@@ -1,47 +1,61 @@
-import { Plugin } from "graphile-build";
+import { Plugin, Build } from "graphile-build";
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import assert = require("assert");
+import { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
 
-function getCompatibleComputedColumns(build, table) {
+function getCompatibleComputedColumns(build: Build, table: PgClass) {
   const {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
     pgOmit: omit,
   } = build;
-  return introspectionResultsByKind.procedure.reduce((memo, proc) => {
-    /* ALSO SEE PgOrderComputedColumnsPlugin */
-    // Must be marked @filterable
-    if (!proc.tags.filterable) return memo;
+  return introspectionResultsByKind.procedure.reduce(
+    (memo, proc) => {
+      /* ALSO SEE PgOrderComputedColumnsPlugin */
+      // Must be marked @filterable
+      if (!proc.tags.filterable) return memo;
 
-    // Must not be omitted
-    if (omit(proc, "execute")) return memo;
+      // Must not be omitted
+      if (omit(proc, "execute")) return memo;
 
-    // Must be a computed column
-    const computedColumnDetails = getComputedColumnDetails(build, table, proc);
-    if (!computedColumnDetails) return memo;
-    const { pseudoColumnName } = computedColumnDetails;
+      // Must be a computed column
+      const computedColumnDetails = getComputedColumnDetails(
+        build,
+        table,
+        proc
+      );
+      if (!computedColumnDetails) return memo;
+      const { pseudoColumnName } = computedColumnDetails;
 
-    // Must have only one required argument
-    const nonOptionalArgumentsCount = proc.inputArgsCount - proc.argDefaultsNum;
-    if (nonOptionalArgumentsCount > 1) {
+      // Must have only one required argument
+      const nonOptionalArgumentsCount =
+        proc.inputArgsCount - proc.argDefaultsNum;
+      if (nonOptionalArgumentsCount > 1) {
+        return memo;
+      }
+
+      // Must return a scalar
+      if (proc.returnsSet) return memo;
+      const returnType = introspectionResultsByKind.typeById[proc.returnTypeId];
+      if (returnType.isPgArray) return memo;
+      const returnTypeTable = returnType.classId
+        ? introspectionResultsByKind.classById[returnType.classId]
+        : null;
+      if (returnTypeTable) return memo;
+      const isRecordLike = returnType.id === "2249";
+      if (isRecordLike) return memo;
+      const isVoid = String(returnType.id) === "2278";
+      if (isVoid) return memo;
+
+      // Looks good
+      memo.push({ proc, pseudoColumnName, returnType });
       return memo;
-    }
-
-    // Must return a scalar
-    if (proc.returnsSet) return memo;
-    const returnType = introspectionResultsByKind.typeById[proc.returnTypeId];
-    if (returnType.isPgArray) return memo;
-    const returnTypeTable =
-      introspectionResultsByKind.classById[returnType.classId];
-    if (returnTypeTable) return memo;
-    const isRecordLike = returnType.id === "2249";
-    if (isRecordLike) return memo;
-    const isVoid = String(returnType.id) === "2278";
-    if (isVoid) return memo;
-
-    // Looks good
-    memo.push({ proc, pseudoColumnName, returnType });
-    return memo;
-  }, []);
+    },
+    [] as {
+      proc: PgProc;
+      pseudoColumnName: string;
+      returnType: PgType;
+    }[]
+  );
 }
 
 export default (function PgConditionComputedColumnPlugin(builder) {

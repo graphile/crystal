@@ -1,7 +1,7 @@
 import debugFactory from "debug";
 import chalk from "chalk";
 
-export function formatSQLForDebugging(sql) {
+export function formatSQLForDebugging(sql: string) {
   let colourIndex = 0;
   const allowedColours = [
     chalk.red,
@@ -21,7 +21,7 @@ export function formatSQLForDebugging(sql) {
   const colours = {};
 
   /* Yep - that's `colour` from English and `ize` from American */
-  function colourize(str) {
+  function colourize(str: string) {
     if (!colours[str]) {
       colours[str] = nextColor();
     }
@@ -29,7 +29,7 @@ export function formatSQLForDebugging(sql) {
   }
 
   let indentLevel = 0;
-  function handleIndent(all, rawMatch) {
+  function handleIndent(_all: string, rawMatch: string) {
     const match = rawMatch.replace(/ $/, "");
     if (match === "(") {
       indentLevel++;
@@ -69,7 +69,7 @@ export function formatSQLForDebugging(sql) {
 
 const rawDebugSql = debugFactory("graphile-build-pg:sql");
 
-function debugSql(sql) {
+function debugSql(sql: string) {
   if (!rawDebugSql.enabled) {
     return;
   }

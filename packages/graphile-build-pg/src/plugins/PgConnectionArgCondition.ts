@@ -2,10 +2,10 @@ import { Plugin } from "graphile-build";
 
 declare module "graphile-build" {
   interface ScopeGraphQLInputObjectType {
-    isPgCondition?: true;
+    isPgCondition?: boolean;
   }
   interface ScopeGraphQLInputObjectTypeFieldsField {
-    isPgConnectionConditionInputField?: true;
+    isPgConnectionConditionInputField?: boolean;
   }
 }
 

@@ -1,7 +1,7 @@
 import { Plugin } from "graphile-build";
 import isString = require("lodash/isString");
 import { SQL } from "../QueryBuilder";
-import { OrderByValue } from "./PgConnectionArgOrderBy";
+import { OrderByValue, OrderBySpec } from "./PgConnectionArgOrderBy";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
 declare module "graphile-build" {
@@ -9,8 +9,14 @@ declare module "graphile-build" {
     disableIssue397Fix?: boolean;
   }
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPgMutationPayloadEdgeField?: true;
+    isPgMutationPayloadEdgeField?: boolean;
   }
+}
+
+function isOrderBySpecArray(
+  specs: OrderBySpec | OrderBySpec[]
+): specs is OrderBySpec[] {
+  return Array.isArray(specs[0]);
 }
 
 export default (function PgMutationPayloadEdgePlugin(
@@ -183,8 +189,10 @@ export default (function PgMutationPayloadEdgePlugin(
                   orderBy.forEach(item => {
                     const { alias, specs, unique: itemIsUnique } = item;
                     unique = unique || itemIsUnique || false;
-                    const orders = Array.isArray(specs[0]) ? specs : [specs];
-                    orders.forEach(([col, _ascending]) => {
+                    const orders: OrderBySpec[] = isOrderBySpecArray(specs)
+                      ? specs
+                      : [specs];
+                    orders.forEach(([col, _ascending]: OrderBySpec) => {
                       if (!col) {
                         return;
                       }

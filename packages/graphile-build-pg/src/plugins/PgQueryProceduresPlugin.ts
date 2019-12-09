@@ -68,7 +68,7 @@ export default (function PgQueryProceduresPlugin(
             return memo;
           }
 
-          function makeField(forceList) {
+          function makeField(forceList: boolean) {
             const fieldName = forceList
               ? inflection.functionQueryNameList(proc)
               : inflection.functionQueryName(proc);

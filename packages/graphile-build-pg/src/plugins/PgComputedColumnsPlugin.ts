@@ -89,7 +89,7 @@ export default (function PgComputedColumnsPlugin(
 
           if (!computedColumnDetails) return memo;
           const { pseudoColumnName } = computedColumnDetails;
-          function makeField(forceList) {
+          function makeField(forceList: boolean) {
             const fieldName = forceList
               ? inflection.computedColumnList(pseudoColumnName, proc, table)
               : inflection.computedColumn(pseudoColumnName, proc, table);

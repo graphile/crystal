@@ -11,7 +11,7 @@ export default (function StandardTypesPlugin(builder) {
   builder.hook(
     "build",
     (build: Build): Build => {
-      const stringType = (name, description) =>
+      const stringType = (name: string, description: string | null) =>
         new build.graphql.GraphQLScalarType({
           name,
           description,

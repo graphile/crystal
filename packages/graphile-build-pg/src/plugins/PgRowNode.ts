@@ -4,7 +4,7 @@ import { PgEntityKind } from "./PgIntrospectionPlugin";
 
 declare module "graphile-build" {
   interface ScopeGraphQLObjectTypeFieldsField {
-    isPgNodeQuery?: true;
+    isPgNodeQuery?: boolean;
   }
 }
 
@@ -48,11 +48,11 @@ export default (async function PgRowNode(builder, { subscriptions }) {
       addNodeFetcherForTypeName(
         object.name,
         async (
-          data,
+          _data,
           identifiers,
           resolveContext,
-          parsedResolveInfoFragment,
-          ReturnType,
+          _parsedResolveInfoFragment,
+          _ReturnType,
           resolveData,
           resolveInfo
         ) => {
@@ -182,7 +182,12 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                         },
                       },
 
-                      async resolve(parent, args, resolveContext, resolveInfo) {
+                      async resolve(
+                        _parent,
+                        args,
+                        resolveContext,
+                        resolveInfo
+                      ) {
                         const { pgClient } = resolveContext;
                         const liveRecord =
                           resolveInfo.rootValue &&

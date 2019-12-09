@@ -28,3 +28,16 @@ export const parseTags = (str: string) => {
     }
   );
 };
+
+export const base64 = (str: string) =>
+  Buffer.from(String(str)).toString("base64");
+
+export const nullableIf = <
+  TCond extends boolean,
+  TType extends import("graphql").GraphQLNullableType
+>(
+  GraphQLNonNull: typeof import("graphql").GraphQLNonNull,
+  condition: TCond,
+  Type: TType
+): TCond extends true ? TType : import("graphql").GraphQLNonNull<TType> =>
+  (condition ? Type : new GraphQLNonNull(Type)) as any;

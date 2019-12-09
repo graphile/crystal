@@ -270,9 +270,12 @@ export interface BuildBase {
   */
 
   /**
-   * @deprecated use fieldDataGeneratorsByFieldNameByType instead
+   * @deprecated use fieldDataGeneratorsByFieldNameByType instead (they're the same, but that one is named better)
    */
-  fieldDataGeneratorsByType: Map<any, any>;
+  fieldDataGeneratorsByType: Map<
+    GraphQLNamedType,
+    { [fieldName: string]: DataGeneratorFunction[] }
+  >;
 
   fieldDataGeneratorsByFieldNameByType: Map<
     GraphQLNamedType,
@@ -396,11 +399,11 @@ export interface ContextGraphQLScalarType extends Context {
 }
 
 export interface ScopeGraphQLObjectType extends Scope {
-  isRootQuery?: true;
-  isRootMutation?: true;
-  isRootSubscription?: true;
-  isMutationPayload?: true;
-  isPageInfo?: true;
+  isRootQuery?: boolean;
+  isRootMutation?: boolean;
+  isRootSubscription?: boolean;
+  isMutationPayload?: boolean;
+  isPageInfo?: boolean;
 }
 export interface ContextGraphQLObjectTypeBase extends Context {
   scope: ScopeGraphQLObjectType;
@@ -447,14 +450,14 @@ export interface ContextGraphQLObjectTypeFields
 export interface ScopeGraphQLObjectTypeFieldsField
   extends ScopeGraphQLObjectType {
   fieldName?: string;
-  autoField?: true;
+  autoField?: boolean;
   fieldDirectives?: DirectiveMap;
 
-  isLiveField?: true;
+  isLiveField?: boolean;
   originalField?: import("graphql").GraphQLField<any, any>;
-  isRootNodeField?: true;
-  isPageInfoHasNextPageField?: true;
-  isPageInfoHasPreviousPageField?: true;
+  isRootNodeField?: boolean;
+  isPageInfoHasNextPageField?: boolean;
+  isPageInfoHasPreviousPageField?: boolean;
 }
 export interface ScopeGraphQLObjectTypeFieldsFieldWithFieldName
   extends ScopeGraphQLObjectTypeFieldsField {
@@ -501,7 +504,7 @@ export interface ContextGraphQLUnionTypeTypes extends ContextGraphQLUnionType {
 }
 
 export interface ScopeGraphQLInputObjectType extends Scope {
-  isMutationInput?: true;
+  isMutationInput?: boolean;
 }
 export interface ContextGraphQLInputObjectType extends Context {
   scope: ScopeGraphQLInputObjectType;
@@ -521,7 +524,7 @@ export interface ContextGraphQLInputObjectTypeFields
 export interface ScopeGraphQLInputObjectTypeFieldsField
   extends ScopeGraphQLInputObjectType {
   fieldName?: string;
-  autoField?: true;
+  autoField?: boolean;
 }
 export interface ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName
   extends ScopeGraphQLInputObjectTypeFieldsField {
