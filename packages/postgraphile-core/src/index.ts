@@ -9,6 +9,7 @@ import {
   Context,
   SchemaBuilder,
   Inflection,
+  GraphileResolverContext,
 } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
@@ -30,6 +31,7 @@ export {
   GraphileBuildOptions,
   GraphileBuildOptions as Options,
   formatSQLForDebugging,
+  GraphileResolverContext,
 };
 
 export type mixed = {} | string | number | boolean | undefined | null;
