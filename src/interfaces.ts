@@ -2,10 +2,24 @@
 import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
+import { GraphileResolverContext } from 'postgraphile-core';
+
+export interface GraphileClaims {
+  [claimName: string]: undefined | null | string | number | boolean;
+}
+
+declare module 'postgraphile-core' {
+  interface GraphileResolverContext {
+    pgClient: PoolClient;
+    pgRole?: string;
+    jwtClaims?: GraphileClaims | null;
+    getExplainResults?: () => any;
+  }
+}
 
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
@@ -249,7 +263,7 @@ export interface PostGraphileOptions<
   // Promise to the same) based on the incoming web request (e.g. to extract
   // session data).
   /* @middlewareOnly */
-  pgSettings?: DirectOrCallback<Request, { [key: string]: mixed }>;
+  pgSettings?: DirectOrCallback<Request, GraphileClaims>;
   // [Experimental] Determines if the 'Explain' feature in GraphiQL can be used
   // to show the user the SQL statements that were executed. Set to a boolean to
   // enable all users to use this, or to a function that filters each request to
@@ -263,7 +277,10 @@ export interface PostGraphileOptions<
   // can even use this to change the response [experimental], e.g. setting
   // cookies.
   /* @middlewareOnly */
-  additionalGraphQLContextFromRequest?: (req: Request, res: Response) => Promise<{}>;
+  additionalGraphQLContextFromRequest?: (
+    req: Request,
+    res: Response,
+  ) => Promise<Partial<GraphileResolverContext>>;
   // [experimental] Plugin hook function, enables functionality within
   // PostGraphile to be expanded with plugins. Generate with
   // `makePluginHook(plugins)` passing a list of plugin objects.
@@ -320,12 +337,12 @@ export interface HttpRequestHandler<
   formatError: (e: GraphQLError) => GraphQLFormattedErrorExtended;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
   pgPool: Pool;
-  withPostGraphileContextFromReqRes: (
+  withPostGraphileContextFromReqRes: <T>(
     req: Request,
     res: Response,
     moreOptions: any,
-    fn: (ctx: mixed) => any,
-  ) => Promise<any>;
+    fn: (ctx: GraphileResolverContext) => Promise<T> | T,
+  ) => Promise<T>;
   options: CreateRequestHandlerOptions;
   handleErrors: (
     errors: ReadonlyArray<GraphQLError>,
@@ -346,7 +363,7 @@ export interface WithPostGraphileContextOptions {
   jwtRole?: Array<string>;
   jwtVerifyOptions?: jwt.VerifyOptions;
   pgDefaultRole?: string;
-  pgSettings?: { [key: string]: mixed };
+  pgSettings?: GraphileClaims;
   explain?: boolean;
   queryDocumentAst?: DocumentNode;
   operationName?: string;
