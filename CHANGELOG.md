@@ -3,7 +3,17 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.5.2...v) (2019-11-22)
+# [](https://github.com/graphile/graphile-engine/compare/v4.5.2...v) (2019-12-09)
+
+
+### Bug Fixes
+
+* **deps:** bump graphile-utils peerDependencies ([cd6b52a](https://github.com/graphile/graphile-engine/commit/cd6b52a2aa4c012fb01b59b4a489592298a5235b))
+
+
+### Features
+
+* **types:** convert graphile-build and -pg to TypeScript ([#573](https://github.com/graphile/graphile-engine/issues/573)) ([3506d4f](https://github.com/graphile/graphile-engine/commit/3506d4f17231f7468d0fa40f34091acd5082b238))
 
 
 
@@ -66,15 +76,15 @@ helpful to you also.
 
 ### Bug Fixes
 
-* **introspection:** corrected bitmasks for mutability checks ([#508](https://github.com/graphile/graphile-engine/issues/508)) ([5fae076](https://github.com/graphile/graphile-engine/commit/5fae0764bc13bf3d0d481d0421e89989a7379391))
 * remove sortable/filterable from functions with required args ([#519](https://github.com/graphile/graphile-engine/issues/519)) ([2335d6e](https://github.com/graphile/graphile-engine/commit/2335d6e9334680b927598ba9e748532323ad649d))
+* **introspection:** corrected bitmasks for mutability checks ([#508](https://github.com/graphile/graphile-engine/issues/508)) ([5fae076](https://github.com/graphile/graphile-engine/commit/5fae0764bc13bf3d0d481d0421e89989a7379391))
 
 
 ### Features
 
-* **query:** improve unique orderBy error message ([#515](https://github.com/graphile/graphile-engine/issues/515)) ([29d87da](https://github.com/graphile/graphile-engine/commit/29d87dacf4ac022bc6252e33efc5dab26d1fcb14))
-* allow passing readCache as an object ([#479](https://github.com/graphile/graphile-engine/issues/479)) ([1a9dc17](https://github.com/graphile/graphile-engine/commit/1a9dc1774071c8dd72ca052fac0a7baebe22db12))
 * **utils:** add PG plugin generators for conditions/orderBy ([#517](https://github.com/graphile/graphile-engine/issues/517)) ([96c1ed4](https://github.com/graphile/graphile-engine/commit/96c1ed47c70748164ebb8717cbec44758c3d5c9a))
+* allow passing readCache as an object ([#479](https://github.com/graphile/graphile-engine/issues/479)) ([1a9dc17](https://github.com/graphile/graphile-engine/commit/1a9dc1774071c8dd72ca052fac0a7baebe22db12))
+* **query:** improve unique orderBy error message ([#515](https://github.com/graphile/graphile-engine/issues/515)) ([29d87da](https://github.com/graphile/graphile-engine/commit/29d87dacf4ac022bc6252e33efc5dab26d1fcb14))
 
 
 
@@ -370,10 +380,10 @@ helpful to you also.
 
 ### Bug Fixes
 
-* restore but severely deprecate ancient inflectors ([#381](https://github.com/graphile/graphile-engine/issues/381)) ([c7a7a5c](https://github.com/graphile/graphile-engine/commit/c7a7a5ce214f1e23a99e7ae0c1c732c3dab675ca))
 * **regression:** restore old orderBy call signature ([#386](https://github.com/graphile/graphile-engine/issues/386)) ([e7fe7cf](https://github.com/graphile/graphile-engine/commit/e7fe7cf72b10571ab1e3ed0d7ac6d9249792d9d3)), closes [#383](https://github.com/graphile/graphile-engine/issues/383)
-* **typo:** pgInflection -> pgIntrospection ([#382](https://github.com/graphile/graphile-engine/issues/382)) ([12c42c1](https://github.com/graphile/graphile-engine/commit/12c42c15149e3a52149e4c1a2806aecb657701d3))
 * **windows:** add support for Windows CRLF in smart comments ([#385](https://github.com/graphile/graphile-engine/issues/385)) ([d8552cd](https://github.com/graphile/graphile-engine/commit/d8552cd4f1b15711daebc634594354a6c968b1dc))
+* restore but severely deprecate ancient inflectors ([#381](https://github.com/graphile/graphile-engine/issues/381)) ([c7a7a5c](https://github.com/graphile/graphile-engine/commit/c7a7a5ce214f1e23a99e7ae0c1c732c3dab675ca))
+* **typo:** pgInflection -> pgIntrospection ([#382](https://github.com/graphile/graphile-engine/issues/382)) ([12c42c1](https://github.com/graphile/graphile-engine/commit/12c42c15149e3a52149e4c1a2806aecb657701d3))
 
 
 ### Features
@@ -415,8 +425,8 @@ helpful to you also.
 
 ### Features
 
-* constraints through smart comments (view foreign keys, etc) ([#365](https://github.com/graphile/graphile-engine/issues/365)) ([7c712a9](https://github.com/graphile/graphile-engine/commit/7c712a9704642221438d93f6716cd04332d54ac3))
 * **indexes:** always warn on FK skip due to no index ([#366](https://github.com/graphile/graphile-engine/issues/366)) ([79df91d](https://github.com/graphile/graphile-engine/commit/79df91deca5e774e82dac86d503d31184fce522e))
+* constraints through smart comments (view foreign keys, etc) ([#365](https://github.com/graphile/graphile-engine/issues/365)) ([7c712a9](https://github.com/graphile/graphile-engine/commit/7c712a9704642221438d93f6716cd04332d54ac3))
 
 
 
@@ -464,19 +474,19 @@ helpful to you also.
 
 ### Bug Fixes
 
-* **sql:** use JSONB concatenation when necessary ([#333](https://github.com/graphile/graphile-engine/issues/333)) ([6195793](https://github.com/graphile/graphile-engine/commit/61957931d236b78c0c8791420d052ae8af22aecf))
-* avoid `deprecationReason: undefined` ([#346](https://github.com/graphile/graphile-engine/issues/346)) ([ba9ad33](https://github.com/graphile/graphile-engine/commit/ba9ad33c55457b45b496abd56898192a2b7f9f21))
 * **typescript:** ignore fieldASTs warning ([#348](https://github.com/graphile/graphile-engine/issues/348)) ([9f44847](https://github.com/graphile/graphile-engine/commit/9f4484711c83549c7a1fc62b91142b6caa298255))
+* avoid `deprecationReason: undefined` ([#346](https://github.com/graphile/graphile-engine/issues/346)) ([ba9ad33](https://github.com/graphile/graphile-engine/commit/ba9ad33c55457b45b496abd56898192a2b7f9f21))
+* **sql:** use JSONB concatenation when necessary ([#333](https://github.com/graphile/graphile-engine/issues/333)) ([6195793](https://github.com/graphile/graphile-engine/commit/61957931d236b78c0c8791420d052ae8af22aecf))
 
 
 ### Features
 
-* **indexes:** introspect index column properties (asc, nulls first) ([#335](https://github.com/graphile/graphile-engine/issues/335)) ([6925d6d](https://github.com/graphile/graphile-engine/commit/6925d6dad7623f3bde233e778b55e2f96cfc76a6))
-* **pg:** support ordering with NULLS FIRST / NULLS LAST ([#332](https://github.com/graphile/graphile-engine/issues/332)) ([545d082](https://github.com/graphile/graphile-engine/commit/545d0822584dcffe1c5d27d0aa2e251e0b7d4683))
-* add `[@deprecated](https://github.com/deprecated)` support to functions ([#340](https://github.com/graphile/graphile-engine/issues/340)) ([a25b19f](https://github.com/graphile/graphile-engine/commit/a25b19f3c4ad8d4427d016f1f40745814efe88f3))
-* add `build.versions` and `build.hasVersion` function ([#339](https://github.com/graphile/graphile-engine/issues/339)) ([4a05670](https://github.com/graphile/graphile-engine/commit/4a05670e6eff1e87257cff510a7f92e9a9b34e54)), closes [#338](https://github.com/graphile/graphile-engine/issues/338)
 * **utils:** makeProcessSchemaPlugin ([#354](https://github.com/graphile/graphile-engine/issues/354)) ([da8b39d](https://github.com/graphile/graphile-engine/commit/da8b39dc31a790342c52d7327a0f5facfdedd12b))
 * **utils:** makeWrapResolversPlugin, makeChangeNullabilityPlugin ([#352](https://github.com/graphile/graphile-engine/issues/352)) ([9393990](https://github.com/graphile/graphile-engine/commit/9393990607e5f2debfe7cbdb8d0c8cbde1a93e1a))
+* add `[@deprecated](https://github.com/deprecated)` support to functions ([#340](https://github.com/graphile/graphile-engine/issues/340)) ([a25b19f](https://github.com/graphile/graphile-engine/commit/a25b19f3c4ad8d4427d016f1f40745814efe88f3))
+* **indexes:** introspect index column properties (asc, nulls first) ([#335](https://github.com/graphile/graphile-engine/issues/335)) ([6925d6d](https://github.com/graphile/graphile-engine/commit/6925d6dad7623f3bde233e778b55e2f96cfc76a6))
+* **pg:** support ordering with NULLS FIRST / NULLS LAST ([#332](https://github.com/graphile/graphile-engine/issues/332)) ([545d082](https://github.com/graphile/graphile-engine/commit/545d0822584dcffe1c5d27d0aa2e251e0b7d4683))
+* add `build.versions` and `build.hasVersion` function ([#339](https://github.com/graphile/graphile-engine/issues/339)) ([4a05670](https://github.com/graphile/graphile-engine/commit/4a05670e6eff1e87257cff510a7f92e9a9b34e54)), closes [#338](https://github.com/graphile/graphile-engine/issues/338)
 
 
 
@@ -499,9 +509,9 @@ helpful to you also.
 
 ### Features
 
-* **functions:** support IN / OUT / INOUT arguments and RETURNS TABLE ([#296](https://github.com/graphile/graphile-engine/issues/296)) ([a029c45](https://github.com/graphile/graphile-engine/commit/a029c4599fbc4c36cfc64e9958b1c912e1a3bbd6))
 * `pgIgnoreIndex = false` feature; fix introspection bug ([#324](https://github.com/graphile/graphile-engine/issues/324)) ([8a4e478](https://github.com/graphile/graphile-engine/commit/8a4e478f7f3c34f7d328a14f50efbece66048f9c))
 * `pgLegacyFunctionsOnly` option ([#325](https://github.com/graphile/graphile-engine/issues/325)) ([4c1cfb9](https://github.com/graphile/graphile-engine/commit/4c1cfb9d0fe4dd307cb32894996c9b1764c997e9))
+* **functions:** support IN / OUT / INOUT arguments and RETURNS TABLE ([#296](https://github.com/graphile/graphile-engine/issues/296)) ([a029c45](https://github.com/graphile/graphile-engine/commit/a029c4599fbc4c36cfc64e9958b1c912e1a3bbd6))
 
 
 
@@ -516,10 +526,10 @@ helpful to you also.
 
 ### Features
 
-* **debug:** enhance SQL debugging ([#317](https://github.com/graphile/graphile-engine/issues/317)) ([128b0d5](https://github.com/graphile/graphile-engine/commit/128b0d5308e43e422b6104b11b1ac0b6db62671c))
-* **inflector:** better errors, overriding possible with makeAddInflectorsPlugin ([#315](https://github.com/graphile/graphile-engine/issues/315)) ([f437721](https://github.com/graphile/graphile-engine/commit/f4377215d1a507c7ce74f9eccb15e4187f03da29))
 * detect invalid skipPlugins option ([#320](https://github.com/graphile/graphile-engine/issues/320)) ([48f2acf](https://github.com/graphile/graphile-engine/commit/48f2acf49b230001f7535a88a45f6d9b73e8d5c6))
 * make skipping NodePlugin easier ([#319](https://github.com/graphile/graphile-engine/issues/319)) ([532fd40](https://github.com/graphile/graphile-engine/commit/532fd40406a22c658f6f287b290937e81950008e)), closes [#310](https://github.com/graphile/graphile-engine/issues/310)
+* **debug:** enhance SQL debugging ([#317](https://github.com/graphile/graphile-engine/issues/317)) ([128b0d5](https://github.com/graphile/graphile-engine/commit/128b0d5308e43e422b6104b11b1ac0b6db62671c))
+* **inflector:** better errors, overriding possible with makeAddInflectorsPlugin ([#315](https://github.com/graphile/graphile-engine/issues/315)) ([f437721](https://github.com/graphile/graphile-engine/commit/f4377215d1a507c7ce74f9eccb15e4187f03da29))
 
 
 ### Performance Improvements
@@ -830,9 +840,9 @@ helpful to you also.
 
 ### Features
 
+* one-to-one relationships ([#177](https://github.com/graphile/graphile-engine/issues/177)) ([18012df](https://github.com/graphile/graphile-engine/commit/18012dfafda92ee61d861afb6bbe67881be70dd6))
 * **errors:** Check inflectors give non-empty string ([#170](https://github.com/graphile/graphile-engine/issues/170)) ([5e2e697](https://github.com/graphile/graphile-engine/commit/5e2e6979a1ea413350b5d22b17286b56f1b19825))
 * **sql:** support more symbol enums ([#171](https://github.com/graphile/graphile-engine/issues/171)) ([552148e](https://github.com/graphile/graphile-engine/commit/552148e238475c95839e0d5fb3147d08868f3fd5))
-* one-to-one relationships ([#177](https://github.com/graphile/graphile-engine/issues/177)) ([18012df](https://github.com/graphile/graphile-engine/commit/18012dfafda92ee61d861afb6bbe67881be70dd6))
 
 
 
@@ -859,10 +869,10 @@ helpful to you also.
 
 ### Features
 
-* support enums with asterisks in ([#163](https://github.com/graphile/graphile-engine/issues/163)) ([cbbf3ea](https://github.com/graphile/graphile-engine/commit/cbbf3ea17926cb3af108b7b799844e36cde99843))
 * **errors:** Better clash error messages ([#164](https://github.com/graphile/graphile-engine/issues/164)) ([faf3b8d](https://github.com/graphile/graphile-engine/commit/faf3b8db585ff6275b9c40ea3ee48970d180ae3c))
 * **errors:** Warn when one or more of the schemas you've specified are missing ([#165](https://github.com/graphile/graphile-engine/issues/165)) ([f422783](https://github.com/graphile/graphile-engine/commit/f422783251356ed4c9e05e75d74116964d1c1a01))
 * **pg:** duck-type PG to prevent 'provide valid PG client' error ([#168](https://github.com/graphile/graphile-engine/issues/168)) ([d5ed9a9](https://github.com/graphile/graphile-engine/commit/d5ed9a935f7947210f2decfed3d447044ba896a2))
+* support enums with asterisks in ([#163](https://github.com/graphile/graphile-engine/issues/163)) ([cbbf3ea](https://github.com/graphile/graphile-engine/commit/cbbf3ea17926cb3af108b7b799844e36cde99843))
 
 
 
@@ -1009,8 +1019,8 @@ helpful to you also.
 
 ### Features
 
-* **graphile-build-pg:** export case-altering functions ([#54](https://github.com/graphile/graphile-engine/issues/54)) ([fd5fe1c](https://github.com/graphile/graphile-engine/commit/fd5fe1c3f39838b7c4fd3753601ba6f281f8b708))
 * export case utils ([#58](https://github.com/graphile/graphile-engine/issues/58)) ([8531671](https://github.com/graphile/graphile-engine/commit/85316717f433e0e6b6fed0889fba5306033a4151))
+* **graphile-build-pg:** export case-altering functions ([#54](https://github.com/graphile/graphile-engine/issues/54)) ([fd5fe1c](https://github.com/graphile/graphile-engine/commit/fd5fe1c3f39838b7c4fd3753601ba6f281f8b708))
 
 
 
@@ -1329,12 +1339,12 @@ helpful to you also.
 
 ### Features
 
+* recursive field generators ([37d73c1](https://github.com/graphile/graphile-engine/commit/37d73c179bec33bd71daee784cbe451cd41e0a1c))
+* **resolveInfo:** can now process arguments ([c94eeb2](https://github.com/graphile/graphile-engine/commit/c94eeb2ae2850a5f2e5388b3c917dc62b1c3ce42))
 * Add parsing of resolveInfo ([6ae734f](https://github.com/graphile/graphile-engine/commit/6ae734fb6b7135802630d9008ba6cb3abaa22b13))
 * Introduce buildFieldWithHooks ([76cb2af](https://github.com/graphile/graphile-engine/commit/76cb2af372e8b719aa27dc5d4c58ee79f51abc56))
 * Introduce buildObjectWithHooks ([94b9d6f](https://github.com/graphile/graphile-engine/commit/94b9d6f10022ac64695a0cbc57e34f1c956949f9))
 * Introduce SchemaBuilder ([2b6d5f3](https://github.com/graphile/graphile-engine/commit/2b6d5f37ccdcebdd1a0e6866e8db2df029a3fc0b))
-* **resolveInfo:** can now process arguments ([c94eeb2](https://github.com/graphile/graphile-engine/commit/c94eeb2ae2850a5f2e5388b3c917dc62b1c3ce42))
-* recursive field generators ([37d73c1](https://github.com/graphile/graphile-engine/commit/37d73c179bec33bd71daee784cbe451cd41e0a1c))
 * start enabling field data ([62ac647](https://github.com/graphile/graphile-engine/commit/62ac647c7abff456334576b88cc3fee3574ed669))
 * Unique object for each build ([94a10d5](https://github.com/graphile/graphile-engine/commit/94a10d5f4eecbcb37bf82e2669d1d0fecbcedc40))
 
