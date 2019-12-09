@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "tsc",
-    "watch": "tsc --watch",
+    "prepack": "tsc -b",
+    "watch": "tsc -b --watch",
     "test": "jest"
   },
   "repository": {

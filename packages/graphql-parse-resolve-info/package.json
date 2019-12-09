@@ -6,8 +6,7 @@
   "types": "node8plus/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prepack": "mkdir -p node8plus && tsc && tsc --target esnext --lib esnext --outDir build-turbo --declarationDir build-turbo",
-    "watch": "mkdir -p node8plus && tsc --watch"
+    "prepack": "tsc -b && tsc --target ES2019 --lib ES2018 --outDir build-turbo --declarationDir build-turbo"
   },
   "repository": {
     "type": "git",

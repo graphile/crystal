@@ -6,11 +6,10 @@
   "types": "node8plus/index.d.ts",
   "scripts": {
     "jest": "jest",
-    "test": "tsc && node node8plus/index.js && jest && markdown-doctest",
-    "test:u": "tsc && node node8plus/index.js && jest -u && markdown-doctest",
+    "test": "tsc -b && node node8plus/index.js && jest && markdown-doctest",
+    "test:u": "tsc -b && node node8plus/index.js && jest -u && markdown-doctest",
     "test:docs": "markdown-doctest",
-    "watch": "tsc --watch",
-    "prepack": "tsc"
+    "prepack": "tsc -b"
   },
   "repository": {
     "type": "git",

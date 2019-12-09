@@ -6,7 +6,7 @@
     "lint:fix": "yarn run lint --fix && prettier --write '**/*.{json,md,html}'",
     "test": "lerna run --concurrency 1 test",
     "prepack:all": "scripts/prepack-all",
-    "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
+    "watch": "tsc -b --watch",
     "clean": "rm -Rf packages/*/node8plus/",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md"

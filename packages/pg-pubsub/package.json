@@ -6,8 +6,7 @@
   "scripts": {
     "db:init": "psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f __tests__/schema.sql \"$TEST_DATABASE_URL\"",
     "test": "npm run db:init && jest -i",
-    "prepack": "tsc",
-    "watch": "tsc --watch"
+    "prepack": "tsc -b"
   },
   "repository": {
     "type": "git",
