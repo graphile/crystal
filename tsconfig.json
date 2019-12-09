@@ -21,7 +21,7 @@
     "lib": ["es2018", "esnext.asynciterable"],
     "noEmit": true
   },
-  "exclude": ["node_modules", "node8plus", "build-turbo"],
+  "exclude": ["node_modules", "node8plus", "dist-turbo"],
   "include": ["packages"],
   "references": [
     { "path": "packages/graphile-build" },

@@ -3,6 +3,6 @@
 node_modules
 node7minus
 node8plus
-build-turbo
+dist-turbo
 examples
 dist

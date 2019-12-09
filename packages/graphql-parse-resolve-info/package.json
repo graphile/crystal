@@ -6,7 +6,7 @@
   "types": "node8plus/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prepack": "tsc -b && tsc --target ES2019 --lib ES2018 --outDir build-turbo --declarationDir build-turbo"
+    "prepack": "tsc -b && tsc --target ES2019 --lib ES2018 --outDir dist-turbo --declarationDir dist-turbo"
   },
   "repository": {
     "type": "git",
@@ -46,7 +46,7 @@
   "files": [
     "node8plus",
     "index.js",
-    "build-turbo"
+    "dist-turbo"
   ],
   "engines": {
     "node": ">=8.6"
