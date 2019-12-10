@@ -15,7 +15,7 @@ import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
+import { HttpRequestHandler, CreateRequestHandlerOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import { Context as KoaContext } from 'koa';
@@ -50,6 +50,7 @@ import favicon from '../../assets/favicon.ico';
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
 import { enhanceHttpServerWithSubscriptions } from './subscriptions';
+import { GraphileResolverContext } from 'postgraphile-core';
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
@@ -107,21 +108,19 @@ const debugRequest = Debugger('postgraphile:request');
  * We need to be able to share the withPostGraphileContext logic between HTTP
  * and websockets
  */
-function withPostGraphileContextFromReqResGenerator(
-  options: CreateRequestHandlerOptions,
-): (
-  req: IncomingMessage,
-  res: ServerResponse,
-  moreOptions: any,
-  fn: (ctx: mixed) => any,
-) => Promise<any> {
+function withPostGraphileContextFromReqResGenerator(options: CreateRequestHandlerOptions) {
   const {
     pgSettings: pgSettingsGenerator,
     allowExplain: allowExplainGenerator,
     jwtSecret,
     additionalGraphQLContextFromRequest,
   } = options;
-  return async (req, res, moreOptions, fn) => {
+  return async <TResult>(
+    req: IncomingMessage,
+    res: ServerResponse,
+    moreOptions: any,
+    fn: (ctx: GraphileResolverContext) => Promise<TResult> | TResult,
+  ): Promise<TResult> => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
@@ -135,7 +134,7 @@ function withPostGraphileContextFromReqResGenerator(
       typeof allowExplainGenerator === 'function'
         ? await allowExplainGenerator(req)
         : allowExplainGenerator;
-    return withPostGraphileContext(
+    return withPostGraphileContext<TResult>(
       {
         ...options,
         jwtToken,
@@ -144,9 +143,7 @@ function withPostGraphileContextFromReqResGenerator(
         ...moreOptions,
       },
       context => {
-        const graphqlContext = additionalContext
-          ? { ...additionalContext, ...(context as object) }
-          : context;
+        const graphqlContext = additionalContext ? { ...additionalContext, ...context } : context;
         return fn(graphqlContext);
       },
     );
@@ -610,7 +607,7 @@ export default function createPostGraphileHttpRequestHandler(
       statusCode?: number;
     }> = [];
     const queryTimeStart = !disableQueryLog && process.hrtime();
-    let pgRole: string;
+    let pgRole: string | undefined;
 
     if (debugRequest.enabled) debugRequest('GraphQL query request has begun.');
     let returnArray = false;
@@ -765,7 +762,7 @@ export default function createPostGraphileHttpRequestHandler(
                   variables,
                   operationName,
                 },
-                (graphqlContext: any) => {
+                (graphqlContext: GraphileResolverContext) => {
                   pgRole = graphqlContext.pgRole;
                   const graphqlResult = executeGraphql(
                     gqlSchema,
@@ -775,11 +772,12 @@ export default function createPostGraphileHttpRequestHandler(
                     variables,
                     operationName,
                   );
-                  if (typeof graphqlContext.getExplainResults === 'function') {
+                  const { getExplainResults } = graphqlContext;
+                  if (typeof getExplainResults === 'function') {
                     return Promise.resolve(graphqlResult).then(async obj => ({
                       ...obj,
                       // Add our explain data
-                      explain: await graphqlContext.getExplainResults(),
+                      explain: await getExplainResults(),
                     }));
                   } else {
                     return graphqlResult;
