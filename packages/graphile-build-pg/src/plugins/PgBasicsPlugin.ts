@@ -443,7 +443,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       this: Inflection,
       proc: PgProc,
       gqlType: import("graphql").GraphQLNamedType,
-      plural: boolean = false,
+      plural = false,
       outputArgNames: Array<string> = []
     ): string {
       const resultFieldName = stringTag(proc, "resultFieldName");

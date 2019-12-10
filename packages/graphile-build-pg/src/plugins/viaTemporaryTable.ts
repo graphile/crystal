@@ -39,7 +39,7 @@ export default async function viaTemporaryTable(
   sqlMutationQuery: SQL,
   sqlResultSourceAlias: SQL,
   sqlResultQuery: SQL,
-  isPgClassLike: boolean = true,
+  isPgClassLike = true,
   pgRecordInfo:
     | {
         outputArgTypes: Array<any>;

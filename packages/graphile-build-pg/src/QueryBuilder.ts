@@ -487,7 +487,7 @@ ${sql.join(
   }
   orderBy(
     exprGen: SQLGen,
-    ascending: boolean = true,
+    ascending = true,
     nullsFirst: boolean | null = null
   ) {
     this.checkLock("orderBy");
@@ -533,7 +533,7 @@ ${sql.join(
 
   // ----------------------------------------
 
-  isOrderUnique(lock: boolean = true) {
+  isOrderUnique(lock = true) {
     if (lock) {
       this.lock("orderBy");
       this.lock("orderIsUnique");

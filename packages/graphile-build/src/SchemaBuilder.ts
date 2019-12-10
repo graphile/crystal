@@ -1117,7 +1117,7 @@ class SchemaBuilder extends EventEmitter {
     hookName: string,
     input: TConfig,
     context: TContext,
-    debugStr: string = ""
+    debugStr = ""
   ): TConfig {
     if (!input) {
       throw new Error("applyHooks was called with falsy input");
