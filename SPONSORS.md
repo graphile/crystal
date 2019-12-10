@@ -14,8 +14,8 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - DOMONDA
-- James Allain
 - Stagency
+- James Allain
 - 8th Light
 - Jack Dinker
 - Nigel Taylor
@@ -23,25 +23,28 @@ sponsor](https://graphile.org/sponsor/).
 - Partners in School Innovation
 - Sterblue
 - HR-ON
+- DocIQ
+- Ian Stewart
+- Principia Mentis
 
 ## Supporters
 
 - Daniel Einspanger
-- Michael Tng
 - Sam Levin
 - Matt Bretl (also a major community contributor!)
 - stlbucket
 - Michel Pelletier
-- Dan Lynch
-- James Rascoe
 - Chris Watland
-- James Cavanaugh
+- James Rascoe
+- Dan Lynch
 - Mark Lipscombe
 - purge
+- Robert Claypool
 - Frank
 - Mark Rapoza
 - innovation.rocks
 - cybere
 - dwwoelfel
 - Bjørn Michelsen
-- cj
+- CJ
+- Ben Botwin
