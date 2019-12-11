@@ -7,6 +7,20 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+## [4.5.2](https://github.com/graphile/postgraphile/compare/v4.5.1...v4.5.2) (2019-12-11)
+
+
+### Bug Fixes
+
+* **deps:** solve serialize-javascript issue ([02af643](https://github.com/graphile/postgraphile/commit/02af64361d634ff009a7cf9ab2fd52b510987b9e))
+
+
+### Reverts
+
+* Revert "chore(deps): upgrade PostGraphiQL deps" ([7147e50](https://github.com/graphile/postgraphile/commit/7147e5093aac7488eb14e5e9a517dfb41b881746))
+
+
+
 ## [4.5.1](https://github.com/graphile/postgraphile/compare/v4.5.0...v4.5.1) (2019-12-11)
 
 
