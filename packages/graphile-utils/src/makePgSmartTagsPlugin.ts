@@ -134,13 +134,24 @@ export function makePgSmartTagsPlugin(
               pgIntrospectionResultsByKind
             );
           }
+
+          /**
+           * The introspection results aren't currently on Build (we're helping
+           * this happen now!), so we're going to fake it to make the API more
+           * straightforward
+           */
+          const buildWithIntrospection = {
+            ...build,
+            pgIntrospectionResultsByKind,
+          };
+
           rules.forEach((rule, idx) => {
             const relevantIntrospectionResults: PgEntity[] =
               pgIntrospectionResultsByKind[rule.kind];
 
             let hits = 0;
             relevantIntrospectionResults.forEach(entity => {
-              if (!rule.match(entity, build)) {
+              if (!rule.match(entity, buildWithIntrospection)) {
                 return;
               }
               hits++;

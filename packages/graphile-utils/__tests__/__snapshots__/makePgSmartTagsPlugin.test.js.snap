@@ -249,7 +249,7 @@ type TestSmartTag implements Node {
   """
   nodeId: ID!
   email: String!
-  value: Int
+  val: Int
 
   """Reads a single \`User\` that is related to this \`TestSmartTag\`."""
   userByEmail: User
@@ -263,8 +263,8 @@ input TestSmartTagCondition {
   """Checks for equality with the object’s \`email\` field."""
   email: String
 
-  """Checks for equality with the object’s \`value\` field."""
-  value: Int
+  """Checks for equality with the object’s \`val\` field."""
+  val: Int
 }
 
 """A connection to a list of \`TestSmartTag\` values."""
@@ -298,8 +298,8 @@ enum TestSmartTagsOrderBy {
   NATURAL
   EMAIL_ASC
   EMAIL_DESC
-  VALUE_ASC
-  VALUE_DESC
+  VAL_ASC
+  VAL_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }

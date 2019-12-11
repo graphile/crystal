@@ -32,6 +32,13 @@ it("allows adding a custom single field to PG schema", async () => {
                 primaryKey: "email",
                 foreignKey: "(email) references graphile_utils.users (email)",
               },
+              attribute: {
+                value: {
+                  tags: {
+                    name: "val",
+                  },
+                },
+              },
             },
           },
         },
@@ -50,7 +57,7 @@ it("allows adding a custom single field to PG schema", async () => {
               email
               testSmartTagByEmail {
                 email
-                value
+                val
               }
             }
           }
@@ -74,14 +81,14 @@ it("allows adding a custom single field to PG schema", async () => {
               "email": "bob@example.com",
               "testSmartTagByEmail": Object {
                 "email": "bob@example.com",
-                "value": 42,
+                "val": 42,
               },
             },
             Object {
               "email": "caroline@example.com",
               "testSmartTagByEmail": Object {
                 "email": "caroline@example.com",
-                "value": 9999,
+                "val": 9999,
               },
             },
           ],
